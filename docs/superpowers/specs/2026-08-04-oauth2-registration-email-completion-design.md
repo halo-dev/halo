@@ -51,8 +51,8 @@
 - 开启时，已登录用户 `spec.emailVerified == false`（空邮箱视为未验证）即被拦截。
 - “注册需验证邮箱”关闭时不拦截任何人，即使邮箱为空。
 - 超级管理员（authorities 含 `ROLE_super-role`）始终豁免。
-- HTML 请求：302 到 `/complete-profile`，原目标存入请求缓存。
-- 非页面请求（API/XHR）：403 ProblemDetails，固定 `type = email-not-set`。本期不做前端拦截器。
+- 显式页面请求（`Accept` 包含 `text/html` 且不是 XHR；不限 HTTP 方法）：302 到 `/complete-profile`，原目标存入请求缓存。
+- 非页面请求（API/XHR，以及仅声明 `Accept: */*` 的请求）：403 ProblemDetails，固定 `type = email-not-set`。本期不做前端拦截器。
 
 ### 补邮箱页
 
@@ -83,6 +83,7 @@
 |--------------------------------|-------------------------------------------------------------|
 | `OAuth2RegistrationService`（新） | 注册核心逻辑：用户名/显示名/邮箱推导、随机兜底、幂等、创建用户与连接。可独立单元测试。                |
 | 预认证端点（新，`/login` 下）            | 渲染 `/login?oauth2_select`；处理 `POST /login/oauth2/register`。 |
+| `AgreementPageFetcher`（新）      | 仅为 OAuth2 选择页加载全部必选协议；任一协议缺失或读取失败时终止渲染。                     |
 | `EmailCompletionFilter`（新）     | 门禁 WebFilter，插在认证过滤器之后。                                     |
 | 补邮箱端点（新，`/complete-profile` 下） | 渲染页面、发送验证码、提交邮箱与验证码。                                        |
 | 网关模板（新）                        | `oauth2_select` 片段、`complete_profile` 页面。                   |
@@ -94,7 +95,7 @@
 
 - Session 缓存中 OAuth2 身份对应的登录方式名称与头像（通过 `registrationId` 查询 `AuthProvider`）。
 - `allowRegistration`。
-- `requiredAgreementPages`（配置了才显示勾选框）。
+- `requiredAgreementPages`（配置了才显示勾选框）；每个已配置页面都必须成功读取，缺失或读取失败时选择页失败关闭，不能在未展示完整协议的情况下继续注册。
 - 错误提示参数。
 
 Session 中没有缓存身份时，重定向回 `/login`。
@@ -107,7 +108,9 @@ Session 中没有缓存身份时，重定向回 `/login`。
 2. 校验 `allowRegistration`；校验协议勾选（配置了协议页时）；校验 `defaultRole` 已配置。
 3. 幂等检查：按 `registrationId + providerUserId` 查询 `UserConnection`，已存在则跳过创建，直接进入登录步骤。
 4. 按注册规则推导用户名、显示名、邮箱并创建用户。
-5. 创建 `UserConnection`；若创建失败（如并发已绑定），补偿删除刚创建的用户并报错。
+5. 创建 `UserConnection`：
+   - 创建成功则使用刚创建的用户名继续登录。
+   - 创建失败时先补偿删除刚创建的用户，再重新查询相同 `registrationId + providerUserId`；若并发请求已经创建连接，则使用胜出连接的用户名继续登录，否则传播原始错误。
 6. 通过 `userDetailsService.findByUsername` 构建 `HaloOAuth2AuthenticationToken`，保存安全上下文。
 7. 调用 `loginHandlerEnhancer.onLoginSuccess`（沿用现有逻辑：更新连接、清理 Session 缓存、设备记录、登录处理）。
 8. 跳转：命中门禁 → `/complete-profile`；否则请求缓存中的原目标（默认 `/uc`）。
@@ -116,12 +119,12 @@ Session 中没有缓存身份时，重定向回 `/login`。
 
 - 以 `SecurityConfigurer` 方式加入，插在认证过滤器之后、授权过滤器之前。
 - 未认证请求放行。
-- 豁免路径：`/oauth2/**`、`/login/**`、`/signup`、`/password-reset/**`、`/logout`、`/complete-profile/**`、`/system/setup`、`/error`、静态资源。
+- 豁免路径：`/oauth2/**`、`/login/**`、`/signup`、`/password-reset/**`、`/logout`、`/complete-profile/**`、`/system/setup`、`/error`、静态资源。单路径仅精确匹配，目录仅匹配自身或其 `/` 后代，不能因字符串前缀相同而豁免（例如 `/logout-history`）。
 - 超级管理员放行。
 - 读取 `SystemSetting.User.mustVerifyEmailOnRegistration`：关闭则放行。
 - 开启时读取当前用户，`emailVerified == false`：
-  - HTML 请求：302 `/complete-profile`，原目标存入 `HaloServerRequestCache`。
-  - 其他请求：403 ProblemDetails，`type = email-not-set`。
+  - 显式页面请求（`Accept` 包含 `text/html`、不是 XHR，不限 HTTP 方法）：302 `/complete-profile`，原目标存入 `HaloServerRequestCache`。
+  - 其他请求（包括 XHR 和仅 `Accept: */*`）：403 ProblemDetails，`type = email-not-set`。
 
 ### 补邮箱端点
 
@@ -138,8 +141,9 @@ Session 中没有缓存身份时，重定向回 `/login`。
 
 - 开放注册关闭、协议未勾选、默认角色缺失 → 选择页重渲染错误，不创建任何数据。
 - 随机用户名重试 20 次仍冲突 → 报错，不落库部分数据。
-- 连接已存在（重复提交/并发）→ 直接登录，不重复创建用户。
-- 用户创建成功但连接创建失败 → 补偿删除用户并报错。
+- 连接已存在（重复提交）→ 直接登录，不重复创建用户。
+- 用户创建成功但连接创建失败 → 补偿删除用户；若重新查询发现并发胜出的连接，则登录胜出账号，否则传播原始错误。
+- 任一必选协议页缺失或读取失败 → 选择页失败关闭，不展示不完整协议，也不允许注册。
 - 注册成功后写入的是 `HaloOAuth2AuthenticationToken`（不是 `OAuth2AuthenticationToken`），`MapOAuth2AuthenticationFilter` 不会二次映射。
 - 补邮箱页发送验证码失败/限流/邮箱占用 → 复用现有异常与表单错误展示。
 
@@ -154,11 +158,12 @@ Session 中没有缓存身份时，重定向回 `/login`。
 ## 测试
 
 - 单元：
-  - `OAuth2RegistrationService`：用户名规范化与随机兜底、显示名回退、邮箱占用、OIDC `email_verified` 分支、幂等。
+  - `OAuth2RegistrationService`：所有用户名属性来源、4/63 位边界、保留名回退、20 次随机冲突耗尽、显示名回退、邮箱占用、OIDC 邮箱缺失与 `email_verified` 分支、幂等和并发连接竞争。
   - 随机用户名生成。
 - 集成：
-  - 注册端点：成功创建用户+连接+登录态；开放注册关闭拒绝；协议必选；token 清理。
-  - 门禁过滤器：开关开/关、空邮箱/未验证/已验证、超级管理员豁免、HTML 302、JSON 403 `type`、豁免路径。
+  - 注册服务真实持久化：无邮箱用户、默认角色和 `UserConnection` 可通过对应服务读取。
+  - 注册端点：成功创建用户+连接+登录态；开放注册关闭拒绝；协议必选；协议页缺失失败关闭；token 清理。
+  - 门禁过滤器：开关开/关、空邮箱/未验证/已验证、超级管理员豁免、显式 HTML 302、JSON/XHR/`Accept: */*` 返回 403 `type`、精确与后代豁免路径、相似前缀不豁免。
   - `/complete-profile`：必填/可选验证码、邮箱占用报错、发送验证码限流。
   - 空邮箱用户落库。
 
@@ -166,4 +171,5 @@ Session 中没有缓存身份时，重定向回 `/login`。
 
 - 前端拦截器消费 `email-not-set`（本期仅后端拦截）。
 - 手机号补充：页面 URL 与命名已为“完善资料”预留，后续可扩展字段或分步提交。
+- 普通 `/signup` 协议页加载逻辑重构；`AgreementPageFetcher` 本期仅服务 OAuth2 选择页。
 

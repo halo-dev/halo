@@ -12,6 +12,9 @@ import io.github.resilience4j.reactor.ratelimiter.operator.RateLimiterOperator;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import java.net.URI;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 import lombok.Data;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.Ordered;
@@ -19,16 +22,22 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.Validator;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.core.user.service.EmailVerificationService;
 import run.halo.app.core.user.service.SignUpData;
 import run.halo.app.core.user.service.UserService;
+import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.infra.SystemConfigFetcher;
+import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.actuator.GlobalInfoService;
 import run.halo.app.infra.exception.*;
 import run.halo.app.infra.utils.HaloUtils;
@@ -53,7 +62,9 @@ class PreAuthSignUpEndpoint {
 
     private final RateLimiterRegistry rateLimiterRegistry;
 
-    private final AgreementPageFetcher agreementPageFetcher;
+    private final SystemConfigFetcher systemConfigFetcher;
+
+    private final ReactiveExtensionClient client;
 
     PreAuthSignUpEndpoint(
             GlobalInfoService globalInfoService,
@@ -61,13 +72,15 @@ class PreAuthSignUpEndpoint {
             UserService userService,
             EmailVerificationService emailVerificationService,
             RateLimiterRegistry rateLimiterRegistry,
-            AgreementPageFetcher agreementPageFetcher) {
+            SystemConfigFetcher systemConfigFetcher,
+            ReactiveExtensionClient client) {
         this.globalInfoService = globalInfoService;
         this.validator = validator;
         this.userService = userService;
         this.emailVerificationService = emailVerificationService;
         this.rateLimiterRegistry = rateLimiterRegistry;
-        this.agreementPageFetcher = agreementPageFetcher;
+        this.systemConfigFetcher = systemConfigFetcher;
+        this.client = client;
     }
 
     @Bean
@@ -81,7 +94,7 @@ class PreAuthSignUpEndpoint {
                             var bindingResult = new BeanPropertyBindingResult(signUpData, "form");
                             var model = bindingResult.getModel();
                             model.put("globalInfo", globalInfoService.getGlobalInfo());
-                            model.put("agreementPages", agreementPageFetcher.fetchAgreementPages());
+                            model.put("agreementPages", fetchAgreementPages());
                             return ServerResponse.ok().render("signup", model);
                         })
                         .POST(
@@ -92,7 +105,7 @@ class PreAuthSignUpEndpoint {
                                     var bindingResult = validate(signUpData, validator, request.exchange());
                                     var model = bindingResult.getModel();
                                     model.put("globalInfo", globalInfoService.getGlobalInfo());
-                                    model.put("agreementPages", agreementPageFetcher.fetchAgreementPages());
+                                    model.put("agreementPages", fetchAgreementPages());
                                     if (bindingResult.hasErrors()) {
                                         return ServerResponse.ok().render("signup", model);
                                     }
@@ -174,6 +187,31 @@ class PreAuthSignUpEndpoint {
         var rateLimiterKey = "send-email-code-for-signing-up-from-" + clientIp;
         var rateLimiter = rateLimiterRegistry.rateLimiter(rateLimiterKey, "send-email-verification-code");
         return RateLimiterOperator.of(rateLimiter);
+    }
+
+    private Mono<List<HashMap<String, String>>> fetchAgreementPages() {
+        return Optional.ofNullable(systemConfigFetcher)
+                .map(fetcher -> fetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class)
+                        .flatMapMany(userSetting -> {
+                            var pages = userSetting.getRequiredAgreementPages();
+                            if (CollectionUtils.isEmpty(pages)) {
+                                return Flux.empty();
+                            }
+                            return Flux.fromIterable(pages);
+                        })
+                        .flatMap(pageName -> client.fetch(SinglePage.class, pageName)
+                                .map(page -> {
+                                    var map = new HashMap<String, String>();
+                                    map.put("title", page.getSpec().getTitle());
+                                    var status = page.getStatus();
+                                    if (status != null) {
+                                        map.put("permalink", status.getPermalink());
+                                    }
+                                    return map;
+                                })
+                                .onErrorResume(e -> Mono.empty()))
+                        .collectList())
+                .orElseGet(() -> Mono.just(List.of()));
     }
 
     @Data

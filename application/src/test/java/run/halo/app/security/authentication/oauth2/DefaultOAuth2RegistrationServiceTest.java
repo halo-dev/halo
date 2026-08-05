@@ -16,9 +16,14 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -67,6 +72,7 @@ class DefaultOAuth2RegistrationServiceTest {
                 client, userService, connectionService, systemConfigFetcher, validator, clock);
         lenient().when(clock.instant()).thenReturn(Instant.parse("2026-08-04T00:00:00Z"));
         lenient().when(validator.validate(any())).thenReturn(Set.of());
+        lenient().when(userService.checkEmailAlreadyVerified(anyString())).thenReturn(Mono.just(false));
     }
 
     SystemSetting.User userSetting() {
@@ -79,6 +85,35 @@ class DefaultOAuth2RegistrationServiceTest {
     OAuth2AuthenticationToken token(String name, Map<String, Object> attributes) {
         var user = new DefaultOAuth2User(List.of(new SimpleGrantedAuthority("ROLE_authenticated")), attributes, "sub");
         return new OAuth2AuthenticationToken(user, List.of(), "github");
+    }
+
+    AtomicReference<User> stubSuccessfulRegistration(
+            SystemSetting.User setting, String providerUserId, String expectedUsername) {
+        when(systemConfigFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
+                .thenReturn(Mono.just(setting));
+        when(connectionService.getByProviderUserId("github", providerUserId)).thenReturn(Mono.empty());
+        when(client.fetch(User.class, expectedUsername)).thenReturn(Mono.empty());
+        var created = new AtomicReference<User>();
+        when(userService.createUser(any(User.class), eq(Set.of(setting.getDefaultRole()))))
+                .thenAnswer(invocation -> {
+                    created.set(invocation.getArgument(0));
+                    return Mono.just(created.get());
+                });
+        when(userService.getUser(expectedUsername)).thenAnswer(invocation -> Mono.just(created.get()));
+        when(connectionService.createUserConnection(eq(expectedUsername), eq("github"), any()))
+                .thenReturn(Mono.just(new UserConnection()));
+        return created;
+    }
+
+    static Stream<Arguments> remainingUsernameAttributes() {
+        return Stream.of(
+                Arguments.of("username", "UsernameCandidate", "usernamecandidate"),
+                Arguments.of("user_name", "user-name-candidate", "user-name-candidate"),
+                Arguments.of("nickname", "NickName", "nickname"));
+    }
+
+    static Stream<String> validBoundaryUsernames() {
+        return Stream.of("abcd", "a" + "b".repeat(62));
     }
 
     @Test
@@ -148,6 +183,32 @@ class DefaultOAuth2RegistrationServiceTest {
         var captor = org.mockito.ArgumentCaptor.forClass(User.class);
         verify(userService).createUser(captor.capture(), anySet());
         assertThat(captor.getValue().getMetadata().getName()).isEqualTo("alice");
+    }
+
+    @ParameterizedTest
+    @MethodSource("remainingUsernameAttributes")
+    void shouldUseRemainingCommonUsernameAttributes(String attribute, String value, String expectedUsername) {
+        var providerUserId = "sub-" + attribute.replace('_', '-');
+        var created = stubSuccessfulRegistration(userSetting(), providerUserId, expectedUsername);
+        var attributes = new java.util.HashMap<String, Object>();
+        attributes.put("sub", providerUserId);
+        attributes.put(attribute, value);
+
+        StepVerifier.create(service.register(token(providerUserId, attributes), false))
+                .assertNext(result -> assertThat(result.username()).isEqualTo(expectedUsername))
+                .verifyComplete();
+
+        assertThat(created.get().getMetadata().getName()).isEqualTo(expectedUsername);
+    }
+
+    @ParameterizedTest
+    @MethodSource("validBoundaryUsernames")
+    void shouldAcceptUsernameLengthBoundaries(String username) {
+        stubSuccessfulRegistration(userSetting(), username, username);
+
+        StepVerifier.create(service.register(token(username, Map.of("sub", username)), false))
+                .assertNext(result -> assertThat(result.username()).isEqualTo(username))
+                .verifyComplete();
     }
 
     @Test
@@ -220,6 +281,69 @@ class DefaultOAuth2RegistrationServiceTest {
     }
 
     @Test
+    void shouldUseRandomUsernameWhenCandidateIsProtected() {
+        var setting = userSetting();
+        setting.setProtectedUsernames("alice");
+        when(systemConfigFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
+                .thenReturn(Mono.just(setting));
+        when(connectionService.getByProviderUserId("github", "alice")).thenReturn(Mono.empty());
+        when(client.fetch(eq(User.class), anyString())).thenReturn(Mono.empty());
+        var created = new AtomicReference<User>();
+        when(userService.createUser(any(User.class), anySet())).thenAnswer(invocation -> {
+            created.set(invocation.getArgument(0));
+            return Mono.just(created.get());
+        });
+        when(userService.getUser(anyString())).thenAnswer(invocation -> Mono.just(created.get()));
+        when(connectionService.createUserConnection(anyString(), anyString(), any()))
+                .thenReturn(Mono.just(new UserConnection()));
+
+        StepVerifier.create(service.register(token("alice", Map.of("sub", "alice")), false))
+                .assertNext(result -> assertThat(result.username()).matches("user-[a-z0-9]{8}"))
+                .verifyComplete();
+    }
+
+    @Test
+    void shouldFailAfterTwentyRandomUsernameCollisions() {
+        when(systemConfigFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
+                .thenReturn(Mono.just(userSetting()));
+        when(connectionService.getByProviderUserId("github", "alice")).thenReturn(Mono.empty());
+        when(client.fetch(eq(User.class), anyString())).thenReturn(Mono.just(new User()));
+
+        StepVerifier.create(service.register(token("alice", Map.of("sub", "alice")), false))
+                .expectError(ServerWebInputException.class)
+                .verify();
+
+        verify(client, org.mockito.Mockito.times(21)).fetch(eq(User.class), anyString());
+        verify(userService, never()).createUser(any(), anySet());
+    }
+
+    @Test
+    void shouldUseDisplayNameAttribute() {
+        var displayNameUser = stubSuccessfulRegistration(userSetting(), "display-sub", "alice");
+        StepVerifier.create(service.register(
+                        token(
+                                "display-sub",
+                                Map.of("sub", "display-sub", "login", "alice", "display_name", "Alice Display")),
+                        false))
+                .expectNextCount(1)
+                .verifyComplete();
+        assertThat(displayNameUser.get().getSpec().getDisplayName()).isEqualTo("Alice Display");
+    }
+
+    @Test
+    void shouldFallbackToUsernameWhenDisplayNameIsProtected() {
+        var protectedSetting = userSetting();
+        protectedSetting.setProtectedUsernames("admin");
+        var protectedDisplayNameUser = stubSuccessfulRegistration(protectedSetting, "protected-sub", "bobby");
+        StepVerifier.create(service.register(
+                        token("protected-sub", Map.of("sub", "protected-sub", "login", "bobby", "name", "Admin")),
+                        false))
+                .expectNextCount(1)
+                .verifyComplete();
+        assertThat(protectedDisplayNameUser.get().getSpec().getDisplayName()).isEqualTo("bobby");
+    }
+
+    @Test
     void shouldLeaveEmailBlankWhenEmailIsTaken() {
         when(systemConfigFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
                 .thenReturn(Mono.just(userSetting()));
@@ -287,6 +411,19 @@ class DefaultOAuth2RegistrationServiceTest {
         verify(userService).createUser(captor.capture(), anySet());
         assertThat(captor.getValue().getSpec().getEmail()).isEqualTo("user@example.com");
         assertThat(captor.getValue().getSpec().isEmailVerified()).isFalse();
+    }
+
+    @Test
+    void shouldLeaveEmailBlankWhenOidcEmailClaimIsMissing() {
+        var created = stubSuccessfulRegistration(userSetting(), "sub-123", "sub-123");
+        var oidcUser = mock(OidcUser.class);
+        when(oidcUser.getName()).thenReturn("sub-123");
+        var token = new OAuth2AuthenticationToken(oidcUser, List.of(), "github");
+
+        StepVerifier.create(service.register(token, false)).expectNextCount(1).verifyComplete();
+
+        assertThat(created.get().getSpec().getEmail()).isNull();
+        assertThat(created.get().getSpec().isEmailVerified()).isFalse();
     }
 
     @Test
@@ -365,6 +502,42 @@ class DefaultOAuth2RegistrationServiceTest {
         StepVerifier.create(service.register(token, false))
                 .expectError(IllegalStateException.class)
                 .verify();
+        verify(client).delete(created);
+    }
+
+    @Test
+    void shouldLoginConcurrentWinnerWhenConnectionCreationLosesRace() {
+        when(systemConfigFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
+                .thenReturn(Mono.just(userSetting()));
+        var winnerConnection = new UserConnection();
+        winnerConnection.setMetadata(new Metadata());
+        var connectionSpec = new UserConnection.UserConnectionSpec();
+        connectionSpec.setUsername("winner");
+        winnerConnection.setSpec(connectionSpec);
+        when(connectionService.getByProviderUserId("github", "alice"))
+                .thenReturn(Mono.empty(), Mono.just(winnerConnection));
+        when(client.fetch(User.class, "alice")).thenReturn(Mono.empty());
+        when(userService.checkEmailAlreadyVerified(anyString())).thenReturn(Mono.just(false));
+        var created = new User();
+        created.setMetadata(new Metadata());
+        created.getMetadata().setName("alice");
+        when(userService.createUser(any(User.class), anySet())).thenReturn(Mono.just(created));
+        when(connectionService.createUserConnection(eq("alice"), eq("github"), any()))
+                .thenReturn(Mono.error(new IllegalStateException("already bound")));
+        when(client.delete(created)).thenReturn(Mono.just(created));
+        var winner = new User();
+        winner.setMetadata(new Metadata());
+        winner.getMetadata().setName("winner");
+        var winnerSpec = new User.UserSpec();
+        winnerSpec.setEmailVerified(true);
+        winner.setSpec(winnerSpec);
+        when(userService.getUser("winner")).thenReturn(Mono.just(winner));
+
+        var token = token("alice", Map.of("sub", "alice", "email", "alice@example.com"));
+
+        StepVerifier.create(service.register(token, false))
+                .assertNext(result -> assertThat(result.username()).isEqualTo("winner"))
+                .verifyComplete();
         verify(client).delete(created);
     }
 }

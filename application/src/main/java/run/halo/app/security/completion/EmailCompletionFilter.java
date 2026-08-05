@@ -2,6 +2,7 @@ package run.halo.app.security.completion;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -31,21 +32,18 @@ public class EmailCompletionFilter implements WebFilter {
 
     private static final URI EMAIL_NOT_SET_TYPE = URI.create("email-not-set");
 
+    private static final Set<String> EXEMPT_PATHS = Set.of("/signup", "/logout", "/system/setup", "/error");
+
     private static final List<String> EXEMPT_PATH_PREFIXES = List.of(
             "/oauth2",
             "/login",
-            "/signup",
             "/password-reset",
-            "/logout",
             "/complete-profile",
-            "/system/setup",
-            "/error",
             "/assets",
             "/images",
             "/js",
             "/styles",
-            "/webjars",
-            "/favicon.");
+            "/webjars");
 
     private final SystemConfigFetcher systemConfigFetcher;
     private final UserService userService;
@@ -110,7 +108,10 @@ public class EmailCompletionFilter implements WebFilter {
 
     private boolean isExemptPath(ServerWebExchange exchange) {
         var path = exchange.getRequest().getPath().pathWithinApplication().value();
-        return EXEMPT_PATH_PREFIXES.stream().anyMatch(path::startsWith);
+        return EXEMPT_PATHS.contains(path)
+                || path.startsWith("/favicon.")
+                || EXEMPT_PATH_PREFIXES.stream()
+                        .anyMatch(prefix -> path.equals(prefix) || path.startsWith(prefix + "/"));
     }
 
     private Mono<Void> intercept(ServerWebExchange exchange) {
@@ -127,6 +128,7 @@ public class EmailCompletionFilter implements WebFilter {
             return false;
         }
         return exchange.getRequest().getHeaders().getAccept().stream()
+                .filter(mediaType -> !MediaType.ALL.equals(mediaType))
                 .anyMatch(mediaType -> mediaType.includes(MediaType.TEXT_HTML));
     }
 

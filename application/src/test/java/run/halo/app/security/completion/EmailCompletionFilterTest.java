@@ -110,6 +110,50 @@ class EmailCompletionFilterTest {
     }
 
     @Test
+    void shouldReturnForbiddenForWildcardAcceptRequest() {
+        when(systemConfigFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
+                .thenReturn(Mono.just(setting(true)));
+        when(userService.getUser("user")).thenReturn(Mono.just(user(false)));
+        when(requestCache.saveRequest(any())).thenReturn(Mono.empty());
+
+        var exchange = MockServerWebExchange.from(
+                MockServerHttpRequest.post("/apis/test").accept(MediaType.ALL));
+        var chain = mock(WebFilterChain.class);
+        when(chain.filter(exchange)).thenReturn(Mono.empty());
+
+        filter.filter(exchange, chain)
+                .contextWrite(ReactiveSecurityContextHolder.withAuthentication(
+                        new TestingAuthenticationToken("user", "password", "ROLE_authenticated")))
+                .block();
+
+        assertThat(exchange.getResponse().getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+        assertThat(exchange.getResponse().getBodyAsString().block()).contains("\"type\":\"email-not-set\"");
+        verify(chain, never()).filter(exchange);
+    }
+
+    @Test
+    void shouldReturnForbiddenForXhrThatAcceptsHtml() {
+        when(systemConfigFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
+                .thenReturn(Mono.just(setting(true)));
+        when(userService.getUser("user")).thenReturn(Mono.just(user(false)));
+
+        var exchange = MockServerWebExchange.from(MockServerHttpRequest.get("/apis/test")
+                .accept(MediaType.TEXT_HTML)
+                .header("X-Requested-With", "XMLHttpRequest"));
+        var chain = mock(WebFilterChain.class);
+        when(chain.filter(exchange)).thenReturn(Mono.empty());
+
+        filter.filter(exchange, chain)
+                .contextWrite(ReactiveSecurityContextHolder.withAuthentication(
+                        new TestingAuthenticationToken("user", "password", "ROLE_authenticated")))
+                .block();
+
+        assertThat(exchange.getResponse().getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+        assertThat(exchange.getResponse().getBodyAsString().block()).contains("\"type\":\"email-not-set\"");
+        verify(chain, never()).filter(exchange);
+    }
+
+    @Test
     void shouldSkipWhenVerificationNotRequired() {
         when(systemConfigFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
                 .thenReturn(Mono.just(setting(false)));
@@ -200,6 +244,28 @@ class EmailCompletionFilterTest {
                 .block();
 
         verify(chain).filter(exchange);
+    }
+
+    @Test
+    void shouldNotExemptPathThatOnlySharesPrefix() {
+        when(systemConfigFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
+                .thenReturn(Mono.just(setting(true)));
+        when(userService.getUser("user")).thenReturn(Mono.just(user(false)));
+        when(requestCache.saveRequest(any())).thenReturn(Mono.empty());
+
+        var exchange = MockServerWebExchange.from(
+                MockServerHttpRequest.get("/logout-history").accept(MediaType.TEXT_HTML));
+        var chain = mock(WebFilterChain.class);
+        when(chain.filter(exchange)).thenReturn(Mono.empty());
+
+        filter.filter(exchange, chain)
+                .contextWrite(ReactiveSecurityContextHolder.withAuthentication(
+                        new TestingAuthenticationToken("user", "password", "ROLE_authenticated")))
+                .block();
+
+        assertThat(exchange.getResponse().getStatusCode()).isEqualTo(HttpStatus.FOUND);
+        assertThat(exchange.getResponse().getHeaders().getLocation()).isEqualTo(URI.create("/complete-profile"));
+        verify(chain, never()).filter(exchange);
     }
 
     @Test

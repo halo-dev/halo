@@ -1,6 +1,6 @@
 # OAuth2 登录注册与邮箱补充门禁实现计划
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **执行状态：** 本计划已实现并完成复核；步骤使用已勾选的 checkbox（`- [x]`）记录完成状态。最终契约以“最终实现校准”和配套 design 为准；各任务中的长代码片段保留 TDD 实施记录，不作为独立源码副本。
 
 **Goal:** OAuth2 未绑定用户可选择绑定已有账号或一键注册；注册无可用邮箱/未验证邮箱的用户被门禁引导到 `/complete-profile` 补邮箱（按“注册需验证邮箱”设置决定是否必须验证码），超级管理员豁免。
 
@@ -17,10 +17,13 @@
 |                                                        文件                                                         |                            职责                             |
 |-------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------|
 | `api/src/main/java/run/halo/app/core/extension/User.java`（修改）                                                     | `spec.email` 改为可选                                         |
-| `api/src/main/java/run/halo/app/core/user/service/UserService.java`（修改）                                           | 新增 `checkEmailInUse(username, email)`                     |
-| `application/src/main/java/run/halo/app/core/user/service/impl/UserServiceImpl.java`（修改）                          | 实现 `checkEmailInUse`                                      |
+| `api/src/main/java/run/halo/app/core/user/service/UserService.java`（修改）                                           | 新增 `checkVerifiedEmailInUse(username, email)`             |
+| `application/src/main/java/run/halo/app/core/user/service/impl/UserServiceImpl.java`（修改）                          | 实现 `checkVerifiedEmailInUse`                              |
 | `application/src/main/java/run/halo/app/security/authentication/oauth2/OAuth2RegistrationService.java`（新增）        | 注册服务接口 + `RegistrationResult`                             |
 | `application/src/main/java/run/halo/app/security/authentication/oauth2/DefaultOAuth2RegistrationService.java`（新增） | 注册核心逻辑                                                    |
+| `application/src/main/java/run/halo/app/security/authentication/oauth2/OAuth2AuthenticationSession.java`（新增）      | 复用 OAuth2 登录态建立与成功处理逻辑                                    |
+| `application/src/main/java/run/halo/app/security/RedirectUtils.java`（新增）                                          | 统一安全地跳转到已缓存请求                                             |
+| `application/src/main/java/run/halo/app/security/preauth/AgreementPageFetcher.java`（新增）                           | 为 OAuth2 选择页加载全部必选协议，缺失或读取失败时失败关闭                         |
 | `application/src/main/java/run/halo/app/security/preauth/PreAuthOAuth2RegistrationEndpoint.java`（新增）              | `/login?oauth2_select` 渲染 + `POST /login/oauth2/register` |
 | `application/src/main/java/run/halo/app/security/completion/EmailCompletionFilter.java`（新增）                       | 门禁 WebFilter                                              |
 | `application/src/main/java/run/halo/app/security/completion/EmailCompletionSecurityConfigurer.java`（新增）           | 注册门禁过滤器到安全链                                               |
@@ -38,7 +41,19 @@
 |------------------------------------------------------------------------------------------------------------|------------------------------------------|
 | `application/src/main/java/run/halo/app/security/authentication/oauth2/MapOAuth2AuthenticationFilter.java` | 未绑定重定向改为 `/login?oauth2_select`          |
 | `application/src/main/java/run/halo/app/infra/config/WebServerSecurityConfig.java`                         | 新增 `OAuth2AuthenticationTokenCache` Bean |
+| `application/src/main/java/run/halo/app/security/authentication/oauth2/OAuth2SecurityConfigurer.java`      | 注入共享的 `OAuth2AuthenticationSession`      |
 | `application/src/main/java/run/halo/app/security/authorization/AuthorizationExchangeConfigurers.java`      | `/complete-profile/**` 要求已认证             |
+
+普通 `/signup` 的协议加载不在本计划范围内，保持原实现；`AgreementPageFetcher` 只由 OAuth2 选择页使用。
+
+## 最终实现校准
+
+- **并发幂等：** 创建 `UserConnection` 失败后删除本次创建的用户，再读取相同 provider identity；若存在并发胜出的连接则登录该连接对应用户，否则传播原始错误。
+- **协议失败关闭：** OAuth2 选择页必须成功加载所有 `requiredAgreementPages`；任一页面缺失或读取失败均终止渲染，不允许在协议展示不完整时注册。
+- **门禁分类：** 仅 `Accept` 显式包含 `text/html` 且不是 XHR 的请求重定向，不限 HTTP 方法；XHR、JSON 和仅 `Accept: */*` 的请求返回 403。
+- **豁免边界：** 单路径精确匹配，目录只匹配自身或 `/` 后代；`/logout-history`、`/signup-foo` 等相似前缀不豁免。
+- **服务命名：** 排除当前用户后检查已验证邮箱占用的方法统一为 `checkVerifiedEmailInUse(username, email)`。
+- **验证证据：** 单元测试覆盖全部用户名来源、4/63 位边界、保留名、20 次冲突、显示名、OIDC 缺失邮箱与并发赢家；Spring 集成测试覆盖真实用户/角色/连接持久化、协议页缺失失败关闭和门禁响应边界。
 
 ---
 
@@ -48,7 +63,7 @@
 - Modify: `api/src/main/java/run/halo/app/core/extension/User.java:64-66`
 - Test: `api/src/test/java/run/halo/app/core/extension/UserSchemaTest.java`
 
-- [ ] **Step 1: 写失败测试**
+- [x] **Step 1: 写失败测试**
 
 创建 `api/src/test/java/run/halo/app/core/extension/UserSchemaTest.java`：
 
@@ -77,12 +92,12 @@ class UserSchemaTest {
 }
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+- [x] **Step 2: 运行测试确认失败**
 
 Run: `./gradlew :api:test --tests "run.halo.app.core.extension.UserSchemaTest"`
 Expected: FAIL，`required` 中包含 `email`。
 
-- [ ] **Step 3: 实现**
+- [x] **Step 3: 实现**
 
 修改 `api/src/main/java/run/halo/app/core/extension/User.java`，删除 `spec.email` 上的 `@Schema(requiredMode = REQUIRED)`：
 
@@ -93,12 +108,12 @@ private String email;
 
 保留 `displayName` 的 `@Schema(requiredMode = REQUIRED)` 不变。
 
-- [ ] **Step 4: 运行测试确认通过**
+- [x] **Step 4: 运行测试确认通过**
 
 Run: `./gradlew :api:test --tests "run.halo.app.core.extension.UserSchemaTest"`
 Expected: PASS。
 
-- [ ] **Step 5: 提交**
+- [x] **Step 5: 提交**
 
 ```bash
 git add api/src/main/java/run/halo/app/core/extension/User.java api/src/test/java/run/halo/app/core/extension/UserSchemaTest.java
@@ -113,8 +128,17 @@ git commit -m "feat: make user email optional in schema for OAuth2 registration"
 - Create: `application/src/main/java/run/halo/app/security/authentication/oauth2/OAuth2RegistrationService.java`
 - Create: `application/src/main/java/run/halo/app/security/authentication/oauth2/DefaultOAuth2RegistrationService.java`
 - Test: `application/src/test/java/run/halo/app/security/authentication/oauth2/DefaultOAuth2RegistrationServiceTest.java`
+- Test: `application/src/test/java/run/halo/app/security/authentication/oauth2/DefaultOAuth2RegistrationServiceIntegrationTest.java`
 
-- [ ] **Step 1: 写失败测试**
+- [x] **Step 1: 写失败测试**
+
+除基础注册、邮箱和幂等分支外，最终测试覆盖以下设计边界：
+
+- `login`、`username`、`user_name`、OIDC `preferred_username`、`nickname` 与 provider user id 的候选顺序。
+- 用户名 4/63 位边界、保留名回退，以及随机用户名连续 20 次冲突后失败。
+- `display_name` 与受保护显示名回退。
+- OIDC 缺失邮箱、`email_verified=false` 与已验证邮箱分支。
+- 创建连接输掉并发竞争时删除本次创建的用户，并复用胜出连接登录。
 
 创建 `application/src/test/java/run/halo/app/security/authentication/oauth2/DefaultOAuth2RegistrationServiceTest.java`：
 
@@ -417,12 +441,12 @@ class DefaultOAuth2RegistrationServiceTest {
 }
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+- [x] **Step 2: 运行测试确认失败**
 
 Run: `./gradlew :application:test --tests "run.halo.app.security.authentication.oauth2.DefaultOAuth2RegistrationServiceTest"`
 Expected: FAIL，编译错误（`OAuth2RegistrationService` / `DefaultOAuth2RegistrationService` 不存在）。
 
-- [ ] **Step 3: 创建接口与实现**
+- [x] **Step 3: 创建接口与实现**
 
 创建 `application/src/main/java/run/halo/app/security/authentication/oauth2/OAuth2RegistrationService.java`：
 
@@ -513,8 +537,7 @@ public class DefaultOAuth2RegistrationService implements OAuth2RegistrationServi
                 .flatMap(setting -> connectionService
                         .getByProviderUserId(registrationId, oauth2User.getName())
                         .map(connection -> connection.getSpec().getUsername())
-                        .switchIfEmpty(Mono.defer(() -> createUser(setting, registrationId, oauth2User)
-                                .map(user -> user.getMetadata().getName()))))
+                        .switchIfEmpty(Mono.defer(() -> createUser(setting, registrationId, oauth2User))))
                 .flatMap(username -> Mono.zip(
                                 userService.getUser(username),
                                 systemConfigFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
@@ -532,7 +555,7 @@ public class DefaultOAuth2RegistrationService implements OAuth2RegistrationServi
                 "Agreement not accepted.", "problemDetail.user.signup.agreement-not-accepted", null));
     }
 
-    private Mono<User> createUser(SystemSetting.User setting, String registrationId, OAuth2User oauth2User) {
+    private Mono<String> createUser(SystemSetting.User setting, String registrationId, OAuth2User oauth2User) {
         return resolveUsername(setting, oauth2User)
                 .flatMap(username -> resolveEmail(oauth2User)
                         .flatMap(emailCandidate -> {
@@ -550,9 +573,12 @@ public class DefaultOAuth2RegistrationService implements OAuth2RegistrationServi
                             return userService.createUser(user, Set.of(setting.getDefaultRole()))
                                     .flatMap(created -> connectionService
                                             .createUserConnection(username, registrationId, oauth2User)
-                                            .onErrorResume(e -> client.delete(created)
-                                                    .then(Mono.<UserConnection>error(e)))
-                                            .thenReturn(created));
+                                            .thenReturn(username)
+                                            .onErrorResume(error -> client.delete(created)
+                                                    .then(connectionService.getByProviderUserId(
+                                                            registrationId, oauth2User.getName()))
+                                                    .map(connection -> connection.getSpec().getUsername())
+                                                    .switchIfEmpty(Mono.error(error))));
                         }));
     }
 
@@ -688,12 +714,20 @@ public class DefaultOAuth2RegistrationService implements OAuth2RegistrationServi
 }
 ```
 
-- [ ] **Step 4: 运行测试确认通过**
+- [x] **Step 4: 运行测试确认通过**
 
 Run: `./gradlew :application:test --tests "run.halo.app.security.authentication.oauth2.DefaultOAuth2RegistrationServiceTest"`
 Expected: PASS。
 
-- [ ] **Step 5: 格式化并提交**
+同时运行真实 Spring 上下文集成测试，确认无邮箱用户、默认角色和 `UserConnection` 均可通过相应服务读回：
+
+```bash
+./gradlew :application:test \
+  --tests "run.halo.app.security.authentication.oauth2.DefaultOAuth2RegistrationServiceTest" \
+  --tests "run.halo.app.security.authentication.oauth2.DefaultOAuth2RegistrationServiceIntegrationTest"
+```
+
+- [x] **Step 5: 格式化并提交**
 
 ```bash
 ./gradlew spotlessApply
@@ -713,7 +747,7 @@ git commit -m "feat: add OAuth2 registration service"
 - Create: `application/src/main/resources/templates/login_oauth2_select_es.properties`
 - Create: `application/src/main/resources/templates/login_oauth2_select_zh_TW.properties`
 
-- [ ] **Step 1: 创建根模板**
+- [x] **Step 1: 创建根模板**
 
 创建 `application/src/main/resources/templates/login_oauth2_select.html`：
 
@@ -737,7 +771,7 @@ git commit -m "feat: add OAuth2 registration service"
 </html>
 ```
 
-- [ ] **Step 2: 创建表单片段**
+- [x] **Step 2: 创建表单片段**
 
 创建 `application/src/main/resources/templates/gateway_fragments/oauth2_select.html`：
 
@@ -849,7 +883,7 @@ git commit -m "feat: add OAuth2 registration service"
 </form>
 ```
 
-- [ ] **Step 3: 创建文案文件**
+- [x] **Step 3: 创建文案文件**
 
 `login_oauth2_select.properties`：
 
@@ -903,7 +937,7 @@ form.registrationClosed=開放註冊已關閉，目前僅支援綁定既有帳�
 form.error=註冊失敗，請稍後重試，或選擇綁定既有帳號。
 ```
 
-- [ ] **Step 4: 提交**
+- [x] **Step 4: 提交**
 
 ```bash
 git add application/src/main/resources/templates/login_oauth2_select.html application/src/main/resources/templates/gateway_fragments/oauth2_select.html application/src/main/resources/templates/login_oauth2_select.properties application/src/main/resources/templates/login_oauth2_select_en.properties application/src/main/resources/templates/login_oauth2_select_es.properties application/src/main/resources/templates/login_oauth2_select_zh_TW.properties
@@ -916,11 +950,12 @@ git commit -m "feat: add OAuth2 selection page templates"
 
 **Files:**
 - Modify: `application/src/main/java/run/halo/app/infra/config/WebServerSecurityConfig.java`
+- Create: `application/src/main/java/run/halo/app/security/preauth/AgreementPageFetcher.java`
 - Create: `application/src/main/java/run/halo/app/security/preauth/PreAuthOAuth2RegistrationEndpoint.java`
 - Test: `application/src/test/java/run/halo/app/security/preauth/PreAuthOAuth2RegistrationEndpointTest.java`
 - Test: `application/src/test/java/run/halo/app/security/preauth/OAuth2SelectPageIntegrationTest.java`
 
-- [ ] **Step 1: 写失败测试（端点单元测试）**
+- [x] **Step 1: 写失败测试（端点单元测试）**
 
 创建 `application/src/test/java/run/halo/app/security/preauth/PreAuthOAuth2RegistrationEndpointTest.java`：
 
@@ -1081,12 +1116,12 @@ class PreAuthOAuth2RegistrationEndpointTest {
 }
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+- [x] **Step 2: 运行测试确认失败**
 
 Run: `./gradlew :application:test --tests "run.halo.app.security.preauth.PreAuthOAuth2RegistrationEndpointTest"`
 Expected: FAIL，编译错误（端点类不存在）。
 
-- [ ] **Step 3: 新增 OAuth2AuthenticationTokenCache Bean**
+- [x] **Step 3: 新增 OAuth2AuthenticationTokenCache Bean**
 
 修改 `application/src/main/java/run/halo/app/infra/config/WebServerSecurityConfig.java`，在类内新增：
 
@@ -1104,7 +1139,7 @@ import run.halo.app.security.authentication.oauth2.OAuth2AuthenticationTokenCach
 import run.halo.app.security.authentication.oauth2.WebSessionOAuth2AuthenticationTokenCache;
 ```
 
-- [ ] **Step 4: 创建端点类**
+- [x] **Step 4: 创建端点类**
 
 创建 `application/src/main/java/run/halo/app/security/preauth/PreAuthOAuth2RegistrationEndpoint.java`：
 
@@ -1294,19 +1329,22 @@ class PreAuthOAuth2RegistrationEndpoint {
                                     }
                                     return map;
                                 })
-                                .onErrorResume(e -> Mono.empty()))
+                                .switchIfEmpty(Mono.error(() -> new IllegalStateException(
+                                        "Required agreement page not found: " + pageName))))
                         .collectList())
                 .orElseGet(() -> Mono.just(List.of()));
     }
 }
 ```
 
-- [ ] **Step 5: 运行单元测试确认通过**
+- [x] **Step 5: 运行单元测试确认通过**
 
 Run: `./gradlew :application:test --tests "run.halo.app.security.preauth.PreAuthOAuth2RegistrationEndpointTest"`
 Expected: PASS。
 
-- [ ] **Step 6: 写选择页渲染集成测试**
+- [x] **Step 6: 写选择页渲染集成测试**
+
+除成功渲染外，补充必选协议页缺失场景：配置中存在页面名、扩展存储中找不到该页面时，选择页必须返回 5xx，证明协议加载失败关闭。
 
 创建 `application/src/test/java/run/halo/app/security/preauth/OAuth2SelectPageIntegrationTest.java`：
 
@@ -1362,12 +1400,12 @@ class OAuth2SelectPageIntegrationTest {
 }
 ```
 
-- [ ] **Step 7: 运行集成测试确认通过**
+- [x] **Step 7: 运行集成测试确认通过**
 
 Run: `./gradlew :application:test --tests "run.halo.app.security.preauth.OAuth2SelectPageIntegrationTest"`
 Expected: PASS。
 
-- [ ] **Step 8: 格式化并提交**
+- [x] **Step 8: 格式化并提交**
 
 ```bash
 ./gradlew spotlessApply
@@ -1383,7 +1421,7 @@ git commit -m "feat: add OAuth2 selection page and registration endpoint"
 - Modify: `application/src/main/java/run/halo/app/security/authentication/oauth2/MapOAuth2AuthenticationFilter.java:106`
 - Test: `application/src/test/java/run/halo/app/security/authentication/oauth2/MapOAuth2AuthenticationFilterTest.java`
 
-- [ ] **Step 1: 写失败测试**
+- [x] **Step 1: 写失败测试**
 
 创建 `application/src/test/java/run/halo/app/security/authentication/oauth2/MapOAuth2AuthenticationFilterTest.java`：
 
@@ -1450,12 +1488,12 @@ class MapOAuth2AuthenticationFilterTest {
 }
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+- [x] **Step 2: 运行测试确认失败**
 
 Run: `./gradlew :application:test --tests "run.halo.app.security.authentication.oauth2.MapOAuth2AuthenticationFilterTest"`
 Expected: FAIL，实际 Location 为 `/login?oauth2_bind`。
 
-- [ ] **Step 3: 修改重定向目标**
+- [x] **Step 3: 修改重定向目标**
 
 修改 `application/src/main/java/run/halo/app/security/authentication/oauth2/MapOAuth2AuthenticationFilter.java` 第 106 行附近：
 
@@ -1464,12 +1502,12 @@ Expected: FAIL，实际 Location 为 `/login?oauth2_bind`。
         exchange, URI.create("/login?oauth2_select"))))
 ```
 
-- [ ] **Step 4: 运行测试确认通过**
+- [x] **Step 4: 运行测试确认通过**
 
 Run: `./gradlew :application:test --tests "run.halo.app.security.authentication.oauth2.MapOAuth2AuthenticationFilterTest"`
 Expected: PASS。
 
-- [ ] **Step 5: 提交**
+- [x] **Step 5: 提交**
 
 ```bash
 git add application/src/main/java/run/halo/app/security/authentication/oauth2/MapOAuth2AuthenticationFilter.java application/src/test/java/run/halo/app/security/authentication/oauth2/MapOAuth2AuthenticationFilterTest.java
@@ -1478,14 +1516,14 @@ git commit -m "feat: redirect unbound OAuth2 users to selection page"
 
 ---
 
-## Task 6: UserService.checkEmailInUse
+## Task 6: UserService.checkVerifiedEmailInUse
 
 **Files:**
 - Modify: `api/src/main/java/run/halo/app/core/user/service/UserService.java`
 - Modify: `application/src/main/java/run/halo/app/core/user/service/impl/UserServiceImpl.java`
 - Test: `application/src/test/java/run/halo/app/core/user/service/impl/UserServiceImplTest.java`
 
-- [ ] **Step 1: 写失败测试**
+- [x] **Step 1: 写失败测试**
 
 在 `application/src/test/java/run/halo/app/core/user/service/impl/UserServiceImplTest.java` 中追加：
 
@@ -1510,11 +1548,11 @@ git commit -m "feat: redirect unbound OAuth2 users to selection page"
 
         when(client.listAll(eq(User.class), any(), any())).thenReturn(Flux.just(self, otherUser));
 
-        StepVerifier.create(userService.checkEmailInUse("self", "user@example.com"))
+        StepVerifier.create(userService.checkVerifiedEmailInUse("self", "user@example.com"))
                 .expectNext(true)
                 .verifyComplete();
 
-        StepVerifier.create(userService.checkEmailInUse("other", "user@example.com"))
+        StepVerifier.create(userService.checkVerifiedEmailInUse("other", "user@example.com"))
                 .expectNext(true)
                 .verifyComplete();
     }
@@ -1531,18 +1569,18 @@ git commit -m "feat: redirect unbound OAuth2 users to selection page"
 
         when(client.listAll(eq(User.class), any(), any())).thenReturn(Flux.just(otherUser));
 
-        StepVerifier.create(userService.checkEmailInUse("self", "user@example.com"))
+        StepVerifier.create(userService.checkVerifiedEmailInUse("self", "user@example.com"))
                 .expectNext(false)
                 .verifyComplete();
     }
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+- [x] **Step 2: 运行测试确认失败**
 
 Run: `./gradlew :application:test --tests "run.halo.app.core.user.service.impl.UserServiceImplTest"`
-Expected: FAIL，编译错误（`checkEmailInUse` 不存在）。
+Expected: FAIL，编译错误（`checkVerifiedEmailInUse` 不存在）。
 
-- [ ] **Step 3: 实现**
+- [x] **Step 3: 实现**
 
 在 `api/src/main/java/run/halo/app/core/user/service/UserService.java` 的 `checkEmailAlreadyVerified` 后追加：
 
@@ -1554,14 +1592,14 @@ Expected: FAIL，编译错误（`checkEmailInUse` 不存在）。
  * @param email email to check
  * @return true if the email is verified and used by another user
  */
-Mono<Boolean> checkEmailInUse(String username, String email);
+Mono<Boolean> checkVerifiedEmailInUse(String username, String email);
 ```
 
 在 `application/src/main/java/run/halo/app/core/user/service/impl/UserServiceImpl.java` 的 `checkEmailAlreadyVerified` 后追加：
 
 ```java
 @Override
-public Mono<Boolean> checkEmailInUse(String username, String email) {
+public Mono<Boolean> checkVerifiedEmailInUse(String username, String email) {
     return listByEmail(email)
             .filter(u -> u.getSpec().isEmailVerified())
             .filter(u -> !u.getMetadata().getName().equals(username))
@@ -1569,12 +1607,12 @@ public Mono<Boolean> checkEmailInUse(String username, String email) {
 }
 ```
 
-- [ ] **Step 4: 运行测试确认通过**
+- [x] **Step 4: 运行测试确认通过**
 
 Run: `./gradlew :application:test --tests "run.halo.app.core.user.service.impl.UserServiceImplTest"`
 Expected: PASS。
 
-- [ ] **Step 5: 提交**
+- [x] **Step 5: 提交**
 
 ```bash
 git add api/src/main/java/run/halo/app/core/user/service/UserService.java application/src/main/java/run/halo/app/core/user/service/impl/UserServiceImpl.java application/src/test/java/run/halo/app/core/user/service/impl/UserServiceImplTest.java
@@ -1593,7 +1631,7 @@ git commit -m "feat: add user service method to check email in use excluding sel
 - Create: `application/src/main/resources/templates/complete_profile_es.properties`
 - Create: `application/src/main/resources/templates/complete_profile_zh_TW.properties`
 
-- [ ] **Step 1: 创建根模板**
+- [x] **Step 1: 创建根模板**
 
 创建 `application/src/main/resources/templates/complete_profile.html`：
 
@@ -1617,7 +1655,7 @@ git commit -m "feat: add user service method to check email in use excluding sel
 </html>
 ```
 
-- [ ] **Step 2: 创建表单片段**
+- [x] **Step 2: 创建表单片段**
 
 创建 `application/src/main/resources/templates/gateway_fragments/complete_profile.html`：
 
@@ -1729,7 +1767,7 @@ git commit -m "feat: add user service method to check email in use excluding sel
 </form>
 ```
 
-- [ ] **Step 3: 创建文案文件**
+- [x] **Step 3: 创建文案文件**
 
 `complete_profile.properties`：
 
@@ -1797,7 +1835,7 @@ form.error.sendCodeFailed=發送驗證碼失敗，請稍後重試。
 form.logout=登出
 ```
 
-- [ ] **Step 4: 提交**
+- [x] **Step 4: 提交**
 
 ```bash
 git add application/src/main/resources/templates/complete_profile.html application/src/main/resources/templates/gateway_fragments/complete_profile.html application/src/main/resources/templates/complete_profile.properties application/src/main/resources/templates/complete_profile_en.properties application/src/main/resources/templates/complete_profile_es.properties application/src/main/resources/templates/complete_profile_zh_TW.properties
@@ -1812,7 +1850,7 @@ git commit -m "feat: add complete profile page templates"
 - Create: `application/src/main/java/run/halo/app/security/completion/EmailCompletionEndpoint.java`
 - Test: `application/src/test/java/run/halo/app/security/completion/EmailCompletionEndpointIntegrationTest.java`
 
-- [ ] **Step 1: 写失败测试**
+- [x] **Step 1: 写失败测试**
 
 创建 `application/src/test/java/run/halo/app/security/completion/EmailCompletionEndpointIntegrationTest.java`：
 
@@ -1947,12 +1985,12 @@ class EmailCompletionEndpointIntegrationTest {
 }
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+- [x] **Step 2: 运行测试确认失败**
 
 Run: `./gradlew :application:test --tests "run.halo.app.security.completion.EmailCompletionEndpointIntegrationTest"`
 Expected: FAIL，`/complete-profile` 无路由。
 
-- [ ] **Step 3: 实现端点**
+- [x] **Step 3: 实现端点**
 
 创建 `application/src/main/java/run/halo/app/security/completion/EmailCompletionEndpoint.java`：
 
@@ -2073,7 +2111,7 @@ class EmailCompletionEndpoint {
                         return renderPage(exchange, setting, form, bindingResult);
                     }
                     var email = form.email().toLowerCase(Locale.ROOT);
-                    return userService.checkEmailInUse(username, email)
+                    return userService.checkVerifiedEmailInUse(username, email)
                             .flatMap(inUse -> {
                                 if (inUse) {
                                     bindingResult.rejectValue(
@@ -2123,7 +2161,7 @@ class EmailCompletionEndpoint {
                     }
                     var email = body.email().toLowerCase(Locale.ROOT);
                     return currentUsername(exchange)
-                            .flatMap(username -> userService.checkEmailInUse(username, email)
+                            .flatMap(username -> userService.checkVerifiedEmailInUse(username, email)
                                     .flatMap(inUse -> {
                                         if (inUse) {
                                             return Mono.error(new EmailVerificationFailed(
@@ -2181,12 +2219,12 @@ class EmailCompletionEndpoint {
 }
 ```
 
-- [ ] **Step 4: 运行测试确认通过**
+- [x] **Step 4: 运行测试确认通过**
 
 Run: `./gradlew :application:test --tests "run.halo.app.security.completion.EmailCompletionEndpointIntegrationTest"`
 Expected: PASS。
 
-- [ ] **Step 5: 提交**
+- [x] **Step 5: 提交**
 
 ```bash
 ./gradlew spotlessApply
@@ -2205,7 +2243,9 @@ git commit -m "feat: add complete profile email endpoints"
 - Test: `application/src/test/java/run/halo/app/security/completion/EmailCompletionFilterTest.java`
 - Test: `application/src/test/java/run/halo/app/security/completion/EmailCompletionFilterIntegrationTest.java`
 
-- [ ] **Step 1: 写失败测试（单元）**
+- [x] **Step 1: 写失败测试（单元）**
+
+最终单元测试除开关、用户状态和超级管理员外，还覆盖：显式 HTML（包括非 GET）重定向、XHR 即使接受 HTML 仍返回 403、仅 `Accept: */*` 返回 403、精确豁免路径放行，以及仅共享字符串前缀的路径不豁免。
 
 创建 `application/src/test/java/run/halo/app/security/completion/EmailCompletionFilterTest.java`：
 
@@ -2388,12 +2428,12 @@ class EmailCompletionFilterTest {
 }
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+- [x] **Step 2: 运行测试确认失败**
 
 Run: `./gradlew :application:test --tests "run.halo.app.security.completion.EmailCompletionFilterTest"`
 Expected: FAIL，编译错误（过滤器不存在）。
 
-- [ ] **Step 3: 实现过滤器与配置器**
+- [x] **Step 3: 实现过滤器与配置器**
 
 创建 `application/src/main/java/run/halo/app/security/completion/EmailCompletionFilter.java`：
 
@@ -2402,7 +2442,7 @@ package run.halo.app.security.completion;
 
 import java.net.URI;
 import java.util.List;
-import org.springframework.http.HttpMethod;
+import java.util.Set;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
@@ -2432,21 +2472,19 @@ public class EmailCompletionFilter implements WebFilter {
 
     private static final URI EMAIL_NOT_SET_TYPE = URI.create("email-not-set");
 
+    private static final Set<String> EXEMPT_PATHS =
+            Set.of("/signup", "/logout", "/system/setup", "/error");
+
     private static final List<String> EXEMPT_PATH_PREFIXES = List.of(
             "/oauth2",
             "/login",
-            "/signup",
             "/password-reset",
-            "/logout",
             "/complete-profile",
-            "/system/setup",
-            "/error",
             "/assets",
             "/images",
             "/js",
             "/styles",
-            "/webjars",
-            "/favicon.");
+            "/webjars");
 
     private final SystemConfigFetcher systemConfigFetcher;
     private final UserService userService;
@@ -2504,7 +2542,10 @@ public class EmailCompletionFilter implements WebFilter {
 
     private boolean isExemptPath(ServerWebExchange exchange) {
         var path = exchange.getRequest().getPath().pathWithinApplication().value();
-        return EXEMPT_PATH_PREFIXES.stream().anyMatch(path::startsWith);
+        return EXEMPT_PATHS.contains(path)
+                || path.startsWith("/favicon.")
+                || EXEMPT_PATH_PREFIXES.stream()
+                        .anyMatch(prefix -> path.equals(prefix) || path.startsWith(prefix + "/"));
     }
 
     private Mono<Void> intercept(ServerWebExchange exchange) {
@@ -2516,13 +2557,11 @@ public class EmailCompletionFilter implements WebFilter {
     }
 
     private boolean isHtmlRequest(ServerWebExchange exchange) {
-        if (!HttpMethod.GET.equals(exchange.getRequest().getMethod())) {
-            return false;
-        }
         if (HaloUtils.isXhr(exchange.getRequest().getHeaders())) {
             return false;
         }
         return exchange.getRequest().getHeaders().getAccept().stream()
+                .filter(mediaType -> !MediaType.ALL.equals(mediaType))
                 .anyMatch(mediaType -> mediaType.includes(MediaType.TEXT_HTML));
     }
 
@@ -2593,12 +2632,12 @@ class EmailCompletionSecurityConfigurer implements SecurityConfigurer {
 .authenticated()
 ```
 
-- [ ] **Step 4: 运行单元测试确认通过**
+- [x] **Step 4: 运行单元测试确认通过**
 
 Run: `./gradlew :application:test --tests "run.halo.app.security.completion.EmailCompletionFilterTest"`
 Expected: PASS。
 
-- [ ] **Step 5: 写集成测试**
+- [x] **Step 5: 写集成测试**
 
 创建 `application/src/test/java/run/halo/app/security/completion/EmailCompletionFilterIntegrationTest.java`：
 
@@ -2692,12 +2731,12 @@ class EmailCompletionFilterIntegrationTest {
 }
 ```
 
-- [ ] **Step 6: 运行集成测试确认通过**
+- [x] **Step 6: 运行集成测试确认通过**
 
 Run: `./gradlew :application:test --tests "run.halo.app.security.completion.EmailCompletionFilterIntegrationTest"`
 Expected: PASS。
 
-- [ ] **Step 7: 提交**
+- [x] **Step 7: 提交**
 
 ```bash
 ./gradlew spotlessApply
@@ -2712,7 +2751,7 @@ git commit -m "feat: add email completion gate filter"
 **Files:**
 - Modify: `ui/packages/api-client/src/models/user-spec.ts`（由生成器更新）
 
-- [ ] **Step 1: 重新生成 OpenAPI 与 api-client**
+- [x] **Step 1: 重新生成 OpenAPI 与 api-client**
 
 Run:
 
@@ -2722,7 +2761,7 @@ Run:
 
 Expected: `ui/packages/api-client/src/models/user-spec.ts` 中 `email` 变为可选（`email?: string`）。
 
-- [ ] **Step 2: 前端类型检查与 lint**
+- [x] **Step 2: 前端类型检查与 lint**
 
 Run:
 
@@ -2732,12 +2771,12 @@ pnpm -C ui typecheck && pnpm -C ui lint
 
 Expected: PASS。
 
-- [ ] **Step 3: 后端全量测试**
+- [x] **Step 3: 后端全量测试**
 
 Run: `./gradlew build`
 Expected: BUILD SUCCESSFUL。
 
-- [ ] **Step 4: 提交**
+- [x] **Step 4: 提交**
 
 ```bash
 git add ui/packages/api-client/src
@@ -2748,7 +2787,8 @@ git commit -m "chore: regenerate api client for optional user email"
 
 ## 自审结论
 
-- Spec 覆盖：选择页（Task 3/4）、注册规则（Task 2）、门禁（Task 9）、补邮箱页（Task 7/8）、`email` 可选（Task 1）、重定向变更（Task 5）、`checkEmailInUse`（Task 6）、api-client（Task 10）全部有对应任务。
+- Spec 覆盖：选择页与协议失败关闭（Task 3/4）、注册规则与并发幂等（Task 2）、门禁分类与路径边界（Task 9）、补邮箱页（Task 7/8）、`email` 可选（Task 1）、重定向变更（Task 5）、`checkVerifiedEmailInUse`（Task 6）、api-client（Task 10）全部有对应任务。
 - 无占位符：所有步骤均含可执行代码与命令。
-- 类型一致：`RegistrationResult(username, needsEmailCompletion)` 在服务与端点中一致；`checkEmailInUse` 签名一致；过滤器构造函数与测试一致。
+- 类型一致：`RegistrationResult(username, needsEmailCompletion)` 在服务与端点中一致；`checkVerifiedEmailInUse` 签名一致；过滤器构造函数与测试一致。
+- 范围一致：普通 `/signup` 保持基线实现，OAuth2 选择页单独使用失败关闭的 `AgreementPageFetcher`。
 

@@ -33,6 +33,8 @@ class AgreementPageFetcher {
                 })
                 .flatMap(pageName -> extensionClient
                         .fetch(SinglePage.class, pageName)
+                        .switchIfEmpty(Mono.error(
+                                () -> new IllegalStateException("Required agreement page not found: " + pageName)))
                         .map(page -> {
                             Map<String, String> map = new HashMap<>();
                             map.put("title", page.getSpec().getTitle());
@@ -41,8 +43,7 @@ class AgreementPageFetcher {
                                 map.put("permalink", status.getPermalink());
                             }
                             return map;
-                        })
-                        .onErrorResume(e -> Mono.empty()))
+                        }))
                 .collectList();
     }
 }

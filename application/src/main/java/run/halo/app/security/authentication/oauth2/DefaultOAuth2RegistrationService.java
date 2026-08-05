@@ -16,7 +16,6 @@ import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.User;
-import run.halo.app.core.extension.UserConnection;
 import run.halo.app.core.user.service.UserConnectionService;
 import run.halo.app.core.user.service.UserService;
 import run.halo.app.extension.Metadata;
@@ -57,8 +56,7 @@ public class DefaultOAuth2RegistrationService implements OAuth2RegistrationServi
                 .flatMap(setting -> connectionService
                         .getByProviderUserId(registrationId, oauth2User.getName())
                         .map(connection -> connection.getSpec().getUsername())
-                        .switchIfEmpty(Mono.defer(() -> createUser(setting, registrationId, oauth2User)
-                                .map(user -> user.getMetadata().getName())))
+                        .switchIfEmpty(Mono.defer(() -> createUser(setting, registrationId, oauth2User)))
                         .flatMap(username -> userService
                                 .getUser(username)
                                 .map(user -> new RegistrationResult(
@@ -75,7 +73,7 @@ public class DefaultOAuth2RegistrationService implements OAuth2RegistrationServi
                 "Agreement not accepted.", "problemDetail.user.signup.agreement-not-accepted", null));
     }
 
-    private Mono<User> createUser(SystemSetting.User setting, String registrationId, OAuth2User oauth2User) {
+    private Mono<String> createUser(SystemSetting.User setting, String registrationId, OAuth2User oauth2User) {
         return resolveUsername(setting, oauth2User)
                 .flatMap(username -> resolveEmail(oauth2User).flatMap(emailCandidate -> {
                     var user = new User();
@@ -92,8 +90,13 @@ public class DefaultOAuth2RegistrationService implements OAuth2RegistrationServi
                             .createUser(user, Set.of(setting.getDefaultRole()))
                             .flatMap(created -> connectionService
                                     .createUserConnection(username, registrationId, oauth2User)
-                                    .onErrorResume(e -> client.delete(created).then(Mono.<UserConnection>error(e)))
-                                    .thenReturn(created));
+                                    .thenReturn(username)
+                                    .onErrorResume(error -> client.delete(created)
+                                            .then(connectionService.getByProviderUserId(
+                                                    registrationId, oauth2User.getName()))
+                                            .map(connection ->
+                                                    connection.getSpec().getUsername())
+                                            .switchIfEmpty(Mono.error(error))));
                 }));
     }
 
