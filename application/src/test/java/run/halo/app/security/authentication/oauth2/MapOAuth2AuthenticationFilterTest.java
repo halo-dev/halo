@@ -41,6 +41,7 @@ class MapOAuth2AuthenticationFilterTest {
         when(connectionService.createUserConnection(any(), any(), any())).thenReturn(Mono.empty());
         var securityContextRepository = mock(ServerSecurityContextRepository.class);
         when(securityContextRepository.save(any(), any())).thenReturn(Mono.empty());
+        when(securityContextRepository.load(any())).thenReturn(Mono.empty());
         var userDetailsService = mock(ReactiveUserDetailsService.class);
         var loginHandlerEnhancer = mock(LoginHandlerEnhancer.class);
         var filter = new MapOAuth2AuthenticationFilter(

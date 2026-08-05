@@ -77,7 +77,9 @@ class MapOAuth2AuthenticationFilter implements WebFilter {
                         // cache the pre-authentication
                         authentication -> exchange.getAttributes().put(PRE_AUTHENTICATION, authentication))
                 .then(chain.filter(exchange))
-                .then(Mono.defer(() -> ReactiveSecurityContextHolder.getContext()
+                .then(Mono.defer(() -> securityContextRepository
+                        .load(exchange)
+                        .switchIfEmpty(ReactiveSecurityContextHolder.getContext())
                         .mapNotNull(SecurityContext::getAuthentication)
                         .filter(OAuth2AuthenticationToken.class::isInstance)
                         .cast(OAuth2AuthenticationToken.class)
@@ -90,6 +92,9 @@ class MapOAuth2AuthenticationFilter implements WebFilter {
                                             () -> Mono.justOrEmpty((Object) exchange.getAttribute(PRE_AUTHENTICATION))
                                                     .filter(Authentication.class::isInstance)
                                                     .cast(Authentication.class)
+                                                    // the OAuth2AuthenticationToken is not the pre-authentication
+                                                    // to bind with, skip it
+                                                    .filter(auth -> !(auth instanceof OAuth2AuthenticationToken))
                                                     .filter(authenticationTrustResolver::isAuthenticated)
                                                     .flatMap(preAuth -> connectionService.createUserConnection(
                                                             preAuth.getName(), registrationId, oauth2User))))
