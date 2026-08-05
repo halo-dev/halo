@@ -34,7 +34,7 @@
 
 ### 注册规则
 
-- 用户名候选：`OAuth2User.getName()`（OIDC 即 `sub`），小写化后按现有用户名规范（`NAME_REGEX`、4–63 位）与保留名单、占用情况校验；不满足则生成随机用户名（`user-` + 8 位小写字母数字，最多重试 20 次）。
+- 用户名候选：依次取 `login`、`username`、`user_name`、OIDC `preferred_username`、`nickname` 属性，全部缺失时才回退到 `OAuth2User.getName()`（OIDC 即 `sub`），小写化后按现有用户名规范（`NAME_REGEX`、4–63 位）与保留名单、占用情况校验；不满足则生成随机用户名（`user-` + 8 位小写字母数字，最多重试 20 次）。
 - 显示名：`name` → `nickname`/`display_name` → OIDC `preferred_username` → 候选用户名；命中显示名保留名单则退化为候选用户名。
 - 邮箱：
   - OIDC 使用 `OidcUser.getEmail()`；普通 OAuth2 使用 `email` 属性。

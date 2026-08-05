@@ -117,6 +117,78 @@ class DefaultOAuth2RegistrationServiceTest {
     }
 
     @Test
+    void shouldPreferLoginAttributeOverGetName() {
+        when(systemConfigFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
+                .thenReturn(Mono.just(userSetting()));
+        // getName() returns the "sub" attribute, but "login" should win as the username candidate
+        when(connectionService.getByProviderUserId("github", "sub-123")).thenReturn(Mono.empty());
+        when(client.fetch(User.class, "alice")).thenReturn(Mono.empty());
+        when(userService.checkEmailAlreadyVerified("alice@example.com")).thenReturn(Mono.just(false));
+        when(userService.createUser(any(User.class), anySet()))
+                .thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
+        when(userService.getUser("alice")).thenAnswer(invocation -> {
+            var user = new User();
+            user.setMetadata(new Metadata());
+            user.getMetadata().setName("alice");
+            var userSpec = new User.UserSpec();
+            userSpec.setEmail("alice@example.com");
+            userSpec.setEmailVerified(true);
+            user.setSpec(userSpec);
+            return Mono.just(user);
+        });
+        when(connectionService.createUserConnection(anyString(), anyString(), any()))
+                .thenReturn(Mono.just(new UserConnection()));
+
+        var token = token("alice", Map.of("sub", "sub-123", "login", "alice", "email", "alice@example.com"));
+
+        StepVerifier.create(service.register(token, false))
+                .assertNext(result -> assertThat(result.username()).isEqualTo("alice"))
+                .verifyComplete();
+
+        var captor = org.mockito.ArgumentCaptor.forClass(User.class);
+        verify(userService).createUser(captor.capture(), anySet());
+        assertThat(captor.getValue().getMetadata().getName()).isEqualTo("alice");
+    }
+
+    @Test
+    void shouldPreferPreferredUsernameForOidcUser() {
+        when(systemConfigFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
+                .thenReturn(Mono.just(userSetting()));
+        when(connectionService.getByProviderUserId("github", "sub-123")).thenReturn(Mono.empty());
+        when(client.fetch(User.class, "alice")).thenReturn(Mono.empty());
+        when(userService.checkEmailAlreadyVerified("user@example.com")).thenReturn(Mono.just(false));
+        when(userService.createUser(any(User.class), anySet()))
+                .thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
+        when(userService.getUser("alice")).thenAnswer(invocation -> {
+            var user = new User();
+            user.setMetadata(new Metadata());
+            user.getMetadata().setName("alice");
+            var userSpec = new User.UserSpec();
+            userSpec.setEmail("user@example.com");
+            userSpec.setEmailVerified(true);
+            user.setSpec(userSpec);
+            return Mono.just(user);
+        });
+        when(connectionService.createUserConnection(anyString(), anyString(), any()))
+                .thenReturn(Mono.just(new UserConnection()));
+
+        var oidcUser = mock(OidcUser.class);
+        when(oidcUser.getName()).thenReturn("sub-123");
+        when(oidcUser.getPreferredUsername()).thenReturn("alice");
+        when(oidcUser.getClaimAsString("email")).thenReturn("user@example.com");
+        when(oidcUser.getClaimAsBoolean("email_verified")).thenReturn(true);
+        var token = new OAuth2AuthenticationToken(oidcUser, List.of(), "github");
+
+        StepVerifier.create(service.register(token, false))
+                .assertNext(result -> assertThat(result.username()).isEqualTo("alice"))
+                .verifyComplete();
+
+        var captor = org.mockito.ArgumentCaptor.forClass(User.class);
+        verify(userService).createUser(captor.capture(), anySet());
+        assertThat(captor.getValue().getMetadata().getName()).isEqualTo("alice");
+    }
+
+    @Test
     void shouldUseRandomUsernameWhenCandidateIsTaken() {
         when(systemConfigFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
                 .thenReturn(Mono.just(userSetting()));

@@ -99,7 +99,13 @@ public class DefaultOAuth2RegistrationService implements OAuth2RegistrationServi
     }
 
     private Mono<String> resolveUsername(SystemSetting.User setting, OAuth2User oauth2User) {
-        var candidate = oauth2User.getName();
+        var candidate = firstText(
+                attribute(oauth2User, "login"),
+                attribute(oauth2User, "username"),
+                attribute(oauth2User, "user_name"),
+                oauth2User instanceof OidcUser oidcUser ? oidcUser.getPreferredUsername() : null,
+                attribute(oauth2User, "nickname"),
+                oauth2User.getName());
         return resolveAvailableUsername(setting, candidate)
                 .switchIfEmpty(Mono.defer(() -> generateRandomUsername(setting)));
     }
