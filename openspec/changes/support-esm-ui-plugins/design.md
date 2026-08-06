@@ -113,6 +113,14 @@ Resolution is anchored at the provider project or manifest path, not the install
 4. reads and normalizes the exact package name and version;
 5. cross-checks the bundler's final resolved entry so aliases or conditional-entry changes cannot bypass validation.
 
+The bundler SHALL NOT infer a package entry from `module`, `main`, or a
+conventional root `index.js`. Vite's configured resolver remains authoritative
+when it exposes a resolved module ID. When externalization prevents Rsbuild
+from exposing that final resource, the bundler kit uses `pkg-types` to resolve
+the package from the importing provider and locate the nearest owning
+`package.json`; this keeps exports-only packages and pnpm symlinks within a
+maintained Node-compatible resolver instead of duplicating entry-point rules.
+
 The resolved version must fall inside the selected inventory range. The bundler also rejects missing shared packages, deep imports, unsupported statically named exports, aliases, forks, and configuration that bypasses externalization. Only after those checks does it externalize a shared root import. A namespace import or dynamic namespace property cannot be proven completely, so it is allowed with a best-effort warning. A shared version above the inventory's exact host version is also allowed within range with a warning; a range mismatch fails the ESM build rather than silently bundling a second copy.
 
 Other dependencies, including VueUse, remain private. Direct `@tiptap/*` or `prosemirror-*` runtime imports also remain private, but produce a compatibility warning when the provider uses `@halo-dev/richtext-editor`; authors should prefer the editor package's re-exports to avoid class-identity and version skew.

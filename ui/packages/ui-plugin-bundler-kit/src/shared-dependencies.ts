@@ -20,6 +20,10 @@ export class SharedDependencyValidator {
   readonly #validatedRoots = new Set<SharedPackageRoot>();
   readonly #resolvedPackages = new Map<
     SharedPackageRoot,
+    Awaited<ReturnType<typeof validateResolvedSharedPackage>>
+  >();
+  readonly #resolvingPackages = new Map<
+    SharedPackageRoot,
     ReturnType<typeof validateResolvedSharedPackage>
   >();
   readonly #warnings = new Set<string>();
@@ -32,9 +36,9 @@ export class SharedDependencyValidator {
     this.#warn = options.warn;
   }
 
-  validateSource(code: string, sourceId: string) {
+  async validateSource(code: string, sourceId: string) {
     for (const imported of parseImports(code)) {
-      this.validateImport(imported.specifier, imported.names, sourceId);
+      await this.validateImport(imported.specifier, imported.names, sourceId);
     }
     if (this.#usesEditor && this.#usesEditorInternals) {
       this.warnOnce(
@@ -43,7 +47,7 @@ export class SharedDependencyValidator {
     }
   }
 
-  validateImport(
+  async validateImport(
     specifier: string,
     names: readonly string[] | "namespace",
     sourceId: string
@@ -72,7 +76,7 @@ export class SharedDependencyValidator {
       return false;
     }
 
-    this.validateResolvedRoot(specifier, sourceId);
+    await this.validateResolvedRoot(specifier, sourceId);
     if (names === "namespace") {
       this.warnOnce(
         `${sourceId} uses a namespace or dynamic import from ${specifier}; runtime properties cannot be fully checked against Halo ${this.#inventory.haloVersion}.`
@@ -100,20 +104,20 @@ export class SharedDependencyValidator {
 
   getBuildSummary() {
     return this.getValidatedRoots().map((root) => {
-      const resolved = this.#resolvedPackages.get(root) as ReturnType<
-        typeof validateResolvedSharedPackage
+      const resolved = this.#resolvedPackages.get(root) as Awaited<
+        ReturnType<typeof validateResolvedSharedPackage>
       >;
       const host = this.#inventory.packages[root];
       return `${root}: provider ${resolved.version}, host ${host.version}, accepted ${host.range}`;
     });
   }
 
-  assertBundlerResolution(
+  async assertBundlerResolution(
     root: SharedPackageRoot,
     resolvedId: string,
     sourceId: string
   ) {
-    this.validateResolvedRoot(root, sourceId);
+    await this.validateResolvedRoot(root, sourceId);
     const expectedRoot = this.#resolvedPackages.get(root)?.packageRoot;
     if (
       !expectedRoot ||
@@ -137,16 +141,37 @@ export class SharedDependencyValidator {
     }
   }
 
-  private validateResolvedRoot(root: SharedPackageRoot, sourceId: string) {
+  shouldExternalize(specifier: string, sourceId: string) {
+    const deepRoot = SHARED_PACKAGE_ROOTS.find((root) =>
+      specifier.startsWith(`${root}/`)
+    );
+    if (deepRoot) {
+      throw new Error(
+        `Unsupported shared dependency subpath ${specifier} imported by ${sourceId}. ` +
+          `Import the ${deepRoot} package root or select IIFE output.`
+      );
+    }
+    return isSharedPackageRoot(specifier);
+  }
+
+  private async validateResolvedRoot(
+    root: SharedPackageRoot,
+    sourceId: string
+  ) {
     if (this.#validatedRoots.has(root)) {
       return;
     }
-    const resolved = validateResolvedSharedPackage(
-      root,
-      this.#providerRoot,
-      this.#inventory,
-      sourceId
-    );
+    let resolving = this.#resolvingPackages.get(root);
+    if (!resolving) {
+      resolving = validateResolvedSharedPackage(
+        root,
+        this.#providerRoot,
+        this.#inventory,
+        sourceId
+      );
+      this.#resolvingPackages.set(root, resolving);
+    }
+    const resolved = await resolving;
     this.#validatedRoots.add(root);
     this.#resolvedPackages.set(root, resolved);
     if (resolved.newerThanHost) {

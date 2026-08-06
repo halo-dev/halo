@@ -58,7 +58,7 @@ describe("shared dependency validation", () => {
     ]);
   });
 
-  it("resolves a transitive shared dependency relative to its importer", () => {
+  it("resolves an exports-only transitive dependency relative to its importer", async () => {
     const providerRoot = fs.mkdtempSync(
       path.join(os.tmpdir(), "halo-transitive-shared-")
     );
@@ -69,18 +69,36 @@ describe("shared dependency validation", () => {
     );
     const importer = path.join(virtualRoot, "@vueuse/router/index.mjs");
     const dependencyRoot = path.join(virtualRoot, "vue-router");
+    const installedDependencyRoot = path.join(
+      providerRoot,
+      "node_modules/.pnpm/vue-router@4.2.5/node_modules/vue-router"
+    );
     fs.mkdirSync(path.dirname(importer), { recursive: true });
-    fs.mkdirSync(dependencyRoot, { recursive: true });
+    fs.mkdirSync(installedDependencyRoot, { recursive: true });
+    fs.symlinkSync(installedDependencyRoot, dependencyRoot, "dir");
     fs.writeFileSync(importer, 'import "vue-router";\n');
     fs.writeFileSync(
-      path.join(dependencyRoot, "package.json"),
+      path.join(installedDependencyRoot, "package.json"),
       JSON.stringify({
         name: "vue-router",
         version: "4.2.5",
-        module: "index.mjs",
+        exports: {
+          ".": {
+            browser: "./dist/browser.mjs",
+            import: "./dist/index.mjs",
+          },
+        },
       })
     );
-    fs.writeFileSync(path.join(dependencyRoot, "index.mjs"), "export {};\n");
+    fs.mkdirSync(path.join(installedDependencyRoot, "dist"));
+    fs.writeFileSync(
+      path.join(installedDependencyRoot, "dist/browser.mjs"),
+      "export {};\n"
+    );
+    fs.writeFileSync(
+      path.join(installedDependencyRoot, "dist/index.mjs"),
+      "export {};\n"
+    );
     const inventory = structuredClone(HALO_SHARED_INVENTORIES[0]);
     inventory.packages["vue-router"].version = "4.2.5";
     const validator = new SharedDependencyValidator({
@@ -89,28 +107,28 @@ describe("shared dependency validation", () => {
       warn: vi.fn(),
     });
 
-    expect(() =>
+    await expect(
       validator.validateSource('import "vue-router";', `${importer}?compiled`)
-    ).not.toThrow();
+    ).resolves.toBeUndefined();
   });
 
-  it("validates actual package versions and static exports", () => {
+  it("validates actual package versions and static exports", async () => {
     const validator = new SharedDependencyValidator({
       inventory: HALO_SHARED_INVENTORIES[0],
       providerRoot: uiRoot,
       warn: vi.fn(),
     });
 
-    expect(() =>
+    await expect(
       validator.validateSource(
         'import { ref } from "vue"; import axios from "axios";',
         "src/index.ts"
       )
-    ).not.toThrow();
+    ).resolves.toBeUndefined();
     expect(validator.getValidatedRoots()).toEqual(["vue", "axios"]);
   });
 
-  it("fails closed for unsupported exports, deep roots, and ranges", () => {
+  it("fails closed for unsupported exports, deep roots, and ranges", async () => {
     const inventory = structuredClone(HALO_SHARED_INVENTORIES[0]);
     inventory.packages.vue.range = ">=3.2 <3.4";
     const rangeValidator = new SharedDependencyValidator({
@@ -118,30 +136,30 @@ describe("shared dependency validation", () => {
       providerRoot: uiRoot,
       warn: vi.fn(),
     });
-    expect(() =>
+    await expect(
       rangeValidator.validateSource('import { ref } from "vue";', "index.ts")
-    ).toThrow("outside Halo 2.26.0's accepted range");
+    ).rejects.toThrow("outside Halo 2.26.0's accepted range");
 
     const validator = new SharedDependencyValidator({
       inventory: HALO_SHARED_INVENTORIES[0],
       providerRoot: uiRoot,
       warn: vi.fn(),
     });
-    expect(() =>
+    await expect(
       validator.validateSource(
         'import { notAHostExport } from "vue";',
         "index.ts"
       )
-    ).toThrow("unsupported vue export");
-    expect(() =>
+    ).rejects.toThrow("unsupported vue export");
+    await expect(
       validator.validateSource(
         'import x from "vue/dist/vue.esm.js";',
         "index.ts"
       )
-    ).toThrow("Unsupported shared dependency subpath");
+    ).rejects.toThrow("Unsupported shared dependency subpath");
   });
 
-  it("warns for namespace, forward-version, and editor identity cases", () => {
+  it("warns for namespace, forward-version, and editor identity cases", async () => {
     const warn = vi.fn();
     const inventory = structuredClone(HALO_SHARED_INVENTORIES[0]);
     inventory.packages.vue.version = "3.2.0";
@@ -151,7 +169,7 @@ describe("shared dependency validation", () => {
       warn,
     });
 
-    validator.validateSource(
+    await validator.validateSource(
       `
         import * as Vue from "vue";
         import { Editor } from "@halo-dev/richtext-editor";

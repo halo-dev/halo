@@ -34,9 +34,8 @@ export function createViteEsmProviderPlugin(
           rollupOptions: {
             external(source, importer, isResolved) {
               if (
-                validator.validateImport(
+                validator.shouldExternalize(
                   source,
-                  [],
                   importer || "provider entry"
                 )
               ) {
@@ -85,12 +84,12 @@ export function createViteEsmProviderPlugin(
     },
     async transform(code, id) {
       if (!id.includes("\0")) {
-        validator.validateSource(code, id);
+        await validator.validateSource(code, id);
         for (const imported of parseImports(code)) {
           if (isSharedPackageRoot(imported.specifier)) {
             const resolved = await resolvePackage(imported.specifier, id);
             if (resolved) {
-              validator.assertBundlerResolution(
+              await validator.assertBundlerResolution(
                 imported.specifier,
                 resolved,
                 id
@@ -100,12 +99,12 @@ export function createViteEsmProviderPlugin(
         }
       }
     },
-    generateBundle(_outputOptions, bundle) {
+    async generateBundle(_outputOptions, bundle) {
       const chunks = Object.values(bundle).filter(
         (item): item is OutputChunk => item.type === "chunk"
       );
       for (const chunk of chunks) {
-        validator.validateSource(chunk.code, chunk.fileName);
+        await validator.validateSource(chunk.code, chunk.fileName);
       }
 
       const entries = chunks.filter((chunk) => chunk.isEntry);

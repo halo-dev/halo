@@ -161,6 +161,12 @@ The bundler SHALL validate a provider project's actually resolved shared depende
 - **THEN** the bundler SHALL validate the actually resolved package
 - **THEN** it SHALL use the declaration and lockfile only as diagnostic context
 
+#### Scenario: Shared dependency exposes only an exports map
+
+- **WHEN** a shared dependency has no `module`, `main`, or root `index.js` but provides a valid package-root `exports` entry
+- **THEN** the bundler SHALL resolve its installed package metadata using maintained Node-compatible package resolution
+- **THEN** it SHALL NOT infer or require a conventional package entry file
+
 #### Scenario: Provider imports an unsupported export
 
 - **WHEN** an ESM provider imports a package subpath or static runtime export that is absent from the target inventory

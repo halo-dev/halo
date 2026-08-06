@@ -69,9 +69,8 @@ export function createRsbuildEsmProviderPlugin(
       });
 
       api.resolve(({ resolveData }) => {
-        validator.validateImport(
+        validator.shouldExternalize(
           resolveData.request,
-          [],
           resolveData.contextInfo.issuer || "provider entry"
         );
       });
@@ -81,21 +80,21 @@ export function createRsbuildEsmProviderPlugin(
           test: /\.[cm]?[jt]sx?$/,
           enforce: "post",
         },
-        ({ code, resourcePath }) => {
-          validator.validateSource(code, resourcePath);
+        async ({ code, resourcePath }) => {
+          await validator.validateSource(code, resourcePath);
           return code;
         }
       );
 
       api.processAssets(
         { stage: "summarize" },
-        ({ assets, compilation, sources }) => {
+        async ({ assets, compilation, sources }) => {
           const entry = assets["main.js"];
           if (!entry) {
             throw new Error("ESM UI provider output is missing main.js.");
           }
           const entryCode = entry.source().toString();
-          validator.validateSource(entryCode, "main.js");
+          await validator.validateSource(entryCode, "main.js");
           if (
             !/\bexport\s+default\b/.test(entryCode) &&
             !/\bexport\s*\{[^}]*\bdefault\b[^}]*\}/s.test(entryCode)

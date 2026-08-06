@@ -93,3 +93,8 @@
 - [x] 10.2 Add backend and frontend regression coverage for direct static resource URLs with `?v=` and remove generation-eviction expectations.
 - [x] 10.3 Remove provider resource copying, retained generations, and generation-specific proxy routes from the backend and frontend loader.
 - [x] 10.4 Run focused backend/frontend checks, strict OpenSpec validation, and update the existing pull request.
+
+## 11. Harden Shared Package Resolution
+
+- [x] 11.1 Replace manual shared-package entry inference with maintained exports-aware package metadata resolution while preserving bundler-resolved cross-checks.
+- [x] 11.2 Add regression coverage for exports-only packages and run focused bundler-kit plus representative Rsbuild provider verification.

@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { resolvePackageJSON } from "pkg-types";
 import { compare, lte, parse, satisfies } from "semver";
 import halo226Inventory from "./inventories/halo-2.26.0.json";
 
@@ -105,18 +106,29 @@ export function selectHaloSharedInventory(
   };
 }
 
-export function resolveSharedPackage(
+export async function resolveSharedPackage(
   root: SharedPackageRoot,
   providerRoot: string,
   sourceId?: string
 ) {
-  const packageRoot = findInstalledPackageRoot(
-    root,
-    getPackageResolutionBase(providerRoot, sourceId)
-  );
-  const packageJson = JSON.parse(
-    fs.readFileSync(path.join(packageRoot, "package.json"), "utf8")
-  ) as { name?: string; version?: string; module?: string; main?: string };
+  const resolutionBase = getPackageResolutionBase(providerRoot, sourceId);
+  let packageJsonPath: string;
+  try {
+    packageJsonPath = await resolvePackageJSON(root, {
+      from: resolutionBase,
+      conditions: ["browser", "import", "default"],
+    });
+  } catch (error) {
+    throw new Error(
+      `Cannot resolve shared dependency ${root} from ${resolutionBase}.`,
+      { cause: error }
+    );
+  }
+  const packageRoot = fs.realpathSync(path.dirname(packageJsonPath));
+  const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8")) as {
+    name?: string;
+    version?: string;
+  };
 
   if (packageJson.name !== root || !packageJson.version) {
     throw new Error(
@@ -127,23 +139,17 @@ export function resolveSharedPackage(
   return {
     name: packageJson.name,
     version: packageJson.version,
-    entry: fs.realpathSync(
-      path.resolve(
-        packageRoot,
-        packageJson.module || packageJson.main || "index.js"
-      )
-    ),
     packageRoot,
   };
 }
 
-export function validateResolvedSharedPackage(
+export async function validateResolvedSharedPackage(
   root: SharedPackageRoot,
   providerRoot: string,
   inventory: HaloSharedInventory,
   sourceId?: string
 ) {
-  const resolved = resolveSharedPackage(root, providerRoot, sourceId);
+  const resolved = await resolveSharedPackage(root, providerRoot, sourceId);
   const expected = inventory.packages[root];
   if (!satisfies(resolved.version, expected.range)) {
     throw new Error(
@@ -209,24 +215,6 @@ function validateInventoryEntry(
       identity: value.runtime.identity,
     },
   };
-}
-
-function findInstalledPackageRoot(root: string, providerRoot: string) {
-  let current = path.resolve(providerRoot);
-  while (true) {
-    const candidate = path.join(current, "node_modules", root);
-    const packageJsonPath = path.join(candidate, "package.json");
-    if (fs.existsSync(packageJsonPath)) {
-      return fs.realpathSync(candidate);
-    }
-    const parent = path.dirname(current);
-    if (parent === current) {
-      throw new Error(
-        `Cannot resolve shared dependency ${root} from ${providerRoot}.`
-      );
-    }
-    current = parent;
-  }
 }
 
 function getPackageResolutionBase(providerRoot: string, sourceId?: string) {

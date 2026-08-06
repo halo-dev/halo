@@ -31,7 +31,7 @@ describe("Halo shared dependency inventory", () => {
 
     await Promise.all(
       SHARED_PACKAGE_ROOTS.map(async (root) => {
-        const resolved = resolveSharedPackage(root, uiRoot);
+        const resolved = await resolveSharedPackage(root, uiRoot);
         const runtimeModule = await import(root);
 
         expect(inventory.packages[root].version, root).toBe(resolved.version);
