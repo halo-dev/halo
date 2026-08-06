@@ -35,6 +35,8 @@ import run.halo.app.infra.exception.AgreementNotAcceptedException;
 import run.halo.app.security.AuthProviderService;
 import run.halo.app.security.authentication.oauth2.OAuth2AuthenticationSession;
 import run.halo.app.security.authentication.oauth2.OAuth2AuthenticationTokenCache;
+import run.halo.app.security.authentication.oauth2.OAuth2RegistrationException;
+import run.halo.app.security.authentication.oauth2.OAuth2RegistrationException.Error;
 import run.halo.app.security.authentication.oauth2.OAuth2RegistrationService;
 
 @ExtendWith(MockitoExtension.class)
@@ -143,8 +145,7 @@ class PreAuthOAuth2RegistrationEndpointTest {
         setting.setAllowRegistration(false);
         givenSelectionModel(List.of());
         when(registrationService.register(token, true))
-                .thenReturn(Mono.error(
-                        new ServerWebInputException("The registration is not allowed by the administrator.")));
+                .thenReturn(Mono.error(new OAuth2RegistrationException(Error.REGISTRATION_CLOSED)));
 
         post("agreedToTerms=true").expectStatus().isOk();
 
@@ -152,6 +153,18 @@ class PreAuthOAuth2RegistrationEndpointTest {
                 .containsEntry("allowRegistration", false)
                 .containsEntry("error", "registration-closed");
         verify(tokenCache, never()).removeToken(any());
+    }
+
+    @Test
+    void shouldNotDeriveRegistrationErrorFromInputExceptionMessage() {
+        givenSelectionModel(List.of());
+        when(registrationService.register(token, true))
+                .thenReturn(Mono.error(
+                        new ServerWebInputException("The registration is not allowed by the administrator.")));
+
+        post("agreedToTerms=true").expectStatus().isOk();
+
+        assertThat(renderedModel.get()).containsEntry("error", "registration-failed");
     }
 
     @Test
@@ -247,8 +260,7 @@ class PreAuthOAuth2RegistrationEndpointTest {
     void shouldRenderDefaultRoleMissingError() {
         givenSelectionModel(List.of());
         when(registrationService.register(token, false))
-                .thenReturn(Mono.error(
-                        new ServerWebInputException("The default role is not configured by the administrator.")));
+                .thenReturn(Mono.error(new OAuth2RegistrationException(Error.DEFAULT_ROLE_MISSING)));
 
         post("agreedToTerms=false").expectStatus().isOk();
 

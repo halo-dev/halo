@@ -21,7 +21,6 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
@@ -30,16 +29,12 @@ import run.halo.app.infra.utils.HaloUtils;
 import run.halo.app.security.AuthProviderService;
 import run.halo.app.security.authentication.oauth2.OAuth2AuthenticationSession;
 import run.halo.app.security.authentication.oauth2.OAuth2AuthenticationTokenCache;
+import run.halo.app.security.authentication.oauth2.OAuth2RegistrationException;
 import run.halo.app.security.authentication.oauth2.OAuth2RegistrationService;
 
 @Component
 @RequiredArgsConstructor
 class PreAuthOAuth2RegistrationEndpoint {
-
-    private static final String REGISTRATION_CLOSED_MESSAGE = "The registration is not allowed by the administrator.";
-
-    private static final String DEFAULT_ROLE_MISSING_MESSAGE =
-            "The default role is not configured by the administrator.";
 
     private final OAuth2AuthenticationTokenCache tokenCache;
 
@@ -128,13 +123,8 @@ class PreAuthOAuth2RegistrationEndpoint {
         if (error instanceof AgreementNotAcceptedException) {
             return "agreement-not-accepted";
         }
-        if (error instanceof ServerWebInputException inputException) {
-            if (Objects.equals(inputException.getReason(), REGISTRATION_CLOSED_MESSAGE)) {
-                return "registration-closed";
-            }
-            if (Objects.equals(inputException.getReason(), DEFAULT_ROLE_MISSING_MESSAGE)) {
-                return "default-role-missing";
-            }
+        if (error instanceof OAuth2RegistrationException registrationException) {
+            return registrationException.getErrorCode();
         }
         return "registration-failed";
     }

@@ -107,7 +107,7 @@ class EmailCompletionFilter implements WebFilter {
                 "/oauth2/authorization/**",
                 "/login/**",
                 "/signup",
-                "/password-reset/email/send",
+                "/password-reset/**",
                 "/logout",
                 "/complete-profile",
                 "/complete-profile/send-email-code",

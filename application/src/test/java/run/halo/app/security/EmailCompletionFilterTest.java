@@ -160,7 +160,6 @@ class EmailCompletionFilterTest {
                 "/login/oauth2/code/github",
                 "/login/oauth2/register",
                 "/signup",
-                "/password-reset/email/send",
                 "/logout",
                 "/complete-profile",
                 "/complete-profile/send-email-code",
@@ -180,6 +179,16 @@ class EmailCompletionFilterTest {
             })
     void shouldPassExemptPath(String path) {
         var exchange = exchange(MockServerHttpRequest.get(path).accept(MediaType.TEXT_HTML));
+
+        pass(exchange, authenticatedUser());
+
+        verifyNoInteractions(systemConfigFetcher, userService, requestCache);
+    }
+
+    @ParameterizedTest
+    @MethodSource("passwordResetRequests")
+    void shouldPassPasswordResetPath(MockServerHttpRequest.BaseBuilder<?> request) {
+        var exchange = exchange(request.accept(MediaType.TEXT_HTML));
 
         pass(exchange, authenticatedUser());
 
@@ -317,6 +326,13 @@ class EmailCompletionFilterTest {
                 Arguments.of(MockServerHttpRequest.get("/apis/api.console.halo.run/v1alpha1/users")
                         .accept(MediaType.APPLICATION_JSON)),
                 Arguments.of(MockServerHttpRequest.get("/archives").header("X-Requested-With", "XMLHttpRequest")));
+    }
+
+    private static Stream<MockServerHttpRequest.BaseBuilder<?>> passwordResetRequests() {
+        return Stream.of(
+                MockServerHttpRequest.get("/password-reset/email"),
+                MockServerHttpRequest.get("/password-reset/email/reset-token"),
+                MockServerHttpRequest.post("/password-reset/email/reset-token"));
     }
 
     private static MockServerWebExchange exchange(MockServerHttpRequest.BaseBuilder<?> request) {

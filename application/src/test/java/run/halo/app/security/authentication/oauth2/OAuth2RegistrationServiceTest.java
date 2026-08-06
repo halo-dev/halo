@@ -366,7 +366,11 @@ class OAuth2RegistrationServiceTest {
         setting.setAllowRegistration(false);
 
         StepVerifier.create(service.register(token(Map.of("sub", "alice")), false))
-                .expectError(ServerWebInputException.class)
+                .expectErrorSatisfies(error -> assertThat(error)
+                        .isInstanceOfSatisfying(
+                                OAuth2RegistrationException.class,
+                                exception ->
+                                        assertThat(exception.getErrorCode()).isEqualTo("registration-closed")))
                 .verify();
 
         verifyNoMutation();
@@ -377,7 +381,11 @@ class OAuth2RegistrationServiceTest {
         setting.setDefaultRole("  ");
 
         StepVerifier.create(service.register(token(Map.of("sub", "alice")), false))
-                .expectError(ServerWebInputException.class)
+                .expectErrorSatisfies(error -> assertThat(error)
+                        .isInstanceOfSatisfying(
+                                OAuth2RegistrationException.class,
+                                exception ->
+                                        assertThat(exception.getErrorCode()).isEqualTo("default-role-missing")))
                 .verify();
 
         verifyNoMutation();

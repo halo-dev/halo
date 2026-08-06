@@ -33,6 +33,7 @@ import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.ValidationUtils;
 import run.halo.app.infra.exception.AgreementNotAcceptedException;
+import run.halo.app.security.authentication.oauth2.OAuth2RegistrationException.Error;
 
 @Service
 @RequiredArgsConstructor
@@ -57,11 +58,9 @@ public class OAuth2RegistrationService {
         return systemConfigFetcher
                 .fetch(SystemSetting.User.GROUP, SystemSetting.User.class)
                 .filter(SystemSetting.User::isAllowRegistration)
-                .switchIfEmpty(Mono.error(
-                        () -> new ServerWebInputException("The registration is not allowed by the administrator.")))
+                .switchIfEmpty(Mono.error(() -> new OAuth2RegistrationException(Error.REGISTRATION_CLOSED)))
                 .filter(setting -> StringUtils.hasText(setting.getDefaultRole()))
-                .switchIfEmpty(Mono.error(
-                        () -> new ServerWebInputException("The default role is not configured by the administrator.")))
+                .switchIfEmpty(Mono.error(() -> new OAuth2RegistrationException(Error.DEFAULT_ROLE_MISSING)))
                 .filter(setting -> CollectionUtils.isEmpty(setting.getRequiredAgreementPages()) || agreedToTerms)
                 .switchIfEmpty(Mono.error(() -> new AgreementNotAcceptedException(
                         "Agreement not accepted.", "problemDetail.user.signup.agreement-not-accepted", null)));
