@@ -817,11 +817,19 @@ function createRuntimeDependencies(
       );
       return data;
     },
-    importModule: (url) => import(/* @vite-ignore */ url),
+    importModule: (url) =>
+      import(/* @vite-ignore */ resolveProviderEntryUrl(url)),
     loadScript: loadLegacyScript,
     loadStyle,
     ...overrides,
   };
+}
+
+export function resolveProviderEntryUrl(
+  url: string,
+  pageOrigin = window.location.origin
+) {
+  return new URL(url, pageOrigin).href;
 }
 
 function loadLegacyScript(src: string) {

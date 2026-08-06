@@ -6,6 +6,7 @@ import { createApp } from "vue";
 import type { Router, RouteRecordRaw } from "vue-router";
 import { usePluginModuleStore } from "@/stores/plugin";
 import {
+  resolveProviderEntryUrl,
   setupUiPluginRuntime,
   type UiPluginProviderDescriptor,
 } from "./setupModules";
@@ -29,6 +30,19 @@ vi.mock("@/locales", () => ({
     },
   },
 }));
+
+describe("resolveProviderEntryUrl", () => {
+  it("resolves a provider entry against the Halo page origin", () => {
+    expect(
+      resolveProviderEntryUrl(
+        "/plugins/content-tools/assets/console/main.js?v=version",
+        "http://localhost:8090"
+      )
+    ).toBe(
+      "http://localhost:8090/plugins/content-tools/assets/console/main.js?v=version"
+    );
+  });
+});
 
 describe("setupUiPluginRuntime", () => {
   beforeEach(() => {
