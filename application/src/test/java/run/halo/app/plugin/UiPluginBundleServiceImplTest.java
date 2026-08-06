@@ -10,12 +10,11 @@ import java.io.IOException;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -52,14 +51,14 @@ class UiPluginBundleServiceImplTest {
     @BeforeEach
     void setUp() {
         service = new UiPluginBundleServiceImpl(pluginManager, themeService, themeRoot);
-        service.setTempDir(tempDir.resolve("snapshots"));
+        service.setTempDir(tempDir.resolve("bundles"));
         lenient().when(themeRoot.get()).thenReturn(tempDir.resolve("themes"));
         lenient().when(pluginManager.startedPlugins()).thenReturn(List.of());
         lenient().when(themeService.fetchActivatedTheme()).thenReturn(Mono.empty());
     }
 
     @Test
-    void shouldBuildLegacySnapshotFromStartedPluginsAndActivatedTheme() throws Exception {
+    void shouldBuildVersionedLegacyDescriptorFromStartedPluginsAndActivatedTheme() throws Exception {
         var plugin = mockClasspathPlugin("legacy-plugin", "plugin/plugin-for-ui-assets");
         when(pluginManager.startedPlugins()).thenReturn(List.of(plugin));
         var activeTheme = prepareActiveTheme("active", "2.0.0");
@@ -68,17 +67,20 @@ class UiPluginBundleServiceImplTest {
         writeThemeUiFile("active", "style.css", readTestResource("theme/legacy-ui-assets/style.css"));
         writeThemeUiFile("inactive", "main.js", "console.log('inactive-theme');");
 
-        var snapshot = service.getProviderSnapshot().block();
+        var descriptor = service.getProviderDescriptor().block();
 
-        assertThat(snapshot).isNotNull();
-        assertThat(snapshot.providers()).isEmpty();
-        assertThat(snapshot.invalid()).isEmpty();
-        assertThat(snapshot.registrations())
-                .extracting(UiPluginProviderSnapshot.Registration::name)
+        assertThat(descriptor).isNotNull();
+        assertThat(descriptor.providers()).isEmpty();
+        assertThat(descriptor.invalid()).isEmpty();
+        assertThat(descriptor.registrations())
+                .extracting(UiPluginProviderDescriptor.Registration::name)
                 .containsExactly("legacy-plugin", "theme:active");
-        assertThat(snapshot.legacy().script()).endsWith("/snapshots/" + snapshot.generation() + "/bundle.js");
+        assertThat(descriptor.legacy().script())
+                .isEqualTo("/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.js?v=" + descriptor.version());
+        assertThat(descriptor.legacy().style())
+                .isEqualTo("/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.css?v=" + descriptor.version());
 
-        assertThat(read(service.getJsBundle(snapshot.generation()).block()))
+        assertThat(read(service.getJsBundle(descriptor.version()).block()))
                 .contains("console.log(\"ui\");")
                 .contains("VueUse.ref(\"legacy-plugin\")")
                 .doesNotContain("console.log(\"console\");")
@@ -88,43 +90,52 @@ class UiPluginBundleServiceImplTest {
                 .contains(
                         "{\"name\":\"theme:active\",\"type\":\"theme\",\"themeName\":\"active\",\"version\":\"2.0.0\"}")
                 .contains("this.enabledPlugins = [{\"name\":\"legacy-plugin\",\"version\":\"1.0.0\"}]");
-        assertThat(read(service.getCssBundle(snapshot.generation()).block()))
+        assertThat(read(service.getCssBundle(descriptor.version()).block()))
                 .contains(".ui")
                 .contains(".legacy-theme");
     }
 
     @Test
-    void shouldClassifyAndServeMixedEsmAndLegacyProviders() throws Exception {
-        var esmPlugin = mockPlugin(
-                "esm-plugin",
+    void shouldDescribeEsmResourcesThroughExistingStaticMappings() throws Exception {
+        var uiPlugin = mockPlugin(
+                "ui-plugin",
                 Map.of(
                         "ui/ui-plugin.json",
-                                "{\"format\":\"esm\",\"entry\":\"./main.js\",\"styles\":[\"./style.css\"]}",
-                        "ui/main.js", "export { value } from './chunks/lazy.js';",
-                        "ui/style.css", ".esm {}",
-                        "ui/chunks/lazy.js", "export const value = 'lazy';"));
-        var legacyPlugin = mockPlugin("legacy-plugin", Map.of("ui/main.js", "console.log('legacy');"));
-        when(pluginManager.startedPlugins()).thenReturn(List.of(legacyPlugin, esmPlugin));
+                                "{\"format\":\"esm\",\"entry\":\"./main.js\",\"styles\":[\"./styles/main.css\"]}",
+                        "ui/main.js", "export default {};",
+                        "ui/styles/main.css", ".ui {}"));
+        var consolePlugin = mockPlugin(
+                "console-plugin",
+                Map.of(
+                        "console/ui-plugin.json", "{\"format\":\"esm\",\"entry\":\"./main.js\",\"styles\":[]}",
+                        "console/main.js", "export default {};"));
+        when(pluginManager.startedPlugins()).thenReturn(List.of(uiPlugin, consolePlugin));
 
-        var snapshot = service.getProviderSnapshot().block();
+        var activeTheme = prepareActiveTheme("active", "2.0.0");
+        when(themeService.fetchActivatedTheme()).thenReturn(Mono.just(activeTheme));
+        writeThemeUiFile(
+                "active",
+                "ui-plugin.json",
+                "{\"format\":\"esm\",\"entry\":\"./chunks/main.js\",\"styles\":[\"./styles/theme.css\"]}");
+        writeThemeUiFile("active", "chunks/main.js", "export default {};");
+        writeThemeUiFile("active", "styles/theme.css", ".theme {}");
 
-        assertThat(snapshot).isNotNull();
-        assertThat(snapshot.registrations())
-                .extracting(UiPluginProviderSnapshot.Registration::name)
-                .containsExactly("esm-plugin", "legacy-plugin");
-        assertThat(snapshot.providers()).singleElement().satisfies(provider -> {
-            assertThat(provider.name()).isEqualTo("esm-plugin");
-            assertThat(provider.entry()).endsWith("/providers/plugin/esm-plugin/main.js");
-            assertThat(provider.styles()).singleElement().asString().endsWith("/providers/plugin/esm-plugin/style.css");
-        });
-        assertThat(read(service.getProviderResource(snapshot.generation(), "plugin", "esm-plugin", "chunks/lazy.js")
-                        .block()))
-                .isEqualTo("export const value = 'lazy';");
-        assertThat(read(service.getJsBundle(snapshot.generation()).block()))
-                .contains("console.log('legacy');")
-                .doesNotContain("export const value")
-                .doesNotContain("\"name\":\"esm-plugin\"")
-                .contains("\"name\":\"legacy-plugin\"");
+        var descriptor = service.getProviderDescriptor().block();
+
+        assertThat(descriptor).isNotNull();
+        assertThat(descriptor.providers())
+                .extracting(UiPluginProviderDescriptor.EsmProvider::entry)
+                .containsExactly(
+                        "/plugins/console-plugin/assets/console/main.js?v=" + descriptor.version(),
+                        "/plugins/ui-plugin/assets/ui/main.js?v=" + descriptor.version(),
+                        "/themes/active/ui-plugin/assets/chunks/main.js?v=" + descriptor.version());
+        assertThat(descriptor.providers().get(1).styles())
+                .containsExactly("/plugins/ui-plugin/assets/ui/styles/main.css?v=" + descriptor.version());
+        assertThat(descriptor.providers().get(2).styles())
+                .containsExactly("/themes/active/ui-plugin/assets/styles/theme.css?v=" + descriptor.version());
+        assertThat(read(service.getJsBundle(descriptor.version()).block()))
+                .doesNotContain("export default")
+                .contains("this.enabledUiPlugins = [];this.enabledPlugins = []");
     }
 
     @Test
@@ -143,98 +154,29 @@ class UiPluginBundleServiceImplTest {
                         "ui/main.js", "console.log('must-not-fallback');"));
         when(pluginManager.startedPlugins()).thenReturn(List.of(traversal, extraField));
 
-        var snapshot = service.getProviderSnapshot().block();
+        var descriptor = service.getProviderDescriptor().block();
 
-        assertThat(snapshot).isNotNull();
-        assertThat(snapshot.providers()).isEmpty();
-        assertThat(snapshot.invalid())
-                .extracting(UiPluginProviderSnapshot.InvalidProvider::name)
+        assertThat(descriptor).isNotNull();
+        assertThat(descriptor.providers()).isEmpty();
+        assertThat(descriptor.invalid())
+                .extracting(UiPluginProviderDescriptor.InvalidProvider::name)
                 .containsExactly("extra-field", "traversal");
-        assertThat(snapshot.invalid())
-                .extracting(UiPluginProviderSnapshot.InvalidProvider::reason)
-                .allMatch(reason -> reason.contains("Provider"));
-        assertThat(service.getProviderResource(snapshot.generation(), "plugin", "extra-field", "main.js")
-                        .block())
-                .isNull();
-        assertThat(read(service.getJsBundle(snapshot.generation()).block()))
+        assertThat(read(service.getJsBundle(descriptor.version()).block()))
                 .doesNotContain("must-not-run", "must-not-fallback")
                 .contains("this.enabledUiPlugins = [];this.enabledPlugins = []");
     }
 
     @Test
-    void shouldRetainCurrentAndPreviousGenerationWithoutContentSubstitution() throws Exception {
-        var source = tempDir.resolve("plugins/changing/ui/main.js");
-        var plugin = mockPlugin("changing", Map.of("ui/main.js", "console.log('one');"));
-        when(pluginManager.startedPlugins()).thenReturn(List.of(plugin));
-
-        var first = service.getProviderSnapshot().block();
-        Files.writeString(source, "console.log('two');");
-        service.onPluginStarted(null);
-        var second = service.getProviderSnapshot().block();
-
-        assertThat(first).isNotNull();
-        assertThat(second).isNotNull();
-        assertThat(second.generation()).isNotEqualTo(first.generation());
-        assertThat(read(service.getJsBundle(first.generation()).block()))
-                .contains("one")
-                .doesNotContain("two");
-        assertThat(read(service.getJsBundle(second.generation()).block()))
-                .contains("two")
-                .doesNotContain("one");
-        assertThat(service.snapshotCount()).isEqualTo(2);
-
-        Files.writeString(source, "console.log('three');");
-        service.onPluginStopped(null);
-        var third = service.getProviderSnapshot().block();
-
-        assertThat(third).isNotNull();
-        assertThat(service.snapshotCount()).isEqualTo(2);
-        assertThat(service.getJsBundle(first.generation()).block()).isNull();
-        assertThat(read(service.getJsBundle(second.generation()).block())).contains("two");
-        assertThat(read(service.getJsBundle(third.generation()).block())).contains("three");
-    }
-
-    @Test
-    void shouldRebuildDevelopmentSnapshotWithoutLifecycleEvent() throws Exception {
-        var source = tempDir.resolve("plugins/development/ui/main.js");
-        var plugin = mockPlugin("development", Map.of("ui/main.js", "console.log('one');"));
+    void shouldUseCurrentTimeAsVersionInDevelopment() throws Exception {
+        var plugin = mockPlugin("development", Map.of("ui/main.js", "console.log('development');"));
         when(pluginManager.startedPlugins()).thenReturn(List.of(plugin));
         when(pluginManager.isDevelopment()).thenReturn(true);
+        service.setClock(Clock.fixed(Instant.ofEpochMilli(1_000), ZoneOffset.UTC));
 
-        var first = service.getProviderSnapshot().block();
-        Files.writeString(source, "console.log('two');");
-        var second = service.getProviderSnapshot().block();
+        assertThat(service.getProviderDescriptor().block().version()).isEqualTo("1000");
 
-        assertThat(first).isNotNull();
-        assertThat(second).isNotNull();
-        assertThat(second.generation()).isNotEqualTo(first.generation());
-    }
-
-    @Test
-    void shouldNotLoseInvalidationDuringSnapshotDiscovery() throws Exception {
-        var discoveryStarted = new CountDownLatch(1);
-        var continueDiscovery = new CountDownLatch(1);
-        var subscriptions = new AtomicInteger();
-        when(themeService.fetchActivatedTheme()).thenAnswer(invocation -> {
-            if (subscriptions.incrementAndGet() == 1) {
-                return Mono.defer(() -> {
-                    discoveryStarted.countDown();
-                    await(continueDiscovery);
-                    return Mono.empty();
-                });
-            }
-            return Mono.empty();
-        });
-
-        var first = CompletableFuture.supplyAsync(
-                () -> service.getProviderSnapshot().block());
-        assertThat(discoveryStarted.await(5, TimeUnit.SECONDS)).isTrue();
-        service.onSystemConfigChanged(null);
-        continueDiscovery.countDown();
-        assertThat(first.get(5, TimeUnit.SECONDS)).isNotNull();
-
-        assertThat(service.getProviderSnapshot().block()).isNotNull();
-        assertThat(subscriptions).hasValue(2);
+        service.setClock(Clock.fixed(Instant.ofEpochMilli(2_000), ZoneOffset.UTC));
+        assertThat(service.getProviderDescriptor().block().version()).isEqualTo("2000");
     }
 
     @Test
@@ -244,11 +186,11 @@ class UiPluginBundleServiceImplTest {
         writeThemeUiFile("active", "style.css", ".active {}");
         writeThemeUiFile("inactive", "main.js", "console.log('inactive');");
 
-        var snapshot = service.getProviderSnapshot().block();
+        var descriptor = service.getProviderDescriptor().block();
 
-        assertThat(snapshot).isNotNull();
-        assertThat(read(service.getJsBundle(snapshot.generation()).block())).doesNotContain("theme:active", "inactive");
-        assertThat(read(service.getCssBundle(snapshot.generation()).block()))
+        assertThat(descriptor).isNotNull();
+        assertThat(read(service.getJsBundle(descriptor.version()).block())).doesNotContain("theme:active", "inactive");
+        assertThat(read(service.getCssBundle(descriptor.version()).block()))
                 .contains(".active {}")
                 .doesNotContain("inactive");
     }
@@ -260,26 +202,24 @@ class UiPluginBundleServiceImplTest {
             Files.createDirectories(path.getParent());
             Files.writeString(path, file.getValue());
         }
-        var pluginWrapper = mock(PluginWrapper.class);
-        var descriptor = mock(PluginDescriptor.class);
-        var classLoader =
-                new URLClassLoader(new java.net.URL[] {pluginRoot.toUri().toURL()});
-        when(pluginWrapper.getPluginId()).thenReturn(pluginId);
-        lenient().when(pluginWrapper.getPluginClassLoader()).thenReturn(classLoader);
-        lenient().when(pluginWrapper.getDescriptor()).thenReturn(descriptor);
-        lenient().when(descriptor.getVersion()).thenReturn("1.0.0");
-        return pluginWrapper;
+        return mockPlugin(
+                pluginId,
+                new URLClassLoader(new java.net.URL[] {pluginRoot.toUri().toURL()}));
     }
 
     private PluginWrapper mockClasspathPlugin(String pluginId, String resourceRoot) throws IOException {
         var pluginRoot = ResourceUtils.getURL("classpath:" + resourceRoot + "/");
+        return mockPlugin(pluginId, new URLClassLoader(new java.net.URL[] {pluginRoot}));
+    }
+
+    private PluginWrapper mockPlugin(String pluginId, URLClassLoader classLoader) {
         var pluginWrapper = mock(PluginWrapper.class);
         var descriptor = mock(PluginDescriptor.class);
-        var classLoader = new URLClassLoader(new java.net.URL[] {pluginRoot});
         when(pluginWrapper.getPluginId()).thenReturn(pluginId);
         lenient().when(pluginWrapper.getPluginClassLoader()).thenReturn(classLoader);
         lenient().when(pluginWrapper.getDescriptor()).thenReturn(descriptor);
         lenient().when(descriptor.getVersion()).thenReturn("1.0.0");
+        lenient().when(pluginManager.getPlugin(pluginId)).thenReturn(pluginWrapper);
         return pluginWrapper;
     }
 
@@ -296,8 +236,9 @@ class UiPluginBundleServiceImplTest {
 
     private void writeThemeUiFile(String themeName, String filename, String content) throws IOException {
         var uiPath = themeRoot.get().resolve(themeName).resolve("ui-plugin").resolve("dist");
-        Files.createDirectories(uiPath);
-        Files.writeString(uiPath.resolve(filename), content);
+        var file = uiPath.resolve(filename);
+        Files.createDirectories(file.getParent());
+        Files.writeString(file, content);
     }
 
     private String readTestResource(String location) throws IOException {
@@ -308,16 +249,5 @@ class UiPluginBundleServiceImplTest {
     private static String read(Resource resource) throws IOException {
         assertThat(resource).isNotNull();
         return resource.getContentAsString(UTF_8);
-    }
-
-    private static void await(CountDownLatch latch) {
-        try {
-            if (!latch.await(5, TimeUnit.SECONDS)) {
-                throw new IllegalStateException("Timed out waiting for test latch");
-            }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new IllegalStateException(e);
-        }
     }
 }

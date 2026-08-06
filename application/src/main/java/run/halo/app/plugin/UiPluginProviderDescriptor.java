@@ -2,15 +2,15 @@ package run.halo.app.plugin;
 
 import java.util.List;
 
-/** Immutable browser descriptor for one generation of plugin and theme UI providers. */
-public record UiPluginProviderSnapshot(
-        String generation,
+/** Browser descriptor for the currently enabled plugin and theme UI providers. */
+public record UiPluginProviderDescriptor(
+        String version,
         LegacyResources legacy,
         List<Registration> registrations,
         List<EsmProvider> providers,
         List<InvalidProvider> invalid) {
 
-    public UiPluginProviderSnapshot {
+    public UiPluginProviderDescriptor {
         registrations = List.copyOf(registrations);
         providers = List.copyOf(providers);
         invalid = List.copyOf(invalid);

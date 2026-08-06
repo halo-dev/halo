@@ -126,48 +126,49 @@ Halo SHALL own the browser mapping from supported shared package roots to Halo-p
 - **THEN** it SHALL receive the separately created shared Halo API instance with host authentication and error handling
 - **THEN** ordinary provider clients SHALL be created with `axios.create()` instead of mutating shared defaults or interceptors
 
-### Requirement: Generation-bound provider snapshot
+### Requirement: Versioned provider descriptor
 
-Halo SHALL derive provider descriptors, legacy aggregates, and ESM resource URLs from one immutable provider generation.
+Halo SHALL describe current UI providers through one authenticated response that reuses existing static resource mappings and supplies a version query for cache invalidation.
 
-#### Scenario: Provider snapshot is requested
+#### Scenario: Provider descriptor is requested
 
 - **WHEN** an authenticated Console or User Center session requests its provider descriptor
-- **THEN** Halo SHALL classify the started plugins and activated theme once
-- **THEN** the response SHALL contain one generation, generation-bound legacy script/style URLs, valid ESM descriptors, and invalid-provider diagnostics from that classification
+- **THEN** Halo SHALL classify the currently started plugins and activated theme
+- **THEN** the response SHALL contain one version, versioned legacy script/style URLs, valid ESM descriptors, and invalid-provider diagnostics from that classification
+
+#### Scenario: ESM plugin resource is described
+
+- **WHEN** a plugin is classified as ESM
+- **THEN** its entry and style URLs SHALL use the existing `/plugins/{name}/assets/ui/` mapping or the selected legacy `/assets/console/` fallback
+- **THEN** each URL SHALL include the descriptor version as a query parameter
+
+#### Scenario: ESM theme resource is described
+
+- **WHEN** the activated theme is classified as ESM
+- **THEN** its entry and style URLs SHALL use the existing `/themes/{name}/ui-plugin/assets/` mapping
+- **THEN** each URL SHALL include the descriptor version as a query parameter
 
 #### Scenario: Provider state changes during startup
 
-- **WHEN** a plugin is started, stopped, or upgraded or the active theme changes after a snapshot response is created
-- **THEN** the snapshot's legacy and ESM URLs SHALL NOT serve content from the newer provider generation
-- **THEN** the next descriptor request SHALL observe a newly generated snapshot
-
-#### Scenario: Previous snapshot is still loading
-
-- **WHEN** a page has received the immediately previous generation and a new generation becomes current
-- **THEN** Halo SHALL retain enough previous snapshot resources for that page to complete provider startup
-
-#### Scenario: Snapshot generation is evicted
-
-- **WHEN** a page requests a generation older than the retained snapshot window
-- **THEN** Halo SHALL fail closed without substituting current-generation content
-- **THEN** the UI SHALL direct the user to reload
+- **WHEN** a plugin or theme changes after a descriptor response is created
+- **THEN** Halo SHALL NOT claim immutable content for the previous response or retain copied provider resources
+- **THEN** a full page reload SHALL obtain a newly versioned current descriptor as the supported recovery boundary
 
 ### Requirement: Shared UI provider registration store
 
 Halo SHALL expose format-neutral UI provider availability and registration metadata through `stores.uiPlugins()` exported by `@halo-dev/ui-shared`.
 
-#### Scenario: Provider snapshot initializes the store
+#### Scenario: Provider descriptor initializes the store
 
-- **WHEN** Console or User Center receives a provider snapshot
+- **WHEN** Console or User Center receives a provider descriptor
 - **THEN** Halo SHALL populate the shared store before evaluating legacy or ESM provider entries
 - **THEN** each discovered plugin or activated-theme provider SHALL have Halo-owned name, type, version, and lifecycle metadata
-- **THEN** valid providers SHALL start as `pending` and providers already invalidated by snapshot discovery SHALL start as `failed`
+- **THEN** valid providers SHALL start as `pending` and providers already invalidated by descriptor discovery SHALL start as `failed`
 
 #### Scenario: Enabled provider is queried
 
 - **WHEN** provider code calls `isEnabled(name)`
-- **THEN** the result SHALL reactively indicate whether that UI provider is present in the current snapshot regardless of IIFE or ESM format
+- **THEN** the result SHALL reactively indicate whether that UI provider is present in the current descriptor regardless of IIFE or ESM format
 
 #### Scenario: Registered provider is queried
 
@@ -200,13 +201,13 @@ Halo SHALL load legacy IIFE and ESM UI providers in the same Console or User Cen
 #### Scenario: Provider descriptors are requested
 
 - **WHEN** an authenticated Console or User Center session initializes UI providers
-- **THEN** Halo SHALL return the current generation-bound provider-neutral descriptor containing the enabled plugin providers and the activated theme provider
+- **THEN** Halo SHALL return the current provider-neutral descriptor containing the enabled plugin providers and the activated theme provider
 - **THEN** inactive themes SHALL NOT be included
 
 #### Scenario: Legacy aggregate is loaded
 
 - **WHEN** one or more discovered providers are classified as legacy IIFE providers
-- **THEN** Halo SHALL load them through the snapshot's generation-bound aggregate bundle behavior
+- **THEN** Halo SHALL load them through the descriptor's versioned aggregate bundle behavior
 - **THEN** the aggregate SHALL exclude providers classified as ESM
 
 #### Scenario: ESM entries are loaded
@@ -328,8 +329,8 @@ Halo SHALL treat a full Console or User Center page load as the supported module
 #### Scenario: Production ESM assets are cached
 
 - **WHEN** production provider ESM resources are emitted
-- **THEN** entry, style, chunk, and asset responses SHALL be bound to an immutable provider snapshot generation
-- **THEN** asynchronous chunks and assets SHALL use content-hashed URLs suitable for immutable caching
+- **THEN** entry, style, and aggregate URLs SHALL include the current provider descriptor version as a cache key
+- **THEN** asynchronous chunks and assets SHALL use provider-relative content-hashed URLs where supported
 - **THEN** provider discovery metadata SHALL be revalidated so it reflects currently enabled providers
 
 ### Requirement: Development and packaged runtime parity

@@ -23,7 +23,7 @@ The change spans the UI build, bundler kit, backend resource discovery, runtime 
 - Publish sparse shared dependency inventories that record exact host facts and broad, best-effort provider build ranges.
 - Resolve shared dependencies through one host-owned Import Map and preserve identity for stateful frameworks.
 - Apply the same ESM contract to Vite and Rsbuild, plugin and theme providers, Console and User Center.
-- Bind provider discovery, legacy aggregates, and ESM resources to one immutable generation.
+- Reuse the existing plugin and theme static resource mappings and add a provider version query for cache invalidation.
 - Isolate ESM provider loading and registration failures without preventing the core UI or other providers from starting.
 - Validate both the proxied development topology and the packaged BootJar topology in real browsers.
 
@@ -169,37 +169,39 @@ Axios sharing exposes the standard package module, not Halo's configured API cli
 
 Alternative considered: point Import Map entries at current npm ESM outputs. Current Halo package outputs retain additional bare imports such as VueUse and Axios, while raw Vue Router, Pinia, and FormKit graphs add internal dependency and identity concerns. Dedicated browser runtime artifacts keep the public dependency graph limited to the inventory.
 
-### Discover providers through one generation-bound snapshot
+### Discover providers through one versioned descriptor
 
-The backend classifies providers once into an immutable snapshot. It reads the started plugin set, activated theme, Halo-managed identity/version/requirements, and provider manifests as one consistent input, then produces one generation identifier covering that classification. A snapshot is invalidated by plugin start/stop/upgrade or theme activation/development changes; the next descriptor request creates a new snapshot atomically.
+The backend classifies the current started plugin set and activated theme when the authenticated provider descriptor is requested. The response contains a version derived from Halo-managed provider identity and version data, versioned legacy aggregate URLs, valid ESM descriptors, and invalid-provider diagnostics. The descriptor is revalidated rather than treated as an immutable resource snapshot.
 
-The authenticated provider-neutral response contains the generation, generation-bound legacy script/style URLs, valid ESM descriptors, and invalid-provider diagnostics. For example:
+ESM entries and styles reuse the static mappings Halo already exposes for plugin `ui` or legacy `console` resources and activated-theme `ui-plugin` resources. The version is appended as a query parameter to invalidate cached entry, style, and aggregate responses without copying resources or introducing another proxy path. For example:
 
 ```json
 {
-  "generation": "abc123",
+  "version": "abc123",
   "legacy": {
-    "script": "/apis/.../snapshots/abc123/bundle.js",
-    "style": "/apis/.../snapshots/abc123/bundle.css"
+    "script": "/apis/.../bundle.js?v=abc123",
+    "style": "/apis/.../bundle.css?v=abc123"
   },
   "providers": [
     {
       "name": "plugin-search",
       "type": "plugin",
-      "entry": "/apis/.../snapshots/abc123/plugin-search/main.js",
+      "entry": "/plugins/plugin-search/assets/ui/main.js?v=abc123",
       "styles": []
     }
   ]
 }
 ```
 
-Generation URLs never return resources from another snapshot. The backend retains at least the current and immediately previous snapshot so a page that has received a descriptor can complete startup during a concurrent provider change. An evicted generation fails closed and instructs the page to reload. This may use a small bounded cache of metadata/resource handles and generated aggregate files; it does not require a database or a broad new catalog subsystem.
+Plugin bundles continue preferring `ui` and falling back to `console`; the selected directory is reflected in the generated URL. Theme bundles use `/themes/{theme}/ui-plugin/assets/{resource}`. Query parameters do not change path resolution, and emitted asynchronous chunks continue using their provider-relative, content-hashed paths.
 
-The legacy JavaScript and CSS generated for a snapshot include only that snapshot's IIFE providers. Existing aggregate endpoints and compatibility aliases remain available. Existing globals, `enabledPlugins`, `enabledUiPlugins`, plugin-name ordering, theme module naming, and `ui`-before-`console` resource selection remain compatible for legacy artifacts.
+The version query is a cache key, not an immutable server-side snapshot. If provider files change after a descriptor is returned, a partially loaded page can observe the newer files. Provider lifecycle changes already use a full page reload as the supported replacement boundary, so the runtime reports a load failure and reload remains the recovery path. The design intentionally avoids resource copying, retained generations, and generation-specific proxy endpoints.
+
+The legacy JavaScript and CSS generated for the current descriptor include only currently classified IIFE providers. Existing aggregate endpoints and compatibility aliases remain available and accept the same version query. Existing globals, `enabledPlugins`, `enabledUiPlugins`, plugin-name ordering, theme module naming, and `ui`-before-`console` resource selection remain compatible for legacy artifacts.
 
 Public `Plugin.status` and `Theme.status` remain unchanged. Descriptor validation and errors remain internal until the diagnostic model is stable.
 
-Alternative considered: request descriptors and legacy aggregates from independently discovered state. A provider change between those requests can execute a provider twice or omit it entirely, so both lanes must be bound to one generation.
+Alternative considered: retain immutable server-side generations to make descriptor and aggregate requests atomic across a concurrent provider change. That guarantee requires copying resources, proxy routes, and eviction behavior; the added machinery is not justified for an optional ESM path whose supported replacement boundary is already a full page reload.
 
 ### Expose provider availability through a shared Pinia store
 
@@ -214,7 +216,7 @@ interface UiPluginRegistration {
 }
 ```
 
-The public surface provides a reactive registration collection plus `get(name)`, `isEnabled(name)`, and `isRegistered(name)`. Record presence means that the UI provider is enabled/discovered in the current snapshot; `registered` means its current-page module commit succeeded. The store is seeded from Halo-owned snapshot metadata before legacy scripts or ESM entries are evaluated, then the loader changes `pending` to `registered` or `failed` as loading and registration settle. It applies equally to plugin and activated-theme providers in Console and User Center.
+The public surface provides a reactive registration collection plus `get(name)`, `isEnabled(name)`, and `isRegistered(name)`. Record presence means that the UI provider is enabled/discovered in the current descriptor; `registered` means its current-page module commit succeeded. The store is seeded from Halo-owned descriptor metadata before legacy scripts or ESM entries are evaluated, then the loader changes `pending` to `registered` or `failed` as loading and registration settle. It applies equally to plugin and activated-theme providers in Console and User Center.
 
 This distinguishes two existing use cases:
 
@@ -230,10 +232,10 @@ The existing internal `usePluginModuleStore` may continue holding successfully l
 The UI startup flow becomes:
 
 ```text
-fetch one provider snapshot
+fetch the current provider descriptor
   -> seed the shared provider-registration store as pending
   -> insert provider styles in descriptor order
-  -> load the generation-bound legacy aggregate once
+  -> load the versioned legacy aggregate once
   -> import valid ESM entries in parallel with all-settled semantics
   -> prepare and validate PluginModule objects
   -> register accepted providers sequentially in descriptor order
@@ -253,7 +255,7 @@ Legacy aggregate behavior is kept intact rather than rewritten into per-provider
 
 The browser caches each module URL once per document, and current routes, Pinia stores, components, and FormKit registrations lack a safe general unload protocol. Installing, upgrading, enabling, disabling, or activating a provider therefore requires or prompts a full Console/User Center reload.
 
-Production entry, chunk, style, and asset URLs are served through or bound to the immutable snapshot generation; emitted chunks and assets also use content hashes where supported. Provider descriptor responses are not stored without revalidation. ESM execution never falls back to IIFE after import begins because top-level effects may already have run.
+Production entry and style URLs receive the descriptor version query, while emitted chunks and assets use provider-relative content-hashed URLs where supported. Provider descriptor responses are not stored without revalidation. ESM execution never falls back to IIFE after import begins because top-level effects may already have run.
 
 HMR across the Halo/provider boundary is not part of the runtime contract. Provider watch builds may trigger or prompt a full page reload.
 
@@ -289,7 +291,7 @@ Compatibility code that exists only until legacy IIFE support ends carries an ad
 TODO(Halo 3): Remove after legacy IIFE UI provider support ends.
 ```
 
-This applies to provider module globals (`window[providerName]`), `window.enabledUiPlugins`, the older `window.enabledPlugins` alias, legacy shared-library globals including VueUse, aggregate/alias endpoints, `ui`-to-`console` resource fallback, bundler IIFE/global mappings, and ESM bridges whose only purpose is adapting legacy globals. Exported declarations use `@deprecated` in addition to the source removal comment where applicable. The new shared registration store, provider snapshot, ESM manifest, and Import Map are not legacy removal targets.
+This applies to provider module globals (`window[providerName]`), `window.enabledUiPlugins`, the older `window.enabledPlugins` alias, legacy shared-library globals including VueUse, aggregate/alias endpoints, `ui`-to-`console` resource fallback, bundler IIFE/global mappings, and ESM bridges whose only purpose is adapting legacy globals. Exported declarations use `@deprecated` in addition to the source removal comment where applicable. The new shared registration store, provider descriptor, ESM manifest, and Import Map are not legacy removal targets.
 
 ## Risks / Trade-offs
 
@@ -299,7 +301,7 @@ This applies to provider module globals (`window[providerName]`), `window.enable
 - [FormKit remains duplicated through a transitive import] → Build one host-owned FormKit graph, externalize transitive core imports, and test node registry operations across host/provider boundaries.
 - [Vite and Rsbuild resolve or emit different graphs] → Share format, inventory, manifest, and import validation logic and run equivalent dynamic-chunk fixtures through both helpers.
 - [User build overrides produce a manifest that lies] → Validate the final resolved build configuration and output graph; fail instead of emitting an inconsistent manifest.
-- [Provider state changes between descriptor and resource requests] → Bind descriptors, legacy aggregates, and ESM resources to immutable generation URLs and retain the current and previous snapshots.
+- [Provider state changes between descriptor and resource requests] → Treat full page reload as the replacement boundary, use a version query to invalidate caches, and report individual resource failures; do not claim immutable content across a concurrent upgrade.
 - [A provider treats another provider's presence as a direct module dependency] → Expose only reactive identity/version/status metadata, distinguish enabled from registered, and keep module objects and registration ordering outside the public store contract.
 - [A provider fails after partially mutating host registries] → Prepare before commit, retain reversible handles, roll back best-effort, attribute the failure, and use reload as the recovery boundary.
 - [Development works while the packaged build fails, or the inverse] → Make both live 3000/8090 browser checks and unpacked/started BootJar checks release-blocking.
@@ -310,7 +312,7 @@ This applies to provider module globals (`window[providerName]`), `window.enable
 ## Migration Plan
 
 1. Generate the initial sparse Halo inventory, browser runtime bridges, Import Map, and shared-identity tests without producing ESM provider artifacts.
-2. Add provider manifest parsing, generation-bound snapshots, the shared provider-registration store, legacy filtering, and the mixed loader while every existing provider still classifies as legacy.
+2. Add provider manifest parsing, the versioned provider descriptor, the shared provider-registration store, legacy filtering, and the mixed loader while every existing provider still classifies as legacy.
 3. Add matching Vite and Rsbuild ESM output for plugins and themes, range/export validation, actionable diagnostics, fixtures, and documentation.
 4. Migrate Halo's own provider-availability checks to the shared store, annotate retained IIFE/global compatibility boundaries for Halo 3 removal, and validate frozen legacy artifacts plus one representative ESM plugin and theme across both bundlers.
 5. Run the same browser acceptance through the live 3000/8090 development topology and the packaged application before publishing the Halo runtime and bundler-kit inventory.

@@ -2,7 +2,6 @@ package run.halo.app.core.endpoint.console;
 
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
@@ -22,7 +21,7 @@ import org.springframework.http.CacheControl;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import run.halo.app.plugin.UiPluginBundleService;
-import run.halo.app.plugin.UiPluginProviderSnapshot;
+import run.halo.app.plugin.UiPluginProviderDescriptor;
 
 @ExtendWith(MockitoExtension.class)
 class UiPluginEndpointTest {
@@ -123,82 +122,32 @@ class UiPluginEndpointTest {
     }
 
     @Test
-    void shouldFetchProviderSnapshotWithoutCaching() {
-        var snapshot = new UiPluginProviderSnapshot(
-                "generation",
-                new UiPluginProviderSnapshot.LegacyResources(
-                        "/snapshots/generation/bundle.js", "/snapshots/generation/bundle.css"),
-                List.of(new UiPluginProviderSnapshot.Registration("esm-plugin", "plugin", "1.0.0")),
-                List.of(new UiPluginProviderSnapshot.EsmProvider(
-                        "esm-plugin",
-                        "plugin",
-                        "1.0.0",
-                        "/snapshots/generation/providers/plugin/esm-plugin/main.js",
-                        List.of())),
+    void shouldFetchProviderDescriptorWithoutCaching() {
+        var descriptor = new UiPluginProviderDescriptor(
+                "version",
+                new UiPluginProviderDescriptor.LegacyResources(
+                        "/ui-plugins/-/bundle.js?v=version", "/ui-plugins/-/bundle.css?v=version"),
+                List.of(new UiPluginProviderDescriptor.Registration("esm-plugin", "plugin", "1.0.0")),
+                List.of(new UiPluginProviderDescriptor.EsmProvider(
+                        "esm-plugin", "plugin", "1.0.0", "/plugins/esm-plugin/assets/ui/main.js?v=version", List.of())),
                 List.of());
-        when(uiPluginBundleService.getProviderSnapshot()).thenReturn(Mono.just(snapshot));
+        when(uiPluginBundleService.getProviderDescriptor()).thenReturn(Mono.just(descriptor));
 
         webClient
                 .get()
-                .uri("/ui-plugins/-/snapshot")
+                .uri("/ui-plugins/-/providers")
                 .exchange()
                 .expectStatus()
                 .isOk()
                 .expectHeader()
                 .cacheControl(CacheControl.noStore())
                 .expectBody()
-                .jsonPath("$.generation")
-                .isEqualTo("generation")
+                .jsonPath("$.version")
+                .isEqualTo("version")
                 .jsonPath("$.providers[0].name")
-                .isEqualTo("esm-plugin");
-    }
-
-    @Test
-    void shouldFetchGenerationBoundBundles() {
-        when(uiPluginBundleService.getJsBundle("generation"))
-                .thenReturn(Mono.fromSupplier(() -> mockResource("snapshot-js")));
-
-        webClient
-                .get()
-                .uri("/ui-plugins/-/snapshots/generation/bundle.js")
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectHeader()
-                .contentType("text/javascript")
-                .expectBody(String.class)
-                .isEqualTo("snapshot-js");
-    }
-
-    @Test
-    void shouldFetchNestedProviderResourceWithJavaScriptMediaType() {
-        when(uiPluginBundleService.getProviderResource("generation", "plugin", "esm-plugin", "chunks/lazy.mjs"))
-                .thenReturn(Mono.fromSupplier(() -> mockResource("export default {};")));
-
-        webClient
-                .get()
-                .uri("/ui-plugins/-/snapshots/generation/providers/plugin/esm-plugin/chunks/lazy.mjs")
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectHeader()
-                .contentType("text/javascript")
-                .expectBody(String.class)
-                .isEqualTo("export default {};");
-
-        verify(uiPluginBundleService).getProviderResource("generation", "plugin", "esm-plugin", "chunks/lazy.mjs");
-    }
-
-    @Test
-    void shouldReturnNotFoundForEvictedGeneration() {
-        when(uiPluginBundleService.getJsBundle("evicted")).thenReturn(Mono.empty());
-
-        webClient
-                .get()
-                .uri("/ui-plugins/-/snapshots/evicted/bundle.js")
-                .exchange()
-                .expectStatus()
-                .isNotFound();
+                .isEqualTo("esm-plugin")
+                .jsonPath("$.providers[0].entry")
+                .isEqualTo("/plugins/esm-plugin/assets/ui/main.js?v=version");
     }
 
     Resource mockResource(String content) {

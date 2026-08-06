@@ -38,8 +38,8 @@ interface InvalidUiProvider extends UiProviderRegistration {
   reason: string;
 }
 
-export interface UiPluginProviderSnapshot {
-  generation: string;
+export interface UiPluginProviderDescriptor {
+  version: string;
   legacy: {
     script: string;
     style: string;
@@ -56,12 +56,10 @@ export interface LoadedPluginModule {
 }
 
 interface UiPluginRuntimeDependencies {
-  fetchSnapshot: () => Promise<UiPluginProviderSnapshot>;
+  fetchProviders: () => Promise<UiPluginProviderDescriptor>;
   importModule: (url: string) => Promise<unknown>;
   loadScript: (url: string) => Promise<void>;
   loadStyle: (url: string, before: ChildNode | null) => Promise<unknown>;
-  isEvicted: (url: string) => Promise<boolean>;
-  reload: () => void;
 }
 
 interface RollbackHandle {
@@ -99,24 +97,24 @@ export async function setupUiPluginRuntime({
   const registrationStore = stores.uiPlugins() as unknown as UiPluginsHostStore;
   pluginModuleStore.clearDiagnostics();
 
-  let snapshot: UiPluginProviderSnapshot;
+  let descriptor: UiPluginProviderDescriptor;
   try {
-    snapshot = await runtime.fetchSnapshot();
+    descriptor = await runtime.fetchProviders();
   } catch (error) {
     setupComponents();
     notifyPluginLoadError(error);
     return [];
   }
 
-  const registrations = mergeRegistrations(snapshot);
+  const registrations = mergeRegistrations(descriptor);
   const registrationsByName = new Map(
     registrations.map((registration) => [registration.name, registration])
   );
   const invalidNames = new Set(
-    snapshot.invalid.map((provider) => provider.name)
+    descriptor.invalid.map((provider) => provider.name)
   );
   const esmProvidersByName = new Map(
-    snapshot.providers.map((provider) => [provider.name, provider])
+    descriptor.providers.map((provider) => [provider.name, provider])
   );
   const legacyRegistrations = registrations.filter(
     (registration) =>
@@ -135,10 +133,7 @@ export async function setupUiPluginRuntime({
     registration: UiProviderRegistration,
     stage: UiPluginFailureStage,
     error: unknown,
-    details: Pick<
-      UiPluginDiagnostic,
-      "reloadRequired" | "incompleteRollback"
-    > = {}
+    details: Pick<UiPluginDiagnostic, "incompleteRollback"> = {}
   ) => {
     const diagnostic: UiPluginDiagnostic = {
       name: registration.name,
@@ -152,18 +147,18 @@ export async function setupUiPluginRuntime({
     console.error("[Halo UI provider]", diagnostic, error);
   };
 
-  for (const invalid of snapshot.invalid) {
+  for (const invalid of descriptor.invalid) {
     report(invalid, "discovery", invalid.reason);
   }
 
   const styleJobs: StyleJob[] = [];
   if (legacyRegistrations.length > 0) {
     styleJobs.push({
-      url: snapshot.legacy.style,
+      url: descriptor.legacy.style,
       registrations: legacyRegistrations,
     });
   }
-  for (const provider of snapshot.providers) {
+  for (const provider of descriptor.providers) {
     for (const style of provider.styles) {
       styleJobs.push({ url: style, registrations: [provider] });
     }
@@ -175,9 +170,9 @@ export async function setupUiPluginRuntime({
   );
   const legacyScriptLoad =
     legacyRegistrations.length > 0
-      ? runtime.loadScript(snapshot.legacy.script)
+      ? runtime.loadScript(descriptor.legacy.script)
       : Promise.resolve();
-  const esmImports = snapshot.providers.map((provider) =>
+  const esmImports = descriptor.providers.map((provider) =>
     runtime.importModule(provider.entry)
   );
 
@@ -188,7 +183,6 @@ export async function setupUiPluginRuntime({
       Promise.allSettled(esmImports),
     ]);
 
-  let reloadRequired = false;
   const failedNames = new Set(invalidNames);
 
   for (const [index, result] of styleResults.entries()) {
@@ -196,24 +190,16 @@ export async function setupUiPluginRuntime({
       continue;
     }
     const job = styleJobs[index];
-    const evicted = await runtime.isEvicted(job.url);
-    reloadRequired ||= evicted;
     for (const registration of job.registrations) {
       failedNames.add(registration.name);
-      report(registration, "style", result.reason, {
-        reloadRequired: evicted,
-      });
+      report(registration, "style", result.reason);
     }
   }
 
   if (legacyScriptResult.status === "rejected") {
-    const evicted = await runtime.isEvicted(snapshot.legacy.script);
-    reloadRequired ||= evicted;
     for (const registration of legacyRegistrations) {
       failedNames.add(registration.name);
-      report(registration, "entry", legacyScriptResult.reason, {
-        reloadRequired: evicted,
-      });
+      report(registration, "entry", legacyScriptResult.reason);
     }
   }
 
@@ -246,12 +232,10 @@ export async function setupUiPluginRuntime({
   }
 
   for (const [index, result] of esmImportResults.entries()) {
-    const provider = snapshot.providers[index];
+    const provider = descriptor.providers[index];
     if (result.status === "rejected") {
-      const evicted = await runtime.isEvicted(provider.entry);
-      reloadRequired ||= evicted;
       failedNames.add(provider.name);
-      report(provider, "entry", result.reason, { reloadRequired: evicted });
+      report(provider, "entry", result.reason);
       continue;
     }
     const module = (result.value as { default?: unknown })?.default;
@@ -339,9 +323,6 @@ export async function setupUiPluginRuntime({
   if (pluginModuleStore.diagnostics.length > 0) {
     Toast.error(i18n.global.t("core.plugin.loader.toast.entry_load_failed"));
   }
-  if (reloadRequired) {
-    runtime.reload();
-  }
   return registeredModules;
 }
 
@@ -381,10 +362,10 @@ export function notifyPluginLoadError(error: unknown) {
   Toast.error(message);
 }
 
-function mergeRegistrations(snapshot: UiPluginProviderSnapshot) {
-  const registrations = [...snapshot.registrations];
+function mergeRegistrations(descriptor: UiPluginProviderDescriptor) {
+  const registrations = [...descriptor.registrations];
   const names = new Set(registrations.map((registration) => registration.name));
-  for (const invalid of snapshot.invalid) {
+  for (const invalid of descriptor.invalid) {
     if (!names.has(invalid.name)) {
       registrations.push(invalid);
       names.add(invalid.name);
@@ -829,9 +810,9 @@ function createRuntimeDependencies(
   overrides: Partial<UiPluginRuntimeDependencies> = {}
 ): UiPluginRuntimeDependencies {
   return {
-    fetchSnapshot: async () => {
-      const { data } = await axiosInstance.get<UiPluginProviderSnapshot>(
-        "/apis/api.console.halo.run/v1alpha1/ui-plugins/-/snapshot",
+    fetchProviders: async () => {
+      const { data } = await axiosInstance.get<UiPluginProviderDescriptor>(
+        "/apis/api.console.halo.run/v1alpha1/ui-plugins/-/providers",
         { mute: true }
       );
       return data;
@@ -839,18 +820,6 @@ function createRuntimeDependencies(
     importModule: (url) => import(/* @vite-ignore */ url),
     loadScript: loadLegacyScript,
     loadStyle,
-    isEvicted: async (url) => {
-      try {
-        const response = await fetch(url, {
-          cache: "no-store",
-          credentials: "same-origin",
-        });
-        return response.status === 404;
-      } catch {
-        return false;
-      }
-    },
-    reload: () => window.location.reload(),
     ...overrides,
   };
 }

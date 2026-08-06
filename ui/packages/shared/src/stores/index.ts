@@ -74,7 +74,7 @@ const useUiPluginsStore = defineStore("ui-plugins", () => {
  * that needs to be accessed across multiple components and plugins.
  */
 export const stores = {
-  /** Reactive metadata for UI providers discovered in the current snapshot. */
+  /** Reactive metadata for UI providers discovered in the current descriptor. */
   uiPlugins: useUiPluginsStore as unknown as () => UiPluginsStore,
   /**
    * Store for managing the current authenticated user's information.

@@ -7,7 +7,7 @@ import type { Router, RouteRecordRaw } from "vue-router";
 import { usePluginModuleStore } from "@/stores/plugin";
 import {
   setupUiPluginRuntime,
-  type UiPluginProviderSnapshot,
+  type UiPluginProviderDescriptor,
 } from "./setupModules";
 
 const RootComponent = { template: "<div />" };
@@ -38,7 +38,7 @@ describe("setupUiPluginRuntime", () => {
     delete window["legacy-plugin"];
   });
 
-  it("seeds metadata before evaluation and registers mixed modules in snapshot order", async () => {
+  it("seeds metadata before evaluation and registers mixed modules in descriptor order", async () => {
     const legacyModule = pluginModuleWithRoute("LegacyRoute");
     const esmAModule = pluginModuleWithRoute("EsmARoute");
     const esmBModule = pluginModuleWithRoute("EsmBRoute");
@@ -62,11 +62,10 @@ describe("setupUiPluginRuntime", () => {
       setupComponents,
       registeredFormKitInputs: {},
       runtime: {
-        fetchSnapshot: async () => mixedSnapshot(),
+        fetchProviders: async () => mixedDescriptor(),
         importModule,
         loadScript,
         loadStyle,
-        isEvicted: async () => false,
       },
     });
 
@@ -86,11 +85,13 @@ describe("setupUiPluginRuntime", () => {
       "EsmBRoute",
       "EsmARoute",
     ]);
-    expect(loadScript).toHaveBeenCalledWith("/snapshots/g1/bundle.js");
+    expect(loadScript).toHaveBeenCalledWith(
+      "/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.js?v=g1"
+    );
     expect(loadStyle.mock.calls.map(([url]) => url)).toEqual([
-      "/snapshots/g1/bundle.css",
-      "/providers/esm-a/esm-a.css",
-      "/providers/esm-b/esm-b.css",
+      "/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.css?v=g1",
+      "/plugins/esm-a/assets/ui/esm-a.css?v=g1",
+      "/plugins/esm-b/assets/ui/esm-b.css?v=g1",
     ]);
     expect(stores.uiPlugins().registrations).toEqual([
       expect.objectContaining({ name: "legacy-plugin", status: "registered" }),
@@ -111,9 +112,9 @@ describe("setupUiPluginRuntime", () => {
     const loadOrder: string[] = [];
     const loadStyle = vi.fn((url: string) => {
       loadOrder.push(url);
-      return url.endsWith("a.css") ? styleA.promise : styleB.promise;
+      return url.includes("/a.css") ? styleA.promise : styleB.promise;
     });
-    const snapshot = esmSnapshot(["a", "b"]);
+    const descriptor = esmDescriptor(["a", "b"]);
     const { router } = createRouter();
 
     const setup = setupUiPluginRuntime({
@@ -123,14 +124,13 @@ describe("setupUiPluginRuntime", () => {
       setupComponents: vi.fn(),
       registeredFormKitInputs: {},
       runtime: {
-        fetchSnapshot: async () => snapshot,
+        fetchProviders: async () => descriptor,
         importModule: async (url) => ({
           default: pluginModuleWithRoute(
             url.includes("/a/") ? "RouteA" : "RouteB"
           ),
         }),
         loadStyle,
-        isEvicted: async () => false,
       },
     });
 
@@ -139,7 +139,10 @@ describe("setupUiPluginRuntime", () => {
     styleA.reject(new Error("a style failed"));
     const modules = await setup;
 
-    expect(loadOrder).toEqual(["/providers/a/a.css", "/providers/b/b.css"]);
+    expect(loadOrder).toEqual([
+      "/plugins/a/assets/ui/a.css?v=version",
+      "/plugins/b/assets/ui/b.css?v=version",
+    ]);
     expect(modules.map((module) => module.name)).toEqual(["b"]);
     expect(stores.uiPlugins().get("a")?.status).toBe("failed");
     expect(stores.uiPlugins().get("b")?.status).toBe("registered");
@@ -176,12 +179,11 @@ describe("setupUiPluginRuntime", () => {
       setupComponents: vi.fn(),
       registeredFormKitInputs: {},
       runtime: {
-        fetchSnapshot: async () => esmSnapshot(["bad", "good"]),
+        fetchProviders: async () => esmDescriptor(["bad", "good"]),
         importModule: async (url) => ({
           default: url.includes("/bad/") ? badModule : goodModule,
         }),
         loadStyle: async () => undefined,
-        isEvicted: async () => false,
       },
     });
 
@@ -218,10 +220,9 @@ describe("setupUiPluginRuntime", () => {
       setupComponents: vi.fn(),
       registeredFormKitInputs: {},
       runtime: {
-        fetchSnapshot: async () => esmSnapshot(["lazy"]),
+        fetchProviders: async () => esmDescriptor(["lazy"]),
         importModule: async () => ({ default: module }),
         loadStyle: async () => undefined,
-        isEvicted: async () => false,
       },
     });
 
@@ -251,10 +252,9 @@ describe("setupUiPluginRuntime", () => {
       setupComponents: vi.fn(),
       registeredFormKitInputs: {},
       runtime: {
-        fetchSnapshot: async () => esmSnapshot(["component-provider"]),
+        fetchProviders: async () => esmDescriptor(["component-provider"]),
         importModule: async () => ({ default: module }),
         loadStyle: async () => undefined,
-        isEvicted: async () => false,
       },
     });
 
@@ -276,37 +276,6 @@ describe("setupUiPluginRuntime", () => {
     ]);
   });
 
-  it("reloads when a failed generation-bound resource has been evicted", async () => {
-    const reload = vi.fn();
-    const { router } = createRouter();
-
-    await setupUiPluginRuntime({
-      app: createApp(RootComponent),
-      router,
-      platform: "console",
-      setupComponents: vi.fn(),
-      registeredFormKitInputs: {},
-      runtime: {
-        fetchSnapshot: async () => esmSnapshot(["evicted"]),
-        importModule: async () => {
-          throw new Error("entry missing");
-        },
-        loadStyle: async () => undefined,
-        isEvicted: async () => true,
-        reload,
-      },
-    });
-
-    expect(reload).toHaveBeenCalledTimes(1);
-    expect(usePluginModuleStore().diagnostics).toEqual([
-      expect.objectContaining({
-        name: "evicted",
-        stage: "entry",
-        reloadRequired: true,
-      }),
-    ]);
-  });
-
   it("rejects an ESM entry without a default PluginModule export", async () => {
     const { router, addRoute } = createRouter();
 
@@ -317,10 +286,9 @@ describe("setupUiPluginRuntime", () => {
       setupComponents: vi.fn(),
       registeredFormKitInputs: {},
       runtime: {
-        fetchSnapshot: async () => esmSnapshot(["invalid-export"]),
+        fetchProviders: async () => esmDescriptor(["invalid-export"]),
         importModule: async () => ({ named: {} }),
         loadStyle: async () => undefined,
-        isEvicted: async () => false,
       },
     });
 
@@ -337,11 +305,13 @@ describe("setupUiPluginRuntime", () => {
 
   it("keeps legacy providers without a UI module as compatible no-ops", async () => {
     const { router } = createRouter();
-    const snapshot: UiPluginProviderSnapshot = {
-      generation: "legacy",
+    const descriptor: UiPluginProviderDescriptor = {
+      version: "legacy",
       legacy: {
-        script: "/snapshots/legacy/bundle.js",
-        style: "/snapshots/legacy/bundle.css",
+        script:
+          "/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.js?v=legacy",
+        style:
+          "/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.css?v=legacy",
       },
       registrations: [registration("backend-only")],
       providers: [],
@@ -355,10 +325,9 @@ describe("setupUiPluginRuntime", () => {
       setupComponents: vi.fn(),
       registeredFormKitInputs: {},
       runtime: {
-        fetchSnapshot: async () => snapshot,
+        fetchProviders: async () => descriptor,
         loadScript: async () => undefined,
         loadStyle: async () => undefined,
-        isEvicted: async () => false,
       },
     });
 
@@ -367,7 +336,7 @@ describe("setupUiPluginRuntime", () => {
     expect(mocks.toastError).not.toHaveBeenCalled();
   });
 
-  it("contains snapshot discovery failure and still initializes core components", async () => {
+  it("contains descriptor discovery failure and still initializes core components", async () => {
     const setupComponents = vi.fn();
     const { router } = createRouter();
 
@@ -379,8 +348,8 @@ describe("setupUiPluginRuntime", () => {
         setupComponents,
         registeredFormKitInputs: {},
         runtime: {
-          fetchSnapshot: async () => {
-            throw new Error("snapshot failed");
+          fetchProviders: async () => {
+            throw new Error("descriptor failed");
           },
         },
       })
@@ -391,12 +360,12 @@ describe("setupUiPluginRuntime", () => {
   });
 });
 
-function mixedSnapshot(): UiPluginProviderSnapshot {
+function mixedDescriptor(): UiPluginProviderDescriptor {
   return {
-    generation: "g1",
+    version: "g1",
     legacy: {
-      script: "/snapshots/g1/bundle.js",
-      style: "/snapshots/g1/bundle.css",
+      script: "/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.js?v=g1",
+      style: "/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.css?v=g1",
     },
     registrations: [
       registration("legacy-plugin"),
@@ -404,7 +373,7 @@ function mixedSnapshot(): UiPluginProviderSnapshot {
       registration("invalid"),
       registration("esm-a"),
     ],
-    providers: [esmProvider("esm-a"), esmProvider("esm-b")],
+    providers: [esmProvider("esm-a", "g1"), esmProvider("esm-b", "g1")],
     invalid: [
       {
         ...registration("invalid"),
@@ -414,15 +383,17 @@ function mixedSnapshot(): UiPluginProviderSnapshot {
   };
 }
 
-function esmSnapshot(names: string[]): UiPluginProviderSnapshot {
+function esmDescriptor(names: string[]): UiPluginProviderDescriptor {
   return {
-    generation: "generation",
+    version: "version",
     legacy: {
-      script: "/snapshots/generation/bundle.js",
-      style: "/snapshots/generation/bundle.css",
+      script:
+        "/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.js?v=version",
+      style:
+        "/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.css?v=version",
     },
     registrations: names.map(registration),
-    providers: names.map(esmProvider),
+    providers: names.map((name) => esmProvider(name)),
     invalid: [],
   };
 }
@@ -435,11 +406,11 @@ function registration(name: string) {
   };
 }
 
-function esmProvider(name: string) {
+function esmProvider(name: string, version = "version") {
   return {
     ...registration(name),
-    entry: `/providers/${name}/main.js`,
-    styles: [`/providers/${name}/${name}.css`],
+    entry: `/plugins/${name}/assets/ui/main.js?v=${version}`,
+    styles: [`/plugins/${name}/assets/ui/${name}.css?v=${version}`],
   };
 }
 

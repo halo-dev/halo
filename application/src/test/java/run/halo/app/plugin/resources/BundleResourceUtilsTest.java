@@ -152,4 +152,11 @@ class BundleResourceUtilsTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Unsupported bundle location: admin");
     }
+
+    @Test
+    void shouldBuildVersionedAssetUrlWithoutFlatteningNestedPath() {
+        assertThat(BundleResourceUtils.buildAssetUrl(
+                        "fake-plugin", BundleResourceUtils.UI_BUNDLE_LOCATION, "chunks/lazy.js", "version 1"))
+                .isEqualTo("/plugins/fake-plugin/assets/ui/chunks/lazy.js?v=version%201");
+    }
 }

@@ -16,7 +16,6 @@ export interface UiPluginDiagnostic {
   type: "plugin" | "theme";
   stage: UiPluginFailureStage;
   message: string;
-  reloadRequired?: boolean;
   incompleteRollback?: string[];
 }
 

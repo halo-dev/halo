@@ -184,7 +184,7 @@ uiPlugins.isRegistered("plugin-search");
 uiPlugins.get("plugin-search");
 ```
 
-The reactive record contains only Halo-owned `name`, `type`, `version`, and `pending | registered | failed` status. `isEnabled` means the provider was discovered in the current snapshot; `isRegistered` becomes true after its current-page registration succeeds. Provider code treats this store as read-only and must not depend on another provider's evaluation order or module object.
+The reactive record contains only Halo-owned `name`, `type`, `version`, and `pending | registered | failed` status. `isEnabled` means the provider was discovered in the current descriptor; `isRegistered` becomes true after its current-page registration succeeds. Provider code treats this store as read-only and must not depend on another provider's evaluation order or module object.
 
 ### Legacy Configuration (Deprecated)
 
@@ -397,7 +397,7 @@ Theme provider:
 
 > **Note**: The production build output directory of `HaloUIPluginBundlerKit` is still `src/main/resources/console` to ensure compatibility.
 
-An ESM output additionally contains the generated `ui-plugin.json` manifest and may contain content-hashed `chunks/` and `assets/`. Keep the complete output directory together; Halo serves entries, styles, chunks, and assets from one immutable provider generation.
+An ESM output additionally contains the generated `ui-plugin.json` manifest and may contain content-hashed `chunks/` and `assets/`. Keep the complete output directory together; Halo serves it through the existing plugin or theme static resource mapping and adds the current provider version to entry and style URLs for cache invalidation.
 
 ## Maintaining Halo Inventories
 

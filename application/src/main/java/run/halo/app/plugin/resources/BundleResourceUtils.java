@@ -16,6 +16,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.util.Assert;
 import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.web.util.UriComponentsBuilder;
 import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.infra.utils.PathUtils;
 
@@ -87,6 +88,20 @@ public abstract class BundleResourceUtils {
             return null;
         }
         return selectBundleLocation(resourceLoader);
+    }
+
+    public static String buildAssetUrl(
+            String pluginName, String bundleLocation, String resourceName, @Nullable String version) {
+        Assert.hasText(pluginName, "The pluginName must not be blank");
+        Assert.hasText(resourceName, "Resource name must not be blank");
+        assertSupportedBundleLocation(bundleLocation);
+
+        var builder = UriComponentsBuilder.fromPath("/plugins/{pluginName}/assets/{bundleLocation}/")
+                .path(resourceName);
+        if (StringUtils.hasText(version)) {
+            builder.queryParam("v", version);
+        }
+        return builder.buildAndExpand(pluginName, bundleLocation).encode().toUriString();
     }
 
     /**

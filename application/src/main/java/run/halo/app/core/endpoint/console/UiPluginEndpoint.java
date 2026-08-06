@@ -12,7 +12,6 @@ import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.core.io.Resource;
 import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
-import org.springframework.http.MediaTypeFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -22,7 +21,7 @@ import org.springframework.web.reactive.resource.NoResourceFoundException;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.plugin.UiPluginBundleService;
-import run.halo.app.plugin.UiPluginProviderSnapshot;
+import run.halo.app.plugin.UiPluginProviderDescriptor;
 
 @Component
 public class UiPluginEndpoint implements CustomEndpoint, InitializingBean {
@@ -45,33 +44,12 @@ public class UiPluginEndpoint implements CustomEndpoint, InitializingBean {
         var tag = "UiPluginV1alpha1Console";
         return SpringdocRouteBuilder.route()
                 .GET(
-                        "ui-plugins/-/snapshot",
-                        this::fetchSnapshot,
-                        builder -> builder.operationId("fetchUiPluginProviderSnapshot")
-                                .description("Fetch one immutable UI provider snapshot.")
+                        "ui-plugins/-/providers",
+                        this::fetchProviders,
+                        builder -> builder.operationId("fetchUiPluginProviders")
+                                .description("Fetch the currently enabled UI provider descriptor.")
                                 .tag(tag)
-                                .response(responseBuilder().implementation(UiPluginProviderSnapshot.class)))
-                .GET(
-                        "ui-plugins/-/snapshots/{generation}/bundle.js",
-                        request -> fetchSnapshotBundle(request, true),
-                        builder -> builder.operationId("fetchUiPluginSnapshotJsBundle")
-                                .description("Fetch the legacy JS bundle from one UI provider snapshot.")
-                                .tag(tag)
-                                .response(responseBuilder().implementation(String.class)))
-                .GET(
-                        "ui-plugins/-/snapshots/{generation}/bundle.css",
-                        request -> fetchSnapshotBundle(request, false),
-                        builder -> builder.operationId("fetchUiPluginSnapshotCssBundle")
-                                .description("Fetch the legacy CSS bundle from one UI provider snapshot.")
-                                .tag(tag)
-                                .response(responseBuilder().implementation(String.class)))
-                .GET(
-                        "ui-plugins/-/snapshots/{generation}/providers/{type}/{name}/{*resourcePath}",
-                        this::fetchProviderResource,
-                        builder -> builder.operationId("fetchUiPluginProviderResource")
-                                .description("Fetch an ESM provider resource from one UI provider snapshot.")
-                                .tag(tag)
-                                .response(responseBuilder().implementation(Resource.class)))
+                                .response(responseBuilder().implementation(UiPluginProviderDescriptor.class)))
                 // TODO(Halo 3): Remove after legacy IIFE UI provider support ends.
                 .GET(
                         "ui-plugins/-/bundle.js",
@@ -90,46 +68,13 @@ public class UiPluginEndpoint implements CustomEndpoint, InitializingBean {
                 .build();
     }
 
-    private Mono<ServerResponse> fetchSnapshot(ServerRequest request) {
+    private Mono<ServerResponse> fetchProviders(ServerRequest request) {
         return uiPluginBundleService
-                .getProviderSnapshot()
-                .flatMap(snapshot -> ServerResponse.ok()
+                .getProviderDescriptor()
+                .flatMap(descriptor -> ServerResponse.ok()
                         .cacheControl(CacheControl.noStore())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .bodyValue(snapshot));
-    }
-
-    private Mono<ServerResponse> fetchSnapshotBundle(ServerRequest request, boolean javascript) {
-        var generation = request.pathVariable("generation");
-        var filename = javascript ? "bundle.js" : "bundle.css";
-        var mediaType = MediaType.valueOf(javascript ? "text/javascript" : "text/css");
-        var resource = javascript
-                ? uiPluginBundleService.getJsBundle(generation)
-                : uiPluginBundleService.getCssBundle(generation);
-        return resource.flatMap(value -> bundleResponse(request, value, filename, mediaType))
-                .switchIfEmpty(Mono.error(new NoResourceFoundException(request.uri(), filename)));
-    }
-
-    private Mono<ServerResponse> fetchProviderResource(ServerRequest request) {
-        var resourcePath = request.pathVariable("resourcePath").replaceFirst("^/", "");
-        return uiPluginBundleService
-                .getProviderResource(
-                        request.pathVariable("generation"),
-                        request.pathVariable("type"),
-                        request.pathVariable("name"),
-                        resourcePath)
-                .flatMap(resource -> bundleResponse(request, resource, resourcePath, mediaType(resourcePath, resource)))
-                .switchIfEmpty(Mono.error(new NoResourceFoundException(request.uri(), resourcePath)));
-    }
-
-    private static MediaType mediaType(String resourcePath, Resource resource) {
-        if (resourcePath.endsWith(".js") || resourcePath.endsWith(".mjs")) {
-            return MediaType.valueOf("text/javascript");
-        }
-        if (resourcePath.endsWith(".css")) {
-            return MediaType.valueOf("text/css");
-        }
-        return MediaTypeFactory.getMediaType(resource).orElse(MediaType.APPLICATION_OCTET_STREAM);
+                        .bodyValue(descriptor));
     }
 
     @Override
