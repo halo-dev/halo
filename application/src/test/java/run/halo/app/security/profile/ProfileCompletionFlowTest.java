@@ -1,13 +1,11 @@
 package run.halo.app.security.profile;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.net.URI;
-import java.util.Optional;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
@@ -37,14 +35,24 @@ class ProfileCompletionFlowTest {
                 URI.create("/complete-profile/phone"),
                 URI.create("phone-not-set"),
                 "A verified phone number is required.");
-        var flow = flow((user, setting) -> Optional.of(emailStep), (user, setting) -> Optional.of(phoneStep));
-        var user = new User();
-        var setting = new SystemSetting.User();
-        when(userService.getUser(USERNAME)).thenReturn(Mono.just(user));
-        when(systemConfigFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
-                .thenReturn(Mono.just(setting));
+        var flow = flow(username -> Mono.just(emailStep), username -> Mono.just(phoneStep));
 
         StepVerifier.create(flow.findNext(USERNAME)).expectNext(emailStep).verifyComplete();
+    }
+
+    @Test
+    void shouldSkipDisabledEmailRequirementBeforeLoadingUser() {
+        var flow = flow(new EmailProfileCompletionRequirement(systemConfigFetcher, userService));
+        var setting = new SystemSetting.User();
+        setting.setMustVerifyEmailOnRegistration(false);
+        when(systemConfigFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
+                .thenReturn(Mono.just(setting));
+        when(userService.getUser(USERNAME))
+                .thenReturn(Mono.error(new AssertionError("Disabled requirements must not load the user")));
+
+        StepVerifier.create(flow.findNext(USERNAME)).verifyComplete();
+
+        verify(userService, never()).getUser(USERNAME);
     }
 
     @Test
@@ -53,8 +61,7 @@ class ProfileCompletionFlowTest {
                 URI.create("/complete-profile/phone"),
                 URI.create("phone-not-set"),
                 "A verified phone number is required.");
-        var flow = flow((user, setting) -> Optional.of(phoneStep));
-        givenUserAndSetting();
+        var flow = flow(username -> Mono.just(phoneStep));
         var exchange = exchange();
 
         StepVerifier.create(flow.getRedirectUri(USERNAME, exchange))
@@ -67,7 +74,6 @@ class ProfileCompletionFlowTest {
     @Test
     void shouldUseSavedRequestWhenProfileIsComplete() {
         var flow = flow();
-        givenUserAndSetting();
         var exchange = exchange();
         when(requestCache.getRedirectUri(exchange)).thenReturn(Mono.just(URI.create("/dashboard")));
 
@@ -79,7 +85,6 @@ class ProfileCompletionFlowTest {
     @Test
     void shouldDefaultToUserCenterWhenProfileIsCompleteAndRequestIsNotSaved() {
         var flow = flow();
-        givenUserAndSetting();
         var exchange = exchange();
         when(requestCache.getRedirectUri(exchange)).thenReturn(Mono.empty());
 
@@ -95,34 +100,35 @@ class ProfileCompletionFlowTest {
         var setting = new SystemSetting.User();
         setting.setMustVerifyEmailOnRegistration(true);
 
-        var step = new EmailProfileCompletionRequirement().evaluate(user, setting);
+        when(systemConfigFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
+                .thenReturn(Mono.just(setting));
+        when(userService.getUser(USERNAME)).thenReturn(Mono.just(user));
+        var requirement = new EmailProfileCompletionRequirement(systemConfigFetcher, userService);
 
-        assertThat(step)
-                .contains(new ProfileCompletionStep(
+        StepVerifier.create(requirement.evaluate(USERNAME))
+                .expectNext(new ProfileCompletionStep(
                         URI.create("/complete-profile"),
                         URI.create("email-not-set"),
-                        "A verified email address is required."));
+                        "A verified email address is required."))
+                .verifyComplete();
     }
 
     @Test
     void emailRequirementShouldBeCompleteWhenEmailIsVerifiedOrPolicyIsDisabled() {
-        var requirement = new EmailProfileCompletionRequirement();
+        var requirement = new EmailProfileCompletionRequirement(systemConfigFetcher, userService);
         var user = new User();
         var setting = new SystemSetting.User();
 
         user.getSpec().setEmailVerified(true);
         setting.setMustVerifyEmailOnRegistration(true);
-        assertThat(requirement.evaluate(user, setting)).isEmpty();
+        when(systemConfigFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
+                .thenReturn(Mono.just(setting));
+        when(userService.getUser(USERNAME)).thenReturn(Mono.just(user));
+        StepVerifier.create(requirement.evaluate(USERNAME)).verifyComplete();
 
         user.getSpec().setEmailVerified(false);
         setting.setMustVerifyEmailOnRegistration(false);
-        assertThat(requirement.evaluate(user, setting)).isEmpty();
-    }
-
-    private void givenUserAndSetting() {
-        when(userService.getUser(USERNAME)).thenReturn(Mono.just(new User()));
-        when(systemConfigFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
-                .thenReturn(Mono.just(new SystemSetting.User()));
+        StepVerifier.create(requirement.evaluate(USERNAME)).verifyComplete();
     }
 
     private static MockServerWebExchange exchange() {
@@ -134,6 +140,6 @@ class ProfileCompletionFlowTest {
         @SuppressWarnings("unchecked")
         var provider = (ObjectProvider<ProfileCompletionRequirement>) mock(ObjectProvider.class);
         when(provider.orderedStream()).thenReturn(Stream.of(requirements));
-        return new ProfileCompletionFlow(userService, systemConfigFetcher, requestCache, provider);
+        return new ProfileCompletionFlow(requestCache, provider);
     }
 }

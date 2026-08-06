@@ -1,16 +1,14 @@
 package run.halo.app.security.profile;
 
-import java.util.Optional;
-import run.halo.app.core.extension.User;
-import run.halo.app.infra.SystemSetting;
+import reactor.core.publisher.Mono;
 
 /** Determines whether a user has a pending profile-completion step. */
 public interface ProfileCompletionRequirement {
 
     /**
-     * Evaluates the requirement against the current user and settings.
+     * Evaluates the requirement for the current user.
      *
      * <p>Requirements are evaluated in Spring order and the first returned step wins.
      */
-    Optional<ProfileCompletionStep> evaluate(User user, SystemSetting.User setting);
+    Mono<ProfileCompletionStep> evaluate(String username);
 }
