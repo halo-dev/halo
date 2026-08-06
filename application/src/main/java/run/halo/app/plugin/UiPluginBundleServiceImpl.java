@@ -97,10 +97,16 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
     @Override
     public Flux<DataBuffer> uglifyCssBundle() {
         return discoverProviders()
-                .flatMapMany(providers -> Flux.fromIterable(providers)
-                        .filter(provider -> provider.kind() == ProviderKind.LEGACY)
-                        .flatMapSequential(
-                                provider -> readProviderBundle(provider, BundleResourceUtils.CSS_BUNDLE, false)));
+                .flatMapMany(providers -> Flux.fromIterable(providers).flatMapSequential(provider -> {
+                    if (provider.kind() == ProviderKind.LEGACY) {
+                        return readProviderBundle(provider, BundleResourceUtils.CSS_BUNDLE, false);
+                    }
+                    if (provider.kind() == ProviderKind.ESM
+                            && provider.manifest().style() != null) {
+                        return readProviderBundle(provider, provider.manifest().style(), false);
+                    }
+                    return Flux.empty();
+                }));
     }
 
     @Override
@@ -214,22 +220,16 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
         }
         var fields = new HashSet<String>();
         manifest.fieldNames().forEachRemaining(fields::add);
-        if (!Set.of("format", "entry", "styles").equals(fields)) {
-            throw new IllegalArgumentException("Provider manifest must contain only format, entry, and styles");
+        if (!fields.containsAll(Set.of("format", "entry"))
+                || !Set.of("format", "entry", "style").containsAll(fields)) {
+            throw new IllegalArgumentException("Provider manifest must contain format, entry, and optional style only");
         }
         if (!"esm".equals(manifest.path("format").textValue())) {
             throw new IllegalArgumentException("Provider manifest format must be esm");
         }
         var entry = validateManifestResource(candidate, manifest.path("entry"));
-        var stylesNode = manifest.path("styles");
-        if (!stylesNode.isArray()) {
-            throw new IllegalArgumentException("Provider manifest styles must be an array");
-        }
-        var styles = new ArrayList<String>();
-        for (var style : stylesNode) {
-            styles.add(validateManifestResource(candidate, style));
-        }
-        return new ProviderManifest(entry, styles);
+        var style = manifest.has("style") ? validateManifestResource(candidate, manifest.path("style")) : null;
+        return new ProviderManifest(entry, style);
     }
 
     private String validateManifestResource(ProviderCandidate candidate, JsonNode value) {
@@ -280,10 +280,7 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
                         provider.candidate().name(),
                         provider.candidate().type(),
                         provider.candidate().version(),
-                        providerUrl(version, provider, provider.manifest().entry()),
-                        provider.manifest().styles().stream()
-                                .map(style -> providerUrl(version, provider, style))
-                                .toList()))
+                        providerUrl(version, provider, provider.manifest().entry())))
                 .toList();
         var invalid = providers.stream()
                 .filter(provider -> provider.kind() == ProviderKind.INVALID)
@@ -295,11 +292,23 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
                 .toList();
         return new UiPluginProviderDescriptor(
                 version,
-                new UiPluginProviderDescriptor.LegacyResources(
-                        versionedBundleUrl("bundle.js", version), versionedBundleUrl("bundle.css", version)),
+                hasProviderStyles(providers) ? versionedBundleUrl("bundle.css", version) : null,
+                new UiPluginProviderDescriptor.LegacyResources(versionedBundleUrl("bundle.js", version)),
                 registrations,
                 esmProviders,
                 invalid);
+    }
+
+    private boolean hasProviderStyles(List<ClassifiedProvider> providers) {
+        return providers.stream().anyMatch(provider -> {
+            if (provider.kind() == ProviderKind.ESM) {
+                return provider.manifest().style() != null;
+            }
+            return provider.kind() == ProviderKind.LEGACY
+                    && Optional.ofNullable(providerResource(provider.candidate(), BundleResourceUtils.CSS_BUNDLE))
+                            .filter(Resource::isReadable)
+                            .isPresent();
+        });
     }
 
     private static String providerUrl(String version, ClassifiedProvider provider, String resourcePath) {
@@ -411,11 +420,7 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
         INVALID
     }
 
-    private record ProviderManifest(String entry, List<String> styles) {
-        ProviderManifest {
-            styles = List.copyOf(styles);
-        }
-    }
+    private record ProviderManifest(String entry, String style) {}
 
     private record ProviderCandidate(
             String name,

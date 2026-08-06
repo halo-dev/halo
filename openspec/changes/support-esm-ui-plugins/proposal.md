@@ -8,10 +8,10 @@ This change turns the ESM direction raised in [halo-dev/halo#10205](https://gith
 
 - Add native ESM build and loading support for both plugin-provided and theme-provided Console/User Center UI modules, including asynchronous JavaScript and CSS chunks.
 - Keep existing IIFE bundles, global variables, compatibility endpoints, and legacy resource-directory fallback operational throughout Halo 2.x so existing artifacts run without rebuilding.
-- Generate a minimal provider manifest that identifies ESM output plus the entry and style resources consumed at runtime; providers without a manifest remain legacy IIFE providers.
-- Publish sparse immutable shared dependency inventories that record the target Halo runtime's resolved versions, best-effort accepted build ranges, and available root exports; validate a provider project's actual resolution and imports against the inventory selected from `spec.requires`.
+- Generate a minimal provider manifest that identifies ESM output, one entry module, and at most one startup stylesheet; asynchronous chunk styles remain bundler-managed and providers without a manifest remain legacy IIFE providers.
+- Publish sparse immutable host runtime snapshots that record a Halo baseline's resolved shared-package versions and available root exports; use version differences as best-effort warnings while still rejecting concrete resolution, identity, deep-import, and missing-export incompatibilities.
 - Provide a host-owned Import Map that resolves the supported shared package roots to one Halo-supplied runtime instance while bundling non-shared dependencies, including VueUse, into each ESM provider.
-- Add an authenticated provider descriptor that references the existing plugin and theme static resource mappings with a version query for cache invalidation, plus a mixed loader that isolates provider failures while preserving stable registration order.
+- Add an authenticated provider descriptor that references the existing plugin and theme static resource mappings with a version query for cache invalidation, exposes one startup stylesheet aggregating legacy and ESM main CSS, and drives a mixed loader that imports ESM entries in parallel before preserving stable registration order.
 - Expose host-owned UI provider availability and registration state through a shared Pinia store in `@halo-dev/ui-shared`, replacing new dependencies on provider globals without exposing another provider's module implementation.
 - Make ESM the modern bundler default when the provider's minimum required stable Halo version is 2.26.0 or newer, with explicit `auto`, `iife`, and `esm` selection modes.
 - Mark every retained compatibility boundary intended to disappear with legacy IIFE support using an explicit Halo 3 removal comment.
@@ -21,7 +21,7 @@ This change turns the ESM direction raised in [halo-dev/halo#10205](https://gith
 
 ### New Capabilities
 
-- `ui-plugin-esm-runtime`: Defines ESM provider manifests, shared dependency inventories and Import Map behavior, mixed legacy/ESM loading, best-effort compatibility policy, failure isolation, and development/production runtime behavior for plugin and theme UI modules.
+- `ui-plugin-esm-runtime`: Defines ESM provider manifests, host runtime snapshots and Import Map behavior, mixed legacy/ESM loading, best-effort compatibility policy, failure isolation, and development/production runtime behavior for plugin and theme UI modules.
 
 ### Modified Capabilities
 
@@ -33,6 +33,6 @@ This change turns the ESM direction raised in [halo-dev/halo#10205](https://gith
 - Public shared Pinia provider-registration metadata under `@halo-dev/ui-shared`; direct JavaScript dependencies between providers remain unsupported.
 - `@halo-dev/ui-plugin-bundler-kit` Vite and Rsbuild presets, provider manifest parsing, dependency resolution, output validation, tests, and documentation.
 - Backend UI plugin bundle services and endpoints in `application/`, plus existing plugin and theme static resource discovery.
-- Generated Halo UI runtime bridges and sparse shared dependency inventories for Vue, Vue Router, Pinia, Axios, FormKit Vue/Core, and public Halo UI packages.
+- Generated Halo UI runtime bridges and sparse host runtime snapshots for Vue, Vue Router, Pinia, Axios, FormKit Vue/Core, and public Halo UI packages.
 - Authenticated UI provider metadata responses; existing same-origin static asset authorization remains unchanged.
 - No database migration and no change to the public `Plugin.status` or `Theme.status` models are required.

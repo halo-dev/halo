@@ -1,15 +1,15 @@
 ## 1. Shared Dependency Contract
 
-- [x] 1.1 Define and test structural validation for sparse Halo inventories and the minimal ESM provider manifest, including normalized provider-root-relative resource paths.
-- [x] 1.2 Generate inventory host facts from the UI build's actually resolved package roots, exact versions, runtime exports, bridge assets, and singleton requirements while keeping accepted build ranges manually reviewed.
-- [x] 1.3 Add the initial best-effort ranges for Vue, Vue Router, Pinia, Axios, FormKit Vue/Core, and the four Halo-owned shared packages.
-- [x] 1.4 Validate that inventories expose exactly the ten supported package roots and exclude VueUse, Tiptap, ProseMirror, and other FormKit subpackages.
-- [x] 1.5 Package sparse immutable historical inventories with the bundler kit and implement latest-eligible-older selection for unknown newer Halo targets.
-- [x] 1.6 Add inventory generation/check tests for actual resolution, export extraction, prerelease exclusion, sparse reuse, and no eligible inventory diagnostics.
+- [x] 1.1 Define and test structural validation for sparse Halo host runtime snapshots and the minimal ESM provider manifest, including normalized provider-root-relative resource paths.
+- [x] 1.2 Generate snapshot host facts from the UI build's actually resolved package roots, exact versions, runtime exports, bridge assets, and singleton requirements.
+- [x] 1.3 Record exact host versions as diagnostic facts without claiming accepted provider build ranges.
+- [x] 1.4 Validate that snapshots expose exactly the ten supported package roots and exclude VueUse, Tiptap, ProseMirror, and other FormKit subpackages.
+- [x] 1.5 Package sparse immutable historical snapshots with the bundler kit and implement latest-eligible-older selection for unknown newer Halo targets.
+- [x] 1.6 Add snapshot generation/check tests for actual resolution, export extraction, sparse reuse, and no eligible snapshot diagnostics.
 
 ## 2. Host Shared Runtime
 
-- [x] 2.1 Generate content-hashed ESM bridges from existing Vue, Vue Router, Pinia, Axios, and Halo package globals using the inventory's static export list.
+- [x] 2.1 Generate content-hashed ESM bridges from existing Vue, Vue Router, Pinia, Axios, and Halo package globals using the snapshot's static export list.
 - [x] 2.2 Build one FormKit runtime graph that supplies both `@formkit/vue` and `@formkit/core` bridges and retains the legacy `window.FormKitVue` contract.
 - [x] 2.3 Keep `@halo-dev/api-client` on its separately created authenticated `axiosInstance` and add tests that custom `axios.create()` clients do not mutate that instance.
 - [x] 2.4 Generate the production Import Map before Console/User Center entries with root-relative content-hashed bridge URLs.
@@ -32,7 +32,7 @@
 - [x] 4.2 Seed valid providers as pending and invalid providers as failed from the descriptor before module evaluation, then update registration status through host-only lifecycle actions.
 - [x] 4.3 Replace direct all-provider aggregate startup with a mixed loader that consumes one provider descriptor, retains the versioned legacy lane, and independently imports ESM entries.
 - [x] 4.4 Validate each ESM entry's default export as the existing `PluginModule` contract and initialize accepted modules in stable provider order after imports settle.
-- [x] 4.5 Insert legacy and ESM styles in descriptor order and isolate individual ESM style failures without letting network settlement reorder CSS precedence.
+- [x] 4.5 Load the descriptor's versioned startup stylesheet and preserve provider CSS order in the backend aggregate.
 - [x] 4.6 Add per-provider prepare/validate/commit registration with reversible handles for routes, stores, components, extensions, and other registries where the current APIs support undo.
 - [x] 4.7 Roll back supported mutations in reverse order after a synchronous registration failure, mark the provider failed, diagnose incomplete rollback, and continue with later providers.
 - [x] 4.8 Attribute entry and delayed route/component chunk failures to their provider through router and asynchronous-component error boundaries.
@@ -46,45 +46,45 @@
 
 - [x] 5.1 Extend plugin and theme readers to obtain `spec.requires` and recognize simple stable or `>=MAJOR.MINOR.PATCH` targets without trying to reproduce Halo's full Java range grammar.
 - [x] 5.2 Add `auto`, `iife`, and `esm` selection to Vite and Rsbuild, including warning-and-IIFE fallback for unparseable auto targets and `targetHaloVersion` for explicit ESM without a derived target.
-- [x] 5.3 Resolve each shared dependency from the provider project root, normalize workspace/symlink paths, locate its owning package root, and compare its actual version with the inventory range.
+- [x] 5.3 Resolve each shared dependency from the provider project root, normalize workspace/symlink paths, locate its owning package root, and compare its actual version with the host snapshot for diagnostics.
 - [x] 5.4 Cross-check final Vite and Rsbuild resolution so aliases, forks, shared deep imports, conditional entries, and externalization overrides cannot bypass validation.
-- [x] 5.5 Validate statically named root exports, allow namespace/dynamic-property use with a warning, and warn when an admitted provider version is newer than the host baseline.
+- [x] 5.5 Validate statically named root exports, allow namespace/dynamic-property use with a warning, and warn when a provider version is newer than or on a different major from the host baseline.
 - [x] 5.6 Externalize both FormKit Vue and Core, keep other FormKit packages private while externalizing their Core imports, and keep VueUse private.
 - [x] 5.7 Keep direct Tiptap/ProseMirror imports private and warn when they cross the shared rich-text editor boundary.
-- [x] 5.8 Emit actionable build summaries and failures containing format reason, provider root, target/inventory versions, actual and host dependency versions, accepted ranges, and remediation.
-- [x] 5.9 Add shared validation vectors for simple/unsupported `spec.requires`, sparse inventory selection, all admitted ranges, forward warnings, namespace warnings, and range/export failures.
+- [x] 5.8 Emit actionable build summaries and failures containing format reason, provider root, target/snapshot versions, actual and host dependency versions, and remediation.
+- [x] 5.9 Add shared validation vectors for simple/unsupported `spec.requires`, sparse snapshot selection, version-drift warnings, namespace warnings, and concrete resolution/export failures.
 
 ## 6. Vite and Rsbuild ESM Output
 
 - [x] 6.1 Implement Vite ESM output for plugins and themes with a default-exported `PluginModule`, external shared root imports, provider-root-safe entries, styles, and dynamic chunks.
 - [x] 6.2 Implement the equivalent Rsbuild ESM output and enforce the same externalization and final-output checks as Vite.
-- [x] 6.3 Emit the minimal ESM provider manifest with only format, entry, and styles after output validation succeeds, leaving the selected target and resolved dependency versions in build diagnostics.
+- [x] 6.3 Emit the minimal ESM provider manifest with format, entry, and at most one optional main style after output validation succeeds, leaving the selected target and resolved dependency versions in build diagnostics.
 - [x] 6.4 Preserve existing IIFE output and global mappings for explicit or automatic legacy builds and ensure IIFE builds do not emit an ESM manifest.
 - [x] 6.5 Ensure a selected ESM build fails rather than falling back to IIFE after dependency, import, or output validation starts.
-- [x] 6.6 Add Vite and Rsbuild fixture tests for plugin/theme builds, automatic fallbacks, explicit targets, range/export diagnostics, conflicting configuration, CSS, and dynamic imports.
+- [x] 6.6 Add Vite and Rsbuild fixture tests for plugin/theme builds, automatic fallbacks, explicit targets, resolution/export diagnostics, conflicting configuration, CSS, and dynamic imports.
 
 ## 7. Compatibility and End-to-End Verification
 
 - [x] 7.1 Freeze representative previously published plugin and theme IIFE artifacts and verify their bundle endpoints, globals, metadata aliases, resource fallback, and VueUse compatibility on the new runtime.
 - [x] 7.2 Maintain one representative ESM plugin, one ESM theme, one legacy plugin, and one legacy theme fixture covering all shared roots, registration-store queries, FormKit Core identity, Axios instance isolation, asynchronous JavaScript, and CSS.
-- [x] 7.3 Exercise enabled/registered/failed store transitions, in-range older versions, admitted forward versions and warnings, range/export failures, namespace warnings, invalid manifests, registration rollback, delayed chunks, and provider lifecycle reload recovery.
+- [x] 7.3 Exercise enabled/registered/failed store transitions, version-drift warnings, concrete resolution/export failures, namespace warnings, invalid manifests, registration rollback, delayed chunks, and provider lifecycle reload recovery.
 - [x] 7.4 Run real-browser development-topology acceptance through Halo on port 8090 and the UI server on port 3000, including Console/User Center deep routes, Import Map ordering, resource origins, API calls, and provider chunks.
 - [x] 7.5 Build the packaged BootJar and run the same fixture acceptance without a UI development server, verifying versioned/hash-bound packaged assets and the absence of development URLs.
 - [x] 7.6 Verify one failed provider does not block other providers, Console, or User Center and that lifecycle changes recover through a full page reload.
 
 ## 8. Documentation and Final Checks
 
-- [x] 8.1 Document plugin/theme migration, `stores.uiPlugins()` availability/registration queries, migration from provider globals, format selection and fallback, explicit ESM targeting, sparse Inventory selection, best-effort ranges, and the no-manifest legacy rule.
+- [x] 8.1 Document plugin/theme migration, `stores.uiPlugins()` availability/registration queries, migration from provider globals, format selection and fallback, explicit ESM targeting, sparse snapshot selection, warning-only version drift, and the no-manifest legacy rule.
 - [x] 8.2 Document all ten shared roots, FormKit Vue/Core identity, private FormKit subpackages, Axios versus `api-client.axiosInstance`, unsupported shared mutations, private VueUse, and editor-internal warnings.
-- [x] 8.3 Document Inventory host-fact generation, manual range review, sparse historical publication/reuse, newer-target fallback, and compatibility fixture maintenance.
+- [x] 8.3 Document host runtime snapshot generation, package-version-derived output, sparse historical publication/reuse, newer-target fallback, and compatibility fixture maintenance.
 - [x] 8.4 Add adjacent `TODO(Halo 3)` removal comments to provider/metadata globals, legacy library globals, aggregate aliases, resource fallback, IIFE bundler mappings, and global-backed ESM bridges; add language deprecation markers where applicable.
 - [x] 8.5 Review that permanent ESM/runtime APIs are not marked for removal, then run backend formatting/tests, frontend lint/typecheck/unit tests, bundler fixture tests, strict OpenSpec validation, and both browser acceptance suites.
 
 ## 9. Halo 2.26 Release Baseline
 
-- [x] 9.1 Rebase automatic ESM selection, the initial shared dependency inventory, and host bridge lookup from Halo 2.27.0 to Halo 2.26.0.
-- [x] 9.2 Update plugin and theme fixtures, prerelease and older-target warnings, inventory selection diagnostics, and documentation so Halo 2.25 remains automatic IIFE while Halo 2.26 selects ESM.
-- [x] 9.3 Regenerate and check the Halo 2.26 inventory, then rerun backend, frontend, bundler, and strict OpenSpec checks.
+- [x] 9.1 Rebase automatic ESM selection, the initial host runtime snapshot, and host bridge lookup from Halo 2.27.0 to Halo 2.26.0.
+- [x] 9.2 Update plugin and theme fixtures, prerelease and older-target warnings, snapshot selection diagnostics, and documentation so Halo 2.25 remains automatic IIFE while Halo 2.26 selects ESM.
+- [x] 9.3 Regenerate and check the Halo 2.26 snapshot, then rerun backend, frontend, bundler, and strict OpenSpec checks.
 - [x] 9.4 Repeat real-browser acceptance in both the proxied UI development topology and the packaged BootJar topology for the Halo 2.26 baseline.
 
 ## 10. Simplify Provider Resource Delivery
@@ -98,3 +98,15 @@
 
 - [x] 11.1 Replace manual shared-package entry inference with maintained exports-aware package metadata resolution while preserving bundler-resolved cross-checks.
 - [x] 11.2 Add regression coverage for exports-only packages and run focused bundler-kit plus representative Rsbuild provider verification.
+
+## 12. Simplify Startup CSS and Shared Compatibility Metadata
+
+- [x] 12.1 Change the ESM provider manifest and descriptor to one optional main style and one aggregate startup stylesheet, and add backend coverage for mixed legacy/ESM CSS ordering and invalid-provider exclusion.
+- [x] 12.2 Keep asynchronous chunk CSS bundler-managed, keep all ESM entry imports fully parallel with all-settled semantics, register in stable order without per-entry reloads, and cover the behavior in Vite, Rsbuild, and frontend tests.
+- [x] 12.3 Replace accepted-range inventories with host runtime snapshots, make version drift warning-only while retaining concrete resolution/export failures, and derive the snapshot baseline/output path from the bundler-kit package version without wiring generation into build or CI.
+- [x] 12.4 Update migration documentation and run strict OpenSpec validation, focused backend/frontend/bundler checks, and a representative real provider build.
+
+## 13. Consolidate Bundler Compatibility Diagnostics
+
+- [x] 13.1 Replace per-source best-effort warnings with one deterministic build report containing an aligned shared-dependency table and grouped compatibility notes with concise source labels.
+- [x] 13.2 Add focused diagnostic-format coverage, run bundler-kit validation, and verify the resulting output with a representative real Rsbuild provider build.

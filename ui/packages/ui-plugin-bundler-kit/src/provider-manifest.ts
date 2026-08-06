@@ -5,7 +5,7 @@ export const ESM_PROVIDER_MANIFEST = "ui-plugin.json";
 export interface EsmProviderManifest {
   format: "esm";
   entry: string;
-  styles: string[];
+  style?: string;
 }
 
 export function validateEsmProviderManifest(
@@ -15,24 +15,30 @@ export function validateEsmProviderManifest(
     throw new Error("ESM provider manifest must be an object.");
   }
   const keys = Object.keys(value).sort();
-  if (keys.join(",") !== "entry,format,styles" || value.format !== "esm") {
+  if (
+    !keys.includes("entry") ||
+    !keys.includes("format") ||
+    keys.some((key) => !["entry", "format", "style"].includes(key)) ||
+    value.format !== "esm"
+  ) {
     throw new Error(
-      'ESM provider manifest must contain only format, entry, and styles with format "esm".'
+      'ESM provider manifest must contain format, entry, and optional style only with format "esm".'
     );
   }
-  if (typeof value.entry !== "string" || !Array.isArray(value.styles)) {
-    throw new Error("ESM provider manifest entry and styles are required.");
+  if (typeof value.entry !== "string") {
+    throw new Error("ESM provider manifest entry is required.");
   }
-  return {
+  const manifest: EsmProviderManifest = {
     format: "esm",
     entry: normalizeProviderResourcePath(value.entry),
-    styles: value.styles.map((style) => {
-      if (typeof style !== "string") {
-        throw new Error("ESM provider manifest styles must be strings.");
-      }
-      return normalizeProviderResourcePath(style);
-    }),
   };
+  if ("style" in value) {
+    if (typeof value.style !== "string") {
+      throw new Error("ESM provider manifest style must be a string.");
+    }
+    manifest.style = normalizeProviderResourcePath(value.style);
+  }
+  return manifest;
 }
 
 export function normalizeProviderResourcePath(resourcePath: string) {

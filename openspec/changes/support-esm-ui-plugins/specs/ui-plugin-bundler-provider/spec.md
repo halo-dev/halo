@@ -75,7 +75,7 @@ The theme provider SHALL configure IIFE or ESM build output to match the active-
 #### Scenario: Theme ESM output reuses shared specifiers
 
 - **WHEN** the theme provider selects ESM format
-- **THEN** the helper SHALL apply the same shared dependency inventory and ESM externalization rules used by plugin ESM bundles
+- **THEN** the helper SHALL apply the same host runtime snapshot and ESM externalization rules used by plugin ESM bundles
 
 #### Scenario: User config overrides theme defaults consistently
 
@@ -107,53 +107,54 @@ The modern Vite and Rsbuild helpers SHALL support `auto`, `iife`, and `esm` prov
 #### Scenario: Explicit ESM target cannot be derived
 
 - **WHEN** a caller explicitly selects `esm` and `spec.requires` does not yield a supported target Halo version
-- **THEN** the helper SHALL require an explicit `targetHaloVersion` build option before selecting an inventory
+- **THEN** the helper SHALL require an explicit `targetHaloVersion` build option before selecting a host runtime snapshot
 
 #### Scenario: Explicit IIFE ignores target parsing
 
 - **WHEN** a caller explicitly selects `iife`
-- **THEN** the helper SHALL preserve legacy output without requiring `spec.requires` or a target inventory
+- **THEN** the helper SHALL preserve legacy output without requiring `spec.requires` or a target snapshot
 
 #### Scenario: ESM is tested against a Halo prerelease
 
 - **WHEN** a caller explicitly selects `esm` for a 2.26 prerelease that supplies the ESM runtime
-- **THEN** the helper SHALL allow the build after validating the explicit target inventory
+- **THEN** the helper SHALL allow the build after validating the explicit target snapshot
 - **THEN** automatic selection SHALL continue using the stable 2.26.0 threshold
 
 ### Requirement: Target Halo shared dependency validation
 
-The bundler SHALL validate a provider project's actually resolved shared dependency packages against the sparse immutable inventory selected for its target Halo version before externalizing them.
+The bundler SHALL validate a provider project's actually resolved shared dependency packages against the sparse immutable host runtime snapshot selected for its target Halo version before externalizing them.
 
-#### Scenario: Target inventory is selected automatically
+#### Scenario: Target snapshot is selected automatically
 
 - **WHEN** automatic format selection chooses ESM
-- **THEN** the bundler SHALL select the latest inventory whose Halo baseline is not newer than the minimum Halo version derived from a simple stable version or `>=MAJOR.MINOR.PATCH` requirement
+- **THEN** the bundler SHALL select the latest snapshot whose Halo baseline is not newer than the minimum Halo version derived from a simple stable version or `>=MAJOR.MINOR.PATCH` requirement
 
-#### Scenario: Target is newer than the bundled inventories
+#### Scenario: Target is newer than the bundled snapshots
 
-- **WHEN** the installed bundler does not contain an inventory with the exact target Halo version but contains an older eligible inventory
-- **THEN** the bundler SHALL use the latest eligible older inventory
+- **WHEN** the installed bundler does not contain a snapshot with the exact target Halo version but contains an older eligible snapshot
+- **THEN** the bundler SHALL use the latest eligible older snapshot
 - **THEN** it SHALL warn that newly introduced target exports require a bundler update
 
-#### Scenario: No eligible ESM inventory exists
+#### Scenario: No eligible ESM snapshot exists
 
-- **WHEN** the installed bundler contains no inventory whose baseline is compatible with the selected ESM target
+- **WHEN** the installed bundler contains no snapshot whose baseline is compatible with the selected ESM target
 - **THEN** the build SHALL fail with a diagnostic that identifies the target version and recommends a bundler update or IIFE output
 
-#### Scenario: Resolved dependency is admitted by the inventory
+#### Scenario: Resolved dependency matches the expected root
 
-- **WHEN** the package resolved from the provider project root has the expected package name and its actual version satisfies the inventory's accepted build range
-- **THEN** the bundler SHALL allow the shared package to remain external
+- **WHEN** the package resolved from the provider project root has the expected package name and owning package root
+- **THEN** the bundler SHALL allow the shared package to remain external after validating its statically imported exports
 
-#### Scenario: Resolved dependency is newer than the host baseline
+#### Scenario: Resolved dependency version differs from the host baseline
 
-- **WHEN** a shared package's actual version satisfies the accepted range but is newer than the exact host version recorded by the inventory
-- **THEN** the bundler SHALL allow externalization with a best-effort compatibility warning
+- **WHEN** a shared package's actual version differs from the exact host version recorded by the snapshot
+- **THEN** the bundler SHALL allow externalization when concrete root and export checks pass
+- **THEN** it SHALL warn for a newer provider version and emit a stronger warning when the major version differs
 
-#### Scenario: Resolved dependency is outside the inventory range
+#### Scenario: Resolved dependency identity is invalid
 
-- **WHEN** a shared dependency is missing, resolves outside the accepted range, resolves through an alias or fork, or bypasses the expected package root
-- **THEN** the ESM build SHALL fail and identify the dependency, resolved source and version, exact host version, accepted range, target inventory, and IIFE remediation
+- **WHEN** a shared dependency is missing, resolves through an alias or fork, or bypasses the expected package root
+- **THEN** the ESM build SHALL fail and identify the dependency, resolved source and version when available, exact host version, target snapshot, and IIFE remediation
 
 #### Scenario: Package declaration differs from actual resolution
 
@@ -169,14 +170,14 @@ The bundler SHALL validate a provider project's actually resolved shared depende
 
 #### Scenario: Provider imports an unsupported export
 
-- **WHEN** an ESM provider imports a package subpath or static runtime export that is absent from the target inventory
+- **WHEN** an ESM provider imports a package subpath or static runtime export that is absent from the target snapshot
 - **THEN** the build SHALL fail before externalizing that import
 
 #### Scenario: Provider uses a namespace import
 
 - **WHEN** an ESM provider uses a namespace import or dynamically reads properties from a shared package namespace
-- **THEN** the bundler SHALL allow the build after validating the package root and version
-- **THEN** it SHALL warn that individual runtime properties could not be proven against the inventory
+- **THEN** the bundler SHALL allow the build after validating the package root
+- **THEN** it SHALL warn that individual runtime properties could not be proven against the snapshot
 
 #### Scenario: Provider imports FormKit Core
 
@@ -190,7 +191,7 @@ The bundler SHALL validate a provider project's actually resolved shared depende
 
 #### Scenario: Provider imports a non-shared dependency
 
-- **WHEN** an ESM provider imports VueUse or another dependency not listed in the target Halo inventory
+- **WHEN** an ESM provider imports VueUse or another dependency not listed in the target Halo snapshot
 - **THEN** the bundler SHALL include that dependency in the provider output unless the provider explicitly configures another supported non-Halo delivery mechanism
 
 #### Scenario: Provider imports editor internals directly
@@ -212,7 +213,15 @@ The bundler SHALL make format and shared dependency decisions visible without ad
 
 - **WHEN** a plugin or theme provider build completes format selection
 - **THEN** the build output SHALL identify the selected format and whether it was explicit, automatic, or an automatic IIFE fallback
-- **THEN** an ESM build SHALL identify the target Halo version, selected inventory baseline, and each shared package's provider version, exact host version, and accepted range
+- **THEN** an ESM build SHALL identify the target Halo version, selected snapshot baseline, and each shared package's provider and exact host versions
+
+#### Scenario: Best-effort compatibility diagnostics are summarized
+
+- **WHEN** a successful ESM build encounters version drift, namespace or dynamic imports, or an editor identity boundary that cannot be fully validated
+- **THEN** the bundler SHALL emit at most one deterministic compatibility-note block after validation
+- **THEN** version drift SHALL be grouped by shared dependency without an earlier duplicate warning
+- **THEN** namespace and dynamic-import diagnostics SHALL be grouped by shared dependency and deduplicated by source
+- **THEN** source labels SHALL be provider-relative or dependency-relative rather than absolute filesystem paths
 
 ### Requirement: ESM provider output manifest
 
@@ -221,8 +230,14 @@ The bundler SHALL generate the provider manifest consumed by Halo whenever ESM o
 #### Scenario: ESM manifest is generated
 
 - **WHEN** a Vite or Rsbuild ESM provider build succeeds
-- **THEN** the output SHALL include a minimal manifest containing only the ESM format, entry module, and styles consumed by the Halo runtime
+- **THEN** the output SHALL include a minimal manifest containing the ESM format, entry module, and at most one optional startup stylesheet consumed by the Halo runtime
 - **THEN** the output manifest SHALL NOT duplicate the build target or resolved shared dependency versions already used by bundler validation
+
+#### Scenario: Provider emits asynchronous CSS chunks
+
+- **WHEN** CSS belongs only to an asynchronously imported JavaScript chunk
+- **THEN** the bundler SHALL NOT list that CSS in the provider manifest
+- **THEN** the emitted JavaScript runtime SHALL load it on demand from a provider-root-safe URL
 
 #### Scenario: ESM provider uses dynamic imports
 
@@ -248,7 +263,7 @@ Vite and Rsbuild provider helpers SHALL implement the same externally observable
 #### Scenario: Equivalent provider is built with both helpers
 
 - **WHEN** equivalent provider source is built through Vite and Rsbuild
-- **THEN** both outputs SHALL use the same manifest schema, shared dependency inventory, import restrictions, entry export contract, resource URL rules, and format selection semantics
+- **THEN** both outputs SHALL use the same manifest schema, host runtime snapshot, import restrictions, entry export contract, resource URL rules, and format selection semantics
 
 #### Scenario: Bundler-specific override bypasses validation
 

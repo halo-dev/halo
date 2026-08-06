@@ -77,7 +77,7 @@ class UiPluginBundleServiceImplTest {
                 .containsExactly("legacy-plugin", "theme:active");
         assertThat(descriptor.legacy().script())
                 .isEqualTo("/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.js?v=" + descriptor.version());
-        assertThat(descriptor.legacy().style())
+        assertThat(descriptor.style())
                 .isEqualTo("/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.css?v=" + descriptor.version());
 
         assertThat(read(service.getJsBundle(descriptor.version()).block()))
@@ -101,13 +101,13 @@ class UiPluginBundleServiceImplTest {
                 "ui-plugin",
                 Map.of(
                         "ui/ui-plugin.json",
-                                "{\"format\":\"esm\",\"entry\":\"./main.js\",\"styles\":[\"./styles/main.css\"]}",
+                                "{\"format\":\"esm\",\"entry\":\"./main.js\",\"style\":\"./styles/main.css\"}",
                         "ui/main.js", "export default {};",
                         "ui/styles/main.css", ".ui {}"));
         var consolePlugin = mockPlugin(
                 "console-plugin",
                 Map.of(
-                        "console/ui-plugin.json", "{\"format\":\"esm\",\"entry\":\"./main.js\",\"styles\":[]}",
+                        "console/ui-plugin.json", "{\"format\":\"esm\",\"entry\":\"./main.js\"}",
                         "console/main.js", "export default {};"));
         when(pluginManager.startedPlugins()).thenReturn(List.of(uiPlugin, consolePlugin));
 
@@ -116,7 +116,7 @@ class UiPluginBundleServiceImplTest {
         writeThemeUiFile(
                 "active",
                 "ui-plugin.json",
-                "{\"format\":\"esm\",\"entry\":\"./chunks/main.js\",\"styles\":[\"./styles/theme.css\"]}");
+                "{\"format\":\"esm\",\"entry\":\"./chunks/main.js\",\"style\":\"./styles/theme.css\"}");
         writeThemeUiFile("active", "chunks/main.js", "export default {};");
         writeThemeUiFile("active", "styles/theme.css", ".theme {}");
 
@@ -129,10 +129,9 @@ class UiPluginBundleServiceImplTest {
                         "/plugins/console-plugin/assets/console/main.js?v=" + descriptor.version(),
                         "/plugins/ui-plugin/assets/ui/main.js?v=" + descriptor.version(),
                         "/themes/active/ui-plugin/assets/chunks/main.js?v=" + descriptor.version());
-        assertThat(descriptor.providers().get(1).styles())
-                .containsExactly("/plugins/ui-plugin/assets/ui/styles/main.css?v=" + descriptor.version());
-        assertThat(descriptor.providers().get(2).styles())
-                .containsExactly("/themes/active/ui-plugin/assets/styles/theme.css?v=" + descriptor.version());
+        assertThat(descriptor.style())
+                .isEqualTo("/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.css?v=" + descriptor.version());
+        assertThat(read(service.getCssBundle(descriptor.version()).block())).containsSubsequence(".ui {}", ".theme {}");
         assertThat(read(service.getJsBundle(descriptor.version()).block()))
                 .doesNotContain("export default")
                 .contains("this.enabledUiPlugins = [];this.enabledPlugins = []");
@@ -143,13 +142,12 @@ class UiPluginBundleServiceImplTest {
         var extraField = mockPlugin(
                 "extra-field",
                 Map.of(
-                        "ui/ui-plugin.json",
-                                "{\"format\":\"esm\",\"entry\":\"./main.js\",\"styles\":[],\"targetHalo\":\"2.26.0\"}",
+                        "ui/ui-plugin.json", "{\"format\":\"esm\",\"entry\":\"./main.js\",\"targetHalo\":\"2.26.0\"}",
                         "ui/main.js", "console.log('must-not-run');"));
         var traversal = mockPlugin(
                 "traversal",
                 Map.of(
-                        "ui/ui-plugin.json", "{\"format\":\"esm\",\"entry\":\"../outside.js\",\"styles\":[]}",
+                        "ui/ui-plugin.json", "{\"format\":\"esm\",\"entry\":\"../outside.js\"}",
                         "outside.js", "console.log('outside');",
                         "ui/main.js", "console.log('must-not-fallback');"));
         when(pluginManager.startedPlugins()).thenReturn(List.of(traversal, extraField));

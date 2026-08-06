@@ -1,22 +1,28 @@
 import fs from "node:fs";
 import path from "node:path";
-import type { HaloSharedInventory, SharedPackageRoot } from "./inventory";
+import type {
+  HaloHostRuntimeSnapshot,
+  SharedPackageRoot,
+} from "./runtime-snapshot";
 import {
   SHARED_PACKAGE_ROOTS,
   isSharedPackageRoot,
   validateResolvedSharedPackage,
-} from "./inventory";
+} from "./runtime-snapshot";
 
 interface SharedDependencyValidatorOptions {
-  inventory: HaloSharedInventory;
+  snapshot: HaloHostRuntimeSnapshot;
   providerRoot: string;
-  warn: (message: string) => void;
+}
+
+interface SharedDependencyBuildReport {
+  summary: string;
+  warning?: string;
 }
 
 export class SharedDependencyValidator {
-  readonly #inventory: HaloSharedInventory;
+  readonly #snapshot: HaloHostRuntimeSnapshot;
   readonly #providerRoot: string;
-  readonly #warn: (message: string) => void;
   readonly #validatedRoots = new Set<SharedPackageRoot>();
   readonly #resolvedPackages = new Map<
     SharedPackageRoot,
@@ -26,14 +32,14 @@ export class SharedDependencyValidator {
     SharedPackageRoot,
     ReturnType<typeof validateResolvedSharedPackage>
   >();
-  readonly #warnings = new Set<string>();
+  readonly #namespaceImports = new Map<SharedPackageRoot, Set<string>>();
+  readonly #compatibilityNotes = new Set<string>();
   #usesEditor = false;
   #usesEditorInternals = false;
 
   constructor(options: SharedDependencyValidatorOptions) {
-    this.#inventory = options.inventory;
+    this.#snapshot = options.snapshot;
     this.#providerRoot = path.resolve(options.providerRoot);
-    this.#warn = options.warn;
   }
 
   async validateSource(code: string, sourceId: string) {
@@ -41,7 +47,7 @@ export class SharedDependencyValidator {
       await this.validateImport(imported.specifier, imported.names, sourceId);
     }
     if (this.#usesEditor && this.#usesEditorInternals) {
-      this.warnOnce(
+      this.#compatibilityNotes.add(
         "Direct @tiptap/* or prosemirror-* imports remain provider-private while @halo-dev/richtext-editor is shared; editor identity is best-effort."
       );
     }
@@ -78,21 +84,21 @@ export class SharedDependencyValidator {
 
     await this.validateResolvedRoot(specifier, sourceId);
     if (names === "namespace") {
-      this.warnOnce(
-        `${sourceId} uses a namespace or dynamic import from ${specifier}; runtime properties cannot be fully checked against Halo ${this.#inventory.haloVersion}.`
-      );
+      const sources = this.#namespaceImports.get(specifier) || new Set();
+      sources.add(this.formatSourceLabel(sourceId));
+      this.#namespaceImports.set(specifier, sources);
       return true;
     }
 
     const supportedExports = new Set(
-      this.#inventory.packages[specifier].exports
+      this.#snapshot.packages[specifier].exports
     );
     const unsupported = names.filter((name) => !supportedExports.has(name));
     if (unsupported.length > 0) {
       throw new Error(
         `${sourceId} imports unsupported ${specifier} export(s): ${unsupported.join(", ")}. ` +
-          `Halo ${this.#inventory.haloVersion} exposes ${supportedExports.size} root exports. ` +
-          "Raise spec.requires with an updated bundler inventory, change the import, or select IIFE output."
+          `Halo ${this.#snapshot.haloVersion} exposes ${supportedExports.size} root exports. ` +
+          "Raise spec.requires with an updated bundler snapshot, change the import, or select IIFE output."
       );
     }
     return true;
@@ -102,14 +108,94 @@ export class SharedDependencyValidator {
     return [...this.#validatedRoots];
   }
 
-  getBuildSummary() {
-    return this.getValidatedRoots().map((root) => {
+  getBuildReport(): SharedDependencyBuildReport {
+    const roots = SHARED_PACKAGE_ROOTS.filter((root) =>
+      this.#validatedRoots.has(root)
+    );
+    const rows = roots.map((root) => {
       const resolved = this.#resolvedPackages.get(root) as Awaited<
         ReturnType<typeof validateResolvedSharedPackage>
       >;
-      const host = this.#inventory.packages[root];
-      return `${root}: provider ${resolved.version}, host ${host.version}, accepted ${host.range}`;
+      const host = this.#snapshot.packages[root];
+      return [root, resolved.version, host.version] as const;
     });
+    const widths = [
+      Math.max("package".length, ...rows.map(([root]) => root.length)),
+      Math.max(
+        "provider".length,
+        ...rows.map(([, providerVersion]) => providerVersion.length)
+      ),
+      Math.max(
+        "Halo host".length,
+        ...rows.map(([, , hostVersion]) => hostVersion.length)
+      ),
+    ];
+    const summary = [
+      `[ui-plugin-bundler-kit] ESM validation passed (Halo ${this.#snapshot.haloVersion} snapshot).`,
+      ...(rows.length > 0
+        ? [
+            "  Shared dependencies",
+            formatTableRow(["package", "provider", "Halo host"], widths),
+            ...rows.map((row) => formatTableRow(row, widths)),
+          ]
+        : ["  Shared dependencies: none"]),
+    ].join("\n");
+
+    const warningSections: string[] = [];
+    const versionNotes = roots.flatMap((root) => {
+      const resolved = this.#resolvedPackages.get(root) as Awaited<
+        ReturnType<typeof validateResolvedSharedPackage>
+      >;
+      if (!resolved.differentMajor && !resolved.newerThanHost) {
+        return [];
+      }
+      const hostVersion = this.#snapshot.packages[root].version;
+      const reason = resolved.differentMajor
+        ? "different major"
+        : "provider is newer";
+      return [
+        `    ${root}: provider ${resolved.version}, Halo host ${hostVersion} (${reason}; best-effort)`,
+      ];
+    });
+    if (versionNotes.length > 0) {
+      warningSections.push("  Version differences", ...versionNotes);
+    }
+
+    const namespaceNotes = roots.flatMap((root) => {
+      const sources = this.#namespaceImports.get(root);
+      if (!sources?.size) {
+        return [];
+      }
+      return [
+        `    ${root}`,
+        ...[...sources].sort().map((source) => `      - ${source}`),
+      ];
+    });
+    if (namespaceNotes.length > 0) {
+      warningSections.push(
+        "  Namespace or dynamic imports not fully checked",
+        ...namespaceNotes
+      );
+    }
+
+    if (this.#compatibilityNotes.size > 0) {
+      warningSections.push(
+        "  Other",
+        ...[...this.#compatibilityNotes].sort().map((note) => `    ${note}`)
+      );
+    }
+
+    return {
+      summary,
+      ...(warningSections.length > 0
+        ? {
+            warning: [
+              "[ui-plugin-bundler-kit] Compatibility notes:",
+              ...warningSections,
+            ].join("\n"),
+          }
+        : {}),
+    };
   }
 
   async assertBundlerResolution(
@@ -166,7 +252,7 @@ export class SharedDependencyValidator {
       resolving = validateResolvedSharedPackage(
         root,
         this.#providerRoot,
-        this.#inventory,
+        this.#snapshot,
         sourceId
       );
       this.#resolvingPackages.set(root, resolving);
@@ -174,20 +260,31 @@ export class SharedDependencyValidator {
     const resolved = await resolving;
     this.#validatedRoots.add(root);
     this.#resolvedPackages.set(root, resolved);
-    if (resolved.newerThanHost) {
-      const entry = this.#inventory.packages[root];
-      this.warnOnce(
-        `${root} ${resolved.version} is newer than Halo ${this.#inventory.haloVersion}'s host ${entry.version} but is admitted by ${entry.range}; compatibility is best-effort.`
-      );
-    }
   }
 
-  private warnOnce(message: string) {
-    if (!this.#warnings.has(message)) {
-      this.#warnings.add(message);
-      this.#warn(`[ui-plugin-bundler-kit] ${message}`);
+  private formatSourceLabel(sourceId: string) {
+    const cleanId = sourceId.split(/[?#]/, 1)[0];
+    const normalizedId = cleanId.split(path.sep).join("/");
+    const nodeModulesMarker = "/node_modules/";
+    const nodeModulesIndex = normalizedId.lastIndexOf(nodeModulesMarker);
+    if (nodeModulesIndex !== -1) {
+      return normalizedId.slice(nodeModulesIndex + nodeModulesMarker.length);
     }
+
+    if (!path.isAbsolute(cleanId)) {
+      return normalizedId.replace(/^\.\//, "");
+    }
+    return path.relative(this.#providerRoot, cleanId).split(path.sep).join("/");
   }
+}
+
+function formatTableRow(
+  values: readonly [string, string, string],
+  widths: readonly number[]
+) {
+  return `    ${values
+    .map((value, index) => value.padEnd(widths[index]))
+    .join("  ")}`.trimEnd();
 }
 
 interface ParsedImport {

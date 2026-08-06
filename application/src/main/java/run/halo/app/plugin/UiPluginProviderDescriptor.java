@@ -5,6 +5,7 @@ import java.util.List;
 /** Browser descriptor for the currently enabled plugin and theme UI providers. */
 public record UiPluginProviderDescriptor(
         String version,
+        String style,
         LegacyResources legacy,
         List<Registration> registrations,
         List<EsmProvider> providers,
@@ -16,15 +17,11 @@ public record UiPluginProviderDescriptor(
         invalid = List.copyOf(invalid);
     }
 
-    public record LegacyResources(String script, String style) {}
+    public record LegacyResources(String script) {}
 
     public record Registration(String name, String type, String version) {}
 
-    public record EsmProvider(String name, String type, String version, String entry, List<String> styles) {
-        public EsmProvider {
-            styles = List.copyOf(styles);
-        }
-    }
+    public record EsmProvider(String name, String type, String version, String entry) {}
 
     public record InvalidProvider(String name, String type, String version, String reason) {}
 }

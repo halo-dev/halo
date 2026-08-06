@@ -1,8 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
 import { resolvePackageJSON } from "pkg-types";
-import { compare, lte, parse, satisfies } from "semver";
-import halo226Inventory from "./inventories/halo-2.26.0.json";
+import { compare, lte, parse } from "semver";
+import { rawHaloHostRuntimeSnapshots } from "./runtime-snapshots";
 
 export const SHARED_PACKAGE_ROOTS = [
   "vue",
@@ -19,9 +19,8 @@ export const SHARED_PACKAGE_ROOTS = [
 
 export type SharedPackageRoot = (typeof SHARED_PACKAGE_ROOTS)[number];
 
-export interface SharedPackageInventoryEntry {
+export interface HostRuntimeSnapshotEntry {
   version: string;
-  range: string;
   exports: string[];
   runtime: {
     bridge: string;
@@ -30,25 +29,25 @@ export interface SharedPackageInventoryEntry {
   };
 }
 
-export interface HaloSharedInventory {
+export interface HaloHostRuntimeSnapshot {
   haloVersion: string;
-  packages: Record<SharedPackageRoot, SharedPackageInventoryEntry>;
+  packages: Record<SharedPackageRoot, HostRuntimeSnapshotEntry>;
 }
 
 const sharedPackageRootSet = new Set<string>(SHARED_PACKAGE_ROOTS);
 
-export const HALO_SHARED_INVENTORIES = Object.freeze([
-  validateHaloSharedInventory(halo226Inventory),
-]);
+export const HALO_HOST_RUNTIME_SNAPSHOTS = Object.freeze(
+  rawHaloHostRuntimeSnapshots.map(validateHaloHostRuntimeSnapshot)
+);
 
-export function validateHaloSharedInventory(
+export function validateHaloHostRuntimeSnapshot(
   value: unknown
-): HaloSharedInventory {
+): HaloHostRuntimeSnapshot {
   if (!isRecord(value) || !parseStableVersion(value.haloVersion)) {
-    throw new Error("Inventory haloVersion must be a stable semantic version.");
+    throw new Error("Host runtime snapshot haloVersion must be stable semver.");
   }
   if (!isRecord(value.packages)) {
-    throw new Error("Inventory packages must be an object.");
+    throw new Error("Host runtime snapshot packages must be an object.");
   }
 
   const packageRoots = Object.keys(value.packages).sort();
@@ -58,51 +57,50 @@ export function validateHaloSharedInventory(
     packageRoots.some((root, index) => root !== supportedRoots[index])
   ) {
     throw new Error(
-      `Inventory must expose exactly: ${SHARED_PACKAGE_ROOTS.join(", ")}.`
+      `Host runtime snapshot must expose exactly: ${SHARED_PACKAGE_ROOTS.join(", ")}.`
     );
   }
 
   const packages = Object.fromEntries(
     SHARED_PACKAGE_ROOTS.map((root) => [
       root,
-      validateInventoryEntry(root, value.packages[root]),
+      validateSnapshotEntry(root, value.packages[root]),
     ])
-  ) as Record<SharedPackageRoot, SharedPackageInventoryEntry>;
+  ) as Record<SharedPackageRoot, HostRuntimeSnapshotEntry>;
 
   return deepFreeze({ haloVersion: value.haloVersion, packages });
 }
 
-export function selectHaloSharedInventory(
+export function selectHaloHostRuntimeSnapshot(
   targetHaloVersion: string,
-  inventories: readonly HaloSharedInventory[] = HALO_SHARED_INVENTORIES
+  snapshots: readonly HaloHostRuntimeSnapshot[] = HALO_HOST_RUNTIME_SNAPSHOTS
 ) {
   const target = parse(targetHaloVersion);
   if (!target) {
     throw new Error(`Invalid target Halo version: ${targetHaloVersion}.`);
   }
 
-  const eligible = inventories
+  const eligible = snapshots
     .filter(
-      (inventory) =>
-        lte(inventory.haloVersion, target.version) ||
+      (snapshot) =>
+        lte(snapshot.haloVersion, target.version) ||
         (target.prerelease.length > 0 &&
-          inventory.haloVersion ===
+          snapshot.haloVersion ===
             `${target.major}.${target.minor}.${target.patch}`)
     )
     .sort((left, right) => compare(right.haloVersion, left.haloVersion));
-  const inventory = eligible[0];
-  if (!inventory) {
+  const snapshot = eligible[0];
+  if (!snapshot) {
     throw new Error(
-      `No ESM shared dependency inventory is available for Halo ${targetHaloVersion}. ` +
+      `No ESM host runtime snapshot is available for Halo ${targetHaloVersion}. ` +
         "Update @halo-dev/ui-plugin-bundler-kit or select IIFE output."
     );
   }
 
   return {
-    inventory,
-    reusedOlderInventory:
-      inventory.haloVersion !== target.version &&
-      target.prerelease.length === 0,
+    snapshot,
+    reusedOlderSnapshot:
+      snapshot.haloVersion !== target.version && target.prerelease.length === 0,
   };
 }
 
@@ -146,21 +144,23 @@ export async function resolveSharedPackage(
 export async function validateResolvedSharedPackage(
   root: SharedPackageRoot,
   providerRoot: string,
-  inventory: HaloSharedInventory,
+  snapshot: HaloHostRuntimeSnapshot,
   sourceId?: string
 ) {
   const resolved = await resolveSharedPackage(root, providerRoot, sourceId);
-  const expected = inventory.packages[root];
-  if (!satisfies(resolved.version, expected.range)) {
+  const hostVersion = snapshot.packages[root].version;
+  const resolvedVersion = parse(resolved.version);
+  const parsedHostVersion = parse(hostVersion);
+  if (!resolvedVersion || !parsedHostVersion) {
     throw new Error(
-      `${root} resolved to ${resolved.version} at ${resolved.packageRoot}, outside ` +
-        `Halo ${inventory.haloVersion}'s accepted range ${expected.range} ` +
-        `(host ${expected.version}). Align the dependency or select IIFE output.`
+      `${root} resolved to invalid version ${resolved.version} at ${resolved.packageRoot}. ` +
+        "Install a valid published package or select IIFE output."
     );
   }
   return {
     ...resolved,
-    newerThanHost: compare(resolved.version, expected.version) > 0,
+    newerThanHost: compare(resolvedVersion, parsedHostVersion) > 0,
+    differentMajor: resolvedVersion.major !== parsedHostVersion.major,
   };
 }
 
@@ -168,20 +168,12 @@ export function isSharedPackageRoot(value: string): value is SharedPackageRoot {
   return sharedPackageRootSet.has(value);
 }
 
-function validateInventoryEntry(
+function validateSnapshotEntry(
   root: SharedPackageRoot,
   value: unknown
-): SharedPackageInventoryEntry {
+): HostRuntimeSnapshotEntry {
   if (!isRecord(value) || !parseStableVersion(value.version)) {
-    throw new Error(`${root} inventory version must be stable semver.`);
-  }
-  if (
-    typeof value.range !== "string" ||
-    !satisfies(value.version, value.range)
-  ) {
-    throw new Error(
-      `${root} inventory range must admit host ${value.version}.`
-    );
+    throw new Error(`${root} snapshot version must be stable semver.`);
   }
   if (
     !Array.isArray(value.exports) ||
@@ -192,7 +184,7 @@ function validateInventoryEntry(
     ) ||
     new Set(value.exports).size !== value.exports.length
   ) {
-    throw new Error(`${root} inventory exports must be unique identifiers.`);
+    throw new Error(`${root} snapshot exports must be unique identifiers.`);
   }
   if (
     !isRecord(value.runtime) ||
@@ -203,11 +195,10 @@ function validateInventoryEntry(
     (value.runtime.identity !== "singleton" &&
       value.runtime.identity !== "shared")
   ) {
-    throw new Error(`${root} inventory runtime descriptor is invalid.`);
+    throw new Error(`${root} snapshot runtime descriptor is invalid.`);
   }
   return {
     version: value.version,
-    range: value.range,
     exports: [...value.exports].sort(),
     runtime: {
       bridge: value.runtime.bridge,

@@ -1,12 +1,12 @@
 export { HaloUIPluginBundlerKit } from "./legacy";
 export {
-  HALO_SHARED_INVENTORIES,
+  HALO_HOST_RUNTIME_SNAPSHOTS,
   SHARED_PACKAGE_ROOTS,
   isSharedPackageRoot,
-  selectHaloSharedInventory,
-  validateHaloSharedInventory,
+  selectHaloHostRuntimeSnapshot,
+  validateHaloHostRuntimeSnapshot,
   validateResolvedSharedPackage,
-} from "./inventory";
+} from "./runtime-snapshot";
 export {
   ESM_PROVIDER_MANIFEST,
   normalizeProviderResourcePath,

@@ -3,7 +3,6 @@
   "packages": {
     "vue": {
       "version": "3.5.40",
-      "range": ">=3.2.0 <4",
       "exports": [
         "BaseTransition",
         "BaseTransitionPropsValidators",
@@ -186,7 +185,6 @@
     },
     "vue-router": {
       "version": "5.0.2",
-      "range": ">=4 <6",
       "exports": [
         "NavigationFailureType",
         "RouterLink",
@@ -220,7 +218,6 @@
     },
     "pinia": {
       "version": "3.0.4",
-      "range": ">=2 <4",
       "exports": [
         "MutationType",
         "acceptHMRUpdate",
@@ -247,7 +244,6 @@
     },
     "axios": {
       "version": "1.16.1",
-      "range": ">=1 <2",
       "exports": [
         "Axios",
         "AxiosError",
@@ -276,7 +272,6 @@
     },
     "@formkit/vue": {
       "version": "2.1.0",
-      "range": ">=1 <3",
       "exports": [
         "FormKit",
         "FormKitIcon",
@@ -322,7 +317,6 @@
     },
     "@formkit/core": {
       "version": "2.1.0",
-      "range": ">=1 <3",
       "exports": [
         "FORMKIT_VERSION",
         "bfs",
@@ -372,7 +366,6 @@
     },
     "@halo-dev/ui-shared": {
       "version": "2.25.2",
-      "range": ">=2 <3",
       "exports": [
         "FormType",
         "THUMBNAIL_WIDTH_MAP",
@@ -389,7 +382,6 @@
     },
     "@halo-dev/components": {
       "version": "2.25.2",
-      "range": ">=2 <3",
       "exports": [
         "AvatarGroupContextInjectionKey",
         "Dialog",
@@ -514,7 +506,6 @@
     },
     "@halo-dev/api-client": {
       "version": "2.25.2",
-      "range": ">=2 <3",
       "exports": [
         "AddOperationOpEnum",
         "AnnotationSettingV1AlphaUcApi",
@@ -887,7 +878,6 @@
     },
     "@halo-dev/richtext-editor": {
       "version": "2.25.2",
-      "range": ">=2 <3",
       "exports": [
         "AUDIO_BUBBLE_MENU_KEY",
         "AddMarkStep",

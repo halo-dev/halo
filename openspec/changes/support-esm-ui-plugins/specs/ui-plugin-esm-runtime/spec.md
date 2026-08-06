@@ -7,7 +7,7 @@ Halo SHALL use a generated provider manifest as the authoritative description of
 #### Scenario: ESM plugin manifest is discovered
 
 - **WHEN** a started plugin provides a valid UI module manifest with `format` set to `esm`
-- **THEN** Halo SHALL discover its entry module and styles from that manifest
+- **THEN** Halo SHALL discover its entry module and at most one optional startup stylesheet from that manifest
 - **THEN** Halo SHALL obtain provider identity, activation state, installed version, and `spec.requires` from Halo-managed metadata
 
 #### Scenario: ESM theme manifest is discovered
@@ -31,48 +31,48 @@ Halo SHALL use a generated provider manifest as the authoritative description of
 - **WHEN** an ESM provider manifest contains an absolute, cross-origin, or provider-root-escaping resource path
 - **THEN** Halo SHALL reject the provider manifest
 
-### Requirement: Halo shared dependency inventory
+### Requirement: Halo host runtime snapshot
 
-Halo SHALL publish sparse immutable inventories that record the actual shared runtime supplied by a Halo baseline and the best-effort provider build ranges it accepts.
+Halo SHALL publish sparse immutable snapshots that record the actual shared runtime supplied by a Halo baseline without claiming a supported provider dependency range.
 
-#### Scenario: Inventory records the shared dependency set
+#### Scenario: Snapshot records the shared dependency set
 
-- **WHEN** Halo generates a release inventory
-- **THEN** the inventory SHALL identify the exact resolved host version, accepted provider build range, and actual package-root runtime exports for `vue`, `vue-router`, `pinia`, `axios`, `@formkit/vue`, `@formkit/core`, `@halo-dev/ui-shared`, `@halo-dev/components`, `@halo-dev/api-client`, and `@halo-dev/richtext-editor`
+- **WHEN** Halo generates a host runtime snapshot
+- **THEN** the snapshot SHALL identify the exact resolved host version and actual package-root runtime exports for `vue`, `vue-router`, `pinia`, `axios`, `@formkit/vue`, `@formkit/core`, `@halo-dev/ui-shared`, `@halo-dev/components`, `@halo-dev/api-client`, and `@halo-dev/richtext-editor`
+- **THEN** it SHALL NOT contain a manually maintained accepted provider version range
 
-#### Scenario: Inventory range expresses best-effort replacement
+#### Scenario: Provider version differs from the snapshot
 
-- **WHEN** a provider build version falls inside an inventory's accepted range
-- **THEN** the range SHALL mean that Halo permits replacement with its host runtime after export validation
-- **THEN** the range SHALL NOT be represented as proof of complete type or behavioral compatibility
+- **WHEN** a provider resolves a shared package version different from the snapshot's exact host version
+- **THEN** the difference SHALL be reported as best-effort diagnostic context rather than proof of compatibility or an automatic build rejection
+- **THEN** a newer provider version SHALL warn and a different major version SHALL produce a stronger warning
 
-#### Scenario: Initial ESM inventory ranges are generated
+#### Scenario: Halo release reuses a snapshot
 
-- **WHEN** Halo publishes the initial ESM provider inventory
-- **THEN** it SHALL admit provider build versions `>=3.2.0 <4` for Vue, `>=4 <6` for Vue Router, `>=2 <4` for Pinia, `>=1 <2` for Axios, `>=1 <3` for FormKit Vue/Core, and `>=2 <3` for the four Halo-owned shared packages
-- **THEN** stable ranges SHALL NOT implicitly admit prerelease versions
+- **WHEN** a Halo release does not change the shared version facts, root exports, or runtime bridge behavior
+- **THEN** it SHALL be allowed to reuse the latest earlier immutable snapshot instead of publishing a duplicate
 
-#### Scenario: Halo release reuses an inventory
+#### Scenario: Snapshot excludes non-shared dependencies
 
-- **WHEN** a Halo release does not change the shared version facts, accepted ranges, root exports, or runtime bridge behavior
-- **THEN** it SHALL be allowed to reuse the latest earlier immutable inventory instead of publishing a duplicate
+- **WHEN** Halo generates a host runtime snapshot
+- **THEN** the snapshot SHALL NOT expose VueUse, Tiptap, ProseMirror, other FormKit subpackages, or arbitrary third-party dependencies as shared runtime specifiers
 
-#### Scenario: Inventory excludes non-shared dependencies
-
-- **WHEN** Halo generates a release inventory
-- **THEN** the inventory SHALL NOT expose VueUse, Tiptap, ProseMirror, other FormKit subpackages, or arbitrary third-party dependencies as shared runtime specifiers
-
-#### Scenario: Inventory is generated from actual resolution
+#### Scenario: Snapshot is generated from actual resolution
 
 - **WHEN** a declared dependency range, workspace link, or lockfile resolution differs from a package's resolved version
-- **THEN** the inventory SHALL record the version obtained from the actual Halo UI build resolution
+- **THEN** the snapshot SHALL record the version obtained from the actual Halo UI build resolution
 - **THEN** it SHALL NOT record a declaration range, peer suffix, workspace protocol, or link protocol as the resolved version
 
-#### Scenario: Inventory exports are generated
+#### Scenario: Snapshot exports are generated
 
-- **WHEN** Halo generates an inventory from its browser runtime artifacts
+- **WHEN** Halo generates a snapshot from its browser runtime artifacts
 - **THEN** the recorded root exports SHALL be derived from and checked against those actual artifacts
-- **THEN** the manually reviewed accepted range SHALL remain separate from the generated host facts
+
+#### Scenario: Snapshot output version is selected
+
+- **WHEN** the bundler-kit snapshot generator runs
+- **THEN** it SHALL derive the Halo baseline and versioned output path from `@halo-dev/ui-plugin-bundler-kit`'s package version
+- **THEN** this change SHALL NOT require snapshot generation or checking to run automatically during every package build or CI job
 
 ### Requirement: Host-owned shared dependency resolution
 
@@ -134,19 +134,26 @@ Halo SHALL describe current UI providers through one authenticated response that
 
 - **WHEN** an authenticated Console or User Center session requests its provider descriptor
 - **THEN** Halo SHALL classify the currently started plugins and activated theme
-- **THEN** the response SHALL contain one version, versioned legacy script/style URLs, valid ESM descriptors, and invalid-provider diagnostics from that classification
+- **THEN** the response SHALL contain one version, one versioned aggregate startup stylesheet URL, one versioned legacy script URL, valid ESM entry descriptors, and invalid-provider diagnostics from that classification
 
 #### Scenario: ESM plugin resource is described
 
 - **WHEN** a plugin is classified as ESM
-- **THEN** its entry and style URLs SHALL use the existing `/plugins/{name}/assets/ui/` mapping or the selected legacy `/assets/console/` fallback
-- **THEN** each URL SHALL include the descriptor version as a query parameter
+- **THEN** its entry URL SHALL use the existing `/plugins/{name}/assets/ui/` mapping or the selected legacy `/assets/console/` fallback
+- **THEN** the entry URL SHALL include the descriptor version as a query parameter
 
 #### Scenario: ESM theme resource is described
 
 - **WHEN** the activated theme is classified as ESM
-- **THEN** its entry and style URLs SHALL use the existing `/themes/{name}/ui-plugin/assets/` mapping
-- **THEN** each URL SHALL include the descriptor version as a query parameter
+- **THEN** its entry URL SHALL use the existing `/themes/{name}/ui-plugin/assets/` mapping
+- **THEN** the entry URL SHALL include the descriptor version as a query parameter
+
+#### Scenario: Startup stylesheet is described
+
+- **WHEN** the descriptor contains legacy providers or valid ESM providers with a main stylesheet
+- **THEN** the descriptor SHALL expose the existing versioned aggregate CSS URL once at the response root
+- **THEN** that stylesheet SHALL concatenate legacy CSS and valid ESM main styles in provider order
+- **THEN** it SHALL NOT contain CSS emitted only for asynchronous chunks
 
 #### Scenario: Provider state changes during startup
 
@@ -178,7 +185,7 @@ Halo SHALL expose format-neutral UI provider availability and registration metad
 
 #### Scenario: Provider loading or registration fails
 
-- **WHEN** an enabled provider fails manifest validation, style loading, entry loading, export validation, or registration
+- **WHEN** an enabled provider fails manifest validation, entry loading, export validation, or registration
 - **THEN** its shared registration record SHALL transition to `failed`
 - **THEN** it SHALL NOT be reported as registered
 
@@ -213,8 +220,9 @@ Halo SHALL load legacy IIFE and ESM UI providers in the same Console or User Cen
 #### Scenario: ESM entries are loaded
 
 - **WHEN** one or more discovered providers are classified as ESM providers
-- **THEN** Halo SHALL import each provider's independent entry URL
+- **THEN** Halo SHALL start all independent entry imports in parallel and await them with all-settled semantics
 - **THEN** the provider SHALL be able to load its own relative asynchronous chunks and emitted assets
+- **THEN** Halo SHALL NOT reload the page after an individual entry import settles
 
 #### Scenario: ESM entry exports a plugin module
 
@@ -228,15 +236,21 @@ Halo SHALL load legacy IIFE and ESM UI providers in the same Console or User Cen
 - **THEN** Halo SHALL initialize the accepted provider modules in a stable provider order
 - **THEN** no provider SHALL rely on ESM evaluation order or direct imports from another provider
 
-#### Scenario: Provider styles settle in different orders
+#### Scenario: Startup provider styles are loaded
 
-- **WHEN** legacy and ESM provider styles finish loading in a nondeterministic order
-- **THEN** their stylesheet elements SHALL retain descriptor order
-- **THEN** one ESM provider style failure SHALL be attributed to that provider without discarding unrelated providers
+- **WHEN** provider startup begins
+- **THEN** Halo SHALL load the descriptor's aggregate stylesheet once instead of inserting every provider CSS asset separately
+- **THEN** a failure of that aggregate stylesheet SHALL be reported once without falsely attributing a concatenated response to one provider
+
+#### Scenario: Provider loads an asynchronous CSS chunk
+
+- **WHEN** a provider later imports a JavaScript chunk with associated CSS
+- **THEN** the bundler runtime SHALL load that CSS on demand from the provider's static resource mapping
+- **THEN** Halo SHALL NOT eagerly include that chunk CSS in the startup aggregate
 
 ### Requirement: ESM provider failure isolation
 
-Halo SHALL isolate observable ESM provider discovery, import, evaluation, export, style, registration, and delayed-chunk failures from other providers and the core UI where the host lifecycle exposes an isolation boundary.
+Halo SHALL isolate observable ESM provider discovery, import, evaluation, export, registration, and delayed-chunk failures from other providers and the core UI where the host lifecycle exposes an isolation boundary; the single aggregate startup stylesheet is a shared startup resource.
 
 #### Scenario: One ESM entry fails
 
@@ -329,7 +343,7 @@ Halo SHALL treat a full Console or User Center page load as the supported module
 #### Scenario: Production ESM assets are cached
 
 - **WHEN** production provider ESM resources are emitted
-- **THEN** entry, style, and aggregate URLs SHALL include the current provider descriptor version as a cache key
+- **THEN** entry and aggregate URLs SHALL include the current provider descriptor version as a cache key
 - **THEN** asynchronous chunks and assets SHALL use provider-relative content-hashed URLs where supported
 - **THEN** provider discovery metadata SHALL be revalidated so it reflects currently enabled providers
 

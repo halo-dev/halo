@@ -42,7 +42,10 @@ describe("ESM provider builds", () => {
       logLevel: "silent",
     });
 
-    assertEsmOutput(path.join(providerRoot, "build/dist"));
+    assertEsmOutput(
+      path.join(providerRoot, "build/dist"),
+      "/plugins/esm-plugin/assets/ui/"
+    );
   });
 
   it("builds a theme with Rsbuild using the equivalent contract", async () => {
@@ -58,7 +61,10 @@ describe("ESM provider builds", () => {
 
     await rsbuild.build();
 
-    assertEsmOutput(path.join(providerRoot, "dist"));
+    assertEsmOutput(
+      path.join(providerRoot, "dist"),
+      "/themes/esm-theme/ui-plugin/assets/"
+    );
   });
 
   it("preserves explicit IIFE output without an ESM manifest", async () => {
@@ -119,7 +125,28 @@ describe("ESM provider builds", () => {
         configFile: false,
         logLevel: "silent",
       })
-    ).rejects.toThrow("would bypass Halo inventory validation");
+    ).rejects.toThrow("would bypass Halo snapshot validation");
+  });
+
+  it("rejects a Vite override that merges async CSS into the entry", async () => {
+    const providerRoot = setupProviderProject("plugin");
+    process.chdir(providerRoot);
+    const config = resolveViteConfig(
+      viteConfig({
+        vite: {
+          build: { cssCodeSplit: false },
+        },
+      })
+    );
+
+    await expect(
+      viteBuild({
+        ...config,
+        root: providerRoot,
+        configFile: false,
+        logLevel: "silent",
+      })
+    ).rejects.toThrow("build.cssCodeSplit to remain enabled");
   });
 });
 
@@ -187,24 +214,46 @@ function setupProviderProject(provider: "plugin" | "theme") {
   );
   fs.writeFileSync(
     path.join(providerRoot, "src/lazy.ts"),
-    'export const value = "lazy";\n'
+    'import "./lazy.css";\nexport const value = "lazy";\n'
   );
   fs.writeFileSync(
     path.join(providerRoot, "src/style.css"),
-    ".esm-provider { color: red; }\n"
+    '.esm-provider { color: red; background-image: url("./asset.svg"); }\n'
+  );
+  fs.writeFileSync(
+    path.join(providerRoot, "src/lazy.css"),
+    ".esm-provider-lazy { color: blue; }\n"
+  );
+  fs.writeFileSync(
+    path.join(providerRoot, "src/asset.svg"),
+    `<svg xmlns="http://www.w3.org/2000/svg"><text>${"asset".repeat(5_000)}</text></svg>`
   );
   return providerRoot;
 }
 
-function assertEsmOutput(outputRoot: string) {
+function assertEsmOutput(outputRoot: string, providerPublicPath: string) {
   const manifest = JSON.parse(
     fs.readFileSync(path.join(outputRoot, "ui-plugin.json"), "utf8")
   );
   expect(manifest).toEqual({
     format: "esm",
     entry: "./main.js",
-    styles: expect.arrayContaining([expect.stringMatching(/\.css$/)]),
+    style: expect.stringMatching(/\.css$/),
   });
+  expect(manifest).not.toHaveProperty("styles");
+  const cssFiles = findFiles(outputRoot, (file) => file.endsWith(".css"));
+  expect(cssFiles).toContain(manifest.style.replace(/^\.\//, ""));
+  expect(cssFiles).toEqual(
+    expect.arrayContaining([expect.stringMatching(/chunks|assets/)])
+  );
+  expect(cssFiles).toHaveLength(2);
+  const entryCss = fs.readFileSync(
+    path.join(outputRoot, manifest.style.replace(/^\.\//, "")),
+    "utf8"
+  );
+  expect(
+    entryCss.includes(providerPublicPath) || entryCss.includes("url(data:")
+  ).toBe(true);
   const entry = fs.readFileSync(path.join(outputRoot, "main.js"), "utf8");
   expect(entry).toMatch(/from\s*["']vue["']/);
   expect(entry).toMatch(/export\s*(?:default|\{)/);
@@ -213,6 +262,15 @@ function assertEsmOutput(outputRoot: string) {
       .readdirSync(path.join(outputRoot, "chunks"))
       .some((file) => file.endsWith(".js"))
   ).toBe(true);
+}
+
+function findFiles(root: string, predicate: (file: string) => boolean) {
+  return fs.readdirSync(root, { recursive: true }).filter((file) => {
+    const relative = String(file);
+    return (
+      predicate(relative) && fs.statSync(path.join(root, relative)).isFile()
+    );
+  });
 }
 
 function resolveViteConfig(config: unknown) {

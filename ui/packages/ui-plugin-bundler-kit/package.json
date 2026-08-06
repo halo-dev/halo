@@ -1,6 +1,6 @@
 {
   "name": "@halo-dev/ui-plugin-bundler-kit",
-  "version": "2.25.2",
+  "version": "2.26.0",
   "homepage": "https://github.com/halo-dev/halo/tree/main/ui/packages/ui-plugin-bundler-kit#readme",
   "bugs": {
     "url": "https://github.com/halo-dev/halo/issues"
@@ -21,8 +21,8 @@
   "scripts": {
     "build": "vp pack",
     "dev": "vp pack --watch",
-    "inventory:check": "node scripts/generate-inventory.mjs --check",
-    "inventory:generate": "node scripts/generate-inventory.mjs",
+    "snapshot:check": "node scripts/generate-runtime-snapshot.mjs --check",
+    "snapshot:generate": "node scripts/generate-runtime-snapshot.mjs",
     "test:unit": "vp test --run",
     "prepublishOnly": "vp run build"
   },

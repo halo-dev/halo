@@ -10,13 +10,19 @@ describe("ESM provider manifest", () => {
       validateEsmProviderManifest({
         format: "esm",
         entry: "chunks/../main.js",
-        styles: ["./styles/main.css", "styles/extra.css"],
+        style: "styles/main.css",
       })
     ).toEqual({
       format: "esm",
       entry: "./main.js",
-      styles: ["./styles/main.css", "./styles/extra.css"],
+      style: "./styles/main.css",
     });
+  });
+
+  it("allows a provider without a startup stylesheet", () => {
+    expect(
+      validateEsmProviderManifest({ format: "esm", entry: "./main.js" })
+    ).toEqual({ format: "esm", entry: "./main.js" });
   });
 
   it.each([
@@ -36,14 +42,12 @@ describe("ESM provider manifest", () => {
         schemaVersion: 1,
         format: "esm",
         entry: "./main.js",
-        styles: [],
       })
-    ).toThrow("must contain only format, entry, and styles");
+    ).toThrow("must contain format, entry, and optional style only");
     expect(() =>
       validateEsmProviderManifest({
         format: "iife",
         entry: "./main.js",
-        styles: [],
       })
     ).toThrow();
   });

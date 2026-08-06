@@ -104,8 +104,6 @@ describe("setupUiPluginRuntime", () => {
     );
     expect(loadStyle.mock.calls.map(([url]) => url)).toEqual([
       "/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.css?v=g1",
-      "/plugins/esm-a/assets/ui/esm-a.css?v=g1",
-      "/plugins/esm-b/assets/ui/esm-b.css?v=g1",
     ]);
     expect(stores.uiPlugins().registrations).toEqual([
       expect.objectContaining({ name: "legacy-plugin", status: "registered" }),
@@ -120,14 +118,9 @@ describe("setupUiPluginRuntime", () => {
     ]);
   });
 
-  it("preserves stylesheet insertion order and isolates a provider style failure", async () => {
-    const styleA = deferred<unknown>();
-    const styleB = deferred<unknown>();
-    const loadOrder: string[] = [];
-    const loadStyle = vi.fn((url: string) => {
-      loadOrder.push(url);
-      return url.includes("/a.css") ? styleA.promise : styleB.promise;
-    });
+  it("loads one aggregate stylesheet without rejecting otherwise valid providers", async () => {
+    const style = deferred<unknown>();
+    const loadStyle = vi.fn(() => style.promise);
     const descriptor = esmDescriptor(["a", "b"]);
     const { router } = createRouter();
 
@@ -148,21 +141,21 @@ describe("setupUiPluginRuntime", () => {
       },
     });
 
-    await vi.waitFor(() => expect(loadStyle).toHaveBeenCalledTimes(2));
-    styleB.resolve(undefined);
-    styleA.reject(new Error("a style failed"));
+    await vi.waitFor(() => expect(loadStyle).toHaveBeenCalledTimes(1));
+    style.reject(new Error("aggregate style failed"));
     const modules = await setup;
 
-    expect(loadOrder).toEqual([
-      "/plugins/a/assets/ui/a.css?v=version",
-      "/plugins/b/assets/ui/b.css?v=version",
-    ]);
-    expect(modules.map((module) => module.name)).toEqual(["b"]);
-    expect(stores.uiPlugins().get("a")?.status).toBe("failed");
+    expect(loadStyle).toHaveBeenCalledWith(
+      "/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.css?v=version",
+      null
+    );
+    expect(modules.map((module) => module.name)).toEqual(["a", "b"]);
+    expect(stores.uiPlugins().get("a")?.status).toBe("registered");
     expect(stores.uiPlugins().get("b")?.status).toBe("registered");
-    expect(usePluginModuleStore().diagnostics).toEqual([
-      expect.objectContaining({ name: "a", stage: "style" }),
-    ]);
+    expect(usePluginModuleStore().diagnostics).toEqual([]);
+    expect(mocks.toastError).toHaveBeenCalledWith(
+      "core.plugin.loader.toast.style_load_failed"
+    );
   });
 
   it("rolls back supported registrations in reverse and continues", async () => {
@@ -321,11 +314,11 @@ describe("setupUiPluginRuntime", () => {
     const { router } = createRouter();
     const descriptor: UiPluginProviderDescriptor = {
       version: "legacy",
+      style:
+        "/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.css?v=legacy",
       legacy: {
         script:
           "/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.js?v=legacy",
-        style:
-          "/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.css?v=legacy",
       },
       registrations: [registration("backend-only")],
       providers: [],
@@ -377,9 +370,9 @@ describe("setupUiPluginRuntime", () => {
 function mixedDescriptor(): UiPluginProviderDescriptor {
   return {
     version: "g1",
+    style: "/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.css?v=g1",
     legacy: {
       script: "/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.js?v=g1",
-      style: "/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.css?v=g1",
     },
     registrations: [
       registration("legacy-plugin"),
@@ -400,11 +393,11 @@ function mixedDescriptor(): UiPluginProviderDescriptor {
 function esmDescriptor(names: string[]): UiPluginProviderDescriptor {
   return {
     version: "version",
+    style:
+      "/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.css?v=version",
     legacy: {
       script:
         "/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.js?v=version",
-      style:
-        "/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.css?v=version",
     },
     registrations: names.map(registration),
     providers: names.map((name) => esmProvider(name)),
@@ -424,7 +417,6 @@ function esmProvider(name: string, version = "version") {
   return {
     ...registration(name),
     entry: `/plugins/${name}/assets/ui/main.js?v=${version}`,
-    styles: [`/plugins/${name}/assets/ui/${name}.css?v=${version}`],
   };
 }
 

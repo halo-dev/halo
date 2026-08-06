@@ -13,7 +13,7 @@ type LibraryTarget = Omit<Target, "rename" | "src"> & {
   rename: string;
 };
 
-interface SharedInventoryEntry {
+interface HostRuntimeSnapshotEntry {
   exports: string[];
   runtime: {
     bridge: string;
@@ -21,8 +21,8 @@ interface SharedInventoryEntry {
   };
 }
 
-interface SharedInventory {
-  packages: Record<string, SharedInventoryEntry>;
+interface HostRuntimeSnapshot {
+  packages: Record<string, HostRuntimeSnapshotEntry>;
 }
 
 const ESM_RUNTIME_PUBLIC_PATH = "/ui-assets/esm-runtime";
@@ -43,8 +43,8 @@ export const setupLibraryExternal = (
   }
 
   const isProduction = command === "build";
-  const sharedInventory = readSharedInventory();
-  const runtimeBridges = createRuntimeBridges(sharedInventory);
+  const hostRuntimeSnapshot = readHostRuntimeSnapshot();
+  const runtimeBridges = createRuntimeBridges(hostRuntimeSnapshot);
 
   // TODO(Halo 3): Remove after legacy IIFE UI provider support ends.
   const libraryTargets: LibraryTarget[] = [
@@ -177,7 +177,7 @@ export const setupLibraryExternal = (
   ];
 };
 
-export function createGlobalBridgeSource(entry: SharedInventoryEntry) {
+export function createGlobalBridgeSource(entry: HostRuntimeSnapshotEntry) {
   const runtime = "__haloSharedRuntime";
   const staticExports = entry.exports
     .filter((exportName) => exportName !== "default")
@@ -198,17 +198,27 @@ export function createGlobalBridgeSource(entry: SharedInventoryEntry) {
   ].join("\n");
 }
 
-function readSharedInventory() {
-  const inventoryPath = path.resolve(
+function readHostRuntimeSnapshot() {
+  const bundlerKitRoot = path.resolve(
     import.meta.dirname,
-    "../../packages/ui-plugin-bundler-kit/src/inventories/halo-2.26.0.json"
+    "../../packages/ui-plugin-bundler-kit"
   );
-  return JSON.parse(fs.readFileSync(inventoryPath, "utf8")) as SharedInventory;
+  const packageJson = JSON.parse(
+    fs.readFileSync(path.join(bundlerKitRoot, "package.json"), "utf8")
+  ) as { version: string };
+  const snapshotPath = path.join(
+    bundlerKitRoot,
+    "src/runtime-snapshots",
+    `halo-${packageJson.version}.json`
+  );
+  return JSON.parse(
+    fs.readFileSync(snapshotPath, "utf8")
+  ) as HostRuntimeSnapshot;
 }
 
-function createRuntimeBridges(inventory: SharedInventory) {
+function createRuntimeBridges(snapshot: HostRuntimeSnapshot) {
   return Object.fromEntries(
-    Object.entries(inventory.packages).map(([specifier, entry]) => {
+    Object.entries(snapshot.packages).map(([specifier, entry]) => {
       const source = createGlobalBridgeSource(entry);
       const hash = crypto
         .createHash("sha256")

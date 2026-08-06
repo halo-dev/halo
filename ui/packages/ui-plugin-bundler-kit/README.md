@@ -147,7 +147,7 @@ export default viteConfig({
 
 After ESM is selected, dependency or output validation fails the build instead of silently changing the artifact to IIFE. Successful ESM builds generate `ui-plugin.json`; do not write this manifest by hand. A provider artifact without this file remains legacy, even if its `spec.requires` also supports Halo 2.26 or newer.
 
-ESM entries must default-export the existing `PluginModule`. Relative dynamic imports and emitted assets are supported. Halo loads entries in parallel, commits modules in provider order, and isolates observable entry, style, registration, and delayed chunk failures. Top-level module effects, timers, listeners, and arbitrary asynchronous effects are not transactional; a full page reload remains the lifecycle and recovery boundary after provider changes.
+ESM entries must default-export the existing `PluginModule`. The generated manifest records one optional main stylesheet; CSS belonging to asynchronous chunks stays out of the manifest and loads on demand with its JavaScript chunk. Halo loads the single aggregated startup stylesheet, starts entries in parallel, and commits modules in provider order without reloading after each entry. Top-level module effects, timers, listeners, and arbitrary asynchronous effects are not transactional; a full page reload remains the lifecycle and recovery boundary after provider changes.
 
 ### Shared Runtime Dependencies
 
@@ -164,7 +164,7 @@ ESM providers may import these package roots from Halo:
 - `@halo-dev/api-client`
 - `@halo-dev/richtext-editor`
 
-The bundler validates the actually resolved package version and used root exports against the selected Halo Inventory. Accepted version ranges are best-effort compatibility policy, not an ABI guarantee.
+The bundler validates the actually resolved package root and statically used root exports against the selected Halo host runtime snapshot. A newer provider dependency emits a warning, and a different major emits a stronger warning, but version drift alone does not fail the build. Missing packages, aliases or forks, deep imports, and unavailable static exports still fail because those are concrete incompatibilities.
 
 Vue, Vue Router, Pinia, and the FormKit Vue/Core graph share host identity. Other `@formkit/*` packages stay private to the provider but must resolve their runtime `@formkit/core` import to Halo. VueUse stays provider-private. Direct Tiptap or ProseMirror imports also stay private and produce a warning when they cross the shared rich-text editor boundary.
 
@@ -397,18 +397,20 @@ Theme provider:
 
 > **Note**: The production build output directory of `HaloUIPluginBundlerKit` is still `src/main/resources/console` to ensure compatibility.
 
-An ESM output additionally contains the generated `ui-plugin.json` manifest and may contain content-hashed `chunks/` and `assets/`. Keep the complete output directory together; Halo serves it through the existing plugin or theme static resource mapping and adds the current provider version to entry and style URLs for cache invalidation.
+An ESM output additionally contains the generated `ui-plugin.json` manifest and may contain content-hashed `chunks/` and `assets/`. The manifest contains `format`, `entry`, and optional `style`; asynchronous chunk CSS is not listed. Keep the complete output directory together; Halo serves it through the existing plugin or theme static resource mapping, aggregates provider main CSS into `bundle.css`, and adds the current provider version to entry and aggregate URLs for cache invalidation.
 
-## Maintaining Halo Inventories
+## Maintaining Halo Host Runtime Snapshots
 
-Inventories capture the exact host version, statically available root exports, bridge global, identity category, and a manually reviewed accepted range for each shared root. They are intentionally sparse: add a new immutable Inventory when Halo's shared runtime contract changes, not automatically for every Halo patch. A newer target selects the latest eligible older Inventory and emits a forward-compatibility warning; a target older than every packaged Inventory cannot build ESM.
+Snapshots capture the exact host version, statically available root exports, bridge global, and identity category for each shared root. They do not claim an accepted provider version range. They are intentionally sparse: add a new immutable snapshot when Halo's shared runtime contract changes, not automatically for every Halo patch. A newer target selects the latest eligible older snapshot and emits a forward-compatibility warning; a target older than every packaged snapshot cannot build ESM.
 
 When the host dependency graph changes:
 
-1. Review the ranges in `scripts/generate-inventory.mjs`; broad ranges express best-effort admission and must be changed deliberately.
-2. Run `pnpm --filter @halo-dev/ui-plugin-bundler-kit inventory:generate` to capture the resolved host versions and exports.
-3. Run `pnpm --filter @halo-dev/ui-plugin-bundler-kit inventory:check` and the compatibility fixtures before publishing.
-4. Preserve older Inventory files while supported provider artifacts may still target them.
+1. Set `@halo-dev/ui-plugin-bundler-kit` to the Halo version represented by the snapshot.
+2. Run `pnpm --filter @halo-dev/ui-plugin-bundler-kit snapshot:generate` to derive the versioned output path and capture resolved host versions and exports.
+3. Run `pnpm --filter @halo-dev/ui-plugin-bundler-kit snapshot:check` and the compatibility fixtures before publishing.
+4. Preserve older snapshot files while supported provider artifacts may still target them.
+
+Snapshot generation is currently an explicit maintainer action; it is not coupled to every package build or CI job.
 
 ## Requirements
 

@@ -31,7 +31,6 @@ interface UiProviderRegistration {
 
 interface EsmUiProvider extends UiProviderRegistration {
   entry: string;
-  styles: string[];
 }
 
 interface InvalidUiProvider extends UiProviderRegistration {
@@ -40,9 +39,9 @@ interface InvalidUiProvider extends UiProviderRegistration {
 
 export interface UiPluginProviderDescriptor {
   version: string;
+  style?: string;
   legacy: {
     script: string;
-    style: string;
   };
   registrations: UiProviderRegistration[];
   providers: EsmUiProvider[];
@@ -70,11 +69,6 @@ interface RollbackHandle {
 interface RegistrationFailure {
   error: unknown;
   incompleteRollback: string[];
-}
-
-interface StyleJob {
-  url: string;
-  registrations: UiProviderRegistration[];
 }
 
 export async function setupUiPluginRuntime({
@@ -151,23 +145,10 @@ export async function setupUiPluginRuntime({
     report(invalid, "discovery", invalid.reason);
   }
 
-  const styleJobs: StyleJob[] = [];
-  if (legacyRegistrations.length > 0) {
-    styleJobs.push({
-      url: descriptor.legacy.style,
-      registrations: legacyRegistrations,
-    });
-  }
-  for (const provider of descriptor.providers) {
-    for (const style of provider.styles) {
-      styleJobs.push({ url: style, registrations: [provider] });
-    }
-  }
-
   const styleInsertionPoint = document.head.firstChild;
-  const styleLoads = styleJobs.map((job) =>
-    runtime.loadStyle(job.url, styleInsertionPoint)
-  );
+  const styleLoad = descriptor.style
+    ? runtime.loadStyle(descriptor.style, styleInsertionPoint)
+    : Promise.resolve();
   const legacyScriptLoad =
     legacyRegistrations.length > 0
       ? runtime.loadScript(descriptor.legacy.script)
@@ -176,24 +157,21 @@ export async function setupUiPluginRuntime({
     runtime.importModule(provider.entry)
   );
 
-  const [styleResults, legacyScriptResult, esmImportResults] =
-    await Promise.all([
-      Promise.allSettled(styleLoads),
+  const [styleResult, legacyScriptResult, esmImportResults] = await Promise.all(
+    [
+      settled(styleLoad),
       settled(legacyScriptLoad),
       Promise.allSettled(esmImports),
-    ]);
+    ]
+  );
 
   const failedNames = new Set(invalidNames);
-
-  for (const [index, result] of styleResults.entries()) {
-    if (result.status === "fulfilled") {
-      continue;
-    }
-    const job = styleJobs[index];
-    for (const registration of job.registrations) {
-      failedNames.add(registration.name);
-      report(registration, "style", result.reason);
-    }
+  const styleFailed = styleResult.status === "rejected";
+  if (styleFailed) {
+    console.error(
+      "[Halo UI providers] Failed to load the aggregate stylesheet.",
+      styleResult.reason
+    );
   }
 
   if (legacyScriptResult.status === "rejected") {
@@ -320,8 +298,14 @@ export async function setupUiPluginRuntime({
     registeredModules.push(loaded);
   }
 
-  if (pluginModuleStore.diagnostics.length > 0) {
-    Toast.error(i18n.global.t("core.plugin.loader.toast.entry_load_failed"));
+  if (styleFailed || pluginModuleStore.diagnostics.length > 0) {
+    Toast.error(
+      i18n.global.t(
+        styleFailed
+          ? "core.plugin.loader.toast.style_load_failed"
+          : "core.plugin.loader.toast.entry_load_failed"
+      )
+    );
   }
   return registeredModules;
 }

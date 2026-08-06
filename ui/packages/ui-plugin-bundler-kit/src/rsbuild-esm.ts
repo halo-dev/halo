@@ -1,14 +1,14 @@
 import type { RsbuildPlugin } from "@rsbuild/core";
-import type { HaloSharedInventory } from "./inventory";
-import { SHARED_PACKAGE_ROOTS } from "./inventory";
 import {
   ESM_PROVIDER_MANIFEST,
   validateEsmProviderManifest,
 } from "./provider-manifest";
+import type { HaloHostRuntimeSnapshot } from "./runtime-snapshot";
+import { SHARED_PACKAGE_ROOTS } from "./runtime-snapshot";
 import { SharedDependencyValidator } from "./shared-dependencies";
 
 interface RsbuildEsmPluginOptions {
-  inventory: HaloSharedInventory;
+  snapshot: HaloHostRuntimeSnapshot;
   providerRoot: string;
 }
 
@@ -16,9 +16,8 @@ export function createRsbuildEsmProviderPlugin(
   options: RsbuildEsmPluginOptions
 ): RsbuildPlugin {
   const validator = new SharedDependencyValidator({
-    inventory: options.inventory,
+    snapshot: options.snapshot,
     providerRoot: options.providerRoot,
-    warn: console.warn,
   });
 
   return {
@@ -29,7 +28,7 @@ export function createRsbuildEsmProviderPlugin(
         for (const root of SHARED_PACKAGE_ROOTS) {
           if (Object.hasOwn(aliases, root)) {
             throw new Error(
-              `Rsbuild alias for shared dependency ${root} would bypass Halo inventory validation.`
+              `Rsbuild alias for shared dependency ${root} would bypass Halo snapshot validation.`
             );
           }
         }
@@ -103,22 +102,30 @@ export function createRsbuildEsmProviderPlugin(
               "ESM UI provider output must expose a default PluginModule export."
             );
           }
-          const styles = Object.keys(assets)
-            .filter((fileName) => fileName.endsWith(".css"))
-            .sort()
-            .map((fileName) => `./${fileName}`);
+          const entryStyles =
+            compilation.entrypoints
+              .get("main")
+              ?.getFiles()
+              .filter((fileName) => fileName.endsWith(".css")) || [];
+          if (entryStyles.length > 1) {
+            throw new Error(
+              "ESM UI provider output must contain at most one entry stylesheet."
+            );
+          }
           const manifest = validateEsmProviderManifest({
             format: "esm",
             entry: "./main.js",
-            styles,
+            ...(entryStyles[0] ? { style: `./${entryStyles[0]}` } : {}),
           });
           compilation.emitAsset(
             ESM_PROVIDER_MANIFEST,
             new sources.RawSource(`${JSON.stringify(manifest, null, 2)}\n`)
           );
-          console.info(
-            `[ui-plugin-bundler-kit] ESM output validated against Halo ${options.inventory.haloVersion}:\n${validator.getBuildSummary().join("\n") || "no shared roots"}`
-          );
+          const report = validator.getBuildReport();
+          console.info(report.summary);
+          if (report.warning) {
+            console.warn(report.warning);
+          }
         }
       );
     },

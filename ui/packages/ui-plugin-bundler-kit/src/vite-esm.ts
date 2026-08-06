@@ -1,15 +1,15 @@
-import type { OutputAsset, OutputChunk } from "rollup";
+import type { OutputChunk } from "rollup";
 import type { Plugin, ResolvedConfig } from "vite";
-import type { HaloSharedInventory } from "./inventory";
-import { isSharedPackageRoot, SHARED_PACKAGE_ROOTS } from "./inventory";
 import {
   ESM_PROVIDER_MANIFEST,
   validateEsmProviderManifest,
 } from "./provider-manifest";
+import type { HaloHostRuntimeSnapshot } from "./runtime-snapshot";
+import { isSharedPackageRoot, SHARED_PACKAGE_ROOTS } from "./runtime-snapshot";
 import { parseImports, SharedDependencyValidator } from "./shared-dependencies";
 
 interface ViteEsmPluginOptions {
-  inventory: HaloSharedInventory;
+  snapshot: HaloHostRuntimeSnapshot;
   providerRoot: string;
 }
 
@@ -17,9 +17,8 @@ export function createViteEsmProviderPlugin(
   options: ViteEsmPluginOptions
 ): Plugin {
   const validator = new SharedDependencyValidator({
-    inventory: options.inventory,
+    snapshot: options.snapshot,
     providerRoot: options.providerRoot,
-    warn: console.warn,
   });
   let resolvedConfig: ResolvedConfig;
   let resolvePackage: ReturnType<ResolvedConfig["createResolver"]>;
@@ -55,6 +54,11 @@ export function createViteEsmProviderPlugin(
     configResolved(config) {
       resolvedConfig = config;
       resolvePackage = config.createResolver();
+      if (!config.build.cssCodeSplit) {
+        throw new Error(
+          "ESM UI provider output requires Vite build.cssCodeSplit to remain enabled."
+        );
+      }
       const formats = Array.isArray(config.build.lib)
         ? []
         : config.build.lib?.formats;
@@ -77,7 +81,7 @@ export function createViteEsmProviderPlugin(
           SHARED_PACKAGE_ROOTS.includes(alias.find as never)
         ) {
           throw new Error(
-            `Vite alias for shared dependency ${alias.find} would bypass Halo inventory validation.`
+            `Vite alias for shared dependency ${alias.find} would bypass Halo snapshot validation.`
           );
         }
       }
@@ -113,17 +117,18 @@ export function createViteEsmProviderPlugin(
           "ESM UI provider output must contain one entry with a default PluginModule export."
         );
       }
-      const styles = Object.values(bundle)
-        .filter(
-          (item): item is OutputAsset =>
-            item.type === "asset" && item.fileName.endsWith(".css")
-        )
-        .map((asset) => `./${asset.fileName}`)
-        .sort();
+      const entryStyles = [
+        ...((entries[0] as ViteOutputChunk).viteMetadata?.importedCss || []),
+      ].sort();
+      if (entryStyles.length > 1) {
+        throw new Error(
+          "ESM UI provider output must contain at most one entry stylesheet."
+        );
+      }
       const manifest = validateEsmProviderManifest({
         format: "esm",
         entry: `./${entries[0].fileName}`,
-        styles,
+        ...(entryStyles[0] ? { style: `./${entryStyles[0]}` } : {}),
       });
       this.emitFile({
         type: "asset",
@@ -131,10 +136,18 @@ export function createViteEsmProviderPlugin(
         source: `${JSON.stringify(manifest, null, 2)}\n`,
       });
 
-      resolvedConfig.logger.info(
-        `[ui-plugin-bundler-kit] ESM output validated against Halo ${options.inventory.haloVersion}:\n${validator.getBuildSummary().join("\n") || "no shared roots"}`
-      );
+      const report = validator.getBuildReport();
+      resolvedConfig.logger.info(report.summary);
+      if (report.warning) {
+        resolvedConfig.logger.warn(report.warning);
+      }
     },
+  };
+}
+
+interface ViteOutputChunk extends OutputChunk {
+  viteMetadata?: {
+    importedCss?: Set<string>;
   };
 }
 

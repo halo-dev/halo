@@ -16,8 +16,11 @@ import {
   DEFAULT_PLUGIN_MANIFEST_PATH,
   DEFAULT_THEME_MANIFEST_PATH,
 } from "./constants/halo-plugin";
-import { selectHaloSharedInventory, SHARED_PACKAGE_ROOTS } from "./inventory";
 import { createRsbuildEsmProviderPlugin } from "./rsbuild-esm";
+import {
+  selectHaloHostRuntimeSnapshot,
+  SHARED_PACKAGE_ROOTS,
+} from "./runtime-snapshot";
 import {
   getHaloPluginBundleLocation,
   getHaloPluginManifest,
@@ -79,13 +82,13 @@ function createRsbuildPresetsConfig(
     targetHaloVersion,
   });
   reportFormatSelection(selection);
-  const selectedInventory =
+  const selectedSnapshot =
     selection.format === "esm"
-      ? selectHaloSharedInventory(selection.targetHaloVersion as string)
+      ? selectHaloHostRuntimeSnapshot(selection.targetHaloVersion as string)
       : undefined;
-  if (selectedInventory?.reusedOlderInventory) {
+  if (selectedSnapshot?.reusedOlderSnapshot) {
     console.warn(
-      `[ui-plugin-bundler-kit] Halo ${selection.targetHaloVersion} is newer than bundled inventories; reusing ${selectedInventory.inventory.haloVersion}. Update the bundler to use newly introduced exports.`
+      `[ui-plugin-bundler-kit] Halo ${selection.targetHaloVersion} is newer than bundled host runtime snapshots; reusing ${selectedSnapshot.snapshot.haloVersion}. Update the bundler to use newly introduced exports.`
     );
   }
 
@@ -98,10 +101,10 @@ function createRsbuildPresetsConfig(
       mode: (envMode as RsbuildMode) || "production",
       plugins: [
         pluginVue(),
-        ...(selectedInventory
+        ...(selectedSnapshot
           ? [
               createRsbuildEsmProviderPlugin({
-                inventory: selectedInventory.inventory,
+                snapshot: selectedSnapshot.snapshot,
                 providerRoot: process.cwd(),
               }),
             ]
@@ -286,7 +289,8 @@ function reportFormatSelection(
   for (const warning of selection.warnings) {
     console.warn(`[ui-plugin-bundler-kit] ${warning}`);
   }
+  const reason = selection.reason.replace("-", " ");
   console.info(
-    `[ui-plugin-bundler-kit] Selected ${selection.format.toUpperCase()} output (${selection.reason})${selection.targetHaloVersion ? ` for Halo ${selection.targetHaloVersion}` : ""}.`
+    `[ui-plugin-bundler-kit] Output: ${selection.format.toUpperCase()} (${reason}${selection.targetHaloVersion ? `; target Halo ${selection.targetHaloVersion}` : ""}).`
   );
 }
