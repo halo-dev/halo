@@ -1,0 +1,250 @@
+## MODIFIED Requirements
+
+### Requirement: Plugin provider compatibility
+
+The plugin provider SHALL preserve legacy output behavior when IIFE format is selected and SHALL select modern ESM output from the plugin manifest's Halo version requirement when automatic format selection is used.
+
+#### Scenario: Plugin manifest default is preserved
+
+- **WHEN** a caller uses the plugin provider without `manifestPath`
+- **THEN** the helper SHALL read `../src/main/resources/plugin.yaml`
+
+#### Scenario: Plugin automatically targets ESM
+
+- **WHEN** a caller uses automatic format selection and `plugin.yaml` `spec.requires` is a simple stable version or `>=MAJOR.MINOR.PATCH` requirement whose minimum is 2.27.0 or newer
+- **THEN** the helper SHALL configure ESM provider output
+
+#### Scenario: Plugin automatically targets IIFE
+
+- **WHEN** a caller uses automatic format selection and `spec.requires` is absent, invalid, wildcard, composite, otherwise unsupported, or permits a stable Halo version older than 2.27.0
+- **THEN** the helper SHALL configure legacy IIFE provider output
+- **THEN** an unparseable or unsupported range SHALL produce a warning explaining the automatic fallback
+
+#### Scenario: Plugin selects IIFE explicitly
+
+- **WHEN** a caller explicitly selects IIFE format
+- **THEN** the helper SHALL keep existing plugin output, global name, externals, globals, and bundle location compatibility behavior
+
+### Requirement: Theme provider manifest
+
+The theme provider SHALL read the theme manifest by default and use its metadata name and required Halo version to derive bundler defaults.
+
+#### Scenario: Theme manifest default is used
+
+- **WHEN** a caller uses the theme provider without `manifestPath`
+- **THEN** the helper SHALL read `../theme.yaml`
+
+#### Scenario: Theme manifest path can be overridden
+
+- **WHEN** a caller uses the theme provider with `manifestPath`
+- **THEN** the helper SHALL read the manifest at the provided path
+
+#### Scenario: Theme module name is derived from metadata name
+
+- **WHEN** the theme manifest has `metadata.name` equal to `earth`
+- **THEN** the helper SHALL configure the provider module name as `theme:earth`
+
+#### Scenario: Theme format uses required Halo version
+
+- **WHEN** the theme provider uses automatic format selection
+- **THEN** the helper SHALL apply the same `spec.requires` threshold rules used by the plugin provider
+
+### Requirement: Theme provider build output
+
+The theme provider SHALL configure IIFE or ESM build output to match the active-theme UI resource runtime contract.
+
+#### Scenario: Theme Vite output defaults are generated
+
+- **WHEN** a caller uses `viteConfig` with `provider: "theme"`
+- **THEN** the helper SHALL configure production output to `dist`
+- **THEN** the helper SHALL configure the Vite base URL as `/themes/{metadata.name}/ui-plugin/assets/`
+- **THEN** the helper SHALL emit the primary entry, styles, chunks, and provider manifest required by the selected format
+
+#### Scenario: Theme Rsbuild output defaults are generated
+
+- **WHEN** a caller uses `rsbuildConfig` with `provider: "theme"`
+- **THEN** the helper SHALL configure the output root to `dist`
+- **THEN** the helper SHALL configure the public path as `/themes/{metadata.name}/ui-plugin/assets/`
+- **THEN** the helper SHALL emit the primary entry, styles, chunks, and provider manifest required by the selected format
+
+#### Scenario: Theme IIFE output reuses legacy globals
+
+- **WHEN** the theme provider selects IIFE format
+- **THEN** the helper SHALL apply the legacy external dependency and global variable mappings used by plugin IIFE bundles
+
+#### Scenario: Theme ESM output reuses shared specifiers
+
+- **WHEN** the theme provider selects ESM format
+- **THEN** the helper SHALL apply the same shared dependency inventory and ESM externalization rules used by plugin ESM bundles
+
+#### Scenario: User config overrides theme defaults consistently
+
+- **WHEN** a caller provides Vite or Rsbuild configuration that does not conflict with the selected provider format, manifest, resource root, or shared dependency contract
+- **THEN** the helper SHALL merge the caller configuration after provider defaults
+
+#### Scenario: User config conflicts with generated output contract
+
+- **WHEN** a caller override causes the final bundle format, entry, public path, external set, or emitted manifest to disagree with the selected provider contract
+- **THEN** the build SHALL fail with a diagnostic describing the conflicting setting
+
+## ADDED Requirements
+
+### Requirement: Provider format selection
+
+The modern Vite and Rsbuild helpers SHALL support `auto`, `iife`, and `esm` provider format selection with `auto` as the default.
+
+#### Scenario: IIFE is selected for a compatible modern target
+
+- **WHEN** a caller explicitly selects `iife` and the provider requires Halo 2.27.0 or newer
+- **THEN** the helper SHALL emit legacy IIFE output as a migration escape hatch
+
+#### Scenario: Explicit ESM metadata permits an older target
+
+- **WHEN** a caller explicitly selects `esm` but the provider's Halo version range permits a release that does not support ESM UI providers
+- **THEN** the helper SHALL emit a strong compatibility warning
+- **THEN** the helper SHALL NOT rewrite the provider manifest or silently select IIFE
+
+#### Scenario: Explicit ESM target cannot be derived
+
+- **WHEN** a caller explicitly selects `esm` and `spec.requires` does not yield a supported target Halo version
+- **THEN** the helper SHALL require an explicit `targetHaloVersion` build option before selecting an inventory
+
+#### Scenario: Explicit IIFE ignores target parsing
+
+- **WHEN** a caller explicitly selects `iife`
+- **THEN** the helper SHALL preserve legacy output without requiring `spec.requires` or a target inventory
+
+#### Scenario: ESM is tested against a Halo prerelease
+
+- **WHEN** a caller explicitly selects `esm` for a 2.27 prerelease that supplies the ESM runtime
+- **THEN** the helper SHALL allow the build after validating the explicit target inventory
+- **THEN** automatic selection SHALL continue using the stable 2.27.0 threshold
+
+### Requirement: Target Halo shared dependency validation
+
+The bundler SHALL validate a provider project's actually resolved shared dependency packages against the sparse immutable inventory selected for its target Halo version before externalizing them.
+
+#### Scenario: Target inventory is selected automatically
+
+- **WHEN** automatic format selection chooses ESM
+- **THEN** the bundler SHALL select the latest inventory whose Halo baseline is not newer than the minimum Halo version derived from a simple stable version or `>=MAJOR.MINOR.PATCH` requirement
+
+#### Scenario: Target is newer than the bundled inventories
+
+- **WHEN** the installed bundler does not contain an inventory with the exact target Halo version but contains an older eligible inventory
+- **THEN** the bundler SHALL use the latest eligible older inventory
+- **THEN** it SHALL warn that newly introduced target exports require a bundler update
+
+#### Scenario: No eligible ESM inventory exists
+
+- **WHEN** the installed bundler contains no inventory whose baseline is compatible with the selected ESM target
+- **THEN** the build SHALL fail with a diagnostic that identifies the target version and recommends a bundler update or IIFE output
+
+#### Scenario: Resolved dependency is admitted by the inventory
+
+- **WHEN** the package resolved from the provider project root has the expected package name and its actual version satisfies the inventory's accepted build range
+- **THEN** the bundler SHALL allow the shared package to remain external
+
+#### Scenario: Resolved dependency is newer than the host baseline
+
+- **WHEN** a shared package's actual version satisfies the accepted range but is newer than the exact host version recorded by the inventory
+- **THEN** the bundler SHALL allow externalization with a best-effort compatibility warning
+
+#### Scenario: Resolved dependency is outside the inventory range
+
+- **WHEN** a shared dependency is missing, resolves outside the accepted range, resolves through an alias or fork, or bypasses the expected package root
+- **THEN** the ESM build SHALL fail and identify the dependency, resolved source and version, exact host version, accepted range, target inventory, and IIFE remediation
+
+#### Scenario: Package declaration differs from actual resolution
+
+- **WHEN** a package declaration range or lockfile text differs from the package actually resolved from the provider project root
+- **THEN** the bundler SHALL validate the actually resolved package
+- **THEN** it SHALL use the declaration and lockfile only as diagnostic context
+
+#### Scenario: Provider imports an unsupported export
+
+- **WHEN** an ESM provider imports a package subpath or static runtime export that is absent from the target inventory
+- **THEN** the build SHALL fail before externalizing that import
+
+#### Scenario: Provider uses a namespace import
+
+- **WHEN** an ESM provider uses a namespace import or dynamically reads properties from a shared package namespace
+- **THEN** the bundler SHALL allow the build after validating the package root and version
+- **THEN** it SHALL warn that individual runtime properties could not be proven against the inventory
+
+#### Scenario: Provider imports FormKit Core
+
+- **WHEN** an ESM provider imports the `@formkit/core` package root directly or through a bundled FormKit subpackage
+- **THEN** the bundler SHALL externalize that root to the same host graph used by `@formkit/vue`
+
+#### Scenario: Provider imports another FormKit package
+
+- **WHEN** an ESM provider imports an `@formkit/*` package other than `@formkit/vue` or `@formkit/core`
+- **THEN** the bundler SHALL include that package in provider output while preserving external resolution of its `@formkit/core` runtime import
+
+#### Scenario: Provider imports a non-shared dependency
+
+- **WHEN** an ESM provider imports VueUse or another dependency not listed in the target Halo inventory
+- **THEN** the bundler SHALL include that dependency in the provider output unless the provider explicitly configures another supported non-Halo delivery mechanism
+
+#### Scenario: Provider imports editor internals directly
+
+- **WHEN** an ESM provider imports `@tiptap/*` or `prosemirror-*` at runtime while also using `@halo-dev/richtext-editor`
+- **THEN** the bundler SHALL keep the direct dependency private and warn that editor class identity and cross-version behavior are best-effort
+
+#### Scenario: ESM validation fails after target selection
+
+- **WHEN** automatic or explicit selection has chosen ESM and dependency, import, or output validation fails
+- **THEN** the build SHALL fail
+- **THEN** it SHALL NOT silently emit IIFE output
+
+### Requirement: Provider build diagnostics
+
+The bundler SHALL make format and shared dependency decisions visible without adding build metadata to the runtime manifest.
+
+#### Scenario: Provider build completes
+
+- **WHEN** a plugin or theme provider build completes format selection
+- **THEN** the build output SHALL identify the selected format and whether it was explicit, automatic, or an automatic IIFE fallback
+- **THEN** an ESM build SHALL identify the target Halo version, selected inventory baseline, and each shared package's provider version, exact host version, and accepted range
+
+### Requirement: ESM provider output manifest
+
+The bundler SHALL generate the provider manifest consumed by Halo whenever ESM output is selected.
+
+#### Scenario: ESM manifest is generated
+
+- **WHEN** a Vite or Rsbuild ESM provider build succeeds
+- **THEN** the output SHALL include a minimal manifest containing only the ESM format, entry module, and styles consumed by the Halo runtime
+- **THEN** the output manifest SHALL NOT duplicate the build target or resolved shared dependency versions already used by bundler validation
+
+#### Scenario: ESM provider uses dynamic imports
+
+- **WHEN** provider source contains a dynamic import
+- **THEN** the bundler SHALL emit an independently addressable ESM chunk under the provider resource root
+- **THEN** the entry and chunk SHALL use relative or provider-root URLs that work for both plugins and themes
+
+#### Scenario: ESM entry is produced
+
+- **WHEN** an ESM provider build succeeds
+- **THEN** the primary entry SHALL export the provider's `PluginModule` as its default export
+- **THEN** it SHALL retain imports for the supported shared package roots for host Import Map resolution
+
+#### Scenario: IIFE provider is built
+
+- **WHEN** IIFE output is selected
+- **THEN** the bundler SHALL NOT emit an ESM provider manifest that could cause Halo to misclassify the artifact
+
+### Requirement: Vite and Rsbuild ESM equivalence
+
+Vite and Rsbuild provider helpers SHALL implement the same externally observable ESM provider contract for plugin and theme providers.
+
+#### Scenario: Equivalent provider is built with both helpers
+
+- **WHEN** equivalent provider source is built through Vite and Rsbuild
+- **THEN** both outputs SHALL use the same manifest schema, shared dependency inventory, import restrictions, entry export contract, resource URL rules, and format selection semantics
+
+#### Scenario: Bundler-specific override bypasses validation
+
+- **WHEN** a Vite or Rsbuild-specific override would bypass dependency validation or change the final output contract
+- **THEN** that helper SHALL fail the build instead of emitting a misleading provider manifest
