@@ -21,6 +21,49 @@ afterEach(() => {
 });
 
 describe("provider defaults", () => {
+  it("selects equivalent ESM defaults for Vite and Rsbuild", () => {
+    const uiDir = setupPluginProject(">=2.26.0");
+    process.chdir(uiDir);
+
+    const vite = resolveViteConfig(viteConfig({ vite: {} }));
+    expect(vite.build?.lib).toMatchObject({ formats: ["es"] });
+    expect(vite.build?.rollupOptions?.output).toMatchObject({
+      chunkFileNames: "chunks/[name].[hash].js",
+    });
+
+    const rsbuild = resolveRsbuildConfig(rsbuildConfig({ rsbuild: {} }));
+    expect(rsbuild.tools?.rspack?.output).toMatchObject({
+      library: { type: "module" },
+      module: true,
+      iife: false,
+    });
+    expect(rsbuild.tools?.rspack?.externalsType).toBe("module");
+  });
+
+  it("uses targetHaloVersion for explicit ESM without a simple requirement", () => {
+    const uiDir = setupPluginProject("*");
+    process.chdir(uiDir);
+
+    const vite = resolveViteConfig(
+      viteConfig({
+        format: "esm",
+        targetHaloVersion: "2.26.0-beta.1",
+        vite: {},
+      })
+    );
+
+    expect(vite.build?.lib).toMatchObject({ formats: ["es"] });
+  });
+
+  it("keeps explicit IIFE for a modern requirement", () => {
+    const uiDir = setupPluginProject(">=3.0.0");
+    process.chdir(uiDir);
+
+    const vite = resolveViteConfig(viteConfig({ format: "iife", vite: {} }));
+
+    expect(vite.build?.lib).toMatchObject({ formats: ["iife"] });
+  });
+
   it("keeps plugin provider defaults when provider is omitted", () => {
     const uiDir = setupPluginProject();
     process.chdir(uiDir);
@@ -246,7 +289,7 @@ describe("provider defaults", () => {
   });
 });
 
-function setupPluginProject() {
+function setupPluginProject(requires = ">=2.25.0") {
   const projectRoot = createTempDir();
   const uiDir = path.join(projectRoot, "ui");
   fs.mkdirSync(path.join(projectRoot, "src/main/resources"), {
@@ -259,7 +302,7 @@ function setupPluginProject() {
       "metadata:",
       "  name: fake-plugin",
       "spec:",
-      "  requires: '>=2.25.0'",
+      `  requires: '${requires}'`,
       "",
     ].join("\n")
   );

@@ -9,6 +9,7 @@ import {
   getHaloThemeManifest,
   getHaloThemeModuleName,
   getManifestName,
+  selectProviderFormat,
 } from "../utils/halo-plugin";
 
 const tempDirs: string[] = [];
@@ -88,6 +89,65 @@ describe("halo manifest utilities", () => {
       '[ui-plugin-bundler-kit] Invalid semver range in plugin manifest "spec.requires": "not semver". ' +
         'Falling back to "console" bundle location.'
     );
+  });
+
+  it.each(["2.26.0", ">=2.26.0", ">=3.2.1"])(
+    "automatically selects ESM for simple target %s",
+    (requires) => {
+      expect(selectProviderFormat({ requires })).toMatchObject({
+        format: "esm",
+        reason: "automatic",
+      });
+    }
+  );
+
+  it.each(["2.25.9", ">=2.25.0"])(
+    "automatically selects IIFE for older simple target %s",
+    (requires) => {
+      expect(selectProviderFormat({ requires })).toMatchObject({
+        format: "iife",
+        reason: "automatic",
+      });
+    }
+  );
+
+  it.each([undefined, "*", ">=2.26.0 <3", ">=2.26.0 & <3", "latest"])(
+    "falls back to IIFE for unsupported automatic target %s",
+    (requires) => {
+      expect(selectProviderFormat({ requires })).toMatchObject({
+        format: "iife",
+        reason: "automatic-fallback",
+        warnings: [expect.stringContaining("using IIFE output")],
+      });
+    }
+  );
+
+  it("keeps explicit format semantics separate from automatic parsing", () => {
+    expect(
+      selectProviderFormat({ format: "iife", requires: ">=3.0.0" })
+    ).toEqual({ format: "iife", reason: "explicit", warnings: [] });
+    expect(
+      selectProviderFormat({
+        format: "esm",
+        requires: "*",
+        targetHaloVersion: "2.26.0-beta.1",
+      })
+    ).toMatchObject({
+      format: "esm",
+      targetHaloVersion: "2.26.0-beta.1",
+    });
+    expect(() =>
+      selectProviderFormat({ format: "esm", requires: "*" })
+    ).toThrow("targetHaloVersion");
+  });
+
+  it("warns but preserves explicit ESM for an older metadata target", () => {
+    expect(
+      selectProviderFormat({ format: "esm", requires: ">=2.25.0" })
+    ).toMatchObject({
+      format: "esm",
+      warnings: [expect.stringContaining("predates ESM UI provider support")],
+    });
   });
 });
 

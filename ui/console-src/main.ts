@@ -7,6 +7,7 @@ import { createApp } from "vue";
 import { builtinFormKitInputs } from "@/formkit/inputs";
 import { setLanguage, setupI18n } from "@/locales";
 import { setupApiClient } from "@/setup/setupApiClient";
+import "@/setup/setupFormKitRuntime";
 import {
   setupComponents,
   type SetupComponentsOptions,

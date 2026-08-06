@@ -13,7 +13,7 @@ This change turns the ESM direction raised in [halo-dev/halo#10205](https://gith
 - Provide a host-owned Import Map that resolves the supported shared package roots to one Halo-supplied runtime instance while bundling non-shared dependencies, including VueUse, into each ESM provider.
 - Add an authenticated generation-bound provider snapshot that supplies consistent descriptor, legacy aggregate, and ESM resource URLs, plus a mixed loader that isolates provider failures while preserving stable registration order.
 - Expose host-owned UI provider availability and registration state through a shared Pinia store in `@halo-dev/ui-shared`, replacing new dependencies on provider globals without exposing another provider's module implementation.
-- Make ESM the modern bundler default when the provider's minimum required stable Halo version is 2.27.0 or newer, with explicit `auto`, `iife`, and `esm` selection modes.
+- Make ESM the modern bundler default when the provider's minimum required stable Halo version is 2.26.0 or newer, with explicit `auto`, `iife`, and `esm` selection modes.
 - Mark every retained compatibility boundary intended to disappear with legacy IIFE support using an explicit Halo 3 removal comment.
 - Verify the feature in both the proxied UI development topology and the packaged BootJar production topology.
 

@@ -11,12 +11,12 @@ The plugin provider SHALL preserve legacy output behavior when IIFE format is se
 
 #### Scenario: Plugin automatically targets ESM
 
-- **WHEN** a caller uses automatic format selection and `plugin.yaml` `spec.requires` is a simple stable version or `>=MAJOR.MINOR.PATCH` requirement whose minimum is 2.27.0 or newer
+- **WHEN** a caller uses automatic format selection and `plugin.yaml` `spec.requires` is a simple stable version or `>=MAJOR.MINOR.PATCH` requirement whose minimum is 2.26.0 or newer
 - **THEN** the helper SHALL configure ESM provider output
 
 #### Scenario: Plugin automatically targets IIFE
 
-- **WHEN** a caller uses automatic format selection and `spec.requires` is absent, invalid, wildcard, composite, otherwise unsupported, or permits a stable Halo version older than 2.27.0
+- **WHEN** a caller uses automatic format selection and `spec.requires` is absent, invalid, wildcard, composite, otherwise unsupported, or permits a stable Halo version older than 2.26.0
 - **THEN** the helper SHALL configure legacy IIFE provider output
 - **THEN** an unparseable or unsupported range SHALL produce a warning explaining the automatic fallback
 
@@ -95,7 +95,7 @@ The modern Vite and Rsbuild helpers SHALL support `auto`, `iife`, and `esm` prov
 
 #### Scenario: IIFE is selected for a compatible modern target
 
-- **WHEN** a caller explicitly selects `iife` and the provider requires Halo 2.27.0 or newer
+- **WHEN** a caller explicitly selects `iife` and the provider requires Halo 2.26.0 or newer
 - **THEN** the helper SHALL emit legacy IIFE output as a migration escape hatch
 
 #### Scenario: Explicit ESM metadata permits an older target
@@ -116,9 +116,9 @@ The modern Vite and Rsbuild helpers SHALL support `auto`, `iife`, and `esm` prov
 
 #### Scenario: ESM is tested against a Halo prerelease
 
-- **WHEN** a caller explicitly selects `esm` for a 2.27 prerelease that supplies the ESM runtime
+- **WHEN** a caller explicitly selects `esm` for a 2.26 prerelease that supplies the ESM runtime
 - **THEN** the helper SHALL allow the build after validating the explicit target inventory
-- **THEN** automatic selection SHALL continue using the stable 2.27.0 threshold
+- **THEN** automatic selection SHALL continue using the stable 2.26.0 threshold
 
 ### Requirement: Target Halo shared dependency validation
 

@@ -4,8 +4,67 @@ import {
   type DetailedUser,
 } from "@halo-dev/api-client";
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import { ref, shallowRef } from "vue";
 import type { GlobalInfo } from "./types";
+
+export interface UiPluginRegistration {
+  name: string;
+  type: "plugin" | "theme";
+  version: string;
+  status: "pending" | "registered" | "failed";
+}
+
+export interface UiPluginsStore {
+  readonly registrations: readonly Readonly<UiPluginRegistration>[];
+  get(name: string): Readonly<UiPluginRegistration> | undefined;
+  isEnabled(name: string): boolean;
+  isRegistered(name: string): boolean;
+}
+
+/** @internal Host loader lifecycle actions; UI providers consume UiPluginsStore. */
+export interface UiPluginsHostStore extends UiPluginsStore {
+  _seed(registrations: readonly UiPluginRegistration[]): void;
+  _setStatus(name: string, status: UiPluginRegistration["status"]): void;
+}
+
+const useUiPluginsStore = defineStore("ui-plugins", () => {
+  const registrations = shallowRef<UiPluginRegistration[]>([]);
+
+  function get(name: string) {
+    return registrations.value.find(
+      (registration) => registration.name === name
+    );
+  }
+
+  function isEnabled(name: string) {
+    return Boolean(get(name));
+  }
+
+  function isRegistered(name: string) {
+    return get(name)?.status === "registered";
+  }
+
+  function _seed(nextRegistrations: readonly UiPluginRegistration[]) {
+    registrations.value = nextRegistrations.map((registration) => ({
+      ...registration,
+    }));
+  }
+
+  function _setStatus(name: string, status: UiPluginRegistration["status"]) {
+    registrations.value = registrations.value.map((registration) =>
+      registration.name === name ? { ...registration, status } : registration
+    );
+  }
+
+  return {
+    registrations,
+    get,
+    isEnabled,
+    isRegistered,
+    _seed,
+    _setStatus,
+  };
+});
 
 /**
  * Collection of Pinia stores for shared application state.
@@ -15,6 +74,8 @@ import type { GlobalInfo } from "./types";
  * that needs to be accessed across multiple components and plugins.
  */
 export const stores = {
+  /** Reactive metadata for UI providers discovered in the current snapshot. */
+  uiPlugins: useUiPluginsStore as unknown as () => UiPluginsStore,
   /**
    * Store for managing the current authenticated user's information.
    *

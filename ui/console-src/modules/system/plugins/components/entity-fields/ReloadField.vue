@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { PluginStatusPhaseEnum, type Plugin } from "@halo-dev/api-client";
 import { IconInformation, VButton } from "@halo-dev/components";
+import { stores } from "@halo-dev/ui-shared";
 import { computed } from "vue";
 
 const props = withDefaults(
@@ -10,22 +11,13 @@ const props = withDefaults(
   {}
 );
 
-const enabledJsModulesInfo =
-  (window["enabledUiPlugins"] as {
-    name: string;
-    type: "plugin" | "theme";
-    version: string;
-  }[]) || [];
-
-const currentJsModuleInfo = enabledJsModulesInfo.find((jsModuleInfo) => {
-  return (
-    jsModuleInfo.type === "plugin" &&
-    jsModuleInfo.name === props.plugin.metadata.name
-  );
-});
+const uiPluginsStore = stores.uiPlugins();
+const currentJsModuleInfo = computed(() =>
+  uiPluginsStore.get(props.plugin.metadata.name)
+);
 
 const needsReloadWindow = computed(() => {
-  if (!currentJsModuleInfo) {
+  if (!currentJsModuleInfo.value) {
     return false;
   }
 
@@ -34,7 +26,7 @@ const needsReloadWindow = computed(() => {
 
   const isStarted = PluginStatusPhaseEnum.Started === phase;
 
-  return isStarted && version !== currentJsModuleInfo?.version;
+  return isStarted && version !== currentJsModuleInfo.value.version;
 });
 
 function handleReloadWindow() {

@@ -15,6 +15,7 @@ import {
   DEFAULT_PLUGIN_MANIFEST_PATH,
   DEFAULT_THEME_MANIFEST_PATH,
 } from "./constants/halo-plugin";
+import { selectHaloSharedInventory } from "./inventory";
 import {
   getHaloPluginBundleLocation,
   getHaloPluginManifest,
@@ -22,7 +23,11 @@ import {
   getHaloThemeManifest,
   getHaloThemeModuleName,
   getManifestName,
+  getManifestRequires,
+  ProviderFormat,
+  selectProviderFormat,
 } from "./utils/halo-plugin";
+import { createViteEsmProviderPlugin } from "./vite-esm";
 
 type Provider = "plugin" | "theme";
 
@@ -42,16 +47,46 @@ export interface ViteUserConfig {
   manifestPath?: string;
 
   /**
+   * Provider output format.
+   *
+   * @default "auto"
+   */
+  format?: ProviderFormat;
+
+  /** Explicit Halo target used when ESM cannot be derived from spec.requires. */
+  targetHaloVersion?: string;
+
+  /**
    * Custom Vite config.
    */
   vite: UserConfig | UserConfigFnObject;
 }
 
-function createVitePresetsConfig(provider: Provider, manifestPath: string) {
+function createVitePresetsConfig(
+  provider: Provider,
+  manifestPath: string,
+  requestedFormat?: ProviderFormat,
+  targetHaloVersion?: string
+) {
   const defaults =
     provider === "theme"
       ? getThemeProviderDefaults(manifestPath)
       : getPluginProviderDefaults(manifestPath);
+  const selection = selectProviderFormat({
+    format: requestedFormat,
+    requires: defaults.requires,
+    targetHaloVersion,
+  });
+  reportFormatSelection(selection);
+  const selectedInventory =
+    selection.format === "esm"
+      ? selectHaloSharedInventory(selection.targetHaloVersion as string)
+      : undefined;
+  if (selectedInventory?.reusedOlderInventory) {
+    console.warn(
+      `[ui-plugin-bundler-kit] Halo ${selection.targetHaloVersion} is newer than bundled inventories; reusing ${selectedInventory.inventory.haloVersion}. Update the bundler to use newly introduced exports.`
+    );
+  }
 
   return defineConfig(({ mode }) => {
     const isProduction = mode === "production";
@@ -59,25 +94,47 @@ function createVitePresetsConfig(provider: Provider, manifestPath: string) {
     return {
       mode: mode || "production",
       base: defaults.base,
-      plugins: [Vue()],
+      plugins: [
+        Vue(),
+        ...(selectedInventory
+          ? [
+              createViteEsmProviderPlugin({
+                inventory: selectedInventory.inventory,
+                providerRoot: process.cwd(),
+              }),
+            ]
+          : []),
+      ],
       define: { "process.env.NODE_ENV": "'production'" },
       build: {
         outDir: isProduction ? defaults.outDir.prod : defaults.outDir.dev,
         emptyOutDir: true,
         lib: {
           entry: "src/index.ts",
-          name: defaults.moduleName,
-          formats: ["iife"],
+          ...(selection.format === "iife" ? { name: defaults.moduleName } : {}),
+          formats: [selection.format === "iife" ? "iife" : "es"],
           fileName: () => "main.js",
           cssFileName: "style",
         },
-        rollupOptions: {
-          external: EXTERNALS,
-          output: {
-            globals: GLOBALS,
-            extend: true,
-          },
-        },
+        ...(selection.format === "iife"
+          ? {
+              rollupOptions: {
+                external: EXTERNALS,
+                output: {
+                  // TODO(Halo 3): Remove after legacy IIFE UI provider support ends.
+                  globals: GLOBALS,
+                  extend: true,
+                },
+              },
+            }
+          : {
+              rollupOptions: {
+                output: {
+                  chunkFileNames: "chunks/[name].[hash].js",
+                  assetFileNames: "assets/[name].[hash][extname]",
+                },
+              },
+            }),
       },
     };
   });
@@ -94,6 +151,7 @@ function getPluginProviderDefaults(manifestPath: string) {
       dev: getDefaultOutDirDev(bundleLocation),
     },
     base: undefined,
+    requires: getManifestRequires(manifest),
   };
 }
 
@@ -107,6 +165,7 @@ function getThemeProviderDefaults(manifestPath: string) {
       dev: DEFAULT_THEME_OUT_DIR,
     },
     base: getHaloThemeAssetPublicPath(manifest),
+    requires: getManifestRequires(manifest),
   };
 }
 
@@ -141,7 +200,9 @@ export function viteConfig(config?: ViteUserConfig) {
   const provider = getProvider(config);
   const presetsConfigFn = createVitePresetsConfig(
     provider,
-    getManifestPath(provider, config)
+    getManifestPath(provider, config),
+    config?.format,
+    config?.targetHaloVersion
   );
   return defineConfig((env) => {
     const presetsConfig = presetsConfigFn(env);
@@ -151,4 +212,15 @@ export function viteConfig(config?: ViteUserConfig) {
         : config?.vite || {};
     return mergeConfig(presetsConfig, userConfig);
   });
+}
+
+function reportFormatSelection(
+  selection: ReturnType<typeof selectProviderFormat>
+) {
+  for (const warning of selection.warnings) {
+    console.warn(`[ui-plugin-bundler-kit] ${warning}`);
+  }
+  console.info(
+    `[ui-plugin-bundler-kit] Selected ${selection.format.toUpperCase()} output (${selection.reason})${selection.targetHaloVersion ? ` for Halo ${selection.targetHaloVersion}` : ""}.`
+  );
 }

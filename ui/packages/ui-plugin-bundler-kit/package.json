@@ -21,6 +21,8 @@
   "scripts": {
     "build": "vp pack",
     "dev": "vp pack --watch",
+    "inventory:check": "node scripts/generate-inventory.mjs --check",
+    "inventory:generate": "node scripts/generate-inventory.mjs",
     "test:unit": "vp test --run",
     "prepublishOnly": "vp run build"
   },

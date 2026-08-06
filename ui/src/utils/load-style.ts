@@ -1,4 +1,4 @@
-export function loadStyle(href: string) {
+export function loadStyle(href: string, before: ChildNode | null = null) {
   return new Promise(function (resolve, reject) {
     let shouldAppend = false;
     let el: HTMLLinkElement | null = document.querySelector(
@@ -22,6 +22,6 @@ export function loadStyle(href: string) {
       resolve(el);
     });
 
-    if (shouldAppend) document.head.prepend(el);
+    if (shouldAppend) document.head.insertBefore(el, before);
   });
 }

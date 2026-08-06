@@ -16,6 +16,8 @@ import {
   DEFAULT_PLUGIN_MANIFEST_PATH,
   DEFAULT_THEME_MANIFEST_PATH,
 } from "./constants/halo-plugin";
+import { selectHaloSharedInventory, SHARED_PACKAGE_ROOTS } from "./inventory";
+import { createRsbuildEsmProviderPlugin } from "./rsbuild-esm";
 import {
   getHaloPluginBundleLocation,
   getHaloPluginManifest,
@@ -23,6 +25,9 @@ import {
   getHaloThemeManifest,
   getHaloThemeModuleName,
   getManifestName,
+  getManifestRequires,
+  type ProviderFormat,
+  selectProviderFormat,
 } from "./utils/halo-plugin";
 
 type Provider = "plugin" | "theme";
@@ -43,16 +48,46 @@ export interface RsBuildUserConfig {
   manifestPath?: string;
 
   /**
+   * Provider output format.
+   *
+   * @default "auto"
+   */
+  format?: ProviderFormat;
+
+  /** Explicit Halo target used when ESM cannot be derived from spec.requires. */
+  targetHaloVersion?: string;
+
+  /**
    * Custom Rsbuild config.
    */
   rsbuild: RsbuildConfig | ((env: ConfigParams) => RsbuildConfig);
 }
 
-function createRsbuildPresetsConfig(provider: Provider, manifestPath: string) {
+function createRsbuildPresetsConfig(
+  provider: Provider,
+  manifestPath: string,
+  requestedFormat?: ProviderFormat,
+  targetHaloVersion?: string
+) {
   const defaults =
     provider === "theme"
       ? getThemeProviderDefaults(manifestPath)
       : getPluginProviderDefaults(manifestPath);
+  const selection = selectProviderFormat({
+    format: requestedFormat,
+    requires: defaults.requires,
+    targetHaloVersion,
+  });
+  reportFormatSelection(selection);
+  const selectedInventory =
+    selection.format === "esm"
+      ? selectHaloSharedInventory(selection.targetHaloVersion as string)
+      : undefined;
+  if (selectedInventory?.reusedOlderInventory) {
+    console.warn(
+      `[ui-plugin-bundler-kit] Halo ${selection.targetHaloVersion} is newer than bundled inventories; reusing ${selectedInventory.inventory.haloVersion}. Update the bundler to use newly introduced exports.`
+    );
+  }
 
   return defineConfig(({ envMode }) => {
     const isProduction = envMode === "production";
@@ -61,7 +96,17 @@ function createRsbuildPresetsConfig(provider: Provider, manifestPath: string) {
 
     return {
       mode: (envMode as RsbuildMode) || "production",
-      plugins: [pluginVue()],
+      plugins: [
+        pluginVue(),
+        ...(selectedInventory
+          ? [
+              createRsbuildEsmProviderPlugin({
+                inventory: selectedInventory.inventory,
+                providerRoot: process.cwd(),
+              }),
+            ]
+          : []),
+      ],
       source: {
         entry: {
           main: "./src/index.ts",
@@ -89,6 +134,7 @@ function createRsbuildPresetsConfig(provider: Provider, manifestPath: string) {
                 force: false,
               },
             },
+            ...(selection.format === "esm" ? { outputModule: true } : {}),
           },
           module: {
             parser: {
@@ -99,14 +145,26 @@ function createRsbuildPresetsConfig(provider: Provider, manifestPath: string) {
           },
           output: {
             publicPath: defaults.publicPath,
-            library: {
-              type: "window",
-              export: "default",
-              name: defaults.moduleName,
-            },
+            // TODO(Halo 3): Remove after legacy IIFE UI provider support ends.
+            library:
+              selection.format === "iife"
+                ? {
+                    type: "window",
+                    export: "default",
+                    name: defaults.moduleName,
+                  }
+                : { type: "module" },
             globalObject: "window",
-            iife: true,
+            iife: selection.format === "iife",
+            ...(selection.format === "esm"
+              ? {
+                  module: true,
+                  chunkFormat: "module",
+                  chunkLoading: "import",
+                }
+              : {}),
           },
+          ...(selection.format === "esm" ? { externalsType: "module" } : {}),
         },
         htmlPlugin: false,
       },
@@ -133,7 +191,12 @@ function createRsbuildPresetsConfig(provider: Provider, manifestPath: string) {
             return "[name].[contenthash:8].js";
           },
         },
-        externals: GLOBALS,
+        externals:
+          selection.format === "iife"
+            ? GLOBALS
+            : Object.fromEntries(
+                SHARED_PACKAGE_ROOTS.map((root) => [root, root])
+              ),
       },
     };
   });
@@ -150,6 +213,7 @@ function getPluginProviderDefaults(manifestPath: string) {
       dev: getDefaultOutDirDev(bundleLocation),
     },
     publicPath: `/plugins/${getManifestName(manifest)}/assets/${bundleLocation}/`,
+    requires: getManifestRequires(manifest),
   };
 }
 
@@ -163,6 +227,7 @@ function getThemeProviderDefaults(manifestPath: string) {
       dev: DEFAULT_THEME_OUT_DIR,
     },
     publicPath: getHaloThemeAssetPublicPath(manifest),
+    requires: getManifestRequires(manifest),
   };
 }
 
@@ -201,7 +266,9 @@ export function rsbuildConfig(
   const provider = getProvider(config);
   const presetsConfigFn = createRsbuildPresetsConfig(
     provider,
-    getManifestPath(provider, config)
+    getManifestPath(provider, config),
+    config?.format,
+    config?.targetHaloVersion
   );
   return defineConfig((env) => {
     const presetsConfig = presetsConfigFn(env);
@@ -211,4 +278,15 @@ export function rsbuildConfig(
         : config?.rsbuild || {};
     return mergeRsbuildConfig(presetsConfig, userConfig);
   });
+}
+
+function reportFormatSelection(
+  selection: ReturnType<typeof selectProviderFormat>
+) {
+  for (const warning of selection.warnings) {
+    console.warn(`[ui-plugin-bundler-kit] ${warning}`);
+  }
+  console.info(
+    `[ui-plugin-bundler-kit] Selected ${selection.format.toUpperCase()} output (${selection.reason})${selection.targetHaloVersion ? ` for Halo ${selection.targetHaloVersion}` : ""}.`
+  );
 }

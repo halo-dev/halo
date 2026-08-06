@@ -122,6 +122,70 @@ export default rsbuildConfig({
 
 The theme provider reads `../theme.yaml`, outputs to `dist`, registers the module as `theme:{metadata.name}`, and configures assets for `/themes/{metadata.name}/ui-plugin/assets/`. Halo reads only `ui-plugin/dist/**` from the theme package.
 
+### Output Format and Halo Target
+
+`viteConfig` and `rsbuildConfig` accept the same format options:
+
+```typescript
+export default viteConfig({
+  format: "auto", // "auto" | "iife" | "esm"
+  vite: {},
+});
+```
+
+`auto` is the default. It emits ESM when `spec.requires` is a stable Halo version or a simple `>=MAJOR.MINOR.PATCH` target whose minimum is Halo 2.26.0 or newer. Missing, wildcard, composite, or otherwise unsupported ranges produce a warning and keep the compatible IIFE output. This fallback is intentional: ESM is optional, and Halo continues loading old IIFE plugin and theme artifacts throughout Halo 2.x.
+
+Use an explicit target only when intentionally forcing ESM and a target cannot be derived:
+
+```typescript
+export default viteConfig({
+  format: "esm",
+  targetHaloVersion: "2.26.0",
+  vite: {},
+});
+```
+
+After ESM is selected, dependency or output validation fails the build instead of silently changing the artifact to IIFE. Successful ESM builds generate `ui-plugin.json`; do not write this manifest by hand. A provider artifact without this file remains legacy, even if its `spec.requires` also supports Halo 2.26 or newer.
+
+ESM entries must default-export the existing `PluginModule`. Relative dynamic imports and emitted assets are supported. Halo loads entries in parallel, commits modules in provider order, and isolates observable entry, style, registration, and delayed chunk failures. Top-level module effects, timers, listeners, and arbitrary asynchronous effects are not transactional; a full page reload remains the lifecycle and recovery boundary after provider changes.
+
+### Shared Runtime Dependencies
+
+ESM providers may import these package roots from Halo:
+
+- `vue`
+- `vue-router`
+- `pinia`
+- `axios`
+- `@formkit/vue`
+- `@formkit/core`
+- `@halo-dev/ui-shared`
+- `@halo-dev/components`
+- `@halo-dev/api-client`
+- `@halo-dev/richtext-editor`
+
+The bundler validates the actually resolved package version and used root exports against the selected Halo Inventory. Accepted version ranges are best-effort compatibility policy, not an ABI guarantee.
+
+Vue, Vue Router, Pinia, and the FormKit Vue/Core graph share host identity. Other `@formkit/*` packages stay private to the provider but must resolve their runtime `@formkit/core` import to Halo. VueUse stays provider-private. Direct Tiptap or ProseMirror imports also stay private and produce a warning when they cross the shared rich-text editor boundary.
+
+The shared `axios` import is the standard package module. Do not mutate its shared defaults or interceptors. For isolated clients, call `axios.create()`. `@halo-dev/api-client` exports Halo's separate authenticated `axiosInstance`; do not mutate that instance either.
+
+### Querying Other UI Providers
+
+Use the shared registration store instead of checking another provider's `window.PluginName` global:
+
+```typescript
+import { stores } from "@halo-dev/ui-shared";
+
+const uiPlugins = stores.uiPlugins();
+
+uiPlugins.isEnabled("plugin-search");
+uiPlugins.isRegistered("plugin-search");
+uiPlugins.get("plugin-search");
+```
+
+The reactive record contains only Halo-owned `name`, `type`, `version`, and `pending | registered | failed` status. `isEnabled` means the provider was discovered in the current snapshot; `isRegistered` becomes true after its current-page registration succeeds. Provider code treats this store as read-only and must not depend on another provider's evaluation order or module object.
+
 ### Legacy Configuration (Deprecated)
 
 > ⚠️ **Note**: The `HaloUIPluginBundlerKit` function is deprecated. Please use `viteConfig` or `rsbuildConfig` instead. It does not support `provider: "theme"`.
@@ -156,6 +220,12 @@ interface ViteUserConfig {
    */
   manifestPath?: string;
 
+  /** @default "auto" */
+  format?: "auto" | "iife" | "esm";
+
+  /** Required for explicit ESM when spec.requires has no derivable target. */
+  targetHaloVersion?: string;
+
   /**
    * Custom Vite configuration
    */
@@ -178,6 +248,12 @@ interface RsBuildUserConfig {
    * @default "../src/main/resources/plugin.yaml" for plugins, "../theme.yaml" for themes
    */
   manifestPath?: string;
+
+  /** @default "auto" */
+  format?: "auto" | "iife" | "esm";
+
+  /** Required for explicit ESM when spec.requires has no derivable target. */
+  targetHaloVersion?: string;
 
   /**
    * Custom Rsbuild configuration
@@ -321,6 +397,19 @@ Theme provider:
 
 > **Note**: The production build output directory of `HaloUIPluginBundlerKit` is still `src/main/resources/console` to ensure compatibility.
 
+An ESM output additionally contains the generated `ui-plugin.json` manifest and may contain content-hashed `chunks/` and `assets/`. Keep the complete output directory together; Halo serves entries, styles, chunks, and assets from one immutable provider generation.
+
+## Maintaining Halo Inventories
+
+Inventories capture the exact host version, statically available root exports, bridge global, identity category, and a manually reviewed accepted range for each shared root. They are intentionally sparse: add a new immutable Inventory when Halo's shared runtime contract changes, not automatically for every Halo patch. A newer target selects the latest eligible older Inventory and emits a forward-compatibility warning; a target older than every packaged Inventory cannot build ESM.
+
+When the host dependency graph changes:
+
+1. Review the ranges in `scripts/generate-inventory.mjs`; broad ranges express best-effort admission and must be changed deliberately.
+2. Run `pnpm --filter @halo-dev/ui-plugin-bundler-kit inventory:generate` to capture the resolved host versions and exports.
+3. Run `pnpm --filter @halo-dev/ui-plugin-bundler-kit inventory:check` and the compatibility fixtures before publishing.
+4. Preserve older Inventory files while supported provider artifacts may still target them.
+
 ## Requirements
 
 - **Node.js**: ^18.0.0 || >=20.0.0
@@ -380,7 +469,7 @@ export default definePlugin({
 
 | Feature           | Vite         | Rsbuild      |
 | ----------------- | ------------ | ------------ |
-| Code Splitting    | ❌ Limited   | ✅ Excellent |
+| Code Splitting    | ✅ ESM       | ✅ ESM       |
 | Vue Ecosystem     | ✅ Excellent | ✅ Good      |
 | Build Performance | ✅ Good      | ✅ Excellent |
 | Dev Experience    | ✅ Excellent | ✅ Excellent |

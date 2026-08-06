@@ -48,7 +48,7 @@ The change spans the UI build, bundler kit, backend resource discovery, runtime 
 
 Providers continue to declare only `spec.requires`. There is no independent UI runtime version. When the bundler can derive a minimum stable Halo version, that version selects the latest immutable inventory whose Halo baseline is not newer than the target. The selected target is build input and diagnostic context, not a field in the emitted runtime manifest.
 
-For example, `requires: ">=2.27.0"` selects the 2.27.0 inventory. A provider that needs an API introduced by Halo 2.28 raises its minimum required version and builds against the 2.28 inventory.
+For example, `requires: ">=2.26.0"` selects the 2.26.0 inventory. A provider that needs an API introduced by Halo 2.28 raises its minimum required version and builds against the 2.28 inventory.
 
 Inventories are sparse: Halo publishes a new one only when a shared version, accepted range, root export surface, or runtime bridge changes. Multiple Halo releases may reuse one inventory. Each entry records:
 
@@ -125,18 +125,18 @@ Alternative considered: exact matching. Local ecosystem sampling showed that exa
 
 Modern Vite and Rsbuild helpers accept `format: "auto" | "iife" | "esm"`, defaulting to `auto`.
 
-- `auto` recognizes a simple stable version or `>=MAJOR.MINOR.PATCH` lower bound and emits ESM when that minimum is at least 2.27.0.
+- `auto` recognizes a simple stable version or `>=MAJOR.MINOR.PATCH` lower bound and emits ESM when that minimum is at least 2.26.0.
 - Missing, wildcard, composite, or otherwise unparseable `spec.requires` values warn and fall back to IIFE. This avoids duplicating Halo's broader Java version-range grammar in Node merely to select an optional output format.
 - `iife` ignores target parsing and always remains available as a migration escape hatch.
 - `esm` uses the derived target when available; otherwise the author supplies `targetHaloVersion` as an explicit build option.
-- Explicit ESM with metadata that still permits Halo older than 2.27 emits a strong warning instead of rewriting or rejecting the provider manifest.
-- 2.27 prerelease testing requires explicit ESM selection and an explicit prerelease target.
+- Explicit ESM with metadata that still permits Halo older than 2.26 emits a strong warning instead of rewriting or rejecting the provider manifest.
+- 2.26 prerelease testing requires explicit ESM selection and an explicit prerelease target.
 
 Once ESM and an inventory have been selected, dependency, import, or output validation failures fail the build. They do not silently change an intended ESM artifact back to IIFE.
 
 Plugin providers read `plugin.yaml`; theme providers read `theme.yaml`, including `spec.requires`. This extends the theme manifest reader, which currently only reads the metadata name.
 
-The host never infers artifact format from `spec.requires`. New bundlers emit an ESM provider manifest; absence of that manifest means legacy IIFE. This preserves artifacts built by older bundlers even when their manifest already requires Halo 2.27 or newer.
+The host never infers artifact format from `spec.requires`. New bundlers emit an ESM provider manifest; absence of that manifest means legacy IIFE. This preserves artifacts built by older bundlers even when their manifest already requires Halo 2.26 or newer.
 
 The provider manifest is placed at the provider UI output root (`ui/` for plugins and `ui-plugin/dist/` for themes) and contains only fields consumed by the runtime:
 
@@ -281,7 +281,7 @@ Compatibility covers more than locating an IIFE file. Existing providers whose `
 
 Halo uses frozen legacy fixtures and a maintained ecosystem usage sample before upgrading shared libraries. It should retain known-used exports or add a focused bridge where practical, but neither legacy globals nor broad ESM inventory ranges guarantee complete upstream behavioral compatibility. A provider can remain or return to IIFE output when an ESM sharing window is unsuitable. `window.VueUse` remains a legacy-only compatibility global and is not offered to ESM providers.
 
-The management UI does not emit a runtime warning merely because a provider is IIFE. Documentation recommends ESM for new 2.27+ targets, while the IIFE build and load paths remain supported for Halo 2.x.
+The management UI does not emit a runtime warning merely because a provider is IIFE. Documentation recommends ESM for new 2.26+ targets, while the IIFE build and load paths remain supported for Halo 2.x.
 
 Compatibility code that exists only until legacy IIFE support ends carries an adjacent, actionable removal marker instead of a vague future TODO:
 

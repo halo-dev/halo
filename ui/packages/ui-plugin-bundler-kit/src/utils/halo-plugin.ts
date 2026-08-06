@@ -1,17 +1,30 @@
 import fs from "node:fs";
 import type { Plugin as HaloPlugin } from "@halo-dev/api-client";
 import yaml from "js-yaml";
-import { gte, minVersion } from "semver";
+import { gte, minVersion, parse } from "semver";
 
 const UI_BUNDLE_MIN_HALO_VERSION = "2.25.0";
+const ESM_PROVIDER_MIN_HALO_VERSION = "2.26.0";
 const UI_BUNDLE_LOCATION = "ui";
 const CONSOLE_BUNDLE_LOCATION = "console";
 const THEME_MODULE_NAME_PREFIX = "theme:";
 
-interface HaloThemeManifest {
+export interface HaloThemeManifest {
   metadata: {
     name: string;
   };
+  spec?: {
+    requires?: string;
+  };
+}
+
+export type ProviderFormat = "auto" | "iife" | "esm";
+
+export interface ProviderFormatSelection {
+  format: Exclude<ProviderFormat, "auto">;
+  reason: "explicit" | "automatic" | "automatic-fallback";
+  targetHaloVersion?: string;
+  warnings: string[];
 }
 
 export function getHaloPluginManifest(manifestPath: string) {
@@ -42,6 +55,83 @@ export function getHaloPluginBundleLocation(manifest: HaloPlugin) {
     gte(requiresMinVersion, UI_BUNDLE_MIN_HALO_VERSION)
     ? UI_BUNDLE_LOCATION
     : CONSOLE_BUNDLE_LOCATION;
+}
+
+export function getManifestRequires(
+  manifest: Pick<HaloPlugin, "spec"> | HaloThemeManifest
+) {
+  return manifest.spec?.requires;
+}
+
+export function selectProviderFormat(options: {
+  format?: ProviderFormat;
+  requires?: string;
+  targetHaloVersion?: string;
+}): ProviderFormatSelection {
+  const requestedFormat = options.format || "auto";
+  if (requestedFormat === "iife") {
+    return { format: "iife", reason: "explicit", warnings: [] };
+  }
+
+  const derivedTarget = parseSimpleStableTarget(options.requires);
+  if (requestedFormat === "auto") {
+    if (!derivedTarget) {
+      return {
+        format: "iife",
+        reason: "automatic-fallback",
+        warnings: [
+          `Cannot derive a simple stable Halo target from spec.requires ${JSON.stringify(options.requires)}; using IIFE output.`,
+        ],
+      };
+    }
+    if (!gte(derivedTarget, ESM_PROVIDER_MIN_HALO_VERSION)) {
+      return {
+        format: "iife",
+        reason: "automatic",
+        targetHaloVersion: derivedTarget,
+        warnings: [],
+      };
+    }
+    return {
+      format: "esm",
+      reason: "automatic",
+      targetHaloVersion: derivedTarget,
+      warnings: [],
+    };
+  }
+
+  const explicitTarget = options.targetHaloVersion
+    ? parse(options.targetHaloVersion)
+    : undefined;
+  const target = derivedTarget || explicitTarget?.version;
+  if (!target) {
+    throw new Error(
+      "Explicit ESM output requires a simple stable spec.requires target or targetHaloVersion."
+    );
+  }
+
+  const warnings: string[] = [];
+  if (derivedTarget && !gte(derivedTarget, ESM_PROVIDER_MIN_HALO_VERSION)) {
+    warnings.push(
+      `Explicit ESM output targets Halo ${derivedTarget}, which predates ESM UI provider support in Halo ${ESM_PROVIDER_MIN_HALO_VERSION}.`
+    );
+  }
+  return {
+    format: "esm",
+    reason: "explicit",
+    targetHaloVersion: target,
+    warnings,
+  };
+}
+
+function parseSimpleStableTarget(requires: string | undefined) {
+  const match = requires
+    ?.trim()
+    .match(/^(?:>=)?(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/);
+  if (!match) {
+    return;
+  }
+  return `${match[1]}.${match[2]}.${match[3]}`;
 }
 
 function getRequiresMinVersion(requires: string | undefined) {

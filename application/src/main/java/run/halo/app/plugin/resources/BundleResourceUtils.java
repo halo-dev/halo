@@ -30,6 +30,7 @@ public abstract class BundleResourceUtils {
     public static final String CONSOLE_BUNDLE_LOCATION = "console";
     public static final String JS_BUNDLE = "main.js";
     public static final String CSS_BUNDLE = "style.css";
+    // TODO(Halo 3): Remove after legacy IIFE UI provider support ends.
     private static final String[] BUNDLE_LOCATIONS = {UI_BUNDLE_LOCATION, CONSOLE_BUNDLE_LOCATION};
 
     /**
