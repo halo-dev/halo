@@ -4,8 +4,9 @@
 
 ## Structure
 
-- `ui/src/` — console application.
-- `ui/uc-src/` — user center application.
+- `ui/console-src/` — console application (entry: `console.html`, alias `@console`).
+- `ui/uc-src/` — user center application (entry: `uc.html`, alias `@uc`).
+- `ui/src/` — shared code: build-time Vite helpers (`src/vite/`), locales, assets, and shared views (alias `@`); not an application entry point.
 - `ui/packages/` — shared workspace packages (`@halo-dev/api-client`, `@halo-dev/components`, `@halo-dev/console-shared`, `@halo-dev/editor`, `@halo-dev/shared`, `@halo-dev/ui-plugin-bundler-kit`).
 - Unit tests: `*.spec.ts` files, usually under `__tests__/` next to the code they cover.
 
