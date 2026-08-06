@@ -50,7 +50,7 @@ public class OAuth2RegistrationService {
     private final Validator validator;
     private Clock clock = Clock.systemUTC();
 
-    public Mono<RegistrationResult> register(OAuth2AuthenticationToken token, boolean agreedToTerms) {
+    public Mono<String> register(OAuth2AuthenticationToken token, boolean agreedToTerms) {
         return fetchAndValidateSettings(agreedToTerms).flatMap(setting -> register(token, setting));
     }
 
@@ -66,19 +66,13 @@ public class OAuth2RegistrationService {
                         "Agreement not accepted.", "problemDetail.user.signup.agreement-not-accepted", null)));
     }
 
-    private Mono<RegistrationResult> register(OAuth2AuthenticationToken token, SystemSetting.User setting) {
+    private Mono<String> register(OAuth2AuthenticationToken token, SystemSetting.User setting) {
         var registrationId = token.getAuthorizedClientRegistrationId();
         var oauth2User = token.getPrincipal();
         return connectionService
                 .getByProviderUserId(registrationId, oauth2User.getName())
                 .map(connection -> connection.getSpec().getUsername())
-                .switchIfEmpty(Mono.defer(() -> createUserAndConnection(registrationId, oauth2User, setting)))
-                .flatMap(username -> userService
-                        .getUser(username)
-                        .map(user -> new RegistrationResult(
-                                username,
-                                setting.isMustVerifyEmailOnRegistration()
-                                        && !user.getSpec().isEmailVerified())));
+                .switchIfEmpty(Mono.defer(() -> createUserAndConnection(registrationId, oauth2User, setting)));
     }
 
     private Mono<String> createUserAndConnection(
@@ -246,8 +240,6 @@ public class OAuth2RegistrationService {
     void setClock(Clock clock) {
         this.clock = clock;
     }
-
-    public record RegistrationResult(String username, boolean needsEmailCompletion) {}
 
     private record EmailCandidate(String email, boolean verified) {}
 

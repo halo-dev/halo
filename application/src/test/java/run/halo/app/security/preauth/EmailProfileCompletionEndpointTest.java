@@ -3,6 +3,7 @@ package run.halo.app.security.preauth;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -39,7 +40,6 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.web.server.WebFilterChainProxy;
-import org.springframework.security.web.server.savedrequest.ServerRequestCache;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
@@ -57,9 +57,10 @@ import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.exception.EmailVerificationFailed;
 import run.halo.app.security.authentication.SecurityConfigurer;
+import run.halo.app.security.profile.ProfileCompletionFlow;
 
 @ExtendWith(MockitoExtension.class)
-class CompleteProfileEndpointTest {
+class EmailProfileCompletionEndpointTest {
 
     private static final String USERNAME = "alice";
     private static final String TEST_USERNAME_HEADER = "X-Test-Username";
@@ -80,7 +81,7 @@ class CompleteProfileEndpointTest {
     ReactiveExtensionClient client;
 
     @Mock
-    ServerRequestCache requestCache;
+    ProfileCompletionFlow profileCompletionFlow;
 
     User user;
     SystemSetting.User setting;
@@ -110,15 +111,17 @@ class CompleteProfileEndpointTest {
                 .when(emailVerificationService.verify(anyString(), anyString()))
                 .thenReturn(Mono.empty());
         lenient().when(client.update(any(User.class))).thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
-        lenient().when(requestCache.getRedirectUri(any())).thenReturn(Mono.empty());
+        lenient()
+                .when(profileCompletionFlow.getRedirectUri(eq(USERNAME), any()))
+                .thenReturn(Mono.just(URI.create("/uc")));
 
-        var endpoint = new CompleteProfileEndpoint(
+        var endpoint = new EmailProfileCompletionEndpoint(
                 userService,
                 systemConfigFetcher,
                 emailVerificationService,
                 rateLimiterRegistry,
                 client,
-                requestCache,
+                profileCompletionFlow,
                 new SpringValidatorAdapter(validatorFactory.getValidator()));
         ViewResolver viewResolver = (viewName, locale) -> {
             renderedView.set(viewName);
@@ -160,15 +163,26 @@ class CompleteProfileEndpointTest {
         assertThat(renderedView.get()).isEqualTo("complete_profile");
         assertThat(renderedModel.get()).containsEntry("mustVerifyEmailOnRegistration", true);
         assertThat(renderedModel.get().get("form"))
-                .isEqualTo(new CompleteProfileEndpoint.CompleteProfileForm("Initial@Example.com", null));
+                .isEqualTo(new EmailProfileCompletionEndpoint.CompleteProfileForm("Initial@Example.com", null));
     }
 
     @Test
     void shouldRedirectVerifiedUserToSavedTarget() {
         user.getSpec().setEmailVerified(true);
-        when(requestCache.getRedirectUri(any())).thenReturn(Mono.just(URI.create("/dashboard")));
+        when(profileCompletionFlow.getRedirectUri(eq(USERNAME), any())).thenReturn(Mono.just(URI.create("/dashboard")));
 
         authenticatedGet().exchange().expectStatus().isFound().expectHeader().location("/dashboard");
+
+        assertVerifiedUserDidNotAct();
+    }
+
+    @Test
+    void shouldRedirectVerifiedUserToNextProfileCompletionStep() {
+        user.getSpec().setEmailVerified(true);
+        when(profileCompletionFlow.getRedirectUri(eq(USERNAME), any()))
+                .thenReturn(Mono.just(URI.create("/complete-profile/phone")));
+
+        authenticatedGet().exchange().expectStatus().isFound().expectHeader().location("/complete-profile/phone");
 
         assertVerifiedUserDidNotAct();
     }
@@ -185,7 +199,7 @@ class CompleteProfileEndpointTest {
     @Test
     void shouldNotSendCodeForVerifiedUser() {
         user.getSpec().setEmailVerified(true);
-        when(requestCache.getRedirectUri(any())).thenReturn(Mono.just(URI.create("/dashboard")));
+        when(profileCompletionFlow.getRedirectUri(eq(USERNAME), any())).thenReturn(Mono.just(URI.create("/dashboard")));
 
         sendCode("Verified@Example.com")
                 .exchange()
@@ -340,7 +354,7 @@ class CompleteProfileEndpointTest {
     void shouldVerifyRequiredEmailAndRedirectToSavedTarget() {
         MetadataUtil.nullSafeAnnotations(user).put(User.EMAIL_TO_VERIFY, "Alice@Example.COM");
         allowRateLimiter("verify-email-" + USERNAME);
-        when(requestCache.getRedirectUri(any())).thenReturn(Mono.just(URI.create("/dashboard")));
+        when(profileCompletionFlow.getRedirectUri(eq(USERNAME), any())).thenReturn(Mono.just(URI.create("/dashboard")));
 
         submit("email=alice%40example.com&emailCode=123456")
                 .exchange()

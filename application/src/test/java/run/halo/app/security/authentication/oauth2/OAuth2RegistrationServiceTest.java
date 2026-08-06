@@ -174,7 +174,7 @@ class OAuth2RegistrationServiceTest {
         var token = token(attributes);
 
         StepVerifier.create(service.register(token, false))
-                .assertNext(result -> assertThat(result.username()).isEqualTo(expectedUsername))
+                .assertNext(result -> assertThat(result).isEqualTo(expectedUsername))
                 .verifyComplete();
 
         assertThat(users).containsKey(expectedUsername);
@@ -189,7 +189,7 @@ class OAuth2RegistrationServiceTest {
         var token = new OAuth2AuthenticationToken(oidcUser, List.of(), "github");
 
         StepVerifier.create(service.register(token, false))
-                .assertNext(result -> assertThat(result.username()).isEqualTo("preferreduser"))
+                .assertNext(result -> assertThat(result).isEqualTo("preferreduser"))
                 .verifyComplete();
 
         assertThat(users.get("preferreduser").getSpec().getDisplayName()).isEqualTo("wrong-nickname");
@@ -204,9 +204,8 @@ class OAuth2RegistrationServiceTest {
 
         StepVerifier.create(service.register(token, false))
                 .assertNext(result -> {
-                    assertThat(result.username()).matches("user-[a-z0-9]{8}");
-                    assertThat(users.get(result.username()).getSpec().getDisplayName())
-                            .isEqualTo("Preferred User");
+                    assertThat(result).matches("user-[a-z0-9]{8}");
+                    assertThat(users.get(result).getSpec().getDisplayName()).isEqualTo("Preferred User");
                 })
                 .verifyComplete();
     }
@@ -219,7 +218,7 @@ class OAuth2RegistrationServiceTest {
     @MethodSource("validBoundaryUsernames")
     void shouldNormalizeAndAcceptUsernameLengthBoundaries(String candidate) {
         StepVerifier.create(service.register(token(Map.of("sub", candidate)), false))
-                .assertNext(result -> assertThat(result.username()).isEqualTo(candidate.toLowerCase()))
+                .assertNext(result -> assertThat(result).isEqualTo(candidate.toLowerCase()))
                 .verifyComplete();
     }
 
@@ -231,7 +230,7 @@ class OAuth2RegistrationServiceTest {
     @MethodSource("invalidUsernames")
     void shouldUseRandomUsernameWhenCandidateFailsValidation(String candidate) {
         StepVerifier.create(service.register(token(Map.of("sub", candidate)), false))
-                .assertNext(result -> assertThat(result.username()).matches("user-[a-z0-9]{8}"))
+                .assertNext(result -> assertThat(result).matches("user-[a-z0-9]{8}"))
                 .verifyComplete();
     }
 
@@ -240,7 +239,7 @@ class OAuth2RegistrationServiceTest {
         setting.setProtectedUsernames("admin, Alice , root");
 
         StepVerifier.create(service.register(token(Map.of("sub", "provider-user-id", "login", "ALICE")), false))
-                .assertNext(result -> assertThat(result.username()).matches("user-[a-z0-9]{8}"))
+                .assertNext(result -> assertThat(result).matches("user-[a-z0-9]{8}"))
                 .verifyComplete();
     }
 
@@ -249,7 +248,7 @@ class OAuth2RegistrationServiceTest {
         users.put("alice", user("alice", true));
 
         StepVerifier.create(service.register(token(Map.of("sub", "alice")), false))
-                .assertNext(result -> assertThat(result.username()).matches("user-[a-z0-9]{8}"))
+                .assertNext(result -> assertThat(result).matches("user-[a-z0-9]{8}"))
                 .verifyComplete();
     }
 
@@ -407,43 +406,22 @@ class OAuth2RegistrationServiceTest {
         setting.setRequiredAgreementPages(List.of("terms"));
 
         StepVerifier.create(service.register(token(Map.of("sub", "alice")), true))
-                .assertNext(result -> assertThat(result.username()).isEqualTo("alice"))
+                .assertNext(result -> assertThat(result).isEqualTo("alice"))
                 .verifyComplete();
     }
 
     @Test
-    void shouldReturnExistingConnectionAndComputeCompletionFromPersistedUser() {
-        setting.setMustVerifyEmailOnRegistration(true);
+    void shouldReturnExistingConnectionWithoutLoadingPersistedUser() {
         users.put("existing-user", user("existing-user", false));
         connections.put(connectionKey("github", "provider-user-id"), connection("existing-user"));
 
         StepVerifier.create(service.register(token(Map.of("sub", "provider-user-id", "login", "new-user")), false))
-                .assertNext(result -> {
-                    assertThat(result.username()).isEqualTo("existing-user");
-                    assertThat(result.needsEmailCompletion()).isTrue();
-                })
+                .expectNext("existing-user")
                 .verifyComplete();
 
+        verify(userService, never()).getUser(anyString());
         verify(userService, never()).createUser(any(), any());
         verify(connectionService, never()).createUserConnection(anyString(), anyString(), any());
-    }
-
-    @Test
-    void shouldComputeNoCompletionWhenPersistedEmailIsVerified() {
-        setting.setMustVerifyEmailOnRegistration(true);
-
-        StepVerifier.create(service.register(token(Map.of("sub", "alice", "email", "alice@example.com")), false))
-                .assertNext(result -> assertThat(result.needsEmailCompletion()).isFalse())
-                .verifyComplete();
-    }
-
-    @Test
-    void shouldComputeNoCompletionWhenVerificationPolicyIsDisabled() {
-        setting.setMustVerifyEmailOnRegistration(false);
-
-        StepVerifier.create(service.register(token(Map.of("sub", "alice")), false))
-                .assertNext(result -> assertThat(result.needsEmailCompletion()).isFalse())
-                .verifyComplete();
     }
 
     @Test
@@ -497,12 +475,7 @@ class OAuth2RegistrationServiceTest {
                     return createdUser;
                 }));
 
-        StepVerifier.create(service.register(token, false))
-                .assertNext(result -> {
-                    assertThat(result.username()).isEqualTo("winner");
-                    assertThat(result.needsEmailCompletion()).isFalse();
-                })
-                .verifyComplete();
+        StepVerifier.create(service.register(token, false)).expectNext("winner").verifyComplete();
 
         var createdCaptor = ArgumentCaptor.forClass(User.class);
         verify(userService).createUser(createdCaptor.capture(), eq(Set.of("guest")));

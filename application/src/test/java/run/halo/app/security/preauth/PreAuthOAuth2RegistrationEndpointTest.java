@@ -20,7 +20,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
-import org.springframework.security.web.server.savedrequest.ServerRequestCache;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.server.HandlerStrategies;
 import org.springframework.web.reactive.result.view.ViewResolver;
@@ -38,6 +37,7 @@ import run.halo.app.security.authentication.oauth2.OAuth2AuthenticationTokenCach
 import run.halo.app.security.authentication.oauth2.OAuth2RegistrationException;
 import run.halo.app.security.authentication.oauth2.OAuth2RegistrationException.Error;
 import run.halo.app.security.authentication.oauth2.OAuth2RegistrationService;
+import run.halo.app.security.profile.ProfileCompletionFlow;
 
 @ExtendWith(MockitoExtension.class)
 class PreAuthOAuth2RegistrationEndpointTest {
@@ -61,7 +61,7 @@ class PreAuthOAuth2RegistrationEndpointTest {
     OAuth2AuthenticationSession authenticationSession;
 
     @Mock
-    ServerRequestCache requestCache;
+    ProfileCompletionFlow profileCompletionFlow;
 
     OAuth2AuthenticationToken token;
     AuthProvider provider;
@@ -87,7 +87,7 @@ class PreAuthOAuth2RegistrationEndpointTest {
                 agreementPageFetcher,
                 registrationService,
                 authenticationSession,
-                requestCache);
+                profileCompletionFlow);
         ViewResolver viewResolver = (viewName, locale) -> {
             renderedView.set(viewName);
             return Mono.just((model, contentType, exchange) -> {
@@ -197,9 +197,10 @@ class PreAuthOAuth2RegistrationEndpointTest {
     @Test
     void shouldEstablishSessionAndRedirectToProfileCompletion() {
         givenSelectionModel(List.of());
-        when(registrationService.register(token, false))
-                .thenReturn(Mono.just(new OAuth2RegistrationService.RegistrationResult("alice", true)));
+        when(registrationService.register(token, false)).thenReturn(Mono.just("alice"));
         when(authenticationSession.establish(any(), eq("alice"), eq(token))).thenReturn(Mono.empty());
+        when(profileCompletionFlow.getRedirectUri(eq("alice"), any()))
+                .thenReturn(Mono.just(URI.create("/complete-profile")));
 
         post("agreedToTerms=false").expectStatus().isFound().expectHeader().location("/complete-profile");
 
@@ -210,10 +211,9 @@ class PreAuthOAuth2RegistrationEndpointTest {
     @Test
     void shouldRedirectCompleteRegistrationToSavedUri() {
         givenSelectionModel(List.of());
-        when(registrationService.register(token, false))
-                .thenReturn(Mono.just(new OAuth2RegistrationService.RegistrationResult("alice", false)));
+        when(registrationService.register(token, false)).thenReturn(Mono.just("alice"));
         when(authenticationSession.establish(any(), eq("alice"), eq(token))).thenReturn(Mono.empty());
-        when(requestCache.getRedirectUri(any())).thenReturn(Mono.just(URI.create("/dashboard")));
+        when(profileCompletionFlow.getRedirectUri(eq("alice"), any())).thenReturn(Mono.just(URI.create("/dashboard")));
 
         post("agreedToTerms=false").expectStatus().isFound().expectHeader().location("/dashboard");
     }
@@ -221,10 +221,9 @@ class PreAuthOAuth2RegistrationEndpointTest {
     @Test
     void shouldDefaultCompleteRegistrationRedirectToUserCenter() {
         givenSelectionModel(List.of());
-        when(registrationService.register(token, false))
-                .thenReturn(Mono.just(new OAuth2RegistrationService.RegistrationResult("alice", false)));
+        when(registrationService.register(token, false)).thenReturn(Mono.just("alice"));
         when(authenticationSession.establish(any(), eq("alice"), eq(token))).thenReturn(Mono.empty());
-        when(requestCache.getRedirectUri(any())).thenReturn(Mono.empty());
+        when(profileCompletionFlow.getRedirectUri(eq("alice"), any())).thenReturn(Mono.just(URI.create("/uc")));
 
         post("agreedToTerms=false").expectStatus().isFound().expectHeader().location("/uc");
     }
@@ -232,8 +231,7 @@ class PreAuthOAuth2RegistrationEndpointTest {
     @Test
     void shouldPropagateSessionEstablishmentFailureWithoutRenderingSelectionPage() {
         givenSelectionModel(List.of());
-        when(registrationService.register(token, false))
-                .thenReturn(Mono.just(new OAuth2RegistrationService.RegistrationResult("alice", true)));
+        when(registrationService.register(token, false)).thenReturn(Mono.just("alice"));
         when(authenticationSession.establish(any(), eq("alice"), eq(token)))
                 .thenReturn(Mono.error(new IllegalStateException("session establishment failed")));
 
@@ -243,13 +241,12 @@ class PreAuthOAuth2RegistrationEndpointTest {
     }
 
     @Test
-    void shouldPropagateRequestCacheFailureWithoutRenderingSelectionPage() {
+    void shouldPropagateProfileCompletionFlowFailureWithoutRenderingSelectionPage() {
         givenSelectionModel(List.of());
-        when(registrationService.register(token, false))
-                .thenReturn(Mono.just(new OAuth2RegistrationService.RegistrationResult("alice", false)));
+        when(registrationService.register(token, false)).thenReturn(Mono.just("alice"));
         when(authenticationSession.establish(any(), eq("alice"), eq(token))).thenReturn(Mono.empty());
-        when(requestCache.getRedirectUri(any()))
-                .thenReturn(Mono.error(new IllegalStateException("request cache failed")));
+        when(profileCompletionFlow.getRedirectUri(eq("alice"), any()))
+                .thenReturn(Mono.error(new IllegalStateException("profile completion flow failed")));
 
         post("agreedToTerms=false").expectStatus().is5xxServerError();
 

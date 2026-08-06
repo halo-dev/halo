@@ -14,7 +14,6 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-import org.springframework.security.web.server.savedrequest.ServerRequestCache;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RequestPredicate;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -31,6 +30,7 @@ import run.halo.app.security.authentication.oauth2.OAuth2AuthenticationSession;
 import run.halo.app.security.authentication.oauth2.OAuth2AuthenticationTokenCache;
 import run.halo.app.security.authentication.oauth2.OAuth2RegistrationException;
 import run.halo.app.security.authentication.oauth2.OAuth2RegistrationService;
+import run.halo.app.security.profile.ProfileCompletionFlow;
 
 @Component
 @RequiredArgsConstructor
@@ -48,7 +48,7 @@ class PreAuthOAuth2RegistrationEndpoint {
 
     private final OAuth2AuthenticationSession authenticationSession;
 
-    private final ServerRequestCache requestCache;
+    private final ProfileCompletionFlow profileCompletionFlow;
 
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE + 99)
@@ -82,15 +82,11 @@ class PreAuthOAuth2RegistrationEndpoint {
                     return selectionModel(token)
                             .flatMap(model -> registrationService
                                     .register(token, agreedToTerms)
-                                    .map(result -> Mono.defer(() -> authenticationSession
-                                            .establish(request.exchange(), result.username(), token)
-                                            .then(
-                                                    result.needsEmailCompletion()
-                                                            ? redirect("/complete-profile")
-                                                            : requestCache
-                                                                    .getRedirectUri(request.exchange())
-                                                                    .defaultIfEmpty(URI.create("/uc"))
-                                                                    .flatMap(uri -> redirect(uri.toString())))))
+                                    .map(username -> Mono.defer(() -> authenticationSession
+                                            .establish(request.exchange(), username, token)
+                                            .then(profileCompletionFlow
+                                                    .getRedirectUri(username, request.exchange())
+                                                    .flatMap(uri -> redirect(uri.toString())))))
                                     .onErrorResume(error -> Mono.just(renderRegistrationError(error, model)))
                                     .flatMap(response -> response));
                 }))

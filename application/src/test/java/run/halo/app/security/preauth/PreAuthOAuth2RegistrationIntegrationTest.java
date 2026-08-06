@@ -51,6 +51,7 @@ import run.halo.app.security.authentication.oauth2.OAuth2AuthenticationTokenCach
 import run.halo.app.security.authentication.oauth2.OAuth2RegistrationService;
 import run.halo.app.security.authentication.rememberme.RememberMeServices;
 import run.halo.app.security.device.DeviceService;
+import run.halo.app.security.profile.ProfileCompletionFlow;
 
 @SpringBootTest
 @AutoConfigureWebTestClient
@@ -89,6 +90,9 @@ class PreAuthOAuth2RegistrationIntegrationTest {
 
     @MockitoBean
     LoginParameterRequestCache parameterRequestCache;
+
+    @MockitoBean
+    ProfileCompletionFlow profileCompletionFlow;
 
     @MockitoSpyBean
     OAuth2AuthenticationTokenCache tokenCache;
@@ -179,8 +183,9 @@ class PreAuthOAuth2RegistrationIntegrationTest {
                 .when(systemConfigFetcher)
                 .fetch(SystemSetting.User.GROUP, SystemSetting.User.class);
         when(agreementPageFetcher.fetchAgreementPages()).thenReturn(Mono.just(List.of()));
-        when(registrationService.register(any(), eq(false)))
-                .thenReturn(Mono.just(new OAuth2RegistrationService.RegistrationResult("alice", false)));
+        when(registrationService.register(any(), eq(false))).thenReturn(Mono.just("alice"));
+        when(profileCompletionFlow.getRedirectUri(eq("alice"), any()))
+                .thenReturn(Mono.just(java.net.URI.create("/uc")));
         when(userDetailsService.findByUsername("alice"))
                 .thenReturn(Mono.just(User.withUsername("alice")
                         .password("password")

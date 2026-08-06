@@ -6,17 +6,14 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.savedrequest.ServerRequestCache;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import run.halo.app.core.user.service.UserService;
-import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.security.authentication.SecurityConfigurer;
+import run.halo.app.security.profile.ProfileCompletionFlow;
 
 @Component
 @RequiredArgsConstructor
-class EmailCompletionSecurityConfigurer implements SecurityConfigurer {
+class ProfileCompletionSecurityConfigurer implements SecurityConfigurer {
 
-    private final SystemConfigFetcher systemConfigFetcher;
-
-    private final UserService userService;
+    private final ProfileCompletionFlow profileCompletionFlow;
 
     private final ServerRequestCache requestCache;
 
@@ -24,8 +21,7 @@ class EmailCompletionSecurityConfigurer implements SecurityConfigurer {
 
     @Override
     public void configure(ServerHttpSecurity http) {
-        var emailCompletionFilter =
-                new EmailCompletionFilter(systemConfigFetcher, userService, requestCache, responseContext);
-        http.addFilterAfter(emailCompletionFilter, SecurityWebFiltersOrder.ANONYMOUS_AUTHENTICATION);
+        var profileCompletionFilter = new ProfileCompletionFilter(profileCompletionFlow, requestCache, responseContext);
+        http.addFilterAfter(profileCompletionFilter, SecurityWebFiltersOrder.ANONYMOUS_AUTHENTICATION);
     }
 }

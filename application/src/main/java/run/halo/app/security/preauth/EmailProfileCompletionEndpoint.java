@@ -11,7 +11,6 @@ import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import io.github.resilience4j.reactor.ratelimiter.operator.RateLimiterOperator;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import java.net.URI;
 import java.util.Locale;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -21,7 +20,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.web.server.savedrequest.ServerRequestCache;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Validator;
@@ -43,10 +41,11 @@ import run.halo.app.infra.exception.EmailVerificationFailed;
 import run.halo.app.infra.exception.RateLimitExceededException;
 import run.halo.app.infra.exception.RequestBodyValidationException;
 import run.halo.app.infra.utils.HaloUtils;
+import run.halo.app.security.profile.ProfileCompletionFlow;
 
 @Component
 @RequiredArgsConstructor
-class CompleteProfileEndpoint {
+class EmailProfileCompletionEndpoint {
 
     private final UserService userService;
 
@@ -58,7 +57,7 @@ class CompleteProfileEndpoint {
 
     private final ReactiveExtensionClient client;
 
-    private final ServerRequestCache requestCache;
+    private final ProfileCompletionFlow profileCompletionFlow;
 
     private final Validator validator;
 
@@ -78,7 +77,7 @@ class CompleteProfileEndpoint {
     private Mono<ServerResponse> renderPage(ServerRequest request) {
         return currentProfile(request).flatMap(profile -> {
             if (profile.user().getSpec().isEmailVerified()) {
-                return redirectToSavedRequest(request);
+                return redirectToNextStep(request, profile.username());
             }
             var form = new CompleteProfileForm(profile.user().getSpec().getEmail(), null);
             return renderForm(profile.setting(), form);
@@ -88,7 +87,7 @@ class CompleteProfileEndpoint {
     private Mono<ServerResponse> sendEmailCode(ServerRequest request) {
         return currentProfile(request).flatMap(profile -> {
             if (profile.user().getSpec().isEmailVerified()) {
-                return redirectToSavedRequest(request);
+                return redirectToNextStep(request, profile.username());
             }
             return request.bodyToMono(SendEmailCodeBody.class)
                     .switchIfEmpty(Mono.error(() -> new ServerWebInputException("Request body is required.")))
@@ -116,7 +115,7 @@ class CompleteProfileEndpoint {
     private Mono<ServerResponse> completeProfile(ServerRequest request) {
         return currentProfile(request).flatMap(profile -> {
             if (profile.user().getSpec().isEmailVerified()) {
-                return redirectToSavedRequest(request);
+                return redirectToNextStep(request, profile.username());
             }
             return request.formData().flatMap(formData -> {
                 var form = new CompleteProfileForm(formData.getFirst("email"), formData.getFirst("emailCode"));
@@ -161,7 +160,7 @@ class CompleteProfileEndpoint {
         }
         profile.user().getSpec().setEmail(email);
         profile.user().getSpec().setEmailVerified(false);
-        return client.update(profile.user()).then(redirectToSavedRequest(request));
+        return client.update(profile.user()).then(redirectToNextStep(request, profile.username()));
     }
 
     private Mono<ServerResponse> verifyEmail(
@@ -179,7 +178,7 @@ class CompleteProfileEndpoint {
                 .transformDeferred(verificationEmailRateLimiter(profile.username()))
                 .flatMap(ignored -> emailVerificationService.verify(profile.username(), code))
                 .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new)
-                .then(redirectToSavedRequest(request))
+                .then(redirectToNextStep(request, profile.username()))
                 .onErrorResume(
                         EmailVerificationFailed.class,
                         error -> renderFormError(
@@ -224,10 +223,9 @@ class CompleteProfileEndpoint {
         return ServerResponse.ok().render("complete_profile", model);
     }
 
-    private Mono<ServerResponse> redirectToSavedRequest(ServerRequest request) {
-        return requestCache
-                .getRedirectUri(request.exchange())
-                .defaultIfEmpty(URI.create("/uc"))
+    private Mono<ServerResponse> redirectToNextStep(ServerRequest request, String username) {
+        return profileCompletionFlow
+                .getRedirectUri(username, request.exchange())
                 .flatMap(uri ->
                         ServerResponse.status(HttpStatus.FOUND).location(uri).build());
     }

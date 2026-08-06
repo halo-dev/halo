@@ -85,26 +85,23 @@ class OAuth2RegistrationServiceIntegrationTest {
 
         StepVerifier.create(registrationService
                         .register(token, false)
-                        .flatMap(result -> Mono.zip(
-                                        client.get(User.class, result.username()),
+                        .flatMap(username -> Mono.zip(
+                                        client.get(User.class, username),
                                         connectionService.getByProviderUserId("github", "oauth-no-email-registration"),
-                                        roleService
-                                                .getRolesByUsername(result.username())
-                                                .collectList())
+                                        roleService.getRolesByUsername(username).collectList())
                                 .doOnNext(persisted -> {
                                     var user = persisted.getT1();
                                     var connection = persisted.getT2();
                                     var roles = persisted.getT3();
-                                    assertThat(result.needsEmailCompletion()).isTrue();
                                     assertThat(user.getSpec().getEmail()).isNull();
                                     assertThat(user.getSpec().getPassword()).isNull();
                                     assertThat(user.getSpec().isEmailVerified()).isFalse();
                                     assertThat(connection.getSpec().getUsername())
-                                            .isEqualTo(result.username());
+                                            .isEqualTo(username);
                                     assertThat(roles).contains("guest");
                                 })
-                                .thenReturn(result)))
-                .assertNext(result -> assertThat(result.username()).isEqualTo("oauth-no-email-registration"))
+                                .thenReturn(username)))
+                .expectNext("oauth-no-email-registration")
                 .verifyComplete();
     }
 
@@ -156,10 +153,8 @@ class OAuth2RegistrationServiceIntegrationTest {
         StepVerifier.create(Mono.zip(
                                 registrationService.register(token, false), registrationService.register(token, false))
                         .flatMap(results -> {
-                            assertThat(results.getT1().username())
-                                    .isEqualTo(results.getT2().username());
-                            return assertSingleSurvivingRegistration(
-                                    "concurrent-provider", "x", results.getT1().username());
+                            assertThat(results.getT1()).isEqualTo(results.getT2());
+                            return assertSingleSurvivingRegistration("concurrent-provider", "x", results.getT1());
                         }))
                 .verifyComplete();
     }
