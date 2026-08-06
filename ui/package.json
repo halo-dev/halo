@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "prepare": "cd .. && husky ui/.husky",
-    "dev": "vp dev --host",
+    "dev": "vp dev . --host",
     "build": "vp build",
     "build:packages": "vp run --filter @halo-dev/* build",
     "api-client:gen": "vp run --filter @halo-dev/api-client gen",
