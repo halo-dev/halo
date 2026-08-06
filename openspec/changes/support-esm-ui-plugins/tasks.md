@@ -110,3 +110,15 @@
 
 - [x] 13.1 Replace per-source best-effort warnings with one deterministic build report containing an aligned shared-dependency table and grouped compatibility notes with concise source labels.
 - [x] 13.2 Add focused diagnostic-format coverage, run bundler-kit validation, and verify the resulting output with a representative real Rsbuild provider build.
+
+## 14. Optimize Native ESM Provider Output
+
+- [x] 14.1 Build Vite ESM providers as deployable Rollup entries with preserved entry exports, full production minification, external shared roots, dynamic chunks, and normal asset emission while leaving IIFE library mode unchanged.
+- [x] 14.2 Let Rsbuild ESM use mode-appropriate optimized module IDs while retaining the existing IIFE window-library behavior and native production minifiers.
+- [x] 14.3 Add Vite/Rsbuild production-output and IIFE regression coverage, run focused bundler checks, strict OpenSpec validation, and representative real provider builds.
+
+## 15. Make ESM Provider Assets Relocatable
+
+- [x] 15.1 Make Vite and Rsbuild ESM preload, chunk, asynchronous CSS, and emitted-asset URLs resolve from the loaded provider artifact while leaving IIFE resource roots unchanged.
+- [x] 15.2 Add production fixture coverage for an ESM plugin whose metadata prefers `ui` but whose complete artifact is served through `console`, including Vite module preloads and Rsbuild asynchronous CSS.
+- [x] 15.3 Run focused bundler tests, package checks, strict OpenSpec validation, representative real Vite/Rsbuild builds, and the live Halo fallback-resource browser acceptance.

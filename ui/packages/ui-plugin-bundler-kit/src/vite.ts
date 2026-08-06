@@ -93,7 +93,7 @@ function createVitePresetsConfig(
 
     return {
       mode: mode || "production",
-      base: selection.format === "esm" ? defaults.esmBase : defaults.legacyBase,
+      base: selection.format === "esm" ? "./" : defaults.legacyBase,
       plugins: [
         Vue(),
         ...(selectedSnapshot
@@ -107,18 +107,17 @@ function createVitePresetsConfig(
       ],
       define: { "process.env.NODE_ENV": "'production'" },
       build: {
-        ...(selection.format === "esm" ? { cssCodeSplit: true } : {}),
         outDir: isProduction ? defaults.outDir.prod : defaults.outDir.dev,
         emptyOutDir: true,
-        lib: {
-          entry: "src/index.ts",
-          ...(selection.format === "iife" ? { name: defaults.moduleName } : {}),
-          formats: [selection.format === "iife" ? "iife" : "es"],
-          fileName: () => "main.js",
-          cssFileName: "style",
-        },
         ...(selection.format === "iife"
           ? {
+              lib: {
+                entry: "src/index.ts",
+                name: defaults.moduleName,
+                formats: ["iife"],
+                fileName: () => "main.js",
+                cssFileName: "style",
+              },
               rollupOptions: {
                 external: EXTERNALS,
                 output: {
@@ -129,8 +128,15 @@ function createVitePresetsConfig(
               },
             }
           : {
+              cssCodeSplit: true,
+              // Vite 8 keeps this as a rolldownOptions alias; use the shared name
+              // while the bundler kit also supports Vite 6 and 7.
               rollupOptions: {
+                input: "src/index.ts",
+                preserveEntrySignatures: "allow-extension",
                 output: {
+                  format: "es",
+                  entryFileNames: "main.js",
                   chunkFileNames: "chunks/[name].[hash].js",
                   assetFileNames: "assets/[name].[hash][extname]",
                 },
@@ -152,7 +158,6 @@ function getPluginProviderDefaults(manifestPath: string) {
       dev: getDefaultOutDirDev(bundleLocation),
     },
     legacyBase: undefined,
-    esmBase: `/plugins/${getManifestName(manifest)}/assets/${bundleLocation}/`,
     requires: getManifestRequires(manifest),
   };
 }
@@ -167,7 +172,6 @@ function getThemeProviderDefaults(manifestPath: string) {
       dev: DEFAULT_THEME_OUT_DIR,
     },
     legacyBase: getHaloThemeAssetPublicPath(manifest),
-    esmBase: getHaloThemeAssetPublicPath(manifest),
     requires: getManifestRequires(manifest),
   };
 }

@@ -59,15 +59,27 @@ export function createViteEsmProviderPlugin(
           "ESM UI provider output requires Vite build.cssCodeSplit to remain enabled."
         );
       }
-      const formats = Array.isArray(config.build.lib)
-        ? []
-        : config.build.lib?.formats;
-      if (
-        !formats?.includes("es") ||
-        formats.some((format) => format !== "es")
-      ) {
+      if (config.base !== "./" && config.base !== "") {
         throw new Error(
-          "ESM UI provider output requires Vite build.lib.formats to contain only es."
+          "ESM UI provider output requires a relative Vite base (./ or empty) so provider resources follow the loaded entry URL."
+        );
+      }
+      if (config.build.lib) {
+        throw new Error(
+          "ESM UI provider output uses a deployable Rollup entry; remove Vite build.lib overrides."
+        );
+      }
+      if (config.build.rollupOptions.preserveEntrySignatures === false) {
+        throw new Error(
+          "ESM UI provider output requires Rollup entry exports to be preserved."
+        );
+      }
+      const outputs = Array.isArray(config.build.rollupOptions.output)
+        ? config.build.rollupOptions.output
+        : [config.build.rollupOptions.output];
+      if (outputs.some((output) => output?.format && output.format !== "es")) {
+        throw new Error(
+          "ESM UI provider output requires Rollup output.format to remain es."
         );
       }
       const aliases = Array.isArray(config.resolve.alias)

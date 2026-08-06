@@ -42,6 +42,11 @@ export function createRsbuildEsmProviderPlugin(
             "ESM UI provider output requires Rspack output.library.type module."
           );
         }
+        if (config.output?.publicPath !== "auto") {
+          throw new Error(
+            `ESM UI provider output requires the automatic Rsbuild public path so provider resources follow the loaded entry URL; received ${JSON.stringify(config.output?.publicPath)}.`
+          );
+        }
 
         config.experiments = {
           ...config.experiments,

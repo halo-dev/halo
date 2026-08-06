@@ -125,6 +125,16 @@ Modern Vite and Rsbuild helpers accept `format: "auto" | "iife" | "esm"`, defaul
 
 Once ESM and a snapshot have been selected, concrete dependency resolution, import, or output validation failures fail the build. They do not silently change an intended ESM artifact back to IIFE.
 
+### Treat ESM providers as deployable browser entries
+
+An ESM provider is loaded directly by Halo rather than published for another bundler to consume. Vite therefore uses a normal Rollup browser entry with a preserved entry signature instead of library mode. This preserves the default `PluginModule` export without requiring a facade that only re-exports an exact library surface, while allowing Vite's production optimizer to fully minify JavaScript and CSS, honor the configured asset inline threshold, and emit independently cacheable assets and dynamic chunks. It also avoids adding a second minifier dependency merely to override Vite's intentional whitespace-preserving behavior for ES library output.
+
+Rsbuild remains a production Web build with Rspack's native module output, module chunk loading, SWC JavaScript minimization, and Lightning CSS minimization. ESM output follows Rspack's mode-appropriate module ID defaults instead of forcing readable `named` IDs intended for debugging. Both helpers keep the provider entry as the only startup JavaScript entry and split code requested through dynamic imports; neither helper introduces automatic initial vendor entries that the provider manifest would need to describe.
+
+ESM output is relocatable below any provider static resource mapping selected by Halo. Vite uses a relative build base so its module-preload helper resolves dependencies from `import.meta.url`. Rsbuild uses its automatic runtime public path so asynchronous CSS and other runtime-loaded resources follow the actual entry location. This is required because Halo may discover a plugin artifact through the legacy `console` fallback even when its metadata prefers `ui`; the build artifact cannot know which complete resource directory the backend will select. Main CSS asset references remain relative to the stylesheet that contains them.
+
+These optimizations are ESM-only defaults. Caller configuration continues to merge after the provider defaults when it does not violate the output contract, and the existing IIFE library/window output, globals, startup CSS, filenames, and debug-oriented Rsbuild module IDs remain unchanged.
+
 Plugin providers read `plugin.yaml`; theme providers read `theme.yaml`, including `spec.requires`. This extends the theme manifest reader, which currently only reads the metadata name.
 
 The host never infers artifact format from `spec.requires`. New bundlers emit an ESM provider manifest; absence of that manifest means legacy IIFE. This preserves artifacts built by older bundlers even when their manifest already requires Halo 2.26 or newer.
@@ -292,6 +302,9 @@ This applies to provider module globals (`window[providerName]`), `window.enable
 - [Generated facades drift from actual global builds] → Generate static exports from the host runtime snapshot and load the real browser global builds in build-time and browser identity tests.
 - [FormKit remains duplicated through a transitive import] → Build one host-owned FormKit graph, externalize transitive core imports, and test node registry operations across host/provider boundaries.
 - [Vite and Rsbuild resolve or emit different graphs] → Share format, snapshot, manifest, and import validation logic and run equivalent dynamic-chunk fixtures through both helpers.
+- [Vite treats ESM output as a reusable library and preserves whitespace] → Build the ESM provider as a deployable browser entry with a preserved export signature, verify production minification, and leave IIFE library mode unchanged.
+- [Rsbuild debugging IDs inflate production ESM output] → Retain `named` IDs for legacy IIFE behavior but let ESM use Rspack's mode-appropriate production defaults.
+- [A provider is built for `ui` but served through the `console` fallback] → Make ESM preload, chunk, CSS, and asset URLs relative to the loaded artifact instead of hard-coding the preferred resource directory.
 - [Aggregated main CSS breaks asset URLs or eagerly loads chunk CSS] → Emit provider-root-safe asset URLs, aggregate only each manifest's optional main style, and verify asynchronous CSS remains bundler-managed.
 - [User build overrides produce a manifest that lies] → Validate the final resolved build configuration and output graph; fail instead of emitting an inconsistent manifest.
 - [Provider state changes between descriptor and resource requests] → Treat full page reload as the replacement boundary, use a version query to invalidate caches, and report individual resource failures; do not claim immutable content across a concurrent upgrade.

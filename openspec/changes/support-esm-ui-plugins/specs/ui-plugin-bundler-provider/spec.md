@@ -57,14 +57,16 @@ The theme provider SHALL configure IIFE or ESM build output to match the active-
 
 - **WHEN** a caller uses `viteConfig` with `provider: "theme"`
 - **THEN** the helper SHALL configure production output to `dist`
-- **THEN** the helper SHALL configure the Vite base URL as `/themes/{metadata.name}/ui-plugin/assets/`
+- **THEN** IIFE output SHALL configure the Vite base URL as `/themes/{metadata.name}/ui-plugin/assets/`
+- **THEN** ESM output SHALL emit relocatable provider-relative resource URLs
 - **THEN** the helper SHALL emit the primary entry, styles, chunks, and provider manifest required by the selected format
 
 #### Scenario: Theme Rsbuild output defaults are generated
 
 - **WHEN** a caller uses `rsbuildConfig` with `provider: "theme"`
 - **THEN** the helper SHALL configure the output root to `dist`
-- **THEN** the helper SHALL configure the public path as `/themes/{metadata.name}/ui-plugin/assets/`
+- **THEN** IIFE output SHALL configure the public path as `/themes/{metadata.name}/ui-plugin/assets/`
+- **THEN** ESM output SHALL derive asynchronous resource URLs from the loaded entry URL
 - **THEN** the helper SHALL emit the primary entry, styles, chunks, and provider manifest required by the selected format
 
 #### Scenario: Theme IIFE output reuses legacy globals
@@ -245,6 +247,13 @@ The bundler SHALL generate the provider manifest consumed by Halo whenever ESM o
 - **THEN** the bundler SHALL emit an independently addressable ESM chunk under the provider resource root
 - **THEN** the entry and chunk SHALL use relative or provider-root URLs that work for both plugins and themes
 
+#### Scenario: ESM provider is served from a fallback resource directory
+
+- **WHEN** a plugin build target prefers the `ui` resource directory but Halo discovers the complete ESM artifact through the legacy `console` fallback
+- **THEN** module preloads, dynamic JavaScript, asynchronous CSS, and emitted assets SHALL resolve from the directory containing the loaded entry or referencing stylesheet
+- **THEN** the emitted ESM runtime SHALL NOT hard-code the preferred `ui` directory
+- **THEN** an existing provider build script SHALL NOT need to change its output copy directory
+
 #### Scenario: ESM entry is produced
 
 - **WHEN** an ESM provider build succeeds
@@ -264,6 +273,25 @@ Vite and Rsbuild provider helpers SHALL implement the same externally observable
 
 - **WHEN** equivalent provider source is built through Vite and Rsbuild
 - **THEN** both outputs SHALL use the same manifest schema, host runtime snapshot, import restrictions, entry export contract, resource URL rules, and format selection semantics
+
+#### Scenario: Default production ESM output is optimized
+
+- **WHEN** a provider is built as ESM in production without caller optimization overrides
+- **THEN** Vite and Rsbuild SHALL apply their native production JavaScript and CSS minimization
+- **THEN** the output SHALL retain one startup JavaScript entry with the default `PluginModule` export
+- **THEN** code requested through dynamic imports SHALL remain independently addressable and non-inlined assets SHALL use provider-root-safe URLs
+
+#### Scenario: Vite emits a deployable ESM entry
+
+- **WHEN** Vite builds an ESM provider
+- **THEN** it SHALL treat the provider as a final browser entry rather than whitespace-preserving library distribution output
+- **THEN** it SHALL preserve the entry module's export signature and honor caller-compatible asset optimization settings
+
+#### Scenario: ESM optimization preserves the IIFE contract
+
+- **WHEN** the ESM production defaults are applied to the modern provider lane
+- **THEN** Vite IIFE library output and Rsbuild IIFE window-library output SHALL retain their existing globals, filenames, startup CSS, and chunk behavior
+- **THEN** an existing caller SHALL NOT need to change its `viteConfig` or `rsbuildConfig` invocation
 
 #### Scenario: Bundler-specific override bypasses validation
 

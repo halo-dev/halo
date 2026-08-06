@@ -129,7 +129,7 @@ function createRsbuildPresetsConfig(
             splitChunks: {
               chunks: "async",
             },
-            moduleIds: "named",
+            ...(selection.format === "iife" ? { moduleIds: "named" } : {}),
           },
           experiments: {
             rspackFuture: {
@@ -147,7 +147,8 @@ function createRsbuildPresetsConfig(
             },
           },
           output: {
-            publicPath: defaults.publicPath,
+            publicPath:
+              selection.format === "esm" ? "auto" : defaults.publicPath,
             // TODO(Halo 3): Remove after legacy IIFE UI provider support ends.
             library:
               selection.format === "iife"
@@ -172,6 +173,7 @@ function createRsbuildPresetsConfig(
         htmlPlugin: false,
       },
       output: {
+        ...(selection.format === "esm" ? { assetPrefix: "auto" } : {}),
         distPath: {
           root: outDir,
           js: "",

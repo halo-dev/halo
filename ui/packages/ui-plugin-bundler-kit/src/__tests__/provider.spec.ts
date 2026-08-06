@@ -26,7 +26,17 @@ describe("provider defaults", () => {
     process.chdir(uiDir);
 
     const vite = resolveViteConfig(viteConfig({ vite: {} }));
-    expect(vite.build?.lib).toMatchObject({ formats: ["es"] });
+    expect(vite.base).toBe("./");
+    expect(vite.build?.lib).toBeUndefined();
+    expect(vite.build?.rollupOptions).toMatchObject({
+      input: "src/index.ts",
+      preserveEntrySignatures: "allow-extension",
+      output: {
+        format: "es",
+        entryFileNames: "main.js",
+        chunkFileNames: "chunks/[name].[hash].js",
+      },
+    });
     expect(vite.build?.rollupOptions?.output).toMatchObject({
       chunkFileNames: "chunks/[name].[hash].js",
     });
@@ -36,8 +46,11 @@ describe("provider defaults", () => {
       library: { type: "module" },
       module: true,
       iife: false,
+      publicPath: "auto",
     });
     expect(rsbuild.tools?.rspack?.externalsType).toBe("module");
+    expect(rsbuild.tools?.rspack?.optimization?.moduleIds).toBeUndefined();
+    expect(rsbuild.output?.assetPrefix).toBe("auto");
   });
 
   it("uses targetHaloVersion for explicit ESM without a simple requirement", () => {
@@ -52,7 +65,11 @@ describe("provider defaults", () => {
       })
     );
 
-    expect(vite.build?.lib).toMatchObject({ formats: ["es"] });
+    expect(vite.build?.lib).toBeUndefined();
+    expect(vite.build?.rollupOptions).toMatchObject({
+      input: "src/index.ts",
+      preserveEntrySignatures: "allow-extension",
+    });
   });
 
   it("keeps explicit IIFE for a modern requirement", () => {
@@ -91,6 +108,7 @@ describe("provider defaults", () => {
       export: "default",
       name: "fake-plugin",
     });
+    expect(rsbuild.tools?.rspack?.optimization?.moduleIds).toBe("named");
 
     const productionVite = resolveViteConfig(viteConfig({ vite: {} }));
     expect(productionVite.build?.outDir).toBe("./build/dist");

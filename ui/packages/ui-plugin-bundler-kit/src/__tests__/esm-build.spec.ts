@@ -148,6 +148,52 @@ describe("ESM provider builds", () => {
       })
     ).rejects.toThrow("build.cssCodeSplit to remain enabled");
   });
+
+  it("rejects an absolute Vite base for relocatable ESM output", async () => {
+    const providerRoot = setupProviderProject("plugin");
+    process.chdir(providerRoot);
+    const config = resolveViteConfig(
+      viteConfig({
+        vite: {
+          base: "/plugins/esm-plugin/assets/ui/",
+        },
+      })
+    );
+
+    await expect(
+      viteBuild({
+        ...config,
+        root: providerRoot,
+        configFile: false,
+        logLevel: "silent",
+      })
+    ).rejects.toThrow("relative Vite base");
+  });
+
+  it("rejects an absolute Rsbuild public path for relocatable ESM output", async () => {
+    const providerRoot = setupProviderProject("theme");
+    process.chdir(providerRoot);
+    const config = resolveRsbuildConfig(
+      rsbuildConfig({
+        provider: "theme",
+        rsbuild: {
+          output: {
+            assetPrefix: "/themes/esm-theme/ui-plugin/assets/",
+          },
+        },
+      })
+    );
+
+    await expect(
+      (async () => {
+        const rsbuild = await createRsbuild({
+          cwd: providerRoot,
+          rsbuildConfig: config,
+        });
+        await rsbuild.build();
+      })()
+    ).rejects.toThrow("automatic Rsbuild public path");
+  });
 });
 
 function setupProviderProject(provider: "plugin" | "theme") {
@@ -247,21 +293,39 @@ function assertEsmOutput(outputRoot: string, providerPublicPath: string) {
     expect.arrayContaining([expect.stringMatching(/chunks|assets/)])
   );
   expect(cssFiles).toHaveLength(2);
+  const asyncStyle = cssFiles.find(
+    (file) => file !== manifest.style.replace(/^\.\//, "")
+  );
+  expect(asyncStyle).toBeDefined();
   const entryCss = fs.readFileSync(
     path.join(outputRoot, manifest.style.replace(/^\.\//, "")),
     "utf8"
   );
-  expect(
-    entryCss.includes(providerPublicPath) || entryCss.includes("url(data:")
-  ).toBe(true);
+  expect(entryCss).toContain("url(");
+  expect(entryCss).not.toContain(providerPublicPath);
   const entry = fs.readFileSync(path.join(outputRoot, "main.js"), "utf8");
   expect(entry).toMatch(/from\s*["']vue["']/);
   expect(entry).toMatch(/export\s*(?:default|\{)/);
+  expect(entry).not.toContain(providerPublicPath);
+  expect(entry).toContain("import.meta.url");
+  expect(entry).toContain(asyncStyle);
+  expect(entry.split("\n").filter(Boolean).length).toBeLessThanOrEqual(2);
+  expect(findFiles(outputRoot, (file) => file.endsWith(".svg"))).toHaveLength(
+    1
+  );
   expect(
     fs
       .readdirSync(path.join(outputRoot, "chunks"))
       .some((file) => file.endsWith(".js"))
   ).toBe(true);
+  for (const file of findFiles(
+    outputRoot,
+    (file) => file.endsWith(".js") || file.endsWith(".css")
+  )) {
+    expect(fs.readFileSync(path.join(outputRoot, file), "utf8")).not.toContain(
+      providerPublicPath
+    );
+  }
 }
 
 function findFiles(root: string, predicate: (file: string) => boolean) {
