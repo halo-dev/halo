@@ -24,6 +24,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import reactor.test.StepVerifier;
 import run.halo.app.core.user.service.UserService;
 import run.halo.app.extension.Metadata;
@@ -102,9 +103,6 @@ class LoginReactiveAuthenticationManagerTest {
 
         var userDetails = createUserDetails("actualuser", "encoded-password");
         when(userDetailsService.findByUsername("actualuser")).thenReturn(Mono.just(userDetails));
-        // the username fallback is subscribed after the email strategy completes, but its result is
-        // discarded once the email-resolved user wins
-        when(userDetailsService.findByUsername("test@example.com")).thenReturn(Mono.empty());
         when(passwordEncoder.matches("password", "encoded-password")).thenReturn(true);
         stubPasswordService();
 
@@ -114,8 +112,9 @@ class LoginReactiveAuthenticationManagerTest {
                 .assertNext(auth -> assertEquals(userDetails, auth.getPrincipal()))
                 .verifyComplete();
 
-        // a resolved email lookup wins, although the username fallback has already been subscribed
-        verify(userDetailsService).findByUsername("test@example.com");
+        // with the immediate scheduler, the email win cancels the concat before the username
+        // fallback gets subscribed, so the raw identifier is never treated as a username
+        verify(userDetailsService, never()).findByUsername("test@example.com");
     }
 
     @Test
@@ -201,8 +200,6 @@ class LoginReactiveAuthenticationManagerTest {
 
         var userDetails = createUserDetails("actualuser", "encoded-password");
         when(userDetailsService.findByUsername("actualuser")).thenReturn(Mono.just(userDetails));
-        // the username fallback is subscribed after the email strategy completes
-        when(userDetailsService.findByUsername("test@example.com")).thenReturn(Mono.empty());
         when(passwordEncoder.matches("password", "encoded-password")).thenReturn(true);
 
         when(passwordEncoder.upgradeEncoding("encoded-password")).thenReturn(true);
@@ -246,7 +243,12 @@ class LoginReactiveAuthenticationManagerTest {
         when(passwordService.updatePassword(eq(userDetails), eq("new-encoded-password")))
                 .thenReturn(Mono.just(upgradedUser));
 
-        var result = authenticate("testuser", "password");
+        // Keep the default boundedElastic scheduler (no setScheduler) for this test.
+        var manager = new LoginReactiveAuthenticationManager(
+                userDetailsService, userService, passwordEncoder, passwordService);
+        var token = UsernamePasswordAuthenticationToken.unauthenticated("testuser", "password");
+
+        var result = manager.authenticate(token);
 
         StepVerifier.create(result).expectNextCount(1).verifyComplete();
 
@@ -284,6 +286,10 @@ class LoginReactiveAuthenticationManagerTest {
     private Mono<Authentication> authenticate(String username, String password) {
         var manager = new LoginReactiveAuthenticationManager(
                 userDetailsService, userService, passwordEncoder, passwordService);
+        // Run the whole chain on the caller thread so that strategy order, fallback subscription
+        // and password upgrades are fully deterministic. The production scheduler is covered by
+        // shouldRunPasswordEncoderOperationsOnBoundedElasticThread.
+        manager.setScheduler(Schedulers.immediate());
         var token = UsernamePasswordAuthenticationToken.unauthenticated(username, password);
         return manager.authenticate(token);
     }
