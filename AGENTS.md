@@ -4,13 +4,13 @@ Halo is a full-stack monorepo: Java 21 / Spring Boot WebFlux + R2DBC backend and
 
 ## Modules
 
-|       Module        |                           Path                            |                              Guide                               |
-|---------------------|-----------------------------------------------------------|------------------------------------------------------------------|
-| API library         | `api/` (extension model, contracts, security)             | [api/AGENTS.md](api/AGENTS.md)                                   |
-| Backend application | `application/` (services, routers, migrations, packaging) | [application/AGENTS.md](application/AGENTS.md)                   |
-| Frontend            | `ui/` (console, user center, workspace packages)          | [ui/AGENTS.md](ui/AGENTS.md)                                     |
-| Application BOM     | `platform/application/` (shared dependency constraints)   | [platform/application/AGENTS.md](platform/application/AGENTS.md) |
-| Plugin BOM          | `platform/plugin/` (plugin-facing constraints)            | [platform/plugin/AGENTS.md](platform/plugin/AGENTS.md)           |
+|       Module        |                           Path                            |
+|---------------------|-----------------------------------------------------------|
+| API library         | `api/` (extension model, contracts, security)             |
+| Backend application | `application/` (services, routers, migrations, packaging) |
+| Frontend            | `ui/` (console, user center, workspace packages)          |
+| Application BOM     | `platform/application/` (shared dependency constraints)   |
+| Plugin BOM          | `platform/plugin/` (plugin-facing constraints)            |
 
 ## Quick Commands
 
