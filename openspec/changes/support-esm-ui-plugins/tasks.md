@@ -174,3 +174,8 @@
 - [x] 22.2 Validate content hashing from the final Vite output and exclude non-runtime Rsbuild sidecars from the cache invariant.
 - [x] 22.3 Preserve legacy last-registration-wins for named child routes under anonymous parents while making Halo-managed parents reversible and diagnosing genuinely incomplete rollback.
 - [x] 22.4 Run focused bundler/runtime tests, package checks, UI type checking, formatting, and strict OpenSpec validation.
+
+## 23. Configure the Built-in Vue Compiler Plugins
+
+- [x] 23.1 Add native Vue plugin options to `viteConfig` and `rsbuildConfig` while retaining exactly one framework plugin and preserving default behavior.
+- [x] 23.2 Add Vite and Rsbuild build regressions for custom Vue compiler options, document the supported configuration, and run focused package and strict OpenSpec checks.

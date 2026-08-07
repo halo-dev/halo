@@ -97,6 +97,27 @@ The theme provider SHALL configure IIFE or ESM build output to match the active-
 
 ## ADDED Requirements
 
+### Requirement: Provider Vue compiler configuration
+
+The Vite and Rsbuild helpers SHALL own exactly one Vue compiler plugin and SHALL allow callers to configure that built-in plugin without registering a duplicate framework plugin.
+
+#### Scenario: Vite Vue compiler is customized
+
+- **WHEN** a caller supplies Vue plugin options through `viteConfig`
+- **THEN** the helper SHALL pass those options to its single built-in `@vitejs/plugin-vue` instance
+- **THEN** ordinary caller Vite plugins SHALL continue merging after the provider defaults
+
+#### Scenario: Rsbuild Vue compiler is customized
+
+- **WHEN** a caller supplies Vue plugin options through `rsbuildConfig`
+- **THEN** the helper SHALL pass those options to its single built-in `@rsbuild/plugin-vue` instance
+- **THEN** ordinary caller Rsbuild plugins SHALL continue merging after the provider defaults
+
+#### Scenario: Vue compiler options are omitted
+
+- **WHEN** a caller does not supply Vue plugin options
+- **THEN** both helpers SHALL retain their existing default Vue compilation behavior
+
 ### Requirement: Provider format selection
 
 The modern Vite and Rsbuild helpers SHALL support `auto`, `iife`, and `esm` provider format selection with `auto` as the default.

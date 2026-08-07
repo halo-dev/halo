@@ -1,4 +1,4 @@
-import Vue from "@vitejs/plugin-vue";
+import Vue, { type Options as VuePluginOptions } from "@vitejs/plugin-vue";
 import {
   defineConfig,
   mergeConfig,
@@ -56,6 +56,9 @@ export interface ViteUserConfig {
   /** Explicit Halo target used when ESM cannot be derived from spec.requires. */
   targetHaloVersion?: string;
 
+  /** Options for the built-in Vue plugin. */
+  vue?: VuePluginOptions;
+
   /**
    * Custom Vite config.
    */
@@ -66,7 +69,8 @@ function createVitePresetsConfig(
   provider: Provider,
   manifestPath: string,
   requestedFormat?: ProviderFormat,
-  targetHaloVersion?: string
+  targetHaloVersion?: string,
+  vueOptions?: VuePluginOptions
 ) {
   const defaults =
     provider === "theme"
@@ -95,7 +99,7 @@ function createVitePresetsConfig(
       mode: mode || "production",
       base: selection.format === "esm" ? "./" : defaults.legacyBase,
       plugins: [
-        Vue(),
+        Vue(vueOptions),
         ...(selectedSnapshot
           ? [
               createViteEsmProviderPlugin({
@@ -209,7 +213,8 @@ export function viteConfig(config?: ViteUserConfig) {
     provider,
     getManifestPath(provider, config),
     config?.format,
-    config?.targetHaloVersion
+    config?.targetHaloVersion,
+    config?.vue
   );
   return defineConfig((env) => {
     const presetsConfig = presetsConfigFn(env);

@@ -5,7 +5,7 @@ import {
   type RsbuildConfig,
   type RsbuildMode,
 } from "@rsbuild/core";
-import { pluginVue } from "@rsbuild/plugin-vue";
+import { pluginVue, type PluginVueOptions } from "@rsbuild/plugin-vue";
 import {
   DEFAULT_OUT_DIR_PROD,
   DEFAULT_THEME_OUT_DIR,
@@ -61,6 +61,9 @@ export interface RsBuildUserConfig {
   /** Explicit Halo target used when ESM cannot be derived from spec.requires. */
   targetHaloVersion?: string;
 
+  /** Options for the built-in Vue plugin. */
+  vue?: PluginVueOptions;
+
   /**
    * Custom Rsbuild config.
    */
@@ -71,7 +74,8 @@ function createRsbuildPresetsConfig(
   provider: Provider,
   manifestPath: string,
   requestedFormat?: ProviderFormat,
-  targetHaloVersion?: string
+  targetHaloVersion?: string,
+  vueOptions?: PluginVueOptions
 ) {
   const defaults =
     provider === "theme"
@@ -101,7 +105,7 @@ function createRsbuildPresetsConfig(
     return {
       mode: (envMode as RsbuildMode) || "production",
       plugins: [
-        pluginVue(),
+        pluginVue(vueOptions),
         ...(selectedSnapshot
           ? [
               createRsbuildEsmProviderPlugin({
@@ -276,7 +280,8 @@ export function rsbuildConfig(
     provider,
     getManifestPath(provider, config),
     config?.format,
-    config?.targetHaloVersion
+    config?.targetHaloVersion,
+    config?.vue
   );
   return defineConfig((env) => {
     const presetsConfig = presets.config(env);

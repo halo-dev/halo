@@ -48,6 +48,37 @@ describe("ESM provider builds", () => {
     );
   });
 
+  it("passes custom Vue compiler options to the built-in Vite plugin", async () => {
+    const providerRoot = setupCustomElementProviderProject("plugin");
+    process.chdir(providerRoot);
+    const config = resolveViteConfig(
+      viteConfig({
+        vue: {
+          template: {
+            compilerOptions: {
+              isCustomElement: (tag) => tag === "halo-app-card",
+            },
+          },
+        },
+        vite: {},
+      })
+    );
+
+    await viteBuild({
+      ...config,
+      root: providerRoot,
+      configFile: false,
+      logLevel: "silent",
+    });
+
+    const entry = fs.readFileSync(
+      path.join(providerRoot, "build/dist/main.js"),
+      "utf8"
+    );
+    expect(entry).toContain("halo-app-card");
+    expect(entry).not.toContain("resolveComponent");
+  });
+
   it("builds a theme with Rsbuild using the equivalent contract", async () => {
     const providerRoot = setupProviderProject("theme");
     process.chdir(providerRoot);
@@ -65,6 +96,37 @@ describe("ESM provider builds", () => {
       path.join(providerRoot, "dist"),
       "/themes/esm-theme/ui-plugin/assets/"
     );
+  });
+
+  it("passes custom Vue compiler options to the built-in Rsbuild plugin", async () => {
+    const providerRoot = setupCustomElementProviderProject("theme");
+    process.chdir(providerRoot);
+    const config = resolveRsbuildConfig(
+      rsbuildConfig({
+        provider: "theme",
+        vue: {
+          vueLoaderOptions: {
+            compilerOptions: {
+              isCustomElement: (tag) => tag === "halo-app-card",
+            },
+          },
+        },
+        rsbuild: {},
+      })
+    );
+    const rsbuild = await createRsbuild({
+      cwd: providerRoot,
+      rsbuildConfig: config,
+    });
+
+    await rsbuild.build();
+
+    const entry = fs.readFileSync(
+      path.join(providerRoot, "dist/main.js"),
+      "utf8"
+    );
+    expect(entry).toContain("halo-app-card");
+    expect(entry).not.toContain("resolveComponent");
   });
 
   it("rebuilds an ESM plugin in Rsbuild development watch mode", async () => {
@@ -606,6 +668,19 @@ function setupProviderProject(provider: "plugin" | "theme") {
   fs.writeFileSync(
     path.join(providerRoot, "src/asset.svg"),
     `<svg xmlns="http://www.w3.org/2000/svg"><text>${"asset".repeat(5_000)}</text></svg>`
+  );
+  return providerRoot;
+}
+
+function setupCustomElementProviderProject(provider: "plugin" | "theme") {
+  const providerRoot = setupProviderProject(provider);
+  fs.writeFileSync(
+    path.join(providerRoot, "src/index.ts"),
+    'import App from "./App.vue";\nexport default { App };\n'
+  );
+  fs.writeFileSync(
+    path.join(providerRoot, "src/App.vue"),
+    "<template><halo-app-card /></template>\n"
   );
   return providerRoot;
 }

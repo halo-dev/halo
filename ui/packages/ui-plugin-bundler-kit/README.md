@@ -62,7 +62,7 @@ export default viteConfig({
 });
 ```
 
-> **Note**: Vue plugin is pre-configured, no need to add it manually.
+> **Note**: Vue plugin is pre-configured. Pass its options through the top-level `vue` field instead of adding another `@vitejs/plugin-vue` instance.
 
 ### Rsbuild Configuration
 
@@ -83,7 +83,7 @@ export default rsbuildConfig({
 });
 ```
 
-> **Note**: Vue plugin is pre-configured, no need to add it manually.
+> **Note**: Vue plugin is pre-configured. Pass its options through the top-level `vue` field instead of adding another `@rsbuild/plugin-vue` instance.
 
 ### Theme UI Plugin Configuration
 
@@ -228,6 +228,9 @@ interface ViteUserConfig {
   /** Required for explicit ESM when spec.requires has no derivable target. */
   targetHaloVersion?: string;
 
+  /** Options for the built-in @vitejs/plugin-vue instance. */
+  vue?: VuePluginOptions;
+
   /**
    * Custom Vite configuration
    */
@@ -257,6 +260,9 @@ interface RsBuildUserConfig {
   /** Required for explicit ESM when spec.requires has no derivable target. */
   targetHaloVersion?: string;
 
+  /** Options for the built-in @rsbuild/plugin-vue instance. */
+  vue?: PluginVueOptions;
+
   /**
    * Custom Rsbuild configuration
    */
@@ -265,6 +271,44 @@ interface RsBuildUserConfig {
 ```
 
 ## Advanced Configuration Examples
+
+### Customizing the Vue Compiler
+
+Vite:
+
+```typescript
+import { viteConfig } from "@halo-dev/ui-plugin-bundler-kit";
+
+export default viteConfig({
+  vue: {
+    template: {
+      compilerOptions: {
+        isCustomElement: (tag) => tag === "halo-app-card",
+      },
+    },
+  },
+  vite: {},
+});
+```
+
+Rsbuild:
+
+```typescript
+import { rsbuildConfig } from "@halo-dev/ui-plugin-bundler-kit";
+
+export default rsbuildConfig({
+  vue: {
+    vueLoaderOptions: {
+      compilerOptions: {
+        isCustomElement: (tag) => tag === "halo-app-card",
+      },
+    },
+  },
+  rsbuild: {},
+});
+```
+
+The helper owns the Vue plugin instance. Keep `@vitejs/plugin-vue` and `@rsbuild/plugin-vue` out of the nested `plugins` array to avoid running the SFC transform twice.
 
 ### Adding Path Aliases (Vite)
 
