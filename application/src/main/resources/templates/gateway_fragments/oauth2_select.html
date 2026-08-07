@@ -1,0 +1,104 @@
+<div th:fragment="form">
+  <style>
+    .oauth2-select-hint {
+      color: var(--color-text);
+      margin: 0 0 1.5em;
+    }
+
+    .oauth2-provider {
+      align-items: center;
+      border: 1px solid var(--color-border);
+      border-radius: var(--rounded-lg);
+      display: flex;
+      gap: 0.75em;
+      margin-bottom: 1.5em;
+      padding: 0.75em;
+    }
+
+    .oauth2-provider img {
+      height: 2.5em;
+      object-fit: contain;
+      width: 2.5em;
+    }
+
+    .oauth2-provider-details {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25em;
+      min-width: 0;
+    }
+
+    .oauth2-provider-hint {
+      color: var(--color-text);
+      font-size: var(--text-sm);
+      opacity: 0.75;
+    }
+
+    .oauth2-bind {
+      font-size: var(--text-sm);
+      margin-top: 1em;
+      text-align: center;
+    }
+
+    .oauth2-bind a {
+      color: var(--color-link);
+      text-decoration: none;
+    }
+  </style>
+
+  <form class="halo-form" th:action="@{/login/oauth2/register}" method="post">
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+    <input type="hidden" name="oauth2Identity" th:value="${oauth2Identity}" />
+
+    <p class="oauth2-select-hint" th:text="#{form.hint}"></p>
+
+    <div class="oauth2-provider">
+      <img
+        th:if="${provider.spec.logo != null}"
+        th:src="${provider.spec.logo}"
+        th:alt="|${provider.spec.displayName}'s icon|"
+      />
+      <div class="oauth2-provider-details">
+        <strong th:text="${provider.spec.displayName}"></strong>
+        <span class="oauth2-provider-hint" th:text="#{form.providerHint}"></span>
+      </div>
+    </div>
+
+    <div class="alert alert-error" role="alert" th:if="${error == 'agreement-not-accepted'}">
+      <strong th:text="#{form.error.agreementNotAccepted}"></strong>
+    </div>
+    <div class="alert alert-error" role="alert" th:if="${error == 'registration-closed'}">
+      <strong th:text="#{form.registrationClosed}"></strong>
+    </div>
+    <div class="alert alert-error" role="alert" th:if="${error == 'default-role-missing'}">
+      <strong th:text="#{form.error.defaultRoleMissing}"></strong>
+    </div>
+    <div class="alert alert-error" role="alert" th:if="${error == 'registration-failed'}">
+      <strong th:text="#{form.error.registrationFailed}"></strong>
+    </div>
+
+    <div class="form-item-compact" th:if="${agreementPages != null and !agreementPages.isEmpty()}">
+      <input type="checkbox" id="agreedToTerms" name="agreedToTerms" value="true" required />
+      <label for="agreedToTerms">
+        <span th:text="#{form.agreedToTerms.label}"></span>
+        <th:block th:each="page, iterStat : ${agreementPages}">
+          <a th:if="${page.permalink != null}" th:href="${page.permalink}" target="_blank" th:text="${page.title}"></a>
+          <span th:if="${page.permalink == null}" th:text="${page.title}"></span>
+          <span th:if="${!iterStat.last}">,</span>
+        </th:block>
+      </label>
+    </div>
+
+    <div class="alert alert-warning" role="alert" th:unless="${allowRegistration}">
+      <strong th:text="#{form.registrationClosed}"></strong>
+    </div>
+
+    <div class="form-item">
+      <button type="submit" th:disabled="${!allowRegistration}" th:text="#{form.register}"></button>
+    </div>
+  </form>
+
+  <div class="oauth2-bind">
+    <a th:href="@{/login(oauth2_bind='',oauth2Identity=${oauth2Identity})}" th:text="#{form.bind}"></a>
+  </div>
+</div>

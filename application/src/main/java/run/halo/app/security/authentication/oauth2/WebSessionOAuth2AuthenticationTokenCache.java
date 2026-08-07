@@ -1,6 +1,7 @@
 package run.halo.app.security.authentication.oauth2;
 
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
@@ -10,6 +11,7 @@ import reactor.core.publisher.Mono;
  * @author johnniang
  * @since 2.20.0
  */
+@Component
 public class WebSessionOAuth2AuthenticationTokenCache implements OAuth2AuthenticationTokenCache {
 
     private static final String SESSION_ATTRIBUTE_KEY = OAuth2AuthenticationTokenCache.class + ".OAUTH2_TOKEN";

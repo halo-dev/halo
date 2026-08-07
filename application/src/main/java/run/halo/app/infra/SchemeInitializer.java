@@ -509,7 +509,12 @@ class SchemeInitializer implements SmartLifecycle {
         });
 
         // security.halo.run
-        schemeManager.register(PersonalAccessToken.class);
+        schemeManager.register(PersonalAccessToken.class, indexSpecs -> {
+            indexSpecs.add(IndexSpecs.<PersonalAccessToken, String>single("spec.username", String.class)
+                    .indexFunc(token -> Optional.ofNullable(token.getSpec())
+                            .map(PersonalAccessToken.Spec::getUsername)
+                            .orElse(null)));
+        });
         schemeManager.register(RememberMeToken.class, indexSpecs -> {
             indexSpecs.add(IndexSpecs.<RememberMeToken, String>single("spec.series", String.class)
                     .indexFunc(token -> Optional.ofNullable(token.getSpec())

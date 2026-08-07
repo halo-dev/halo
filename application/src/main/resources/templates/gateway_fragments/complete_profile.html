@@ -1,0 +1,102 @@
+<form
+  th:fragment="form"
+  class="halo-form"
+  id="complete-profile-form"
+  th:action="@{/complete-profile}"
+  th:object="${form}"
+  method="post"
+>
+  <p th:text="${mustVerifyEmailOnRegistration} ? #{form.description.required} : #{form.description.optional}"></p>
+
+  <div class="form-item">
+    <label for="email" th:text="#{form.email.label}"></label>
+    <div class="form-input">
+      <input
+        type="email"
+        id="email"
+        name="email"
+        autocomplete="email"
+        spellcheck="false"
+        autocorrect="off"
+        autocapitalize="off"
+        autofocus
+        required
+        th:field="*{email}"
+      />
+    </div>
+    <p class="alert alert-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
+  </div>
+
+  <div class="form-item">
+    <div class="form-label-group">
+      <label for="emailCode" th:text="#{form.emailCode.label}"></label>
+      <span
+        class="form-item-extra-link"
+        th:unless="${mustVerifyEmailOnRegistration}"
+        th:text="#{form.emailCode.optional}"
+      ></span>
+    </div>
+    <div class="form-input-group">
+      <div class="form-input">
+        <input
+          type="text"
+          inputmode="numeric"
+          autocomplete="one-time-code"
+          spellcheck="false"
+          autocorrect="off"
+          autocapitalize="off"
+          id="emailCode"
+          name="emailCode"
+          th:required="${mustVerifyEmailOnRegistration}"
+        />
+      </div>
+      <button id="emailCodeSendButton" type="button" th:text="#{form.emailCode.sendButton}"></button>
+    </div>
+    <p class="alert alert-error" th:if="${#fields.hasErrors('emailCode')}" th:errors="*{emailCode}"></p>
+  </div>
+
+  <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+  <div class="form-item">
+    <button type="submit" th:text="#{form.submit}"></button>
+  </div>
+
+  <div class="form-item">
+    <a th:href="@{/logout}" class="cancel-link" th:text="#{form.logout}"></a>
+  </div>
+
+  <script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+      const headerName = /*[[${_csrf.headerName}]]*/ "";
+      const token = /*[[${_csrf.token}]]*/ "";
+
+      async function sendRequest() {
+        const email = document.getElementById("email").value;
+        const response = await fetch("/complete-profile/send-email-code", {
+          method: "POST",
+          body: JSON.stringify({ email: email }),
+          headers: {
+            "Content-Type": "application/json",
+            [headerName]: token,
+          },
+        });
+
+        if (!response.ok) {
+          const json = await response.json();
+          if (json.errors && json.errors.length) {
+            throw new Error(json.errors[0]);
+          }
+          if (json.detail) {
+            throw new Error(json.detail);
+          }
+          throw new Error(i18nResources.sendVerificationCodeFailed);
+        }
+
+        return response;
+      }
+
+      const emailCodeSendButton = document.getElementById("emailCodeSendButton");
+      sendVerificationCode(emailCodeSendButton, sendRequest);
+    });
+  </script>
+</form>

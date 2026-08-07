@@ -73,8 +73,10 @@ class AuthorizationExchangeConfigurers {
     @Order(300)
     SecurityConfigurer authenticatedAuthorizationConfigurer() {
         // Anonymous user is not allowed
-        return http -> http.authorizeExchange(
-                spec -> spec.pathMatchers("/console/**", "/uc/**").authenticated());
+        return http -> http.authorizeExchange(spec -> spec.pathMatchers("/complete-profile/**")
+                .authenticated()
+                .pathMatchers("/console/**", "/uc/**")
+                .authenticated());
     }
 
     @Bean

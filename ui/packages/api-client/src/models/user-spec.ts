@@ -37,7 +37,7 @@ export interface UserSpec {
     /**
      * Email address used for sign-in and notifications.
      */
-    'email': string;
+    'email'?: string;
     /**
      * Whether the email address has been verified.
      */
