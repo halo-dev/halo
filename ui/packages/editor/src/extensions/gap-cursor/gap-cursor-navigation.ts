@@ -333,7 +333,11 @@ function selectStructuralBlockFromGap(
   const nodePos =
     direction < 0 ? selection.from - adjacent.nodeSize : selection.from;
   if (dispatch) {
-    dispatch(state.tr.setSelection(NodeSelection.create(state.doc, nodePos)));
+    dispatch(
+      state.tr
+        .setSelection(NodeSelection.create(state.doc, nodePos))
+        .scrollIntoView()
+    );
   }
   return true;
 }
@@ -345,6 +349,8 @@ function selectGap(
   side: GapCursorSide
 ) {
   if (dispatch) {
-    dispatch(state.tr.setSelection(new HaloGapCursor($pos, side)));
+    dispatch(
+      state.tr.setSelection(new HaloGapCursor($pos, side)).scrollIntoView()
+    );
   }
 }
