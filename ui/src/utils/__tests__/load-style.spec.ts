@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "vite-plus/test";
-import { loadStyle } from "./load-style";
+import { loadStyle } from "../load-style";
 
 describe("loadStyle", () => {
   afterEach(() => {

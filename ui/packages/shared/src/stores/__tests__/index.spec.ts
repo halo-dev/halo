@@ -1,6 +1,6 @@
 import { createPinia, setActivePinia } from "pinia";
 import { beforeEach, describe, expect, it } from "vite-plus/test";
-import { stores, type UiPluginsHostStore } from ".";
+import { stores, type UiPluginsHostStore } from "..";
 
 describe("stores.uiPlugins", () => {
   beforeEach(() => {

@@ -4,7 +4,7 @@ import {
   createGlobalBridgeSource,
   selectHostRuntimeSnapshotFile,
   setupLibraryExternal,
-} from "./library-external";
+} from "../library-external";
 
 describe("ESM shared runtime", () => {
   afterEach(() => {

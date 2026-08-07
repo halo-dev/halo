@@ -1,7 +1,7 @@
 import * as FormKitCore from "@formkit/core";
 import * as FormKitVue from "@formkit/vue";
 import { describe, expect, it } from "vite-plus/test";
-import "./setupFormKitRuntime";
+import "../setupFormKitRuntime";
 
 describe("FormKit shared runtime", () => {
   it("exposes Vue and Core from the host's single module graph", () => {
