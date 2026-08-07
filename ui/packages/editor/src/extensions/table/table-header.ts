@@ -1,31 +1,14 @@
-import { VTooltipComponent } from "@halo-dev/components";
-import { h, render } from "vue";
-import MdiPlus from "~icons/mdi/plus";
-import { i18n } from "@/locales";
+import type { Attribute } from "@tiptap/core";
 import {
-  addColumnAfter,
-  Decoration,
-  DecorationSet,
-  Plugin,
-  PluginKey,
-} from "@/tiptap/pm";
-import { mergeAttributes, Node } from "@/tiptap/vue-3";
-import { getCellsInRow, isColumnSelected, selectColumn } from "./util";
+  TableHeader as TiptapTableHeader,
+  type TableHeaderOptions,
+} from "@tiptap/extension-table";
+import {
+  createTableCellAttributes,
+  renderTableCellAttributes,
+} from "./table-cell-attributes";
 
-export interface TableCellOptions {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  HTMLAttributes: Record<string, any>;
-}
-
-const markEditorUiElement = (element: HTMLElement) => {
-  element.dataset.editorUi = "true";
-};
-
-const TableHeader = Node.create<TableCellOptions>({
-  name: "tableHeader",
-  content: "block+",
-  tableRole: "header_cell",
-  isolating: true,
+export const TableHeader = TiptapTableHeader.extend<TableHeaderOptions>({
   fakeSelection: true,
 
   addHaloEditorMetadata() {
@@ -52,10 +35,21 @@ const TableHeader = Node.create<TableCellOptions>({
             examples: [null],
             omitWhen: ["Automatic table sizing is appropriate."],
           },
-          style: {
-            description: "Optional CSS declarations for the header cell.",
-            format: "CSS declarations",
-            omitWhen: ["Default header styling is appropriate."],
+          align: {
+            description: "Horizontal alignment of the header cell content.",
+            examples: ["left", "center", "right"],
+            omitWhen: ["Left alignment is appropriate."],
+          },
+          verticalAlign: {
+            description: "Vertical alignment of the header cell content.",
+            examples: ["top", "middle", "bottom"],
+            omitWhen: ["Top alignment is appropriate."],
+          },
+          backgroundColor: {
+            description: "Background color of the header cell.",
+            format: "CSS color",
+            examples: ["#fee2e2"],
+            omitWhen: ["The default header background is appropriate."],
           },
         },
         generation: {
@@ -73,128 +67,23 @@ const TableHeader = Node.create<TableCellOptions>({
     };
   },
 
-  addOptions() {
-    return {
-      HTMLAttributes: {},
-    };
-  },
-
   addAttributes() {
-    return {
-      colspan: {
-        default: 1,
-      },
-      rowspan: {
-        default: 1,
-      },
-      colwidth: {
-        default: [100],
-        parseHTML: (element) => {
-          const colwidth = element.getAttribute("colwidth");
-          const value = colwidth
-            ? colwidth.split(",").map((width) => parseInt(width, 10))
-            : null;
-          return value;
-        },
-      },
-      style: {
-        default: null,
-      },
-    };
+    const parentAttributes = (this.parent?.() ?? {}) as Record<
+      string,
+      Attribute
+    >;
+    return createTableCellAttributes(parentAttributes);
   },
 
-  parseHTML() {
-    return [{ tag: "th" }];
-  },
-
-  renderHTML({ HTMLAttributes }) {
+  renderHTML({ node, HTMLAttributes }) {
     return [
       "th",
-      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
+      renderTableCellAttributes(
+        this.options.HTMLAttributes,
+        HTMLAttributes,
+        node.attrs
+      ),
       0,
-    ];
-  },
-
-  addStorage() {
-    const gripMap = new Map<string, HTMLElement>();
-    return {
-      gripMap,
-    };
-  },
-
-  onDestroy() {
-    this.storage.gripMap.clear();
-  },
-
-  addProseMirrorPlugins() {
-    const editor = this.editor;
-    const storage = this.storage;
-    return [
-      new Plugin({
-        key: new PluginKey("table-header-control"),
-        props: {
-          decorations(state) {
-            const { doc, selection } = state;
-            const decorations: Decoration[] = [];
-            const cells = getCellsInRow(0)(selection);
-            if (cells) {
-              cells.forEach(({ pos }, index) => {
-                decorations.push(
-                  Decoration.widget(pos + 1, () => {
-                    const key = "column" + index;
-                    const colSelected = isColumnSelected(index)(selection);
-                    let className = "grip-column";
-                    if (colSelected) {
-                      className += " selected";
-                    }
-                    if (index === 0) {
-                      className += " first";
-                    } else if (index === cells.length - 1) {
-                      className += " last";
-                    }
-
-                    let grip = storage.gripMap.get(key) as HTMLElement;
-                    if (!grip) {
-                      grip = document.createElement("a");
-                      markEditorUiElement(grip);
-                      const instance = h(
-                        VTooltipComponent,
-                        {
-                          triggers: ["hover"],
-                        },
-                        {
-                          default: () => h(MdiPlus, { class: "plus-icon" }),
-                          popper: () =>
-                            i18n.global.t(
-                              "editor.menus.table.add_column_after"
-                            ),
-                        }
-                      );
-                      render(instance, grip);
-                      grip.addEventListener("mousedown", (event) => {
-                        event.preventDefault();
-                        event.stopImmediatePropagation();
-
-                        editor.view.dispatch(
-                          selectColumn(index)(editor.state.tr)
-                        );
-
-                        if (event.target !== grip) {
-                          addColumnAfter(editor.state, editor.view.dispatch);
-                        }
-                      });
-                    }
-                    grip.className = className;
-                    storage.gripMap.set(key, grip);
-                    return grip;
-                  })
-                );
-              });
-            }
-            return DecorationSet.create(doc, decorations);
-          },
-        },
-      }),
     ];
   },
 });
