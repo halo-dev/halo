@@ -1,8 +1,8 @@
 import type { FormKitLibrary } from "@formkit/core";
 import {
   consoleApiClient,
+  type UiPluginProvider,
   type UiPluginProviderDescriptor,
-  type UiPluginProviderRegistration,
 } from "@halo-dev/api-client";
 import { Toast } from "@halo-dev/components";
 import {
@@ -25,7 +25,10 @@ import type { SetupComponentsOptions } from "./setupComponents";
 
 export type Platform = "console" | "uc";
 
-type UiProviderRegistration = UiPluginProviderRegistration;
+type UiProviderRegistration = Pick<
+  UiPluginProvider,
+  "name" | "type" | "version"
+>;
 type UiProviderType = UiProviderRegistration["type"];
 
 export interface LoadedPluginModule {
@@ -86,26 +89,31 @@ export async function setupUiPluginRuntime({
     return [];
   }
 
-  const registrations = mergeRegistrations(descriptor);
+  const providers = descriptor.providers;
   const registrationsByName = new Map(
-    registrations.map((registration) => [registration.name, registration])
+    providers.map((provider) => [provider.name, provider])
   );
-  const invalidNames = new Set(
-    descriptor.invalid.map((provider) => provider.name)
+  const invalidProviders = providers.filter(
+    (provider) => provider.kind === "invalid"
   );
-  const esmProvidersByName = new Map(
-    descriptor.providers.map((provider) => [provider.name, provider])
+  const legacyProviders = providers.filter(
+    (provider) => provider.kind === "legacy"
   );
-  const legacyRegistrations = registrations.filter(
-    (registration) =>
-      !invalidNames.has(registration.name) &&
-      !esmProvidersByName.has(registration.name)
+  const esmProviders = providers.filter((provider) => provider.kind === "esm");
+  const styledProviders = providers.filter(
+    (
+      provider
+    ): provider is UiPluginProvider & {
+      style: string;
+    } => Boolean(provider.style)
   );
 
   registrationStore._seed(
-    registrations.map((registration) => ({
-      ...registration,
-      status: invalidNames.has(registration.name) ? "failed" : "pending",
+    providers.map((provider) => ({
+      name: provider.name,
+      type: provider.type,
+      version: provider.version,
+      status: provider.kind === "invalid" ? "failed" : "pending",
     }))
   );
 
@@ -127,20 +135,32 @@ export async function setupUiPluginRuntime({
     console.error("[Halo UI provider]", diagnostic, error);
   };
 
-  for (const invalid of descriptor.invalid) {
-    report(invalid, "discovery", invalid.reason);
+  for (const invalid of invalidProviders) {
+    report(
+      invalid,
+      "discovery",
+      invalid.reason || `Provider "${invalid.name}" is invalid.`
+    );
   }
 
   const styleInsertionPoint = document.head.firstChild;
-  const styleLoads = descriptor.styles.map((style) =>
-    runtime.loadStyle(style.href, styleInsertionPoint)
+  const styleLoads = styledProviders.map((provider) =>
+    runtime.loadStyle(provider.style, styleInsertionPoint)
   );
   const legacyScriptLoad =
-    legacyRegistrations.length > 0
-      ? runtime.loadScript(descriptor.legacy.script)
+    legacyProviders.length > 0
+      ? descriptor.legacyScript
+        ? runtime.loadScript(descriptor.legacyScript)
+        : Promise.reject(
+            new Error("The UI provider descriptor has no legacy script.")
+          )
       : Promise.resolve();
-  const esmImports = descriptor.providers.map((provider) =>
-    runtime.importModule(provider.entry)
+  const esmImports = esmProviders.map((provider) =>
+    provider.entry
+      ? runtime.importModule(provider.entry)
+      : Promise.reject(
+          new Error(`ESM provider "${provider.name}" has no entry.`)
+        )
   );
 
   const [styleResults, legacyScriptResult, esmImportResults] =
@@ -150,7 +170,9 @@ export async function setupUiPluginRuntime({
       Promise.allSettled(esmImports),
     ]);
 
-  const failedNames = new Set(invalidNames);
+  const failedNames = new Set(
+    invalidProviders.map((provider) => provider.name)
+  );
   const styleFailed = styleResults.some(
     (result) => result.status === "rejected"
   );
@@ -158,51 +180,48 @@ export async function setupUiPluginRuntime({
     if (result.status === "fulfilled") {
       continue;
     }
-    const style = descriptor.styles[index];
-    const registration = registrationsByName.get(style.name);
-    if (registration) {
-      failedNames.add(registration.name);
-      report(registration, "style", result.reason);
-    }
+    const provider = styledProviders[index];
+    failedNames.add(provider.name);
+    report(provider, "style", result.reason);
   }
 
   if (legacyScriptResult.status === "rejected") {
-    for (const registration of legacyRegistrations) {
-      failedNames.add(registration.name);
-      report(registration, "entry", legacyScriptResult.reason);
+    for (const provider of legacyProviders) {
+      failedNames.add(provider.name);
+      report(provider, "entry", legacyScriptResult.reason);
     }
   }
 
   const loadedByName = new Map<string, LoadedPluginModule>();
   const legacyProvidersWithoutModule = new Set<string>();
   if (legacyScriptResult.status === "fulfilled") {
-    for (const registration of legacyRegistrations) {
-      const module = window[registration.name] as unknown;
+    for (const provider of legacyProviders) {
+      const module = window[provider.name] as unknown;
       if (module === undefined || module === null) {
-        legacyProvidersWithoutModule.add(registration.name);
+        legacyProvidersWithoutModule.add(provider.name);
         continue;
       }
       if (!isPluginModule(module)) {
-        failedNames.add(registration.name);
+        failedNames.add(provider.name);
         report(
-          registration,
+          provider,
           "export",
           new Error(
-            `Legacy provider "${registration.name}" did not expose a PluginModule.`
+            `Legacy provider "${provider.name}" did not expose a PluginModule.`
           )
         );
         continue;
       }
-      loadedByName.set(registration.name, {
-        name: registration.name,
-        type: registration.type,
+      loadedByName.set(provider.name, {
+        name: provider.name,
+        type: provider.type,
         module,
       });
     }
   }
 
   for (const [index, result] of esmImportResults.entries()) {
-    const provider = descriptor.providers[index];
+    const provider = esmProviders[index];
     if (result.status === "rejected") {
       failedNames.add(provider.name);
       report(provider, "entry", result.reason);
@@ -227,9 +246,9 @@ export async function setupUiPluginRuntime({
     });
   }
 
-  const loadableModules = registrations
-    .filter((registration) => !failedNames.has(registration.name))
-    .map((registration) => loadedByName.get(registration.name))
+  const loadableModules = providers
+    .filter((provider) => !failedNames.has(provider.name))
+    .map((provider) => loadedByName.get(provider.name))
     .filter((module): module is LoadedPluginModule => Boolean(module));
 
   setupComponents({
@@ -251,21 +270,21 @@ export async function setupUiPluginRuntime({
   });
 
   const registeredModules: LoadedPluginModule[] = [];
-  for (const registration of registrations) {
-    if (failedNames.has(registration.name)) {
+  for (const provider of providers) {
+    if (failedNames.has(provider.name)) {
       continue;
     }
-    const loaded = loadedByName.get(registration.name);
+    const loaded = loadedByName.get(provider.name);
     if (!loaded) {
-      if (legacyProvidersWithoutModule.has(registration.name)) {
-        registrationStore._setStatus(registration.name, "registered");
+      if (legacyProvidersWithoutModule.has(provider.name)) {
+        registrationStore._setStatus(provider.name, "registered");
         continue;
       }
-      failedNames.add(registration.name);
+      failedNames.add(provider.name);
       report(
-        registration,
+        provider,
         "export",
-        new Error(`Provider "${registration.name}" has no loadable module.`)
+        new Error(`Provider "${provider.name}" has no loadable module.`)
       );
       continue;
     }
@@ -273,20 +292,20 @@ export async function setupUiPluginRuntime({
       app,
       router,
       platform,
-      registration,
+      registration: provider,
       module: loaded.module,
       routeOwners,
       componentOwners,
       report,
     });
     if (failure) {
-      failedNames.add(registration.name);
-      report(registration, "registration", failure.error, {
+      failedNames.add(provider.name);
+      report(provider, "registration", failure.error, {
         incompleteRollback: failure.incompleteRollback,
       });
       continue;
     }
-    registrationStore._setStatus(registration.name, "registered");
+    registrationStore._setStatus(provider.name, "registered");
     registeredModules.push(loaded);
   }
 
@@ -336,18 +355,6 @@ export function notifyPluginLoadError(error: unknown) {
 
   console.error(message, error);
   Toast.error(message);
-}
-
-function mergeRegistrations(descriptor: UiPluginProviderDescriptor) {
-  const registrations = [...descriptor.registrations];
-  const names = new Set(registrations.map((registration) => registration.name));
-  for (const invalid of descriptor.invalid) {
-    if (!names.has(invalid.name)) {
-      registrations.push(invalid);
-      names.add(invalid.name);
-    }
-  }
-  return registrations;
 }
 
 function registerPluginModule({

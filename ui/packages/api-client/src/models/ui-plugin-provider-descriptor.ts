@@ -15,29 +15,16 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { UiPluginEsmProvider } from './ui-plugin-esm-provider';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { UiPluginInvalidProvider } from './ui-plugin-invalid-provider';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { UiPluginLegacyResources } from './ui-plugin-legacy-resources';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { UiPluginProviderRegistration } from './ui-plugin-provider-registration';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { UiPluginProviderStyle } from './ui-plugin-provider-style';
+import type { UiPluginProvider } from './ui-plugin-provider';
 
 /**
  * Browser descriptor for the currently enabled plugin and theme UI providers.
  */
 export interface UiPluginProviderDescriptor {
-    'invalid': Array<UiPluginInvalidProvider>;
-    'legacy': UiPluginLegacyResources;
-    'providers': Array<UiPluginEsmProvider>;
-    'registrations': Array<UiPluginProviderRegistration>;
-    'styles': Array<UiPluginProviderStyle>;
-    'version': string;
+    /**
+     * Legacy aggregate script URL, present when a legacy provider exists.
+     */
+    'legacyScript'?: string;
+    'providers': Array<UiPluginProvider>;
 }
 

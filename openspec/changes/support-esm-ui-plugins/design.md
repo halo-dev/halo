@@ -170,36 +170,46 @@ Axios sharing exposes the standard package module, not Halo's configured API cli
 
 Alternative considered: point Import Map entries at current npm ESM outputs. Current Halo package outputs retain additional bare imports such as VueUse and Axios, while raw Vue Router, Pinia, and FormKit graphs add internal dependency and identity concerns. Dedicated browser runtime artifacts keep the public dependency graph limited to the snapshot.
 
-### Discover providers through one versioned descriptor
+### Discover providers through one ordered descriptor
 
-The backend classifies the current started plugin set and activated theme when the authenticated provider descriptor is requested. The response contains a catalog version derived from the ordered provider classification and cache keys, versioned legacy aggregate URLs, valid ESM descriptors, and invalid-provider diagnostics. The descriptor is revalidated rather than treated as an immutable resource snapshot.
+The backend classifies the current started plugin set and activated theme when the authenticated provider descriptor is requested. The response projects that classification into one ordered provider list in which every discovered provider appears exactly once. Each record contains Halo-owned identity, type, installed version, a `legacy`, `esm`, or `invalid` kind, and only the fields needed by that kind: ESM entry, optional startup style, or invalid reason. A shared legacy script URL is returned only when the list contains a legacy provider. The descriptor is revalidated rather than treated as an immutable resource snapshot.
 
-ESM entries and startup styles reuse the static mappings Halo already exposes for plugin `ui` or legacy `console` resources and activated-theme `ui-plugin` resources. Each provider manifest may identify one main stylesheet, and a legacy provider may expose its existing main stylesheet. The descriptor returns those provider-owned styles in provider order so each stylesheet keeps its own URL base for relative assets. Asynchronous chunk CSS remains under the provider mapping and is loaded on demand by its bundler runtime.
+The provider list is the single source of truth for discovery, registration-store seeding, startup-style precedence, and final registration order. It does not split the same provider identity across parallel registration, style, ESM, and invalid arrays that the browser would have to join again. The catalog version remains an internal cache key encoded in the legacy script URL instead of a separately exposed response field.
+
+ESM entries and startup styles reuse the static mappings Halo already exposes for plugin `ui` or legacy `console` resources and activated-theme `ui-plugin` resources. Each provider manifest may identify one main stylesheet, and a legacy provider may expose its existing main stylesheet. The descriptor places that direct style URL on its owning provider record so each stylesheet keeps its own URL base and failure attribution. Asynchronous chunk CSS remains under the provider mapping and is loaded on demand by its bundler runtime.
 
 Each direct entry and startup-style URL receives a provider-specific cache key. In packaged operation the key is derived from Halo-managed provider type, identity, and installed version. In development it additionally fingerprints the provider manifest and directly loaded entry/style resources through stable file metadata, so repeated descriptor requests keep the same URL until the build output changes. The catalog version hashes the ordered provider classification and provider cache keys and remains the cache key for legacy aggregate resources. This prevents one development provider or a repeated descriptor request from invalidating every provider resource. For example:
 
 ```json
 {
-  "version": "abc123",
-  "styles": [
-    {
-      "name": "plugin-search",
-      "type": "plugin",
-      "href": "/plugins/plugin-search/assets/ui/style.css?v=provider123"
-    }
-  ],
-  "legacy": {
-    "script": "/apis/.../bundle.js?v=abc123"
-  },
+  "legacyScript": "/apis/.../bundle.js?v=abc123",
   "providers": [
     {
       "name": "plugin-search",
       "type": "plugin",
-      "entry": "/plugins/plugin-search/assets/ui/main.js?v=provider123"
+      "version": "1.0.0",
+      "kind": "esm",
+      "entry": "/plugins/plugin-search/assets/ui/main.js?v=provider123",
+      "style": "/plugins/plugin-search/assets/ui/style.css?v=provider123"
+    },
+    {
+      "name": "legacy-plugin",
+      "type": "plugin",
+      "version": "1.0.0",
+      "kind": "legacy"
+    },
+    {
+      "name": "broken-plugin",
+      "type": "plugin",
+      "version": "1.0.0",
+      "kind": "invalid",
+      "reason": "Provider resource does not exist"
     }
   ]
 }
 ```
+
+`kind` is an explicit discriminator rather than being inferred from optional-field presence. An ESM record always has `entry` and may have `style`; a legacy record has no individual entry and may have `style`; an invalid record always has `reason` and no loadable resources. A legacy provider without a UI module remains represented and retains its successful no-op compatibility behavior. The interface intentionally does not add generic resource arrays, nested diagnostics, or OpenAPI polymorphism while the runtime supports exactly one entry, at most one startup style, and one discovery reason.
 
 Plugin bundles continue preferring `ui` and falling back to `console`; the selected directory is reflected in generated entry and style URLs. Theme bundles use `/themes/{theme}/ui-plugin/assets/{resource}`. Query parameters do not change path resolution, and emitted asynchronous chunks continue using their provider-relative, content-hashed paths. Main CSS asset references therefore resolve relative to the direct stylesheet URL and need no backend rewriting.
 
@@ -211,8 +221,8 @@ Public `Plugin.status` and `Theme.status` remain unchanged. Descriptor validatio
 
 The authenticated descriptor endpoint declares its complete response schema in
 the generated OpenAPI document. Required descriptor and provider fields remain
-required in the generated TypeScript models, while the ordered style list may
-remain empty. Console and User Center consume the generated API
+required in the generated TypeScript models, while kind-specific fields remain
+optional and are constrained by the provider kind. Console and User Center consume the generated API
 method and models through `@halo-dev/api-client`; they do not maintain a
 parallel hand-written descriptor contract.
 
@@ -248,8 +258,8 @@ The UI startup flow becomes:
 
 ```text
 fetch the current provider descriptor
-  -> seed the shared provider-registration store as pending
-  -> start every ordered provider stylesheet directly
+  -> seed the shared provider-registration store from the ordered provider list
+  -> start every provider record's startup stylesheet directly
   -> start the versioned legacy aggregate and all valid ESM entries
   -> await all startup resources with all-settled semantics
   -> prepare and validate PluginModule objects
@@ -258,7 +268,7 @@ fetch the current provider descriptor
 
 An ESM entry default-exports the existing `PluginModule` object. It does not register routes or components through top-level side effects. Providers may import host shared packages and their own chunks but may not directly import another provider.
 
-All provider style loads, the legacy lane, and all ESM imports are started together. Style links are inserted in descriptor order so CSS precedence remains deterministic, while network completion order does not control registration. Halo waits for all startup resources to settle before validating results and registering accepted providers sequentially in descriptor order. It does not reload the page after an individual resource finishes and does not add an arbitrary request batch size, because the UI mounts only after provider setup and batching would extend the startup wait.
+All provider style loads, the legacy lane, and all ESM imports are started together. Style links are inserted in provider-list order so CSS precedence remains deterministic, while network completion order does not control registration. Halo waits for all startup resources to settle before validating results and registering accepted providers sequentially in provider-list order. It does not reload the page after an individual resource finishes and does not add an arbitrary request batch size, because the UI mounts only after provider setup and batching would extend the startup wait.
 
 Fetch, MIME, link, evaluation, export-shape, and startup-style failures are associated with one provider and do not stop the core UI or other valid providers. A failed provider startup style prevents only its owning provider from registering. Delayed CSS chunk failures remain attributable through the owning asynchronous chunk. The UI presents one summary notification and retains structured provider-specific diagnostics for logs and management screens.
 

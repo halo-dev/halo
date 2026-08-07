@@ -23981,9 +23981,9 @@
         },
         "description": "User-center request payload for uploading from a URL."
       },
-      "UiPluginEsmProvider": {
+      "UiPluginProvider": {
         "required": [
-          "entry",
+          "kind",
           "name",
           "type",
           "version"
@@ -23991,37 +23991,28 @@
         "type": "object",
         "properties": {
           "entry": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "type": {
             "type": "string",
+            "description": "ESM entry URL, required for ESM providers."
+          },
+          "kind": {
+            "type": "string",
+            "description": "Provider classification and loading mode.",
             "enum": [
-              "plugin",
-              "theme"
+              "legacy",
+              "esm",
+              "invalid"
             ]
           },
-          "version": {
-            "type": "string"
-          }
-        }
-      },
-      "UiPluginInvalidProvider": {
-        "required": [
-          "name",
-          "reason",
-          "type",
-          "version"
-        ],
-        "type": "object",
-        "properties": {
           "name": {
             "type": "string"
           },
           "reason": {
-            "type": "string"
+            "type": "string",
+            "description": "Discovery failure reason, required for invalid providers."
+          },
+          "style": {
+            "type": "string",
+            "description": "Optional startup stylesheet URL."
           },
           "type": {
             "type": "string",
@@ -24029,112 +24020,31 @@
               "plugin",
               "theme"
             ]
-          },
-          "version": {
-            "type": "string"
-          }
-        }
-      },
-      "UiPluginLegacyResources": {
-        "required": [
-          "script"
-        ],
-        "type": "object",
-        "properties": {
-          "script": {
-            "type": "string"
-          }
-        }
-      },
-      "UiPluginProviderDescriptor": {
-        "required": [
-          "invalid",
-          "legacy",
-          "providers",
-          "registrations",
-          "styles",
-          "version"
-        ],
-        "type": "object",
-        "properties": {
-          "invalid": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/UiPluginInvalidProvider"
-            }
-          },
-          "legacy": {
-            "$ref": "#/components/schemas/UiPluginLegacyResources"
-          },
-          "providers": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/UiPluginEsmProvider"
-            }
-          },
-          "registrations": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/UiPluginProviderRegistration"
-            }
-          },
-          "styles": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/UiPluginProviderStyle"
-            }
           },
           "version": {
             "type": "string"
           }
         },
+        "description": "One ordered UI provider classification."
+      },
+      "UiPluginProviderDescriptor": {
+        "required": [
+          "providers"
+        ],
+        "type": "object",
+        "properties": {
+          "legacyScript": {
+            "type": "string",
+            "description": "Legacy aggregate script URL, present when a legacy provider exists."
+          },
+          "providers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UiPluginProvider"
+            }
+          }
+        },
         "description": "Browser descriptor for the currently enabled plugin and theme UI providers."
-      },
-      "UiPluginProviderRegistration": {
-        "required": [
-          "name",
-          "type",
-          "version"
-        ],
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "plugin",
-              "theme"
-            ]
-          },
-          "version": {
-            "type": "string"
-          }
-        }
-      },
-      "UiPluginProviderStyle": {
-        "required": [
-          "href",
-          "name",
-          "type"
-        ],
-        "type": "object",
-        "properties": {
-          "href": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "plugin",
-              "theme"
-            ]
-          }
-        }
       },
       "UpgradeFromUriRequest": {
         "required": [

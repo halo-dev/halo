@@ -94,7 +94,7 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
         return discoverProviders().flatMapMany(providers -> {
             return Flux.fromIterable(providerStyles(providers))
                     .map(style -> DefaultDataBufferFactory.sharedInstance.wrap(
-                            ("@import url(\"" + style.href() + "\");\n").getBytes(UTF_8)));
+                            ("@import url(\"" + style + "\");\n").getBytes(UTF_8)));
         });
     }
 
@@ -258,48 +258,54 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
     }
 
     private UiPluginProviderDescriptor createDescriptor(String version, List<ClassifiedProvider> providers) {
-        var registrations = providers.stream()
-                .map(provider -> new UiPluginProviderDescriptor.Registration(
-                        provider.candidate().name(),
-                        provider.candidate().type(),
-                        provider.candidate().version()))
-                .toList();
-        var esmProviders = providers.stream()
-                .filter(provider -> provider.kind() == ProviderKind.ESM)
-                .map(provider -> new UiPluginProviderDescriptor.EsmProvider(
-                        provider.candidate().name(),
-                        provider.candidate().type(),
-                        provider.candidate().version(),
-                        providerUrl(
-                                providerCacheKey(provider),
-                                provider,
-                                provider.manifest().entry())))
-                .toList();
-        var invalid = providers.stream()
-                .filter(provider -> provider.kind() == ProviderKind.INVALID)
-                .map(provider -> new UiPluginProviderDescriptor.InvalidProvider(
-                        provider.candidate().name(),
-                        provider.candidate().type(),
-                        provider.candidate().version(),
-                        provider.error()))
-                .toList();
+        var hasLegacyProvider = providers.stream().anyMatch(provider -> provider.kind() == ProviderKind.LEGACY);
         return new UiPluginProviderDescriptor(
-                version,
-                providerStyles(providers),
-                new UiPluginProviderDescriptor.LegacyResources(versionedBundleUrl("bundle.js", version)),
-                registrations,
-                esmProviders,
-                invalid);
+                providers.stream().map(this::describeProvider).toList(),
+                hasLegacyProvider ? versionedBundleUrl("bundle.js", version) : null);
     }
 
-    private List<UiPluginProviderDescriptor.Style> providerStyles(List<ClassifiedProvider> providers) {
+    private UiPluginProviderDescriptor.Provider describeProvider(ClassifiedProvider provider) {
+        var candidate = provider.candidate();
+        var cacheKey = providerCacheKey(provider);
+        return switch (provider.kind()) {
+            case LEGACY ->
+                new UiPluginProviderDescriptor.Provider(
+                        candidate.name(),
+                        candidate.type(),
+                        candidate.version(),
+                        "legacy",
+                        null,
+                        providerStyle(provider, cacheKey).orElse(null),
+                        null);
+            case ESM ->
+                new UiPluginProviderDescriptor.Provider(
+                        candidate.name(),
+                        candidate.type(),
+                        candidate.version(),
+                        "esm",
+                        providerUrl(cacheKey, provider, provider.manifest().entry()),
+                        providerStyle(provider, cacheKey).orElse(null),
+                        null);
+            case INVALID ->
+                new UiPluginProviderDescriptor.Provider(
+                        candidate.name(),
+                        candidate.type(),
+                        candidate.version(),
+                        "invalid",
+                        null,
+                        null,
+                        provider.error());
+        };
+    }
+
+    private List<String> providerStyles(List<ClassifiedProvider> providers) {
         return providers.stream()
-                .map(this::providerStyle)
+                .map(provider -> providerStyle(provider, providerCacheKey(provider)))
                 .flatMap(Optional::stream)
                 .toList();
     }
 
-    private Optional<UiPluginProviderDescriptor.Style> providerStyle(ClassifiedProvider provider) {
+    private Optional<String> providerStyle(ClassifiedProvider provider, String cacheKey) {
         String resourcePath;
         if (provider.kind() == ProviderKind.ESM) {
             resourcePath = provider.manifest().style();
@@ -315,10 +321,7 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
         if (resourcePath == null) {
             return Optional.empty();
         }
-        return Optional.of(new UiPluginProviderDescriptor.Style(
-                provider.candidate().name(),
-                provider.candidate().type(),
-                providerUrl(providerCacheKey(provider), provider, resourcePath)));
+        return Optional.of(providerUrl(cacheKey, provider, resourcePath));
     }
 
     private static String providerUrl(String cacheKey, ClassifiedProvider provider, String resourcePath) {

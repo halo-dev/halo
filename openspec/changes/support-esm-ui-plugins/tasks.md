@@ -144,3 +144,10 @@
 - [x] 18.1 Separate the catalog version used by legacy aggregate resources from provider-specific entry and startup-style cache keys in the runtime contract and design.
 - [x] 18.2 Derive packaged provider keys from Halo-managed identity/version data and development provider keys from stable directly loaded resource metadata, with backend regression coverage for unchanged and rebuilt resources.
 - [x] 18.3 Run backend formatting and focused tests plus strict OpenSpec validation.
+
+## 19. Consolidate the Provider Descriptor
+
+- [x] 19.1 Replace the parallel registration, style, ESM, and invalid arrays plus exposed catalog version with one authoritative ordered provider list and an optional catalog-versioned legacy script URL in the runtime contract and design.
+- [x] 19.2 Refactor backend descriptor projection and tests so each discovered provider appears exactly once with an explicit `legacy`, `esm`, or `invalid` kind and its kind-specific fields.
+- [x] 19.3 Regenerate OpenAPI and the UI API client, then consume the unified provider list without cross-array joins while preserving parallel startup, stable registration, failure isolation, and legacy no-op behavior.
+- [x] 19.4 Run backend formatting and focused tests, frontend unit/type checks, generated API and runtime snapshot checks, and strict OpenSpec validation.

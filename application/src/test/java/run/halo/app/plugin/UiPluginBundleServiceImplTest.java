@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -68,22 +69,21 @@ class UiPluginBundleServiceImplTest {
         writeThemeUiFile("inactive", "main.js", "console.log('inactive-theme');");
 
         var descriptor = service.getProviderDescriptor().block();
+        var bundleVersion = generateBundleVersion();
 
         assertThat(descriptor).isNotNull();
-        assertThat(descriptor.providers()).isEmpty();
-        assertThat(descriptor.invalid()).isEmpty();
-        assertThat(descriptor.registrations())
-                .extracting(UiPluginProviderDescriptor.Registration::name)
-                .containsExactly("legacy-plugin", "theme:active");
-        assertThat(descriptor.legacy().script())
-                .isEqualTo("/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.js?v=" + descriptor.version());
-        assertThat(descriptor.styles())
-                .extracting(UiPluginProviderDescriptor.Style::name, UiPluginProviderDescriptor.Style::type)
-                .containsExactly(tuple("legacy-plugin", "plugin"), tuple("theme:active", "theme"));
-        assertVersionedUrl(descriptor.styles().getFirst().href(), "/plugins/legacy-plugin/assets/ui/style.css");
-        assertVersionedUrl(descriptor.styles().get(1).href(), "/themes/active/ui-plugin/assets/style.css");
+        assertThat(descriptor.providers())
+                .extracting(
+                        UiPluginProviderDescriptor.Provider::name,
+                        UiPluginProviderDescriptor.Provider::type,
+                        UiPluginProviderDescriptor.Provider::kind)
+                .containsExactly(tuple("legacy-plugin", "plugin", "legacy"), tuple("theme:active", "theme", "legacy"));
+        assertThat(descriptor.legacyScript())
+                .isEqualTo("/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.js?v=" + bundleVersion);
+        assertVersionedUrl(descriptor.providers().getFirst().style(), "/plugins/legacy-plugin/assets/ui/style.css");
+        assertVersionedUrl(descriptor.providers().get(1).style(), "/themes/active/ui-plugin/assets/style.css");
 
-        assertThat(read(service.getJsBundle(descriptor.version()).block()))
+        assertThat(read(service.getJsBundle(bundleVersion).block()))
                 .contains("console.log(\"ui\");")
                 .contains("VueUse.ref(\"legacy-plugin\")")
                 .doesNotContain("console.log(\"console\");")
@@ -93,9 +93,11 @@ class UiPluginBundleServiceImplTest {
                 .contains(
                         "{\"name\":\"theme:active\",\"type\":\"theme\",\"themeName\":\"active\",\"version\":\"2.0.0\"}")
                 .contains("this.enabledPlugins = [{\"name\":\"legacy-plugin\",\"version\":\"1.0.0\"}]");
-        assertThat(read(service.getCssBundle(descriptor.version()).block()))
-                .isEqualTo(descriptor.styles().stream()
-                        .map(style -> "@import url(\"" + style.href() + "\");\n")
+        assertThat(read(service.getCssBundle(bundleVersion).block()))
+                .isEqualTo(descriptor.providers().stream()
+                        .map(UiPluginProviderDescriptor.Provider::style)
+                        .filter(Objects::nonNull)
+                        .map(style -> "@import url(\"" + style + "\");\n")
                         .collect(java.util.stream.Collectors.joining()));
     }
 
@@ -125,27 +127,32 @@ class UiPluginBundleServiceImplTest {
         writeThemeUiFile("active", "styles/theme.css", ".theme {}");
 
         var descriptor = service.getProviderDescriptor().block();
+        var bundleVersion = generateBundleVersion();
 
         assertThat(descriptor).isNotNull();
         assertThat(descriptor.providers())
-                .extracting(UiPluginProviderDescriptor.EsmProvider::name, UiPluginProviderDescriptor.EsmProvider::type)
+                .extracting(
+                        UiPluginProviderDescriptor.Provider::name,
+                        UiPluginProviderDescriptor.Provider::type,
+                        UiPluginProviderDescriptor.Provider::kind)
                 .containsExactly(
-                        tuple("console-plugin", "plugin"),
-                        tuple("ui-plugin", "plugin"),
-                        tuple("theme:active", "theme"));
+                        tuple("console-plugin", "plugin", "esm"),
+                        tuple("ui-plugin", "plugin", "esm"),
+                        tuple("theme:active", "theme", "esm"));
+        assertThat(descriptor.legacyScript()).isNull();
         assertVersionedUrl(descriptor.providers().getFirst().entry(), "/plugins/console-plugin/assets/console/main.js");
         assertVersionedUrl(descriptor.providers().get(1).entry(), "/plugins/ui-plugin/assets/ui/main.js");
         assertVersionedUrl(descriptor.providers().get(2).entry(), "/themes/active/ui-plugin/assets/chunks/main.js");
-        assertThat(descriptor.styles())
-                .extracting(UiPluginProviderDescriptor.Style::name, UiPluginProviderDescriptor.Style::type)
-                .containsExactly(tuple("ui-plugin", "plugin"), tuple("theme:active", "theme"));
-        assertVersionedUrl(descriptor.styles().getFirst().href(), "/plugins/ui-plugin/assets/ui/styles/main.css");
-        assertVersionedUrl(descriptor.styles().get(1).href(), "/themes/active/ui-plugin/assets/styles/theme.css");
-        assertThat(read(service.getCssBundle(descriptor.version()).block()))
-                .isEqualTo(descriptor.styles().stream()
-                        .map(style -> "@import url(\"" + style.href() + "\");\n")
+        assertThat(descriptor.providers().getFirst().style()).isNull();
+        assertVersionedUrl(descriptor.providers().get(1).style(), "/plugins/ui-plugin/assets/ui/styles/main.css");
+        assertVersionedUrl(descriptor.providers().get(2).style(), "/themes/active/ui-plugin/assets/styles/theme.css");
+        assertThat(read(service.getCssBundle(bundleVersion).block()))
+                .isEqualTo(descriptor.providers().stream()
+                        .map(UiPluginProviderDescriptor.Provider::style)
+                        .filter(Objects::nonNull)
+                        .map(style -> "@import url(\"" + style + "\");\n")
                         .collect(java.util.stream.Collectors.joining()));
-        assertThat(read(service.getJsBundle(descriptor.version()).block()))
+        assertThat(read(service.getJsBundle(bundleVersion).block()))
                 .doesNotContain("export default")
                 .contains("this.enabledUiPlugins = [];this.enabledPlugins = []");
     }
@@ -166,13 +173,20 @@ class UiPluginBundleServiceImplTest {
         when(pluginManager.startedPlugins()).thenReturn(List.of(traversal, extraField));
 
         var descriptor = service.getProviderDescriptor().block();
+        var bundleVersion = generateBundleVersion();
 
         assertThat(descriptor).isNotNull();
-        assertThat(descriptor.providers()).isEmpty();
-        assertThat(descriptor.invalid())
-                .extracting(UiPluginProviderDescriptor.InvalidProvider::name)
+        assertThat(descriptor.legacyScript()).isNull();
+        assertThat(descriptor.providers())
+                .extracting(UiPluginProviderDescriptor.Provider::name)
                 .containsExactly("extra-field", "traversal");
-        assertThat(read(service.getJsBundle(descriptor.version()).block()))
+        assertThat(descriptor.providers())
+                .extracting(
+                        UiPluginProviderDescriptor.Provider::kind,
+                        UiPluginProviderDescriptor.Provider::entry,
+                        UiPluginProviderDescriptor.Provider::style)
+                .containsOnly(tuple("invalid", null, null));
+        assertThat(read(service.getJsBundle(bundleVersion).block()))
                 .doesNotContain("must-not-run", "must-not-fallback")
                 .contains("this.enabledUiPlugins = [];this.enabledPlugins = []");
     }
@@ -209,13 +223,15 @@ class UiPluginBundleServiceImplTest {
         when(pluginManager.isDevelopment()).thenReturn(true);
 
         var first = service.getProviderDescriptor().block();
+        var firstVersion = generateBundleVersion();
 
         Files.writeString(tempDir.resolve("plugins/development/ui/main.js"), "export default { changed: true };");
         var second = service.getProviderDescriptor().block();
+        var secondVersion = generateBundleVersion();
 
         assertThat(second.providers().getFirst().entry())
                 .isNotEqualTo(first.providers().getFirst().entry());
-        assertThat(second.version()).isNotEqualTo(first.version());
+        assertThat(secondVersion).isNotEqualTo(firstVersion);
     }
 
     @Test
@@ -252,11 +268,12 @@ class UiPluginBundleServiceImplTest {
         writeThemeUiFile("inactive", "main.js", "console.log('inactive');");
 
         var descriptor = service.getProviderDescriptor().block();
+        var bundleVersion = generateBundleVersion();
 
         assertThat(descriptor).isNotNull();
-        assertThat(read(service.getJsBundle(descriptor.version()).block())).doesNotContain("theme:active", "inactive");
-        assertThat(read(service.getCssBundle(descriptor.version()).block()))
-                .isEqualTo("@import url(\"" + descriptor.styles().getFirst().href() + "\");\n");
+        assertThat(read(service.getJsBundle(bundleVersion).block())).doesNotContain("theme:active", "inactive");
+        assertThat(read(service.getCssBundle(bundleVersion).block()))
+                .isEqualTo("@import url(\"" + descriptor.providers().getFirst().style() + "\");\n");
     }
 
     @Test
@@ -335,6 +352,10 @@ class UiPluginBundleServiceImplTest {
     private static String read(Resource resource) throws IOException {
         assertThat(resource).isNotNull();
         return resource.getContentAsString(UTF_8);
+    }
+
+    private String generateBundleVersion() {
+        return Objects.requireNonNull(service.generateBundleVersion().block());
     }
 
     private static void assertVersionedUrl(String actual, String path) {

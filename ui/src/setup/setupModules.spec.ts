@@ -475,15 +475,9 @@ describe("setupUiPluginRuntime", () => {
   it("keeps legacy providers without a UI module as compatible no-ops", async () => {
     const { router } = createRouter();
     const descriptor: UiPluginProviderDescriptor = {
-      version: "legacy",
-      styles: [],
-      legacy: {
-        script:
-          "/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.js?v=legacy",
-      },
-      registrations: [registration("backend-only")],
-      providers: [],
-      invalid: [],
+      legacyScript:
+        "/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.js?v=legacy",
+      providers: [legacyProvider("backend-only")],
     };
 
     await setupUiPluginRuntime({
@@ -530,45 +524,28 @@ describe("setupUiPluginRuntime", () => {
 
 function mixedDescriptor(): UiPluginProviderDescriptor {
   return {
-    version: "g1",
-    styles: [
-      providerStyle("legacy-plugin", "g1"),
-      providerStyle("esm-b", "g1"),
-    ],
-    legacy: {
-      script: "/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.js?v=g1",
-    },
-    registrations: [
-      registration("legacy-plugin"),
-      registration("esm-b"),
-      registration("invalid"),
-      registration("esm-a"),
-    ],
-    providers: [esmProvider("esm-a", "g1"), esmProvider("esm-b", "g1")],
-    invalid: [
+    legacyScript:
+      "/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.js?v=g1",
+    providers: [
+      legacyProvider("legacy-plugin", "g1"),
+      esmProvider("esm-b", "g1", true),
       {
-        ...registration("invalid"),
+        ...providerIdentity("invalid"),
+        kind: "invalid",
         reason: "manifest invalid",
       },
+      esmProvider("esm-a", "g1"),
     ],
   };
 }
 
 function esmDescriptor(names: string[]): UiPluginProviderDescriptor {
   return {
-    version: "version",
-    styles: names.map((name) => providerStyle(name)),
-    legacy: {
-      script:
-        "/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.js?v=version",
-    },
-    registrations: names.map(registration),
-    providers: names.map((name) => esmProvider(name)),
-    invalid: [],
+    providers: names.map((name) => esmProvider(name, "version", true)),
   };
 }
 
-function registration(name: string) {
+function providerIdentity(name: string) {
   return {
     name,
     type: "plugin" as const,
@@ -576,17 +553,24 @@ function registration(name: string) {
   };
 }
 
-function esmProvider(name: string, version = "version") {
+function esmProvider(name: string, version = "version", hasStyle = false) {
   return {
-    ...registration(name),
+    ...providerIdentity(name),
+    kind: "esm" as const,
     entry: `/plugins/${name}/assets/ui/main.js?v=${version}`,
+    ...(hasStyle
+      ? { style: `/plugins/${name}/assets/ui/style.css?v=${version}` }
+      : {}),
   };
 }
 
-function providerStyle(name: string, version = "version") {
+function legacyProvider(name: string, version?: string) {
   return {
-    ...registration(name),
-    href: `/plugins/${name}/assets/ui/style.css?v=${version}`,
+    ...providerIdentity(name),
+    kind: "legacy" as const,
+    ...(version
+      ? { style: `/plugins/${name}/assets/ui/style.css?v=${version}` }
+      : {}),
   };
 }
 

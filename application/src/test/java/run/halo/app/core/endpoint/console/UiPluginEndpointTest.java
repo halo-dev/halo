@@ -124,14 +124,15 @@ class UiPluginEndpointTest {
     @Test
     void shouldFetchProviderDescriptorWithoutCaching() {
         var descriptor = new UiPluginProviderDescriptor(
-                "version",
-                List.of(new UiPluginProviderDescriptor.Style(
-                        "esm-plugin", "plugin", "/plugins/esm-plugin/assets/ui/style.css?v=version")),
-                new UiPluginProviderDescriptor.LegacyResources("/ui-plugins/-/bundle.js?v=version"),
-                List.of(new UiPluginProviderDescriptor.Registration("esm-plugin", "plugin", "1.0.0")),
-                List.of(new UiPluginProviderDescriptor.EsmProvider(
-                        "esm-plugin", "plugin", "1.0.0", "/plugins/esm-plugin/assets/ui/main.js?v=version")),
-                List.of());
+                List.of(new UiPluginProviderDescriptor.Provider(
+                        "esm-plugin",
+                        "plugin",
+                        "1.0.0",
+                        "esm",
+                        "/plugins/esm-plugin/assets/ui/main.js?v=version",
+                        "/plugins/esm-plugin/assets/ui/style.css?v=version",
+                        null)),
+                null);
         when(uiPluginBundleService.getProviderDescriptor()).thenReturn(Mono.just(descriptor));
 
         webClient
@@ -143,14 +144,16 @@ class UiPluginEndpointTest {
                 .expectHeader()
                 .cacheControl(CacheControl.noStore())
                 .expectBody()
-                .jsonPath("$.version")
-                .isEqualTo("version")
-                .jsonPath("$.styles[0].href")
+                .jsonPath("$.providers[0].style")
                 .isEqualTo("/plugins/esm-plugin/assets/ui/style.css?v=version")
                 .jsonPath("$.providers[0].name")
                 .isEqualTo("esm-plugin")
+                .jsonPath("$.providers[0].kind")
+                .isEqualTo("esm")
                 .jsonPath("$.providers[0].entry")
-                .isEqualTo("/plugins/esm-plugin/assets/ui/main.js?v=version");
+                .isEqualTo("/plugins/esm-plugin/assets/ui/main.js?v=version")
+                .jsonPath("$.legacyScript")
+                .doesNotExist();
     }
 
     Resource mockResource(String content) {

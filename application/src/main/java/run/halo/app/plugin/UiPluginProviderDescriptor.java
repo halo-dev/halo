@@ -1,55 +1,29 @@
 package run.halo.app.plugin;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIRED;
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 /** Browser descriptor for the currently enabled plugin and theme UI providers. */
 @Schema(description = "Browser descriptor for the currently enabled plugin and theme UI providers.")
 public record UiPluginProviderDescriptor(
-        @Schema(requiredMode = REQUIRED) String version,
-        @Schema(requiredMode = REQUIRED) List<Style> styles,
-        @Schema(requiredMode = REQUIRED) LegacyResources legacy,
-        @Schema(requiredMode = REQUIRED) List<Registration> registrations,
-        @Schema(requiredMode = REQUIRED) List<EsmProvider> providers,
-        @Schema(requiredMode = REQUIRED) List<InvalidProvider> invalid) {
+        @Schema(requiredMode = REQUIRED) List<Provider> providers,
+
+        @Schema(
+                description = "Legacy aggregate script URL, present when a legacy provider exists.",
+                requiredMode = NOT_REQUIRED)
+        @Nullable
+        String legacyScript) {
 
     public UiPluginProviderDescriptor {
-        styles = List.copyOf(styles);
-        registrations = List.copyOf(registrations);
         providers = List.copyOf(providers);
-        invalid = List.copyOf(invalid);
     }
 
-    @Schema(name = "UiPluginLegacyResources")
-    public record LegacyResources(
-            @Schema(requiredMode = REQUIRED) String script) {}
-
-    @Schema(name = "UiPluginProviderStyle")
-    public record Style(
-            @Schema(requiredMode = REQUIRED) String name,
-
-            @Schema(
-                    requiredMode = REQUIRED,
-                    allowableValues = {"plugin", "theme"})
-            String type,
-
-            @Schema(requiredMode = REQUIRED) String href) {}
-
-    @Schema(name = "UiPluginProviderRegistration")
-    public record Registration(
-            @Schema(requiredMode = REQUIRED) String name,
-
-            @Schema(
-                    requiredMode = REQUIRED,
-                    allowableValues = {"plugin", "theme"})
-            String type,
-
-            @Schema(requiredMode = REQUIRED) String version) {}
-
-    @Schema(name = "UiPluginEsmProvider")
-    public record EsmProvider(
+    @Schema(name = "UiPluginProvider", description = "One ordered UI provider classification.")
+    public record Provider(
             @Schema(requiredMode = REQUIRED) String name,
 
             @Schema(
@@ -58,17 +32,22 @@ public record UiPluginProviderDescriptor(
             String type,
 
             @Schema(requiredMode = REQUIRED) String version,
-            @Schema(requiredMode = REQUIRED) String entry) {}
-
-    @Schema(name = "UiPluginInvalidProvider")
-    public record InvalidProvider(
-            @Schema(requiredMode = REQUIRED) String name,
 
             @Schema(
+                    description = "Provider classification and loading mode.",
                     requiredMode = REQUIRED,
-                    allowableValues = {"plugin", "theme"})
-            String type,
+                    allowableValues = {"legacy", "esm", "invalid"})
+            String kind,
 
-            @Schema(requiredMode = REQUIRED) String version,
-            @Schema(requiredMode = REQUIRED) String reason) {}
+            @Schema(description = "ESM entry URL, required for ESM providers.", requiredMode = NOT_REQUIRED) @Nullable
+            String entry,
+
+            @Schema(description = "Optional startup stylesheet URL.", requiredMode = NOT_REQUIRED) @Nullable
+            String style,
+
+            @Schema(
+                    description = "Discovery failure reason, required for invalid providers.",
+                    requiredMode = NOT_REQUIRED)
+            @Nullable
+            String reason) {}
 }

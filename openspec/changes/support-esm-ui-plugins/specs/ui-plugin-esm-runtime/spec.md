@@ -141,7 +141,10 @@ Halo SHALL describe current UI providers through one authenticated response that
 
 - **WHEN** an authenticated Console or User Center session requests its provider descriptor
 - **THEN** Halo SHALL classify the currently started plugins and activated theme
-- **THEN** the response SHALL contain one catalog version, an ordered list of provider-keyed startup stylesheet descriptors, one catalog-versioned legacy script URL, valid provider-keyed ESM entry descriptors, and invalid-provider diagnostics from that classification
+- **THEN** the response SHALL contain one ordered provider list in which every discovered provider appears exactly once with its Halo-owned identity, type, installed version, classification kind, and kind-specific entry, startup style, or invalid reason
+- **THEN** the response SHALL contain a catalog-versioned legacy script URL only when at least one provider is classified as legacy
+- **THEN** the provider list SHALL be the authoritative discovery, startup-style precedence, and registration order
+- **THEN** the response SHALL NOT expose a separate catalog version, registration list, stylesheet list, ESM-provider list, or invalid-provider list
 
 #### Scenario: Provider descriptor is consumed by the Halo UI
 
@@ -165,9 +168,9 @@ Halo SHALL describe current UI providers through one authenticated response that
 #### Scenario: Startup stylesheets are described
 
 - **WHEN** the descriptor contains legacy providers or valid ESM providers with a main stylesheet
-- **THEN** the descriptor SHALL expose each provider's name, type, and direct provider-keyed stylesheet URL in provider order
+- **THEN** the descriptor SHALL expose the direct provider-keyed stylesheet URL on its owning provider record
 - **THEN** each URL SHALL use the existing provider static resource mapping so relative CSS assets resolve from their owning provider
-- **THEN** the list SHALL NOT contain CSS emitted only for asynchronous chunks
+- **THEN** provider records SHALL NOT expose CSS emitted only for asynchronous chunks
 
 #### Scenario: Legacy aggregate stylesheet is requested
 
@@ -250,7 +253,7 @@ Halo SHALL load legacy IIFE and ESM UI providers in the same Console or User Cen
 
 - **WHEN** the descriptor contains many provider styles and ESM entries
 - **THEN** Halo SHALL start every style load, every ESM entry import, and the legacy script load before waiting for any individual startup resource to settle
-- **THEN** style elements SHALL retain descriptor order independent of network completion order
+- **THEN** style elements SHALL retain provider-list order independent of network completion order
 - **THEN** Halo SHALL NOT introduce application-level request batching that serializes provider startup
 
 #### Scenario: ESM entry exports a plugin module
@@ -268,7 +271,7 @@ Halo SHALL load legacy IIFE and ESM UI providers in the same Console or User Cen
 #### Scenario: Startup provider styles are loaded
 
 - **WHEN** provider startup begins
-- **THEN** Halo SHALL insert and load each descriptor stylesheet directly in provider order
+- **THEN** Halo SHALL insert and load each provider record's startup stylesheet directly in provider-list order
 - **THEN** a stylesheet failure SHALL fail only its owning provider and SHALL NOT prevent unrelated providers or the core UI from continuing
 
 #### Scenario: Provider loads an asynchronous CSS chunk
