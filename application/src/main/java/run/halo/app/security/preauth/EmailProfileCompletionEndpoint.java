@@ -47,6 +47,9 @@ import run.halo.app.security.profile.ProfileCompletionFlow;
 @RequiredArgsConstructor
 class EmailProfileCompletionEndpoint {
 
+    private static final String EMAIL_FIELD = "email";
+    private static final String EMAIL_CODE_FIELD = "emailCode";
+
     private final UserService userService;
 
     private final SystemConfigFetcher systemConfigFetcher;
@@ -75,8 +78,8 @@ class EmailProfileCompletionEndpoint {
     }
 
     private Mono<ServerResponse> renderPage(ServerRequest request) {
-        return currentProfile(request).flatMap(profile -> {
-            if (profile.user().getSpec().isEmailVerified()) {
+        return currentProfile().flatMap(profile -> {
+            if (hasVerifiedEmail(profile.user())) {
                 return redirectToNextStep(request, profile.username());
             }
             var form = new CompleteProfileForm(profile.user().getSpec().getEmail(), null);
@@ -85,8 +88,8 @@ class EmailProfileCompletionEndpoint {
     }
 
     private Mono<ServerResponse> sendEmailCode(ServerRequest request) {
-        return currentProfile(request).flatMap(profile -> {
-            if (profile.user().getSpec().isEmailVerified()) {
+        return currentProfile().flatMap(profile -> {
+            if (hasVerifiedEmail(profile.user())) {
                 return redirectToNextStep(request, profile.username());
             }
             return request.bodyToMono(SendEmailCodeBody.class)
@@ -113,18 +116,18 @@ class EmailProfileCompletionEndpoint {
     }
 
     private Mono<ServerResponse> completeProfile(ServerRequest request) {
-        return currentProfile(request).flatMap(profile -> {
-            if (profile.user().getSpec().isEmailVerified()) {
+        return currentProfile().flatMap(profile -> {
+            if (hasVerifiedEmail(profile.user())) {
                 return redirectToNextStep(request, profile.username());
             }
             return request.formData().flatMap(formData -> {
-                var form = new CompleteProfileForm(formData.getFirst("email"), formData.getFirst("emailCode"));
+                var form = new CompleteProfileForm(formData.getFirst(EMAIL_FIELD), formData.getFirst(EMAIL_CODE_FIELD));
                 var bindingResult = validate(form, "form", validator, request.exchange());
-                if (bindingResult.hasFieldErrors("email")) {
+                if (bindingResult.hasFieldErrors(EMAIL_FIELD)) {
                     return renderFormError(
                             profile.setting(),
                             form,
-                            "email",
+                            EMAIL_FIELD,
                             "form.error.emailInvalid",
                             "Enter a valid email address.");
                 }
@@ -134,7 +137,7 @@ class EmailProfileCompletionEndpoint {
                         return renderFormError(
                                 profile.setting(),
                                 form,
-                                "email",
+                                EMAIL_FIELD,
                                 "form.error.emailTaken",
                                 "This email address is already used by another user.");
                     }
@@ -151,7 +154,7 @@ class EmailProfileCompletionEndpoint {
             return renderFormError(
                     profile.setting(),
                     form,
-                    "emailCode",
+                    EMAIL_CODE_FIELD,
                     "form.error.codeRequired",
                     "Enter the email verification code.");
         }
@@ -170,7 +173,7 @@ class EmailProfileCompletionEndpoint {
             return renderFormError(
                     profile.setting(),
                     form,
-                    "email",
+                    EMAIL_FIELD,
                     "form.error.emailChanged",
                     "The email address changed. Send a new verification code.");
         }
@@ -184,7 +187,7 @@ class EmailProfileCompletionEndpoint {
                         error -> renderFormError(
                                 profile.setting(),
                                 form,
-                                "emailCode",
+                                EMAIL_CODE_FIELD,
                                 "form.error.codeInvalid",
                                 "The verification code is invalid or expired."))
                 .onErrorResume(
@@ -192,12 +195,12 @@ class EmailProfileCompletionEndpoint {
                         error -> renderFormError(
                                 profile.setting(),
                                 form,
-                                "emailCode",
+                                EMAIL_CODE_FIELD,
                                 "form.error.rateLimitExceeded",
                                 "Too many attempts. Try again later."));
     }
 
-    private Mono<CurrentProfile> currentProfile(ServerRequest request) {
+    private Mono<CurrentProfile> currentProfile() {
         return ReactiveSecurityContextHolder.getContext()
                 .map(SecurityContext::getAuthentication)
                 .map(authentication -> authentication.getName())
@@ -243,6 +246,11 @@ class EmailProfileCompletionEndpoint {
 
     private static String normalizeEmail(String email) {
         return email.toLowerCase(Locale.ROOT);
+    }
+
+    private static boolean hasVerifiedEmail(User user) {
+        return StringUtils.isNotBlank(user.getSpec().getEmail())
+                && user.getSpec().isEmailVerified();
     }
 
     record SendEmailCodeBody(@Email @NotBlank String email) {}

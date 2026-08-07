@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Clock;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.HexFormat;
 import java.util.Optional;
@@ -24,11 +25,15 @@ import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.MetadataOperator;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.infra.exception.DuplicateNameException;
 import run.halo.app.infra.exception.OAuth2UserAlreadyBoundException;
 import tools.jackson.databind.json.JsonMapper;
 
 @Service
 public class UserConnectionServiceImpl implements UserConnectionService {
+
+    private static final int RECONNECT_MAX_ATTEMPTS = 20;
+    private static final Duration RECONNECT_RETRY_DELAY = Duration.ofMillis(100);
 
     private final ReactiveExtensionClient client;
 
@@ -65,11 +70,35 @@ public class UserConnectionServiceImpl implements UserConnectionService {
                     spec.setRegistrationId(registrationId);
                     spec.setUpdatedAt(clock.instant());
                     return client.create(connection)
+                            .onErrorResume(
+                                    DuplicateNameException.class,
+                                    original -> retryCreateWhileDeleting(connection, original, RECONNECT_MAX_ATTEMPTS))
                             .onErrorResume(original -> getByProviderUserId(registrationId, oauth2User.getName())
                                     .flatMap(existing ->
                                             Mono.<UserConnection>error(new OAuth2UserAlreadyBoundException(existing)))
                                     .switchIfEmpty(Mono.error(original)));
                 }));
+    }
+
+    private Mono<UserConnection> retryCreateWhileDeleting(
+            UserConnection connection, DuplicateNameException original, int remainingAttempts) {
+        var name = connection.getMetadata().getName();
+        return Mono.defer(() -> client.fetch(UserConnection.class, name))
+                .map(Optional::of)
+                .defaultIfEmpty(Optional.empty())
+                .flatMap(existing -> {
+                    if (existing.isPresent() && existing.get().getMetadata().getDeletionTimestamp() == null) {
+                        return Mono.error(new OAuth2UserAlreadyBoundException(existing.get()));
+                    }
+                    if (remainingAttempts == 0) {
+                        return Mono.error(original);
+                    }
+                    return Mono.delay(RECONNECT_RETRY_DELAY)
+                            .then(client.create(connection))
+                            .onErrorResume(
+                                    DuplicateNameException.class,
+                                    ignored -> retryCreateWhileDeleting(connection, original, remainingAttempts - 1));
+                });
     }
 
     private Mono<UserConnection> updateUserConnection(UserConnection connection, OAuth2User oauth2User) {

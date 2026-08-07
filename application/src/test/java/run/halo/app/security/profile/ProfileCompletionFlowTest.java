@@ -114,11 +114,32 @@ class ProfileCompletionFlowTest {
     }
 
     @Test
+    void emailRequirementShouldRejectVerifiedFlagWithoutEmail() {
+        var user = new User();
+        user.getSpec().setEmailVerified(true);
+        var setting = new SystemSetting.User();
+        setting.setMustVerifyEmailOnRegistration(true);
+        when(systemConfigFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
+                .thenReturn(Mono.just(setting));
+        when(userService.getUser(USERNAME)).thenReturn(Mono.just(user));
+
+        var requirement = new EmailProfileCompletionRequirement(systemConfigFetcher, userService);
+
+        StepVerifier.create(requirement.evaluate(USERNAME))
+                .expectNext(new ProfileCompletionStep(
+                        URI.create("/complete-profile"),
+                        URI.create("email-not-set"),
+                        "A verified email address is required."))
+                .verifyComplete();
+    }
+
+    @Test
     void emailRequirementShouldBeCompleteWhenEmailIsVerifiedOrPolicyIsDisabled() {
         var requirement = new EmailProfileCompletionRequirement(systemConfigFetcher, userService);
         var user = new User();
         var setting = new SystemSetting.User();
 
+        user.getSpec().setEmail("alice@example.com");
         user.getSpec().setEmailVerified(true);
         setting.setMustVerifyEmailOnRegistration(true);
         when(systemConfigFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))

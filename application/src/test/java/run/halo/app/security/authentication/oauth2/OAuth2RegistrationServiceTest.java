@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -33,6 +35,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
@@ -44,6 +47,7 @@ import run.halo.app.core.extension.UserConnection;
 import run.halo.app.core.user.service.UserConnectionService;
 import run.halo.app.core.user.service.UserService;
 import run.halo.app.extension.Metadata;
+import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
@@ -507,6 +511,58 @@ class OAuth2RegistrationServiceTest {
         assertThat(user.getSpec().getPassword()).isNull();
         verify(userService).createUser(user, Set.of("guest"));
         verify(connectionService).createUserConnection("alice", "github", token.getPrincipal());
+    }
+
+    @Test
+    void shouldRetryRegistrationClaimCleanupAfterOptimisticLock() {
+        var claim = new AtomicReference<String>();
+        var updateAttempts = new AtomicInteger();
+        when(userService.createUser(any(User.class), eq(Set.of("guest")))).thenAnswer(invocation -> {
+            var created = invocation.getArgument(0, User.class);
+            claim.set(MetadataUtil.nullSafeAnnotations(created).get(OAuth2RegistrationService.REGISTRATION_CLAIM_ANNO));
+            users.put("alice", created);
+            return Mono.just(created);
+        });
+        when(client.update(any(User.class))).thenAnswer(invocation -> {
+            var updating = invocation.getArgument(0, User.class);
+            if (updateAttempts.getAndIncrement() == 0) {
+                MetadataUtil.nullSafeAnnotations(updating)
+                        .put(OAuth2RegistrationService.REGISTRATION_CLAIM_ANNO, claim.get());
+                return Mono.error(new OptimisticLockingFailureException("concurrent reconciliation"));
+            }
+            return Mono.just(updating);
+        });
+
+        StepVerifier.create(service.register(token(Map.of("sub", "alice")), false))
+                .expectNext("alice")
+                .verifyComplete();
+
+        verify(client, times(2)).update(any(User.class));
+        assertThat(MetadataUtil.nullSafeAnnotations(users.get("alice")))
+                .doesNotContainKey(OAuth2RegistrationService.REGISTRATION_CLAIM_ANNO);
+    }
+
+    @Test
+    void shouldKeepRegistrationSuccessfulWhenClaimCleanupOptimisticRetriesExhausted() {
+        var claim = new AtomicReference<String>();
+        when(userService.createUser(any(User.class), eq(Set.of("guest")))).thenAnswer(invocation -> {
+            var created = invocation.getArgument(0, User.class);
+            claim.set(MetadataUtil.nullSafeAnnotations(created).get(OAuth2RegistrationService.REGISTRATION_CLAIM_ANNO));
+            users.put("alice", created);
+            return Mono.just(created);
+        });
+        when(client.update(any(User.class))).thenAnswer(invocation -> {
+            var updating = invocation.getArgument(0, User.class);
+            MetadataUtil.nullSafeAnnotations(updating)
+                    .put(OAuth2RegistrationService.REGISTRATION_CLAIM_ANNO, claim.get());
+            return Mono.error(new OptimisticLockingFailureException("continuous reconciliation"));
+        });
+
+        StepVerifier.create(service.register(token(Map.of("sub", "alice")), false))
+                .expectNext("alice")
+                .verifyComplete();
+
+        verify(client, times(3)).update(any(User.class));
     }
 
     private void verifyNoMutation() {

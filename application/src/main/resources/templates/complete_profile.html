@@ -1,8 +1,13 @@
 <!DOCTYPE html>
 <html
+  lang="en"
+  th:lang="${#locale.toLanguageTag}"
   xmlns:th="https://www.thymeleaf.org"
   th:replace="~{gateway_fragments/layout :: layout(title = |#{title} - ${site.title}|, head = ~{::head}, body = ~{::body})}"
 >
+  <head>
+    <title th:text="|#{title} - ${site.title}|">Complete profile</title>
+  </head>
   <th:block th:fragment="body">
     <div class="gateway-wrapper complete-profile-page-wrapper">
       <div th:replace="~{gateway_fragments/common::haloLogo}"></div>

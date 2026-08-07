@@ -48,6 +48,7 @@
 
   <form class="halo-form" th:action="@{/login/oauth2/register}" method="post">
     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+    <input type="hidden" name="oauth2Identity" th:value="${oauth2Identity}" />
 
     <p class="oauth2-select-hint" th:text="#{form.hint}"></p>
 
@@ -98,6 +99,6 @@
   </form>
 
   <div class="oauth2-bind">
-    <a th:href="@{/login?oauth2_bind}" th:text="#{form.bind}"></a>
+    <a th:href="@{/login(oauth2_bind='',oauth2Identity=${oauth2Identity})}" th:text="#{form.bind}"></a>
   </div>
 </div>

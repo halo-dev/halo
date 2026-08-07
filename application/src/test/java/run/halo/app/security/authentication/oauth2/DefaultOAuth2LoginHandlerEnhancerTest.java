@@ -26,6 +26,8 @@ import run.halo.app.core.user.service.UserConnectionService;
 @ExtendWith(MockitoExtension.class)
 class DefaultOAuth2LoginHandlerEnhancerTest {
 
+    private static final String OAUTH2_IDENTITY = "4d2f4d279e39d96d972a1afa6bb5920871c7b4b9f068b1bfca47898ec655c41f";
+
     @Mock
     UserConnectionService connectionService;
 
@@ -50,7 +52,7 @@ class DefaultOAuth2LoginHandlerEnhancerTest {
     @Test
     void shouldBindOnlyAfterConsumingExplicitIntent() {
         var authentication = localAuthentication();
-        when(bindIntent.consume(exchange)).thenReturn(Mono.just(true));
+        when(bindIntent.consume(exchange)).thenReturn(Mono.just(OAUTH2_IDENTITY));
         when(tokenCache.getToken(exchange)).thenReturn(Mono.just(oauth2Token));
         when(connectionService.updateUserConnectionIfPresent("github", oauth2Token.getPrincipal()))
                 .thenReturn(Mono.empty());
@@ -70,7 +72,7 @@ class DefaultOAuth2LoginHandlerEnhancerTest {
 
     @Test
     void shouldClearStaleOAuth2TokenWithoutBindingForOrdinaryLogin() {
-        when(bindIntent.consume(exchange)).thenReturn(Mono.just(false));
+        when(bindIntent.consume(exchange)).thenReturn(Mono.empty());
         when(tokenCache.removeToken(exchange)).thenReturn(Mono.empty());
 
         enhancer.loginSuccess(exchange, localAuthentication())
@@ -84,7 +86,7 @@ class DefaultOAuth2LoginHandlerEnhancerTest {
 
     @Test
     void shouldConsumeIntentOnceAndNotBindAgain() {
-        when(bindIntent.consume(exchange)).thenReturn(Mono.just(true), Mono.just(false));
+        when(bindIntent.consume(exchange)).thenReturn(Mono.just(OAUTH2_IDENTITY), Mono.empty());
         when(tokenCache.getToken(exchange)).thenReturn(Mono.just(oauth2Token));
         when(connectionService.updateUserConnectionIfPresent("github", oauth2Token.getPrincipal()))
                 .thenReturn(Mono.empty());
@@ -102,7 +104,7 @@ class DefaultOAuth2LoginHandlerEnhancerTest {
     @Test
     void shouldClearCachedTokenWhenBindingFails() {
         var failure = new IllegalStateException("binding failed");
-        when(bindIntent.consume(exchange)).thenReturn(Mono.just(true));
+        when(bindIntent.consume(exchange)).thenReturn(Mono.just(OAUTH2_IDENTITY));
         when(tokenCache.getToken(exchange)).thenReturn(Mono.just(oauth2Token));
         when(connectionService.updateUserConnectionIfPresent("github", oauth2Token.getPrincipal()))
                 .thenReturn(Mono.error(failure));
@@ -115,6 +117,21 @@ class DefaultOAuth2LoginHandlerEnhancerTest {
 
         verify(tokenCache).removeToken(exchange);
         verify(connectionService, never()).createUserConnection(any(), any(), any());
+    }
+
+    @Test
+    void shouldKeepHaloLoginButRefuseBindingWhenOAuth2IdentityChanged() {
+        when(bindIntent.consume(exchange)).thenReturn(Mono.just("stale"));
+        when(tokenCache.getToken(exchange)).thenReturn(Mono.just(oauth2Token));
+        when(tokenCache.removeToken(exchange)).thenReturn(Mono.empty());
+
+        enhancer.loginSuccess(exchange, localAuthentication())
+                .as(StepVerifier::create)
+                .verifyComplete();
+
+        verify(connectionService, never()).updateUserConnectionIfPresent(any(), any());
+        verify(connectionService, never()).createUserConnection(any(), any(), any());
+        verify(tokenCache).removeToken(exchange);
     }
 
     private static UsernamePasswordAuthenticationToken localAuthentication() {

@@ -177,6 +177,18 @@ class EmailProfileCompletionEndpointTest {
     }
 
     @Test
+    void shouldRenderCompletionPageWhenVerifiedFlagHasNoEmail() {
+        user.getSpec().setEmail(null);
+        user.getSpec().setEmailVerified(true);
+
+        authenticatedGet().exchange().expectStatus().isOk();
+
+        assertThat(renderedView.get()).isEqualTo("complete_profile");
+        assertThat(renderedModel.get().get("form"))
+                .isEqualTo(new EmailProfileCompletionEndpoint.CompleteProfileForm(null, null));
+    }
+
+    @Test
     void shouldRedirectVerifiedUserToNextProfileCompletionStep() {
         user.getSpec().setEmailVerified(true);
         when(profileCompletionFlow.getRedirectUri(eq(USERNAME), any()))

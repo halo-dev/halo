@@ -58,6 +58,8 @@ import run.halo.app.security.profile.ProfileCompletionFlow;
 @Import(PreAuthOAuth2RegistrationIntegrationTest.TokenCacheRouteConfiguration.class)
 class PreAuthOAuth2RegistrationIntegrationTest {
 
+    private static final String OAUTH2_IDENTITY = "bdd378e8617e43f02022e84b6613e018339b4ed1d6141c79b87d9329d8eb09cc";
+
     @Autowired
     WebTestClient webClient;
 
@@ -116,7 +118,11 @@ class PreAuthOAuth2RegistrationIntegrationTest {
                 .expectStatus()
                 .isOk()
                 .expectBody(String.class)
-                .value(body -> assertThat(body).contains("GitHub").contains("href=\"/login?oauth2_bind\""));
+                .value(body -> assertThat(body)
+                        .contains("GitHub")
+                        .contains("name=\"oauth2Identity\"")
+                        .contains("value=\"" + OAUTH2_IDENTITY + "\"")
+                        .contains("oauth2Identity=" + OAUTH2_IDENTITY));
     }
 
     @Test
@@ -131,7 +137,7 @@ class PreAuthOAuth2RegistrationIntegrationTest {
                 .uri("/login/oauth2/register")
                 .cookie(sessionCookie.getName(), sessionCookie.getValue())
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .bodyValue("agreedToTerms=false")
+                .bodyValue("oauth2Identity=" + OAUTH2_IDENTITY + "&agreedToTerms=false")
                 .exchange()
                 .expectStatus()
                 .isFound()

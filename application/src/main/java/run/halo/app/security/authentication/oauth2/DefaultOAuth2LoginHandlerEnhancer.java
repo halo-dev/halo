@@ -45,12 +45,18 @@ public class DefaultOAuth2LoginHandlerEnhancer implements OAuth2LoginHandlerEnha
         }
         return bindIntent
                 .consume(exchange)
-                .flatMap(shouldBind ->
-                        shouldBind ? bind(exchange, authentication) : oauth2TokenCache.removeToken(exchange));
+                .flatMap(oauth2Identity ->
+                        bind(exchange, authentication, oauth2Identity).thenReturn(true))
+                .defaultIfEmpty(false)
+                .flatMap(bindAttempted -> bindAttempted ? Mono.empty() : oauth2TokenCache.removeToken(exchange));
     }
 
-    private Mono<Void> bind(ServerWebExchange exchange, Authentication authentication) {
+    private Mono<Void> bind(ServerWebExchange exchange, Authentication authentication, String expectedOAuth2Identity) {
         var binding = oauth2TokenCache.getToken(exchange).flatMap(oauth2Token -> {
+            if (!OAuth2IdentityFingerprint.from(oauth2Token).equals(expectedOAuth2Identity)) {
+                log.warn("Refused to bind an OAuth2 identity that changed during local login");
+                return Mono.empty();
+            }
             var oauth2User = oauth2Token.getPrincipal();
             var username = authentication.getName();
             var registrationId = oauth2Token.getAuthorizedClientRegistrationId();

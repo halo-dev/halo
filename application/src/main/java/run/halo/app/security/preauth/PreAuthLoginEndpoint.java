@@ -3,6 +3,7 @@ package run.halo.app.security.preauth;
 import static org.springframework.web.reactive.function.server.RequestPredicates.path;
 import static run.halo.app.security.SecurityConstant.REMEMBER_ME_PARAMETER_NAME;
 import static run.halo.app.security.SecurityConstant.USERNAME_PARAMETER_NAME;
+import static run.halo.app.security.authentication.oauth2.OAuth2IdentityFingerprint.PARAMETER_NAME;
 
 import java.net.URI;
 import java.util.Base64;
@@ -33,6 +34,7 @@ import run.halo.app.security.LoginParameterRequestCache;
 import run.halo.app.security.authentication.CryptoService;
 import run.halo.app.security.authentication.oauth2.OAuth2AuthenticationTokenCache;
 import run.halo.app.security.authentication.oauth2.OAuth2BindIntent;
+import run.halo.app.security.authentication.oauth2.OAuth2IdentityFingerprint;
 
 /**
  * Pre-auth login endpoints.
@@ -111,36 +113,43 @@ class PreAuthLoginEndpoint {
                                             ap.getMetadata().getName())))
                                     .cache();
 
-                            return prepareOAuth2Continuation(request)
-                                    .then(serverRequestCache.saveRequest(exchange))
-                                    .then(Mono.defer(() -> ServerResponse.ok()
-                                            .render(
-                                                    "login",
-                                                    Map.of(
-                                                            "action",
-                                                            contextPath + "/login",
-                                                            "publicKey",
-                                                            publicKey,
-                                                            "globalInfo",
-                                                            globalInfo,
-                                                            "authProvider",
-                                                            authProvider,
-                                                            "fragmentTemplateName",
-                                                            fragmentTemplateName,
-                                                            "socialAuthProviders",
-                                                            socialAuthProviders,
-                                                            "formAuthProviders",
-                                                            formAuthProviders,
-                                                            "rememberMe",
-                                                            parameterRequestCache.getParameter(
-                                                                    exchange, REMEMBER_ME_PARAMETER_NAME),
-                                                            "username",
-                                                            parameterRequestCache.getParameter(
-                                                                    exchange, USERNAME_PARAMETER_NAME),
-                                                            "email",
-                                                            parameterRequestCache.getParameter(exchange, "email")
-                                                            // TODO Add more models here
-                                                            ))));
+                            return prepareOAuth2Continuation(request).flatMap(ready -> {
+                                if (!ready) {
+                                    return ServerResponse.status(HttpStatus.FOUND)
+                                            .location(URI.create("/login?error=oauth2-flow-expired"))
+                                            .build();
+                                }
+                                return serverRequestCache
+                                        .saveRequest(exchange)
+                                        .then(Mono.defer(() -> ServerResponse.ok()
+                                                .render(
+                                                        "login",
+                                                        Map.of(
+                                                                "action",
+                                                                contextPath + "/login",
+                                                                "publicKey",
+                                                                publicKey,
+                                                                "globalInfo",
+                                                                globalInfo,
+                                                                "authProvider",
+                                                                authProvider,
+                                                                "fragmentTemplateName",
+                                                                fragmentTemplateName,
+                                                                "socialAuthProviders",
+                                                                socialAuthProviders,
+                                                                "formAuthProviders",
+                                                                formAuthProviders,
+                                                                "rememberMe",
+                                                                parameterRequestCache.getParameter(
+                                                                        exchange, REMEMBER_ME_PARAMETER_NAME),
+                                                                "username",
+                                                                parameterRequestCache.getParameter(
+                                                                        exchange, USERNAME_PARAMETER_NAME),
+                                                                "email",
+                                                                parameterRequestCache.getParameter(exchange, "email")
+                                                                // TODO Add more models here
+                                                                ))));
+                            });
                         })
                         .POST("/social/{authProviderName}", request -> {
                             var authProviderName = request.pathVariable("authProviderName");
@@ -166,13 +175,23 @@ class PreAuthLoginEndpoint {
                         .build());
     }
 
-    private Mono<Void> prepareOAuth2Continuation(ServerRequest request) {
+    private Mono<Boolean> prepareOAuth2Continuation(ServerRequest request) {
         if (request.queryParam("oauth2_bind").isPresent()) {
-            return bindIntent.save(request.exchange());
+            var exchange = request.exchange();
+            var expectedIdentity = request.queryParam(PARAMETER_NAME).orElse(null);
+            return oauth2TokenCache
+                    .getToken(exchange)
+                    .filter(token -> Objects.equals(expectedIdentity, OAuth2IdentityFingerprint.from(token)))
+                    .flatMap(
+                            token -> bindIntent.save(exchange, expectedIdentity).thenReturn(true))
+                    .switchIfEmpty(Mono.defer(
+                            () -> Mono.when(oauth2TokenCache.removeToken(exchange), bindIntent.clear(exchange))
+                                    .thenReturn(false)));
         }
         if (request.queryParam("oauth2_select").isPresent()) {
-            return bindIntent.clear(request.exchange());
+            return bindIntent.clear(request.exchange()).thenReturn(true);
         }
-        return Mono.when(oauth2TokenCache.removeToken(request.exchange()), bindIntent.clear(request.exchange()));
+        return Mono.when(oauth2TokenCache.removeToken(request.exchange()), bindIntent.clear(request.exchange()))
+                .thenReturn(true);
     }
 }

@@ -16,6 +16,9 @@
     <strong th:if="${error == 'account-disabled'}">
       <span th:text="#{form.error.accountDisabled}"></span>
     </strong>
+    <strong th:if="${error == 'oauth2-flow-expired'}">
+      <span th:text="#{form.error.oauth2FlowExpired}"></span>
+    </strong>
   </div>
   <div class="alert" role="alert" th:if="${param.logout.size() > 0}">
     <strong th:text="#{form.messages.logoutSuccess}"></strong>

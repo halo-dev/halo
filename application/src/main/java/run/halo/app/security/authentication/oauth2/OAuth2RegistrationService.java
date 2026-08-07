@@ -13,7 +13,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -23,6 +25,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.user.service.UserConnectionService;
 import run.halo.app.core.user.service.UserService;
@@ -36,12 +39,14 @@ import run.halo.app.infra.exception.AgreementNotAcceptedException;
 import run.halo.app.security.authentication.oauth2.OAuth2RegistrationException.Error;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class OAuth2RegistrationService {
 
     static final int RANDOM_USERNAME_MAX_ATTEMPTS = 20;
     static final String RANDOM_USERNAME_PREFIX = "user-";
     static final String REGISTRATION_CLAIM_ANNO = "auth.halo.run/oauth2-registration-claim";
+    private static final int CLAIM_CLEAR_MAX_RETRIES = 2;
 
     private final ReactiveExtensionClient client;
     private final UserService userService;
@@ -129,14 +134,21 @@ public class OAuth2RegistrationService {
     }
 
     private Mono<Void> clearRegistrationClaim(String username, String claim) {
-        return client.fetch(User.class, username)
+        return Mono.defer(() -> client.fetch(User.class, username))
                 .filter(user ->
                         Objects.equals(MetadataUtil.nullSafeAnnotations(user).get(REGISTRATION_CLAIM_ANNO), claim))
                 .flatMap(user -> {
                     MetadataUtil.nullSafeAnnotations(user).remove(REGISTRATION_CLAIM_ANNO);
                     return client.update(user);
                 })
-                .then();
+                .then()
+                .retryWhen(Retry.max(CLAIM_CLEAR_MAX_RETRIES)
+                        .filter(OptimisticLockingFailureException.class::isInstance)
+                        .onRetryExhaustedThrow((spec, signal) -> signal.failure()))
+                .onErrorResume(OptimisticLockingFailureException.class, error -> {
+                    log.warn("Failed to clear OAuth2 registration claim for user {} after retries", username, error);
+                    return Mono.empty();
+                });
     }
 
     private Mono<String> resolveUsername(OAuth2User oauth2User, SystemSetting.User setting) {

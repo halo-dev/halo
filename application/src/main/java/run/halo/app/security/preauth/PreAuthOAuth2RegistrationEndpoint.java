@@ -3,6 +3,7 @@ package run.halo.app.security.preauth;
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
 import static org.springframework.web.reactive.function.server.RequestPredicates.contentType;
 import static org.springframework.web.reactive.function.server.RequestPredicates.path;
+import static run.halo.app.security.authentication.oauth2.OAuth2IdentityFingerprint.PARAMETER_NAME;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -28,15 +29,24 @@ import run.halo.app.infra.utils.HaloUtils;
 import run.halo.app.security.AuthProviderService;
 import run.halo.app.security.authentication.oauth2.OAuth2AuthenticationSession;
 import run.halo.app.security.authentication.oauth2.OAuth2AuthenticationTokenCache;
+import run.halo.app.security.authentication.oauth2.OAuth2BindIntent;
+import run.halo.app.security.authentication.oauth2.OAuth2IdentityFingerprint;
 import run.halo.app.security.authentication.oauth2.OAuth2RegistrationException;
 import run.halo.app.security.authentication.oauth2.OAuth2RegistrationService;
+import run.halo.app.security.authorization.AuthorityUtils;
 import run.halo.app.security.profile.ProfileCompletionFlow;
 
 @Component
 @RequiredArgsConstructor
 class PreAuthOAuth2RegistrationEndpoint {
 
+    private static final String LOGIN_PATH = "/login";
+
+    private static final String FLOW_EXPIRED_REDIRECT = LOGIN_PATH + "?error=oauth2-flow-expired";
+
     private final OAuth2AuthenticationTokenCache tokenCache;
+
+    private final OAuth2BindIntent bindIntent;
 
     private final AuthProviderService authProviderService;
 
@@ -69,28 +79,41 @@ class PreAuthOAuth2RegistrationEndpoint {
     private Mono<ServerResponse> renderSelectPage(ServerRequest request) {
         return tokenCache
                 .getToken(request.exchange())
-                .flatMap(token -> selectionModel(token)
+                .flatMap(token -> bindIntent
+                        .clear(request.exchange())
+                        .then(selectionModel(token))
                         .flatMap(model -> ServerResponse.ok().render("login_oauth2_select", model)))
-                .switchIfEmpty(redirect("/login"));
+                .switchIfEmpty(redirect(LOGIN_PATH));
     }
 
     private Mono<ServerResponse> register(ServerRequest request) {
         return tokenCache
                 .getToken(request.exchange())
                 .flatMap(token -> request.formData().flatMap(formData -> {
+                    var submittedIdentity = formData.getFirst(PARAMETER_NAME);
+                    if (!Objects.equals(submittedIdentity, OAuth2IdentityFingerprint.from(token))) {
+                        return clearOAuth2State(request).then(redirect(FLOW_EXPIRED_REDIRECT));
+                    }
                     var agreedToTerms = Boolean.parseBoolean(formData.getFirst("agreedToTerms"));
                     return selectionModel(token)
                             .flatMap(model -> registrationService
                                     .register(token, agreedToTerms)
                                     .map(username -> Mono.defer(() -> authenticationSession
-                                            .establish(request.exchange(), username, token)
-                                            .then(profileCompletionFlow
-                                                    .getRedirectUri(username, request.exchange())
-                                                    .flatMap(uri -> redirect(uri.toString())))))
+                                            .establishAndGetAuthentication(request.exchange(), username, token)
+                                            .flatMap(authentication -> {
+                                                var roles = AuthorityUtils.authoritiesToRoles(
+                                                        authentication.getAuthorities());
+                                                var redirectUri = AuthorityUtils.containsSuperRole(roles)
+                                                        ? profileCompletionFlow.getRedirectUriAfterCompletion(
+                                                                request.exchange())
+                                                        : profileCompletionFlow.getRedirectUri(
+                                                                username, request.exchange());
+                                                return redirectUri.flatMap(uri -> redirect(uri.toString()));
+                                            })))
                                     .onErrorResume(error -> Mono.just(renderRegistrationError(error, model)))
                                     .flatMap(response -> response));
                 }))
-                .switchIfEmpty(redirect("/login"));
+                .switchIfEmpty(redirect(LOGIN_PATH));
     }
 
     private Mono<Map<String, Object>> selectionModel(OAuth2AuthenticationToken token) {
@@ -104,10 +127,15 @@ class PreAuthOAuth2RegistrationEndpoint {
         return Mono.zip(provider, userSetting, agreementPages).map(tuple -> {
             Map<String, Object> model = new HashMap<>();
             model.put("provider", tuple.getT1());
+            model.put(PARAMETER_NAME, OAuth2IdentityFingerprint.from(token));
             model.put("allowRegistration", tuple.getT2().isAllowRegistration());
             model.put("agreementPages", tuple.getT3());
             return model;
         });
+    }
+
+    private Mono<Void> clearOAuth2State(ServerRequest request) {
+        return Mono.when(tokenCache.removeToken(request.exchange()), bindIntent.clear(request.exchange()));
     }
 
     private Mono<ServerResponse> renderRegistrationError(Throwable error, Map<String, Object> model) {

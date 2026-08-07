@@ -131,14 +131,12 @@ class ProfileCompletionFilterTest {
                 "/password-reset/email",
                 "/password-reset/email/reset-token",
                 "/logout",
+                "/logout/impersonate",
                 "/complete-profile",
                 "/complete-profile/send-email-code",
                 "/complete-profile/phone",
                 "/complete-profile/phone/send-code",
                 "/system/setup",
-                "/ui-assets/app.js",
-                "/themes/default/assets/app.css",
-                "/plugins/example/assets/app.js",
                 "/favicon.ico"
             })
     void shouldPassExemptPath(String path) {
@@ -180,8 +178,8 @@ class ProfileCompletionFilterTest {
     }
 
     @Test
-    void shouldNotExemptNonGetStaticResource() {
-        var exchange = exchange(MockServerHttpRequest.method(HttpMethod.POST, "/ui-assets/app.js")
+    void shouldLeaveStaticResourceExclusionToSecurityChain() {
+        var exchange = exchange(MockServerHttpRequest.method(HttpMethod.GET, "/ui-assets/app.js")
                 .accept(MediaType.APPLICATION_JSON));
         when(profileCompletionFlow.findNext(USERNAME)).thenReturn(Mono.just(PHONE_STEP));
 

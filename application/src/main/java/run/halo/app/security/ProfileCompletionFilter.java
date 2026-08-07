@@ -17,7 +17,6 @@ import org.springframework.security.web.server.ServerRedirectStrategy;
 import org.springframework.security.web.server.savedrequest.ServerRequestCache;
 import org.springframework.security.web.server.util.matcher.AndServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.NegatedServerWebExchangeMatcher;
-import org.springframework.security.web.server.util.matcher.OrServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebExchange;
@@ -108,23 +107,12 @@ class ProfileCompletionFilter implements WebFilter {
                 "/signup",
                 "/password-reset/**",
                 "/logout",
+                "/logout/impersonate",
                 "/complete-profile/**",
                 "/system/setup",
                 "/error",
                 "/favicon.ico");
-        var staticResources = pathMatchers(
-                HttpMethod.GET,
-                "/ui-assets/**",
-                "/themes/{themeName}/assets/{*resourcePaths}",
-                "/themes/{themeName}/ui-plugin/assets/{*resourcePaths}",
-                "/themes/{themeName}/screenshot.{extension}",
-                "/plugins/{pluginName}/assets/**",
-                "/webjars/**",
-                "/js/**",
-                "/styles/**",
-                "/halo-tracker.js",
-                "/images/**");
-        return new OrServerWebExchangeMatcher(paths, staticResources);
+        return paths;
     }
 
     private static ServerWebExchangeMatcher createNavigationMatcher() {

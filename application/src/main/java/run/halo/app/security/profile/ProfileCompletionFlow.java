@@ -36,7 +36,11 @@ public class ProfileCompletionFlow {
     public Mono<URI> getRedirectUri(String username, ServerWebExchange exchange) {
         return findNext(username)
                 .map(ProfileCompletionStep::location)
-                .switchIfEmpty(Mono.defer(() -> requestCache.getRedirectUri(exchange)))
-                .defaultIfEmpty(DEFAULT_REDIRECT_URI);
+                .switchIfEmpty(Mono.defer(() -> getRedirectUriAfterCompletion(exchange)));
+    }
+
+    /** Returns the saved request or the user-center fallback after all requirements are complete. */
+    public Mono<URI> getRedirectUriAfterCompletion(ServerWebExchange exchange) {
+        return requestCache.getRedirectUri(exchange).defaultIfEmpty(DEFAULT_REDIRECT_URI);
     }
 }
