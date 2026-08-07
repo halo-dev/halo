@@ -403,7 +403,7 @@ Halo SHALL preserve the existing IIFE UI provider protocol throughout Halo 2.x.
 
 ### Requirement: UI provider lifecycle and cache boundary
 
-Halo SHALL treat a full Console or User Center page load as the supported module replacement boundary and SHALL provide cache-safe resource URLs for output produced by the default provider presets.
+Halo SHALL treat a full Console or User Center page load as the supported module replacement boundary and SHALL provide canonical cache-safe resource URLs for output produced by the default provider presets.
 
 #### Scenario: Provider is installed, upgraded, enabled, disabled, or activated
 
@@ -414,23 +414,30 @@ Halo SHALL treat a full Console or User Center page load as the supported module
 #### Scenario: Production ESM assets from default presets are cached
 
 - **WHEN** production provider ESM resources are emitted without overriding the supported bundler-kit resource naming defaults
-- **THEN** entry and direct startup-style URLs SHALL include a cache key derived from that provider's Halo-managed identity and installed version
-- **THEN** legacy aggregate URLs SHALL include the current catalog version as a cache key
+- **THEN** entry and startup-style filenames SHALL contain content-derived hashes
+- **THEN** their descriptor URLs SHALL use the manifest-selected provider-relative paths without appending a query cache key
 - **THEN** asynchronous chunks and assets emitted by the default presets SHALL use provider-relative content-hashed URLs
+- **THEN** legacy aggregate URLs SHALL include the current catalog version as a cache key
 - **THEN** provider discovery metadata SHALL be revalidated so it reflects currently enabled providers
 
-#### Scenario: Provider overrides secondary resource names
+#### Scenario: A provider chunk imports the provider entry
 
-- **WHEN** caller bundler configuration or hooks emit asynchronous chunks, stylesheets, or assets with stable or otherwise custom filenames
-- **THEN** Halo SHALL NOT rewrite those resources or propagate the entry query cache key to their relative requests
+- **WHEN** an asynchronous ESM chunk statically imports a binding from the provider entry
+- **THEN** the chunk reference and the descriptor entry SHALL resolve to the same canonical URL
+- **THEN** the browser SHALL NOT fetch or evaluate a second entry module solely because Halo appended a query cache key
+
+#### Scenario: Provider overrides startup or secondary resource names
+
+- **WHEN** caller bundler configuration or hooks emit the ESM entry, startup stylesheet, asynchronous chunks, stylesheets, or assets with stable or otherwise custom filenames
+- **THEN** Halo SHALL NOT rewrite those resources or append a query cache key to the ESM entry and startup-style URLs
 - **THEN** cache invalidation for the overridden resources SHALL be the provider developer's responsibility
 
 #### Scenario: Development provider assets are cached
 
 - **WHEN** a development plugin or theme provider is described repeatedly without changing its directly loaded build output
-- **THEN** its entry and startup-style URLs SHALL retain the same provider-specific cache key
+- **THEN** its manifest-selected entry and startup-style URLs SHALL remain unchanged
 - **WHEN** its manifest, entry, or startup stylesheet changes
-- **THEN** its provider-specific cache key and the catalog version SHALL change
+- **THEN** its content-hashed startup filenames and the catalog version SHALL change
 - **THEN** another unchanged provider SHALL retain its existing direct resource URLs
 
 ### Requirement: Development and packaged runtime parity
