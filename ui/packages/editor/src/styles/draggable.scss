@@ -25,3 +25,17 @@
     opacity: 0;
   }
 }
+
+.halo-editor-block-drag-handle {
+  position: relative;
+
+  &::after {
+    position: absolute;
+    top: 0;
+    right: calc(0px - var(--halo-drag-handle-hover-bridge));
+    bottom: 0;
+    width: var(--halo-drag-handle-hover-bridge);
+    pointer-events: auto;
+    content: "";
+  }
+}

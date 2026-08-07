@@ -188,7 +188,7 @@ const sortBubbleMenuItems = (items: BubbleItemType[] | undefined) => {
     :get-referenced-virtual-element="bubbleMenu.getReferencedVirtualElement"
   >
     <div
-      class="bubble-menu flex items-center space-x-1 rounded-md border bg-white p-1 shadow"
+      class="bubble-menu flex max-w-[calc(100vw-30px)] items-center space-x-1 overflow-x-auto rounded-md border bg-white p-1 shadow [overscroll-behavior-inline:contain] [scrollbar-width:none]"
     >
       <template v-if="bubbleMenu.items">
         <template
@@ -212,9 +212,8 @@ const sortBubbleMenuItems = (items: BubbleItemType[] | undefined) => {
   </bubble-menu>
 </template>
 <style scoped>
-.bubble-menu {
-  max-width: calc(100vw - 30px);
-  overflow-x: auto;
+.bubble-menu::-webkit-scrollbar {
+  display: none;
 }
 
 .bubble-menu-pointer-selection-active {

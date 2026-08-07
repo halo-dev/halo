@@ -492,3 +492,75 @@ export interface DragButtonType extends DragButtonItemProps {
   };
 }
 ```
+
+## 6. 块缩进扩展
+
+编辑器会根据节点的 schema 元数据发现可缩进节点，不维护组件名称白名单。第三方节点只要属于 `block` group，且不属于 `list` group，就会自动获得块缩进属性、快捷键和拖拽缩进能力：
+
+```ts
+import { Node } from "@halo-dev/richtext-editor";
+
+export const MyBlock = Node.create({
+  name: "myBlock",
+  group: "block",
+  // ...
+});
+```
+
+特殊节点可以通过 `haloEditorIndentation` 调整接入行为：
+
+```ts
+import { Node } from "@halo-dev/richtext-editor";
+
+export const MyBlock = Node.create({
+  name: "myBlock",
+  group: "block",
+
+  // 光标在节点内部时，将 Tab / Shift-Tab 交给节点自身处理；
+  // 节点选中或光标位于节点左上角间隙时，仍可缩进整个节点。
+  haloEditorIndentation: {
+    keyboard: "passthrough",
+  },
+});
+```
+
+- 设置为 `false` 可以让 block 节点退出通用缩进。
+- 设置为 `true` 可以让不属于 block group 的特殊节点显式接入缩进。
+- `legacyLineIndent: true` 仅用于需要兼容旧版首行缩进数据的文本节点，不建议新扩展启用。
+
+自定义列表容器应加入 `list` group，列表项应加入 `listItem` group。编辑器通过这两个 schema group 识别列表层级、继承缩进和行内拖拽目标，不依赖 `bulletList`、`orderedList`、`listItem` 等具体节点名称。
+
+第三方块命令可以复用以下公共 helpers：
+
+```ts
+import {
+  findAncestorListItems,
+  getBlockIndentAtSelection,
+  prepareBlockCommandFromList,
+} from "@halo-dev/richtext-editor";
+
+const listItems = findAncestorListItems(editor.state.selection.$from);
+const indent = getBlockIndentAtSelection(editor);
+const preparedRange = prepareBlockCommandFromList(editor, range);
+```
+
+- `findAncestorListItems` 按 schema group 查找当前光标所在的列表项，结果从内层到外层排列。
+- `getBlockIndentAtSelection` 将显式块缩进和列表层级换算为当前配置下的可视缩进。
+- `prepareBlockCommandFromList` 适用于 Slash Command 一类块命令：移除触发文本、退出列表并保留可视缩进，且整个操作可以一次撤销。
+
+缩进步长、最小值、最大值和默认值都可以通过 `ExtensionsKit` 配置：
+
+```ts
+import { ExtensionsKit } from "@halo-dev/richtext-editor";
+
+ExtensionsKit.configure({
+  indent: {
+    indentRange: 32,
+    minIndentLevel: 0,
+    maxIndentLevel: 320,
+    defaultIndentLevel: 0,
+  },
+});
+```
+
+未配置 `maxIndentLevel` 时，默认允许 10 级缩进，并会随 `indentRange` 自动换算最大值。

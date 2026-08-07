@@ -45,7 +45,7 @@
   },
   "peerDependencies": {
     "vue": "^3.5.x",
-    "vue-router": "^5.0.x"
+    "vue-router": "~5.1.0"
   },
   "inlinedDependencies": {
     "@formkit/core": "2.1.0",

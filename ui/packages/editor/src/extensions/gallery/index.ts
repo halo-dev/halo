@@ -7,6 +7,7 @@ import ToolboxItem from "@/components/toolbox/ToolboxItem.vue";
 import { i18n } from "@/locales";
 import {
   isActive,
+  mergeAttributes,
   Node,
   PluginKey,
   VueNodeViewRenderer,
@@ -180,7 +181,7 @@ export const ExtensionGallery = Node.create<
     ];
   },
 
-  renderHTML({ node }) {
+  renderHTML({ node, HTMLAttributes }) {
     const images: ExtensionGalleryImageItem[] = node.attrs.images || [];
     const groupSize =
       node.attrs.groupSize ||
@@ -231,12 +232,12 @@ export const ExtensionGallery = Node.create<
 
     return [
       "div",
-      {
+      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
         "data-type": "gallery",
         "data-group-size": groupSize.toString(),
         "data-layout": layout,
         "data-gap": gap?.toString(),
-      },
+      }),
       [
         "div",
         { style: `display: grid; gap: ${gap}px;` },

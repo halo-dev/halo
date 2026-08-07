@@ -26,6 +26,8 @@ export type ExtensionDetailsOptions = Partial<DetailsOptions> &
   ExtensionOptions;
 
 const ExtensionDetailsSummary = DetailsSummary.extend({
+  haloEditorIndentation: true,
+
   addHaloEditorMetadata() {
     return {
       ai: {

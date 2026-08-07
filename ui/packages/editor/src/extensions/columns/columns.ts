@@ -193,6 +193,9 @@ export const ExtensionColumns = Node.create<ExtensionColumnsOptions>({
   isolating: true,
   content: "column{1,}",
   fakeSelection: false,
+  haloEditorIndentation: {
+    keyboard: "passthrough",
+  },
 
   addHaloEditorMetadata() {
     return {

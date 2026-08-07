@@ -26,6 +26,10 @@ import { generateAnchorId } from "@/utils";
 export type ExtensionHeadingOptions = ExtensionOptions & HeadingOptions;
 
 export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
+  haloEditorIndentation: {
+    legacyLineIndent: true,
+  },
+
   addHaloEditorMetadata() {
     return {
       ai: {
