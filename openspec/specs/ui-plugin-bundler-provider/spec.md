@@ -80,7 +80,7 @@ The theme provider SHALL read the theme manifest by default and use its metadata
 
 ### Requirement: Theme provider build output
 
-The theme provider SHALL configure IIFE or ESM build output to match the active-theme UI resource runtime contract.
+The theme provider SHALL configure IIFE or ESM build defaults to match the active-theme UI resource runtime contract while preserving native caller configuration as an advanced escape hatch.
 
 #### Scenario: Theme Vite output defaults are generated
 
@@ -88,7 +88,7 @@ The theme provider SHALL configure IIFE or ESM build output to match the active-
 - **THEN** the helper SHALL configure production output to `dist`
 - **THEN** IIFE output SHALL configure the Vite base URL as `/themes/{metadata.name}/ui-plugin/assets/`
 - **THEN** ESM output SHALL emit relocatable provider-relative resource URLs
-- **THEN** the helper SHALL emit the primary entry, styles, chunks, and provider manifest required by the selected format
+- **THEN** the helper SHALL emit the primary entry, styles, chunks, and provider manifest required by the selected format when the relevant defaults are not overridden
 
 #### Scenario: Theme Rsbuild output defaults are generated
 
@@ -96,7 +96,7 @@ The theme provider SHALL configure IIFE or ESM build output to match the active-
 - **THEN** the helper SHALL configure the output root to `dist`
 - **THEN** IIFE output SHALL configure the public path as `/themes/{metadata.name}/ui-plugin/assets/`
 - **THEN** ESM output SHALL derive asynchronous resource URLs from the loaded entry URL
-- **THEN** the helper SHALL emit the primary entry, styles, chunks, and provider manifest required by the selected format
+- **THEN** the helper SHALL emit the primary entry, styles, chunks, and provider manifest required by the selected format when the relevant defaults are not overridden
 
 #### Scenario: Theme builds with the supported Rsbuild toolchain
 
@@ -111,18 +111,20 @@ The theme provider SHALL configure IIFE or ESM build output to match the active-
 
 #### Scenario: Theme ESM output reuses shared specifiers
 
-- **WHEN** the theme provider selects ESM format
-- **THEN** the helper SHALL apply the same host runtime snapshot and ESM externalization rules used by plugin ESM bundles
+- **WHEN** the theme provider selects ESM format without caller overrides to the shared external configuration
+- **THEN** the helper SHALL apply the same host runtime snapshot and ESM externalization defaults used by plugin ESM bundles
 
-#### Scenario: User config overrides theme defaults consistently
+#### Scenario: User config overrides theme defaults
 
-- **WHEN** a caller provides Vite or Rsbuild configuration that does not conflict with the selected provider format, manifest, resource root, or shared dependency contract
-- **THEN** the helper SHALL merge the caller configuration after provider defaults
+- **WHEN** a caller supplies native Vite or Rsbuild configuration
+- **THEN** the helper SHALL merge the caller configuration after provider defaults using the bundler's normal merge semantics
+- **THEN** the helper SHALL NOT reject, rewrite, or warn about the override merely because it conflicts with the default provider output contract
 
-#### Scenario: User config conflicts with generated output contract
+#### Scenario: User config changes the generated output contract
 
-- **WHEN** a caller override causes the final bundle format, entry, public path, external set, or emitted manifest to disagree with the selected provider contract
-- **THEN** the build SHALL fail with a diagnostic describing the conflicting setting
+- **WHEN** caller configuration or a raw bundler hook changes the final format, entry, public path, external set, filenames, resources, or manifest consistency
+- **THEN** correctness of the resulting artifact SHALL be the provider developer's responsibility
+- **THEN** the bundler-kit SHALL NOT claim that the overridden output retains the supported default preset contract
 
 ### Requirement: Provider Vue compiler configuration
 
@@ -178,7 +180,7 @@ The modern Vite and Rsbuild helpers SHALL support `auto`, `iife`, and `esm` prov
 
 ### Requirement: Target Halo shared dependency validation
 
-The bundler SHALL validate a provider project's actually resolved shared dependency packages against the sparse immutable host runtime snapshot selected for its target Halo version before externalizing them.
+The bundler SHALL discover imported shared package roots and provide best-effort installed-version diagnostics against the sparse immutable host runtime snapshot selected for the target Halo version. Version diagnostics SHALL NOT be an admission gate for ESM output.
 
 #### Scenario: Target snapshot is selected automatically
 
@@ -189,7 +191,7 @@ The bundler SHALL validate a provider project's actually resolved shared depende
 
 - **WHEN** the installed bundler does not contain a snapshot with the exact target Halo version but contains an older eligible snapshot
 - **THEN** the bundler SHALL use the latest eligible older snapshot
-- **THEN** it SHALL warn that newly introduced target exports require a bundler update
+- **THEN** it SHALL warn that the installed bundler contains only an older host dependency baseline
 
 #### Scenario: Prerelease target reuses a snapshot
 
@@ -203,105 +205,100 @@ The bundler SHALL validate a provider project's actually resolved shared depende
 - **WHEN** the installed bundler contains no snapshot whose baseline is compatible with the selected ESM target
 - **THEN** the build SHALL fail with a diagnostic that identifies the target version and recommends a bundler update or IIFE output
 
-#### Scenario: Resolved dependency matches the expected root
+#### Scenario: Imported shared root has an installed version
 
-- **WHEN** the package resolved from the provider project root has the expected package name and owning package root
-- **THEN** the bundler SHALL allow the shared package to remain external after validating its statically imported exports
+- **WHEN** syntax-aware import discovery observes a supported shared root and its package metadata can be resolved from the provider project
+- **THEN** the bundler SHALL report the installed provider version and exact host version recorded by the selected snapshot
+- **THEN** the supported root SHALL remain external according to the default preset
 
-#### Scenario: Resolved dependency version differs from the host baseline
+#### Scenario: Provider version is not newer within the host major
 
-- **WHEN** a shared package's actual version differs from the exact host version recorded by the snapshot
-- **THEN** the bundler SHALL allow externalization when concrete root and export checks pass
-- **THEN** it SHALL warn for a newer provider version and emit a stronger warning when the major version differs
+- **WHEN** the provider package and host snapshot have the same major version and the provider version is not newer than the host version
+- **THEN** version difference alone SHALL NOT produce a compatibility note or fail the build
 
-#### Scenario: Resolved dependency identity is invalid
+#### Scenario: Provider version is newer within the host major
 
-- **WHEN** a shared dependency is missing, resolves through an alias or fork, or bypasses the expected package root
-- **THEN** the ESM build SHALL fail and identify the dependency, resolved source and version when available, exact host version, target snapshot, and IIFE remediation
+- **WHEN** the provider package and host snapshot have the same major version and the provider version is newer than the host version
+- **THEN** the bundler SHALL emit one best-effort compatibility note identifying the newer provider version
+- **THEN** the version difference SHALL NOT fail the build or change externalization
 
-#### Scenario: Package declaration differs from actual resolution
+#### Scenario: Provider and host major versions differ
 
-- **WHEN** a package declaration range or lockfile text differs from the package actually resolved from the provider project root
-- **THEN** the bundler SHALL validate the actually resolved package
-- **THEN** it SHALL use the declaration and lockfile only as diagnostic context
-
-#### Scenario: Bundler resolves a nested copy of a shared package
-
-- **WHEN** the bundler resolves a genuine nested installation with the expected shared package name
-- **THEN** the bundler SHALL validate and report that resolved copy's actual version instead of silently treating it as the provider-root installation
-- **THEN** version differences from the host snapshot SHALL remain best-effort compatibility diagnostics
+- **WHEN** the provider package and host snapshot have different major versions
+- **THEN** the bundler SHALL emit one best-effort compatibility note identifying the major-version difference
+- **THEN** it SHALL NOT emit a second provider-newer note for the same package
+- **THEN** the version difference SHALL NOT fail the build or change externalization
 
 #### Scenario: Shared dependency exposes only an exports map
 
-- **WHEN** a shared dependency has no `module`, `main`, or root `index.js` but provides a valid package-root `exports` entry
-- **THEN** the bundler SHALL resolve its installed package metadata using maintained Node-compatible package resolution
+- **WHEN** a shared dependency has no `module`, `main`, or root `index.js` but provides valid package metadata through its package exports
+- **THEN** the bundler SHALL use maintained Node-compatible package resolution when reading the installed version
 - **THEN** it SHALL NOT infer or require a conventional package entry file
-
-#### Scenario: Provider imports an unsupported export
-
-- **WHEN** an ESM provider imports a package subpath or static runtime export that is absent from the target snapshot
-- **THEN** the build SHALL fail before externalizing that import
 
 #### Scenario: Source contains import-like text
 
 - **WHEN** a provider source comment or string literal contains text that resembles a static, re-export, side-effect, or dynamic import
 - **THEN** the bundler SHALL ignore that text instead of treating it as a runtime dependency
 
-#### Scenario: Provider uses a namespace import
+#### Scenario: Provider imports a shared root namespace
 
-- **WHEN** an ESM provider uses a namespace import or dynamically reads properties from a shared package namespace
-- **THEN** the bundler SHALL allow the build after validating the package root
-- **THEN** it SHALL warn that individual runtime properties could not be proven against the snapshot
+- **WHEN** an ESM provider uses a namespace import or dynamically reads properties from a supported shared package root
+- **THEN** the bundler SHALL treat it like any other import of that shared root
+- **THEN** the bundler SHALL NOT attempt to prove individual namespace properties against the snapshot
+
+#### Scenario: Provider imports a shared-package subpath
+
+- **WHEN** an ESM provider imports a subpath below one of Halo's supported shared roots
+- **THEN** the build SHALL fail because the host Import Map exposes only the exact root specifier
 
 #### Scenario: Provider imports FormKit Core
 
 - **WHEN** an ESM provider imports the `@formkit/core` package root directly or through a bundled FormKit subpackage
-- **THEN** the bundler SHALL externalize that root to the same host graph used by `@formkit/vue`
+- **THEN** the default preset SHALL externalize that root to the same host graph used by `@formkit/vue`
 
 #### Scenario: Provider imports another FormKit package
 
 - **WHEN** an ESM provider imports an `@formkit/*` package other than `@formkit/vue` or `@formkit/core`
-- **THEN** the bundler SHALL include that package in provider output while preserving external resolution of its `@formkit/core` runtime import
+- **THEN** the default preset SHALL include that package in provider output while preserving external resolution of its `@formkit/core` runtime import
 
 #### Scenario: Provider imports a non-shared dependency
 
 - **WHEN** an ESM provider imports VueUse or another dependency not listed in the target Halo snapshot
-- **THEN** the bundler SHALL include that dependency in the provider output
+- **THEN** the default preset SHALL include that dependency in the provider output
 
-#### Scenario: Caller externalizes a non-shared dependency
+#### Scenario: Caller changes dependency resolution
 
-- **WHEN** caller Vite or Rsbuild configuration externalizes a dependency that is not a Halo shared root
-- **THEN** the ESM build SHALL fail with a diagnostic that identifies the unsupported external
-- **THEN** the build SHALL NOT emit a manifest containing a browser-unresolvable bare import
+- **WHEN** caller Vite or Rsbuild configuration aliases a shared dependency, changes externals, externalizes a non-shared dependency, or otherwise changes final bundler resolution
+- **THEN** the helper SHALL preserve the caller configuration without validating the final resolved identity or browser mapping
+- **THEN** compatibility and browser resolution of that overridden output SHALL be the provider developer's responsibility
 
 #### Scenario: Provider imports editor internals directly
 
-- **WHEN** an ESM provider imports `@tiptap/*` or `prosemirror-*` at runtime while also using `@halo-dev/richtext-editor`
-- **THEN** the bundler SHALL keep the direct dependency private and warn that editor class identity and cross-version behavior are best-effort
+- **WHEN** an ESM provider imports `@tiptap/*` or `prosemirror-*` at runtime
+- **THEN** the default preset SHALL keep those dependencies private even when the provider also uses `@halo-dev/richtext-editor`
 
-#### Scenario: ESM validation fails after target selection
+#### Scenario: Required provider structure validation fails after target selection
 
-- **WHEN** automatic or explicit selection has chosen ESM and dependency, import, or output validation fails
+- **WHEN** automatic or explicit selection has chosen ESM and a shared-root subpath or required manifest structure is invalid
 - **THEN** the build SHALL fail
 - **THEN** it SHALL NOT silently emit IIFE output
 
 ### Requirement: Provider build diagnostics
 
-The bundler SHALL make format and shared dependency decisions visible without adding build metadata to the runtime manifest.
+The bundler SHALL make format and best-effort shared dependency version decisions visible without adding build metadata to the runtime manifest.
 
 #### Scenario: Provider build completes
 
 - **WHEN** a plugin or theme provider build completes format selection
 - **THEN** the build output SHALL identify the selected format and whether it was explicit, automatic, or an automatic IIFE fallback
-- **THEN** an ESM build SHALL identify the target Halo version, selected snapshot baseline, and each shared package's provider and exact host versions
+- **THEN** an ESM build SHALL identify the target Halo version, selected snapshot baseline, and the provider and exact host versions available for imported shared roots
 
 #### Scenario: Best-effort compatibility diagnostics are summarized
 
-- **WHEN** a successful ESM build encounters version drift, namespace or dynamic imports, or an editor identity boundary that cannot be fully validated
-- **THEN** the bundler SHALL emit at most one deterministic compatibility-note block after validation
-- **THEN** version drift SHALL be grouped by shared dependency without an earlier duplicate warning
-- **THEN** namespace and dynamic-import diagnostics SHALL be grouped by shared dependency and deduplicated by source
-- **THEN** source labels SHALL be provider-relative or dependency-relative rather than absolute filesystem paths
+- **WHEN** a successful ESM build encounters a provider-newer or different-major shared dependency version
+- **THEN** the bundler SHALL emit at most one deterministic compatibility-note block
+- **THEN** version differences SHALL be grouped by shared dependency without duplicate warnings
+- **THEN** the bundler SHALL NOT emit source-by-source namespace, static-export, editor-identity, alias, fork, or final-resolution compatibility diagnostics
 
 ### Requirement: ESM provider output manifest
 
@@ -345,12 +342,12 @@ The bundler SHALL generate the provider manifest consumed by Halo whenever ESM o
 
 ### Requirement: Vite and Rsbuild ESM equivalence
 
-Vite and Rsbuild provider helpers SHALL implement the same externally observable ESM provider contract for plugin and theme providers.
+Vite and Rsbuild provider helpers SHALL implement equivalent supported defaults for plugin and theme ESM providers. Equivalence SHALL NOT be claimed after caller overrides change those defaults.
 
-#### Scenario: Equivalent provider is built with both helpers
+#### Scenario: Equivalent provider is built with both default helpers
 
-- **WHEN** equivalent provider source is built through Vite and Rsbuild
-- **THEN** both outputs SHALL use the same manifest schema, host runtime snapshot, import restrictions, entry export contract, resource URL rules, and format selection semantics
+- **WHEN** equivalent provider source is built through Vite and Rsbuild without conflicting caller overrides
+- **THEN** both outputs SHALL use the same manifest schema, host runtime snapshot, shared-root defaults, entry export contract, resource URL rules, and format selection semantics
 
 #### Scenario: Default production ESM output is optimized
 
@@ -358,12 +355,13 @@ Vite and Rsbuild provider helpers SHALL implement the same externally observable
 - **THEN** Vite and Rsbuild SHALL apply their native production JavaScript and CSS minimization
 - **THEN** the output SHALL retain one startup JavaScript entry with the default `PluginModule` export
 - **THEN** code requested through dynamic imports SHALL remain independently addressable and non-inlined assets SHALL use provider-root-safe URLs
+- **THEN** asynchronous JavaScript, CSS, and non-inlined assets emitted by the default preset SHALL use content-hashed filenames
 
 #### Scenario: Vite emits a deployable ESM entry
 
-- **WHEN** Vite builds an ESM provider
+- **WHEN** Vite builds an ESM provider with its preset defaults
 - **THEN** it SHALL treat the provider as a final browser entry rather than whitespace-preserving library distribution output
-- **THEN** it SHALL preserve the entry module's export signature and honor caller-compatible asset optimization settings
+- **THEN** it SHALL preserve the entry module's export signature and apply the preset's relative resource and content-hash defaults
 
 #### Scenario: ESM optimization preserves the IIFE contract
 
@@ -371,39 +369,26 @@ Vite and Rsbuild provider helpers SHALL implement the same externally observable
 - **THEN** Vite IIFE library output and Rsbuild IIFE window-library output SHALL retain their existing globals, filenames, startup CSS, and chunk behavior
 - **THEN** an existing caller SHALL NOT need to change its `viteConfig` or `rsbuildConfig` invocation
 
-#### Scenario: Bundler-specific override bypasses validation
+#### Scenario: Caller overrides ESM preset output
 
-- **WHEN** a Vite or Rsbuild-specific override would bypass dependency validation or change the final output contract
-- **THEN** that helper SHALL fail the build instead of emitting a misleading provider manifest
+- **WHEN** a caller changes dependency resolution, format, entry, public path, resource naming, optimization, or output through native configuration or bundler hooks
+- **THEN** the helper SHALL merge that configuration after the preset without attempting to prove or restore the default ESM contract
+- **THEN** the caller SHALL be responsible for manifest consistency, browser resolution, runtime identity, resource relocation, and cache invalidation
 
-#### Scenario: Caller removes secondary resource content hashes
+#### Scenario: Default Vite secondary resources are content hashed
 
-- **WHEN** the final Vite or Rsbuild output contains an asynchronous chunk, asynchronous stylesheet, or browser-loaded emitted asset without a content hash in its filename
-- **THEN** the ESM build SHALL fail with an actionable diagnostic
-- **THEN** the stable entry and startup stylesheet names SHALL remain cache-keyed by the provider descriptor
-- **THEN** a fixed filename that merely resembles a hash SHALL NOT satisfy the content-hash invariant
+- **WHEN** the Vite ESM preset emits an asynchronous chunk, asynchronous stylesheet, or non-inlined asset without caller filename overrides
+- **THEN** its configured output pattern SHALL include a content-derived hash
+- **THEN** the bundler-kit SHALL NOT inspect final assets or re-emit them to prove their filenames were content-derived
 
-#### Scenario: Output contains build sidecars or filename functions
+#### Scenario: Default Rsbuild secondary resources are content hashed
 
-- **WHEN** the final output contains non-runtime sidecars such as source maps, legal-comment files, or the provider manifest
-- **THEN** the content-hash invariant SHALL NOT reject those sidecars merely because their filenames are stable
-- **WHEN** caller filename functions produce content-hashed runtime resource names
-- **THEN** the ESM build SHALL accept the final output without requiring a particular configuration value shape
-
-#### Scenario: Vite generates a name for an anonymous asset
-
-- **WHEN** a Vite plugin emits a runtime asset without `name` or `fileName` and lets the bundler select its filename
-- **THEN** the ESM build SHALL accept the asset when the bundler-generated filename is content-hashed
-- **THEN** validating the asset SHALL NOT emit a duplicate output file
-
-#### Scenario: Rsbuild override changes the ESM output contract
-
-- **WHEN** caller Rsbuild configuration conflicts with module output, IIFE mode, module chunk format or loading, the required entry filename, Halo-controlled externals, or aliases a shared dependency
-- **THEN** the helper SHALL fail before compilation with an actionable diagnostic
-- **THEN** the same validation SHALL apply after caller `tools.rspack` hooks have produced the final compiler configuration
+- **WHEN** the Rsbuild ESM preset emits an asynchronous chunk, asynchronous stylesheet, or non-inlined asset without caller filename overrides
+- **THEN** its configured output pattern SHALL include a content-derived hash
+- **THEN** the bundler-kit SHALL NOT inspect later Rspack compilation stages to prove the final resource name
 
 #### Scenario: Rsbuild watches a development ESM provider
 
-- **WHEN** a plugin or theme runs `rsbuild build --watch --env-mode=development`
-- **THEN** the helper SHALL preserve the automatic runtime public path required by relocatable ESM chunks and assets instead of accepting the development server base default
+- **WHEN** a plugin or theme runs `rsbuild build --watch --env-mode=development` without overriding the preset resource path
+- **THEN** the default helper SHALL preserve the automatic runtime public path required by relocatable ESM chunks and assets
 - **THEN** the initial build and subsequent watched rebuilds SHALL emit the entry, chunks, startup style, and provider manifest without changing the caller invocation
