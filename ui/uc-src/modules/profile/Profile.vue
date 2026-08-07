@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { ucApiClient } from "@halo-dev/api-client";
 import {
   VButton,
   VDropdown,
@@ -30,6 +31,24 @@ const passwordChangeModal = ref(false);
 const { currentUser } = storeToRefs(stores.currentUser());
 const { fetchCurrentUser } = stores.currentUser();
 fetchCurrentUser();
+
+const hasPassword = ref(false);
+
+async function fetchHasPassword() {
+  try {
+    const { data } = await ucApiClient.user.currentUser.getMyUser();
+    hasPassword.value = data.passwordSet;
+  } catch (error) {
+    console.error("Failed to get current user password status", error);
+  }
+}
+fetchHasPassword();
+
+const changePasswordLabel = computed(() =>
+  hasPassword.value
+    ? t("core.uc_profile.actions.change_password.title")
+    : t("core.uc_profile.actions.set_password.title")
+);
 
 const tabs = shallowRef<UserProfileTab[]>([
   {
@@ -118,6 +137,7 @@ const activeTab = useRouteQuery<string>("tab", tabs.value[0].id, {
 
   <PasswordChangeModal
     v-if="passwordChangeModal"
+    :has-password="hasPassword"
     @close="passwordChangeModal = false"
   />
 
@@ -150,7 +170,7 @@ const activeTab = useRouteQuery<string>("tab", tabs.value[0].id, {
                 {{ $t("core.uc_profile.actions.update_profile.title") }}
               </VDropdownItem>
               <VDropdownItem @click="passwordChangeModal = true">
-                {{ $t("core.uc_profile.actions.change_password.title") }}
+                {{ changePasswordLabel }}
               </VDropdownItem>
             </template>
           </VDropdown>

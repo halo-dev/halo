@@ -54,6 +54,10 @@ rules:
     resources: ["users"]
     resourceNames: ["-"]
     verbs: ["get", "update"]
+  - apiGroups: ["uc.api.halo.run"]
+    resources: ["users"]
+    resourceNames: ["-"]
+    verbs: ["get"]
   - apiGroups: ["api.console.halo.run"]
     resources: ["users/avatar"]
     resourceNames: ["-"]
@@ -85,6 +89,10 @@ metadata:
     halo.run/hidden: "true"
 rules:
   - apiGroups: ["api.console.halo.run"]
+    resources: ["users/password"]
+    resourceNames: ["-"]
+    verbs: ["update"]
+  - apiGroups: ["uc.api.halo.run"]
     resources: ["users/password"]
     resourceNames: ["-"]
     verbs: ["update"]
