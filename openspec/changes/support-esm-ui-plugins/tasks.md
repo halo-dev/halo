@@ -122,3 +122,10 @@
 - [x] 15.1 Make Vite and Rsbuild ESM preload, chunk, asynchronous CSS, and emitted-asset URLs resolve from the loaded provider artifact while leaving IIFE resource roots unchanged.
 - [x] 15.2 Add production fixture coverage for an ESM plugin whose metadata prefers `ui` but whose complete artifact is served through `console`, including Vite module preloads and Rsbuild asynchronous CSS.
 - [x] 15.3 Run focused bundler tests, package checks, strict OpenSpec validation, representative real Vite/Rsbuild builds, and the live Halo fallback-resource browser acceptance.
+
+## 16. Generate the Provider Descriptor Client Contract
+
+- [x] 16.1 Declare required provider descriptor fields and provider-type values in the backend OpenAPI schema, then regenerate the committed OpenAPI JSON and `@halo-dev/api-client` models and method.
+- [x] 16.2 Expose the generated UI plugin client through `consoleApiClient` and replace the runtime's hand-written descriptor types and raw URL request with the generated contract.
+- [x] 16.3 Verify the generated OpenAPI/client diff, focused backend and frontend tests, API client/UI type checking, formatting, and strict OpenSpec validation.
+- [x] 16.4 Grant the authenticated role access to the provider descriptor resource and verify ordinary User Center authorization.

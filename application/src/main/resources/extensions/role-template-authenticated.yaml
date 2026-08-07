@@ -30,6 +30,7 @@ rules:
       [
         "ui-plugins/bundle.js",
         "ui-plugins/bundle.css",
+        "ui-plugins/providers",
         "plugins/bundle.js",
         "plugins/bundle.css",
       ]

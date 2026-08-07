@@ -201,6 +201,13 @@ The legacy JavaScript generated for the current descriptor includes only current
 
 Public `Plugin.status` and `Theme.status` remain unchanged. Descriptor validation and errors remain internal until the diagnostic model is stable.
 
+The authenticated descriptor endpoint declares its complete response schema in
+the generated OpenAPI document. Required descriptor and provider fields remain
+required in the generated TypeScript models, while the optional aggregate
+stylesheet remains optional. Console and User Center consume the generated API
+method and models through `@halo-dev/api-client`; they do not maintain a
+parallel hand-written descriptor contract.
+
 Alternative considered: retain immutable server-side generations to make descriptor and aggregate requests atomic across a concurrent provider change. That guarantee requires copying resources, proxy routes, and eviction behavior; the added machinery is not justified for an optional ESM path whose supported replacement boundary is already a full page reload.
 
 ### Expose provider availability through a shared Pinia store

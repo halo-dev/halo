@@ -136,6 +136,13 @@ Halo SHALL describe current UI providers through one authenticated response that
 - **THEN** Halo SHALL classify the currently started plugins and activated theme
 - **THEN** the response SHALL contain one version, one versioned aggregate startup stylesheet URL, one versioned legacy script URL, valid ESM entry descriptors, and invalid-provider diagnostics from that classification
 
+#### Scenario: Provider descriptor is consumed by the Halo UI
+
+- **WHEN** Halo generates its OpenAPI document and TypeScript API client
+- **THEN** the document SHALL include the provider descriptor endpoint and its complete response schema
+- **THEN** required descriptor and provider fields and the `plugin` or `theme` provider type SHALL remain represented in the generated models
+- **THEN** Console and User Center SHALL use the generated API method and models instead of a parallel hand-written descriptor contract
+
 #### Scenario: ESM plugin resource is described
 
 - **WHEN** a plugin is classified as ESM

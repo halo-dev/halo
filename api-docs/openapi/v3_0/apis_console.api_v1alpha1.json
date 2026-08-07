@@ -2903,6 +2903,27 @@
         ]
       }
     },
+    "/apis/api.console.halo.run/v1alpha1/ui-plugins/-/providers": {
+      "get": {
+        "description": "Fetch the currently enabled UI provider descriptor.",
+        "operationId": "fetchUiPluginProviders",
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UiPluginProviderDescriptor"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "UiPluginV1alpha1Console"
+        ]
+      }
+    },
     "/apis/api.console.halo.run/v1alpha1/users": {
       "get": {
         "description": "List users",
@@ -7424,6 +7445,134 @@
           }
         },
         "description": "Observed theme lifecycle and installation state."
+      },
+      "UiPluginEsmProvider": {
+        "required": [
+          "entry",
+          "name",
+          "type",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "entry": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "plugin",
+              "theme"
+            ]
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      },
+      "UiPluginInvalidProvider": {
+        "required": [
+          "name",
+          "reason",
+          "type",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "plugin",
+              "theme"
+            ]
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      },
+      "UiPluginLegacyResources": {
+        "required": [
+          "script"
+        ],
+        "type": "object",
+        "properties": {
+          "script": {
+            "type": "string"
+          }
+        }
+      },
+      "UiPluginProviderDescriptor": {
+        "required": [
+          "invalid",
+          "legacy",
+          "providers",
+          "registrations",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "invalid": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UiPluginInvalidProvider"
+            }
+          },
+          "legacy": {
+            "$ref": "#/components/schemas/UiPluginLegacyResources"
+          },
+          "providers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UiPluginEsmProvider"
+            }
+          },
+          "registrations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UiPluginProviderRegistration"
+            }
+          },
+          "style": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          }
+        },
+        "description": "Browser descriptor for the currently enabled plugin and theme UI providers."
+      },
+      "UiPluginProviderRegistration": {
+        "required": [
+          "name",
+          "type",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "plugin",
+              "theme"
+            ]
+          },
+          "version": {
+            "type": "string"
+          }
+        }
       },
       "UpgradeFromUriRequest": {
         "required": [

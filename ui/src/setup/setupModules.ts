@@ -1,5 +1,9 @@
 import type { FormKitLibrary } from "@formkit/core";
-import { axiosInstance } from "@halo-dev/api-client";
+import {
+  consoleApiClient,
+  type UiPluginProviderDescriptor,
+  type UiPluginProviderRegistration,
+} from "@halo-dev/api-client";
 import { Toast } from "@halo-dev/components";
 import {
   stores,
@@ -21,32 +25,8 @@ import type { SetupComponentsOptions } from "./setupComponents";
 
 export type Platform = "console" | "uc";
 
-type UiProviderType = "plugin" | "theme";
-
-interface UiProviderRegistration {
-  name: string;
-  type: UiProviderType;
-  version: string;
-}
-
-interface EsmUiProvider extends UiProviderRegistration {
-  entry: string;
-}
-
-interface InvalidUiProvider extends UiProviderRegistration {
-  reason: string;
-}
-
-export interface UiPluginProviderDescriptor {
-  version: string;
-  style?: string;
-  legacy: {
-    script: string;
-  };
-  registrations: UiProviderRegistration[];
-  providers: EsmUiProvider[];
-  invalid: InvalidUiProvider[];
-}
+type UiProviderRegistration = UiPluginProviderRegistration;
+type UiProviderType = UiProviderRegistration["type"];
 
 export interface LoadedPluginModule {
   name: string;
@@ -795,10 +775,9 @@ function createRuntimeDependencies(
 ): UiPluginRuntimeDependencies {
   return {
     fetchProviders: async () => {
-      const { data } = await axiosInstance.get<UiPluginProviderDescriptor>(
-        "/apis/api.console.halo.run/v1alpha1/ui-plugins/-/providers",
-        { mute: true }
-      );
+      const { data } = await consoleApiClient.uiPlugin.fetchUiPluginProviders({
+        mute: true,
+      });
       return data;
     },
     importModule: (url) =>

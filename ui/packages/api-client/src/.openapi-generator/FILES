@@ -326,6 +326,11 @@ models/totp-auth-link-response.ts
 models/totp-request.ts
 models/two-factor-auth-settings.ts
 models/uc-upload-from-url-request.ts
+models/ui-plugin-esm-provider.ts
+models/ui-plugin-invalid-provider.ts
+models/ui-plugin-legacy-resources.ts
+models/ui-plugin-provider-descriptor.ts
+models/ui-plugin-provider-registration.ts
 models/upgrade-from-uri-request.ts
 models/upload-from-url-request.ts
 models/user-connection-list.ts

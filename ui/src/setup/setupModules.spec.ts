@@ -1,3 +1,4 @@
+import type { UiPluginProviderDescriptor } from "@halo-dev/api-client";
 import type { PluginModule } from "@halo-dev/ui-shared";
 import { stores } from "@halo-dev/ui-shared";
 import { createPinia, setActivePinia } from "pinia";
@@ -5,11 +6,7 @@ import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 import { createApp } from "vue";
 import type { Router, RouteRecordRaw } from "vue-router";
 import { usePluginModuleStore } from "@/stores/plugin";
-import {
-  resolveProviderEntryUrl,
-  setupUiPluginRuntime,
-  type UiPluginProviderDescriptor,
-} from "./setupModules";
+import { resolveProviderEntryUrl, setupUiPluginRuntime } from "./setupModules";
 
 const RootComponent = { template: "<div />" };
 

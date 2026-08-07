@@ -1,15 +1,19 @@
 package run.halo.app.plugin;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 
 /** Browser descriptor for the currently enabled plugin and theme UI providers. */
+@Schema(description = "Browser descriptor for the currently enabled plugin and theme UI providers.")
 public record UiPluginProviderDescriptor(
-        String version,
+        @Schema(requiredMode = REQUIRED) String version,
         String style,
-        LegacyResources legacy,
-        List<Registration> registrations,
-        List<EsmProvider> providers,
-        List<InvalidProvider> invalid) {
+        @Schema(requiredMode = REQUIRED) LegacyResources legacy,
+        @Schema(requiredMode = REQUIRED) List<Registration> registrations,
+        @Schema(requiredMode = REQUIRED) List<EsmProvider> providers,
+        @Schema(requiredMode = REQUIRED) List<InvalidProvider> invalid) {
 
     public UiPluginProviderDescriptor {
         registrations = List.copyOf(registrations);
@@ -17,11 +21,42 @@ public record UiPluginProviderDescriptor(
         invalid = List.copyOf(invalid);
     }
 
-    public record LegacyResources(String script) {}
+    @Schema(name = "UiPluginLegacyResources")
+    public record LegacyResources(
+            @Schema(requiredMode = REQUIRED) String script) {}
 
-    public record Registration(String name, String type, String version) {}
+    @Schema(name = "UiPluginProviderRegistration")
+    public record Registration(
+            @Schema(requiredMode = REQUIRED) String name,
 
-    public record EsmProvider(String name, String type, String version, String entry) {}
+            @Schema(
+                    requiredMode = REQUIRED,
+                    allowableValues = {"plugin", "theme"})
+            String type,
 
-    public record InvalidProvider(String name, String type, String version, String reason) {}
+            @Schema(requiredMode = REQUIRED) String version) {}
+
+    @Schema(name = "UiPluginEsmProvider")
+    public record EsmProvider(
+            @Schema(requiredMode = REQUIRED) String name,
+
+            @Schema(
+                    requiredMode = REQUIRED,
+                    allowableValues = {"plugin", "theme"})
+            String type,
+
+            @Schema(requiredMode = REQUIRED) String version,
+            @Schema(requiredMode = REQUIRED) String entry) {}
+
+    @Schema(name = "UiPluginInvalidProvider")
+    public record InvalidProvider(
+            @Schema(requiredMode = REQUIRED) String name,
+
+            @Schema(
+                    requiredMode = REQUIRED,
+                    allowableValues = {"plugin", "theme"})
+            String type,
+
+            @Schema(requiredMode = REQUIRED) String version,
+            @Schema(requiredMode = REQUIRED) String reason) {}
 }
