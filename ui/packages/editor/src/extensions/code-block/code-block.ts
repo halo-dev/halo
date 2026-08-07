@@ -12,70 +12,13 @@ import {
   isActive,
   isNodeActive,
   posToDOMRect,
-  type CommandProps,
   type Range,
 } from "@/tiptap";
-import {
-  EditorState,
-  Plugin,
-  PluginKey,
-  TextSelection,
-  type Transaction,
-} from "@/tiptap/pm";
+import { EditorState, Plugin, PluginKey, TextSelection } from "@/tiptap/pm";
 import type { ExtensionOptions } from "@/types";
 import { deleteNode } from "@/utils";
 import CodeBlockViewRenderer from "./CodeBlockViewRenderer.vue";
-
-declare module "@/tiptap" {
-  interface Commands<ReturnType> {
-    codeIndent: {
-      codeIndent: () => ReturnType;
-      codeOutdent: () => ReturnType;
-    };
-  }
-}
-
-type IndentType = "indent" | "outdent";
-
-const updateIndent = (tr: Transaction, type: IndentType): Transaction => {
-  const { doc, selection } = tr;
-  if (!doc || !selection) return tr;
-  if (!(selection instanceof TextSelection)) {
-    return tr;
-  }
-  const { from, to } = selection;
-  doc.nodesBetween(from, to, (_node, pos) => {
-    if (from - to == 0 && type === "indent") {
-      tr.insertText("  ", from, to);
-      return false;
-    }
-
-    const precedeContent = doc.textBetween(pos + 1, from, "\n");
-    const precedeLineBreakPos = precedeContent.lastIndexOf("\n");
-    const startBetWeenIndex =
-      precedeLineBreakPos === -1 ? pos + 1 : pos + precedeLineBreakPos + 1;
-    const text = doc.textBetween(startBetWeenIndex, to, "\n");
-    if (type === "indent") {
-      let replacedStr = text.replace(/\n/g, "\n  ");
-      if (startBetWeenIndex === pos + 1) {
-        replacedStr = "  " + replacedStr;
-      }
-      tr.insertText(replacedStr, startBetWeenIndex, to);
-    } else {
-      let replacedStr = text.replace(/\n {2}/g, "\n");
-      if (startBetWeenIndex === pos + 1) {
-        const firstNewLineIndex = replacedStr.indexOf("  ");
-        if (firstNewLineIndex == 0) {
-          replacedStr = replacedStr.replace("  ", "");
-        }
-      }
-      tr.insertText(replacedStr, startBetWeenIndex, to);
-    }
-    return false;
-  });
-
-  return tr;
-};
+import { setCodeBlockWithIndent } from "./set-code-block-with-indent";
 
 interface Option {
   label: string;
@@ -112,6 +55,18 @@ export interface CodeBlockOptions {
    * @default null
    */
   defaultTheme: string | null | undefined;
+
+  /**
+   * Use Tiptap's built-in Tab and Shift-Tab indentation inside code blocks.
+   * @default true
+   */
+  enableTabIndentation: boolean | null | undefined;
+
+  /**
+   * Number of spaces inserted for code indentation.
+   * @default 2
+   */
+  tabSize: number | null | undefined;
 }
 
 export interface ExtensionCodeBlockOptions extends CodeBlockOptions {
@@ -154,6 +109,10 @@ export const ExtensionCodeBlock = TiptapCodeBlock.extend<
   priority: 101,
 
   fakeSelection: true,
+
+  haloEditorIndentation: {
+    keyboard: "passthrough",
+  },
 
   addHaloEditorMetadata() {
     const languages = Array.isArray(this.options.languages)
@@ -240,37 +199,9 @@ export const ExtensionCodeBlock = TiptapCodeBlock.extend<
     };
   },
 
-  addCommands() {
-    return {
-      ...this.parent?.(),
-      codeIndent:
-        () =>
-        ({ tr, state, dispatch }: CommandProps) => {
-          const { selection } = state;
-          tr = tr.setSelection(selection);
-          tr = updateIndent(tr, "indent");
-          if (tr.docChanged && dispatch) {
-            dispatch(tr);
-            return true;
-          }
-          return false;
-        },
-      codeOutdent:
-        () =>
-        ({ tr, state, dispatch }: CommandProps) => {
-          const { selection } = state;
-          tr = tr.setSelection(selection);
-          tr = updateIndent(tr, "outdent");
-          if (tr.docChanged && dispatch) {
-            dispatch(tr);
-            return true;
-          }
-          return false;
-        },
-    };
-  },
   addKeyboardShortcuts() {
     return {
+      ...this.parent?.(),
       Backspace: ({ editor }) => {
         if (!isNodeActive(editor.state, this.name)) {
           return false;
@@ -295,18 +226,6 @@ export const ExtensionCodeBlock = TiptapCodeBlock.extend<
           return true;
         }
 
-        return false;
-      },
-      Tab: () => {
-        if (this.editor.isActive(TiptapCodeBlock.name)) {
-          return this.editor.chain().focus().codeIndent().run();
-        }
-        return false;
-      },
-      "Shift-Tab": () => {
-        if (this.editor.isActive(TiptapCodeBlock.name)) {
-          return this.editor.chain().focus().codeOutdent().run();
-        }
         return false;
       },
       "Mod-a": () => {
@@ -345,6 +264,8 @@ export const ExtensionCodeBlock = TiptapCodeBlock.extend<
       themes: [],
       defaultLanguage: null,
       defaultTheme: null,
+      enableTabIndentation: true,
+      tabSize: 2,
       getToolbarItems({ editor }: { editor: Editor }) {
         return {
           priority: 160,
@@ -354,7 +275,13 @@ export const ExtensionCodeBlock = TiptapCodeBlock.extend<
             isActive: editor.isActive(TiptapCodeBlock.name),
             icon: markRaw(MingcuteBracesLine),
             title: i18n.global.t("editor.common.codeblock.title"),
-            action: () => editor.chain().focus().toggleCodeBlock().run(),
+            action: () => {
+              if (editor.isActive(TiptapCodeBlock.name)) {
+                editor.chain().focus().toggleCodeBlock().run();
+                return;
+              }
+              setCodeBlockWithIndent(editor);
+            },
           },
         };
       },
@@ -365,7 +292,7 @@ export const ExtensionCodeBlock = TiptapCodeBlock.extend<
           title: "editor.common.codeblock.title",
           keywords: ["codeblock", "daimakuai"],
           command: ({ editor, range }: { editor: Editor; range: Range }) => {
-            editor.chain().focus().deleteRange(range).setCodeBlock().run();
+            setCodeBlockWithIndent(editor, range);
           },
         };
       },
@@ -379,7 +306,7 @@ export const ExtensionCodeBlock = TiptapCodeBlock.extend<
               icon: markRaw(MingcuteBracesLine),
               title: i18n.global.t("editor.common.codeblock.title"),
               action: () => {
-                editor.chain().focus().setCodeBlock().run();
+                setCodeBlockWithIndent(editor);
               },
             },
           },

@@ -74,6 +74,10 @@ export type ExtensionTableOptions = ExtensionOptions & Partial<TableOptions>;
 
 export const ExtensionTable = TiptapTable.extend<ExtensionTableOptions>({
   priority: 1000,
+  haloEditorIndentation: {
+    keyboard: "passthrough",
+  },
+
   addHaloEditorMetadata() {
     return {
       ai: {
@@ -335,10 +339,20 @@ export const ExtensionTable = TiptapTable.extend<ExtensionTableOptions>({
       cellMinWidth
     );
 
+    const indent = HTMLAttributes?.["data-indent"];
     const configuredStyle = this.options.HTMLAttributes?.style as
       | string
       | undefined;
-    const contentStyle = HTMLAttributes.style as string | undefined;
+    const contentStyle = indent
+      ? undefined
+      : (HTMLAttributes.style as string | undefined);
+    const tableHTMLAttributes = indent
+      ? Object.fromEntries(
+          Object.entries(HTMLAttributes ?? {}).filter(
+            ([name]) => name !== "style"
+          )
+        )
+      : HTMLAttributes;
     const layoutStyle =
       layoutMode === "auto"
         ? "display: table; width: 100%; min-width: 100%; table-layout: auto"
@@ -350,7 +364,7 @@ export const ExtensionTable = TiptapTable.extend<ExtensionTableOptions>({
           );
     const tableAttributes = mergeAttributes(
       this.options.HTMLAttributes ?? {},
-      HTMLAttributes ?? {},
+      tableHTMLAttributes ?? {},
       {
         "data-table-layout": layoutMode,
         style: joinStyles(configuredStyle, contentStyle, layoutStyle),
@@ -369,8 +383,10 @@ export const ExtensionTable = TiptapTable.extend<ExtensionTableOptions>({
       {
         class: "halo-table-wrapper",
         "data-table-layout": layoutMode,
-        style:
-          "box-sizing: border-box; overflow-x: auto; overflow-y: hidden; width: 100%; max-width: 100%; min-width: 0;",
+        style: joinStyles(
+          "box-sizing: border-box; overflow-x: auto; overflow-y: hidden; width: 100%; max-width: 100%; min-width: 0",
+          indent ? (HTMLAttributes.style as string | undefined) : undefined
+        ),
       },
       table,
     ];

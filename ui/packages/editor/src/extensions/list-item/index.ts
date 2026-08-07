@@ -1,6 +1,8 @@
 import { ListItem as TiptapListItem } from "@tiptap/extension-list";
 
 export const ExtensionListItem = TiptapListItem.extend({
+  group: "listItem",
+
   addHaloEditorMetadata() {
     return {
       ai: {

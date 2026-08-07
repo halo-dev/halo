@@ -21,6 +21,10 @@ export type ExtensionParagraphOptions = ExtensionOptions &
 
 export const ExtensionParagraph =
   TiptapParagraph.extend<ExtensionParagraphOptions>({
+    haloEditorIndentation: {
+      legacyLineIndent: true,
+    },
+
     addHaloEditorMetadata() {
       return {
         ai: {

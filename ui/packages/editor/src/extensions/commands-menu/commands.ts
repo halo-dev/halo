@@ -10,6 +10,7 @@ import {
   type Range,
 } from "@/tiptap";
 import type { CommandMenuItemType } from "@/types";
+import { prepareBlockCommandFromList } from "@/utils";
 import CommandsView from "./CommandsView.vue";
 
 export const ExtensionCommandsMenu = Extension.create({
@@ -32,7 +33,10 @@ export const ExtensionCommandsMenu = Extension.create({
         range: Range;
         props: CommandMenuItemType;
       }) => {
-        props.command({ editor, range });
+        props.command({
+          editor,
+          range: prepareBlockCommandFromList(editor, range),
+        });
       },
       items: ({ query }: { query: string }) => {
         return commandMenuItems.filter((item) =>

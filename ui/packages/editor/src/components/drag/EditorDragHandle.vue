@@ -21,8 +21,13 @@ import type {
 } from "@/types";
 import { isBlockEmpty } from "@/utils";
 import defaultDragItems from "./default-drag";
-import { topLevelDragHandleOptions } from "./drag-handle-options";
+import {
+  BLOCK_DRAG_HANDLE_OFFSET,
+  blockDragHandleBridgeStyle,
+  blockDragHandleOptions,
+} from "./drag-handle-options";
 import EditorDragMenu from "./EditorDragMenu.vue";
+import { insertCommandBlockAfter } from "./insert-command-block";
 
 const { editor } = defineProps({
   editor: {
@@ -43,20 +48,13 @@ const isEmptyNode = computed(() => {
 });
 
 const handleInsertBlock = () => {
+  if (!currentNode.value) {
+    return;
+  }
   if (isEmptyNode.value) {
     editor.chain().insertContent("/").focus().run();
   } else {
-    const insertPos = currentPos.value + (currentNode.value?.nodeSize ?? 0);
-    editor.commands.insertContentAt(
-      insertPos,
-      [{ type: "paragraph", content: [{ type: "text", text: "/" }] }],
-      {
-        updateSelection: true,
-      }
-    );
-    editor.commands.focus(insertPos + 2, {
-      scrollIntoView: true,
-    });
+    insertCommandBlockAfter(editor, currentNode.value, currentPos.value);
   }
 };
 
@@ -408,13 +406,16 @@ const sortDragButtonItems = (items: DragButtonType[]): DragButtonType[] => {
   <!-- @vue-ignore-->
   <DragHandle
     :editor="editor"
-    :nested="topLevelDragHandleOptions"
+    :nested="blockDragHandleOptions"
     :compute-position-config="{
-      middleware: [offset(5)],
+      middleware: [offset(BLOCK_DRAG_HANDLE_OFFSET)],
     }"
     @node-change="handleNodeChange"
   >
-    <div class="flex items-center justify-center gap-0.5">
+    <div
+      class="halo-editor-block-drag-handle flex items-center justify-center gap-0.5"
+      :style="blockDragHandleBridgeStyle"
+    >
       <button
         v-tooltip="{
           content: i18n.global.t('editor.drag.button.insert_block'),

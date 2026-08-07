@@ -1,0 +1,41 @@
+.halo-rich-text-editor {
+  .ProseMirror {
+    .halo-indent-dropcursor {
+      position: relative;
+      z-index: 20;
+      display: block;
+      width: calc(100% - var(--halo-drop-indent));
+      height: 2px;
+      margin-left: var(--halo-drop-indent);
+      pointer-events: none;
+      color: var(--halo-drop-color, currentColor);
+      background: currentColor;
+      box-shadow: 0 0 0 1px color-mix(in srgb, currentColor 20%, transparent);
+
+      &[data-list-item-target="true"] {
+        position: fixed;
+        top: var(--halo-drop-top);
+        left: var(--halo-drop-left);
+        width: var(--halo-drop-width);
+        margin-left: 0;
+      }
+
+      &::before {
+        content: "↳ " attr(data-indent-level);
+        position: absolute;
+        top: 50%;
+        left: 4px;
+        min-width: 1.5rem;
+        padding: 1px 5px;
+        border-radius: 9999px;
+        color: white;
+        background: var(--halo-drop-color, rgb(14 165 233));
+        font-size: 11px;
+        font-weight: 600;
+        line-height: 16px;
+        text-align: center;
+        transform: translateY(-50%);
+      }
+    }
+  }
+}

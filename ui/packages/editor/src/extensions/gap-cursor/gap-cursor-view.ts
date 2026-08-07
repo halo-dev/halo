@@ -186,27 +186,32 @@ function findGapCursorMouseHit(
   }
 
   const hits: GapCursorMouseHit[] = [];
-  view.state.doc.forEach((node, pos) => {
+  view.state.doc.descendants((node, pos) => {
     if (!isGapCursorTargetNode(node)) {
-      return;
+      return true;
     }
 
     const element = getEditorNodeElement(view, pos);
     if (!element) {
-      return;
+      return false;
     }
     if (!isGapCursorClickArea(view, event.target, eventElement, element)) {
-      return;
+      return false;
     }
 
     const visualElement = getGapCursorVisualElement(element);
-    if (eventElement && visualElement.contains(eventElement)) {
-      return;
+    const rect = visualElement.getBoundingClientRect();
+    if (
+      eventElement &&
+      visualElement.contains(eventElement) &&
+      isPointInsideRect(x, y, rect)
+    ) {
+      return false;
     }
 
-    const rect = visualElement.getBoundingClientRect();
     addHorizontalHit(hits, pos, node.nodeSize, x, y, rect);
     addVerticalHit(hits, pos, node.nodeSize, x, y, rect);
+    return false;
   });
 
   return hits.sort((left, right) => left.distance - right.distance)[0] ?? null;
@@ -231,6 +236,14 @@ function isGapCursorClickArea(
   }
   if (!eventElement) {
     return false;
+  }
+
+  if (
+    eventElement === nodeElement ||
+    nodeElement.contains(eventElement) ||
+    eventElement.contains(nodeElement)
+  ) {
+    return true;
   }
 
   const clickArea = eventElement.closest<HTMLElement>(
