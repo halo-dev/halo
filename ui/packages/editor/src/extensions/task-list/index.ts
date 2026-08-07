@@ -12,6 +12,8 @@ export type ExtensionTaskListOptions = Partial<TaskListOptions> &
   ExtensionOptions;
 
 const ExtensionTaskItem = TiptapTaskItem.extend({
+  group: "listItem",
+
   addHaloEditorMetadata() {
     return {
       ai: {
