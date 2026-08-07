@@ -69,6 +69,12 @@ The theme provider SHALL configure IIFE or ESM build output to match the active-
 - **THEN** ESM output SHALL derive asynchronous resource URLs from the loaded entry URL
 - **THEN** the helper SHALL emit the primary entry, styles, chunks, and provider manifest required by the selected format
 
+#### Scenario: Theme builds with the supported Rsbuild toolchain
+
+- **WHEN** a theme uses the Rsbuild 2 helper without adding a duplicate Vue plugin to caller configuration
+- **THEN** the preset SHALL compile the theme with an Rsbuild Vue plugin compatible with that Rsbuild major
+- **THEN** linked workspace development SHALL NOT inject an Rsbuild 1 preset plugin into the Rsbuild 2 compilation
+
 #### Scenario: Theme IIFE output reuses legacy globals
 
 - **WHEN** the theme provider selects IIFE format
@@ -315,3 +321,9 @@ Vite and Rsbuild provider helpers SHALL implement the same externally observable
 
 - **WHEN** caller Rsbuild configuration conflicts with module output, IIFE mode, module chunk format or loading, the required entry filename, or Halo-controlled externals
 - **THEN** the helper SHALL fail before compilation with an actionable diagnostic
+
+#### Scenario: Rsbuild watches a development ESM provider
+
+- **WHEN** a plugin or theme runs `rsbuild build --watch --env-mode=development`
+- **THEN** the helper SHALL preserve the automatic runtime public path required by relocatable ESM chunks and assets instead of accepting the development server base default
+- **THEN** the initial build and subsequent watched rebuilds SHALL emit the entry, chunks, startup style, and provider manifest without changing the caller invocation

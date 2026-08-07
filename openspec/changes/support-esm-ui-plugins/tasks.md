@@ -151,3 +151,10 @@
 - [x] 19.2 Refactor backend descriptor projection and tests so each discovered provider appears exactly once with an explicit `legacy`, `esm`, or `invalid` kind and its kind-specific fields.
 - [x] 19.3 Regenerate OpenAPI and the UI API client, then consume the unified provider list without cross-array joins while preserving parallel startup, stable registration, failure isolation, and legacy no-op behavior.
 - [x] 19.4 Run backend formatting and focused tests, frontend unit/type checks, generated API and runtime snapshot checks, and strict OpenSpec validation.
+
+## 20. Stabilize Rsbuild Theme and Development Watch Builds
+
+- [x] 20.1 Reproduce a real Rsbuild 2 theme build failure and isolate the linked bundler kit's mismatched Rsbuild 1 Vue plugin from caller custom plugins.
+- [x] 20.2 Align the bundler kit's linked development and integration-test Rsbuild/Vue-plugin versions with Rsbuild 2 while retaining the published peer contract, then verify the real theme build.
+- [x] 20.3 Preserve automatic ESM asset resolution in Rsbuild development mode and add an integration test that observes both the initial watch build and a source-triggered rebuild.
+- [x] 20.4 Run focused bundler checks, package formatting/type checks, strict OpenSpec validation, and both real provider reproduction commands.

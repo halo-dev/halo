@@ -33,6 +33,8 @@
     "semver": "^7.7.4"
   },
   "devDependencies": {
+    "@rsbuild/core": "^2.1.10",
+    "@rsbuild/plugin-vue": "^2.0.1",
     "@types/js-yaml": "^4.0.9",
     "@types/semver": "^7.7.1"
   },

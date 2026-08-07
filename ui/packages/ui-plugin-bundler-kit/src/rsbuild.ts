@@ -117,6 +117,7 @@ function createRsbuildPresetsConfig(
       },
       dev: {
         hmr: false,
+        ...(selection.format === "esm" ? { assetPrefix: "auto" } : {}),
       },
       performance: {
         chunkSplit: {

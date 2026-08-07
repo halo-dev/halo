@@ -14,6 +14,7 @@ This change turns the ESM direction raised in [halo-dev/halo#10205](https://gith
 - Add an authenticated provider descriptor that represents each plugin or theme exactly once in one ordered provider list, references existing static resource mappings with stable provider-specific cache keys, and drives a mixed loader that starts styles and ESM entries in parallel before preserving stable registration order.
 - Expose host-owned UI provider availability and registration state through a shared Pinia store in `@halo-dev/ui-shared`, replacing new dependencies on provider globals without exposing another provider's module implementation.
 - Make ESM the modern bundler default when the provider's minimum required stable Halo version is 2.26.0 or newer, with explicit `auto`, `iife`, and `esm` selection modes.
+- Keep Rsbuild 2 plugin and theme presets on one compatible toolchain instance and preserve relocatable ESM output during `build --watch --env-mode=development` rebuilds.
 - Mark every retained compatibility boundary intended to disappear with legacy IIFE support using an explicit Halo 3 removal comment.
 - Verify the feature in both the proxied UI development topology and the packaged BootJar production topology.
 

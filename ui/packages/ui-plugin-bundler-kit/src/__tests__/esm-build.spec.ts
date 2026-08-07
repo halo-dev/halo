@@ -67,6 +67,65 @@ describe("ESM provider builds", () => {
     );
   });
 
+  it("rebuilds an ESM plugin in Rsbuild development watch mode", async () => {
+    const providerRoot = setupProviderProject("plugin");
+    process.chdir(providerRoot);
+    const entryPath = path.join(providerRoot, "src/index.ts");
+    fs.appendFileSync(
+      entryPath,
+      '\nexport const watchMarker = "before-watch";\n'
+    );
+    const buildCompletions: Array<() => void> = [];
+    const waitForBuild = () =>
+      new Promise<void>((resolve) => buildCompletions.push(resolve));
+    const config = resolveRsbuildConfig(
+      rsbuildConfig({
+        rsbuild: {
+          plugins: [
+            {
+              name: "test:watch-completion",
+              setup(api) {
+                api.onAfterBuild(() => buildCompletions.shift()?.());
+              },
+            },
+          ],
+        },
+      }),
+      "development"
+    );
+    const rsbuild = await createRsbuild({
+      cwd: providerRoot,
+      rsbuildConfig: config,
+    });
+
+    const firstBuild = waitForBuild();
+    const resultPromise = rsbuild.build({ watch: true });
+    await withTimeout(
+      Promise.race([firstBuild, resultPromise.then(() => undefined)]),
+      "initial watch build"
+    );
+    const result = await resultPromise;
+
+    try {
+      const secondBuild = waitForBuild();
+      fs.writeFileSync(
+        entryPath,
+        fs
+          .readFileSync(entryPath, "utf8")
+          .replace("before-watch", "after-watch")
+      );
+      await withTimeout(secondBuild, "watch rebuild");
+      expect(
+        fs.readFileSync(
+          path.resolve(providerRoot, "../build/resources/main/ui/main.js"),
+          "utf8"
+        )
+      ).toContain("after-watch");
+    } finally {
+      await result.close();
+    }
+  }, 20_000);
+
   it("preserves explicit IIFE output without an ESM manifest", async () => {
     const providerRoot = setupProviderProject("plugin");
     process.chdir(providerRoot);
@@ -423,8 +482,25 @@ function resolveViteConfig(config: unknown) {
   });
 }
 
-function resolveRsbuildConfig(config: unknown) {
+function resolveRsbuildConfig(config: unknown, envMode = "production") {
   return (config as (env: ConfigParams) => RsbuildConfig)({
-    envMode: "production",
+    envMode,
   } as ConfigParams);
+}
+
+async function withTimeout(promise: Promise<void>, label: string) {
+  let timeout: ReturnType<typeof setTimeout> | undefined;
+  try {
+    await Promise.race([
+      promise,
+      new Promise<never>((_, reject) => {
+        timeout = setTimeout(
+          () => reject(new Error(`Timed out waiting for ${label}.`)),
+          10_000
+        );
+      }),
+    ]);
+  } finally {
+    clearTimeout(timeout);
+  }
 }
