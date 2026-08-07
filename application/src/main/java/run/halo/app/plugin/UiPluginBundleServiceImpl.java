@@ -409,12 +409,13 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
     }
 
     private String enabledUiPluginsScript(List<ClassifiedProvider> providers) {
-        var legacy = providers.stream()
-                .filter(provider -> provider.kind() == ProviderKind.LEGACY)
+        var enabledProviders = providers.stream()
+                .filter(provider -> provider.kind() != ProviderKind.INVALID)
                 .filter(provider -> PLUGIN_TYPE.equals(provider.candidate().type())
+                        || provider.kind() == ProviderKind.ESM
                         || providerResource(provider.candidate(), BundleResourceUtils.JS_BUNDLE) != null)
                 .toList();
-        var uiPlugins = legacy.stream()
+        var uiPlugins = enabledProviders.stream()
                 .map(provider -> {
                     var metadata = new LinkedHashMap<String, String>();
                     metadata.put("name", provider.candidate().name());
@@ -426,7 +427,7 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
                     return JSON_MAPPER.writeValueAsString(metadata);
                 })
                 .collect(Collectors.joining(","));
-        var plugins = legacy.stream()
+        var plugins = enabledProviders.stream()
                 .filter(provider -> PLUGIN_TYPE.equals(provider.candidate().type()))
                 .map(provider -> {
                     var metadata = new LinkedHashMap<String, String>();

@@ -111,7 +111,11 @@ export function selectProviderFormat(options: {
   }
 
   const warnings: string[] = [];
-  if (derivedTarget && !gte(derivedTarget, ESM_PROVIDER_MIN_HALO_VERSION)) {
+  if (!derivedTarget) {
+    warnings.push(
+      `Explicit ESM output uses target Halo ${target}, but spec.requires ${JSON.stringify(options.requires)} does not prove a minimum Halo version of ${ESM_PROVIDER_MIN_HALO_VERSION} or newer. Update spec.requires so older Halo releases do not install this ESM-only artifact.`
+    );
+  } else if (!gte(derivedTarget, ESM_PROVIDER_MIN_HALO_VERSION)) {
     warnings.push(
       `Explicit ESM output targets Halo ${derivedTarget}, which predates ESM UI provider support in Halo ${ESM_PROVIDER_MIN_HALO_VERSION}.`
     );

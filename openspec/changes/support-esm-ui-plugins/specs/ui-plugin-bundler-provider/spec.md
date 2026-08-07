@@ -188,6 +188,11 @@ The bundler SHALL validate a provider project's actually resolved shared depende
 - **WHEN** an ESM provider imports a package subpath or static runtime export that is absent from the target snapshot
 - **THEN** the build SHALL fail before externalizing that import
 
+#### Scenario: Source contains import-like text
+
+- **WHEN** a provider source comment or string literal contains text that resembles a static, re-export, side-effect, or dynamic import
+- **THEN** the bundler SHALL ignore that text instead of treating it as a runtime dependency
+
 #### Scenario: Provider uses a namespace import
 
 - **WHEN** an ESM provider uses a namespace import or dynamically reads properties from a shared package namespace
@@ -316,6 +321,19 @@ Vite and Rsbuild provider helpers SHALL implement the same externally observable
 
 - **WHEN** a Vite or Rsbuild-specific override would bypass dependency validation or change the final output contract
 - **THEN** that helper SHALL fail the build instead of emitting a misleading provider manifest
+
+#### Scenario: Caller removes secondary resource content hashes
+
+- **WHEN** the final Vite or Rsbuild output contains an asynchronous chunk, asynchronous stylesheet, or browser-loaded emitted asset without a content hash in its filename
+- **THEN** the ESM build SHALL fail with an actionable diagnostic
+- **THEN** the stable entry and startup stylesheet names SHALL remain cache-keyed by the provider descriptor
+
+#### Scenario: Output contains build sidecars or filename functions
+
+- **WHEN** the final output contains non-runtime sidecars such as source maps, legal-comment files, or the provider manifest
+- **THEN** the content-hash invariant SHALL NOT reject those sidecars merely because their filenames are stable
+- **WHEN** caller filename functions produce content-hashed runtime resource names
+- **THEN** the ESM build SHALL accept the final output without requiring a particular configuration value shape
 
 #### Scenario: Rsbuild override changes the ESM output contract
 

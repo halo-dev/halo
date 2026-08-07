@@ -57,6 +57,7 @@ interface RegistrationFailure {
 interface ReplacedRoute {
   route: RouteRecordRaw;
   parentName?: string | symbol;
+  nestedUnderAnonymousParent: boolean;
   owner?: UiProviderRegistration;
 }
 
@@ -438,7 +439,7 @@ function commitJsModule({
 }) {
   const pluginModuleStore = usePluginModuleStore();
   const routes = platform === "console" ? module.routes : module.ucRoutes;
-  validateRestorableRouteConflicts(router, routes);
+  assignInternalRouteParentNames(routes);
   const previousModule = pluginModuleStore.pluginModuleMap[name];
   pluginModuleStore.registerPluginModule(name, module);
   rollbackHandles.push({
@@ -556,30 +557,18 @@ function commitJsModule({
   }
 }
 
-function validateRestorableRouteConflicts(
-  router: Router,
+function assignInternalRouteParentNames(
   routes: RouteRecordRaw[] | RouteRecordAppend[] | undefined
 ) {
   if (!routes) {
     return;
   }
-  const currentRoutes = router.getRoutes();
   for (const routeItem of routes) {
-    if ("parentName" in routeItem || !routeItem.name) {
-      continue;
+    const route = "parentName" in routeItem ? routeItem.route : routeItem;
+    if (!route.name && route.children?.length) {
+      route.name = Symbol(`Halo route parent: ${route.path}`);
     }
-    const existing = currentRoutes.find(
-      (route) => route.name === routeItem.name
-    );
-    if (!existing || existing.name === undefined) {
-      continue;
-    }
-    const parent = findRouteParent(currentRoutes, existing.name);
-    if (parent && !parent.name) {
-      throw new Error(
-        `Cannot replace nested route "${String(existing.name)}" because its parent has no name for rollback.`
-      );
-    }
+    assignInternalRouteParentNames(route.children);
   }
 }
 
@@ -600,6 +589,7 @@ function findReplacedRoute(
   return {
     route: existing as unknown as RouteRecordRaw,
     parentName: parent?.name,
+    nestedUnderAnonymousParent: Boolean(parent && !parent.name),
     owner: routeOwners?.get(route.name),
   };
 }
@@ -620,6 +610,11 @@ function restoreReplacedRoute(
 ) {
   if (!replacedRoute) {
     return;
+  }
+  if (replacedRoute.nestedUnderAnonymousParent) {
+    throw new Error(
+      "Cannot restore a replaced route under an anonymous parent registered outside Halo's managed route setup."
+    );
   }
   if (replacedRoute.parentName) {
     router.addRoute(replacedRoute.parentName, replacedRoute.route);

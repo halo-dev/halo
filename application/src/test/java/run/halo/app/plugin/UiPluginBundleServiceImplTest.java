@@ -154,7 +154,32 @@ class UiPluginBundleServiceImplTest {
                         .collect(java.util.stream.Collectors.joining()));
         assertThat(read(service.getJsBundle(bundleVersion).block()))
                 .doesNotContain("export default")
-                .contains("this.enabledUiPlugins = [];this.enabledPlugins = []");
+                .contains(
+                        "this.enabledUiPlugins = [{\"name\":\"console-plugin\",\"type\":\"plugin\",\"version\":\"1.0.0\"},{\"name\":\"ui-plugin\",\"type\":\"plugin\",\"version\":\"1.0.0\"},{\"name\":\"theme:active\",\"type\":\"theme\",\"themeName\":\"active\",\"version\":\"2.0.0\"}]")
+                .contains(
+                        "this.enabledPlugins = [{\"name\":\"console-plugin\",\"version\":\"1.0.0\"},{\"name\":\"ui-plugin\",\"version\":\"1.0.0\"}]");
+    }
+
+    @Test
+    void shouldExposeEsmProvidersThroughLegacyEnabledMetadata() throws Exception {
+        var legacyPlugin = mockClasspathPlugin("legacy-plugin", "plugin/plugin-for-ui-assets");
+        var esmPlugin = mockPlugin(
+                "esm-plugin",
+                Map.of(
+                        "ui/ui-plugin.json", "{\"format\":\"esm\",\"entry\":\"./main.js\"}",
+                        "ui/main.js", "export default {};"));
+        when(pluginManager.startedPlugins()).thenReturn(List.of(legacyPlugin, esmPlugin));
+
+        var bundleVersion = generateBundleVersion();
+        var bundle = read(service.getJsBundle(bundleVersion).block());
+
+        assertThat(bundle)
+                .contains("console.log(\"ui\");")
+                .doesNotContain("export default {};")
+                .contains(
+                        "this.enabledUiPlugins = [{\"name\":\"esm-plugin\",\"type\":\"plugin\",\"version\":\"1.0.0\"},{\"name\":\"legacy-plugin\",\"type\":\"plugin\",\"version\":\"1.0.0\"}]")
+                .contains(
+                        "this.enabledPlugins = [{\"name\":\"esm-plugin\",\"version\":\"1.0.0\"},{\"name\":\"legacy-plugin\",\"version\":\"1.0.0\"}]");
     }
 
     @Test

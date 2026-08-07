@@ -686,6 +686,9 @@ importers:
       '@vitejs/plugin-vue':
         specifier: ^5.0.0 || ^6.0.0
         version: 6.0.8(@voidzero-dev/vite-plus-core@0.2.8)(vue@3.5.40)
+      es-module-lexer:
+        specifier: ^2.1.0
+        version: 2.1.0
       js-yaml:
         specifier: ^4.1.1
         version: 4.1.1

@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "@halo-dev/api-client": "workspace:*",
+    "es-module-lexer": "^2.1.0",
     "js-yaml": "^4.1.1",
     "pkg-types": "^2.3.1",
     "semver": "^7.7.4"

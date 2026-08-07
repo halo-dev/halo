@@ -149,6 +149,24 @@ describe("halo manifest utilities", () => {
       warnings: [expect.stringContaining("predates ESM UI provider support")],
     });
   });
+
+  it("warns when explicit ESM metadata cannot prove the supported minimum", () => {
+    expect(
+      selectProviderFormat({
+        format: "esm",
+        requires: "*",
+        targetHaloVersion: "2.26.0",
+      })
+    ).toMatchObject({
+      format: "esm",
+      targetHaloVersion: "2.26.0",
+      warnings: [
+        expect.stringMatching(
+          /spec\.requires .* does not prove a minimum Halo version/
+        ),
+      ],
+    });
+  });
 });
 
 function writeManifest(lines: string[]) {

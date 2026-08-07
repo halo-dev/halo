@@ -37,8 +37,8 @@ describe("shared dependency validation", () => {
     ).toEqual([
       { specifier: "axios", names: ["default", "AxiosError"] },
       { specifier: "vue", names: "namespace" },
-      { specifier: "vue", names: ["ref"] },
       { specifier: "pinia", names: [] },
+      { specifier: "vue", names: ["ref"] },
       { specifier: "vue-router", names: "namespace" },
     ]);
   });
@@ -56,6 +56,18 @@ describe("shared dependency validation", () => {
       { specifier: "vue", names: "namespace" },
       { specifier: "vue", names: "namespace" },
     ]);
+  });
+
+  it("ignores import-like text in comments and strings", () => {
+    expect(
+      parseImports(`
+        // import { notAHostExport } from "vue";
+        /* export * from "vue-router/internal"; */
+        const example = 'import "pinia/private"';
+        const dynamic = 'import("axios/private")';
+        import { ref } from "vue";
+      `)
+    ).toEqual([{ specifier: "vue", names: ["ref"] }]);
   });
 
   it("resolves an exports-only transitive dependency relative to its importer", async () => {

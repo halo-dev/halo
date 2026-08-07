@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { parse as parseEsmImports } from "es-module-lexer/js";
 import type {
   HaloHostRuntimeSnapshot,
   SharedPackageRoot,
@@ -294,23 +295,24 @@ interface ParsedImport {
 
 export function parseImports(code: string): ParsedImport[] {
   const imports: ParsedImport[] = [];
-  const fromPattern =
-    /\b(?:import\s+((?:type\s+)?(?:(?:[$A-Z_a-z][$\w]*\s*,\s*)?(?:\*\s+as\s+[$A-Z_a-z][$\w]*|\{[^}]*\})|[$A-Z_a-z][$\w]*))|export\s+((?:type\s+)?(?:\*(?:\s+as\s+[$A-Z_a-z][$\w]*)?|\{[^}]*\})))\s+from\s*["']([^"']+)["']/g;
-  for (const match of code.matchAll(fromPattern)) {
+  const [esmImports] = parseEsmImports(code);
+  for (const imported of esmImports) {
+    if (!imported.n || imported.d === -2) {
+      continue;
+    }
+    if (imported.d >= 0) {
+      imports.push({ specifier: imported.n, names: "namespace" });
+      continue;
+    }
+
+    const statement = code.slice(imported.ss, imported.se);
+    const match = statement.match(
+      /\b(?:import\s+((?:type\s+)?(?:(?:[$A-Z_a-z][$\w]*\s*,\s*)?(?:\*\s+as\s+[$A-Z_a-z][$\w]*|\{[^}]*\})|[$A-Z_a-z][$\w]*))|export\s+((?:type\s+)?(?:\*(?:\s+as\s+[$A-Z_a-z][$\w]*)?|\{[^}]*\})))\s+from\s*["']/
+    );
     imports.push({
-      specifier: match[3],
-      names: parseImportClause(match[1] || match[2]),
+      specifier: imported.n,
+      names: match ? parseImportClause(match[1] || match[2]) : [],
     });
-  }
-
-  const sideEffectPattern = /\bimport\s*["']([^"']+)["']/g;
-  for (const match of code.matchAll(sideEffectPattern)) {
-    imports.push({ specifier: match[1], names: [] });
-  }
-
-  const dynamicPattern = /\bimport\s*\(\s*["']([^"']+)["']\s*\)/g;
-  for (const match of code.matchAll(dynamicPattern)) {
-    imports.push({ specifier: match[1], names: "namespace" });
   }
   return imports;
 }

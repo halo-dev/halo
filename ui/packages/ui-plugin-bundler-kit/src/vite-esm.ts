@@ -1,4 +1,4 @@
-import type { OutputChunk } from "rollup";
+import type { OutputBundle, OutputChunk } from "rollup";
 import type { Plugin, ResolvedConfig } from "vite";
 import {
   ESM_PROVIDER_MANIFEST,
@@ -105,44 +105,52 @@ export function createViteEsmProviderPlugin(
         }
       }
     },
-    async generateBundle(_outputOptions, bundle) {
-      const chunks = Object.values(bundle).filter(
-        (item): item is OutputChunk => item.type === "chunk"
-      );
-      for (const chunk of chunks) {
-        await validator.validateSource(chunk.code, chunk.fileName);
-      }
-
-      const entries = chunks.filter((chunk) => chunk.isEntry);
-      if (entries.length !== 1 || !entries[0].exports.includes("default")) {
-        throw new Error(
-          "ESM UI provider output must contain one entry with a default PluginModule export."
+    generateBundle: {
+      order: "post",
+      async handler(_outputOptions, bundle) {
+        const chunks = Object.values(bundle).filter(
+          (item): item is OutputChunk => item.type === "chunk"
         );
-      }
-      const entryStyles = [
-        ...((entries[0] as ViteOutputChunk).viteMetadata?.importedCss || []),
-      ].sort();
-      if (entryStyles.length > 1) {
-        throw new Error(
-          "ESM UI provider output must contain at most one entry stylesheet."
-        );
-      }
-      const manifest = validateEsmProviderManifest({
-        format: "esm",
-        entry: `./${entries[0].fileName}`,
-        ...(entryStyles[0] ? { style: `./${entryStyles[0]}` } : {}),
-      });
-      this.emitFile({
-        type: "asset",
-        fileName: ESM_PROVIDER_MANIFEST,
-        source: `${JSON.stringify(manifest, null, 2)}\n`,
-      });
+        for (const chunk of chunks) {
+          await validator.validateSource(chunk.code, chunk.fileName);
+        }
 
-      const report = validator.getBuildReport();
-      resolvedConfig.logger.info(report.summary);
-      if (report.warning) {
-        resolvedConfig.logger.warn(report.warning);
-      }
+        const entries = chunks.filter((chunk) => chunk.isEntry);
+        if (entries.length !== 1 || !entries[0].exports.includes("default")) {
+          throw new Error(
+            "ESM UI provider output must contain one entry with a default PluginModule export."
+          );
+        }
+        const entryStyles = [
+          ...((entries[0] as ViteOutputChunk).viteMetadata?.importedCss || []),
+        ].sort();
+        if (entryStyles.length > 1) {
+          throw new Error(
+            "ESM UI provider output must contain at most one entry stylesheet."
+          );
+        }
+        assertSecondaryOutputContentHashed(
+          bundle,
+          entries[0].fileName,
+          entryStyles
+        );
+        const manifest = validateEsmProviderManifest({
+          format: "esm",
+          entry: `./${entries[0].fileName}`,
+          ...(entryStyles[0] ? { style: `./${entryStyles[0]}` } : {}),
+        });
+        this.emitFile({
+          type: "asset",
+          fileName: ESM_PROVIDER_MANIFEST,
+          source: `${JSON.stringify(manifest, null, 2)}\n`,
+        });
+
+        const report = validator.getBuildReport();
+        resolvedConfig.logger.info(report.summary);
+        if (report.warning) {
+          resolvedConfig.logger.warn(report.warning);
+        }
+      },
     },
   };
 }
@@ -170,4 +178,39 @@ function assertOnlyHaloExternals(external: unknown) {
       `ESM UI provider output cannot externalize ${String(unsupported)} because Halo does not provide it through the shared runtime. Remove the Vite external or select IIFE output.`
     );
   }
+}
+
+function assertSecondaryOutputContentHashed(
+  bundle: OutputBundle,
+  entryFileName: string,
+  entryStyles: readonly string[]
+) {
+  const descriptorKeyedFiles = new Set([entryFileName, ...entryStyles]);
+  const unversioned = Object.values(bundle)
+    .map((item) => item.fileName)
+    .filter(
+      (fileName) =>
+        !descriptorKeyedFiles.has(fileName) &&
+        !isBuildSidecar(fileName) &&
+        !hasContentHashSegment(fileName)
+    );
+  if (unversioned.length > 0) {
+    throw new Error(
+      `ESM UI provider secondary resources must include a content hash in their filenames; received ${unversioned.join(", ")}. Remove the conflicting Vite or Rollup filename override.`
+    );
+  }
+}
+
+function hasContentHashSegment(fileName: string) {
+  return /(?:^|[.-])(?:[a-f0-9]{8,64}|(?=[A-Za-z0-9_-]{8,64}(?:\.|$))(?=[A-Za-z0-9_-]*(?:[A-Z0-9_]))[A-Za-z0-9_-]{8,64})(?=\.|$)/.test(
+    fileName.split("/").at(-1) || ""
+  );
+}
+
+function isBuildSidecar(fileName: string) {
+  return (
+    fileName === ESM_PROVIDER_MANIFEST ||
+    fileName.endsWith(".map") ||
+    /\.LICENSE\.txt$/i.test(fileName)
+  );
 }

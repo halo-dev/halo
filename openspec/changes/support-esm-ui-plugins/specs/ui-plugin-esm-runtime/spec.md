@@ -241,6 +241,7 @@ Halo SHALL load legacy IIFE and ESM UI providers in the same Console or User Cen
 - **WHEN** one or more discovered providers are classified as legacy IIFE providers
 - **THEN** Halo SHALL load them through the descriptor's versioned aggregate bundle behavior
 - **THEN** the aggregate SHALL exclude providers classified as ESM
+- **THEN** its legacy enabled-provider metadata SHALL include every valid enabled provider regardless of IIFE or ESM format
 
 #### Scenario: ESM entries are loaded
 
@@ -308,7 +309,9 @@ Halo SHALL isolate observable ESM provider discovery, startup-style, import, eva
 - **WHEN** a provider fails while registering routes, components, stores, extensions, or other host integrations
 - **THEN** Halo SHALL invoke recorded removal or restoration handles in reverse order for mutations that support undo
 - **THEN** a named route replaced by the failing provider SHALL be restored to the previously registered route
-- **THEN** a route conflict that cannot be restored reliably SHALL be rejected before the router is mutated
+- **THEN** Halo-managed anonymous parent routes SHALL have an internal identity that permits their replaced named children to be restored
+- **THEN** a route already registered under an unidentifiable anonymous parent SHALL retain legacy last-registration-wins behavior when replacement succeeds
+- **THEN** if that replacement is followed by a failed transaction and cannot be restored reliably, Halo SHALL diagnose an incomplete route rollback and require a page reload instead of having rejected the provider before mutation
 - **THEN** Halo SHALL continue registering later providers
 - **THEN** any mutation that could not be reversed SHALL be diagnosed and SHALL use page reload as the final recovery boundary
 

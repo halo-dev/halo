@@ -11,7 +11,11 @@ import {
   type RouteRecordRaw,
 } from "vue-router";
 import { usePluginModuleStore } from "@/stores/plugin";
-import { resolveProviderEntryUrl, setupUiPluginRuntime } from "./setupModules";
+import {
+  resolveProviderEntryUrl,
+  setupCoreModules,
+  setupUiPluginRuntime,
+} from "./setupModules";
 
 const RootComponent = { template: "<div />" };
 
@@ -347,7 +351,7 @@ describe("setupUiPluginRuntime", () => {
     expect(stores.uiPlugins().get("failing")?.status).toBe("failed");
   });
 
-  it("rejects an un-restorable nested route conflict before mutating the router", async () => {
+  it("keeps last-registration-wins for an existing anonymous-parent route", async () => {
     const parent = route("", "/parent");
     const nested = route("NestedRoute", "/nested");
     parent.children = [nested];
@@ -368,11 +372,97 @@ describe("setupUiPluginRuntime", () => {
       },
     });
 
-    expect(addRoute).not.toHaveBeenCalled();
+    expect(addRoute).toHaveBeenCalledWith(
+      expect.objectContaining({ name: "NestedRoute", path: "/replacement" })
+    );
     expect(
       router.getRoutes().find((item) => item.name === "NestedRoute")?.path
-    ).toBe("/nested");
-    expect(stores.uiPlugins().get("conflict")?.status).toBe("failed");
+    ).toBe("/replacement");
+    expect(stores.uiPlugins().get("conflict")?.status).toBe("registered");
+  });
+
+  it("diagnoses rollback after replacing an unidentifiable anonymous-parent route", async () => {
+    const parent = route("", "/parent");
+    parent.children = [route("NestedRoute", "/nested")];
+    const { router, addRoute } = createStatefulRouter([parent], "FailRoute");
+
+    await setupUiPluginRuntime({
+      app: createApp(RootComponent),
+      router,
+      platform: "console",
+      setupComponents: vi.fn(),
+      registeredFormKitInputs: {},
+      runtime: {
+        fetchProviders: async () => esmDescriptor(["failing"]),
+        importModule: async () => ({
+          default: {
+            routes: [route("NestedRoute", "/replacement"), route("FailRoute")],
+          },
+        }),
+        loadStyle: async () => undefined,
+      },
+    });
+
+    expect(addRoute).toHaveBeenCalledWith(
+      expect.objectContaining({ name: "NestedRoute", path: "/replacement" })
+    );
+    expect(stores.uiPlugins().get("failing")?.status).toBe("failed");
+    expect(usePluginModuleStore().diagnostics).toEqual([
+      expect.objectContaining({
+        name: "failing",
+        stage: "registration",
+        incompleteRollback: ["route NestedRoute"],
+      }),
+    ]);
+  });
+
+  it("restores a replaced child of a Halo-managed anonymous parent", async () => {
+    const app = createApp(RootComponent);
+    const router = createVueRouter({
+      history: createMemoryHistory(),
+      routes: [],
+    });
+    const parent = route("", "/parent");
+    parent.children = [route("NestedRoute", "nested")];
+    setupCoreModules({
+      app,
+      router,
+      platform: "console",
+      modules: { core: { routes: [parent] } },
+    });
+    expect(
+      typeof router.getRoutes().find((item) => item.path === "/parent")?.name
+    ).toBe("symbol");
+
+    await setupUiPluginRuntime({
+      app,
+      router,
+      platform: "console",
+      setupComponents: vi.fn(),
+      registeredFormKitInputs: {},
+      runtime: {
+        fetchProviders: async () => esmDescriptor(["failing"]),
+        importModule: async () => ({
+          default: {
+            routes: [
+              route("NestedRoute", "/replacement"),
+              { path: 123 } as unknown as RouteRecordRaw,
+            ],
+          },
+        }),
+        loadStyle: async () => undefined,
+      },
+    });
+
+    expect(router.resolve({ name: "NestedRoute" }).path).toBe("/parent/nested");
+    expect(stores.uiPlugins().get("failing")?.status).toBe("failed");
+    expect(usePluginModuleStore().diagnostics).toEqual([
+      expect.objectContaining({
+        name: "failing",
+        stage: "registration",
+        incompleteRollback: [],
+      }),
+    ]);
   });
 
   it("attributes a delayed route chunk failure after successful registration", async () => {

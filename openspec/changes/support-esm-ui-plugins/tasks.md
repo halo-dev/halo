@@ -134,7 +134,7 @@
 
 - [x] 17.1 Replace aggregate startup CSS in the descriptor with ordered direct provider style descriptors, retain the Halo 2.x aggregate endpoint through ordered `@import` rules and a Halo 3 removal marker, isolate backend resource reads from reactive threads, migrate new JSON parsing to Jackson 3, and cover the behavior with backend tests.
 - [x] 17.2 Regenerate the OpenAPI document and API client, load all ordered provider styles, ESM entries, and legacy JavaScript concurrently with all-settled semantics, isolate style failures by provider, treat legacy providers without UI modules as successful no-ops, and cover 50-provider startup behavior without eager asynchronous CSS.
-- [x] 17.3 Preserve successful last-registration-wins route behavior while restoring a replaced named route after synchronous registration failure and rejecting un-restorable conflicts before mutation, with focused frontend tests.
+- [x] 17.3 Preserve successful last-registration-wins route behavior while restoring a replaced named route after synchronous registration failure and diagnosing genuinely incomplete rollback, with focused frontend tests.
 - [x] 17.4 Reject arbitrary Vite and Rsbuild externals plus conflicting Rsbuild ESM output and entry filename overrides before emitting a misleading manifest, with focused bundler tests.
 - [x] 17.5 Align runtime snapshots with actual browser exports, make host bridge lookup reuse the latest eligible sparse snapshot, and distinguish same-core prerelease reuse from genuinely older-snapshot warnings, with generator, host, and bundler tests.
 - [x] 17.6 Document the deliberate `ui-plugin.json` reserved output name and compatibility CSS bridge, then run formatting, strict OpenSpec validation, backend/frontend/bundler checks, OpenAPI checks, and feasible development and packaged-runtime acceptance.
@@ -158,3 +158,19 @@
 - [x] 20.2 Align the bundler kit's linked development and integration-test Rsbuild/Vue-plugin versions with Rsbuild 2 while retaining the published peer contract, then verify the real theme build.
 - [x] 20.3 Preserve automatic ESM asset resolution in Rsbuild development mode and add an integration test that observes both the initial watch build and a source-triggered rebuild.
 - [x] 20.4 Run focused bundler checks, package formatting/type checks, strict OpenSpec validation, and both real provider reproduction commands.
+
+## 21. Close Final Review Compatibility and Cache Gaps
+
+- [x] 21.1 Regenerate the OpenAPI document and API client without hand-editing generated output so `openapi-check` remains reproducible.
+- [x] 21.2 Preserve legacy `enabledPlugins` and `enabledUiPlugins` metadata for valid ESM providers while keeping ESM code out of the legacy aggregate, with backend regression coverage.
+- [x] 21.3 Emit a strong warning when explicit ESM uses `targetHaloVersion` but `spec.requires` cannot prove a 2.26-or-newer minimum, with format-selection coverage.
+- [x] 21.4 Replace regex-only ESM import discovery with syntax-aware lexing and cover import-like comments and strings.
+- [x] 21.5 Reject Vite and Rsbuild ESM overrides that remove content hashes from secondary JavaScript, CSS, or emitted assets, with fixture coverage.
+- [x] 21.6 Remove unintended snapshot and manifest root exports, then run focused backend, bundler, generated-client, formatting, type, and strict OpenSpec checks.
+
+## 22. Validate Runtime Assets and Preserve Legacy Route Overrides
+
+- [x] 22.1 Add public-build regression coverage for Vite final-output validation, safe filename functions, and Rsbuild legal-comment sidecars.
+- [x] 22.2 Validate content hashing from the final Vite output and exclude non-runtime Rsbuild sidecars from the cache invariant.
+- [x] 22.3 Preserve legacy last-registration-wins for named child routes under anonymous parents while making Halo-managed parents reversible and diagnosing genuinely incomplete rollback.
+- [x] 22.4 Run focused bundler/runtime tests, package checks, UI type checking, formatting, and strict OpenSpec validation.

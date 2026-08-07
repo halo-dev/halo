@@ -233,6 +233,120 @@ describe("ESM provider builds", () => {
     ).rejects.toThrow("build.cssCodeSplit to remain enabled");
   });
 
+  it("rejects Vite secondary resource names without content hashes", async () => {
+    const providerRoot = setupProviderProject("plugin");
+    process.chdir(providerRoot);
+    const config = resolveViteConfig(
+      viteConfig({
+        vite: {
+          build: {
+            rollupOptions: {
+              output: {
+                chunkFileNames: "chunks/[name].js",
+              },
+            },
+          },
+        },
+      })
+    );
+
+    await expect(
+      viteBuild({
+        ...config,
+        root: providerRoot,
+        configFile: false,
+        logLevel: "silent",
+      })
+    ).rejects.toThrow("content hash");
+  });
+
+  it("rejects Vite emitted asset names without content hashes", async () => {
+    const providerRoot = setupProviderProject("plugin");
+    process.chdir(providerRoot);
+    const config = resolveViteConfig(
+      viteConfig({
+        vite: {
+          build: {
+            rollupOptions: {
+              output: {
+                assetFileNames: "assets/[name][extname]",
+              },
+            },
+          },
+        },
+      })
+    );
+
+    await expect(
+      viteBuild({
+        ...config,
+        root: providerRoot,
+        configFile: false,
+        logLevel: "silent",
+      })
+    ).rejects.toThrow("content hash");
+  });
+
+  it("rejects a fixed-name runtime asset emitted by a Vite plugin", async () => {
+    const providerRoot = setupProviderProject("plugin");
+    process.chdir(providerRoot);
+    const config = resolveViteConfig(
+      viteConfig({
+        vite: {
+          plugins: [
+            {
+              name: "test:fixed-runtime-asset",
+              generateBundle() {
+                this.emitFile({
+                  type: "asset",
+                  fileName: "runtime-config.json",
+                  source: "{}",
+                });
+              },
+            },
+          ],
+        },
+      })
+    );
+
+    await expect(
+      viteBuild({
+        ...config,
+        root: providerRoot,
+        configFile: false,
+        logLevel: "silent",
+      })
+    ).rejects.toThrow("runtime-config.json");
+  });
+
+  it("accepts Vite filename functions that emit content hashes", async () => {
+    const providerRoot = setupProviderProject("plugin");
+    process.chdir(providerRoot);
+    const config = resolveViteConfig(
+      viteConfig({
+        vite: {
+          build: {
+            rollupOptions: {
+              output: {
+                chunkFileNames: () => "chunks/[name].[hash].js",
+                assetFileNames: () => "assets/[name].[hash][extname]",
+              },
+            },
+          },
+        },
+      })
+    );
+
+    await expect(
+      viteBuild({
+        ...config,
+        root: providerRoot,
+        configFile: false,
+        logLevel: "silent",
+      })
+    ).resolves.toBeDefined();
+  });
+
   it("rejects an absolute Vite base for relocatable ESM output", async () => {
     const providerRoot = setupProviderProject("plugin");
     process.chdir(providerRoot);
@@ -293,6 +407,89 @@ describe("ESM provider builds", () => {
         })
       )
     ).toThrow("owns output.filename.js");
+  });
+
+  it("rejects Rsbuild secondary resource names without content hashes", () => {
+    const providerRoot = setupProviderProject("theme");
+    process.chdir(providerRoot);
+
+    expect(() =>
+      resolveRsbuildConfig(
+        rsbuildConfig({
+          provider: "theme",
+          rsbuild: {
+            output: {
+              filename: { css: "[name].css" },
+            },
+          },
+        })
+      )
+    ).toThrow("content hash");
+  });
+
+  it("rejects disabling Rsbuild filename hashes", () => {
+    const providerRoot = setupProviderProject("theme");
+    process.chdir(providerRoot);
+
+    expect(() =>
+      resolveRsbuildConfig(
+        rsbuildConfig({
+          provider: "theme",
+          rsbuild: {
+            output: { filenameHash: false },
+          },
+        })
+      )
+    ).toThrow("content-hashed secondary resources");
+  });
+
+  it("rejects low-level Rspack asset names without content hashes", () => {
+    const providerRoot = setupProviderProject("theme");
+    process.chdir(providerRoot);
+
+    expect(() =>
+      resolveRsbuildConfig(
+        rsbuildConfig({
+          provider: "theme",
+          rsbuild: {
+            tools: {
+              rspack: {
+                output: {
+                  assetModuleFilename: "assets/[name][ext]",
+                },
+              },
+            },
+          },
+        })
+      )
+    ).toThrow("content hash");
+  });
+
+  it("allows an Rsbuild legal-comment sidecar without a content hash", async () => {
+    const providerRoot = setupProviderProject("theme");
+    process.chdir(providerRoot);
+    const entryPath = path.join(providerRoot, "src/index.ts");
+    fs.writeFileSync(
+      entryPath,
+      `/*! @license fixture */\n${fs.readFileSync(entryPath, "utf8")}`
+    );
+    const config = resolveRsbuildConfig(
+      rsbuildConfig({
+        provider: "theme",
+        rsbuild: {
+          output: { legalComments: "linked" },
+        },
+      })
+    );
+    const rsbuild = await createRsbuild({
+      cwd: providerRoot,
+      rsbuildConfig: config,
+    });
+
+    await expect(rsbuild.build()).resolves.toBeDefined();
+    expect(
+      fs.existsSync(path.join(providerRoot, "dist/main.js.LICENSE.txt"))
+    ).toBe(true);
   });
 
   it("rejects conflicting Rsbuild module output settings", () => {
@@ -454,6 +651,15 @@ function assertEsmOutput(outputRoot: string, providerPublicPath: string) {
       .readdirSync(path.join(outputRoot, "chunks"))
       .some((file) => file.endsWith(".js"))
   ).toBe(true);
+  const descriptorKeyedFiles = new Set([
+    "main.js",
+    manifest.style.replace(/^\.\//, ""),
+  ]);
+  for (const file of findFiles(outputRoot, (file) =>
+    /\.(?:css|js|svg)$/.test(file)
+  ).filter((file) => !descriptorKeyedFiles.has(file))) {
+    expect(path.basename(file)).toMatch(/\.[A-Za-z0-9_-]{8,}\./);
+  }
   for (const file of findFiles(
     outputRoot,
     (file) => file.endsWith(".js") || file.endsWith(".css")

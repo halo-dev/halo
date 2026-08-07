@@ -1,4 +1,5 @@
 import type { RsbuildPlugin } from "@rsbuild/core";
+import { hasRspackContentHashPlaceholder } from "./output-validation";
 import {
   ESM_PROVIDER_MANIFEST,
   validateEsmProviderManifest,
@@ -47,6 +48,18 @@ export function createRsbuildEsmProviderPlugin(
             `ESM UI provider output requires the automatic Rsbuild public path so provider resources follow the loaded entry URL; received ${JSON.stringify(config.output?.publicPath)}.`
           );
         }
+        assertResolvedRspackContentHash(
+          "output.chunkFilename",
+          config.output?.chunkFilename
+        );
+        assertResolvedRspackContentHash(
+          "output.cssChunkFilename",
+          config.output?.cssChunkFilename
+        );
+        assertResolvedRspackContentHash(
+          "output.assetModuleFilename",
+          config.output?.assetModuleFilename
+        );
 
         assertRspackValue(
           "experiments.outputModule",
@@ -134,6 +147,7 @@ export function createRsbuildEsmProviderPlugin(
               "ESM UI provider output must contain at most one entry stylesheet."
             );
           }
+          assertSecondaryAssetsContentHashed(compilation, entryStyles);
           const manifest = validateEsmProviderManifest({
             format: "esm",
             entry: "./main.js",
@@ -184,4 +198,52 @@ function assertOnlyHaloExternals(externals: unknown) {
       );
     }
   }
+}
+
+function assertResolvedRspackContentHash(path: string, pattern: unknown) {
+  if (pattern === undefined) {
+    return;
+  }
+  if (typeof pattern === "function") {
+    return;
+  }
+  if (!hasRspackContentHashPlaceholder(pattern)) {
+    throw new Error(
+      `ESM UI provider Rspack ${path} must include a [contenthash] content hash so secondary resources remain cache-safe.`
+    );
+  }
+}
+
+function assertSecondaryAssetsContentHashed(
+  compilation: {
+    getAssets(): readonly {
+      name: string;
+      info: { immutable?: boolean };
+    }[];
+  },
+  entryStyles: readonly string[]
+) {
+  const descriptorKeyedAssets = new Set(["main.js", ...entryStyles]);
+  const unversioned = compilation
+    .getAssets()
+    .filter(
+      (asset) =>
+        !descriptorKeyedAssets.has(asset.name) &&
+        !isBuildSidecar(asset.name) &&
+        asset.info.immutable !== true
+    )
+    .map((asset) => asset.name);
+  if (unversioned.length > 0) {
+    throw new Error(
+      `ESM UI provider secondary resources must use content-hashed filenames; received ${unversioned.join(", ")}. Remove the conflicting Rsbuild or Rspack filename override.`
+    );
+  }
+}
+
+function isBuildSidecar(fileName: string) {
+  return (
+    fileName === ESM_PROVIDER_MANIFEST ||
+    fileName.endsWith(".map") ||
+    /\.LICENSE\.txt$/i.test(fileName)
+  );
 }
