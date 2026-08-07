@@ -17308,8 +17308,8 @@
       },
       "CopyOperation": {
         "required": [
-          "op",
           "from",
+          "op",
           "path"
         ],
         "type": "object",
@@ -19613,8 +19613,8 @@
       },
       "MoveOperation": {
         "required": [
-          "op",
           "from",
+          "op",
           "path"
         ],
         "type": "object",
@@ -22717,6 +22717,7 @@
             "format": "email"
           },
           "externalUrl": {
+            "pattern": "",
             "type": "string"
           },
           "language": {
