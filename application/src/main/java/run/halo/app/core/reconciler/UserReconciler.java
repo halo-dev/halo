@@ -19,7 +19,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import run.halo.app.core.extension.Device;
+import run.halo.app.core.extension.RememberMeToken;
 import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.UserConnection;
@@ -39,6 +42,8 @@ import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.infra.utils.ReactiveUtils;
+import run.halo.app.security.PersonalAccessToken;
+import run.halo.app.security.device.DeviceService;
 
 @Slf4j
 @Component
@@ -53,6 +58,7 @@ public class UserReconciler implements Reconciler<Request>, UserPreCreatingHandl
     private final RoleService roleService;
     private final AttachmentService attachmentService;
     private final UserService userService;
+    private final DeviceService deviceService;
 
     @Override
     public Mono<Void> preCreating(User user) {
@@ -64,8 +70,18 @@ public class UserReconciler implements Reconciler<Request>, UserPreCreatingHandl
     public Result reconcile(Request request) {
         client.fetch(User.class, request.name()).ifPresent(user -> {
             if (isDeleted(user)) {
-                deleteUserConnections(request.name());
-                deleteUserRoleBindings(request.name());
+                var rememberMeTokensPending = deleteUserRememberMeTokens(request.name());
+                var devicesPending = deleteUserDevices(request.name());
+                var personalAccessTokensPending = deleteUserPersonalAccessTokens(request.name());
+                var connectionsPending = deleteUserConnections(request.name());
+                var roleBindingsPending = deleteUserRoleBindings(request.name());
+                if (rememberMeTokensPending
+                        || devicesPending
+                        || personalAccessTokensPending
+                        || connectionsPending
+                        || roleBindingsPending) {
+                    throw new RequeueException(new Result(true, null), "User data is not deleted yet");
+                }
                 removeFinalizers(user.getMetadata(), Set.of(FINALIZER_NAME));
                 client.update(user);
                 return;
@@ -180,13 +196,52 @@ public class UserReconciler implements Reconciler<Request>, UserPreCreatingHandl
                 .toUriString();
     }
 
-    void deleteUserConnections(String username) {
+    boolean deleteUserConnections(String username) {
         var userConnections = listConnectionsByUsername(username);
         if (CollectionUtils.isEmpty(userConnections)) {
-            return;
+            return false;
         }
         userConnections.forEach(client::delete);
-        throw new RequeueException(new Result(true, null), "User connections are not deleted yet");
+        return true;
+    }
+
+    boolean deleteUserDevices(String username) {
+        var listOptions = ListOptions.builder()
+                .andQuery(equal("spec.principalName", username))
+                .build();
+        var devices = client.listAll(Device.class, listOptions, defaultSort());
+        if (CollectionUtils.isEmpty(devices)) {
+            return false;
+        }
+        Flux.fromIterable(devices)
+                .filter(device -> !isDeleted(device))
+                .concatMap(device ->
+                        deviceService.revoke(username, device.getMetadata().getName()))
+                .then()
+                .block(BLOCKING_TIMEOUT);
+        return true;
+    }
+
+    boolean deleteUserRememberMeTokens(String username) {
+        var listOptions =
+                ListOptions.builder().andQuery(equal("spec.username", username)).build();
+        var tokens = client.listAll(RememberMeToken.class, listOptions, defaultSort());
+        if (CollectionUtils.isEmpty(tokens)) {
+            return false;
+        }
+        tokens.forEach(client::delete);
+        return true;
+    }
+
+    boolean deleteUserPersonalAccessTokens(String username) {
+        var listOptions =
+                ListOptions.builder().andQuery(equal("spec.username", username)).build();
+        var tokens = client.listAll(PersonalAccessToken.class, listOptions, defaultSort());
+        if (CollectionUtils.isEmpty(tokens)) {
+            return false;
+        }
+        tokens.forEach(client::delete);
+        return true;
     }
 
     List<UserConnection> listConnectionsByUsername(String username) {
@@ -195,7 +250,7 @@ public class UserReconciler implements Reconciler<Request>, UserPreCreatingHandl
         return client.listAll(UserConnection.class, listOptions, defaultSort());
     }
 
-    void deleteUserRoleBindings(String username) {
+    boolean deleteUserRoleBindings(String username) {
         var subject = new RoleBinding.Subject(User.KIND, username, User.GROUP);
         var roleBindings = roleService
                 .listRoleBindings(subject)
@@ -203,7 +258,7 @@ public class UserReconciler implements Reconciler<Request>, UserPreCreatingHandl
                 .blockOptional(BLOCKING_TIMEOUT)
                 .orElseGet(List::of);
         if (CollectionUtils.isEmpty(roleBindings)) {
-            return;
+            return false;
         }
         roleBindings.forEach(binding -> {
             binding.getSubjects().removeIf(RoleBinding.Subject.isUser(username));
@@ -213,7 +268,7 @@ public class UserReconciler implements Reconciler<Request>, UserPreCreatingHandl
                 client.update(binding);
             }
         });
-        throw new RequeueException(new Result(true, null), "User role bindings are not updated yet");
+        return true;
     }
 
     @Override
