@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 import run.halo.app.core.user.service.UserService;
 import run.halo.app.security.authentication.UserAccountStatusChecker;
@@ -33,14 +34,27 @@ class LoginReactiveAuthenticationManager implements ReactiveAuthenticationManage
 
     private final ReactiveUserDetailsPasswordService passwordService;
 
+    private Scheduler scheduler = Schedulers.boundedElastic();
+
+    /**
+     * Sets the scheduler used to offload password encoder operations. Package-private so that unit tests can inject a
+     * deterministic scheduler.
+     */
+    void setScheduler(Scheduler scheduler) {
+        this.scheduler = scheduler;
+    }
+
     @Override
     public Mono<Authentication> authenticate(Authentication authentication) {
         var loginId = authentication.getName();
         var credentials = authentication.getCredentials();
         var password = credentials != null ? credentials.toString() : null;
 
+        // Note: when the email strategy wins, the username fallback is raced by the cancel from
+        // next() below (it runs on a boundedElastic thread while this chain subscribes on the
+        // caller thread), so the fallback subscription is best-effort and may be skipped.
         return Flux.concat(Mono.defer(() -> lookupByEmail(loginId)), Mono.defer(() -> lookupByUsername(loginId)))
-                .publishOn(Schedulers.boundedElastic())
+                .publishOn(scheduler)
                 .filter(userDetails -> password != null && passwordEncoder.matches(password, userDetails.getPassword()))
                 .next()
                 .switchIfEmpty(Mono.error(() -> new BadCredentialsException("Invalid Credentials")))
