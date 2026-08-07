@@ -15,7 +15,10 @@ import {
   DEFAULT_PLUGIN_MANIFEST_PATH,
   DEFAULT_THEME_MANIFEST_PATH,
 } from "./constants/halo-plugin";
-import { selectHaloHostRuntimeSnapshot } from "./runtime-snapshot";
+import {
+  selectHaloHostRuntimeSnapshot,
+  SHARED_PACKAGE_ROOTS,
+} from "./runtime-snapshot";
 import {
   getHaloPluginBundleLocation,
   getHaloPluginManifest,
@@ -88,7 +91,7 @@ function createVitePresetsConfig(
       : undefined;
   if (selectedSnapshot?.reusedOlderSnapshot) {
     console.warn(
-      `[ui-plugin-bundler-kit] Halo ${selection.targetHaloVersion} is newer than bundled host runtime snapshots; reusing ${selectedSnapshot.snapshot.haloVersion}. Update the bundler to use newly introduced exports.`
+      `[ui-plugin-bundler-kit] Halo ${selection.targetHaloVersion} is newer than bundled host runtime snapshots; reusing ${selectedSnapshot.snapshot.haloVersion}. Update the bundler kit for the target Halo dependency baseline.`
     );
   }
 
@@ -136,6 +139,7 @@ function createVitePresetsConfig(
               // Vite 8 keeps this as a rolldownOptions alias; use the shared name
               // while the bundler kit also supports Vite 6 and 7.
               rollupOptions: {
+                external: [...SHARED_PACKAGE_ROOTS],
                 input: "src/index.ts",
                 preserveEntrySignatures: "allow-extension",
                 output: {

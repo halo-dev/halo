@@ -145,11 +145,11 @@ export default viteConfig({
 });
 ```
 
-After ESM is selected, dependency or output validation fails the build instead of silently changing the artifact to IIFE. Successful ESM builds generate `ui-plugin.json`. This filename is reserved for the bundler kit: do not create, copy, or emit another file with that name. A provider artifact without this file remains legacy, even if its `spec.requires` also supports Halo 2.26 or newer.
+After ESM is selected, successful builds generate `ui-plugin.json`. This filename is reserved for the bundler kit: do not create, copy, or emit another file with that name. A provider artifact without this file remains legacy, even if its `spec.requires` also supports Halo 2.26 or newer.
 
 ESM entries must default-export the existing `PluginModule`. The generated manifest records one optional main stylesheet; CSS belonging to asynchronous chunks stays out of the manifest and loads on demand with its JavaScript chunk. Halo starts every provider-owned startup stylesheet and entry in parallel, then commits modules in provider order without reloading after each entry. Top-level module effects, timers, listeners, and arbitrary asynchronous effects are not transactional; a full page reload remains the lifecycle and recovery boundary after provider changes.
 
-Halo owns the shared-runtime externals and the ESM entry filename. Vite configuration cannot externalize packages outside the published shared roots. Rsbuild configuration must not override the entry JavaScript filename, add arbitrary externals, or replace the required module-output settings. These restrictions apply only to ESM output; compatible IIFE overrides retain their previous behavior.
+The default Vite and Rsbuild presets provide ESM output, provider-relative resource paths, a stable `main.js`, one startup stylesheet, content-hashed secondary resources, and Halo shared-runtime externals. Raw `vite` and `rsbuild` configuration is merged after these defaults and is not inspected, rejected, or rewritten. If it changes entry names, formats, public paths, externals, or caching behavior, the caller owns the resulting manifest consistency, Import Map compatibility, shared dependency identity, resource relocation, and cache safety. Compatible IIFE overrides retain their previous behavior.
 
 ### Shared Runtime Dependencies
 
@@ -166,9 +166,9 @@ ESM providers may import these package roots from Halo:
 - `@halo-dev/api-client`
 - `@halo-dev/richtext-editor`
 
-The bundler validates the actually resolved package root and statically used root exports against the selected Halo host runtime snapshot. A newer provider dependency emits a warning, and a different major emits a stronger warning, but version drift alone does not fail the build. Missing packages, aliases or forks, deep imports, and unavailable static exports still fail because those are concrete incompatibilities.
+The bundler discovers shared package root imports and reports the installed provider version beside the selected Halo host snapshot version when package metadata is available. A newer provider dependency emits a compatibility note, and a different major emits a stronger note, but version drift does not fail the build. Export usage, aliases, forks, and final bundler resolution are not inspected. Deep imports such as `vue/dist/vue.esm-bundler.js` still fail because Halo's Import Map exposes shared package roots only.
 
-Vue, Vue Router, Pinia, and the FormKit Vue/Core graph share host identity. Other `@formkit/*` packages stay private to the provider but must resolve their runtime `@formkit/core` import to Halo. VueUse stays provider-private. Direct Tiptap or ProseMirror imports also stay private and produce a warning when they cross the shared rich-text editor boundary.
+Vue, Vue Router, Pinia, and the FormKit Vue/Core graph share host identity. Other `@formkit/*` packages and VueUse stay provider-private. Non-shared dependencies are bundled by the default presets.
 
 The shared `axios` import is the standard package module. Do not mutate its shared defaults or interceptors. For isolated clients, call `axios.create()`. `@halo-dev/api-client` exports Halo's separate authenticated `axiosInstance`; do not mutate that instance either.
 
@@ -443,7 +443,7 @@ Theme provider:
 
 > **Note**: The production build output directory of `HaloUIPluginBundlerKit` is still `src/main/resources/console` to ensure compatibility.
 
-An ESM output additionally contains the reserved, generated `ui-plugin.json` manifest and may contain content-hashed `chunks/` and `assets/`. The manifest contains `format`, `entry`, and optional `style`; asynchronous chunk CSS is not listed. Keep the complete output directory together. Halo serves it through the existing plugin or theme static resource mapping, returns each startup stylesheet's direct URL in provider order, and adds the current provider version to entry and style URLs for cache invalidation. The Halo 2.x compatibility `bundle.css` endpoint remains available for older callers, but now contains ordered `@import` rules pointing at those direct styles so relative asset URLs keep the correct provider base; it is not used by the new runtime.
+An ESM output additionally contains the reserved, generated `ui-plugin.json` manifest and may contain content-hashed `chunks/` and `assets/`. The manifest contains `format`, `entry`, and optional `style`; asynchronous chunk CSS is not listed. Keep the complete output directory together. Halo serves it through the existing plugin or theme static resource mapping, returns each startup stylesheet's direct URL in provider order, and adds the current provider version to entry and style URLs for cache invalidation. That query does not propagate to relative chunks and assets, so callers that replace the default content-hashed secondary filenames accept the risk of stale resources under Halo's production static-resource cache. The Halo 2.x compatibility `bundle.css` endpoint remains available for older callers, but now contains ordered `@import` rules pointing at those direct styles so relative asset URLs keep the correct provider base; it is not used by the new runtime.
 
 ## Maintaining Halo Host Runtime Snapshots
 
@@ -462,10 +462,10 @@ Snapshot generation is currently an explicit maintainer action; it is not couple
 
 - **Node.js**: ^18.0.0 || >=20.0.0
 - **Peer Dependencies**:
-  - `@rsbuild/core`: ^1.0.0 (when using Rsbuild)
-  - `@rsbuild/plugin-vue`: ^1.0.0 (when using Rsbuild)
-  - `@vitejs/plugin-vue`: ^4.0.0 || ^5.0.0 (when using Vite)
-  - `vite`: ^4.0.0 || ^5.0.0 || ^6.0.0 (when using Vite)
+  - `@rsbuild/core`: ^1.0.0 || ^2.0.0 (when using Rsbuild)
+  - `@rsbuild/plugin-vue`: ^1.0.0 || ^2.0.0 (when using Rsbuild)
+  - `@vitejs/plugin-vue`: ^5.0.0 || ^6.0.0 (when using Vite)
+  - `vite`: ^6.0.0 || ^7.0.0 || ^8.0.0 (when using Vite)
 
 ## Vite vs Rsbuild
 

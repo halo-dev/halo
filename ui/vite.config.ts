@@ -31,7 +31,7 @@ export default defineConfig(({ command, mode }) => ({
     VueI18n({
       include: [path.resolve(__dirname, "./src/locales/*.json")],
     }),
-    setupLibraryExternal(mode === "test" ? "test" : command),
+    setupLibraryExternal(mode === "test" ? "test" : command, DEV_SERVER_PORT),
     devPlugin({ port: DEV_SERVER_PORT }),
   ],
   resolve: {

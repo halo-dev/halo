@@ -225,6 +225,12 @@ The bundler SHALL validate a provider project's actually resolved shared depende
 - **THEN** the bundler SHALL validate the actually resolved package
 - **THEN** it SHALL use the declaration and lockfile only as diagnostic context
 
+#### Scenario: Bundler resolves a nested copy of a shared package
+
+- **WHEN** the bundler resolves a genuine nested installation with the expected shared package name
+- **THEN** the bundler SHALL validate and report that resolved copy's actual version instead of silently treating it as the provider-root installation
+- **THEN** version differences from the host snapshot SHALL remain best-effort compatibility diagnostics
+
 #### Scenario: Shared dependency exposes only an exports map
 
 - **WHEN** a shared dependency has no `module`, `main`, or root `index.js` but provides a valid package-root `exports` entry
@@ -375,6 +381,7 @@ Vite and Rsbuild provider helpers SHALL implement the same externally observable
 - **WHEN** the final Vite or Rsbuild output contains an asynchronous chunk, asynchronous stylesheet, or browser-loaded emitted asset without a content hash in its filename
 - **THEN** the ESM build SHALL fail with an actionable diagnostic
 - **THEN** the stable entry and startup stylesheet names SHALL remain cache-keyed by the provider descriptor
+- **THEN** a fixed filename that merely resembles a hash SHALL NOT satisfy the content-hash invariant
 
 #### Scenario: Output contains build sidecars or filename functions
 
@@ -383,10 +390,17 @@ Vite and Rsbuild provider helpers SHALL implement the same externally observable
 - **WHEN** caller filename functions produce content-hashed runtime resource names
 - **THEN** the ESM build SHALL accept the final output without requiring a particular configuration value shape
 
+#### Scenario: Vite generates a name for an anonymous asset
+
+- **WHEN** a Vite plugin emits a runtime asset without `name` or `fileName` and lets the bundler select its filename
+- **THEN** the ESM build SHALL accept the asset when the bundler-generated filename is content-hashed
+- **THEN** validating the asset SHALL NOT emit a duplicate output file
+
 #### Scenario: Rsbuild override changes the ESM output contract
 
-- **WHEN** caller Rsbuild configuration conflicts with module output, IIFE mode, module chunk format or loading, the required entry filename, or Halo-controlled externals
+- **WHEN** caller Rsbuild configuration conflicts with module output, IIFE mode, module chunk format or loading, the required entry filename, Halo-controlled externals, or aliases a shared dependency
 - **THEN** the helper SHALL fail before compilation with an actionable diagnostic
+- **THEN** the same validation SHALL apply after caller `tools.rspack` hooks have produced the final compiler configuration
 
 #### Scenario: Rsbuild watches a development ESM provider
 

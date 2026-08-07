@@ -224,113 +224,18 @@ describe("ESM provider builds", () => {
     );
   });
 
-  it("rejects a Vite alias that bypasses the shared contract", async () => {
+  it("preserves raw Vite output overrides without policy rejection", async () => {
     const providerRoot = setupProviderProject("plugin");
     process.chdir(providerRoot);
     const config = resolveViteConfig(
       viteConfig({
         vite: {
-          resolve: {
-            alias: {
-              vue: path.join(providerRoot, "src/lazy.ts"),
-            },
-          },
-        },
-      })
-    );
-
-    await expect(
-      viteBuild({
-        ...config,
-        root: providerRoot,
-        configFile: false,
-        logLevel: "silent",
-      })
-    ).rejects.toThrow("would bypass Halo snapshot validation");
-  });
-
-  it("rejects a Vite external that Halo does not provide", async () => {
-    const providerRoot = setupProviderProject("plugin");
-    process.chdir(providerRoot);
-    const config = resolveViteConfig(
-      viteConfig({
-        vite: {
+          base: "/custom-provider-assets/",
           build: {
             rollupOptions: {
               external: ["@vueuse/core"],
-            },
-          },
-        },
-      })
-    );
-
-    await expect(
-      viteBuild({
-        ...config,
-        root: providerRoot,
-        configFile: false,
-        logLevel: "silent",
-      })
-    ).rejects.toThrow("cannot externalize @vueuse/core");
-  });
-
-  it("rejects a Vite override that merges async CSS into the entry", async () => {
-    const providerRoot = setupProviderProject("plugin");
-    process.chdir(providerRoot);
-    const config = resolveViteConfig(
-      viteConfig({
-        vite: {
-          build: { cssCodeSplit: false },
-        },
-      })
-    );
-
-    await expect(
-      viteBuild({
-        ...config,
-        root: providerRoot,
-        configFile: false,
-        logLevel: "silent",
-      })
-    ).rejects.toThrow("build.cssCodeSplit to remain enabled");
-  });
-
-  it("rejects Vite secondary resource names without content hashes", async () => {
-    const providerRoot = setupProviderProject("plugin");
-    process.chdir(providerRoot);
-    const config = resolveViteConfig(
-      viteConfig({
-        vite: {
-          build: {
-            rollupOptions: {
               output: {
                 chunkFileNames: "chunks/[name].js",
-              },
-            },
-          },
-        },
-      })
-    );
-
-    await expect(
-      viteBuild({
-        ...config,
-        root: providerRoot,
-        configFile: false,
-        logLevel: "silent",
-      })
-    ).rejects.toThrow("content hash");
-  });
-
-  it("rejects Vite emitted asset names without content hashes", async () => {
-    const providerRoot = setupProviderProject("plugin");
-    process.chdir(providerRoot);
-    const config = resolveViteConfig(
-      viteConfig({
-        vite: {
-          build: {
-            rollupOptions: {
-              output: {
                 assetFileNames: "assets/[name][extname]",
               },
             },
@@ -346,91 +251,16 @@ describe("ESM provider builds", () => {
         configFile: false,
         logLevel: "silent",
       })
-    ).rejects.toThrow("content hash");
-  });
-
-  it("rejects a fixed-name runtime asset emitted by a Vite plugin", async () => {
-    const providerRoot = setupProviderProject("plugin");
-    process.chdir(providerRoot);
-    const config = resolveViteConfig(
-      viteConfig({
-        vite: {
-          plugins: [
-            {
-              name: "test:fixed-runtime-asset",
-              generateBundle() {
-                this.emitFile({
-                  type: "asset",
-                  fileName: "runtime-config.json",
-                  source: "{}",
-                });
-              },
-            },
-          ],
-        },
-      })
-    );
-
-    await expect(
-      viteBuild({
-        ...config,
-        root: providerRoot,
-        configFile: false,
-        logLevel: "silent",
-      })
-    ).rejects.toThrow("runtime-config.json");
-  });
-
-  it("accepts Vite filename functions that emit content hashes", async () => {
-    const providerRoot = setupProviderProject("plugin");
-    process.chdir(providerRoot);
-    const config = resolveViteConfig(
-      viteConfig({
-        vite: {
-          build: {
-            rollupOptions: {
-              output: {
-                chunkFileNames: () => "chunks/[name].[hash].js",
-                assetFileNames: () => "assets/[name].[hash][extname]",
-              },
-            },
-          },
-        },
-      })
-    );
-
-    await expect(
-      viteBuild({
-        ...config,
-        root: providerRoot,
-        configFile: false,
-        logLevel: "silent",
-      })
     ).resolves.toBeDefined();
+    expect(
+      fs.existsSync(path.join(providerRoot, "build/dist/ui-plugin.json"))
+    ).toBe(true);
+    expect(
+      fs.existsSync(path.join(providerRoot, "build/dist/chunks/lazy.js"))
+    ).toBe(true);
   });
 
-  it("rejects an absolute Vite base for relocatable ESM output", async () => {
-    const providerRoot = setupProviderProject("plugin");
-    process.chdir(providerRoot);
-    const config = resolveViteConfig(
-      viteConfig({
-        vite: {
-          base: "/plugins/esm-plugin/assets/ui/",
-        },
-      })
-    );
-
-    await expect(
-      viteBuild({
-        ...config,
-        root: providerRoot,
-        configFile: false,
-        logLevel: "silent",
-      })
-    ).rejects.toThrow("relative Vite base");
-  });
-
-  it("rejects an absolute Rsbuild public path for relocatable ESM output", async () => {
+  it("preserves raw Rsbuild output overrides without policy rejection", async () => {
     const providerRoot = setupProviderProject("theme");
     process.chdir(providerRoot);
     const config = resolveRsbuildConfig(
@@ -439,155 +269,65 @@ describe("ESM provider builds", () => {
         rsbuild: {
           output: {
             assetPrefix: "/themes/esm-theme/ui-plugin/assets/",
+            externals: { "@vueuse/core": "@vueuse/core" },
+            filename: {
+              css: "[name].css",
+              jsAsync: "chunks/[name].js",
+            },
+            filenameHash: false,
           },
         },
       })
     );
 
-    await expect(
-      (async () => {
-        const rsbuild = await createRsbuild({
-          cwd: providerRoot,
-          rsbuildConfig: config,
-        });
-        await rsbuild.build();
-      })()
-    ).rejects.toThrow("automatic Rsbuild public path");
-  });
-
-  it("rejects an Rsbuild entry filename override", () => {
-    const providerRoot = setupProviderProject("theme");
-    process.chdir(providerRoot);
-
-    expect(() =>
-      resolveRsbuildConfig(
-        rsbuildConfig({
-          provider: "theme",
-          rsbuild: {
-            output: { filename: { js: "custom.js" } },
-          },
-        })
-      )
-    ).toThrow("owns output.filename.js");
-  });
-
-  it("rejects Rsbuild secondary resource names without content hashes", () => {
-    const providerRoot = setupProviderProject("theme");
-    process.chdir(providerRoot);
-
-    expect(() =>
-      resolveRsbuildConfig(
-        rsbuildConfig({
-          provider: "theme",
-          rsbuild: {
-            output: {
-              filename: { css: "[name].css" },
-            },
-          },
-        })
-      )
-    ).toThrow("content hash");
-  });
-
-  it("rejects disabling Rsbuild filename hashes", () => {
-    const providerRoot = setupProviderProject("theme");
-    process.chdir(providerRoot);
-
-    expect(() =>
-      resolveRsbuildConfig(
-        rsbuildConfig({
-          provider: "theme",
-          rsbuild: {
-            output: { filenameHash: false },
-          },
-        })
-      )
-    ).toThrow("content-hashed secondary resources");
-  });
-
-  it("rejects low-level Rspack asset names without content hashes", () => {
-    const providerRoot = setupProviderProject("theme");
-    process.chdir(providerRoot);
-
-    expect(() =>
-      resolveRsbuildConfig(
-        rsbuildConfig({
-          provider: "theme",
-          rsbuild: {
-            tools: {
-              rspack: {
-                output: {
-                  assetModuleFilename: "assets/[name][ext]",
-                },
-              },
-            },
-          },
-        })
-      )
-    ).toThrow("content hash");
-  });
-
-  it("allows an Rsbuild legal-comment sidecar without a content hash", async () => {
-    const providerRoot = setupProviderProject("theme");
-    process.chdir(providerRoot);
-    const entryPath = path.join(providerRoot, "src/index.ts");
-    fs.writeFileSync(
-      entryPath,
-      `/*! @license fixture */\n${fs.readFileSync(entryPath, "utf8")}`
-    );
-    const config = resolveRsbuildConfig(
-      rsbuildConfig({
-        provider: "theme",
-        rsbuild: {
-          output: { legalComments: "linked" },
-        },
-      })
-    );
     const rsbuild = await createRsbuild({
       cwd: providerRoot,
       rsbuildConfig: config,
     });
 
     await expect(rsbuild.build()).resolves.toBeDefined();
-    expect(
-      fs.existsSync(path.join(providerRoot, "dist/main.js.LICENSE.txt"))
-    ).toBe(true);
+    expect(fs.existsSync(path.join(providerRoot, "dist/ui-plugin.json"))).toBe(
+      true
+    );
   });
 
-  it("rejects conflicting Rsbuild module output settings", () => {
-    const providerRoot = setupProviderProject("theme");
+  it("rejects a Vite entry without the provider default export", async () => {
+    const providerRoot = setupProviderProject("plugin");
     process.chdir(providerRoot);
+    fs.writeFileSync(
+      path.join(providerRoot, "src/index.ts"),
+      'export const marker = "missing-default";\n'
+    );
+    const config = resolveViteConfig(viteConfig({ vite: {} }));
 
-    expect(() =>
-      resolveRsbuildConfig(
-        rsbuildConfig({
-          provider: "theme",
-          rsbuild: {
-            tools: {
-              rspack: {
-                output: { iife: true },
-              },
-            },
-          },
-        })
-      )
-    ).toThrow("requires Rspack output.iife to be false");
+    await expect(
+      viteBuild({
+        ...config,
+        root: providerRoot,
+        configFile: false,
+        logLevel: "silent",
+      })
+    ).rejects.toThrow("default PluginModule export");
   });
 
-  it("rejects arbitrary Rsbuild externals", () => {
+  it("rejects an Rsbuild entry without the provider default export", async () => {
     const providerRoot = setupProviderProject("theme");
     process.chdir(providerRoot);
+    fs.writeFileSync(
+      path.join(providerRoot, "src/index.ts"),
+      'export const marker = "missing-default";\n'
+    );
+    const config = resolveRsbuildConfig(
+      rsbuildConfig({ provider: "theme", rsbuild: {} })
+    );
+    const rsbuild = await createRsbuild({
+      cwd: providerRoot,
+      rsbuildConfig: config,
+    });
 
-    expect(() =>
-      resolveRsbuildConfig(
-        rsbuildConfig({
-          provider: "theme",
-          rsbuild: {
-            output: { externals: { lodash: "lodash" } },
-          },
-        })
-      )
-    ).toThrow("cannot externalize dependencies that Halo does not provide");
+    await expect(rsbuild.build()).rejects.toThrow(
+      "default PluginModule export"
+    );
   });
 });
 

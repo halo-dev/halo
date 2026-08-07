@@ -43,12 +43,17 @@ export const HALO_HOST_RUNTIME_SNAPSHOTS = Object.freeze(
 export function validateHaloHostRuntimeSnapshot(
   value: unknown
 ): HaloHostRuntimeSnapshot {
-  if (!isRecord(value) || !parseStableVersion(value.haloVersion)) {
+  if (
+    !isRecord(value) ||
+    typeof value.haloVersion !== "string" ||
+    !parseStableVersion(value.haloVersion)
+  ) {
     throw new Error("Host runtime snapshot haloVersion must be stable semver.");
   }
   if (!isRecord(value.packages)) {
     throw new Error("Host runtime snapshot packages must be an object.");
   }
+  const snapshotPackages = value.packages;
 
   const packageRoots = Object.keys(value.packages).sort();
   const supportedRoots = [...SHARED_PACKAGE_ROOTS].sort();
@@ -64,7 +69,7 @@ export function validateHaloHostRuntimeSnapshot(
   const packages = Object.fromEntries(
     SHARED_PACKAGE_ROOTS.map((root) => [
       root,
-      validateSnapshotEntry(root, value.packages[root]),
+      validateSnapshotEntry(root, snapshotPackages[root]),
     ])
   ) as Record<SharedPackageRoot, HostRuntimeSnapshotEntry>;
 
@@ -173,7 +178,11 @@ function validateSnapshotEntry(
   root: SharedPackageRoot,
   value: unknown
 ): HostRuntimeSnapshotEntry {
-  if (!isRecord(value) || !parseStableVersion(value.version)) {
+  if (
+    !isRecord(value) ||
+    typeof value.version !== "string" ||
+    !parseStableVersion(value.version)
+  ) {
     throw new Error(`${root} snapshot version must be stable semver.`);
   }
   if (

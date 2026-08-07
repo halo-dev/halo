@@ -100,7 +100,7 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
 
     @Override
     public Mono<String> generateBundleVersion() {
-        return discoverProviders().map(this::providerVersion);
+        return discoverProviders().map(this::keyProviders).map(UiPluginBundleServiceImpl::descriptorVersion);
     }
 
     @Override
@@ -115,7 +115,10 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
 
     @Override
     public Mono<UiPluginProviderDescriptor> getProviderDescriptor() {
-        return discoverProviders().map(providers -> createDescriptor(providerVersion(providers), providers));
+        return discoverProviders().map(providers -> {
+            var keyedProviders = keyProviders(providers);
+            return createDescriptor(descriptorVersion(keyedProviders), keyedProviders);
+        });
     }
 
     private Mono<List<ClassifiedProvider>> discoverProviders() {
@@ -146,7 +149,8 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
                 PLUGIN_TYPE,
                 Objects.toString(plugin.getDescriptor().getVersion(), ""),
                 selectPluginBundleLocation(pluginName),
-                pluginManager.isDevelopment());
+                pluginManager.isDevelopment(),
+                null);
     }
 
     private ProviderCandidate themeCandidate(Theme theme) {
@@ -157,7 +161,8 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
                 THEME_TYPE,
                 Objects.toString(theme.getSpec().getVersion(), ""),
                 null,
-                isThemeInDevelopment(theme));
+                isThemeInDevelopment(theme),
+                themeCompatibilityError(theme));
     }
 
     private String selectPluginBundleLocation(String pluginName) {
@@ -187,6 +192,9 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
     }
 
     private ClassifiedProvider classify(ProviderCandidate candidate) {
+        if (candidate.error() != null) {
+            return ClassifiedProvider.invalid(candidate, candidate.error());
+        }
         var manifestResource = providerResource(candidate, PROVIDER_MANIFEST);
         if (manifestResource == null) {
             return ClassifiedProvider.legacy(candidate);
@@ -257,16 +265,19 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
         return normalized.toString().replace('\\', '/');
     }
 
-    private UiPluginProviderDescriptor createDescriptor(String version, List<ClassifiedProvider> providers) {
-        var hasLegacyProvider = providers.stream().anyMatch(provider -> provider.kind() == ProviderKind.LEGACY);
+    private UiPluginProviderDescriptor createDescriptor(String version, List<KeyedProvider> keyedProviders) {
+        var hasLegacyProvider = keyedProviders.stream()
+                .map(KeyedProvider::provider)
+                .anyMatch(provider -> provider.kind() == ProviderKind.LEGACY);
         return new UiPluginProviderDescriptor(
-                providers.stream().map(this::describeProvider).toList(),
+                keyedProviders.stream().map(this::describeProvider).toList(),
                 hasLegacyProvider ? versionedBundleUrl("bundle.js", version) : null);
     }
 
-    private UiPluginProviderDescriptor.Provider describeProvider(ClassifiedProvider provider) {
+    private UiPluginProviderDescriptor.Provider describeProvider(KeyedProvider keyedProvider) {
+        var provider = keyedProvider.provider();
         var candidate = provider.candidate();
-        var cacheKey = providerCacheKey(provider);
+        var cacheKey = keyedProvider.cacheKey();
         return switch (provider.kind()) {
             case LEGACY ->
                 new UiPluginProviderDescriptor.Provider(
@@ -341,9 +352,15 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
                 .toUriString();
     }
 
-    private String providerVersion(List<ClassifiedProvider> providers) {
+    private List<KeyedProvider> keyProviders(List<ClassifiedProvider> providers) {
+        return providers.stream()
+                .map(provider -> new KeyedProvider(provider, providerCacheKey(provider)))
+                .toList();
+    }
+
+    private static String descriptorVersion(List<KeyedProvider> providers) {
         var value = providers.stream()
-                .map(provider -> provider.kind() + ":" + providerCacheKey(provider))
+                .map(provider -> provider.provider().kind() + ":" + provider.cacheKey())
                 .collect(Collectors.joining("|"));
         return Hashing.sha256().hashUnencodedChars(value).toString();
     }
@@ -411,9 +428,6 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
     private String enabledUiPluginsScript(List<ClassifiedProvider> providers) {
         var enabledProviders = providers.stream()
                 .filter(provider -> provider.kind() != ProviderKind.INVALID)
-                .filter(provider -> PLUGIN_TYPE.equals(provider.candidate().type())
-                        || provider.kind() == ProviderKind.ESM
-                        || providerResource(provider.candidate(), BundleResourceUtils.JS_BUNDLE) != null)
                 .toList();
         var uiPlugins = enabledProviders.stream()
                 .map(provider -> {
@@ -443,6 +457,20 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
     private static boolean isThemeInDevelopment(Theme theme) {
         var status = theme.getStatus();
         return status != null && Boolean.TRUE.equals(status.getInDevelopment());
+    }
+
+    private static String themeCompatibilityError(Theme theme) {
+        var status = theme.getStatus();
+        if (status == null || status.getPhase() != Theme.ThemePhase.FAILED || status.getConditions() == null) {
+            return null;
+        }
+        var currentCondition = status.getConditions().peekFirst();
+        if (currentCondition == null || !"UnsatisfiedRequiresVersion".equals(currentCondition.getReason())) {
+            return null;
+        }
+        return StringUtils.hasText(currentCondition.getMessage())
+                ? currentCondition.getMessage()
+                : "Activated theme is incompatible with this Halo version.";
     }
 
     @Override
@@ -476,7 +504,10 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
             String type,
             String version,
             String bundleLocation,
-            boolean development) {}
+            boolean development,
+            String error) {}
+
+    private record KeyedProvider(ClassifiedProvider provider, String cacheKey) {}
 
     private record ClassifiedProvider(
             ProviderCandidate candidate, ProviderKind kind, ProviderManifest manifest, String error) {

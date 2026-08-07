@@ -689,6 +689,9 @@ importers:
       es-module-lexer:
         specifier: ^2.1.0
         version: 2.1.0
+      exsolve:
+        specifier: ^1.0.8
+        version: 1.0.8
       js-yaml:
         specifier: ^4.1.1
         version: 4.1.1

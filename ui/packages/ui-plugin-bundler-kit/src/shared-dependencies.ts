@@ -1,4 +1,3 @@
-import fs from "node:fs";
 import path from "node:path";
 import { parse as parseEsmImports } from "es-module-lexer/js";
 import type {
@@ -33,10 +32,6 @@ export class SharedDependencyValidator {
     SharedPackageRoot,
     ReturnType<typeof validateResolvedSharedPackage>
   >();
-  readonly #namespaceImports = new Map<SharedPackageRoot, Set<string>>();
-  readonly #compatibilityNotes = new Set<string>();
-  #usesEditor = false;
-  #usesEditorInternals = false;
 
   constructor(options: SharedDependencyValidatorOptions) {
     this.#snapshot = options.snapshot;
@@ -44,32 +39,12 @@ export class SharedDependencyValidator {
   }
 
   async validateSource(code: string, sourceId: string) {
-    for (const imported of parseImports(code)) {
-      await this.validateImport(imported.specifier, imported.names, sourceId);
-    }
-    if (this.#usesEditor && this.#usesEditorInternals) {
-      this.#compatibilityNotes.add(
-        "Direct @tiptap/* or prosemirror-* imports remain provider-private while @halo-dev/richtext-editor is shared; editor identity is best-effort."
-      );
+    for (const specifier of parseImports(code)) {
+      await this.validateImport(specifier, sourceId);
     }
   }
 
-  async validateImport(
-    specifier: string,
-    names: readonly string[] | "namespace",
-    sourceId: string
-  ) {
-    if (specifier === "@halo-dev/richtext-editor") {
-      this.#usesEditor = true;
-    }
-    if (
-      specifier.startsWith("@tiptap/") ||
-      specifier.startsWith("prosemirror-")
-    ) {
-      this.#usesEditorInternals = true;
-      return false;
-    }
-
+  async validateImport(specifier: string, sourceId: string) {
     const deepRoot = SHARED_PACKAGE_ROOTS.find((root) =>
       specifier.startsWith(`${root}/`)
     );
@@ -84,24 +59,6 @@ export class SharedDependencyValidator {
     }
 
     await this.validateResolvedRoot(specifier, sourceId);
-    if (names === "namespace") {
-      const sources = this.#namespaceImports.get(specifier) || new Set();
-      sources.add(this.formatSourceLabel(sourceId));
-      this.#namespaceImports.set(specifier, sources);
-      return true;
-    }
-
-    const supportedExports = new Set(
-      this.#snapshot.packages[specifier].exports
-    );
-    const unsupported = names.filter((name) => !supportedExports.has(name));
-    if (unsupported.length > 0) {
-      throw new Error(
-        `${sourceId} imports unsupported ${specifier} export(s): ${unsupported.join(", ")}. ` +
-          `Halo ${this.#snapshot.haloVersion} exposes ${supportedExports.size} root exports. ` +
-          "Raise spec.requires with an updated bundler snapshot, change the import, or select IIFE output."
-      );
-    }
     return true;
   }
 
@@ -132,7 +89,7 @@ export class SharedDependencyValidator {
       ),
     ];
     const summary = [
-      `[ui-plugin-bundler-kit] ESM validation passed (Halo ${this.#snapshot.haloVersion} snapshot).`,
+      `[ui-plugin-bundler-kit] ESM shared dependency versions (Halo ${this.#snapshot.haloVersion} snapshot).`,
       ...(rows.length > 0
         ? [
             "  Shared dependencies",
@@ -142,7 +99,6 @@ export class SharedDependencyValidator {
         : ["  Shared dependencies: none"]),
     ].join("\n");
 
-    const warningSections: string[] = [];
     const versionNotes = roots.flatMap((root) => {
       const resolved = this.#resolvedPackages.get(root) as Awaited<
         ReturnType<typeof validateResolvedSharedPackage>
@@ -158,74 +114,18 @@ export class SharedDependencyValidator {
         `    ${root}: provider ${resolved.version}, Halo host ${hostVersion} (${reason}; best-effort)`,
       ];
     });
-    if (versionNotes.length > 0) {
-      warningSections.push("  Version differences", ...versionNotes);
-    }
-
-    const namespaceNotes = roots.flatMap((root) => {
-      const sources = this.#namespaceImports.get(root);
-      if (!sources?.size) {
-        return [];
-      }
-      return [
-        `    ${root}`,
-        ...[...sources].sort().map((source) => `      - ${source}`),
-      ];
-    });
-    if (namespaceNotes.length > 0) {
-      warningSections.push(
-        "  Namespace or dynamic imports not fully checked",
-        ...namespaceNotes
-      );
-    }
-
-    if (this.#compatibilityNotes.size > 0) {
-      warningSections.push(
-        "  Other",
-        ...[...this.#compatibilityNotes].sort().map((note) => `    ${note}`)
-      );
-    }
-
     return {
       summary,
-      ...(warningSections.length > 0
+      ...(versionNotes.length > 0
         ? {
             warning: [
               "[ui-plugin-bundler-kit] Compatibility notes:",
-              ...warningSections,
+              "  Version differences",
+              ...versionNotes,
             ].join("\n"),
           }
         : {}),
     };
-  }
-
-  async assertBundlerResolution(
-    root: SharedPackageRoot,
-    resolvedId: string,
-    sourceId: string
-  ) {
-    await this.validateResolvedRoot(root, sourceId);
-    const expectedRoot = this.#resolvedPackages.get(root)?.packageRoot;
-    if (
-      !expectedRoot ||
-      resolvedId.startsWith("\0") ||
-      !path.isAbsolute(resolvedId)
-    ) {
-      return;
-    }
-    const cleanId = resolvedId.split("?")[0];
-    const actualPath = fs.existsSync(cleanId)
-      ? fs.realpathSync(cleanId)
-      : path.normalize(cleanId);
-    if (
-      actualPath !== expectedRoot &&
-      !actualPath.startsWith(`${expectedRoot}${path.sep}`)
-    ) {
-      throw new Error(
-        `${root} imported by ${sourceId} resolved through the bundler to ${actualPath}, ` +
-          `outside the validated package root ${expectedRoot}. Remove aliases or conditional resolution overrides.`
-      );
-    }
   }
 
   shouldExternalize(specifier: string, sourceId: string) {
@@ -258,24 +158,14 @@ export class SharedDependencyValidator {
       );
       this.#resolvingPackages.set(root, resolving);
     }
-    const resolved = await resolving;
+    let resolved: Awaited<ReturnType<typeof validateResolvedSharedPackage>>;
+    try {
+      resolved = await resolving;
+    } catch {
+      return;
+    }
     this.#validatedRoots.add(root);
     this.#resolvedPackages.set(root, resolved);
-  }
-
-  private formatSourceLabel(sourceId: string) {
-    const cleanId = sourceId.split(/[?#]/, 1)[0];
-    const normalizedId = cleanId.split(path.sep).join("/");
-    const nodeModulesMarker = "/node_modules/";
-    const nodeModulesIndex = normalizedId.lastIndexOf(nodeModulesMarker);
-    if (nodeModulesIndex !== -1) {
-      return normalizedId.slice(nodeModulesIndex + nodeModulesMarker.length);
-    }
-
-    if (!path.isAbsolute(cleanId)) {
-      return normalizedId.replace(/^\.\//, "");
-    }
-    return path.relative(this.#providerRoot, cleanId).split(path.sep).join("/");
   }
 }
 
@@ -288,63 +178,14 @@ function formatTableRow(
     .join("  ")}`.trimEnd();
 }
 
-interface ParsedImport {
-  specifier: string;
-  names: string[] | "namespace";
-}
-
-export function parseImports(code: string): ParsedImport[] {
-  const imports: ParsedImport[] = [];
+export function parseImports(code: string): string[] {
+  const imports: string[] = [];
   const [esmImports] = parseEsmImports(code);
   for (const imported of esmImports) {
     if (!imported.n || imported.d === -2) {
       continue;
     }
-    if (imported.d >= 0) {
-      imports.push({ specifier: imported.n, names: "namespace" });
-      continue;
-    }
-
-    const statement = code.slice(imported.ss, imported.se);
-    const match = statement.match(
-      /\b(?:import\s+((?:type\s+)?(?:(?:[$A-Z_a-z][$\w]*\s*,\s*)?(?:\*\s+as\s+[$A-Z_a-z][$\w]*|\{[^}]*\})|[$A-Z_a-z][$\w]*))|export\s+((?:type\s+)?(?:\*(?:\s+as\s+[$A-Z_a-z][$\w]*)?|\{[^}]*\})))\s+from\s*["']/
-    );
-    imports.push({
-      specifier: imported.n,
-      names: match ? parseImportClause(match[1] || match[2]) : [],
-    });
+    imports.push(imported.n);
   }
   return imports;
-}
-
-function parseImportClause(clause: string): string[] | "namespace" {
-  const normalized = clause.trim();
-  if (normalized === "*" || normalized.startsWith("* as ")) {
-    return "namespace";
-  }
-
-  const names: string[] = [];
-  const namedStart = normalized.indexOf("{");
-  const namedEnd = normalized.lastIndexOf("}");
-  const defaultImport = (
-    namedStart === -1 ? normalized : normalized.slice(0, namedStart)
-  )
-    .replace(/,$/, "")
-    .trim();
-  if (defaultImport && !defaultImport.startsWith("type ")) {
-    names.push("default");
-  }
-  if (namedStart !== -1 && namedEnd > namedStart) {
-    for (const item of normalized.slice(namedStart + 1, namedEnd).split(",")) {
-      const importedName = item
-        .trim()
-        .replace(/^type\s+/, "")
-        .split(/\s+as\s+/)[0]
-        .trim();
-      if (importedName) {
-        names.push(importedName);
-      }
-    }
-  }
-  return names;
 }

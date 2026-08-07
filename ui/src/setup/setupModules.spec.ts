@@ -227,11 +227,12 @@ describe("setupUiPluginRuntime", () => {
     const goodModule = pluginModuleWithRoute("GoodRoute");
     const app = createApp(RootComponent);
 
+    const setupComponents = vi.fn();
     await setupUiPluginRuntime({
       app,
       router,
       platform: "console",
-      setupComponents: vi.fn(),
+      setupComponents,
       registeredFormKitInputs: {},
       runtime: {
         fetchProviders: async () => esmDescriptor(["bad", "good"]),
@@ -255,10 +256,89 @@ describe("setupUiPluginRuntime", () => {
       expect.objectContaining({
         name: "bad",
         stage: "registration",
-        incompleteRollback: ["formkit"],
+        incompleteRollback: [],
       }),
     ]);
+    expect(setupComponents).toHaveBeenCalledWith({ formkitInputs: {} });
     expect(mocks.toastError).toHaveBeenCalledTimes(1);
+  });
+
+  it("preserves provider precedence over same-named core components", async () => {
+    const providerComponent = {};
+    const coreComponent = {};
+    const app = createApp(RootComponent);
+    const { router } = createRouter();
+
+    await setupUiPluginRuntime({
+      app,
+      router,
+      platform: "console",
+      setupComponents: () => {
+        app.component("SharedComponent", coreComponent);
+      },
+      registeredFormKitInputs: {},
+      runtime: {
+        fetchProviders: async () => esmDescriptor(["component-provider"]),
+        importModule: async () => ({
+          default: {
+            components: { SharedComponent: providerComponent },
+          },
+        }),
+        loadStyle: async () => undefined,
+      },
+    });
+
+    expect(app.component("SharedComponent")).toBe(providerComponent);
+  });
+
+  it("removes a loaded stylesheet when its provider entry fails", async () => {
+    const style = { provider: "failing" };
+    const unloadStyle = vi.fn();
+    const { router } = createRouter();
+
+    await setupUiPluginRuntime({
+      app: createApp(RootComponent),
+      router,
+      platform: "console",
+      setupComponents: vi.fn(),
+      registeredFormKitInputs: {},
+      runtime: {
+        fetchProviders: async () => esmDescriptor(["failing"]),
+        importModule: async () => {
+          throw new Error("entry failed");
+        },
+        loadStyle: async () => style,
+        unloadStyle,
+      },
+    });
+
+    expect(unloadStyle).toHaveBeenCalledWith(style);
+  });
+
+  it("preserves functional route components", async () => {
+    const component = Object.assign(() => null, {
+      displayName: "FunctionalRoute",
+    });
+    const functionalRoute = route("FunctionalRoute");
+    functionalRoute.component = component;
+    const { router } = createRouter();
+
+    await setupUiPluginRuntime({
+      app: createApp(RootComponent),
+      router,
+      platform: "console",
+      setupComponents: vi.fn(),
+      registeredFormKitInputs: {},
+      runtime: {
+        fetchProviders: async () => esmDescriptor(["functional"]),
+        importModule: async () => ({
+          default: { routes: [functionalRoute] },
+        }),
+        loadStyle: async () => undefined,
+      },
+    });
+
+    expect(functionalRoute.component).toBe(component);
   });
 
   it("keeps last-registration-wins for successful named route conflicts", async () => {
@@ -533,6 +613,177 @@ describe("setupUiPluginRuntime", () => {
         stage: "chunk",
       }),
     ]);
+  });
+
+  it("attributes a nested asynchronous component failure through its provider parent", async () => {
+    const providerComponent = {};
+    const module: PluginModule = {
+      routes: [
+        {
+          path: "/provider",
+          name: "ProviderRoute",
+          component: providerComponent,
+        },
+      ],
+    };
+    const app = createApp(RootComponent);
+    const { router } = createRouter();
+
+    await setupUiPluginRuntime({
+      app,
+      router,
+      platform: "console",
+      setupComponents: vi.fn(),
+      registeredFormKitInputs: {},
+      runtime: {
+        fetchProviders: async () => esmDescriptor(["route-provider"]),
+        importModule: async () => ({ default: module }),
+        loadStyle: async () => undefined,
+      },
+    });
+
+    const instance = {
+      $: {
+        type: {},
+        parent: { type: providerComponent, parent: null },
+      },
+    } as Parameters<NonNullable<typeof app.config.errorHandler>>[1];
+    app.config.errorHandler?.(
+      new Error("nested async component failed"),
+      instance,
+      "async component loader"
+    );
+
+    expect(stores.uiPlugins().get("route-provider")?.status).toBe("failed");
+    expect(usePluginModuleStore().diagnostics).toEqual([
+      expect.objectContaining({ name: "route-provider", stage: "chunk" }),
+    ]);
+  });
+
+  it("attributes an asynchronous component failure through the active lazy route", async () => {
+    const resolvedRouteComponent = {};
+    const app = createApp(RootComponent);
+    const { router } = createRouter();
+    Object.assign(router, {
+      currentRoute: {
+        value: { matched: [{ name: "LazyProviderRoute" }] },
+      },
+    });
+
+    await setupUiPluginRuntime({
+      app,
+      router,
+      platform: "console",
+      setupComponents: vi.fn(),
+      registeredFormKitInputs: {},
+      runtime: {
+        fetchProviders: async () => esmDescriptor(["lazy-route-provider"]),
+        importModule: async () => ({
+          default: {
+            routes: [
+              {
+                path: "/lazy-provider",
+                name: "LazyProviderRoute",
+                component: async () => resolvedRouteComponent,
+              },
+            ],
+          },
+        }),
+        loadStyle: async () => undefined,
+      },
+    });
+    app.config.errorHandler?.(
+      new Error("lazy route async component failed"),
+      {
+        $: { type: {}, parent: { type: resolvedRouteComponent, parent: null } },
+      } as Parameters<NonNullable<typeof app.config.errorHandler>>[1],
+      "async component loader"
+    );
+
+    expect(stores.uiPlugins().get("lazy-route-provider")?.status).toBe(
+      "failed"
+    );
+  });
+
+  it("does not classify ordinary descendant errors as chunk failures", async () => {
+    const providerComponent = {};
+    const app = createApp(RootComponent);
+    const { router } = createRouter();
+
+    await setupUiPluginRuntime({
+      app,
+      router,
+      platform: "console",
+      setupComponents: vi.fn(),
+      registeredFormKitInputs: {},
+      runtime: {
+        fetchProviders: async () => esmDescriptor(["route-provider"]),
+        importModule: async () => ({
+          default: {
+            routes: [
+              {
+                path: "/provider",
+                name: "ProviderRoute",
+                component: providerComponent,
+              },
+            ],
+          },
+        }),
+        loadStyle: async () => undefined,
+      },
+    });
+
+    app.config.errorHandler?.(
+      new Error("render failed"),
+      {
+        $: { type: {}, parent: { type: providerComponent, parent: null } },
+      } as Parameters<NonNullable<typeof app.config.errorHandler>>[1],
+      "render function"
+    );
+
+    expect(stores.uiPlugins().get("route-provider")?.status).toBe("registered");
+    expect(usePluginModuleStore().diagnostics).toEqual([]);
+  });
+
+  it("keeps a registered provider stylesheet after a delayed chunk failure", async () => {
+    const style = { provider: "chunk-provider" };
+    const unloadStyle = vi.fn();
+    const providerComponent = {};
+    const app = createApp(RootComponent);
+    const { router } = createRouter();
+
+    await setupUiPluginRuntime({
+      app,
+      router,
+      platform: "console",
+      setupComponents: vi.fn(),
+      registeredFormKitInputs: {},
+      runtime: {
+        fetchProviders: async () => esmDescriptor(["chunk-provider"]),
+        importModule: async () => ({
+          default: {
+            routes: [
+              {
+                path: "/chunk-provider",
+                name: "ChunkProviderRoute",
+                component: providerComponent,
+              },
+            ],
+          },
+        }),
+        loadStyle: async () => style,
+        unloadStyle,
+      },
+    });
+    app.config.errorHandler?.(
+      new Error("chunk failed"),
+      {
+        $: { type: {}, parent: { type: providerComponent, parent: null } },
+      } as Parameters<NonNullable<typeof app.config.errorHandler>>[1],
+      "async component loader"
+    );
+
+    expect(unloadStyle).not.toHaveBeenCalled();
   });
 
   it("rejects an ESM entry without a default PluginModule export", async () => {

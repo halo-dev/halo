@@ -171,6 +171,12 @@ Halo SHALL describe current UI providers through one authenticated response that
 - **THEN** its entry URL SHALL use the existing `/themes/{name}/ui-plugin/assets/` mapping
 - **THEN** the entry URL SHALL include a stable theme-specific cache key as a query parameter
 
+#### Scenario: Activated theme is incompatible with Halo
+
+- **WHEN** the activated theme status reports `UnsatisfiedRequiresVersion`
+- **THEN** Halo SHALL classify its UI provider as invalid before reading or importing its entry
+- **THEN** the descriptor SHALL expose the theme compatibility message as the invalid reason
+
 #### Scenario: Startup stylesheets are described
 
 - **WHEN** the descriptor contains legacy providers or valid ESM providers with a main stylesheet
@@ -280,6 +286,8 @@ Halo SHALL load legacy IIFE and ESM UI providers in the same Console or User Cen
 - **WHEN** provider startup begins
 - **THEN** Halo SHALL insert and load each provider record's startup stylesheet directly in provider-list order
 - **THEN** a stylesheet failure SHALL fail only its owning provider and SHALL NOT prevent unrelated providers or the core UI from continuing
+- **THEN** Halo SHALL remove a successfully loaded provider stylesheet if that provider later fails entry, export, or registration
+- **THEN** Halo SHALL remove only a stylesheet link inserted for that provider startup and SHALL preserve an already-existing matching stylesheet
 
 #### Scenario: Provider loads an asynchronous CSS chunk
 
@@ -320,12 +328,27 @@ Halo SHALL isolate observable ESM provider discovery, startup-style, import, eva
 - **THEN** if that replacement is followed by a failed transaction and cannot be restored reliably, Halo SHALL diagnose an incomplete route rollback and require a page reload instead of having rejected the provider before mutation
 - **THEN** Halo SHALL continue registering later providers
 - **THEN** any mutation that could not be reversed SHALL be diagnosed and SHALL use page reload as the final recovery boundary
+- **THEN** FormKit inputs SHALL be collected only from providers whose registration committed successfully
 
 #### Scenario: Provider lazy route chunk fails later
 
 - **WHEN** an accepted provider's route or asynchronous component chunk fails after startup
 - **THEN** Halo SHALL attribute the error to that provider through router or component error handling
 - **THEN** it SHALL show a provider-specific failure state where possible without disabling unrelated routes or providers
+- **THEN** nested asynchronous component errors SHALL inherit provider ownership from their component-instance parent chain
+- **THEN** a resolved lazy route SHALL fall back to the active matched route's provider ownership when the resolved component no longer matches the registered loader
+- **THEN** Halo SHALL retain the successfully registered provider's startup stylesheet
+- **THEN** ordinary descendant render or event errors SHALL NOT be reclassified as provider chunk-load failures
+
+#### Scenario: Provider registers a functional route component
+
+- **WHEN** a route uses a Vue Router-recognized functional component
+- **THEN** Halo SHALL preserve that component instead of wrapping it as an asynchronous route loader
+
+#### Scenario: Provider overrides a same-named global component
+
+- **WHEN** a provider registers a global component with the same name as a Halo core component
+- **THEN** the provider registration SHALL retain the legacy last-registration-wins precedence after core component and FormKit setup completes
 
 #### Scenario: Provider creates non-transactional side effects
 
@@ -342,6 +365,11 @@ Halo SHALL preserve the existing IIFE UI provider protocol throughout Halo 2.x.
 - **WHEN** an existing IIFE plugin whose `spec.requires` accepts the current Halo version is started
 - **THEN** Halo SHALL load it without requiring a rebuild or new manifest
 - **THEN** Halo SHALL preserve existing bundle endpoints, global module registration, shared global names, enabled-provider metadata, and `ui` to `console` resource fallback
+
+#### Scenario: Activated legacy theme has only a stylesheet
+
+- **WHEN** the activated theme has no UI script but exposes a legacy main stylesheet
+- **THEN** Halo SHALL retain the theme in `enabledUiPlugins` compatibility metadata
 
 #### Scenario: Existing theme UI artifact runs on a new Halo 2.x release
 

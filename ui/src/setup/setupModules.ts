@@ -20,7 +20,7 @@ import {
   type UiPluginDiagnostic,
   type UiPluginFailureStage,
 } from "@/stores/plugin";
-import { loadStyle } from "@/utils/load-style";
+import { loadStyle, unloadStyle } from "@/utils/load-style";
 import type { SetupComponentsOptions } from "./setupComponents";
 
 export type Platform = "console" | "uc";
@@ -42,6 +42,7 @@ interface UiPluginRuntimeDependencies {
   importModule: (url: string) => Promise<unknown>;
   loadScript: (url: string) => Promise<void>;
   loadStyle: (url: string, before: ChildNode | null) => Promise<unknown>;
+  unloadStyle: (loadedStyle: unknown) => void;
 }
 
 interface RollbackHandle {
@@ -106,8 +107,9 @@ export async function setupUiPluginRuntime({
       provider
     ): provider is UiPluginProvider & {
       style: string;
-    } => Boolean(provider.style)
+    } => provider.kind !== "invalid" && Boolean(provider.style)
   );
+  const loadedStyles = new Map<string, unknown>();
 
   registrationStore._seed(
     providers.map((provider) => ({
@@ -124,6 +126,13 @@ export async function setupUiPluginRuntime({
     error: unknown,
     details: Pick<UiPluginDiagnostic, "incompleteRollback"> = {}
   ) => {
+    if (stage === "entry" || stage === "export" || stage === "registration") {
+      const loadedStyle = loadedStyles.get(registration.name);
+      if (loadedStyle !== undefined) {
+        runtime.unloadStyle(loadedStyle);
+        loadedStyles.delete(registration.name);
+      }
+    }
     const diagnostic: UiPluginDiagnostic = {
       name: registration.name,
       type: registration.type,
@@ -179,6 +188,7 @@ export async function setupUiPluginRuntime({
   );
   for (const [index, result] of styleResults.entries()) {
     if (result.status === "fulfilled") {
+      loadedStyles.set(styledProviders[index].name, result.value);
       continue;
     }
     const provider = styledProviders[index];
@@ -247,18 +257,6 @@ export async function setupUiPluginRuntime({
     });
   }
 
-  const loadableModules = providers
-    .filter((provider) => !failedNames.has(provider.name))
-    .map((provider) => loadedByName.get(provider.name))
-    .filter((module): module is LoadedPluginModule => Boolean(module));
-
-  setupComponents({
-    formkitInputs: collectPluginFormKitInputs(
-      loadableModules.filter((module) => module.type === "plugin"),
-      registeredFormKitInputs
-    ),
-  });
-
   const routeOwners = new Map<string | symbol, UiProviderRegistration>();
   const componentOwners = new WeakMap<object, UiProviderRegistration>();
   installProviderErrorHooks({
@@ -309,6 +307,14 @@ export async function setupUiPluginRuntime({
     registrationStore._setStatus(provider.name, "registered");
     registeredModules.push(loaded);
   }
+
+  setupComponents({
+    formkitInputs: collectPluginFormKitInputs(
+      registeredModules.filter((module) => module.type === "plugin"),
+      registeredFormKitInputs
+    ),
+  });
+  restoreProviderComponents(app, registeredModules);
 
   if (styleFailed || pluginModuleStore.diagnostics.length > 0) {
     Toast.error(
@@ -382,7 +388,7 @@ function registerPluginModule({
   ) => void;
 }): RegistrationFailure | undefined {
   const rollbackHandles: RollbackHandle[] = [];
-  const incompleteRollback = module.formkit?.inputs ? ["formkit"] : [];
+  const incompleteRollback: string[] = [];
   try {
     preparePluginModule(module, registration, report);
     commitJsModule({
@@ -494,22 +500,32 @@ function commitJsModule({
         rollbackHandles,
         registration,
         routeOwners,
+        componentOwners,
       });
     } else {
       const replacedRoute = findReplacedRoute(router, route, routeOwners);
       const removeRoute = router.addRoute(route);
       if (replacedRoute) {
-        unregisterRouteOwners(replacedRoute.route, routeOwners);
+        unregisterRouteOwners(
+          replacedRoute.route,
+          routeOwners,
+          componentOwners
+        );
       }
       if (registration) {
-        registerRouteOwners(route, registration, routeOwners);
+        registerRouteOwners(route, registration, routeOwners, componentOwners);
       }
       rollbackHandles.push({
         label: `route ${String(route.name || route.path)}`,
         rollback: () => {
           removeRoute();
-          unregisterRouteOwners(route, routeOwners);
-          restoreReplacedRoute(router, replacedRoute, routeOwners);
+          unregisterRouteOwners(route, routeOwners, componentOwners);
+          restoreReplacedRoute(
+            router,
+            replacedRoute,
+            routeOwners,
+            componentOwners
+          );
         },
       });
     }
@@ -521,12 +537,14 @@ function commitJsModule({
     rollbackHandles,
     registration,
     routeOwners,
+    componentOwners,
   }: {
     router: Router;
     route: RouteRecordAppend;
     rollbackHandles: RollbackHandle[];
     registration?: UiProviderRegistration;
     routeOwners?: Map<string | symbol, UiProviderRegistration>;
+    componentOwners?: WeakMap<object, UiProviderRegistration>;
   }) {
     const parentRoute = router
       .getRoutes()
@@ -541,14 +559,19 @@ function commitJsModule({
         router.removeRoute(route.parentName);
         parentRoute.children = previousChildren;
         router.addRoute(parentRoute as unknown as RouteRecordRaw);
-        unregisterRouteOwners(route.route, routeOwners);
+        unregisterRouteOwners(route.route, routeOwners, componentOwners);
       },
     });
     router.removeRoute(route.parentName);
     parentRoute.children = [...parentRoute.children, route.route];
     router.addRoute(parentRoute as unknown as RouteRecordRaw);
     if (registration) {
-      registerRouteOwners(route.route, registration, routeOwners);
+      registerRouteOwners(
+        route.route,
+        registration,
+        routeOwners,
+        componentOwners
+      );
     }
   }
 
@@ -606,7 +629,8 @@ function findRouteParent(
 function restoreReplacedRoute(
   router: Router,
   replacedRoute: ReplacedRoute | undefined,
-  routeOwners?: Map<string | symbol, UiProviderRegistration>
+  routeOwners?: Map<string | symbol, UiProviderRegistration>,
+  componentOwners?: WeakMap<object, UiProviderRegistration>
 ) {
   if (!replacedRoute) {
     return;
@@ -622,7 +646,12 @@ function restoreReplacedRoute(
     router.addRoute(replacedRoute.route);
   }
   if (replacedRoute.owner) {
-    registerRouteOwners(replacedRoute.route, replacedRoute.owner, routeOwners);
+    registerRouteOwners(
+      replacedRoute.route,
+      replacedRoute.owner,
+      routeOwners,
+      componentOwners
+    );
   }
 }
 
@@ -688,7 +717,11 @@ function wrapRouteComponentLoaders(
     error: unknown
   ) => void
 ) {
-  if ("component" in route && typeof route.component === "function") {
+  if (
+    "component" in route &&
+    typeof route.component === "function" &&
+    !isRouteComponent(route.component)
+  ) {
     route.component = wrapChunkLoader(
       route.component as unknown as ComponentLoader,
       registration,
@@ -697,7 +730,7 @@ function wrapRouteComponentLoaders(
   }
   if ("components" in route && route.components) {
     for (const [viewName, component] of Object.entries(route.components)) {
-      if (typeof component === "function") {
+      if (typeof component === "function" && !isRouteComponent(component)) {
         route.components[viewName] = wrapChunkLoader(
           component as unknown as ComponentLoader,
           registration,
@@ -706,6 +739,15 @@ function wrapRouteComponentLoaders(
       }
     }
   }
+}
+
+function isRouteComponent(component: object | ((...args: never[]) => unknown)) {
+  return (
+    typeof component === "object" ||
+    "displayName" in component ||
+    "props" in component ||
+    "__vccOpts" in component
+  );
 }
 
 type ComponentLoader = (...args: unknown[]) => unknown;
@@ -767,29 +809,59 @@ function installProviderErrorHooks({
 
   const previousErrorHandler = app.config.errorHandler;
   app.config.errorHandler = (error, instance, info) => {
+    const isAsyncComponentError =
+      typeof info === "string" && info.includes("async component");
     const component = instance?.$?.type;
-    const owner = isWeakMapKey(component)
-      ? componentOwners.get(component)
-      : undefined;
-    if (
-      owner ||
-      (typeof info === "string" && info.includes("async component"))
-    ) {
+    let handled = false;
+    if (isAsyncComponentError) {
+      const owner = findComponentOwner(instance?.$, componentOwners);
       const fallbackOwner =
         owner ||
+        findMatchedRouteOwner(
+          router.currentRoute?.value?.matched,
+          routeOwners
+        ) ||
         [...registrationsByName.values()].find(
           (registration) => registration.name === componentName(component)
         );
       if (fallbackOwner) {
         report(fallbackOwner, "chunk", error);
+        handled = true;
       }
     }
     if (previousErrorHandler) {
       previousErrorHandler(error, instance, info);
-    } else if (!owner) {
+    } else if (!handled) {
       console.error("[Vue]", info, error);
     }
   };
+}
+
+function findMatchedRouteOwner(
+  matched: readonly { name?: string | symbol }[] | undefined,
+  routeOwners: Map<string | symbol, UiProviderRegistration>
+) {
+  return [...(matched || [])]
+    .reverse()
+    .map((route) => route.name && routeOwners.get(route.name))
+    .find(Boolean);
+}
+
+function findComponentOwner(
+  instance: unknown,
+  componentOwners: WeakMap<object, UiProviderRegistration>
+) {
+  let current = instance;
+  while (isRecord(current)) {
+    if (isWeakMapKey(current.type)) {
+      const owner = componentOwners.get(current.type);
+      if (owner) {
+        return owner;
+      }
+    }
+    current = current.parent;
+  }
+  return undefined;
 }
 
 function componentName(component: unknown) {
@@ -799,29 +871,61 @@ function componentName(component: unknown) {
   return undefined;
 }
 
+function restoreProviderComponents(
+  app: App,
+  registeredModules: readonly LoadedPluginModule[]
+) {
+  for (const loaded of registeredModules) {
+    for (const [name, component] of Object.entries(
+      loaded.module.components || {}
+    )) {
+      app._context.components[name] = component;
+    }
+  }
+}
+
 function registerRouteOwners(
   route: RouteRecordRaw,
   registration: UiProviderRegistration,
-  routeOwners?: Map<string | symbol, UiProviderRegistration>
+  routeOwners?: Map<string | symbol, UiProviderRegistration>,
+  componentOwners?: WeakMap<object, UiProviderRegistration>
 ) {
   if (route.name) {
     routeOwners?.set(route.name, registration);
   }
+  for (const component of routeComponents(route)) {
+    if (isWeakMapKey(component)) {
+      componentOwners?.set(component, registration);
+    }
+  }
   for (const child of route.children || []) {
-    registerRouteOwners(child, registration, routeOwners);
+    registerRouteOwners(child, registration, routeOwners, componentOwners);
   }
 }
 
 function unregisterRouteOwners(
   route: RouteRecordRaw,
-  routeOwners?: Map<string | symbol, UiProviderRegistration>
+  routeOwners?: Map<string | symbol, UiProviderRegistration>,
+  componentOwners?: WeakMap<object, UiProviderRegistration>
 ) {
   if (route.name) {
     routeOwners?.delete(route.name);
   }
-  for (const child of route.children || []) {
-    unregisterRouteOwners(child, routeOwners);
+  for (const component of routeComponents(route)) {
+    if (isWeakMapKey(component)) {
+      componentOwners?.delete(component);
+    }
   }
+  for (const child of route.children || []) {
+    unregisterRouteOwners(child, routeOwners, componentOwners);
+  }
+}
+
+function routeComponents(route: RouteRecordRaw) {
+  if ("components" in route && route.components) {
+    return Object.values(route.components);
+  }
+  return "component" in route && route.component ? [route.component] : [];
 }
 
 function isPluginModule(value: unknown): value is PluginModule {
@@ -872,6 +976,7 @@ function createRuntimeDependencies(
       import(/* @vite-ignore */ resolveProviderEntryUrl(url)),
     loadScript: loadLegacyScript,
     loadStyle,
+    unloadStyle,
     ...overrides,
   };
 }

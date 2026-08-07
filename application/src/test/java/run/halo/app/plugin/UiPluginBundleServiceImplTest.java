@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -29,6 +30,8 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import run.halo.app.core.extension.Theme;
 import run.halo.app.extension.Metadata;
+import run.halo.app.infra.Condition;
+import run.halo.app.infra.ConditionStatus;
 import run.halo.app.infra.ThemeRootGetter;
 import run.halo.app.theme.service.ThemeService;
 
@@ -286,7 +289,7 @@ class UiPluginBundleServiceImplTest {
     }
 
     @Test
-    void shouldExcludeInactiveThemeAndThemeWithoutLegacyScriptFromGlobals() throws Exception {
+    void shouldExposeActiveCssOnlyThemeInLegacyGlobals() throws Exception {
         var activeTheme = prepareActiveTheme("active", "1.0.0");
         when(themeService.fetchActivatedTheme()).thenReturn(Mono.just(activeTheme));
         writeThemeUiFile("active", "style.css", ".active {}");
@@ -296,9 +299,73 @@ class UiPluginBundleServiceImplTest {
         var bundleVersion = generateBundleVersion();
 
         assertThat(descriptor).isNotNull();
-        assertThat(read(service.getJsBundle(bundleVersion).block())).doesNotContain("theme:active", "inactive");
+        assertThat(read(service.getJsBundle(bundleVersion).block()))
+                .contains("\"name\":\"theme:active\"")
+                .doesNotContain("inactive");
         assertThat(read(service.getCssBundle(bundleVersion).block()))
                 .isEqualTo("@import url(\"" + descriptor.providers().getFirst().style() + "\");\n");
+    }
+
+    @Test
+    void shouldRejectActivatedThemeWithUnsatisfiedHaloVersion() throws Exception {
+        var activeTheme = prepareActiveTheme("active", "1.0.0");
+        var status = new Theme.ThemeStatus();
+        status.setPhase(Theme.ThemePhase.FAILED);
+        activeTheme.setStatus(status);
+        Theme.nullSafeConditionList(activeTheme)
+                .addAndEvictFIFO(Condition.builder()
+                        .type(Theme.ThemePhase.FAILED.name())
+                        .status(ConditionStatus.FALSE)
+                        .reason("UnsatisfiedRequiresVersion")
+                        .message("Theme requires Halo >=3.0.0.")
+                        .lastTransitionTime(Instant.now())
+                        .build());
+        when(themeService.fetchActivatedTheme()).thenReturn(Mono.just(activeTheme));
+        writeThemeUiFile("active", "ui-plugin.json", "{\"format\":\"esm\",\"entry\":\"./main.js\"}");
+        writeThemeUiFile("active", "main.js", "export default {};");
+
+        var descriptor = service.getProviderDescriptor().block();
+
+        assertThat(descriptor).isNotNull();
+        assertThat(descriptor.legacyScript()).isNull();
+        assertThat(descriptor.providers())
+                .extracting(
+                        UiPluginProviderDescriptor.Provider::kind,
+                        UiPluginProviderDescriptor.Provider::entry,
+                        UiPluginProviderDescriptor.Provider::reason)
+                .containsExactly(tuple("invalid", null, "Theme requires Halo >=3.0.0."));
+    }
+
+    @Test
+    void shouldIgnoreHistoricalUnsatisfiedRequiresCondition() throws Exception {
+        var activeTheme = prepareActiveTheme("active", "1.0.0");
+        var status = new Theme.ThemeStatus();
+        status.setPhase(Theme.ThemePhase.FAILED);
+        activeTheme.setStatus(status);
+        var conditions = Theme.nullSafeConditionList(activeTheme);
+        conditions.addAndEvictFIFO(Condition.builder()
+                .type("Compatibility")
+                .status(ConditionStatus.FALSE)
+                .reason("UnsatisfiedRequiresVersion")
+                .message("Historical compatibility failure.")
+                .lastTransitionTime(Instant.now())
+                .build());
+        conditions.addAndEvictFIFO(Condition.builder()
+                .type(Theme.ThemePhase.FAILED.name())
+                .status(ConditionStatus.FALSE)
+                .reason("ThemeConfigError")
+                .message("Current unrelated failure.")
+                .lastTransitionTime(Instant.now())
+                .build());
+        when(themeService.fetchActivatedTheme()).thenReturn(Mono.just(activeTheme));
+        writeThemeUiFile("active", "main.js", "console.log('active');");
+
+        var descriptor = service.getProviderDescriptor().block();
+
+        assertThat(descriptor).isNotNull();
+        assertThat(descriptor.providers())
+                .extracting(UiPluginProviderDescriptor.Provider::kind)
+                .containsExactly("legacy");
     }
 
     @Test

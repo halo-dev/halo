@@ -25,7 +25,7 @@ afterEach(() => {
 });
 
 describe("shared dependency validation", () => {
-  it("extracts named, default, namespace, side-effect, and dynamic imports", () => {
+  it("extracts static, side-effect, re-export, and dynamic import specifiers", () => {
     expect(
       parseImports(`
         import axios, { AxiosError as Error } from "axios";
@@ -34,28 +34,13 @@ describe("shared dependency validation", () => {
         export { ref } from "vue";
         const router = import("vue-router");
       `)
-    ).toEqual([
-      { specifier: "axios", names: ["default", "AxiosError"] },
-      { specifier: "vue", names: "namespace" },
-      { specifier: "pinia", names: [] },
-      { specifier: "vue", names: ["ref"] },
-      { specifier: "vue-router", names: "namespace" },
-    ]);
+    ).toEqual(["axios", "vue", "pinia", "vue", "vue-router"]);
   });
 
-  it("does not parse exported function bodies as re-export clauses", () => {
+  it("recognizes minified imports without relying on whitespace", () => {
     expect(
-      parseImports(`
-        import * as Vue from "vue";
-        export function set(target, key, value) {
-          target[key] = value;
-        }
-        export * from "vue";
-      `)
-    ).toEqual([
-      { specifier: "vue", names: "namespace" },
-      { specifier: "vue", names: "namespace" },
-    ]);
+      parseImports('import{ref as r}from"vue";export{defineStore}from"pinia"')
+    ).toEqual(["vue", "pinia"]);
   });
 
   it("ignores import-like text in comments and strings", () => {
@@ -67,7 +52,7 @@ describe("shared dependency validation", () => {
         const dynamic = 'import("axios/private")';
         import { ref } from "vue";
       `)
-    ).toEqual([{ specifier: "vue", names: ["ref"] }]);
+    ).toEqual(["vue"]);
   });
 
   it("resolves an exports-only transitive dependency relative to its importer", async () => {
@@ -118,12 +103,15 @@ describe("shared dependency validation", () => {
       providerRoot,
     });
 
-    await expect(
-      validator.validateSource('import "vue-router";', `${importer}?compiled`)
-    ).resolves.toBeUndefined();
+    await validator.validateSource(
+      'import "vue-router";',
+      `${importer}?compiled`
+    );
+
+    expect(validator.getBuildReport().summary).toContain("vue-router  4.2.5");
   });
 
-  it("validates actual package versions and static exports", async () => {
+  it("reports installed shared versions without validating imported names", async () => {
     const validator = new SharedDependencyValidator({
       snapshot: HALO_HOST_RUNTIME_SNAPSHOTS[0],
       providerRoot: uiRoot,
@@ -131,7 +119,7 @@ describe("shared dependency validation", () => {
 
     await expect(
       validator.validateSource(
-        'import { ref } from "vue"; import axios from "axios";',
+        'import { notAHostExport } from "vue"; import axios from "axios";',
         "src/index.ts"
       )
     ).resolves.toBeUndefined();
@@ -139,17 +127,12 @@ describe("shared dependency validation", () => {
     expect(validator.getBuildReport().warning).toBeUndefined();
   });
 
-  it("fails closed for unsupported exports and deep roots", async () => {
+  it("rejects shared package subpaths", async () => {
     const validator = new SharedDependencyValidator({
       snapshot: HALO_HOST_RUNTIME_SNAPSHOTS[0],
       providerRoot: uiRoot,
     });
-    await expect(
-      validator.validateSource(
-        'import { notAHostExport } from "vue";',
-        "index.ts"
-      )
-    ).rejects.toThrow("unsupported vue export");
+
     await expect(
       validator.validateSource(
         'import x from "vue/dist/vue.esm.js";',
@@ -158,7 +141,7 @@ describe("shared dependency validation", () => {
     ).rejects.toThrow("Unsupported shared dependency subpath");
   });
 
-  it("groups version, namespace, and editor compatibility notes", async () => {
+  it("reports only a newer-provider version note", async () => {
     const snapshot = structuredClone(HALO_HOST_RUNTIME_SNAPSHOTS[0]);
     snapshot.packages.vue.version = "3.2.0";
     const validator = new SharedDependencyValidator({
@@ -174,36 +157,24 @@ describe("shared dependency validation", () => {
       `,
       path.join(uiRoot, "src/index.ts")
     );
-    await validator.validateSource(
-      'import * as Vue from "vue";',
-      path.join(
-        uiRoot,
-        "node_modules/.pnpm/vue-demi@0.14.10/node_modules/vue-demi/lib/index.mjs?compiled"
-      )
-    );
-    await validator.validateSource(
-      'import * as Vue from "vue";',
-      path.join(
-        uiRoot,
-        "node_modules/.pnpm/vue-demi@0.14.10/node_modules/vue-demi/lib/index.mjs?compiled"
-      )
-    );
 
     const report = validator.getBuildReport();
-    expect(report.summary).toContain(
-      "package                    provider  Halo host"
-    );
-    expect(report.summary).toContain("vue");
-    expect(report.warning).toContain("Version differences");
     expect(report.warning).toContain("provider is newer; best-effort");
-    expect(report.warning).toContain(
-      "Namespace or dynamic imports not fully checked"
-    );
-    expect(report.warning).toContain("- src/index.ts");
-    expect(report.warning).toContain("- vue-demi/lib/index.mjs");
-    expect(report.warning?.match(/vue-demi\/lib\/index\.mjs/g)).toHaveLength(1);
-    expect(report.warning).toContain("editor identity is best-effort");
-    expect(report.warning).not.toContain(uiRoot);
+    expect(report.warning).not.toContain("Namespace or dynamic imports");
+    expect(report.warning).not.toContain("editor identity");
+  });
+
+  it("does not warn for an older provider version in the same major", async () => {
+    const snapshot = structuredClone(HALO_HOST_RUNTIME_SNAPSHOTS[0]);
+    snapshot.packages.vue.version = "3.99.0";
+    const validator = new SharedDependencyValidator({
+      snapshot,
+      providerRoot: uiRoot,
+    });
+
+    await validator.validateSource('import { ref } from "vue";', "index.ts");
+
+    expect(validator.getBuildReport().warning).toBeUndefined();
   });
 
   it("warns but does not reject a different provider major", async () => {
@@ -220,6 +191,24 @@ describe("shared dependency validation", () => {
         "index.ts"
       )
     ).resolves.toBeUndefined();
-    expect(validator.getBuildReport().warning).toContain("different major");
+    const warning = validator.getBuildReport().warning;
+    expect(warning).toContain("different major");
+    expect(warning).not.toContain("provider is newer");
+  });
+
+  it("does not turn unavailable package metadata into a policy failure", async () => {
+    const providerRoot = fs.mkdtempSync(
+      path.join(os.tmpdir(), "halo-missing-shared-")
+    );
+    tempDirs.push(providerRoot);
+    const validator = new SharedDependencyValidator({
+      snapshot: HALO_HOST_RUNTIME_SNAPSHOTS[0],
+      providerRoot,
+    });
+
+    await expect(
+      validator.validateSource('import { ref } from "vue";', "src/index.ts")
+    ).resolves.toBeUndefined();
+    expect(validator.getValidatedRoots()).toEqual([]);
   });
 });

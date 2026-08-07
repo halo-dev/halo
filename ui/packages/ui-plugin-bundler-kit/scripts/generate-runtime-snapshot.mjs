@@ -1,10 +1,14 @@
 import fs from "node:fs";
 import path from "node:path";
-import { pathToFileURL } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { TextDecoder, TextEncoder } from "node:util";
 import vm from "node:vm";
+import { resolveModulePath } from "exsolve";
 
-const packageRoot = path.resolve(import.meta.dirname, "..");
+const packageRoot = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  ".."
+);
 const projectRoot = path.resolve(packageRoot, "../..");
 const packageJson = JSON.parse(
   fs.readFileSync(path.join(packageRoot, "package.json"), "utf8")
@@ -45,11 +49,13 @@ const browserRuntimeRoots = new Set([
 ]);
 const browserRuntimeGlobals = loadBrowserRuntimeGlobals();
 
-const projectUrl = pathToFileURL(path.join(projectRoot, "package.json")).href;
 const packages = {};
 for (const [root, [bridge, global, identity]] of Object.entries(definitions)) {
   const entry = fs.realpathSync(
-    new URL(import.meta.resolve(root, projectUrl)).pathname
+    resolveModulePath(root, {
+      from: path.join(projectRoot, "package.json"),
+      conditions: ["node", "import"],
+    })
   );
   const owningRoot = findOwningPackageRoot(root, entry);
   const dependencyPackageJson = JSON.parse(
