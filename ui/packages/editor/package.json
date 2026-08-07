@@ -33,6 +33,7 @@
     "build": "vp build",
     "dev": "vp build --watch --mode development",
     "prepublishOnly": "vp run build",
+    "test:unit": "vp test --run",
     "typecheck": "vue-tsc --noEmit -p tsconfig.app.json --composite false"
   },
   "dependencies": {
