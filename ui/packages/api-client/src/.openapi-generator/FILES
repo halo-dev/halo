@@ -331,6 +331,7 @@ models/ui-plugin-invalid-provider.ts
 models/ui-plugin-legacy-resources.ts
 models/ui-plugin-provider-descriptor.ts
 models/ui-plugin-provider-registration.ts
+models/ui-plugin-provider-style.ts
 models/upgrade-from-uri-request.ts
 models/upload-from-url-request.ts
 models/user-connection-list.ts

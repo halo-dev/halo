@@ -125,7 +125,8 @@ class UiPluginEndpointTest {
     void shouldFetchProviderDescriptorWithoutCaching() {
         var descriptor = new UiPluginProviderDescriptor(
                 "version",
-                "/ui-plugins/-/bundle.css?v=version",
+                List.of(new UiPluginProviderDescriptor.Style(
+                        "esm-plugin", "plugin", "/plugins/esm-plugin/assets/ui/style.css?v=version")),
                 new UiPluginProviderDescriptor.LegacyResources("/ui-plugins/-/bundle.js?v=version"),
                 List.of(new UiPluginProviderDescriptor.Registration("esm-plugin", "plugin", "1.0.0")),
                 List.of(new UiPluginProviderDescriptor.EsmProvider(
@@ -144,8 +145,8 @@ class UiPluginEndpointTest {
                 .expectBody()
                 .jsonPath("$.version")
                 .isEqualTo("version")
-                .jsonPath("$.style")
-                .isEqualTo("/ui-plugins/-/bundle.css?v=version")
+                .jsonPath("$.styles[0].href")
+                .isEqualTo("/plugins/esm-plugin/assets/ui/style.css?v=version")
                 .jsonPath("$.providers[0].name")
                 .isEqualTo("esm-plugin")
                 .jsonPath("$.providers[0].entry")

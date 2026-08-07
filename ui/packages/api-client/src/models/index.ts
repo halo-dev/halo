@@ -240,6 +240,7 @@ export * from './ui-plugin-invalid-provider';
 export * from './ui-plugin-legacy-resources';
 export * from './ui-plugin-provider-descriptor';
 export * from './ui-plugin-provider-registration';
+export * from './ui-plugin-provider-style';
 export * from './upgrade-from-uri-request';
 export * from './upload-from-url-request';
 export * from './user';

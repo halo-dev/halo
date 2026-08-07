@@ -100,7 +100,8 @@ export function selectHaloHostRuntimeSnapshot(
   return {
     snapshot,
     reusedOlderSnapshot:
-      snapshot.haloVersion !== target.version && target.prerelease.length === 0,
+      snapshot.haloVersion !==
+      `${target.major}.${target.minor}.${target.patch}`,
   };
 }
 

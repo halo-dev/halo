@@ -145,9 +145,11 @@ export default viteConfig({
 });
 ```
 
-After ESM is selected, dependency or output validation fails the build instead of silently changing the artifact to IIFE. Successful ESM builds generate `ui-plugin.json`; do not write this manifest by hand. A provider artifact without this file remains legacy, even if its `spec.requires` also supports Halo 2.26 or newer.
+After ESM is selected, dependency or output validation fails the build instead of silently changing the artifact to IIFE. Successful ESM builds generate `ui-plugin.json`. This filename is reserved for the bundler kit: do not create, copy, or emit another file with that name. A provider artifact without this file remains legacy, even if its `spec.requires` also supports Halo 2.26 or newer.
 
-ESM entries must default-export the existing `PluginModule`. The generated manifest records one optional main stylesheet; CSS belonging to asynchronous chunks stays out of the manifest and loads on demand with its JavaScript chunk. Halo loads the single aggregated startup stylesheet, starts entries in parallel, and commits modules in provider order without reloading after each entry. Top-level module effects, timers, listeners, and arbitrary asynchronous effects are not transactional; a full page reload remains the lifecycle and recovery boundary after provider changes.
+ESM entries must default-export the existing `PluginModule`. The generated manifest records one optional main stylesheet; CSS belonging to asynchronous chunks stays out of the manifest and loads on demand with its JavaScript chunk. Halo starts every provider-owned startup stylesheet and entry in parallel, then commits modules in provider order without reloading after each entry. Top-level module effects, timers, listeners, and arbitrary asynchronous effects are not transactional; a full page reload remains the lifecycle and recovery boundary after provider changes.
+
+Halo owns the shared-runtime externals and the ESM entry filename. Vite configuration cannot externalize packages outside the published shared roots. Rsbuild configuration must not override the entry JavaScript filename, add arbitrary externals, or replace the required module-output settings. These restrictions apply only to ESM output; compatible IIFE overrides retain their previous behavior.
 
 ### Shared Runtime Dependencies
 
@@ -397,11 +399,11 @@ Theme provider:
 
 > **Note**: The production build output directory of `HaloUIPluginBundlerKit` is still `src/main/resources/console` to ensure compatibility.
 
-An ESM output additionally contains the generated `ui-plugin.json` manifest and may contain content-hashed `chunks/` and `assets/`. The manifest contains `format`, `entry`, and optional `style`; asynchronous chunk CSS is not listed. Keep the complete output directory together; Halo serves it through the existing plugin or theme static resource mapping, aggregates provider main CSS into `bundle.css`, and adds the current provider version to entry and aggregate URLs for cache invalidation.
+An ESM output additionally contains the reserved, generated `ui-plugin.json` manifest and may contain content-hashed `chunks/` and `assets/`. The manifest contains `format`, `entry`, and optional `style`; asynchronous chunk CSS is not listed. Keep the complete output directory together. Halo serves it through the existing plugin or theme static resource mapping, returns each startup stylesheet's direct URL in provider order, and adds the current provider version to entry and style URLs for cache invalidation. The Halo 2.x compatibility `bundle.css` endpoint remains available for older callers, but now contains ordered `@import` rules pointing at those direct styles so relative asset URLs keep the correct provider base; it is not used by the new runtime.
 
 ## Maintaining Halo Host Runtime Snapshots
 
-Snapshots capture the exact host version, statically available root exports, bridge global, and identity category for each shared root. They do not claim an accepted provider version range. They are intentionally sparse: add a new immutable snapshot when Halo's shared runtime contract changes, not automatically for every Halo patch. A newer target selects the latest eligible older snapshot and emits a forward-compatibility warning; a target older than every packaged snapshot cannot build ESM.
+Snapshots capture the exact host version, statically importable root exports that are also present on the browser runtime global, bridge global, and identity category for each shared root. Synthetic namespace metadata such as `__esModule` is excluded when the browser global does not expose it. Snapshots do not claim an accepted provider version range. They are intentionally sparse: add a new immutable snapshot when Halo's shared runtime contract changes, not automatically for every Halo patch. A newer target selects the latest eligible older snapshot and emits a forward-compatibility warning; a target older than every packaged snapshot cannot build ESM.
 
 When the host dependency graph changes:
 

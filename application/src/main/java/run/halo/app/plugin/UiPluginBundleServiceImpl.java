@@ -4,7 +4,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.hash.Hashing;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -44,10 +43,11 @@ import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 import run.halo.app.core.extension.Theme;
 import run.halo.app.infra.ThemeRootGetter;
-import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.plugin.resources.BundleResourceUtils;
 import run.halo.app.theme.ThemeUiResources;
 import run.halo.app.theme.service.ThemeService;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 @Slf4j
 @Component
@@ -57,6 +57,7 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
     private static final String PLUGIN_TYPE = "plugin";
     private static final String THEME_TYPE = "theme";
     private static final String BUNDLE_BASE_URL = "/apis/api.console.halo.run/v1alpha1/ui-plugins/-";
+    private static final JsonMapper JSON_MAPPER = JsonMapper.shared();
 
     private final SpringPluginManager pluginManager;
     private final ThemeService themeService;
@@ -87,7 +88,7 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
         return discoverProviders().flatMapMany(providers -> {
             var bundles = Flux.fromIterable(providers)
                     .filter(provider -> provider.kind() == ProviderKind.LEGACY)
-                    .flatMapSequential(provider -> readProviderBundle(provider, BundleResourceUtils.JS_BUNDLE, true));
+                    .flatMapSequential(this::readProviderJavaScript);
             var metadata = Mono.fromSupplier(() -> enabledUiPluginsScript(providers))
                     .map(script -> DefaultDataBufferFactory.sharedInstance.wrap(script.getBytes(UTF_8)));
             return Flux.concat(bundles, metadata);
@@ -95,18 +96,14 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
     }
 
     @Override
+    // TODO(Halo 3): Remove after legacy IIFE UI provider support ends.
     public Flux<DataBuffer> uglifyCssBundle() {
-        return discoverProviders()
-                .flatMapMany(providers -> Flux.fromIterable(providers).flatMapSequential(provider -> {
-                    if (provider.kind() == ProviderKind.LEGACY) {
-                        return readProviderBundle(provider, BundleResourceUtils.CSS_BUNDLE, false);
-                    }
-                    if (provider.kind() == ProviderKind.ESM
-                            && provider.manifest().style() != null) {
-                        return readProviderBundle(provider, provider.manifest().style(), false);
-                    }
-                    return Flux.empty();
-                }));
+        return discoverProviders().flatMapMany(providers -> {
+            var version = providerVersion(providers);
+            return Flux.fromIterable(providerStyles(version, providers))
+                    .map(style -> DefaultDataBufferFactory.sharedInstance.wrap(
+                            ("@import url(\"" + style.href() + "\");\n").getBytes(UTF_8)));
+        });
     }
 
     @Override
@@ -130,22 +127,23 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
     }
 
     private Mono<List<ClassifiedProvider>> discoverProviders() {
-        return Mono.defer(() -> {
-                    var plugins = pluginManager.startedPlugins().stream()
-                            .sorted(Comparator.comparing(PluginWrapper::getPluginId))
-                            .map(this::pluginCandidate)
-                            .toList();
-                    return themeService
-                            .fetchActivatedTheme()
-                            .map(Optional::of)
-                            .defaultIfEmpty(Optional.empty())
-                            .map(theme -> {
-                                var candidates = new ArrayList<>(plugins);
-                                theme.map(this::themeCandidate).ifPresent(candidates::add);
-                                return candidates.stream().map(this::classify).toList();
-                            });
-                })
-                .subscribeOn(scheduler);
+        return Mono.fromCallable(() -> pluginManager.startedPlugins().stream()
+                        .sorted(Comparator.comparing(PluginWrapper::getPluginId))
+                        .map(this::pluginCandidate)
+                        .toList())
+                .subscribeOn(scheduler)
+                .flatMap(plugins -> themeService
+                        .fetchActivatedTheme()
+                        .map(Optional::of)
+                        .defaultIfEmpty(Optional.empty())
+                        .map(theme -> {
+                            var candidates = new ArrayList<>(plugins);
+                            theme.map(this::themeCandidate).ifPresent(candidates::add);
+                            return candidates;
+                        }))
+                .flatMap(candidates -> Mono.fromCallable(
+                                () -> candidates.stream().map(this::classify).toList())
+                        .subscribeOn(scheduler));
     }
 
     private ProviderCandidate pluginCandidate(PluginWrapper plugin) {
@@ -213,13 +211,13 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
     private ProviderManifest readManifest(ProviderCandidate candidate, Resource resource) throws IOException {
         JsonNode manifest;
         try (var inputStream = resource.getInputStream()) {
-            manifest = JsonUtils.mapper().readTree(inputStream);
+            manifest = JSON_MAPPER.readTree(inputStream);
         }
         if (!manifest.isObject()) {
             throw new IllegalArgumentException("Provider manifest must be an object");
         }
         var fields = new HashSet<String>();
-        manifest.fieldNames().forEachRemaining(fields::add);
+        fields.addAll(manifest.propertyNames());
         if (!fields.containsAll(Set.of("format", "entry"))
                 || !Set.of("format", "entry", "style").containsAll(fields)) {
             throw new IllegalArgumentException("Provider manifest must contain format, entry, and optional style only");
@@ -292,23 +290,40 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
                 .toList();
         return new UiPluginProviderDescriptor(
                 version,
-                hasProviderStyles(providers) ? versionedBundleUrl("bundle.css", version) : null,
+                providerStyles(version, providers),
                 new UiPluginProviderDescriptor.LegacyResources(versionedBundleUrl("bundle.js", version)),
                 registrations,
                 esmProviders,
                 invalid);
     }
 
-    private boolean hasProviderStyles(List<ClassifiedProvider> providers) {
-        return providers.stream().anyMatch(provider -> {
-            if (provider.kind() == ProviderKind.ESM) {
-                return provider.manifest().style() != null;
+    private List<UiPluginProviderDescriptor.Style> providerStyles(String version, List<ClassifiedProvider> providers) {
+        return providers.stream()
+                .map(provider -> providerStyle(version, provider))
+                .flatMap(Optional::stream)
+                .toList();
+    }
+
+    private Optional<UiPluginProviderDescriptor.Style> providerStyle(String version, ClassifiedProvider provider) {
+        String resourcePath;
+        if (provider.kind() == ProviderKind.ESM) {
+            resourcePath = provider.manifest().style();
+        } else if (provider.kind() == ProviderKind.LEGACY) {
+            resourcePath = BundleResourceUtils.CSS_BUNDLE;
+            var resource = providerResource(provider.candidate(), resourcePath);
+            if (resource == null || !resource.isReadable()) {
+                return Optional.empty();
             }
-            return provider.kind() == ProviderKind.LEGACY
-                    && Optional.ofNullable(providerResource(provider.candidate(), BundleResourceUtils.CSS_BUNDLE))
-                            .filter(Resource::isReadable)
-                            .isPresent();
-        });
+        } else {
+            return Optional.empty();
+        }
+        if (resourcePath == null) {
+            return Optional.empty();
+        }
+        return Optional.of(new UiPluginProviderDescriptor.Style(
+                provider.candidate().name(),
+                provider.candidate().type(),
+                providerUrl(version, provider, resourcePath)));
     }
 
     private static String providerUrl(String version, ClassifiedProvider provider, String resourcePath) {
@@ -343,18 +358,17 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
         return Hashing.sha256().hashUnencodedChars(value).toString();
     }
 
-    private Flux<DataBuffer> readProviderBundle(ClassifiedProvider provider, String bundleName, boolean javascript) {
-        var resource = providerResource(provider.candidate(), bundleName);
+    private Flux<DataBuffer> readProviderJavaScript(ClassifiedProvider provider) {
+        var resource = providerResource(provider.candidate(), BundleResourceUtils.JS_BUNDLE);
         if (resource == null || !resource.isReadable()) {
             return Flux.empty();
         }
         var dataBufferFactory = DefaultDataBufferFactory.sharedInstance;
-        var head = Mono.<DataBuffer>fromSupplier(
-                () -> dataBufferFactory.wrap(((javascript ? "// Generated from " : "/* Generated from ")
-                                + provider.candidate().type()
+        var head = Mono.<DataBuffer>fromSupplier(() -> dataBufferFactory.wrap(
+                ("// Generated from " + provider.candidate().type()
                                 + ' '
                                 + provider.candidate().name()
-                                + (javascript ? "\n" : " */\n"))
+                                + "\n")
                         .getBytes(UTF_8)));
         var content = DataBufferUtils.read(resource, dataBufferFactory, StreamUtils.BUFFER_SIZE);
         var tail = Mono.fromSupplier(() -> dataBufferFactory.wrap("\n".getBytes(UTF_8)));
@@ -376,7 +390,7 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
                         metadata.put("themeName", provider.candidate().resourceName());
                     }
                     metadata.put("version", provider.candidate().version());
-                    return JsonUtils.objectToJson(metadata);
+                    return JSON_MAPPER.writeValueAsString(metadata);
                 })
                 .collect(Collectors.joining(","));
         var plugins = legacy.stream()
@@ -385,7 +399,7 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
                     var metadata = new LinkedHashMap<String, String>();
                     metadata.put("name", provider.candidate().name());
                     metadata.put("version", provider.candidate().version());
-                    return JsonUtils.objectToJson(metadata);
+                    return JSON_MAPPER.writeValueAsString(metadata);
                 })
                 .collect(Collectors.joining(","));
         // TODO(Halo 3): Remove after legacy IIFE UI provider support ends.

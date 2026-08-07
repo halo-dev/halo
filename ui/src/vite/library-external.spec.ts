@@ -2,6 +2,7 @@ import crypto from "node:crypto";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 import {
   createGlobalBridgeSource,
+  selectHostRuntimeSnapshotFile,
   setupLibraryExternal,
 } from "./library-external";
 
@@ -38,6 +39,29 @@ describe("ESM shared runtime", () => {
     );
 
     expect(bridge.identity).toBe(identity);
+  });
+
+  it("fails before evaluating a bridge with unavailable named exports", async () => {
+    (globalThis as Record<string, unknown>).TestSharedRuntime = {};
+    const source = createGlobalBridgeSource({
+      exports: ["missing"],
+      runtime: { bridge: "test", global: "TestSharedRuntime" },
+    });
+
+    await expect(
+      import(
+        `data:text/javascript;base64,${Buffer.from(source).toString("base64")}#${crypto.randomUUID()}`
+      )
+    ).rejects.toThrow("missing export(s): missing");
+  });
+
+  it("selects the latest eligible sparse host snapshot", () => {
+    expect(
+      selectHostRuntimeSnapshotFile("2.27.0", [
+        "halo-2.26.0.json",
+        "halo-3.0.0.json",
+      ])
+    ).toBe("halo-2.26.0.json");
   });
 
   it("injects all ten development mappings before module entries", () => {

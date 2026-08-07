@@ -25,6 +25,9 @@ import type { UiPluginLegacyResources } from './ui-plugin-legacy-resources';
 // May contain unused imports in some cases
 // @ts-ignore
 import type { UiPluginProviderRegistration } from './ui-plugin-provider-registration';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { UiPluginProviderStyle } from './ui-plugin-provider-style';
 
 /**
  * Browser descriptor for the currently enabled plugin and theme UI providers.
@@ -34,7 +37,7 @@ export interface UiPluginProviderDescriptor {
     'legacy': UiPluginLegacyResources;
     'providers': Array<UiPluginEsmProvider>;
     'registrations': Array<UiPluginProviderRegistration>;
-    'style'?: string;
+    'styles': Array<UiPluginProviderStyle>;
     'version': string;
 }
 

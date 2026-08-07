@@ -52,6 +52,12 @@ Halo SHALL publish sparse immutable snapshots that record the actual shared runt
 - **WHEN** a Halo release does not change the shared version facts, root exports, or runtime bridge behavior
 - **THEN** it SHALL be allowed to reuse the latest earlier immutable snapshot instead of publishing a duplicate
 
+#### Scenario: Host runtime selects a sparse snapshot
+
+- **WHEN** Halo builds its host runtime bridges for a release without an exact snapshot file
+- **THEN** it SHALL select the latest snapshot whose Halo baseline is not newer than the current release
+- **THEN** a prerelease SHALL compare snapshot age by its stable core version so a same-core snapshot is not treated as an older release
+
 #### Scenario: Snapshot excludes non-shared dependencies
 
 - **WHEN** Halo generates a host runtime snapshot
@@ -67,6 +73,7 @@ Halo SHALL publish sparse immutable snapshots that record the actual shared runt
 
 - **WHEN** Halo generates a snapshot from its browser runtime artifacts
 - **THEN** the recorded root exports SHALL be derived from and checked against those actual artifacts
+- **THEN** the snapshot SHALL NOT retain a synthetic package export that the browser artifact does not expose
 
 #### Scenario: Snapshot output version is selected
 
@@ -134,7 +141,7 @@ Halo SHALL describe current UI providers through one authenticated response that
 
 - **WHEN** an authenticated Console or User Center session requests its provider descriptor
 - **THEN** Halo SHALL classify the currently started plugins and activated theme
-- **THEN** the response SHALL contain one version, one versioned aggregate startup stylesheet URL, one versioned legacy script URL, valid ESM entry descriptors, and invalid-provider diagnostics from that classification
+- **THEN** the response SHALL contain one version, an ordered list of versioned provider startup stylesheet descriptors, one versioned legacy script URL, valid ESM entry descriptors, and invalid-provider diagnostics from that classification
 
 #### Scenario: Provider descriptor is consumed by the Halo UI
 
@@ -155,12 +162,19 @@ Halo SHALL describe current UI providers through one authenticated response that
 - **THEN** its entry URL SHALL use the existing `/themes/{name}/ui-plugin/assets/` mapping
 - **THEN** the entry URL SHALL include the descriptor version as a query parameter
 
-#### Scenario: Startup stylesheet is described
+#### Scenario: Startup stylesheets are described
 
 - **WHEN** the descriptor contains legacy providers or valid ESM providers with a main stylesheet
-- **THEN** the descriptor SHALL expose the existing versioned aggregate CSS URL once at the response root
-- **THEN** that stylesheet SHALL concatenate legacy CSS and valid ESM main styles in provider order
-- **THEN** it SHALL NOT contain CSS emitted only for asynchronous chunks
+- **THEN** the descriptor SHALL expose each provider's name, type, and direct versioned stylesheet URL in provider order
+- **THEN** each URL SHALL use the existing provider static resource mapping so relative CSS assets resolve from their owning provider
+- **THEN** the list SHALL NOT contain CSS emitted only for asynchronous chunks
+
+#### Scenario: Legacy aggregate stylesheet is requested
+
+- **WHEN** a Halo 2.x client requests the existing aggregate CSS endpoint
+- **THEN** the endpoint SHALL remain available as a compatibility bridge
+- **THEN** it SHALL emit ordered CSS `@import` rules that reference the direct versioned provider stylesheet URLs instead of concatenating their source under the aggregate API URL
+- **THEN** the implementation SHALL include an adjacent comment identifying removal after legacy IIFE support ends in Halo 3
 
 #### Scenario: Provider state changes during startup
 
@@ -188,6 +202,7 @@ Halo SHALL expose format-neutral UI provider availability and registration metad
 
 - **WHEN** provider code calls `isRegistered(name)` or observes the corresponding registration record
 - **THEN** the result SHALL become true only after that provider's module registration commits successfully in the current page
+- **THEN** a discovered legacy provider that has no UI module SHALL be treated as a successful compatible no-op and reported as registered
 - **THEN** consumers SHALL NOT need to depend on provider evaluation or registration order
 
 #### Scenario: Provider loading or registration fails
@@ -231,6 +246,13 @@ Halo SHALL load legacy IIFE and ESM UI providers in the same Console or User Cen
 - **THEN** the provider SHALL be able to load its own relative asynchronous chunks and emitted assets
 - **THEN** Halo SHALL NOT reload the page after an individual entry import settles
 
+#### Scenario: Many provider startup resources are loaded
+
+- **WHEN** the descriptor contains many provider styles and ESM entries
+- **THEN** Halo SHALL start every style load, every ESM entry import, and the legacy script load before waiting for any individual startup resource to settle
+- **THEN** style elements SHALL retain descriptor order independent of network completion order
+- **THEN** Halo SHALL NOT introduce application-level request batching that serializes provider startup
+
 #### Scenario: ESM entry exports a plugin module
 
 - **WHEN** an ESM entry finishes evaluating
@@ -246,8 +268,8 @@ Halo SHALL load legacy IIFE and ESM UI providers in the same Console or User Cen
 #### Scenario: Startup provider styles are loaded
 
 - **WHEN** provider startup begins
-- **THEN** Halo SHALL load the descriptor's aggregate stylesheet once instead of inserting every provider CSS asset separately
-- **THEN** a failure of that aggregate stylesheet SHALL be reported once without falsely attributing a concatenated response to one provider
+- **THEN** Halo SHALL insert and load each descriptor stylesheet directly in provider order
+- **THEN** a stylesheet failure SHALL fail only its owning provider and SHALL NOT prevent unrelated providers or the core UI from continuing
 
 #### Scenario: Provider loads an asynchronous CSS chunk
 
@@ -257,7 +279,7 @@ Halo SHALL load legacy IIFE and ESM UI providers in the same Console or User Cen
 
 ### Requirement: ESM provider failure isolation
 
-Halo SHALL isolate observable ESM provider discovery, import, evaluation, export, registration, and delayed-chunk failures from other providers and the core UI where the host lifecycle exposes an isolation boundary; the single aggregate startup stylesheet is a shared startup resource.
+Halo SHALL isolate observable ESM provider discovery, startup-style, import, evaluation, export, registration, and delayed-chunk failures from other providers and the core UI where the host lifecycle exposes an isolation boundary.
 
 #### Scenario: One ESM entry fails
 
@@ -282,6 +304,8 @@ Halo SHALL isolate observable ESM provider discovery, import, evaluation, export
 
 - **WHEN** a provider fails while registering routes, components, stores, extensions, or other host integrations
 - **THEN** Halo SHALL invoke recorded removal or restoration handles in reverse order for mutations that support undo
+- **THEN** a named route replaced by the failing provider SHALL be restored to the previously registered route
+- **THEN** a route conflict that cannot be restored reliably SHALL be rejected before the router is mutated
 - **THEN** Halo SHALL continue registering later providers
 - **THEN** any mutation that could not be reversed SHALL be diagnosed and SHALL use page reload as the final recovery boundary
 
@@ -350,7 +374,7 @@ Halo SHALL treat a full Console or User Center page load as the supported module
 #### Scenario: Production ESM assets are cached
 
 - **WHEN** production provider ESM resources are emitted
-- **THEN** entry and aggregate URLs SHALL include the current provider descriptor version as a cache key
+- **THEN** entry, direct startup-style, and legacy aggregate URLs SHALL include the current provider descriptor version as a cache key
 - **THEN** asynchronous chunks and assets SHALL use provider-relative content-hashed URLs where supported
 - **THEN** provider discovery metadata SHALL be revalidated so it reflects currently enabled providers
 

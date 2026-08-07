@@ -36,11 +36,14 @@ describe("Halo host runtime snapshot", () => {
         expect(snapshot.packages[root].version, root).toBe(resolved.version);
         expect(snapshot.packages[root].exports, root).toEqual(
           Object.keys(runtimeModule)
-            .filter((name) => /^[$A-Z_a-z][$\w]*$/.test(name))
+            .filter(
+              (name) => /^[$A-Z_a-z][$\w]*$/.test(name) && name !== "__esModule"
+            )
             .sort()
         );
       })
     );
+    expect(snapshot.packages.vue.exports).not.toContain("__esModule");
   }, 15_000);
 
   it("records host facts without accepted provider ranges", () => {
@@ -56,6 +59,15 @@ describe("Halo host runtime snapshot", () => {
 
     expect(selected.snapshot.haloVersion).toBe("2.26.0");
     expect(selected.reusedOlderSnapshot).toBe(true);
+  });
+
+  it("distinguishes same-core prereleases from newer prereleases", () => {
+    expect(
+      selectHaloHostRuntimeSnapshot("2.26.0-beta.1").reusedOlderSnapshot
+    ).toBe(false);
+    expect(
+      selectHaloHostRuntimeSnapshot("2.27.0-beta.1").reusedOlderSnapshot
+    ).toBe(true);
   });
 
   it("fails with a diagnostic when no snapshot is eligible", () => {

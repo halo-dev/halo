@@ -48,6 +48,26 @@ export function createRsbuildEsmProviderPlugin(
           );
         }
 
+        assertRspackValue(
+          "experiments.outputModule",
+          config.experiments?.outputModule,
+          true
+        );
+        assertRspackValue("externalsType", config.externalsType, "module");
+        assertRspackValue("output.module", config.output?.module, true);
+        assertRspackValue("output.iife", config.output?.iife, false);
+        assertRspackValue(
+          "output.chunkFormat",
+          config.output?.chunkFormat,
+          "module"
+        );
+        assertRspackValue(
+          "output.chunkLoading",
+          config.output?.chunkLoading,
+          "import"
+        );
+        assertOnlyHaloExternals(config.externals);
+
         config.experiments = {
           ...config.experiments,
           outputModule: true,
@@ -62,14 +82,9 @@ export function createRsbuildEsmProviderPlugin(
           chunkFilename: "chunks/[name].[contenthash:8].js",
           library: { type: "module" },
         };
-        config.externals = [
-          ...(Array.isArray(config.externals)
-            ? config.externals
-            : config.externals
-              ? [config.externals]
-              : []),
-          Object.fromEntries(SHARED_PACKAGE_ROOTS.map((root) => [root, root])),
-        ];
+        config.externals = Object.fromEntries(
+          SHARED_PACKAGE_ROOTS.map((root) => [root, root])
+        );
       });
 
       api.resolve(({ resolveData }) => {
@@ -95,7 +110,9 @@ export function createRsbuildEsmProviderPlugin(
         async ({ assets, compilation, sources }) => {
           const entry = assets["main.js"];
           if (!entry) {
-            throw new Error("ESM UI provider output is missing main.js.");
+            throw new Error(
+              "ESM UI provider output is missing main.js. Remove entry filename overrides because Halo owns the manifest entry name."
+            );
           }
           const entryCode = entry.source().toString();
           await validator.validateSource(entryCode, "main.js");
@@ -135,4 +152,36 @@ export function createRsbuildEsmProviderPlugin(
       );
     },
   };
+}
+
+function assertRspackValue(
+  path: string,
+  actual: unknown,
+  expected: string | boolean
+) {
+  if (actual !== undefined && actual !== expected) {
+    throw new Error(
+      `ESM UI provider output requires Rspack ${path} to be ${JSON.stringify(expected)}; received ${JSON.stringify(actual)}.`
+    );
+  }
+}
+
+function assertOnlyHaloExternals(externals: unknown) {
+  const values = Array.isArray(externals) ? externals : [externals];
+  for (const value of values) {
+    if (!value) {
+      continue;
+    }
+    if (
+      typeof value !== "object" ||
+      value instanceof RegExp ||
+      Object.keys(value).some(
+        (root) => !SHARED_PACKAGE_ROOTS.includes(root as never)
+      )
+    ) {
+      throw new Error(
+        "ESM UI provider output cannot externalize dependencies that Halo does not provide. Remove custom Rspack externals or select IIFE output."
+      );
+    }
+  }
 }

@@ -22,36 +22,26 @@ export function createViteEsmProviderPlugin(
   });
   let resolvedConfig: ResolvedConfig;
   let resolvePackage: ReturnType<ResolvedConfig["createResolver"]>;
+  let userExternal: unknown;
+  const haloExternal = (source: string, importer?: string) =>
+    validator.shouldExternalize(source, importer || "provider entry");
 
   return {
     name: "halo:esm-ui-provider",
     enforce: "post",
     config(config) {
-      const userExternal = config.build?.rollupOptions?.external;
+      userExternal = config.build?.rollupOptions?.external;
       return {
         build: {
           rollupOptions: {
-            external(source, importer, isResolved) {
-              if (
-                validator.shouldExternalize(
-                  source,
-                  importer || "provider entry"
-                )
-              ) {
-                return true;
-              }
-              return matchesExternal(
-                userExternal,
-                source,
-                importer,
-                isResolved
-              );
-            },
+            external: haloExternal,
           },
         },
       };
     },
     configResolved(config) {
+      assertOnlyHaloExternals(userExternal);
+      config.build.rollupOptions.external = haloExternal;
       resolvedConfig = config;
       resolvePackage = config.createResolver();
       if (!config.build.cssCodeSplit) {
@@ -163,22 +153,21 @@ interface ViteOutputChunk extends OutputChunk {
   };
 }
 
-function matchesExternal(
-  external: unknown,
-  source: string,
-  importer: string | undefined,
-  isResolved: boolean
-) {
-  if (typeof external === "function") {
-    return external(source, importer, isResolved);
+function assertOnlyHaloExternals(external: unknown) {
+  if (external === undefined) {
+    return;
   }
-  if (external instanceof RegExp) {
-    return external.test(source);
-  }
-  if (Array.isArray(external)) {
-    return external.some((entry) =>
-      entry instanceof RegExp ? entry.test(source) : entry === source
+  const entries = Array.isArray(external)
+    ? external.flat(Infinity)
+    : [external];
+  const unsupported = entries.find(
+    (entry) =>
+      typeof entry !== "string" ||
+      !SHARED_PACKAGE_ROOTS.includes(entry as never)
+  );
+  if (unsupported !== undefined) {
+    throw new Error(
+      `ESM UI provider output cannot externalize ${String(unsupported)} because Halo does not provide it through the shared runtime. Remove the Vite external or select IIFE output.`
     );
   }
-  return false;
 }

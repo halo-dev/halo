@@ -128,6 +128,31 @@ describe("ESM provider builds", () => {
     ).rejects.toThrow("would bypass Halo snapshot validation");
   });
 
+  it("rejects a Vite external that Halo does not provide", async () => {
+    const providerRoot = setupProviderProject("plugin");
+    process.chdir(providerRoot);
+    const config = resolveViteConfig(
+      viteConfig({
+        vite: {
+          build: {
+            rollupOptions: {
+              external: ["@vueuse/core"],
+            },
+          },
+        },
+      })
+    );
+
+    await expect(
+      viteBuild({
+        ...config,
+        root: providerRoot,
+        configFile: false,
+        logLevel: "silent",
+      })
+    ).rejects.toThrow("cannot externalize @vueuse/core");
+  });
+
   it("rejects a Vite override that merges async CSS into the entry", async () => {
     const providerRoot = setupProviderProject("plugin");
     process.chdir(providerRoot);
@@ -193,6 +218,58 @@ describe("ESM provider builds", () => {
         await rsbuild.build();
       })()
     ).rejects.toThrow("automatic Rsbuild public path");
+  });
+
+  it("rejects an Rsbuild entry filename override", () => {
+    const providerRoot = setupProviderProject("theme");
+    process.chdir(providerRoot);
+
+    expect(() =>
+      resolveRsbuildConfig(
+        rsbuildConfig({
+          provider: "theme",
+          rsbuild: {
+            output: { filename: { js: "custom.js" } },
+          },
+        })
+      )
+    ).toThrow("owns output.filename.js");
+  });
+
+  it("rejects conflicting Rsbuild module output settings", () => {
+    const providerRoot = setupProviderProject("theme");
+    process.chdir(providerRoot);
+
+    expect(() =>
+      resolveRsbuildConfig(
+        rsbuildConfig({
+          provider: "theme",
+          rsbuild: {
+            tools: {
+              rspack: {
+                output: { iife: true },
+              },
+            },
+          },
+        })
+      )
+    ).toThrow("requires Rspack output.iife to be false");
+  });
+
+  it("rejects arbitrary Rsbuild externals", () => {
+    const providerRoot = setupProviderProject("theme");
+    process.chdir(providerRoot);
+
+    expect(() =>
+      resolveRsbuildConfig(
+        rsbuildConfig({
+          provider: "theme",
+          rsbuild: {
+            output: { externals: { lodash: "lodash" } },
+          },
+        })
+      )
+    ).toThrow("cannot externalize dependencies that Halo does not provide");
   });
 });
 

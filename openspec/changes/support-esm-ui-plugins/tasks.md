@@ -129,3 +129,12 @@
 - [x] 16.2 Expose the generated UI plugin client through `consoleApiClient` and replace the runtime's hand-written descriptor types and raw URL request with the generated contract.
 - [x] 16.3 Verify the generated OpenAPI/client diff, focused backend and frontend tests, API client/UI type checking, formatting, and strict OpenSpec validation.
 - [x] 16.4 Grant the authenticated role access to the provider descriptor resource and verify ordinary User Center authorization.
+
+## 17. Close Provider Startup and Build-Contract Review Gaps
+
+- [x] 17.1 Replace aggregate startup CSS in the descriptor with ordered direct provider style descriptors, retain the Halo 2.x aggregate endpoint through ordered `@import` rules and a Halo 3 removal marker, isolate backend resource reads from reactive threads, migrate new JSON parsing to Jackson 3, and cover the behavior with backend tests.
+- [x] 17.2 Regenerate the OpenAPI document and API client, load all ordered provider styles, ESM entries, and legacy JavaScript concurrently with all-settled semantics, isolate style failures by provider, treat legacy providers without UI modules as successful no-ops, and cover 50-provider startup behavior without eager asynchronous CSS.
+- [x] 17.3 Preserve successful last-registration-wins route behavior while restoring a replaced named route after synchronous registration failure and rejecting un-restorable conflicts before mutation, with focused frontend tests.
+- [x] 17.4 Reject arbitrary Vite and Rsbuild externals plus conflicting Rsbuild ESM output and entry filename overrides before emitting a misleading manifest, with focused bundler tests.
+- [x] 17.5 Align runtime snapshots with actual browser exports, make host bridge lookup reuse the latest eligible sparse snapshot, and distinguish same-core prerelease reuse from genuinely older-snapshot warnings, with generator, host, and bundler tests.
+- [x] 17.6 Document the deliberate `ui-plugin.json` reserved output name and compatibility CSS bridge, then run formatting, strict OpenSpec validation, backend/frontend/bundler checks, OpenAPI checks, and feasible development and packaged-runtime acceptance.

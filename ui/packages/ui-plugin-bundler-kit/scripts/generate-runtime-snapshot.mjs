@@ -1,6 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
+import { TextDecoder, TextEncoder } from "node:util";
+import vm from "node:vm";
 
 const packageRoot = path.resolve(import.meta.dirname, "..");
 const projectRoot = path.resolve(packageRoot, "../..");
@@ -31,6 +33,18 @@ const definitions = {
   "@halo-dev/richtext-editor": ["richtext-editor", "RichTextEditor", "shared"],
 };
 
+const browserRuntimeRoots = new Set([
+  "vue",
+  "vue-router",
+  "pinia",
+  "axios",
+  "@halo-dev/ui-shared",
+  "@halo-dev/components",
+  "@halo-dev/api-client",
+  "@halo-dev/richtext-editor",
+]);
+const browserRuntimeGlobals = loadBrowserRuntimeGlobals();
+
 const projectUrl = pathToFileURL(path.join(projectRoot, "package.json")).href;
 const packages = {};
 for (const [root, [bridge, global, identity]] of Object.entries(definitions)) {
@@ -42,11 +56,28 @@ for (const [root, [bridge, global, identity]] of Object.entries(definitions)) {
     fs.readFileSync(path.join(owningRoot, "package.json"), "utf8")
   );
   const runtimeModule = await import(pathToFileURL(entry).href);
+  const moduleExports = Object.keys(runtimeModule).filter(
+    (name) => /^[$A-Z_a-z][$\w]*$/.test(name) && name !== "__esModule"
+  );
+  const browserGlobal = browserRuntimeRoots.has(root)
+    ? browserRuntimeGlobals[global]
+    : runtimeModule;
+  if (!browserGlobal) {
+    throw new Error(`Browser runtime did not expose ${global} for ${root}.`);
+  }
+  const missingExports = moduleExports.filter(
+    (name) =>
+      name !== "default" &&
+      !Object.prototype.hasOwnProperty.call(browserGlobal, name)
+  );
+  if (missingExports.length > 0) {
+    throw new Error(
+      `Browser runtime ${global} is missing ${root} export(s): ${missingExports.join(", ")}.`
+    );
+  }
   packages[root] = {
     version: dependencyPackageJson.version,
-    exports: Object.keys(runtimeModule)
-      .filter((name) => /^[$A-Z_a-z][$\w]*$/.test(name))
-      .sort(),
+    exports: moduleExports.sort(),
     runtime: { bridge, global, identity },
   };
 }
@@ -68,6 +99,93 @@ if (check) {
   fs.mkdirSync(snapshotsDir, { recursive: true });
   fs.writeFileSync(outputFile, generatedSnapshot);
   fs.writeFileSync(indexFile, generatedIndex);
+}
+
+function loadBrowserRuntimeGlobals() {
+  class NodeStub {}
+  class ElementStub extends NodeStub {}
+  class HTMLElementStub extends ElementStub {}
+  class SVGElementStub extends ElementStub {}
+  const createElement = () =>
+    Object.assign(new HTMLElementStub(), {
+      style: {},
+      classList: { add() {}, remove() {} },
+      appendChild() {},
+      removeChild() {},
+      setAttribute() {},
+      getAttribute() {
+        return null;
+      },
+      querySelector() {
+        return null;
+      },
+      querySelectorAll() {
+        return [];
+      },
+    });
+  const document = {
+    createElement,
+    createElementNS: createElement,
+    createTextNode: () => new NodeStub(),
+    querySelector: () => null,
+    querySelectorAll: () => [],
+    documentElement: createElement(),
+    head: createElement(),
+    body: createElement(),
+    addEventListener() {},
+    removeEventListener() {},
+  };
+  const context = {
+    console,
+    setTimeout,
+    clearTimeout,
+    setInterval,
+    clearInterval,
+    URL,
+    URLSearchParams,
+    TextDecoder,
+    TextEncoder,
+    location: new URL("http://localhost/"),
+    navigator: { userAgent: "node" },
+    document,
+    Node: NodeStub,
+    Element: ElementStub,
+    HTMLElement: HTMLElementStub,
+    SVGElement: SVGElementStub,
+    MutationObserver: class {
+      observe() {}
+      disconnect() {}
+    },
+    getComputedStyle: () => ({}),
+    addEventListener() {},
+    removeEventListener() {},
+  };
+  context.window = context;
+  context.self = context;
+  context.globalThis = context;
+  vm.createContext(context);
+
+  for (const runtimeFile of [
+    "vue/dist/vue.global.prod.js",
+    "vue-router/dist/vue-router.global.prod.js",
+    "pinia/dist/pinia.iife.prod.js",
+    "axios/dist/axios.min.js",
+    "vue-demi/lib/index.iife.js",
+    "@vueuse/shared/dist/index.iife.min.js",
+    "@vueuse/core/dist/index.iife.min.js",
+    "@vueuse/components/dist/index.iife.min.js",
+    "@vueuse/router/dist/index.iife.min.js",
+    "@halo-dev/api-client/dist/index.iife.js",
+    "@halo-dev/ui-shared/dist/index.iife.js",
+    "@halo-dev/components/dist/index.iife.js",
+    "@halo-dev/richtext-editor/dist/index.iife.js",
+  ]) {
+    const runtimePath = path.join(projectRoot, "node_modules", runtimeFile);
+    vm.runInContext(fs.readFileSync(runtimePath, "utf8"), context, {
+      filename: runtimePath,
+    });
+  }
+  return context;
 }
 
 function listSnapshotFiles() {

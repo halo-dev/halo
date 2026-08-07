@@ -92,7 +92,7 @@ function createRsbuildPresetsConfig(
     );
   }
 
-  return defineConfig(({ envMode }) => {
+  const config = defineConfig(({ envMode }) => {
     const isProduction = envMode === "production";
 
     const outDir = isProduction ? defaults.outDir.prod : defaults.outDir.dev;
@@ -205,6 +205,7 @@ function createRsbuildPresetsConfig(
       },
     };
   });
+  return { selection, config };
 }
 
 function getPluginProviderDefaults(manifestPath: string) {
@@ -269,20 +270,76 @@ export function rsbuildConfig(
   config?: RsBuildUserConfig
 ): (env: ConfigParams) => RsbuildConfig {
   const provider = getProvider(config);
-  const presetsConfigFn = createRsbuildPresetsConfig(
+  const presets = createRsbuildPresetsConfig(
     provider,
     getManifestPath(provider, config),
     config?.format,
     config?.targetHaloVersion
   );
   return defineConfig((env) => {
-    const presetsConfig = presetsConfigFn(env);
+    const presetsConfig = presets.config(env);
     const userConfig =
       typeof config?.rsbuild === "function"
         ? config.rsbuild(env)
         : config?.rsbuild || {};
+    if (presets.selection.format === "esm") {
+      validateRsbuildEsmUserConfig(userConfig);
+    }
     return mergeRsbuildConfig(presetsConfig, userConfig);
   });
+}
+
+function validateRsbuildEsmUserConfig(config: RsbuildConfig) {
+  if (config.output?.filename?.js !== undefined) {
+    throw new Error(
+      "ESM UI provider output owns output.filename.js so the manifest entry remains main.js. Remove the Rsbuild filename override or select IIFE output."
+    );
+  }
+  if (config.output?.externals !== undefined) {
+    throw new Error(
+      "ESM UI provider output cannot externalize dependencies that Halo does not provide. Remove output.externals or select IIFE output."
+    );
+  }
+
+  const rspack = config.tools?.rspack;
+  if (!isRecord(rspack)) {
+    return;
+  }
+  const output = isRecord(rspack.output) ? rspack.output : undefined;
+  if (output?.filename !== undefined) {
+    throw new Error(
+      "ESM UI provider output owns Rspack output.filename so the manifest entry remains main.js. Remove the filename override or select IIFE output."
+    );
+  }
+  if (output?.module !== undefined && output.module !== true) {
+    throw new Error(
+      "ESM UI provider output requires Rspack output.module true."
+    );
+  }
+  if (output?.iife !== undefined && output.iife !== false) {
+    throw new Error(
+      "ESM UI provider output requires Rspack output.iife to be false."
+    );
+  }
+  if (output?.chunkFormat !== undefined && output.chunkFormat !== "module") {
+    throw new Error(
+      "ESM UI provider output requires Rspack output.chunkFormat module."
+    );
+  }
+  if (output?.chunkLoading !== undefined && output.chunkLoading !== "import") {
+    throw new Error(
+      "ESM UI provider output requires Rspack output.chunkLoading import."
+    );
+  }
+  if (rspack.externals !== undefined) {
+    throw new Error(
+      "ESM UI provider output cannot externalize dependencies that Halo does not provide. Remove Rspack externals or select IIFE output."
+    );
+  }
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 function reportFormatSelection(

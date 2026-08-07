@@ -9,13 +9,14 @@ import java.util.List;
 @Schema(description = "Browser descriptor for the currently enabled plugin and theme UI providers.")
 public record UiPluginProviderDescriptor(
         @Schema(requiredMode = REQUIRED) String version,
-        String style,
+        @Schema(requiredMode = REQUIRED) List<Style> styles,
         @Schema(requiredMode = REQUIRED) LegacyResources legacy,
         @Schema(requiredMode = REQUIRED) List<Registration> registrations,
         @Schema(requiredMode = REQUIRED) List<EsmProvider> providers,
         @Schema(requiredMode = REQUIRED) List<InvalidProvider> invalid) {
 
     public UiPluginProviderDescriptor {
+        styles = List.copyOf(styles);
         registrations = List.copyOf(registrations);
         providers = List.copyOf(providers);
         invalid = List.copyOf(invalid);
@@ -24,6 +25,17 @@ public record UiPluginProviderDescriptor(
     @Schema(name = "UiPluginLegacyResources")
     public record LegacyResources(
             @Schema(requiredMode = REQUIRED) String script) {}
+
+    @Schema(name = "UiPluginProviderStyle")
+    public record Style(
+            @Schema(requiredMode = REQUIRED) String name,
+
+            @Schema(
+                    requiredMode = REQUIRED,
+                    allowableValues = {"plugin", "theme"})
+            String type,
+
+            @Schema(requiredMode = REQUIRED) String href) {}
 
     @Schema(name = "UiPluginProviderRegistration")
     public record Registration(

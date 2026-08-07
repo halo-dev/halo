@@ -179,6 +179,9 @@ export const setupLibraryExternal = (
 
 export function createGlobalBridgeSource(entry: HostRuntimeSnapshotEntry) {
   const runtime = "__haloSharedRuntime";
+  const namedExports = entry.exports.filter(
+    (exportName) => exportName !== "default"
+  );
   const staticExports = entry.exports
     .filter((exportName) => exportName !== "default")
     .map(
@@ -192,6 +195,8 @@ export function createGlobalBridgeSource(entry: HostRuntimeSnapshotEntry) {
     "// TODO(Halo 3): Remove after legacy IIFE UI provider support ends.",
     `const ${runtime} = globalThis[${JSON.stringify(entry.runtime.global)}];`,
     `if (!${runtime}) throw new Error(${JSON.stringify(`Halo shared runtime global ${entry.runtime.global} is unavailable.`)});`,
+    `const __haloMissingExports = ${JSON.stringify(namedExports)}.filter((name) => !(name in ${runtime}));`,
+    `if (__haloMissingExports.length) throw new Error(${JSON.stringify(`Halo shared runtime global ${entry.runtime.global} is missing export(s): `)} + __haloMissingExports.join(", "));`,
     ...staticExports,
     ...defaultExport,
     "",
@@ -206,14 +211,71 @@ function readHostRuntimeSnapshot() {
   const packageJson = JSON.parse(
     fs.readFileSync(path.join(bundlerKitRoot, "package.json"), "utf8")
   ) as { version: string };
-  const snapshotPath = path.join(
-    bundlerKitRoot,
-    "src/runtime-snapshots",
-    `halo-${packageJson.version}.json`
+  const snapshotsDir = path.join(bundlerKitRoot, "src/runtime-snapshots");
+  const snapshotFile = selectHostRuntimeSnapshotFile(
+    packageJson.version,
+    fs.readdirSync(snapshotsDir)
   );
+  const snapshotPath = path.join(snapshotsDir, snapshotFile);
   return JSON.parse(
     fs.readFileSync(snapshotPath, "utf8")
   ) as HostRuntimeSnapshot;
+}
+
+export function selectHostRuntimeSnapshotFile(
+  targetVersion: string,
+  files: readonly string[]
+) {
+  const target = parseVersionCore(targetVersion);
+  if (!target) {
+    throw new Error(`Invalid Halo UI version: ${targetVersion}.`);
+  }
+  const selected = files
+    .map((file) => ({
+      file,
+      version: parseSnapshotFileVersion(file),
+    }))
+    .filter(
+      (
+        candidate
+      ): candidate is { file: string; version: [number, number, number] } =>
+        candidate.version !== undefined &&
+        compareVersionCore(candidate.version, target) <= 0
+    )
+    .sort((left, right) => compareVersionCore(right.version, left.version))[0];
+  if (!selected) {
+    throw new Error(
+      `No host runtime snapshot is available for Halo UI ${targetVersion}.`
+    );
+  }
+  return selected.file;
+}
+
+function parseSnapshotFileVersion(file: string) {
+  const match = /^halo-(\d+)\.(\d+)\.(\d+)\.json$/.exec(file);
+  return match
+    ? ([Number(match[1]), Number(match[2]), Number(match[3])] as const)
+    : undefined;
+}
+
+function parseVersionCore(version: string) {
+  const match = /^(\d+)\.(\d+)\.(\d+)(?:-|$)/.exec(version);
+  return match
+    ? ([Number(match[1]), Number(match[2]), Number(match[3])] as const)
+    : undefined;
+}
+
+function compareVersionCore(
+  left: readonly [number, number, number],
+  right: readonly [number, number, number]
+) {
+  for (let index = 0; index < left.length; index++) {
+    const difference = left[index] - right[index];
+    if (difference !== 0) {
+      return difference;
+    }
+  }
+  return 0;
 }
 
 function createRuntimeBridges(snapshot: HostRuntimeSnapshot) {

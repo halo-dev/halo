@@ -51,6 +51,12 @@ interface RegistrationFailure {
   incompleteRollback: string[];
 }
 
+interface ReplacedRoute {
+  route: RouteRecordRaw;
+  parentName?: string | symbol;
+  owner?: UiProviderRegistration;
+}
+
 export async function setupUiPluginRuntime({
   app,
   router,
@@ -126,9 +132,9 @@ export async function setupUiPluginRuntime({
   }
 
   const styleInsertionPoint = document.head.firstChild;
-  const styleLoad = descriptor.style
-    ? runtime.loadStyle(descriptor.style, styleInsertionPoint)
-    : Promise.resolve();
+  const styleLoads = descriptor.styles.map((style) =>
+    runtime.loadStyle(style.href, styleInsertionPoint)
+  );
   const legacyScriptLoad =
     legacyRegistrations.length > 0
       ? runtime.loadScript(descriptor.legacy.script)
@@ -137,21 +143,27 @@ export async function setupUiPluginRuntime({
     runtime.importModule(provider.entry)
   );
 
-  const [styleResult, legacyScriptResult, esmImportResults] = await Promise.all(
-    [
-      settled(styleLoad),
+  const [styleResults, legacyScriptResult, esmImportResults] =
+    await Promise.all([
+      Promise.allSettled(styleLoads),
       settled(legacyScriptLoad),
       Promise.allSettled(esmImports),
-    ]
-  );
+    ]);
 
   const failedNames = new Set(invalidNames);
-  const styleFailed = styleResult.status === "rejected";
-  if (styleFailed) {
-    console.error(
-      "[Halo UI providers] Failed to load the aggregate stylesheet.",
-      styleResult.reason
-    );
+  const styleFailed = styleResults.some(
+    (result) => result.status === "rejected"
+  );
+  for (const [index, result] of styleResults.entries()) {
+    if (result.status === "fulfilled") {
+      continue;
+    }
+    const style = descriptor.styles[index];
+    const registration = registrationsByName.get(style.name);
+    if (registration) {
+      failedNames.add(registration.name);
+      report(registration, "style", result.reason);
+    }
   }
 
   if (legacyScriptResult.status === "rejected") {
@@ -418,6 +430,8 @@ function commitJsModule({
   componentOwners?: WeakMap<object, UiProviderRegistration>;
 }) {
   const pluginModuleStore = usePluginModuleStore();
+  const routes = platform === "console" ? module.routes : module.ucRoutes;
+  validateRestorableRouteConflicts(router, routes);
   const previousModule = pluginModuleStore.pluginModuleMap[name];
   pluginModuleStore.registerPluginModule(name, module);
   rollbackHandles.push({
@@ -461,7 +475,6 @@ function commitJsModule({
     }
   }
 
-  const routes = platform === "console" ? module.routes : module.ucRoutes;
   if (!routes) {
     return;
   }
@@ -475,24 +488,22 @@ function commitJsModule({
         routeOwners,
       });
     } else {
-      const routeRemoval: { handle?: () => void } = {};
-      rollbackHandles.push({
-        label: `route ${String(route.name || route.path)}`,
-        rollback: () => {
-          if (routeRemoval.handle) {
-            routeRemoval.handle();
-          } else if (route.name) {
-            router.removeRoute(route.name);
-          } else {
-            throw new Error("The route has no removal handle or name.");
-          }
-          unregisterRouteOwners(route, routeOwners);
-        },
-      });
-      routeRemoval.handle = router.addRoute(route);
+      const replacedRoute = findReplacedRoute(router, route, routeOwners);
+      const removeRoute = router.addRoute(route);
+      if (replacedRoute) {
+        unregisterRouteOwners(replacedRoute.route, routeOwners);
+      }
       if (registration) {
         registerRouteOwners(route, registration, routeOwners);
       }
+      rollbackHandles.push({
+        label: `route ${String(route.name || route.path)}`,
+        rollback: () => {
+          removeRoute();
+          unregisterRouteOwners(route, routeOwners);
+          restoreReplacedRoute(router, replacedRoute, routeOwners);
+        },
+      });
     }
   }
 
@@ -535,6 +546,81 @@ function commitJsModule({
 
   if (core) {
     rollbackHandles.length = 0;
+  }
+}
+
+function validateRestorableRouteConflicts(
+  router: Router,
+  routes: RouteRecordRaw[] | RouteRecordAppend[] | undefined
+) {
+  if (!routes) {
+    return;
+  }
+  const currentRoutes = router.getRoutes();
+  for (const routeItem of routes) {
+    if ("parentName" in routeItem || !routeItem.name) {
+      continue;
+    }
+    const existing = currentRoutes.find(
+      (route) => route.name === routeItem.name
+    );
+    if (!existing || existing.name === undefined) {
+      continue;
+    }
+    const parent = findRouteParent(currentRoutes, existing.name);
+    if (parent && !parent.name) {
+      throw new Error(
+        `Cannot replace nested route "${String(existing.name)}" because its parent has no name for rollback.`
+      );
+    }
+  }
+}
+
+function findReplacedRoute(
+  router: Router,
+  route: RouteRecordRaw,
+  routeOwners?: Map<string | symbol, UiProviderRegistration>
+): ReplacedRoute | undefined {
+  if (!route.name) {
+    return undefined;
+  }
+  const currentRoutes = router.getRoutes();
+  const existing = currentRoutes.find((item) => item.name === route.name);
+  if (!existing || existing.name === undefined) {
+    return undefined;
+  }
+  const parent = findRouteParent(currentRoutes, existing.name);
+  return {
+    route: existing as unknown as RouteRecordRaw,
+    parentName: parent?.name,
+    owner: routeOwners?.get(route.name),
+  };
+}
+
+function findRouteParent(
+  routes: ReturnType<Router["getRoutes"]>,
+  name: string | symbol
+) {
+  return routes.find((route) =>
+    route.children?.some((child) => child.name === name)
+  );
+}
+
+function restoreReplacedRoute(
+  router: Router,
+  replacedRoute: ReplacedRoute | undefined,
+  routeOwners?: Map<string | symbol, UiProviderRegistration>
+) {
+  if (!replacedRoute) {
+    return;
+  }
+  if (replacedRoute.parentName) {
+    router.addRoute(replacedRoute.parentName, replacedRoute.route);
+  } else {
+    router.addRoute(replacedRoute.route);
+  }
+  if (replacedRoute.owner) {
+    registerRouteOwners(replacedRoute.route, replacedRoute.owner, routeOwners);
   }
 }
 

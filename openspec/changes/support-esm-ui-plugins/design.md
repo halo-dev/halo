@@ -78,7 +78,7 @@ axios
 @halo-dev/richtext-editor
 ```
 
-The current snapshot is emitted with the Halo UI runtime. Immutable historical snapshots are embedded in published bundler-kit releases; builds never fetch mutable online metadata. If a target is newer than the installed bundler knows, the bundler selects its latest snapshot not newer than the target and warns. If no eligible ESM snapshot exists, the ESM build fails and points to a bundler update or IIFE output.
+The current snapshot is emitted with the Halo UI runtime. Immutable historical snapshots are embedded in published bundler-kit releases; builds never fetch mutable online metadata. Both the provider bundler and Halo's host runtime bridge select the latest snapshot not newer than the target Halo release. If a target is newer than the installed bundler knows, the bundler reuses that eligible snapshot and warns only when the selected baseline is from an earlier stable core release; a prerelease of the same core release does not make that same-core snapshot older. If no eligible ESM snapshot exists, the ESM build fails and points to a bundler update or IIFE output.
 
 The snapshot generator derives its Halo baseline and output file name from `@halo-dev/ui-plugin-bundler-kit`'s own package version. The exact moment at which Halo maintainers generate or check a new snapshot is intentionally not coupled to package build or CI in this change; publication workflow integration can be decided separately.
 
@@ -104,7 +104,7 @@ the package from the importing provider and locate the nearest owning
 `package.json`; this keeps exports-only packages and pnpm symlinks within a
 maintained Node-compatible resolver instead of duplicating entry-point rules.
 
-The bundler rejects missing shared packages, deep imports, unsupported statically named exports, aliases, forks, and configuration that bypasses externalization. Only after those checks does it externalize a shared root import. A namespace import or dynamic namespace property cannot be proven completely, so it is allowed with a best-effort warning. Any version difference is diagnostic rather than an admission gate: a provider version newer than the host warns, and a different major version emits a stronger warning, but the build proceeds when all concrete root identity and static export checks pass.
+The bundler rejects missing shared packages, deep imports, unsupported statically named exports, aliases, forks, and configuration that bypasses externalization. Only after those checks does it externalize a shared root import. Caller configuration cannot externalize arbitrary non-shared packages because the browser Import Map supplies only Halo's declared shared roots. A namespace import or dynamic namespace property cannot be proven completely, so it is allowed with a best-effort warning. Any version difference is diagnostic rather than an admission gate: a provider version newer than the host warns, and a different major version emits a stronger warning, but the build proceeds when all concrete root identity and static export checks pass.
 
 Other dependencies, including VueUse, remain private. Direct `@tiptap/*` or `prosemirror-*` runtime imports also remain private, but produce a compatibility warning when the provider uses `@halo-dev/richtext-editor`; authors should prefer the editor package's re-exports to avoid class-identity and version skew.
 
@@ -162,7 +162,7 @@ During the first migration phase:
 - Existing Vue, Vue Router, Pinia, Axios, and Halo UI package globals remain canonical for the host and legacy IIFE providers; generated static ESM bridges export the same functions and objects for ESM providers.
 - Halo builds one FormKit runtime graph that exposes both `@formkit/vue` and `@formkit/core` bridges while retaining the compatible `window.FormKitVue` global expected by legacy providers.
 
-Static facades are generated from the snapshot export surface and browser-tested against the actual global builds. They cannot dynamically export arbitrary properties from `window`, because ESM named exports must be statically known. A missing global or export fails the Halo UI build.
+Static facades are generated from the snapshot export surface and browser-tested against the actual global builds. The snapshot records exactly the exports supplied by those browser artifacts and does not retain synthetic package metadata exports such as `__esModule` unless the browser artifact actually exposes them. Facades cannot dynamically export arbitrary properties from `window`, because ESM named exports must be statically known. A missing global or export fails the Halo UI build.
 
 FormKit requires special treatment. Its core registry is module-instance state, so a bridge over a second FormKit copy would not provide actual sharing. Both `@formkit/vue` and `@formkit/core` are public roots. Other `@formkit/*` packages remain provider-private, but any runtime import they retain to `@formkit/core` is externalized to the host graph. Identity fixtures cover operations such as `getNode`, `submitForm`, and `reset` across host/provider boundaries.
 
@@ -174,12 +174,18 @@ Alternative considered: point Import Map entries at current npm ESM outputs. Cur
 
 The backend classifies the current started plugin set and activated theme when the authenticated provider descriptor is requested. The response contains a version derived from Halo-managed provider identity and version data, versioned legacy aggregate URLs, valid ESM descriptors, and invalid-provider diagnostics. The descriptor is revalidated rather than treated as an immutable resource snapshot.
 
-ESM entries reuse the static mappings Halo already exposes for plugin `ui` or legacy `console` resources and activated-theme `ui-plugin` resources. Each provider manifest may identify one main stylesheet. The backend concatenates those main styles with legacy provider CSS into the existing aggregate stylesheet, while asynchronous chunk CSS remains under the provider mapping and is loaded on demand by its bundler runtime. The version is appended as a query parameter to invalidate cached entry and aggregate responses without copying resources or introducing another proxy path. For example:
+ESM entries and startup styles reuse the static mappings Halo already exposes for plugin `ui` or legacy `console` resources and activated-theme `ui-plugin` resources. Each provider manifest may identify one main stylesheet, and a legacy provider may expose its existing main stylesheet. The descriptor returns those provider-owned styles in provider order so each stylesheet keeps its own URL base for relative assets. Asynchronous chunk CSS remains under the provider mapping and is loaded on demand by its bundler runtime. The version is appended as a query parameter to invalidate cached entry, style, and legacy aggregate responses without copying resources or introducing another proxy path. For example:
 
 ```json
 {
   "version": "abc123",
-  "style": "/apis/.../bundle.css?v=abc123",
+  "styles": [
+    {
+      "name": "plugin-search",
+      "type": "plugin",
+      "href": "/plugins/plugin-search/assets/ui/style.css?v=abc123"
+    }
+  ],
   "legacy": {
     "script": "/apis/.../bundle.js?v=abc123"
   },
@@ -193,18 +199,18 @@ ESM entries reuse the static mappings Halo already exposes for plugin `ui` or le
 }
 ```
 
-Plugin bundles continue preferring `ui` and falling back to `console`; the selected directory is reflected in the generated entry URL. Theme bundles use `/themes/{theme}/ui-plugin/assets/{resource}`. Query parameters do not change path resolution, and emitted asynchronous chunks continue using their provider-relative, content-hashed paths. Main CSS and any referenced assets must therefore be emitted with provider-root-safe URLs before concatenation; the aggregate service does not rewrite arbitrary CSS URLs.
+Plugin bundles continue preferring `ui` and falling back to `console`; the selected directory is reflected in generated entry and style URLs. Theme bundles use `/themes/{theme}/ui-plugin/assets/{resource}`. Query parameters do not change path resolution, and emitted asynchronous chunks continue using their provider-relative, content-hashed paths. Main CSS asset references therefore resolve relative to the direct stylesheet URL and need no backend rewriting.
 
 The version query is a cache key, not an immutable server-side snapshot. If provider files change after a descriptor is returned, a partially loaded page can observe the newer files. Provider lifecycle changes already use a full page reload as the supported replacement boundary, so the runtime reports a load failure and reload remains the recovery path. The design intentionally avoids resource copying, retained generations, and generation-specific proxy endpoints.
 
-The legacy JavaScript generated for the current descriptor includes only currently classified IIFE providers. The aggregate CSS includes legacy providers plus each valid ESM provider's optional main style, in provider order. Existing aggregate endpoints and compatibility aliases remain available and accept the same version query. Existing globals, `enabledPlugins`, `enabledUiPlugins`, plugin-name ordering, theme module naming, and `ui`-before-`console` resource selection remain compatible for legacy artifacts.
+The legacy JavaScript generated for the current descriptor includes only currently classified IIFE providers. The existing aggregate CSS endpoint and compatibility aliases remain available for Halo 2.x, but emit ordered `@import url("<direct provider style URL>")` rules instead of concatenating provider CSS under the API URL base. This compatibility bridge carries an adjacent `TODO(Halo 3)` removal comment. Existing globals, `enabledPlugins`, `enabledUiPlugins`, plugin-name ordering, theme module naming, and `ui`-before-`console` resource selection remain compatible for legacy artifacts.
 
 Public `Plugin.status` and `Theme.status` remain unchanged. Descriptor validation and errors remain internal until the diagnostic model is stable.
 
 The authenticated descriptor endpoint declares its complete response schema in
 the generated OpenAPI document. Required descriptor and provider fields remain
-required in the generated TypeScript models, while the optional aggregate
-stylesheet remains optional. Console and User Center consume the generated API
+required in the generated TypeScript models, while the ordered style list may
+remain empty. Console and User Center consume the generated API
 method and models through `@halo-dev/api-client`; they do not maintain a
 parallel hand-written descriptor contract.
 
@@ -223,7 +229,7 @@ interface UiPluginRegistration {
 }
 ```
 
-The public surface provides a reactive registration collection plus `get(name)`, `isEnabled(name)`, and `isRegistered(name)`. Record presence means that the UI provider is enabled/discovered in the current descriptor; `registered` means its current-page module commit succeeded. The store is seeded from Halo-owned descriptor metadata before legacy scripts or ESM entries are evaluated, then the loader changes `pending` to `registered` or `failed` as loading and registration settle. It applies equally to plugin and activated-theme providers in Console and User Center.
+The public surface provides a reactive registration collection plus `get(name)`, `isEnabled(name)`, and `isRegistered(name)`. Record presence means that the UI provider is enabled/discovered in the current descriptor; `registered` normally means its current-page module commit succeeded. A legacy provider with no UI module is a compatible successful no-op and also becomes registered, because backend-only providers historically contribute no global module. The store is seeded from Halo-owned descriptor metadata before legacy scripts or ESM entries are evaluated, then the loader changes `pending` to `registered` or `failed` as loading and registration settle. It applies equally to plugin and activated-theme providers in Console and User Center.
 
 This distinguishes two existing use cases:
 
@@ -241,20 +247,20 @@ The UI startup flow becomes:
 ```text
 fetch the current provider descriptor
   -> seed the shared provider-registration store as pending
-  -> load the versioned aggregate startup stylesheet once
-  -> load the versioned legacy aggregate once
-  -> import valid ESM entries in parallel with all-settled semantics
+  -> start every ordered provider stylesheet directly
+  -> start the versioned legacy aggregate and all valid ESM entries
+  -> await all startup resources with all-settled semantics
   -> prepare and validate PluginModule objects
   -> register accepted providers sequentially in descriptor order
 ```
 
 An ESM entry default-exports the existing `PluginModule` object. It does not register routes or components through top-level side effects. Providers may import host shared packages and their own chunks but may not directly import another provider.
 
-All ESM imports are started together. Halo waits for the legacy lane, aggregate stylesheet, and all entry imports to settle before validating results and registering accepted providers sequentially in descriptor order. It does not reload the page after an individual entry finishes and does not add an arbitrary request batch size, because the UI mounts only after provider setup and batching would extend the startup wait.
+All provider style loads, the legacy lane, and all ESM imports are started together. Style links are inserted in descriptor order so CSS precedence remains deterministic, while network completion order does not control registration. Halo waits for all startup resources to settle before validating results and registering accepted providers sequentially in descriptor order. It does not reload the page after an individual resource finishes and does not add an arbitrary request batch size, because the UI mounts only after provider setup and batching would extend the startup wait.
 
-Fetch, MIME, link, evaluation, and export-shape failures are associated with one provider and do not stop the core UI or other valid providers. A failure of the single aggregate startup stylesheet is reported once for provider startup rather than pretending it can be attributed to one concatenated source; delayed CSS chunk failures remain attributable through the owning asynchronous chunk. The UI presents one summary notification and retains structured provider-specific diagnostics for logs and management screens.
+Fetch, MIME, link, evaluation, export-shape, and startup-style failures are associated with one provider and do not stop the core UI or other valid providers. A failed provider startup style prevents only its owning provider from registering. Delayed CSS chunk failures remain attributable through the owning asynchronous chunk. The UI presents one summary notification and retains structured provider-specific diagnostics for logs and management screens.
 
-Registration uses a prepare/validate/commit boundary per provider. The commit records removal or restoration handles for routes, store entries, components, extensions, and other registries where supported. A synchronous commit failure invokes those handles in reverse order before the next provider is registered. Existing framework registries do not make every mutation reversible, so an incomplete rollback is diagnosed and a full page reload remains the final recovery boundary.
+Registration uses a prepare/validate/commit boundary per provider. Existing successful route conflicts retain Vue Router's last-registration-wins behavior. Before replacing a named route, Halo retains enough information to restore the previous route if a later synchronous mutation fails; when reliable restoration is impossible, registration is rejected before mutating the router. The commit records removal or restoration handles for routes, store entries, components, extensions, and other registries where supported. A synchronous commit failure invokes those handles in reverse order before the next provider is registered. Existing framework registries do not make every mutation reversible, so an incomplete rollback is diagnosed and a full page reload remains the final recovery boundary.
 
 Entry import success does not prove that every lazy route chunk can load later. Router errors and asynchronous component boundaries therefore carry provider identity, render a provider-specific failure state where possible, and leave unrelated routes/providers usable. Top-level module side effects, arbitrary timers/event listeners, and later unhandled asynchronous work cannot be transactionally undone; Halo attributes and reports failures it can observe but does not claim complete isolation.
 
@@ -264,7 +270,7 @@ Legacy aggregate behavior is kept intact rather than rewritten into per-provider
 
 The browser caches each module URL once per document, and current routes, Pinia stores, components, and FormKit registrations lack a safe general unload protocol. Installing, upgrading, enabling, disabling, or activating a provider therefore requires or prompts a full Console/User Center reload.
 
-Production entry and aggregate-style URLs receive the descriptor version query, while emitted chunks and assets use provider-relative content-hashed URLs where supported. Provider descriptor responses are not stored without revalidation. ESM execution never falls back to IIFE after import begins because top-level effects may already have run.
+Production entry, direct startup-style, and legacy aggregate URLs receive the descriptor version query, while emitted chunks and assets use provider-relative content-hashed URLs where supported. Provider descriptor responses are not stored without revalidation. ESM execution never falls back to IIFE after import begins because top-level effects may already have run.
 
 HMR across the Halo/provider boundary is not part of the runtime contract. Provider watch builds may trigger or prompt a full page reload.
 
@@ -312,11 +318,11 @@ This applies to provider module globals (`window[providerName]`), `window.enable
 - [Vite treats ESM output as a reusable library and preserves whitespace] → Build the ESM provider as a deployable browser entry with a preserved export signature, verify production minification, and leave IIFE library mode unchanged.
 - [Rsbuild debugging IDs inflate production ESM output] → Retain `named` IDs for legacy IIFE behavior but let ESM use Rspack's mode-appropriate production defaults.
 - [A provider is built for `ui` but served through the `console` fallback] → Make ESM preload, chunk, CSS, and asset URLs relative to the loaded artifact instead of hard-coding the preferred resource directory.
-- [Aggregated main CSS breaks asset URLs or eagerly loads chunk CSS] → Emit provider-root-safe asset URLs, aggregate only each manifest's optional main style, and verify asynchronous CSS remains bundler-managed.
+- [Many providers add startup requests] → Start all direct provider styles and entries together, preserve stylesheet insertion order, isolate failures by owner, and keep asynchronous CSS bundler-managed so startup is not serialized or inflated with chunk styles.
 - [User build overrides produce a manifest that lies] → Validate the final resolved build configuration and output graph; fail instead of emitting an inconsistent manifest.
 - [Provider state changes between descriptor and resource requests] → Treat full page reload as the replacement boundary, use a version query to invalidate caches, and report individual resource failures; do not claim immutable content across a concurrent upgrade.
 - [A provider treats another provider's presence as a direct module dependency] → Expose only reactive identity/version/status metadata, distinguish enabled from registered, and keep module objects and registration ordering outside the public store contract.
-- [A provider fails after partially mutating host registries] → Prepare before commit, retain reversible handles, roll back best-effort, attribute the failure, and use reload as the recovery boundary.
+- [A provider fails after replacing a named route and partially mutating host registries] → Preserve last-registration-wins on success, restore the replaced route on synchronous failure, reject un-restorable conflicts before mutation, and use reload only for genuinely non-reversible mutations.
 - [Development works while the packaged build fails, or the inverse] → Make both live 3000/8090 browser checks and unpacked/started BootJar checks release-blocking.
 - [Cross-origin development module fetches fail] → Generate serve-specific absolute URLs and test actual CORS and MIME responses from deep Console and User Center routes.
 - [Legacy bundle execution remains all-or-nothing] → Preserve it as an explicit compatibility trade-off; apply provider-level isolation only to the new ESM lane.

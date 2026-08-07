@@ -15,6 +15,7 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,6 +27,7 @@ import org.pf4j.PluginWrapper;
 import org.springframework.core.io.Resource;
 import org.springframework.util.ResourceUtils;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import run.halo.app.core.extension.Theme;
 import run.halo.app.extension.Metadata;
 import run.halo.app.infra.ThemeRootGetter;
@@ -77,8 +79,16 @@ class UiPluginBundleServiceImplTest {
                 .containsExactly("legacy-plugin", "theme:active");
         assertThat(descriptor.legacy().script())
                 .isEqualTo("/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.js?v=" + descriptor.version());
-        assertThat(descriptor.style())
-                .isEqualTo("/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.css?v=" + descriptor.version());
+        assertThat(descriptor.styles())
+                .containsExactly(
+                        new UiPluginProviderDescriptor.Style(
+                                "legacy-plugin",
+                                "plugin",
+                                "/plugins/legacy-plugin/assets/ui/style.css?v=" + descriptor.version()),
+                        new UiPluginProviderDescriptor.Style(
+                                "theme:active",
+                                "theme",
+                                "/themes/active/ui-plugin/assets/style.css?v=" + descriptor.version()));
 
         assertThat(read(service.getJsBundle(descriptor.version()).block()))
                 .contains("console.log(\"ui\");")
@@ -91,8 +101,10 @@ class UiPluginBundleServiceImplTest {
                         "{\"name\":\"theme:active\",\"type\":\"theme\",\"themeName\":\"active\",\"version\":\"2.0.0\"}")
                 .contains("this.enabledPlugins = [{\"name\":\"legacy-plugin\",\"version\":\"1.0.0\"}]");
         assertThat(read(service.getCssBundle(descriptor.version()).block()))
-                .contains(".ui")
-                .contains(".legacy-theme");
+                .isEqualTo("@import url(\"/plugins/legacy-plugin/assets/ui/style.css?v=%s\");\n"
+                                .formatted(descriptor.version())
+                        + "@import url(\"/themes/active/ui-plugin/assets/style.css?v=%s\");\n"
+                                .formatted(descriptor.version()));
     }
 
     @Test
@@ -129,9 +141,21 @@ class UiPluginBundleServiceImplTest {
                         "/plugins/console-plugin/assets/console/main.js?v=" + descriptor.version(),
                         "/plugins/ui-plugin/assets/ui/main.js?v=" + descriptor.version(),
                         "/themes/active/ui-plugin/assets/chunks/main.js?v=" + descriptor.version());
-        assertThat(descriptor.style())
-                .isEqualTo("/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.css?v=" + descriptor.version());
-        assertThat(read(service.getCssBundle(descriptor.version()).block())).containsSubsequence(".ui {}", ".theme {}");
+        assertThat(descriptor.styles())
+                .containsExactly(
+                        new UiPluginProviderDescriptor.Style(
+                                "ui-plugin",
+                                "plugin",
+                                "/plugins/ui-plugin/assets/ui/styles/main.css?v=" + descriptor.version()),
+                        new UiPluginProviderDescriptor.Style(
+                                "theme:active",
+                                "theme",
+                                "/themes/active/ui-plugin/assets/styles/theme.css?v=" + descriptor.version()));
+        assertThat(read(service.getCssBundle(descriptor.version()).block()))
+                .isEqualTo("@import url(\"/plugins/ui-plugin/assets/ui/styles/main.css?v=%s\");\n"
+                                .formatted(descriptor.version())
+                        + "@import url(\"/themes/active/ui-plugin/assets/styles/theme.css?v=%s\");\n"
+                                .formatted(descriptor.version()));
         assertThat(read(service.getJsBundle(descriptor.version()).block()))
                 .doesNotContain("export default")
                 .contains("this.enabledUiPlugins = [];this.enabledPlugins = []");
@@ -189,8 +213,30 @@ class UiPluginBundleServiceImplTest {
         assertThat(descriptor).isNotNull();
         assertThat(read(service.getJsBundle(descriptor.version()).block())).doesNotContain("theme:active", "inactive");
         assertThat(read(service.getCssBundle(descriptor.version()).block()))
-                .contains(".active {}")
-                .doesNotContain("inactive");
+                .isEqualTo("@import url(\"/themes/active/ui-plugin/assets/style.css?v=%s\");\n"
+                        .formatted(descriptor.version()));
+    }
+
+    @Test
+    void shouldClassifyThemeResourcesOnBoundedElastic() throws Exception {
+        var activeTheme = prepareActiveTheme("active", "1.0.0");
+        writeThemeUiFile("active", "ui-plugin.json", "{\"format\":\"esm\",\"entry\":\"./main.js\"}");
+        writeThemeUiFile("active", "main.js", "export default {};");
+        var lookupThread = new AtomicReference<String>();
+        when(themeRoot.get()).thenAnswer(invocation -> {
+            lookupThread.set(Thread.currentThread().getName());
+            return tempDir.resolve("themes");
+        });
+        var themeScheduler = Schedulers.newSingle("theme-source");
+        when(themeService.fetchActivatedTheme())
+                .thenReturn(Mono.just(activeTheme).publishOn(themeScheduler));
+
+        try {
+            assertThat(service.getProviderDescriptor().block()).isNotNull();
+            assertThat(lookupThread.get()).startsWith("boundedElastic-");
+        } finally {
+            themeScheduler.dispose();
+        }
     }
 
     private PluginWrapper mockPlugin(String pluginId, Map<String, String> files) throws IOException {

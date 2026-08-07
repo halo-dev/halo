@@ -7517,6 +7517,7 @@
           "legacy",
           "providers",
           "registrations",
+          "styles",
           "version"
         ],
         "type": "object",
@@ -7542,8 +7543,11 @@
               "$ref": "#/components/schemas/UiPluginProviderRegistration"
             }
           },
-          "style": {
-            "type": "string"
+          "styles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UiPluginProviderStyle"
+            }
           },
           "version": {
             "type": "string"
@@ -7571,6 +7575,29 @@
           },
           "version": {
             "type": "string"
+          }
+        }
+      },
+      "UiPluginProviderStyle": {
+        "required": [
+          "href",
+          "name",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "plugin",
+              "theme"
+            ]
           }
         }
       },

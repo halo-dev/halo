@@ -137,6 +137,13 @@ The bundler SHALL validate a provider project's actually resolved shared depende
 - **THEN** the bundler SHALL use the latest eligible older snapshot
 - **THEN** it SHALL warn that newly introduced target exports require a bundler update
 
+#### Scenario: Prerelease target reuses a snapshot
+
+- **WHEN** the selected target is a prerelease whose stable core version has an exact snapshot
+- **THEN** the bundler SHALL reuse that same-core snapshot without describing it as an older release
+- **WHEN** the prerelease stable core version is newer than the selected snapshot baseline
+- **THEN** the bundler SHALL warn that the older eligible snapshot is being reused
+
 #### Scenario: No eligible ESM snapshot exists
 
 - **WHEN** the installed bundler contains no snapshot whose baseline is compatible with the selected ESM target
@@ -194,7 +201,13 @@ The bundler SHALL validate a provider project's actually resolved shared depende
 #### Scenario: Provider imports a non-shared dependency
 
 - **WHEN** an ESM provider imports VueUse or another dependency not listed in the target Halo snapshot
-- **THEN** the bundler SHALL include that dependency in the provider output unless the provider explicitly configures another supported non-Halo delivery mechanism
+- **THEN** the bundler SHALL include that dependency in the provider output
+
+#### Scenario: Caller externalizes a non-shared dependency
+
+- **WHEN** caller Vite or Rsbuild configuration externalizes a dependency that is not a Halo shared root
+- **THEN** the ESM build SHALL fail with a diagnostic that identifies the unsupported external
+- **THEN** the build SHALL NOT emit a manifest containing a browser-unresolvable bare import
 
 #### Scenario: Provider imports editor internals directly
 
@@ -297,3 +310,8 @@ Vite and Rsbuild provider helpers SHALL implement the same externally observable
 
 - **WHEN** a Vite or Rsbuild-specific override would bypass dependency validation or change the final output contract
 - **THEN** that helper SHALL fail the build instead of emitting a misleading provider manifest
+
+#### Scenario: Rsbuild override changes the ESM output contract
+
+- **WHEN** caller Rsbuild configuration conflicts with module output, IIFE mode, module chunk format or loading, the required entry filename, or Halo-controlled externals
+- **THEN** the helper SHALL fail before compilation with an actionable diagnostic
