@@ -13,20 +13,40 @@ type LibraryTarget = Omit<Target, "rename" | "src"> & {
   rename: string;
 };
 
+interface HostRuntimeSnapshotEntry {
+  exports: string[];
+  runtime: {
+    bridge: string;
+    global: string;
+  };
+}
+
+interface HostRuntimeSnapshot {
+  packages: Record<string, HostRuntimeSnapshotEntry>;
+}
+
+const ESM_RUNTIME_PUBLIC_PATH = "/ui-assets/esm-runtime";
+
 /**
  * It copies the external libraries to the `assets` folder, and injects the script tags into the HTML
  *
  * @param {string} command
  * @returns An array of plugins
  */
-export const setupLibraryExternal = (command?: string) => {
+export const setupLibraryExternal = (
+  command?: string,
+  devServerPort = 3000
+) => {
   // test command doesn't need to setup library external.
   if (command === "test") {
     return [];
   }
 
   const isProduction = command === "build";
+  const hostRuntimeSnapshot = readHostRuntimeSnapshot();
+  const runtimeBridges = createRuntimeBridges(hostRuntimeSnapshot);
 
+  // TODO(Halo 3): Remove after legacy IIFE UI provider support ends.
   const libraryTargets: LibraryTarget[] = [
     {
       src: `./node_modules/vue/dist/vue.global${
@@ -92,12 +112,7 @@ export const setupLibraryExternal = (command?: string) => {
       dest: "ui-shared",
       rename: `ui-shared.[hash].js`,
     },
-    {
-      src: "./node_modules/@formkit/vue/dist/index.iife.js",
-      dest: "formkit-vue",
-      rename: `formkit-vue.[hash].js`,
-    },
-    // TODO: Remove this in the future, only for compatibility.
+    // TODO(Halo 3): Remove after legacy IIFE UI provider support ends.
     {
       src: "./node_modules/@halo-dev/console-shared/index.js",
       dest: "console-shared",
@@ -157,9 +172,191 @@ export const setupLibraryExternal = (command?: string) => {
         },
       })),
     }),
+    createEsmRuntimePlugin(runtimeBridges, isProduction, devServerPort),
     createInjectExternalTagsPlugin(injectTags),
   ];
 };
+
+export function createGlobalBridgeSource(entry: HostRuntimeSnapshotEntry) {
+  const runtime = "__haloSharedRuntime";
+  const namedExports = entry.exports.filter(
+    (exportName) => exportName !== "default"
+  );
+  const staticExports = entry.exports
+    .filter((exportName) => exportName !== "default")
+    .map(
+      (exportName) =>
+        `export const ${exportName} = ${runtime}[${JSON.stringify(exportName)}];`
+    );
+  const defaultExport = entry.exports.includes("default")
+    ? [`export default ${runtime}.default ?? ${runtime};`]
+    : [];
+  return [
+    "// TODO(Halo 3): Remove after legacy IIFE UI provider support ends.",
+    `const ${runtime} = globalThis[${JSON.stringify(entry.runtime.global)}];`,
+    `if (!${runtime}) throw new Error(${JSON.stringify(`Halo shared runtime global ${entry.runtime.global} is unavailable.`)});`,
+    `const __haloMissingExports = ${JSON.stringify(namedExports)}.filter((name) => !(name in ${runtime}));`,
+    `if (__haloMissingExports.length) throw new Error(${JSON.stringify(`Halo shared runtime global ${entry.runtime.global} is missing export(s): `)} + __haloMissingExports.join(", "));`,
+    ...staticExports,
+    ...defaultExport,
+    "",
+  ].join("\n");
+}
+
+function readHostRuntimeSnapshot() {
+  const bundlerKitRoot = path.resolve(
+    import.meta.dirname,
+    "../../packages/ui-plugin-bundler-kit"
+  );
+  const packageJson = JSON.parse(
+    fs.readFileSync(path.join(bundlerKitRoot, "package.json"), "utf8")
+  ) as { version: string };
+  const snapshotsDir = path.join(bundlerKitRoot, "src/runtime-snapshots");
+  const snapshotFile = selectHostRuntimeSnapshotFile(
+    packageJson.version,
+    fs.readdirSync(snapshotsDir)
+  );
+  const snapshotPath = path.join(snapshotsDir, snapshotFile);
+  return JSON.parse(
+    fs.readFileSync(snapshotPath, "utf8")
+  ) as HostRuntimeSnapshot;
+}
+
+export function selectHostRuntimeSnapshotFile(
+  targetVersion: string,
+  files: readonly string[]
+) {
+  const target = parseVersionCore(targetVersion);
+  if (!target) {
+    throw new Error(`Invalid Halo UI version: ${targetVersion}.`);
+  }
+  const selected = files
+    .map((file) => ({
+      file,
+      version: parseSnapshotFileVersion(file),
+    }))
+    .filter(
+      (
+        candidate
+      ): candidate is { file: string; version: [number, number, number] } =>
+        candidate.version !== undefined &&
+        compareVersionCore(candidate.version, target) <= 0
+    )
+    .sort((left, right) => compareVersionCore(right.version, left.version))[0];
+  if (!selected) {
+    throw new Error(
+      `No host runtime snapshot is available for Halo UI ${targetVersion}.`
+    );
+  }
+  return selected.file;
+}
+
+function parseSnapshotFileVersion(file: string) {
+  const match = /^halo-(\d+)\.(\d+)\.(\d+)\.json$/.exec(file);
+  return match
+    ? ([Number(match[1]), Number(match[2]), Number(match[3])] as const)
+    : undefined;
+}
+
+function parseVersionCore(version: string) {
+  const match = /^(\d+)\.(\d+)\.(\d+)(?:-|$)/.exec(version);
+  return match
+    ? ([Number(match[1]), Number(match[2]), Number(match[3])] as const)
+    : undefined;
+}
+
+function compareVersionCore(
+  left: readonly [number, number, number],
+  right: readonly [number, number, number]
+) {
+  for (let index = 0; index < left.length; index++) {
+    const difference = left[index] - right[index];
+    if (difference !== 0) {
+      return difference;
+    }
+  }
+  return 0;
+}
+
+function createRuntimeBridges(snapshot: HostRuntimeSnapshot) {
+  return Object.fromEntries(
+    Object.entries(snapshot.packages).map(([specifier, entry]) => {
+      const source = createGlobalBridgeSource(entry);
+      const hash = crypto
+        .createHash("sha256")
+        .update(source)
+        .digest("hex")
+        .slice(0, 8);
+      return [
+        specifier,
+        {
+          fileName: `${entry.runtime.bridge}.${hash}.mjs`,
+          source,
+        },
+      ];
+    })
+  );
+}
+
+function createEsmRuntimePlugin(
+  bridges: Record<string, { fileName: string; source: string }>,
+  isProduction: boolean,
+  devServerPort: number
+): Plugin {
+  const importMap = {
+    imports: Object.fromEntries(
+      Object.entries(bridges).map(([specifier, bridge]) => [
+        specifier,
+        `${isProduction ? "" : `http://localhost:${devServerPort}`}${ESM_RUNTIME_PUBLIC_PATH}/${bridge.fileName}`,
+      ])
+    ),
+  };
+  return {
+    name: "halo:esm-shared-runtime",
+    enforce: "pre",
+    buildStart() {
+      if (isProduction) {
+        for (const bridge of Object.values(bridges)) {
+          this.emitFile({
+            type: "asset",
+            fileName: `ui-assets/esm-runtime/${bridge.fileName}`,
+            source: bridge.source,
+          });
+        }
+      }
+    },
+    configureServer(server) {
+      server.middlewares.use((request, response, next) => {
+        const requestPath = request.url?.split("?", 1)[0];
+        const bridge = Object.values(bridges).find(
+          (candidate) =>
+            `${ESM_RUNTIME_PUBLIC_PATH}/${candidate.fileName}` === requestPath
+        );
+        if (!bridge) {
+          next();
+          return;
+        }
+        response.statusCode = 200;
+        response.setHeader("Content-Type", "text/javascript; charset=utf-8");
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.end(bridge.source);
+      });
+    },
+    transformIndexHtml: {
+      order: "pre",
+      handler() {
+        return [
+          {
+            tag: "script",
+            attrs: { type: "importmap" },
+            children: JSON.stringify(importMap),
+            injectTo: "head-prepend",
+          },
+        ];
+      },
+    },
+  };
+}
 
 function createInjectExternalTagsPlugin(tags: HtmlTagDescriptor[]): Plugin {
   return {

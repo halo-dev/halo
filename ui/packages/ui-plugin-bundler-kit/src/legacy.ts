@@ -58,6 +58,7 @@ export function HaloUIPluginBundlerKit(
           rollupOptions: {
             external: EXTERNALS,
             output: {
+              // TODO(Halo 3): Remove after legacy IIFE UI provider support ends.
               globals: GLOBALS,
               extend: true,
             },

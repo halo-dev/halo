@@ -1,6 +1,6 @@
 {
   "name": "@halo-dev/ui-plugin-bundler-kit",
-  "version": "2.25.2",
+  "version": "2.26.0",
   "homepage": "https://github.com/halo-dev/halo/tree/main/ui/packages/ui-plugin-bundler-kit#readme",
   "bugs": {
     "url": "https://github.com/halo-dev/halo/issues"
@@ -21,15 +21,23 @@
   "scripts": {
     "build": "vp pack",
     "dev": "vp pack --watch",
+    "snapshot:check": "node scripts/generate-runtime-snapshot.mjs --check",
+    "snapshot:generate": "node scripts/generate-runtime-snapshot.mjs",
     "test:unit": "vp test --run",
+    "typecheck": "tsc --noEmit",
     "prepublishOnly": "vp run build"
   },
   "dependencies": {
     "@halo-dev/api-client": "workspace:*",
+    "es-module-lexer": "^2.1.0",
+    "exsolve": "^1.0.8",
     "js-yaml": "^4.1.1",
+    "pkg-types": "^2.3.1",
     "semver": "^7.7.4"
   },
   "devDependencies": {
+    "@rsbuild/core": "^2.1.10",
+    "@rsbuild/plugin-vue": "^2.0.1",
     "@types/js-yaml": "^4.0.9",
     "@types/semver": "^7.7.1"
   },

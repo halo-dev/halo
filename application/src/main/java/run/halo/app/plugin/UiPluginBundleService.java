@@ -17,4 +17,6 @@ public interface UiPluginBundleService {
     Mono<Resource> getJsBundle(String version);
 
     Mono<Resource> getCssBundle(String version);
+
+    Mono<UiPluginProviderDescriptor> getProviderDescriptor();
 }

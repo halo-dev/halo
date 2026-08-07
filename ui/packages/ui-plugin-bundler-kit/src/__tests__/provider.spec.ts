@@ -21,6 +21,78 @@ afterEach(() => {
 });
 
 describe("provider defaults", () => {
+  it("selects equivalent ESM defaults for Vite and Rsbuild", () => {
+    const uiDir = setupPluginProject(">=2.26.0");
+    process.chdir(uiDir);
+
+    const vite = resolveViteConfig(viteConfig({ vite: {} }));
+    expect(vite.base).toBe("./");
+    expect(vite.build?.lib).toBeUndefined();
+    expect(vite.build?.rollupOptions).toMatchObject({
+      input: "src/index.ts",
+      preserveEntrySignatures: "allow-extension",
+      output: {
+        format: "es",
+        entryFileNames: "main.[hash].js",
+        chunkFileNames: "chunks/[name].[hash].js",
+      },
+    });
+    expect(vite.build?.rollupOptions?.output).toMatchObject({
+      chunkFileNames: "chunks/[name].[hash].js",
+    });
+
+    const rsbuild = resolveRsbuildConfig(rsbuildConfig({ rsbuild: {} }));
+    expect(rsbuild.tools?.rspack?.output).toMatchObject({
+      library: { type: "module" },
+      module: true,
+      iife: false,
+      publicPath: "auto",
+    });
+    expect(rsbuild.tools?.rspack?.externalsType).toBe("module");
+    expect(rsbuild.tools?.rspack?.optimization?.moduleIds).toBeUndefined();
+    expect(rsbuild.output?.assetPrefix).toBe("auto");
+    const jsFilename = rsbuild.output?.filename?.js;
+    const cssFilename = rsbuild.output?.filename?.css;
+    expect(typeof jsFilename).toBe("function");
+    expect(typeof cssFilename).toBe("function");
+    if (typeof jsFilename === "function" && typeof cssFilename === "function") {
+      expect(jsFilename({ chunk: { name: "main" } })).toBe(
+        "main.[contenthash:8].js"
+      );
+      expect(cssFilename({ chunk: { name: "main" } })).toBe(
+        "style.[contenthash:8].css"
+      );
+    }
+  });
+
+  it("uses targetHaloVersion for explicit ESM without a simple requirement", () => {
+    const uiDir = setupPluginProject("*");
+    process.chdir(uiDir);
+
+    const vite = resolveViteConfig(
+      viteConfig({
+        format: "esm",
+        targetHaloVersion: "2.26.0-beta.1",
+        vite: {},
+      })
+    );
+
+    expect(vite.build?.lib).toBeUndefined();
+    expect(vite.build?.rollupOptions).toMatchObject({
+      input: "src/index.ts",
+      preserveEntrySignatures: "allow-extension",
+    });
+  });
+
+  it("keeps explicit IIFE for a modern requirement", () => {
+    const uiDir = setupPluginProject(">=3.0.0");
+    process.chdir(uiDir);
+
+    const vite = resolveViteConfig(viteConfig({ format: "iife", vite: {} }));
+
+    expect(vite.build?.lib).toMatchObject({ formats: ["iife"] });
+  });
+
   it("keeps plugin provider defaults when provider is omitted", () => {
     const uiDir = setupPluginProject();
     process.chdir(uiDir);
@@ -48,6 +120,7 @@ describe("provider defaults", () => {
       export: "default",
       name: "fake-plugin",
     });
+    expect(rsbuild.tools?.rspack?.optimization?.moduleIds).toBe("named");
 
     const productionVite = resolveViteConfig(viteConfig({ vite: {} }));
     expect(productionVite.build?.outDir).toBe("./build/dist");
@@ -246,7 +319,7 @@ describe("provider defaults", () => {
   });
 });
 
-function setupPluginProject() {
+function setupPluginProject(requires = ">=2.25.0") {
   const projectRoot = createTempDir();
   const uiDir = path.join(projectRoot, "ui");
   fs.mkdirSync(path.join(projectRoot, "src/main/resources"), {
@@ -259,7 +332,7 @@ function setupPluginProject() {
       "metadata:",
       "  name: fake-plugin",
       "spec:",
-      "  requires: '>=2.25.0'",
+      `  requires: '${requires}'`,
       "",
     ].join("\n")
   );

@@ -1,4 +1,4 @@
-import Vue from "@vitejs/plugin-vue";
+import Vue, { type Options as VuePluginOptions } from "@vitejs/plugin-vue";
 import {
   defineConfig,
   mergeConfig,
@@ -16,13 +16,21 @@ import {
   DEFAULT_THEME_MANIFEST_PATH,
 } from "./constants/halo-plugin";
 import {
+  selectHaloHostRuntimeSnapshot,
+  SHARED_PACKAGE_ROOTS,
+} from "./runtime-snapshot";
+import {
   getHaloPluginBundleLocation,
   getHaloPluginManifest,
   getHaloThemeAssetPublicPath,
   getHaloThemeManifest,
   getHaloThemeModuleName,
   getManifestName,
+  getManifestRequires,
+  ProviderFormat,
+  selectProviderFormat,
 } from "./utils/halo-plugin";
+import { createViteEsmProviderPlugin } from "./vite-esm";
 
 type Provider = "plugin" | "theme";
 
@@ -42,42 +50,106 @@ export interface ViteUserConfig {
   manifestPath?: string;
 
   /**
+   * Provider output format.
+   *
+   * @default "auto"
+   */
+  format?: ProviderFormat;
+
+  /** Explicit Halo target used when ESM cannot be derived from spec.requires. */
+  targetHaloVersion?: string;
+
+  /** Options for the built-in Vue plugin. */
+  vue?: VuePluginOptions;
+
+  /**
    * Custom Vite config.
    */
   vite: UserConfig | UserConfigFnObject;
 }
 
-function createVitePresetsConfig(provider: Provider, manifestPath: string) {
+function createVitePresetsConfig(
+  provider: Provider,
+  manifestPath: string,
+  requestedFormat?: ProviderFormat,
+  targetHaloVersion?: string,
+  vueOptions?: VuePluginOptions
+) {
   const defaults =
     provider === "theme"
       ? getThemeProviderDefaults(manifestPath)
       : getPluginProviderDefaults(manifestPath);
+  const selection = selectProviderFormat({
+    format: requestedFormat,
+    requires: defaults.requires,
+    targetHaloVersion,
+  });
+  reportFormatSelection(selection);
+  const selectedSnapshot =
+    selection.format === "esm"
+      ? selectHaloHostRuntimeSnapshot(selection.targetHaloVersion as string)
+      : undefined;
+  if (selectedSnapshot?.reusedOlderSnapshot) {
+    console.warn(
+      `[ui-plugin-bundler-kit] Halo ${selection.targetHaloVersion} is newer than bundled host runtime snapshots; reusing ${selectedSnapshot.snapshot.haloVersion}. Update the bundler kit for the target Halo dependency baseline.`
+    );
+  }
 
   return defineConfig(({ mode }) => {
     const isProduction = mode === "production";
 
     return {
       mode: mode || "production",
-      base: defaults.base,
-      plugins: [Vue()],
+      base: selection.format === "esm" ? "./" : defaults.legacyBase,
+      plugins: [
+        Vue(vueOptions),
+        ...(selectedSnapshot
+          ? [
+              createViteEsmProviderPlugin({
+                snapshot: selectedSnapshot.snapshot,
+                providerRoot: process.cwd(),
+              }),
+            ]
+          : []),
+      ],
       define: { "process.env.NODE_ENV": "'production'" },
       build: {
         outDir: isProduction ? defaults.outDir.prod : defaults.outDir.dev,
         emptyOutDir: true,
-        lib: {
-          entry: "src/index.ts",
-          name: defaults.moduleName,
-          formats: ["iife"],
-          fileName: () => "main.js",
-          cssFileName: "style",
-        },
-        rollupOptions: {
-          external: EXTERNALS,
-          output: {
-            globals: GLOBALS,
-            extend: true,
-          },
-        },
+        ...(selection.format === "iife"
+          ? {
+              lib: {
+                entry: "src/index.ts",
+                name: defaults.moduleName,
+                formats: ["iife"],
+                fileName: () => "main.js",
+                cssFileName: "style",
+              },
+              rollupOptions: {
+                external: EXTERNALS,
+                output: {
+                  // TODO(Halo 3): Remove after legacy IIFE UI provider support ends.
+                  globals: GLOBALS,
+                  extend: true,
+                },
+              },
+            }
+          : {
+              cssCodeSplit: true,
+              // Vite 8 keeps this as a rolldownOptions alias; use the shared name
+              // while the bundler kit also supports Vite 6 and 7.
+              rollupOptions: {
+                external: [...SHARED_PACKAGE_ROOTS],
+                input: "src/index.ts",
+                preserveEntrySignatures: "allow-extension",
+                output: {
+                  format: "es",
+                  entryFileNames: "main.[hash].js",
+                  chunkFileNames: "chunks/[name].[hash].js",
+                  assetFileNames: "assets/[name].[hash][extname]",
+                },
+              },
+            }),
       },
     };
   });
@@ -93,7 +165,8 @@ function getPluginProviderDefaults(manifestPath: string) {
       prod: DEFAULT_OUT_DIR_PROD,
       dev: getDefaultOutDirDev(bundleLocation),
     },
-    base: undefined,
+    legacyBase: undefined,
+    requires: getManifestRequires(manifest),
   };
 }
 
@@ -106,7 +179,8 @@ function getThemeProviderDefaults(manifestPath: string) {
       prod: DEFAULT_THEME_OUT_DIR,
       dev: DEFAULT_THEME_OUT_DIR,
     },
-    base: getHaloThemeAssetPublicPath(manifest),
+    legacyBase: getHaloThemeAssetPublicPath(manifest),
+    requires: getManifestRequires(manifest),
   };
 }
 
@@ -141,7 +215,10 @@ export function viteConfig(config?: ViteUserConfig) {
   const provider = getProvider(config);
   const presetsConfigFn = createVitePresetsConfig(
     provider,
-    getManifestPath(provider, config)
+    getManifestPath(provider, config),
+    config?.format,
+    config?.targetHaloVersion,
+    config?.vue
   );
   return defineConfig((env) => {
     const presetsConfig = presetsConfigFn(env);
@@ -151,4 +228,16 @@ export function viteConfig(config?: ViteUserConfig) {
         : config?.vite || {};
     return mergeConfig(presetsConfig, userConfig);
   });
+}
+
+function reportFormatSelection(
+  selection: ReturnType<typeof selectProviderFormat>
+) {
+  for (const warning of selection.warnings) {
+    console.warn(`[ui-plugin-bundler-kit] ${warning}`);
+  }
+  const reason = selection.reason.replace("-", " ");
+  console.info(
+    `[ui-plugin-bundler-kit] Output: ${selection.format.toUpperCase()} (${reason}${selection.targetHaloVersion ? `; target Halo ${selection.targetHaloVersion}` : ""}).`
+  );
 }

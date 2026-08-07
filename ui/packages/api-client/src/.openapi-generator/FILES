@@ -329,6 +329,8 @@ models/totp-request.ts
 models/two-factor-auth-settings.ts
 models/uc-upload-from-url-request.ts
 models/uc-user-vo.ts
+models/ui-plugin-provider-descriptor.ts
+models/ui-plugin-provider.ts
 models/upgrade-from-uri-request.ts
 models/upload-from-url-request.ts
 models/user-connection-list.ts

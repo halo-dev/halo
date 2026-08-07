@@ -2903,6 +2903,27 @@
         ]
       }
     },
+    "/apis/api.console.halo.run/v1alpha1/ui-plugins/-/providers": {
+      "get": {
+        "description": "Fetch the currently enabled UI provider descriptor.",
+        "operationId": "fetchUiPluginProviders",
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UiPluginProviderDescriptor"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "UiPluginV1alpha1Console"
+        ]
+      }
+    },
     "/apis/api.console.halo.run/v1alpha1/users": {
       "get": {
         "description": "List users",
@@ -7424,6 +7445,71 @@
           }
         },
         "description": "Observed theme lifecycle and installation state."
+      },
+      "UiPluginProvider": {
+        "required": [
+          "kind",
+          "name",
+          "type",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "entry": {
+            "type": "string",
+            "description": "ESM entry URL, required for ESM providers."
+          },
+          "kind": {
+            "type": "string",
+            "description": "Provider classification and loading mode.",
+            "enum": [
+              "legacy",
+              "esm",
+              "invalid"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string",
+            "description": "Discovery failure reason, required for invalid providers."
+          },
+          "style": {
+            "type": "string",
+            "description": "Optional startup stylesheet URL."
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "plugin",
+              "theme"
+            ]
+          },
+          "version": {
+            "type": "string"
+          }
+        },
+        "description": "One ordered UI provider classification."
+      },
+      "UiPluginProviderDescriptor": {
+        "required": [
+          "providers"
+        ],
+        "type": "object",
+        "properties": {
+          "legacyScript": {
+            "type": "string",
+            "description": "Legacy aggregate script URL, present when a legacy provider exists."
+          },
+          "providers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UiPluginProvider"
+            }
+          }
+        },
+        "description": "Browser descriptor for the currently enabled plugin and theme UI providers."
       },
       "UpgradeFromUriRequest": {
         "required": [

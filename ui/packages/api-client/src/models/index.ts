@@ -237,6 +237,8 @@ export * from './totp-request';
 export * from './two-factor-auth-settings';
 export * from './uc-upload-from-url-request';
 export * from './uc-user-vo';
+export * from './ui-plugin-provider';
+export * from './ui-plugin-provider-descriptor';
 export * from './upgrade-from-uri-request';
 export * from './upload-from-url-request';
 export * from './user';

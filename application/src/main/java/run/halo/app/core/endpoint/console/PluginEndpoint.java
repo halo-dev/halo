@@ -272,6 +272,7 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
                                         .required(true)
                                         .implementation(String.class))
                                 .response(responseBuilder().implementation(Object.class)))
+                // TODO(Halo 3): Remove after legacy IIFE UI provider support ends.
                 .GET(
                         "plugins/-/bundle.js",
                         this::fetchJsBundle,

@@ -61,10 +61,11 @@ public final class ThemeUiResources {
         Assert.hasText(themeName, THEME_NAME_REQUIRED);
         Assert.hasText(resourceName, "Resource name must not be blank");
 
-        var builder = UriComponentsBuilder.fromPath("/themes/{themeName}/ui-plugin/assets/{resourceName}");
+        var builder = UriComponentsBuilder.fromPath("/themes/{themeName}/ui-plugin/assets/")
+                .path(resourceName);
         if (StringUtils.hasText(version)) {
             builder.queryParam("v", version);
         }
-        return builder.buildAndExpand(themeName, resourceName).encode().toUriString();
+        return builder.buildAndExpand(themeName).encode().toUriString();
     }
 }

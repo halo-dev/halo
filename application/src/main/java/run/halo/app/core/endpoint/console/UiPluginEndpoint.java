@@ -21,6 +21,7 @@ import org.springframework.web.reactive.resource.NoResourceFoundException;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.plugin.UiPluginBundleService;
+import run.halo.app.plugin.UiPluginProviderDescriptor;
 
 @Component
 public class UiPluginEndpoint implements CustomEndpoint, InitializingBean {
@@ -43,6 +44,14 @@ public class UiPluginEndpoint implements CustomEndpoint, InitializingBean {
         var tag = "UiPluginV1alpha1Console";
         return SpringdocRouteBuilder.route()
                 .GET(
+                        "ui-plugins/-/providers",
+                        this::fetchProviders,
+                        builder -> builder.operationId("fetchUiPluginProviders")
+                                .description("Fetch the currently enabled UI provider descriptor.")
+                                .tag(tag)
+                                .response(responseBuilder().implementation(UiPluginProviderDescriptor.class)))
+                // TODO(Halo 3): Remove after legacy IIFE UI provider support ends.
+                .GET(
                         "ui-plugins/-/bundle.js",
                         this::fetchJsBundle,
                         builder -> builder.operationId("fetchUiPluginJsBundle")
@@ -57,6 +66,15 @@ public class UiPluginEndpoint implements CustomEndpoint, InitializingBean {
                                 .tag(tag)
                                 .response(responseBuilder().implementation(String.class)))
                 .build();
+    }
+
+    private Mono<ServerResponse> fetchProviders(ServerRequest request) {
+        return uiPluginBundleService
+                .getProviderDescriptor()
+                .flatMap(descriptor -> ServerResponse.ok()
+                        .cacheControl(CacheControl.noStore())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(descriptor));
     }
 
     @Override
@@ -88,7 +106,8 @@ public class UiPluginEndpoint implements CustomEndpoint, InitializingBean {
         return request.queryParam("v")
                 .map(version -> bundleGetter
                         .apply(version)
-                        .flatMap(resource -> bundleResponse(request, resource, filename, mediaType)))
+                        .flatMap(resource -> bundleResponse(request, resource, filename, mediaType))
+                        .switchIfEmpty(Mono.error(new NoResourceFoundException(request.uri(), filename))))
                 .orElseGet(() -> uiPluginBundleService
                         .generateBundleVersion()
                         .flatMap(version -> ServerResponse.temporaryRedirect(buildBundleUri(type, version))
@@ -113,6 +132,7 @@ public class UiPluginEndpoint implements CustomEndpoint, InitializingBean {
     }
 
     URI buildBundleUri(String type, String version) {
+        // TODO(Halo 3): Remove after legacy IIFE UI provider support ends.
         return URI.create("/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle." + type + "?v=" + version);
     }
 }
