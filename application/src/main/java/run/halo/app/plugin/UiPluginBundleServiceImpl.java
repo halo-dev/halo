@@ -294,7 +294,7 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
                         candidate.type(),
                         candidate.version(),
                         "esm",
-                        providerUrl(cacheKey, provider, provider.manifest().entry()),
+                        providerUrl(provider, provider.manifest().entry()),
                         providerStyle(provider, cacheKey).orElse(null),
                         null);
             case INVALID ->
@@ -332,7 +332,19 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
         if (resourcePath == null) {
             return Optional.empty();
         }
+        if (provider.kind() == ProviderKind.ESM) {
+            return Optional.of(providerUrl(provider, resourcePath));
+        }
         return Optional.of(providerUrl(cacheKey, provider, resourcePath));
+    }
+
+    private static String providerUrl(ClassifiedProvider provider, String resourcePath) {
+        var candidate = provider.candidate();
+        if (PLUGIN_TYPE.equals(candidate.type())) {
+            return BundleResourceUtils.buildAssetUrl(
+                    candidate.resourceName(), candidate.bundleLocation(), resourcePath, null);
+        }
+        return ThemeUiResources.buildAssetUrl(candidate.resourceName(), resourcePath, null);
     }
 
     private static String providerUrl(String cacheKey, ClassifiedProvider provider, String resourcePath) {

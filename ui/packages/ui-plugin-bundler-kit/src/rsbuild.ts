@@ -190,13 +190,17 @@ function createRsbuildPresetsConfig(
         filename: {
           css: (pathData) => {
             if (pathData.chunk?.name === "main") {
-              return "style.css";
+              return selection.format === "esm"
+                ? "style.[contenthash:8].css"
+                : "style.css";
             }
             return "[name].[contenthash:8].css";
           },
           js: (pathData) => {
             if (pathData.chunk?.name === "main") {
-              return "main.js";
+              return selection.format === "esm"
+                ? "main.[contenthash:8].js"
+                : "main.js";
             }
             return "[name].[contenthash:8].js";
           },

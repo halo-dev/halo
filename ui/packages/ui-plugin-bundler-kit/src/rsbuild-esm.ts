@@ -43,14 +43,25 @@ export function createRsbuildEsmProviderPlugin(
       api.processAssets(
         { stage: "summarize" },
         async ({ assets, compilation, sources }) => {
-          const entry = assets["main.js"];
+          const entryFiles =
+            compilation.entrypoints.get("main")?.getFiles() || [];
+          const entryScripts = entryFiles.filter((fileName) =>
+            fileName.endsWith(".js")
+          );
+          if (entryScripts.length !== 1) {
+            throw new Error(
+              "ESM UI provider output must contain exactly one entry JavaScript file."
+            );
+          }
+          const entryFile = entryScripts[0];
+          const entry = assets[entryFile];
           if (!entry) {
             throw new Error(
-              "ESM UI provider output is missing main.js. Remove entry filename overrides because Halo owns the manifest entry name."
+              `ESM UI provider output is missing its entry asset ${entryFile}.`
             );
           }
           const entryCode = entry.source().toString();
-          await validator.validateSource(entryCode, "main.js");
+          await validator.validateSource(entryCode, entryFile);
           if (
             !/\bexport\s+default\b/.test(entryCode) &&
             !/\bexport\s*\{[^}]*\bdefault\b[^}]*\}/s.test(entryCode)
@@ -71,7 +82,7 @@ export function createRsbuildEsmProviderPlugin(
           }
           const manifest = validateEsmProviderManifest({
             format: "esm",
-            entry: "./main.js",
+            entry: `./${entryFile}`,
             ...(entryStyles[0] ? { style: `./${entryStyles[0]}` } : {}),
           });
           compilation.emitAsset(

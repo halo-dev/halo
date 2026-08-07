@@ -33,7 +33,7 @@ describe("provider defaults", () => {
       preserveEntrySignatures: "allow-extension",
       output: {
         format: "es",
-        entryFileNames: "main.js",
+        entryFileNames: "main.[hash].js",
         chunkFileNames: "chunks/[name].[hash].js",
       },
     });
@@ -51,6 +51,18 @@ describe("provider defaults", () => {
     expect(rsbuild.tools?.rspack?.externalsType).toBe("module");
     expect(rsbuild.tools?.rspack?.optimization?.moduleIds).toBeUndefined();
     expect(rsbuild.output?.assetPrefix).toBe("auto");
+    const jsFilename = rsbuild.output?.filename?.js;
+    const cssFilename = rsbuild.output?.filename?.css;
+    expect(typeof jsFilename).toBe("function");
+    expect(typeof cssFilename).toBe("function");
+    if (typeof jsFilename === "function" && typeof cssFilename === "function") {
+      expect(jsFilename({ chunk: { name: "main" } })).toBe(
+        "main.[contenthash:8].js"
+      );
+      expect(cssFilename({ chunk: { name: "main" } })).toBe(
+        "style.[contenthash:8].css"
+      );
+    }
   });
 
   it("uses targetHaloVersion for explicit ESM without a simple requirement", () => {

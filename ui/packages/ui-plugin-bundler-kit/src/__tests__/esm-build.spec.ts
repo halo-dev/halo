@@ -42,10 +42,24 @@ describe("ESM provider builds", () => {
       logLevel: "silent",
     });
 
-    assertEsmOutput(
+    const manifest = assertEsmOutput(
       path.join(providerRoot, "build/dist"),
       "/plugins/esm-plugin/assets/ui/"
     );
+    const entryFile = manifest.entry.replace(/^\.\//, "");
+    const reverseEntryImport = `../${entryFile}`;
+    expect(
+      findFiles(path.join(providerRoot, "build/dist/chunks"), (file) =>
+        file.endsWith(".js")
+      ).some((file) =>
+        fs
+          .readFileSync(
+            path.join(providerRoot, "build/dist/chunks", file),
+            "utf8"
+          )
+          .includes(reverseEntryImport)
+      )
+    ).toBe(true);
   });
 
   it("passes custom Vue compiler options to the built-in Vite plugin", async () => {
@@ -71,8 +85,11 @@ describe("ESM provider builds", () => {
       logLevel: "silent",
     });
 
+    const manifest = readProviderManifest(
+      path.join(providerRoot, "build/dist")
+    );
     const entry = fs.readFileSync(
-      path.join(providerRoot, "build/dist/main.js"),
+      path.join(providerRoot, "build/dist", manifest.entry),
       "utf8"
     );
     expect(entry).toContain("halo-app-card");
@@ -121,8 +138,9 @@ describe("ESM provider builds", () => {
 
     await rsbuild.build();
 
+    const manifest = readProviderManifest(path.join(providerRoot, "dist"));
     const entry = fs.readFileSync(
-      path.join(providerRoot, "dist/main.js"),
+      path.join(providerRoot, "dist", manifest.entry),
       "utf8"
     );
     expect(entry).toContain("halo-app-card");
@@ -162,11 +180,10 @@ describe("ESM provider builds", () => {
 
     const firstBuild = waitForBuild();
     const resultPromise = rsbuild.build({ watch: true });
-    await withTimeout(
-      Promise.race([firstBuild, resultPromise.then(() => undefined)]),
-      "initial watch build"
-    );
+    await withTimeout(firstBuild, "initial watch build");
     const result = await resultPromise;
+    const outputRoot = path.resolve(providerRoot, "../build/resources/main/ui");
+    const firstManifest = readProviderManifest(outputRoot);
 
     try {
       const secondBuild = waitForBuild();
@@ -177,11 +194,10 @@ describe("ESM provider builds", () => {
           .replace("before-watch", "after-watch")
       );
       await withTimeout(secondBuild, "watch rebuild");
+      const manifest = readProviderManifest(outputRoot);
+      expect(manifest.entry).not.toBe(firstManifest.entry);
       expect(
-        fs.readFileSync(
-          path.resolve(providerRoot, "../build/resources/main/ui/main.js"),
-          "utf8"
-        )
+        fs.readFileSync(path.join(outputRoot, manifest.entry), "utf8")
       ).toContain("after-watch");
     } finally {
       await result.close();
@@ -387,6 +403,7 @@ function setupProviderProject(provider: "plugin" | "theme") {
       import { refAutoReset } from "@vueuse/core";
       import "./style.css";
 
+      export const entryMarker = "entry-marker";
       export const loadAsync = () => import("./lazy");
       export default {
         marker: [ref, createRouter, defineStore, axios, FormKit, getNode, stores.uiPlugins().isEnabled("fixture-dependency"), VButton, axiosInstance, Editor, refAutoReset]
@@ -395,7 +412,7 @@ function setupProviderProject(provider: "plugin" | "theme") {
   );
   fs.writeFileSync(
     path.join(providerRoot, "src/lazy.ts"),
-    'import "./lazy.css";\nexport const value = "lazy";\n'
+    'import "./lazy.css";\nimport { entryMarker } from "./index";\nexport const value = entryMarker;\n'
   );
   fs.writeFileSync(
     path.join(providerRoot, "src/style.css"),
@@ -426,13 +443,13 @@ function setupCustomElementProviderProject(provider: "plugin" | "theme") {
 }
 
 function assertEsmOutput(outputRoot: string, providerPublicPath: string) {
-  const manifest = JSON.parse(
-    fs.readFileSync(path.join(outputRoot, "ui-plugin.json"), "utf8")
-  );
+  const manifest = readProviderManifest(outputRoot);
   expect(manifest).toEqual({
     format: "esm",
-    entry: "./main.js",
-    style: expect.stringMatching(/\.css$/),
+    entry: expect.stringMatching(/^\.\/main\.[A-Za-z0-9_-]{8,}\.js$/),
+    style: expect.stringMatching(
+      /^\.\/(?:assets\/)?(?:index|style)\.[A-Za-z0-9_-]{8,}\.css$/
+    ),
   });
   expect(manifest).not.toHaveProperty("styles");
   const cssFiles = findFiles(outputRoot, (file) => file.endsWith(".css"));
@@ -451,7 +468,8 @@ function assertEsmOutput(outputRoot: string, providerPublicPath: string) {
   );
   expect(entryCss).toContain("url(");
   expect(entryCss).not.toContain(providerPublicPath);
-  const entry = fs.readFileSync(path.join(outputRoot, "main.js"), "utf8");
+  const entryFile = manifest.entry.replace(/^\.\//, "");
+  const entry = fs.readFileSync(path.join(outputRoot, entryFile), "utf8");
   expect(entry).toMatch(/from\s*["']vue["']/);
   expect(entry).toMatch(/export\s*(?:default|\{)/);
   expect(entry).not.toContain(providerPublicPath);
@@ -467,7 +485,7 @@ function assertEsmOutput(outputRoot: string, providerPublicPath: string) {
       .some((file) => file.endsWith(".js"))
   ).toBe(true);
   const descriptorKeyedFiles = new Set([
-    "main.js",
+    entryFile,
     manifest.style.replace(/^\.\//, ""),
   ]);
   for (const file of findFiles(outputRoot, (file) =>
@@ -483,6 +501,19 @@ function assertEsmOutput(outputRoot: string, providerPublicPath: string) {
       providerPublicPath
     );
   }
+  return manifest;
+}
+
+interface ProviderManifest {
+  format: "esm";
+  entry: string;
+  style?: string;
+}
+
+function readProviderManifest(outputRoot: string): ProviderManifest {
+  return JSON.parse(
+    fs.readFileSync(path.join(outputRoot, "ui-plugin.json"), "utf8")
+  ) as ProviderManifest;
 }
 
 function findFiles(root: string, predicate: (file: string) => boolean) {

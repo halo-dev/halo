@@ -110,14 +110,14 @@ class UiPluginBundleServiceImplTest {
                 "ui-plugin",
                 Map.of(
                         "ui/ui-plugin.json",
-                                "{\"format\":\"esm\",\"entry\":\"./main.js\",\"style\":\"./styles/main.css\"}",
-                        "ui/main.js", "export default {};",
-                        "ui/styles/main.css", ".ui {}"));
+                                "{\"format\":\"esm\",\"entry\":\"./main.12345678.js\",\"style\":\"./styles/main.12345678.css\"}",
+                        "ui/main.12345678.js", "export default {};",
+                        "ui/styles/main.12345678.css", ".ui {}"));
         var consolePlugin = mockPlugin(
                 "console-plugin",
                 Map.of(
-                        "console/ui-plugin.json", "{\"format\":\"esm\",\"entry\":\"./main.js\"}",
-                        "console/main.js", "export default {};"));
+                        "console/ui-plugin.json", "{\"format\":\"esm\",\"entry\":\"./main.abcdef12.js\"}",
+                        "console/main.abcdef12.js", "export default {};"));
         when(pluginManager.startedPlugins()).thenReturn(List.of(uiPlugin, consolePlugin));
 
         var activeTheme = prepareActiveTheme("active", "2.0.0");
@@ -125,9 +125,9 @@ class UiPluginBundleServiceImplTest {
         writeThemeUiFile(
                 "active",
                 "ui-plugin.json",
-                "{\"format\":\"esm\",\"entry\":\"./chunks/main.js\",\"style\":\"./styles/theme.css\"}");
-        writeThemeUiFile("active", "chunks/main.js", "export default {};");
-        writeThemeUiFile("active", "styles/theme.css", ".theme {}");
+                "{\"format\":\"esm\",\"entry\":\"./chunks/main.87654321.js\",\"style\":\"./styles/theme.87654321.css\"}");
+        writeThemeUiFile("active", "chunks/main.87654321.js", "export default {};");
+        writeThemeUiFile("active", "styles/theme.87654321.css", ".theme {}");
 
         var descriptor = service.getProviderDescriptor().block();
         var bundleVersion = generateBundleVersion();
@@ -143,12 +143,16 @@ class UiPluginBundleServiceImplTest {
                         tuple("ui-plugin", "plugin", "esm"),
                         tuple("theme:active", "theme", "esm"));
         assertThat(descriptor.legacyScript()).isNull();
-        assertVersionedUrl(descriptor.providers().getFirst().entry(), "/plugins/console-plugin/assets/console/main.js");
-        assertVersionedUrl(descriptor.providers().get(1).entry(), "/plugins/ui-plugin/assets/ui/main.js");
-        assertVersionedUrl(descriptor.providers().get(2).entry(), "/themes/active/ui-plugin/assets/chunks/main.js");
+        assertThat(descriptor.providers().getFirst().entry())
+                .isEqualTo("/plugins/console-plugin/assets/console/main.abcdef12.js");
+        assertThat(descriptor.providers().get(1).entry()).isEqualTo("/plugins/ui-plugin/assets/ui/main.12345678.js");
+        assertThat(descriptor.providers().get(2).entry())
+                .isEqualTo("/themes/active/ui-plugin/assets/chunks/main.87654321.js");
         assertThat(descriptor.providers().getFirst().style()).isNull();
-        assertVersionedUrl(descriptor.providers().get(1).style(), "/plugins/ui-plugin/assets/ui/styles/main.css");
-        assertVersionedUrl(descriptor.providers().get(2).style(), "/themes/active/ui-plugin/assets/styles/theme.css");
+        assertThat(descriptor.providers().get(1).style())
+                .isEqualTo("/plugins/ui-plugin/assets/ui/styles/main.12345678.css");
+        assertThat(descriptor.providers().get(2).style())
+                .isEqualTo("/themes/active/ui-plugin/assets/styles/theme.87654321.css");
         assertThat(read(service.getCssBundle(bundleVersion).block()))
                 .isEqualTo(descriptor.providers().stream()
                         .map(UiPluginProviderDescriptor.Provider::style)
@@ -245,15 +249,19 @@ class UiPluginBundleServiceImplTest {
         var plugin = mockPlugin(
                 "development",
                 Map.of(
-                        "ui/ui-plugin.json", "{\"format\":\"esm\",\"entry\":\"./main.js\"}",
-                        "ui/main.js", "export default {};"));
+                        "ui/ui-plugin.json", "{\"format\":\"esm\",\"entry\":\"./main.11111111.js\"}",
+                        "ui/main.11111111.js", "export default {};"));
         when(pluginManager.startedPlugins()).thenReturn(List.of(plugin));
         when(pluginManager.isDevelopment()).thenReturn(true);
 
         var first = service.getProviderDescriptor().block();
         var firstVersion = generateBundleVersion();
 
-        Files.writeString(tempDir.resolve("plugins/development/ui/main.js"), "export default { changed: true };");
+        Files.writeString(
+                tempDir.resolve("plugins/development/ui/main.22222222.js"), "export default { changed: true };");
+        Files.writeString(
+                tempDir.resolve("plugins/development/ui/ui-plugin.json"),
+                "{\"format\":\"esm\",\"entry\":\"./main.22222222.js\"}");
         var second = service.getProviderDescriptor().block();
         var secondVersion = generateBundleVersion();
 
@@ -267,19 +275,22 @@ class UiPluginBundleServiceImplTest {
         var alpha = mockPlugin(
                 "alpha",
                 Map.of(
-                        "ui/ui-plugin.json", "{\"format\":\"esm\",\"entry\":\"./main.js\"}",
-                        "ui/main.js", "export default {};"));
+                        "ui/ui-plugin.json", "{\"format\":\"esm\",\"entry\":\"./main.11111111.js\"}",
+                        "ui/main.11111111.js", "export default {};"));
         var beta = mockPlugin(
                 "beta",
                 Map.of(
-                        "ui/ui-plugin.json", "{\"format\":\"esm\",\"entry\":\"./main.js\"}",
-                        "ui/main.js", "export default {};"));
+                        "ui/ui-plugin.json", "{\"format\":\"esm\",\"entry\":\"./main.11111111.js\"}",
+                        "ui/main.11111111.js", "export default {};"));
         when(pluginManager.startedPlugins()).thenReturn(List.of(alpha, beta));
         when(pluginManager.isDevelopment()).thenReturn(true);
 
         var first = service.getProviderDescriptor().block();
 
-        Files.writeString(tempDir.resolve("plugins/alpha/ui/main.js"), "export default { changed: true };");
+        Files.writeString(tempDir.resolve("plugins/alpha/ui/main.22222222.js"), "export default { changed: true };");
+        Files.writeString(
+                tempDir.resolve("plugins/alpha/ui/ui-plugin.json"),
+                "{\"format\":\"esm\",\"entry\":\"./main.22222222.js\"}");
         var second = service.getProviderDescriptor().block();
 
         assertThat(second.providers().getFirst().entry())

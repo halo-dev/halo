@@ -144,7 +144,7 @@ function createVitePresetsConfig(
                 preserveEntrySignatures: "allow-extension",
                 output: {
                   format: "es",
-                  entryFileNames: "main.js",
+                  entryFileNames: "main.[hash].js",
                   chunkFileNames: "chunks/[name].[hash].js",
                   assetFileNames: "assets/[name].[hash][extname]",
                 },
