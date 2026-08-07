@@ -183,7 +183,7 @@
       }
     },
     "vue-router": {
-      "version": "5.0.2",
+      "version": "5.2.0",
       "exports": [
         "NavigationFailureType",
         "RouterLink",
@@ -216,7 +216,7 @@
       }
     },
     "pinia": {
-      "version": "3.0.4",
+      "version": "4.0.2",
       "exports": [
         "MutationType",
         "acceptHMRUpdate",
@@ -229,6 +229,7 @@
         "mapState",
         "mapStores",
         "mapWritableState",
+        "piniaSymbol",
         "setActivePinia",
         "setMapStoreSuffix",
         "shouldHydrate",
