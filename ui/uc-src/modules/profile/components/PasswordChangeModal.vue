@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { consoleApiClient } from "@halo-dev/api-client";
+import { ucApiClient } from "@halo-dev/api-client";
 import { VButton, VModal, VSpace } from "@halo-dev/components";
 import { cloneDeep } from "es-toolkit";
 import { onMounted, ref } from "vue";
@@ -7,12 +7,16 @@ import SubmitButton from "@/components/button/SubmitButton.vue";
 import { PASSWORD_REGEX } from "@/constants/regex";
 import { setFocus } from "@/formkit/utils/focus";
 
+const props = withDefaults(defineProps<{ hasPassword?: boolean }>(), {
+  hasPassword: true,
+});
+
 const emit = defineEmits<{
   (event: "close"): void;
 }>();
 
 interface PasswordChangeFormState {
-  oldPassword: string;
+  oldPassword?: string;
   password: string;
   password_confirm?: string;
 }
@@ -27,18 +31,21 @@ const formState = ref<PasswordChangeFormState>({
 const isSubmitting = ref(false);
 
 onMounted(() => {
-  setFocus("passwordInput");
+  setFocus(props.hasPassword ? "passwordInput" : "newPasswordInput");
 });
 
 const handleChangePassword = async () => {
   try {
     isSubmitting.value = true;
 
-    const changeOwnPasswordRequest = cloneDeep(formState.value);
-    delete changeOwnPasswordRequest.password_confirm;
+    const updatePasswordRequest = cloneDeep(formState.value);
+    delete updatePasswordRequest.password_confirm;
+    if (!props.hasPassword) {
+      delete updatePasswordRequest.oldPassword;
+    }
 
-    await consoleApiClient.user.changeOwnPassword({
-      changeOwnPasswordRequest,
+    await ucApiClient.user.currentUser.changeMyPassword({
+      changeMyPasswordRequest: updatePasswordRequest,
     });
 
     window.location.reload();
@@ -54,7 +61,13 @@ const handleChangePassword = async () => {
   <VModal
     ref="modal"
     :width="500"
-    :title="$t('core.uc_profile.change_password_modal.title')"
+    :title="
+      $t(
+        hasPassword
+          ? 'core.uc_profile.change_password_modal.title'
+          : 'core.uc_profile.change_password_modal.title_set'
+      )
+    "
     @close="emit('close')"
   >
     <!-- @vue-ignore -->
@@ -68,6 +81,7 @@ const handleChangePassword = async () => {
       @submit="handleChangePassword"
     >
       <FormKit
+        v-if="hasPassword"
         id="passwordInput"
         :label="
           $t('core.uc_profile.change_password_modal.fields.old_password.label')
@@ -77,6 +91,7 @@ const handleChangePassword = async () => {
         validation="required:trim"
       ></FormKit>
       <FormKit
+        id="newPasswordInput"
         :label="
           $t('core.uc_profile.change_password_modal.fields.new_password.label')
         "

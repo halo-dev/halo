@@ -14901,6 +14901,58 @@
         ]
       }
     },
+    "/apis/uc.api.halo.run/v1alpha1/users/-": {
+      "get": {
+        "description": "Get current user profile without password hash.",
+        "operationId": "GetMyUser",
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UcUserVo"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "UserV1alpha1Uc"
+        ]
+      }
+    },
+    "/apis/uc.api.halo.run/v1alpha1/users/-/password": {
+      "put": {
+        "description": "Set or change the password of the current user.",
+        "operationId": "ChangeMyPassword",
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeMyPasswordRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UcUserVo"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "UserV1alpha1Uc"
+        ]
+      }
+    },
     "/apis/uc.api.security.halo.run/v1alpha1/authentications/two-factor/settings": {
       "get": {
         "description": "Get Two-factor authentication settings.",
@@ -16508,6 +16560,25 @@
             "format": "int64"
           }
         }
+      },
+      "ChangeMyPasswordRequest": {
+        "required": [
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "oldPassword": {
+            "type": "string",
+            "description": "Old password. Required and verified only when the current user has a password; ignored otherwise."
+          },
+          "password": {
+            "maxLength": 257,
+            "minLength": 5,
+            "type": "string",
+            "description": "new password of the current user"
+          }
+        },
+        "description": "Payload for setting or changing the current user\u0027s password."
       },
       "ChangeOwnPasswordRequest": {
         "required": [
@@ -23981,6 +24052,32 @@
           }
         },
         "description": "User-center request payload for uploading from a URL."
+      },
+      "UcUserVo": {
+        "required": [
+          "name",
+          "passwordSet"
+        ],
+        "type": "object",
+        "properties": {
+          "avatar": {
+            "type": "string",
+            "description": "avatar of the current user"
+          },
+          "displayName": {
+            "type": "string",
+            "description": "display name of the current user"
+          },
+          "name": {
+            "type": "string",
+            "description": "username of the current user"
+          },
+          "passwordSet": {
+            "type": "boolean",
+            "description": "whether the current user has a password set"
+          }
+        },
+        "description": "Masked current user profile. The password hash is never exposed."
       },
       "UiPluginProvider": {
         "required": [

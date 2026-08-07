@@ -83,6 +83,7 @@ api/user-connection-v1alpha1-uc-api.ts
 api/user-preference-v1alpha1-uc-api.ts
 api/user-v1alpha1-api.ts
 api/user-v1alpha1-console-api.ts
+api/user-v1alpha1-uc-api.ts
 base.ts
 common.ts
 configuration.ts
@@ -116,6 +117,7 @@ models/category-tree-node.ts
 models/category-vo-list.ts
 models/category-vo.ts
 models/category.ts
+models/change-my-password-request.ts
 models/change-own-password-request.ts
 models/change-password-request.ts
 models/comment-email-owner.ts
@@ -326,6 +328,7 @@ models/totp-auth-link-response.ts
 models/totp-request.ts
 models/two-factor-auth-settings.ts
 models/uc-upload-from-url-request.ts
+models/uc-user-vo.ts
 models/ui-plugin-provider-descriptor.ts
 models/ui-plugin-provider.ts
 models/upgrade-from-uri-request.ts

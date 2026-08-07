@@ -76,6 +76,7 @@ import {
   UserPreferenceV1alpha1UcApi,
   UserV1alpha1Api,
   UserV1alpha1ConsoleApi,
+  UserV1alpha1UcApi,
 } from "../src";
 
 const defaultAxiosInstance = axios.create({
@@ -412,6 +413,7 @@ function createUcApiClient(axiosInstance: AxiosInstance) {
         baseURL,
         axiosInstance
       ),
+      currentUser: new UserV1alpha1UcApi(undefined, baseURL, axiosInstance),
     },
     core: {
       annotationSetting: new AnnotationSettingV1AlphaUcApi(
