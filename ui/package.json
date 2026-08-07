@@ -57,6 +57,7 @@
     "@uppy/locales": "^5.1.1",
     "@uppy/vue": "^3.2.0",
     "@uppy/xhr-upload": "^5.2.0",
+    "@vue/devtools-api": "^8.2.1",
     "@vueuse/components": "^14.4.0",
     "@vueuse/core": "^14.4.0",
     "@vueuse/integrations": "^14.4.0",
@@ -79,7 +80,7 @@
     "overlayscrollbars": "^2.5.0",
     "overlayscrollbars-vue": "^0.5.7",
     "path-browserify": "^1.0.1",
-    "pinia": "^3.0.4",
+    "pinia": "^4.0.2",
     "pretty-bytes": "^6.0.0",
     "qrcode": "^1.5.3",
     "sanitize-html": "^2.17.4",
@@ -92,7 +93,7 @@
     "vue-draggable-plus": "^0.4.1",
     "vue-grid-layout": "3.0.0-beta1",
     "vue-i18n": "^11.2.8",
-    "vue-router": "^5.0.2"
+    "vue-router": "^5.2.0"
   },
   "devDependencies": {
     "@iconify-json/fluent": "^1.2.45",
