@@ -74,9 +74,6 @@ export type ExtensionTableOptions = ExtensionOptions & Partial<TableOptions>;
 
 export const ExtensionTable = TiptapTable.extend<ExtensionTableOptions>({
   priority: 1000,
-
-  allowGapCursor: true,
-
   addHaloEditorMetadata() {
     return {
       ai: {

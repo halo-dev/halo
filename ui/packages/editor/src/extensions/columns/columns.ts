@@ -191,7 +191,6 @@ export const ExtensionColumns = Node.create<ExtensionColumnsOptions>({
   priority: 10,
   defining: true,
   isolating: true,
-  allowGapCursor: true,
   content: "column{1,}",
   fakeSelection: false,
 

@@ -10,3 +10,6 @@ export * from "./keyboard";
 export * from "./table";
 export * from "./upload";
 export * from "./get-cursor-coords";
+export * from "./gap-cursor";
+export * from "./node-view";
+export * from "./textblock";

@@ -131,6 +131,7 @@ export function useThemeCustomTemplates(type: "post" | "page" | "category") {
         return {
           value: template.file,
           label: template.name || template.file,
+          description: template.description || "",
         };
       }) || []),
     ];

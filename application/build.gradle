@@ -173,6 +173,11 @@ tasks.register('downloadPluginPresets', Download) {
             filename  : 'plugin-editor-hyperlink-card.jar',
             autoEnable: true,
         ],
+        [
+            url       : 'https://github.com/halo-dev/plugin-ai-foundation/releases/download/v1.0.0/plugin-ai-foundation-1.0.0.jar',
+            filename  : 'plugin-ai-foundation.jar',
+            autoEnable: true,
+        ],
 
         // Currently, plugin-app-store is not open source, so we need to download it from the official website.
         // Please see https://github.com/halo-dev/plugin-app-store/issues/55

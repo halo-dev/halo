@@ -22,7 +22,9 @@ export class HaloTableView extends TiptapTableView {
     super(node, cellMinWidth, view, HTMLAttributes);
 
     this.dom.className = "halo-table-wrapper";
+    this.dom.dataset.gapCursorClickArea = "";
     this.dom.dataset.tableLayout = this.getLayoutMode(node);
+    this.table.dataset.gapCursorAnchor = "";
     this.dom.style.boxSizing = "border-box";
     this.dom.style.overflowX = "auto";
     this.dom.style.overflowY = "hidden";

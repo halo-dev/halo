@@ -37,7 +37,9 @@ describe("HaloTableView", () => {
     const view = new HaloTableView(getTableNode(editor).node, 25, editor.view);
 
     expect(view.dom.className).toBe("halo-table-wrapper");
+    expect(view.dom.dataset.gapCursorClickArea).toBe("");
     expect(view.dom.dataset.tableLayout).toBe("auto");
+    expect(view.table.dataset.gapCursorAnchor).toBe("");
     expect(view.dom.style.overflowX).toBe("auto");
     expect(view.table.style.width).toBe("100%");
     expect(view.table.style.tableLayout).toBe("auto");

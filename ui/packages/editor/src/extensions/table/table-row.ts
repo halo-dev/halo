@@ -6,8 +6,6 @@ import { mergeAttributes } from "@/tiptap";
 import { joinStyles, parseRowHeight } from "./attributes";
 
 export const TableRow = TiptapTableRow.extend<TableRowOptions>({
-  allowGapCursor: false,
-
   addHaloEditorMetadata() {
     return {
       ai: {
