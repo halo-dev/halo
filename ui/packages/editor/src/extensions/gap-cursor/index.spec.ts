@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 
+import CodeBlock from "@tiptap/extension-code-block";
 import Document from "@tiptap/extension-document";
 import {
   BulletList,
@@ -162,6 +163,17 @@ describe("ExtensionGapCursor", () => {
     expect(beforeCursor?.style.transform).toBe("translate(50px, 50px)");
   });
 
+  it("keeps an indented node's own margin area available to the gap cursor", () => {
+    const editor = createEditor();
+    const card = editor.view.nodeDOM(0) as HTMLElement;
+    setRect(editor.view.dom, 0, 0, 300, 300);
+    setRect(card, 98, 50, 152, 100);
+
+    expect(runMouseDown(editor, 30, 100, card)).toBe(true);
+    expect(editor.state.selection).toBeInstanceOf(GapCursor);
+    expect(editor.state.selection.from).toBe(0);
+  });
+
   it("places a click in the whitespace below a block after it", () => {
     const editor = createEditor();
     const card = editor.view.nodeDOM(0) as HTMLElement;
@@ -175,6 +187,34 @@ describe("ExtensionGapCursor", () => {
     expect(
       editor.view.dom.querySelector(".halo-gap-cursor--after")
     ).not.toBeNull();
+  });
+
+  it("places mouse gaps around a code block nested in a list item", () => {
+    const editor = createListCodeBlockEditor();
+    let codeBlockPos = -1;
+    editor.state.doc.descendants((node, pos) => {
+      if (node.type.name === "codeBlock") {
+        codeBlockPos = pos;
+        return false;
+      }
+      return true;
+    });
+    const codeBlock = editor.view.nodeDOM(codeBlockPos) as HTMLElement;
+    const list = codeBlock.closest("ul, ol");
+    expect(list).not.toBeNull();
+    setRect(editor.view.dom, 0, 0, 300, 300);
+    setRect(codeBlock, 50, 50, 200, 100);
+
+    expect(runMouseDown(editor, 20, 100, list ?? codeBlock)).toBe(true);
+    expect(editor.state.selection).toBeInstanceOf(GapCursor);
+    expect(editor.state.selection.from).toBe(codeBlockPos);
+    expect(editor.state.selection.$from.parent.type.name).toBe("listItem");
+
+    expect(runMouseDown(editor, 280, 100, list ?? codeBlock)).toBe(true);
+    expect(editor.state.selection).toBeInstanceOf(GapCursor);
+    expect(editor.state.selection.from).toBe(
+      codeBlockPos + (editor.state.doc.nodeAt(codeBlockPos)?.nodeSize ?? 0)
+    );
   });
 
   it("uses an explicit visual anchor for NodeView chrome and cursor placement", () => {
@@ -943,6 +983,62 @@ function createEditorWithTrailingNode(
       ...extraExtensions,
     ],
     content: { type: "doc", content },
+  });
+  editors.push(editor);
+  return editor;
+}
+
+function createListCodeBlockEditor() {
+  const editor = new Editor({
+    element: document.createElement("div"),
+    extensions: [
+      Document,
+      Paragraph,
+      CodeBlock,
+      Text,
+      ListItem,
+      BulletList,
+      OrderedList,
+      ExtensionGapCursor,
+    ],
+    content: {
+      type: "doc",
+      content: [
+        {
+          type: "bulletList",
+          content: [
+            {
+              type: "listItem",
+              content: [
+                {
+                  type: "paragraph",
+                  content: [{ type: "text", text: "item" }],
+                },
+                {
+                  type: "codeBlock",
+                  content: [{ type: "text", text: "nested code" }],
+                },
+                {
+                  type: "orderedList",
+                  content: [
+                    {
+                      type: "listItem",
+                      content: [
+                        {
+                          type: "paragraph",
+                          content: [{ type: "text", text: "nested item" }],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        { type: "paragraph" },
+      ],
+    },
   });
   editors.push(editor);
   return editor;

@@ -6,6 +6,7 @@ export * from "./filter-duplicate-extensions";
 export * from "./is-allowed-uri";
 export * from "./is-list-active";
 export * from "./is-node-empty";
+export * from "./indentation";
 export * from "./keyboard";
 export * from "./table";
 export * from "./upload";
