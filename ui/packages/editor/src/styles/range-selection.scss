@@ -1,5 +1,5 @@
 .halo-rich-text-editor {
-  $editorRangeFakeSelection: rgba(27, 162, 227, 0.2);
+  $editorRangeFakeSelection: Highlight;
 
   .ProseMirror-noderangeselection,
   .no-selection {
@@ -15,6 +15,7 @@
 
   .ProseMirror-selectednoderange,
   .range-fake-selection {
+    isolation: isolate;
     position: relative;
 
     &::after {
@@ -26,7 +27,7 @@
       bottom: 0;
       background-color: $editorRangeFakeSelection;
       pointer-events: none;
-      z-index: 99;
+      z-index: -1;
       caret-color: transparent;
     }
 
