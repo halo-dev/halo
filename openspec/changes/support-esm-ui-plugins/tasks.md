@@ -21,7 +21,7 @@
 - [x] 3.1 Discover and validate plugin and activated-theme ESM manifests from their UI resource roots, including containment checks for entry and style paths.
 - [x] 3.2 Classify a provider with no ESM manifest as legacy and classify an existing malformed or incompatible manifest as invalid without IIFE fallback.
 - [x] 3.3 Build a current provider descriptor containing one version, versioned legacy URLs, ESM descriptors, and invalid-provider diagnostics.
-- [x] 3.4 Reuse existing plugin `ui`/`console` and theme `ui-plugin` static mappings for ESM resources and append the descriptor version as a cache key.
+- [x] 3.4 Reuse existing plugin `ui`/`console` and theme `ui-plugin` static mappings for ESM resources and append a cache key.
 - [x] 3.5 Avoid copied provider resources, retained generations, and generation-specific resource proxy endpoints; use full page reload as the replacement boundary.
 - [x] 3.6 Keep the existing aggregate endpoints and aliases while sourcing legacy-only content, globals, metadata, ordering, and `ui` to `console` fallback from current provider classification.
 - [x] 3.7 Add backend tests for manifest containment, inactive-theme exclusion, mixed classification, versioned direct resource URLs, and legacy aggregate filtering.
@@ -138,3 +138,9 @@
 - [x] 17.4 Reject arbitrary Vite and Rsbuild externals plus conflicting Rsbuild ESM output and entry filename overrides before emitting a misleading manifest, with focused bundler tests.
 - [x] 17.5 Align runtime snapshots with actual browser exports, make host bridge lookup reuse the latest eligible sparse snapshot, and distinguish same-core prerelease reuse from genuinely older-snapshot warnings, with generator, host, and bundler tests.
 - [x] 17.6 Document the deliberate `ui-plugin.json` reserved output name and compatibility CSS bridge, then run formatting, strict OpenSpec validation, backend/frontend/bundler checks, OpenAPI checks, and feasible development and packaged-runtime acceptance.
+
+## 18. Stabilize Provider Resource Cache Keys
+
+- [x] 18.1 Separate the catalog version used by legacy aggregate resources from provider-specific entry and startup-style cache keys in the runtime contract and design.
+- [x] 18.2 Derive packaged provider keys from Halo-managed identity/version data and development provider keys from stable directly loaded resource metadata, with backend regression coverage for unchanged and rebuilt resources.
+- [x] 18.3 Run backend formatting and focused tests plus strict OpenSpec validation.

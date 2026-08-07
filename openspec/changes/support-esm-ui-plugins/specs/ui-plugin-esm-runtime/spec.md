@@ -135,13 +135,13 @@ Halo SHALL own the browser mapping from supported shared package roots to Halo-p
 
 ### Requirement: Versioned provider descriptor
 
-Halo SHALL describe current UI providers through one authenticated response that reuses existing static resource mappings and supplies a version query for cache invalidation.
+Halo SHALL describe current UI providers through one authenticated response that reuses existing static resource mappings and supplies stable catalog and provider cache keys for cache invalidation.
 
 #### Scenario: Provider descriptor is requested
 
 - **WHEN** an authenticated Console or User Center session requests its provider descriptor
 - **THEN** Halo SHALL classify the currently started plugins and activated theme
-- **THEN** the response SHALL contain one version, an ordered list of versioned provider startup stylesheet descriptors, one versioned legacy script URL, valid ESM entry descriptors, and invalid-provider diagnostics from that classification
+- **THEN** the response SHALL contain one catalog version, an ordered list of provider-keyed startup stylesheet descriptors, one catalog-versioned legacy script URL, valid provider-keyed ESM entry descriptors, and invalid-provider diagnostics from that classification
 
 #### Scenario: Provider descriptor is consumed by the Halo UI
 
@@ -154,18 +154,18 @@ Halo SHALL describe current UI providers through one authenticated response that
 
 - **WHEN** a plugin is classified as ESM
 - **THEN** its entry URL SHALL use the existing `/plugins/{name}/assets/ui/` mapping or the selected legacy `/assets/console/` fallback
-- **THEN** the entry URL SHALL include the descriptor version as a query parameter
+- **THEN** the entry URL SHALL include a stable plugin-specific cache key as a query parameter
 
 #### Scenario: ESM theme resource is described
 
 - **WHEN** the activated theme is classified as ESM
 - **THEN** its entry URL SHALL use the existing `/themes/{name}/ui-plugin/assets/` mapping
-- **THEN** the entry URL SHALL include the descriptor version as a query parameter
+- **THEN** the entry URL SHALL include a stable theme-specific cache key as a query parameter
 
 #### Scenario: Startup stylesheets are described
 
 - **WHEN** the descriptor contains legacy providers or valid ESM providers with a main stylesheet
-- **THEN** the descriptor SHALL expose each provider's name, type, and direct versioned stylesheet URL in provider order
+- **THEN** the descriptor SHALL expose each provider's name, type, and direct provider-keyed stylesheet URL in provider order
 - **THEN** each URL SHALL use the existing provider static resource mapping so relative CSS assets resolve from their owning provider
 - **THEN** the list SHALL NOT contain CSS emitted only for asynchronous chunks
 
@@ -173,7 +173,7 @@ Halo SHALL describe current UI providers through one authenticated response that
 
 - **WHEN** a Halo 2.x client requests the existing aggregate CSS endpoint
 - **THEN** the endpoint SHALL remain available as a compatibility bridge
-- **THEN** it SHALL emit ordered CSS `@import` rules that reference the direct versioned provider stylesheet URLs instead of concatenating their source under the aggregate API URL
+- **THEN** it SHALL emit ordered CSS `@import` rules that reference the direct provider-keyed stylesheet URLs instead of concatenating their source under the aggregate API URL
 - **THEN** the implementation SHALL include an adjacent comment identifying removal after legacy IIFE support ends in Halo 3
 
 #### Scenario: Provider state changes during startup
@@ -374,9 +374,18 @@ Halo SHALL treat a full Console or User Center page load as the supported module
 #### Scenario: Production ESM assets are cached
 
 - **WHEN** production provider ESM resources are emitted
-- **THEN** entry, direct startup-style, and legacy aggregate URLs SHALL include the current provider descriptor version as a cache key
+- **THEN** entry and direct startup-style URLs SHALL include a cache key derived from that provider's Halo-managed identity and installed version
+- **THEN** legacy aggregate URLs SHALL include the current catalog version as a cache key
 - **THEN** asynchronous chunks and assets SHALL use provider-relative content-hashed URLs where supported
 - **THEN** provider discovery metadata SHALL be revalidated so it reflects currently enabled providers
+
+#### Scenario: Development provider assets are cached
+
+- **WHEN** a development plugin or theme provider is described repeatedly without changing its directly loaded build output
+- **THEN** its entry and startup-style URLs SHALL retain the same provider-specific cache key
+- **WHEN** its manifest, entry, or startup stylesheet changes
+- **THEN** its provider-specific cache key and the catalog version SHALL change
+- **THEN** another unchanged provider SHALL retain its existing direct resource URLs
 
 ### Requirement: Development and packaged runtime parity
 

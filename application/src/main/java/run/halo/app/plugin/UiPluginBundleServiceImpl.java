@@ -8,7 +8,6 @@ import com.google.common.hash.Hashing;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.Clock;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -67,7 +66,6 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
     private final Scheduler scheduler = Schedulers.boundedElastic();
 
     private Path tempDir;
-    private Clock clock = Clock.systemUTC();
 
     public UiPluginBundleServiceImpl(
             SpringPluginManager pluginManager, ThemeService themeService, ThemeRootGetter themeRoot) {
@@ -76,11 +74,6 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
         this.themeRoot = themeRoot;
         this.jsBundleCache = new BundleCache(".js");
         this.cssBundleCache = new BundleCache(".css");
-    }
-
-    void setClock(Clock clock) {
-        Assert.notNull(clock, "Clock must not be null");
-        this.clock = clock;
     }
 
     @Override
@@ -99,8 +92,7 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
     // TODO(Halo 3): Remove after legacy IIFE UI provider support ends.
     public Flux<DataBuffer> uglifyCssBundle() {
         return discoverProviders().flatMapMany(providers -> {
-            var version = providerVersion(providers);
-            return Flux.fromIterable(providerStyles(version, providers))
+            return Flux.fromIterable(providerStyles(providers))
                     .map(style -> DefaultDataBufferFactory.sharedInstance.wrap(
                             ("@import url(\"" + style.href() + "\");\n").getBytes(UTF_8)));
         });
@@ -278,7 +270,10 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
                         provider.candidate().name(),
                         provider.candidate().type(),
                         provider.candidate().version(),
-                        providerUrl(version, provider, provider.manifest().entry())))
+                        providerUrl(
+                                providerCacheKey(provider),
+                                provider,
+                                provider.manifest().entry())))
                 .toList();
         var invalid = providers.stream()
                 .filter(provider -> provider.kind() == ProviderKind.INVALID)
@@ -290,21 +285,21 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
                 .toList();
         return new UiPluginProviderDescriptor(
                 version,
-                providerStyles(version, providers),
+                providerStyles(providers),
                 new UiPluginProviderDescriptor.LegacyResources(versionedBundleUrl("bundle.js", version)),
                 registrations,
                 esmProviders,
                 invalid);
     }
 
-    private List<UiPluginProviderDescriptor.Style> providerStyles(String version, List<ClassifiedProvider> providers) {
+    private List<UiPluginProviderDescriptor.Style> providerStyles(List<ClassifiedProvider> providers) {
         return providers.stream()
-                .map(provider -> providerStyle(version, provider))
+                .map(this::providerStyle)
                 .flatMap(Optional::stream)
                 .toList();
     }
 
-    private Optional<UiPluginProviderDescriptor.Style> providerStyle(String version, ClassifiedProvider provider) {
+    private Optional<UiPluginProviderDescriptor.Style> providerStyle(ClassifiedProvider provider) {
         String resourcePath;
         if (provider.kind() == ProviderKind.ESM) {
             resourcePath = provider.manifest().style();
@@ -323,16 +318,16 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
         return Optional.of(new UiPluginProviderDescriptor.Style(
                 provider.candidate().name(),
                 provider.candidate().type(),
-                providerUrl(version, provider, resourcePath)));
+                providerUrl(providerCacheKey(provider), provider, resourcePath)));
     }
 
-    private static String providerUrl(String version, ClassifiedProvider provider, String resourcePath) {
+    private static String providerUrl(String cacheKey, ClassifiedProvider provider, String resourcePath) {
         var candidate = provider.candidate();
         if (PLUGIN_TYPE.equals(candidate.type())) {
             return BundleResourceUtils.buildAssetUrl(
-                    candidate.resourceName(), candidate.bundleLocation(), resourcePath, version);
+                    candidate.resourceName(), candidate.bundleLocation(), resourcePath, cacheKey);
         }
-        return ThemeUiResources.buildAssetUrl(candidate.resourceName(), resourcePath, version);
+        return ThemeUiResources.buildAssetUrl(candidate.resourceName(), resourcePath, cacheKey);
     }
 
     private static String versionedBundleUrl(String filename, String version) {
@@ -344,18 +339,53 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
     }
 
     private String providerVersion(List<ClassifiedProvider> providers) {
-        if (pluginManager.isDevelopment()
-                || providers.stream().anyMatch(provider -> provider.candidate().development())) {
-            return String.valueOf(clock.instant().toEpochMilli());
-        }
         var value = providers.stream()
-                .map(provider -> provider.candidate().type()
-                        + ':'
-                        + provider.candidate().name()
-                        + ':'
-                        + provider.candidate().version())
-                .collect(Collectors.joining());
+                .map(provider -> provider.kind() + ":" + providerCacheKey(provider))
+                .collect(Collectors.joining("|"));
         return Hashing.sha256().hashUnencodedChars(value).toString();
+    }
+
+    private String providerCacheKey(ClassifiedProvider provider) {
+        var candidate = provider.candidate();
+        var value = new StringBuilder()
+                .append(candidate.type())
+                .append(':')
+                .append(candidate.name())
+                .append(':')
+                .append(candidate.version());
+        if (candidate.development()) {
+            developmentResourcePaths(provider)
+                    .forEach(resourcePath -> value.append('|').append(resourceMetadata(candidate, resourcePath)));
+        }
+        return Hashing.sha256().hashUnencodedChars(value).toString();
+    }
+
+    private List<String> developmentResourcePaths(ClassifiedProvider provider) {
+        var paths = new ArrayList<String>();
+        paths.add(PROVIDER_MANIFEST);
+        if (provider.kind() == ProviderKind.ESM) {
+            paths.add(provider.manifest().entry());
+            if (provider.manifest().style() != null) {
+                paths.add(provider.manifest().style());
+            }
+        } else if (provider.kind() == ProviderKind.LEGACY) {
+            paths.add(BundleResourceUtils.JS_BUNDLE);
+            paths.add(BundleResourceUtils.CSS_BUNDLE);
+        }
+        return paths;
+    }
+
+    private String resourceMetadata(ProviderCandidate candidate, String resourcePath) {
+        var resource = providerResource(candidate, resourcePath);
+        if (resource == null) {
+            return resourcePath + ":missing";
+        }
+        try {
+            return resourcePath + ':' + resource.lastModified() + ':' + resource.contentLength();
+        } catch (IOException e) {
+            log.debug("Unable to read UI provider resource metadata for {}", resource.getDescription(), e);
+            return resourcePath + ':' + resource.getDescription();
+        }
     }
 
     private Flux<DataBuffer> readProviderJavaScript(ClassifiedProvider provider) {

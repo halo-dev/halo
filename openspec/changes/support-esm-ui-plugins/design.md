@@ -23,7 +23,7 @@ The change spans the UI build, bundler kit, backend resource discovery, runtime 
 - Publish sparse host runtime snapshots that record exact shared-package versions, root exports, and runtime bridge facts for a Halo baseline.
 - Resolve shared dependencies through one host-owned Import Map and preserve identity for stateful frameworks.
 - Apply the same ESM contract to Vite and Rsbuild, plugin and theme providers, Console and User Center.
-- Reuse the existing plugin and theme static resource mappings and add a provider version query for cache invalidation.
+- Reuse the existing plugin and theme static resource mappings and add stable provider-specific cache keys for cache invalidation.
 - Isolate ESM provider loading and registration failures without preventing the core UI or other providers from starting.
 - Validate both the proxied development topology and the packaged BootJar topology in real browsers.
 
@@ -172,9 +172,11 @@ Alternative considered: point Import Map entries at current npm ESM outputs. Cur
 
 ### Discover providers through one versioned descriptor
 
-The backend classifies the current started plugin set and activated theme when the authenticated provider descriptor is requested. The response contains a version derived from Halo-managed provider identity and version data, versioned legacy aggregate URLs, valid ESM descriptors, and invalid-provider diagnostics. The descriptor is revalidated rather than treated as an immutable resource snapshot.
+The backend classifies the current started plugin set and activated theme when the authenticated provider descriptor is requested. The response contains a catalog version derived from the ordered provider classification and cache keys, versioned legacy aggregate URLs, valid ESM descriptors, and invalid-provider diagnostics. The descriptor is revalidated rather than treated as an immutable resource snapshot.
 
-ESM entries and startup styles reuse the static mappings Halo already exposes for plugin `ui` or legacy `console` resources and activated-theme `ui-plugin` resources. Each provider manifest may identify one main stylesheet, and a legacy provider may expose its existing main stylesheet. The descriptor returns those provider-owned styles in provider order so each stylesheet keeps its own URL base for relative assets. Asynchronous chunk CSS remains under the provider mapping and is loaded on demand by its bundler runtime. The version is appended as a query parameter to invalidate cached entry, style, and legacy aggregate responses without copying resources or introducing another proxy path. For example:
+ESM entries and startup styles reuse the static mappings Halo already exposes for plugin `ui` or legacy `console` resources and activated-theme `ui-plugin` resources. Each provider manifest may identify one main stylesheet, and a legacy provider may expose its existing main stylesheet. The descriptor returns those provider-owned styles in provider order so each stylesheet keeps its own URL base for relative assets. Asynchronous chunk CSS remains under the provider mapping and is loaded on demand by its bundler runtime.
+
+Each direct entry and startup-style URL receives a provider-specific cache key. In packaged operation the key is derived from Halo-managed provider type, identity, and installed version. In development it additionally fingerprints the provider manifest and directly loaded entry/style resources through stable file metadata, so repeated descriptor requests keep the same URL until the build output changes. The catalog version hashes the ordered provider classification and provider cache keys and remains the cache key for legacy aggregate resources. This prevents one development provider or a repeated descriptor request from invalidating every provider resource. For example:
 
 ```json
 {
@@ -183,7 +185,7 @@ ESM entries and startup styles reuse the static mappings Halo already exposes fo
     {
       "name": "plugin-search",
       "type": "plugin",
-      "href": "/plugins/plugin-search/assets/ui/style.css?v=abc123"
+      "href": "/plugins/plugin-search/assets/ui/style.css?v=provider123"
     }
   ],
   "legacy": {
@@ -193,7 +195,7 @@ ESM entries and startup styles reuse the static mappings Halo already exposes fo
     {
       "name": "plugin-search",
       "type": "plugin",
-      "entry": "/plugins/plugin-search/assets/ui/main.js?v=abc123"
+      "entry": "/plugins/plugin-search/assets/ui/main.js?v=provider123"
     }
   ]
 }
@@ -201,7 +203,7 @@ ESM entries and startup styles reuse the static mappings Halo already exposes fo
 
 Plugin bundles continue preferring `ui` and falling back to `console`; the selected directory is reflected in generated entry and style URLs. Theme bundles use `/themes/{theme}/ui-plugin/assets/{resource}`. Query parameters do not change path resolution, and emitted asynchronous chunks continue using their provider-relative, content-hashed paths. Main CSS asset references therefore resolve relative to the direct stylesheet URL and need no backend rewriting.
 
-The version query is a cache key, not an immutable server-side snapshot. If provider files change after a descriptor is returned, a partially loaded page can observe the newer files. Provider lifecycle changes already use a full page reload as the supported replacement boundary, so the runtime reports a load failure and reload remains the recovery path. The design intentionally avoids resource copying, retained generations, and generation-specific proxy endpoints.
+The catalog and provider version queries are cache keys, not immutable server-side snapshots. If provider files change after a descriptor is returned, a partially loaded page can observe the newer files. Provider lifecycle changes already use a full page reload as the supported replacement boundary, so the runtime reports a load failure and reload remains the recovery path. The design intentionally avoids resource copying, retained generations, generation-specific proxy endpoints, and hashing complete resource contents on every descriptor request.
 
 The legacy JavaScript generated for the current descriptor includes only currently classified IIFE providers. The existing aggregate CSS endpoint and compatibility aliases remain available for Halo 2.x, but emit ordered `@import url("<direct provider style URL>")` rules instead of concatenating provider CSS under the API URL base. This compatibility bridge carries an adjacent `TODO(Halo 3)` removal comment. Existing globals, `enabledPlugins`, `enabledUiPlugins`, plugin-name ordering, theme module naming, and `ui`-before-`console` resource selection remain compatible for legacy artifacts.
 
@@ -270,7 +272,7 @@ Legacy aggregate behavior is kept intact rather than rewritten into per-provider
 
 The browser caches each module URL once per document, and current routes, Pinia stores, components, and FormKit registrations lack a safe general unload protocol. Installing, upgrading, enabling, disabling, or activating a provider therefore requires or prompts a full Console/User Center reload.
 
-Production entry, direct startup-style, and legacy aggregate URLs receive the descriptor version query, while emitted chunks and assets use provider-relative content-hashed URLs where supported. Provider descriptor responses are not stored without revalidation. ESM execution never falls back to IIFE after import begins because top-level effects may already have run.
+Production entry and direct startup-style URLs receive their provider-specific cache key, while legacy aggregate URLs receive the catalog version and emitted chunks and assets use provider-relative content-hashed URLs where supported. Development provider keys remain stable until directly loaded build output changes. Provider descriptor responses are not stored without revalidation. ESM execution never falls back to IIFE after import begins because top-level effects may already have run.
 
 HMR across the Halo/provider boundary is not part of the runtime contract. Provider watch builds may trigger or prompt a full page reload.
 
