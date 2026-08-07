@@ -1,9 +1,51 @@
+import { getMarkRange } from "@tiptap/core";
 import TiptapLink, { type LinkOptions } from "@tiptap/extension-link";
+import { Plugin, PluginKey, TextSelection } from "@tiptap/pm/state";
 import type { ExtensionOptions } from "@/types";
 
 export type ExtensionLinkOptions = ExtensionOptions & Partial<LinkOptions>;
 
 export const ExtensionLink = TiptapLink.extend<ExtensionLinkOptions>({
+  addProseMirrorPlugins() {
+    const linkType = this.type;
+
+    return [
+      ...(this.parent?.() ?? []),
+      new Plugin({
+        key: new PluginKey("haloLinkDoubleClickSelection"),
+        props: {
+          handleDoubleClick(view, pos, event) {
+            const target = event.target;
+
+            if (!(target instanceof Element)) {
+              return false;
+            }
+
+            const link = target.closest("a");
+
+            if (!link || !view.dom.contains(link)) {
+              return false;
+            }
+
+            const range = getMarkRange(view.state.doc.resolve(pos), linkType);
+
+            if (!range) {
+              return false;
+            }
+
+            view.dispatch(
+              view.state.tr.setSelection(
+                TextSelection.create(view.state.doc, range.from, range.to)
+              )
+            );
+
+            return true;
+          },
+        },
+      }),
+    ];
+  },
+
   addHaloEditorMetadata() {
     return {
       ai: {
