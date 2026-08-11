@@ -139,4 +139,19 @@ class SecurityVerificationEndpointIntegrationTest {
                 .expectHeader()
                 .valueEquals("Location", "/uc/profile");
     }
+
+    @Test
+    void shouldRedirectToDefaultWhenRedirectHasBackslash() {
+        when(userService.getUser(USERNAME)).thenReturn(Mono.just(user(false, null)));
+        // /\evil.com gets normalized by browsers to the external //evil.com
+        webClient
+                .mutateWith(mockUser(USERNAME))
+                .get()
+                .uri("/security-verification?redirect=/\\evil.com")
+                .exchange()
+                .expectStatus()
+                .is3xxRedirection()
+                .expectHeader()
+                .valueEquals("Location", "/uc/profile");
+    }
 }

@@ -89,7 +89,10 @@ class SecurityVerificationEndpoint {
     }
 
     private static String safeRedirect(String redirect) {
-        if (StringUtils.isNotBlank(redirect) && redirect.startsWith("/") && !redirect.startsWith("//")) {
+        if (StringUtils.isNotBlank(redirect)
+                && redirect.startsWith("/")
+                && !redirect.startsWith("//")
+                && !redirect.contains("\\")) {
             return redirect;
         }
         return DEFAULT_REDIRECT;
