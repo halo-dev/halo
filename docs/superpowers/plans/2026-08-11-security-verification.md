@@ -271,7 +271,7 @@ git commit -m "refactor: extract TOTP validation into TotpVerificationService"
         @Test
         void shouldSendCodeWhenEmailVerified() {
             when(client.get(User.class, "faker")).thenReturn(Mono.just(user(true, "faker@halo.run")));
-            when(reasonEmitter.emit(eq(SecurityVerificationServiceImpl.SECURITY_VERIFICATION_REASON_TYPE), any()))
+            when(reasonEmitter.emit(eq(EmailVerificationServiceImpl.SECURITY_VERIFICATION_REASON_TYPE), any()))
                     .thenReturn(Mono.empty());
             when(notificationCenter.subscribe(any(), any())).thenReturn(Mono.just(new Subscription()));
             StepVerifier.create(service.sendSecurityVerificationCode("faker")).verifyComplete();
@@ -1385,7 +1385,18 @@ git commit -m "feat: render security verification page"
     }
 ```
 
-注意：表单 POST 需携带 CSRF——`mutateWith(csrf())` 会为表单自动附加 `_csrf` 字段（导入 `org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf`），在 `mutateWith(mockUser(...))` 处一并链式调用：`webClient.mutateWith(mockUser(USERNAME)).mutateWith(csrf())`。实际实现中每个 POST 测试都需两个 mutator。
+注意：表单 POST 需携带 CSRF——`mutateWith(csrf())` 会为表单附加 `_csrf` token，且表单 body 必须显式声明 `contentType(MediaType.APPLICATION_FORM_URLENCODED)`（既有先例：`OAuth2EmailCompletionFlowIntegrationTest` 第 255-260 行）。每个 POST 测试都需链式调用两个 mutator 并设置 contentType：
+
+```java
+        webClient.mutateWith(mockUser(USERNAME)).mutateWith(csrf())
+                .post()
+                .uri("/security-verification?redirect=/uc/profile")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .bodyValue("redirect=/uc/profile&emailCode=123456")
+                ...
+```
+
+需要补全的 import：`static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf`、`org.springframework.http.MediaType`。
 
 - [ ] **Step 2: 运行确认失败**
 
