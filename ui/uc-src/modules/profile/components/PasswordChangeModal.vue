@@ -51,6 +51,11 @@ const handleChangePassword = async () => {
     window.location.reload();
   } catch (e) {
     console.error(e);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const redirectURI = (e as any)?.response?.data?.redirectURI;
+    if (redirectURI) {
+      window.location.href = redirectURI;
+    }
   } finally {
     isSubmitting.value = false;
   }

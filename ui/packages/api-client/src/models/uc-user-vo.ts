@@ -30,6 +30,7 @@ export interface UcUserVo {
      * username of the current user
      */
     'name': string;
+    'passwordChangeVerificationRequired': boolean;
     /**
      * whether the current user has a password set
      */
