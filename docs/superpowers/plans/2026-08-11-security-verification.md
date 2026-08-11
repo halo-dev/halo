@@ -165,12 +165,13 @@ public class TotpVerificationService {
 - [ ] **Step 4: 改造 `TwoFactorAuthEndpoint` 使用共享服务**
 
 - 构造函数注入 `TotpVerificationService`（`totpVerificationService` 字段），保留 `TotpAuthService`（`configureTotp`/`getTotpAuthLink` 仍需要）。
+
 - 删除私有方法 `validateTotpCode(User user, String totpCode)`（第 290-297 行）；三处调用 `validateTotpCode(user, ...)` 改为 `totpVerificationService.validate(user, ...)`：
+
   - `deleteTotp` 中 `delayUntil(user -> validateTotpCode(user, passwordRequest.getTotpCode()))`
   - `toggleTwoFactor` 中 `delayUntil(user -> validateTotpCode(user, passwordRequest.getTotpCode()))`
   - `configureTotp` 中 `delayUntil(user -> validateTotpCode(user, totpRequest.getCurrentTotpCode()))`
 - **保留** `validateTotpCode(String totpEncryptedSecret, String totpCode)`（第 299-314 行）——`configureTotp` 用它校验新 secret 的 code，语义不同。
-
 - [ ] **Step 5: 运行测试确认通过**
 
 Run: `./gradlew :application:test --tests "run.halo.app.security.authentication.twofactor.TotpVerificationServiceTest" && ./gradlew :application:compileJava`
@@ -298,6 +299,7 @@ git commit -m "refactor: extract TOTP validation into TotpVerificationService"
 ```
 
 需要新增 import（追加到文件头部）：
+
 ```java
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -326,13 +328,17 @@ Expected: 编译失败（方法/常量不存在）。
 - [ ] **Step 4: 实现** `EmailVerificationServiceImpl.java`
 
 - 类中新增常量（与 `EMAIL_VERIFICATION_REASON_TYPE` 并列）：
+
 ```java
-    public static final String SECURITY_VERIFICATION_REASON_TYPE = "security-verification";
+public static final String SECURITY_VERIFICATION_REASON_TYPE = "security-verification";
 ```
+
 - 将私有字段改为包级可见（供测试通过 `ReflectionTestUtils` 读取，测试与 impl 同包）：
+
 ```java
-    final EmailVerificationManager emailVerificationManager = new EmailVerificationManager();
+final EmailVerificationManager emailVerificationManager = new EmailVerificationManager();
 ```
+
 - 新增方法（放在 `verify` 之后）：
 
 ```java
@@ -478,10 +484,10 @@ git commit -m "feat: add security verification email code service and notificati
 **Interfaces:**
 - Consumes: `User`（`getSpec().isEmailVerified()`、`getSpec().getTotpEncryptedSecret()`）、`TwoFactorUtils.getTwoFactorAuthSettings(User)`
 - Produces:
-  - `SecurityVerificationService.isVerified(WebSession) → boolean`
-  - `SecurityVerificationService.markVerified(WebSession) → void`
-  - `SecurityVerificationService.isAvailable(User) → boolean`
-  - `SecurityVerificationRequiredException`（403，body 属性 `redirectURI = /security-verification`）——Task 6/7 使用
+- `SecurityVerificationService.isVerified(WebSession) → boolean`
+- `SecurityVerificationService.markVerified(WebSession) → void`
+- `SecurityVerificationService.isAvailable(User) → boolean`
+- `SecurityVerificationRequiredException`（403，body 属性 `redirectURI = /security-verification`）——Task 6/7 使用
 
 - [ ] **Step 1: 写失败测试** `SecurityVerificationServiceTest.java`
 
@@ -865,24 +871,28 @@ git commit -m "feat: add security verification session service and exception"
 - [ ] **Step 3: 页面 properties**（`security-verification.properties` + 3 个语言变体）
 
 `security-verification.properties`（默认，中文）：
+
 ```properties
 title=安全验证
 subtitle=为保障账号安全，请完成安全验证后继续操作
 ```
 
 `security-verification_en.properties`：
+
 ```properties
 title=Security verification
 subtitle=For the security of your account, please complete the security verification to continue.
 ```
 
 `security-verification_es.properties`：
+
 ```properties
 title=Verificación de seguridad
 subtitle=Para la seguridad de tu cuenta, completa la verificación de seguridad para continuar.
 ```
 
 `security-verification_zh_TW.properties`：
+
 ```properties
 title=安全驗證
 subtitle=為保障帳號安全，請完成安全驗證後繼續操作
@@ -891,6 +901,7 @@ subtitle=為保障帳號安全，請完成安全驗證後繼續操作
 - [ ] **Step 4: fragment properties**（`gateway_fragments/security-verification.properties` + 3 个语言变体）
 
 `gateway_fragments/security-verification.properties`（默认，中文）：
+
 ```properties
 form.method.email=邮箱验证码
 form.method.totp=TOTP 验证码
@@ -904,6 +915,7 @@ form.cancel=取消
 ```
 
 `gateway_fragments/security-verification_en.properties`：
+
 ```properties
 form.method.email=Email code
 form.method.totp=TOTP code
@@ -917,6 +929,7 @@ form.cancel=Cancel
 ```
 
 `gateway_fragments/security-verification_es.properties`：
+
 ```properties
 form.method.email=Código de correo electrónico
 form.method.totp=Código TOTP
@@ -930,6 +943,7 @@ form.cancel=Cancelar
 ```
 
 `gateway_fragments/security-verification_zh_TW.properties`：
+
 ```properties
 form.method.email=信箱驗證碼
 form.method.totp=TOTP 驗證碼
@@ -1268,14 +1282,17 @@ class SecurityVerificationEndpoint {
 - [ ] **Step 4: 授权规则** `AuthorizationExchangeConfigurers.java`（`authenticatedAuthorizationConfigurer`，Order 300）
 
 把：
+
 ```java
-                .pathMatchers("/complete-profile/**")
-                .authenticated()
+.pathMatchers("/complete-profile/**")
+.authenticated()
 ```
+
 改为：
+
 ```java
-                .pathMatchers("/complete-profile/**", "/security-verification/**")
-                .authenticated()
+.pathMatchers("/complete-profile/**", "/security-verification/**")
+.authenticated()
 ```
 
 - [ ] **Step 5: 运行测试确认通过**
@@ -1388,12 +1405,12 @@ git commit -m "feat: render security verification page"
 注意：表单 POST 需携带 CSRF——`mutateWith(csrf())` 会为表单附加 `_csrf` token，且表单 body 必须显式声明 `contentType(MediaType.APPLICATION_FORM_URLENCODED)`（既有先例：`OAuth2EmailCompletionFlowIntegrationTest` 第 255-260 行）。每个 POST 测试都需链式调用两个 mutator 并设置 contentType：
 
 ```java
-        webClient.mutateWith(mockUser(USERNAME)).mutateWith(csrf())
-                .post()
-                .uri("/security-verification?redirect=/uc/profile")
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .bodyValue("redirect=/uc/profile&emailCode=123456")
-                ...
+webClient.mutateWith(mockUser(USERNAME)).mutateWith(csrf())
+        .post()
+        .uri("/security-verification?redirect=/uc/profile")
+        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+        .bodyValue("redirect=/uc/profile&emailCode=123456")
+        ...
 ```
 
 需要补全的 import：`static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf`、`org.springframework.http.MediaType`。
@@ -1427,21 +1444,21 @@ Expected: POST 路由未实现/限流未接入，至少 `shouldVerifyWithEmailCo
 `verifySecurityVerification` 的 `verifyMono` 加限流（按会话，复用 `totp-validation` 配置 5 次/5 分钟，与登录 TOTP 同策略）：
 
 ```java
-                                return verifyMono
-                                        .transformDeferred(rateLimiterForVerification(request))
-                                        .then(request.exchange().getSession())
-                                        .doOnNext(securityVerificationService::markVerified)
-                                        .then(redirectTo(redirect));
+return verifyMono
+        .transformDeferred(rateLimiterForVerification(request))
+        .then(request.exchange().getSession())
+        .doOnNext(securityVerificationService::markVerified)
+        .then(redirectTo(redirect));
 ```
 
 ```java
-    private Function<Mono<Void>, Mono<Void>> rateLimiterForVerification(ServerRequest request) {
-        return mono -> request.exchange().getSession().flatMap(session -> {
-            var rateLimiterKey = "totp-validation-" + session.getId();
-            var rateLimiter = rateLimiterRegistry.rateLimiter(rateLimiterKey, "totp-validation");
-            return mono.transformDeferred(RateLimiterOperator.of(rateLimiter));
-        });
-    }
+private Function<Mono<Void>, Mono<Void>> rateLimiterForVerification(ServerRequest request) {
+    return mono -> request.exchange().getSession().flatMap(session -> {
+        var rateLimiterKey = "totp-validation-" + session.getId();
+        var rateLimiter = rateLimiterRegistry.rateLimiter(rateLimiterKey, "totp-validation");
+        return mono.transformDeferred(RateLimiterOperator.of(rateLimiter));
+    });
+}
 ```
 
 需要补全的 import：`io.github.resilience4j.reactor.ratelimiter.operator.RateLimiterOperator`、`java.util.function.Function`、`run.halo.app.infra.exception.RateLimitExceededException`。
@@ -1619,76 +1636,90 @@ Expected: 编译失败（`passwordChangeVerificationRequired` / 守卫不存在�
 - [ ] **Step 3: 实现** `UcUserEndpoint.java`
 
 - 注入 `SecurityVerificationService`（`@RequiredArgsConstructor` 字段）：
+
 ```java
-    private final SecurityVerificationService securityVerificationService;
+private final SecurityVerificationService securityVerificationService;
 ```
+
 - `getCurrentUser` 改为传入 session 计算 VO：
+
 ```java
-    private Mono<ServerResponse> getCurrentUser(ServerRequest request) {
-        return authenticated()
-                .map(Authentication::getName)
-                .flatMap(userService::getUser)
-                .flatMap(user -> request.exchange().getSession().map(session -> toUserVo(user, session)))
-                .flatMap(userVo -> ServerResponse.ok().bodyValue(userVo));
-    }
+private Mono<ServerResponse> getCurrentUser(ServerRequest request) {
+    return authenticated()
+            .map(Authentication::getName)
+            .flatMap(userService::getUser)
+            .flatMap(user -> request.exchange().getSession().map(session -> toUserVo(user, session)))
+            .flatMap(userVo -> ServerResponse.ok().bodyValue(userVo));
+}
 ```
+
 - `changeMyPassword` 在验证原密码之前加守卫（在 `flatMap(changeRequest -> userService.getUser(username).flatMap(user -> {` 内、`verifyPassword` 计算之前）：
+
 ```java
-                            return requirePasswordChangeVerification(user, request)
-                                    .then(verifyPassword
-                                            .flatMap(ignored ->
-                                                    userService.updateWithRawPassword(username, changeRequest.password()))
-                                            .defaultIfEmpty(user)
-                                            .map(this::toUserVo));
+return requirePasswordChangeVerification(user, request)
+        .then(verifyPassword
+                .flatMap(ignored ->
+                        userService.updateWithRawPassword(username, changeRequest.password()))
+                .defaultIfEmpty(user)
+                .map(this::toUserVo));
 ```
+
 - 新增私有方法：
+
 ```java
-    private Mono<Void> requirePasswordChangeVerification(User user, ServerRequest request) {
-        return request.exchange().getSession().flatMap(session -> {
-            var passwordSet = StringUtils.hasText(user.getSpec().getPassword());
-            if (passwordSet
-                    && securityVerificationService.isAvailable(user)
-                    && !securityVerificationService.isVerified(session)) {
-                return Mono.error(new SecurityVerificationRequiredException());
-            }
-            return Mono.empty();
-        });
-    }
-```
-- `toUserVo` 改为接收 session 并计算新字段：
-```java
-    private UcUserVo toUserVo(User user, WebSession session) {
+private Mono<Void> requirePasswordChangeVerification(User user, ServerRequest request) {
+    return request.exchange().getSession().flatMap(session -> {
         var passwordSet = StringUtils.hasText(user.getSpec().getPassword());
-        var verificationRequired = passwordSet
+        if (passwordSet
                 && securityVerificationService.isAvailable(user)
-                && !securityVerificationService.isVerified(session);
-        return new UcUserVo(
-                user.getMetadata().getName(),
-                user.getSpec().getDisplayName(),
-                user.getSpec().getAvatar(),
-                passwordSet,
-                verificationRequired);
-    }
+                && !securityVerificationService.isVerified(session)) {
+            return Mono.error(new SecurityVerificationRequiredException());
+        }
+        return Mono.empty();
+    });
+}
 ```
-> 注意：`toUserVo` 原签名被 `changeMyPassword` 的 `map(this::toUserVo)` 调用——该处需要 session，改为：
-> ```java
->             return requirePasswordChangeVerification(user, request)
->                     .then(verifyPassword
->                             .flatMap(ignored ->
->                                     userService.updateWithRawPassword(username, changeRequest.password()))
->                             .defaultIfEmpty(user)
->                             .flatMap(u -> request.exchange().getSession().map(session -> toUserVo(u, session))));
-> ```
-- `UcUserVo` record 追加字段：
+
+- `toUserVo` 改为接收 session 并计算新字段：
+
 ```java
-    record UcUserVo(
-            @Schema(requiredMode = REQUIRED) String name,
-            String displayName,
-            String avatar,
-            @Schema(requiredMode = REQUIRED) boolean passwordSet,
-            @Schema(requiredMode = REQUIRED) boolean passwordChangeVerificationRequired) {}
+private UcUserVo toUserVo(User user, WebSession session) {
+    var passwordSet = StringUtils.hasText(user.getSpec().getPassword());
+    var verificationRequired = passwordSet
+            && securityVerificationService.isAvailable(user)
+            && !securityVerificationService.isVerified(session);
+    return new UcUserVo(
+            user.getMetadata().getName(),
+            user.getSpec().getDisplayName(),
+            user.getSpec().getAvatar(),
+            passwordSet,
+            verificationRequired);
+}
 ```
-- import 追加：`org.springframework.web.server.WebSession`、`run.halo.app.security.verification.SecurityVerificationRequiredException`、`run.halo.app.security.verification.SecurityVerificationService`。
+
+> 注意：`toUserVo` 原签名被 `changeMyPassword` 的 `map(this::toUserVo)` 调用——该处需要 session，改为：
+>
+> ```java
+> return requirePasswordChangeVerification(user, request)
+>         .then(verifyPassword
+>                 .flatMap(ignored ->
+>                         userService.updateWithRawPassword(username, changeRequest.password()))
+>                 .defaultIfEmpty(user)
+>                 .flatMap(u -> request.exchange().getSession().map(session -> toUserVo(u, session))));
+> ```
+>
+> - `UcUserVo` record 追加字段：
+>
+> ```java
+> record UcUserVo(
+> @Schema(requiredMode = REQUIRED) String name,
+> String displayName,
+> String avatar,
+> @Schema(requiredMode = REQUIRED) boolean passwordSet,
+> @Schema(requiredMode = REQUIRED) boolean passwordChangeVerificationRequired) {}
+> ```
+>
+> - import 追加：`org.springframework.web.server.WebSession`、`run.halo.app.security.verification.SecurityVerificationRequiredException`、`run.halo.app.security.verification.SecurityVerificationService`。
 
 - [ ] **Step 4: 运行全部相关测试确认通过**
 
@@ -1761,32 +1792,33 @@ async function handleChangePassword() {
 - 在现有 `onMounted(async () => {...})` 开头追加：
 
 ```ts
-  if (route.query["password-change"] === "1") {
-    await fetchPasswordState();
-    if (passwordChangeVerificationRequired.value) {
-      navigateToSecurityVerification();
-    } else {
-      passwordChangeModal.value = true;
-    }
+if (route.query["password-change"] === "1") {
+  await fetchPasswordState();
+  if (passwordChangeVerificationRequired.value) {
+    navigateToSecurityVerification();
+  } else {
+    passwordChangeModal.value = true;
   }
+}
 ```
 
 - 模板中改密入口（`<VDropdownItem @click="passwordChangeModal = true">`）改为：
+
 ```html
-              <VDropdownItem @click="handleChangePassword">
+<VDropdownItem @click="handleChangePassword">
 ```
 
 - [ ] **Step 3: 改 `PasswordChangeModal.vue`**（catch 块，403 + redirectURI 时跳转）
 
 ```ts
-  } catch (e) {
-    console.error(e);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const redirectURI = (e as any)?.response?.data?.redirectURI;
-    if (redirectURI) {
-      window.location.href = redirectURI;
-    }
+} catch (e) {
+  console.error(e);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const redirectURI = (e as any)?.response?.data?.redirectURI;
+  if (redirectURI) {
+    window.location.href = redirectURI;
   }
+}
 ```
 
 - [ ] **Step 4: 前端校验**
@@ -1830,3 +1862,4 @@ Expected: 全部通过。
 - **Spec 覆盖**：验证页主题模板（Task 4/5）、邮箱码/TOTP 任选其一（Task 4 模板 tab + Task 6 校验逻辑）、会话标记 TTL 30 分钟（Task 3）、仅已有密码需要验证（Task 7 守卫条件）、无能力回退（Task 5/7 的 `isAvailable` 条件）、redirect 站内校验（Task 6 `safeRedirect`）、`UcUserVo.passwordChangeVerificationRequired`（Task 7）、授权规则（Task 5）、通知原因/模板（Task 2）、TOTP 抽取复用（Task 1）、契约再生成（Task 8）。
 - **占位符扫描**：所有代码步骤均给出完整代码；无 TBD/TODO。
 - **类型一致性**：`TotpVerificationService.validate(User, String) → Mono<Void>`（Task 1 → 6）；`EmailVerificationService.sendSecurityVerificationCode(String) / verifySecurityVerificationCode(String, String) → Mono<Void>`（Task 2 → 6）；`SecurityVerificationService.isVerified(WebSession) / markVerified(WebSession) / isAvailable(User)`（Task 3 → 5/7）；`SecurityVerificationRequiredException.REDIRECT_LOCATION = /security-verification`（Task 3 → 7）；会话 key `security-verification.verified-at` 与 TTL 常量在 Task 3 定义，Task 3 测试引用同一常量。
+

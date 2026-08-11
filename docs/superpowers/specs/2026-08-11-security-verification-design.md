@@ -40,11 +40,11 @@
 
 POST-auth 页面端点（仿 `PreAuthTwoFactorEndpoint` 渲染 + `TwoFactorAuthSecurityConfigurer` 校验的组合）：
 
-| 方法/路径 | 行为 |
-|---|---|
-| `GET /security-verification` | 渲染 `security-verification` 页面模板，注入：可用方式（emailVerified / totpConfigured）、redirect 参数。未认证 → 302 登录；无可用方式 → 302 回 redirect（不弹验证页） |
-| `POST /security-verification/email-code` | 向已验证邮箱发送 6 位验证码（JSON 响应，错误信息给前端 JS 展示） |
-| `POST /security-verification` | 校验 `emailCode` 或 `totpCode`（任一通过即可；TOTP 已配置则校验 TOTP，否则校验邮箱码，都未提供 → 400）→ 写 session 标记 → 302 到 redirect |
+|                  方法/路径                   |                                                               行为                                                               |
+|------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------|
+| `GET /security-verification`             | 渲染 `security-verification` 页面模板，注入：可用方式（emailVerified / totpConfigured）、redirect 参数。未认证 → 302 登录；无可用方式 → 302 回 redirect（不弹验证页） |
+| `POST /security-verification/email-code` | 向已验证邮箱发送 6 位验证码（JSON 响应，错误信息给前端 JS 展示）                                                                                         |
+| `POST /security-verification`            | 校验 `emailCode` 或 `totpCode`（任一通过即可；TOTP 已配置则校验 TOTP，否则校验邮箱码，都未提供 → 400）→ 写 session 标记 → 302 到 redirect                         |
 
 安全要求：
 - **redirect 仅接受站内相对路径**（以 `/` 开头且非 `//`、非协议相对），防 open redirect；非法值 → 400 或默认跳 `/uc/profile`。
@@ -95,15 +95,15 @@ POST-auth 页面端点（仿 `PreAuthTwoFactorEndpoint` 渲染 + `TwoFactorAuthS
 
 ## 边界情况
 
-| 场景 | 行为 |
-|---|---|
-| 无密码用户首次设置密码 | 不要求验证 |
-| 有密码但无已验证邮箱且无 TOTP | 回退仅原密码，不跳验证页 |
-| 两种方式都可用 | 页面任选其一 |
-| 会话标记未过期 | 直接改密，不重复验证 |
-| 匿名访问验证页 | 302 登录 |
-| redirect 为外部 URL | 拒绝（400 / 默认 `/uc/profile`） |
-| 验证码 / TOTP 均未提供 | 400 |
+|        场景         |             行为             |
+|-------------------|----------------------------|
+| 无密码用户首次设置密码       | 不要求验证                      |
+| 有密码但无已验证邮箱且无 TOTP | 回退仅原密码，不跳验证页               |
+| 两种方式都可用           | 页面任选其一                     |
+| 会话标记未过期           | 直接改密，不重复验证                 |
+| 匿名访问验证页           | 302 登录                     |
+| redirect 为外部 URL  | 拒绝（400 / 默认 `/uc/profile`） |
+| 验证码 / TOTP 均未提供   | 400                        |
 
 ## 测试计划
 
@@ -114,16 +114,16 @@ POST-auth 页面端点（仿 `PreAuthTwoFactorEndpoint` 渲染 + `TwoFactorAuthS
 
 ## 命名总览
 
-| 项 | 名称 |
-|---|---|
-| 页面路径 | `/security-verification` |
-| 页面端点 | `SecurityVerificationEndpoint` |
-| 会话标记 | `security-verification.verified-at`（Instant，TTL 30 分钟） |
-| 共享组件 | `SecurityVerificationService`（isVerified / markVerified / isAvailable） |
-| 异常 | `SecurityVerificationRequiredException` |
-| 邮箱服务方法 | `sendSecurityVerificationCode` / `verifySecurityVerificationCode` |
-| 邮件原因类型 | `security-verification` |
-| UC 接口字段 | `UcUserVo.passwordChangeVerificationRequired`（按操作命名，由通用检查派生） |
+|    项    |                                   名称                                   |
+|---------|------------------------------------------------------------------------|
+| 页面路径    | `/security-verification`                                               |
+| 页面端点    | `SecurityVerificationEndpoint`                                         |
+| 会话标记    | `security-verification.verified-at`（Instant，TTL 30 分钟）                 |
+| 共享组件    | `SecurityVerificationService`（isVerified / markVerified / isAvailable） |
+| 异常      | `SecurityVerificationRequiredException`                                |
+| 邮箱服务方法  | `sendSecurityVerificationCode` / `verifySecurityVerificationCode`      |
+| 邮件原因类型  | `security-verification`                                                |
+| UC 接口字段 | `UcUserVo.passwordChangeVerificationRequired`（按操作命名，由通用检查派生）           |
 
 ## 契约变更
 
