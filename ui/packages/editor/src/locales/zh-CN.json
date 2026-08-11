@@ -215,5 +215,7 @@
   "editor.common.text.tip": "提示",
   "editor.common.toast.save_success": "保存成功",
   "editor.common.line_height": "行高",
-  "editor.common.clear_format": "清除格式"
+  "editor.common.clear_format": "清除格式",
+  "editor.components.editor_header.toolbar": "编辑器工具栏",
+  "editor.components.editor_header.insert_content": "插入内容"
 }
