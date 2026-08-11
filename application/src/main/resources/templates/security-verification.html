@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{gateway_fragments/layout :: layout(title = |#{title} - ${site.title}|, head = ~{::head}, body = ~{::body})}"
+>
+  <th:block th:fragment="body">
+    <div class="gateway-wrapper">
+      <div th:replace="~{gateway_fragments/common::haloLogo}"></div>
+      <div class="halo-form-wrapper">
+        <h1 class="form-title" th:text="#{title}"></h1>
+        <p class="form-description" th:text="#{subtitle}"></p>
+        <form th:replace="~{gateway_fragments/security-verification::form}"></form>
+      </div>
+    </div>
+  </th:block>
+
+  <th:block th:fragment="head">
+    <style>
+      .security-verification-form .method-switcher {
+        display: flex;
+        margin-bottom: 1.25rem;
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius);
+        overflow: hidden;
+      }
+      .security-verification-form .method-tab {
+        flex: 1;
+        padding: 0.625rem;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        color: var(--color-text);
+        font-size: var(--text-sm);
+      }
+      .security-verification-form .method-tab.active {
+        background: var(--color-primary);
+        color: #fff;
+      }
+      .security-verification-form .form-description {
+        margin-bottom: 1.25rem;
+        color: var(--color-text-secondary);
+        font-size: var(--text-sm);
+      }
+    </style>
+  </th:block>
+</html>

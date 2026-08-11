@@ -1,0 +1,140 @@
+<form
+  th:fragment="form"
+  class="halo-form security-verification-form"
+  th:action="@{/security-verification}"
+  name="security-verification-form"
+  id="security-verification-form"
+  method="post"
+>
+  <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+  <input type="hidden" name="redirect" th:value="${redirect}" />
+
+  <div class="alert alert-error" role="alert" th:if="${param.error.size() > 0}">
+    <strong
+      th:if="${#strings.equals(param.error[0], 'rate-limit-exceeded')}"
+      th:text="#{form.messages.rateLimitError}"
+    ></strong>
+    <strong
+      th:unless="${#strings.equals(param.error[0], 'rate-limit-exceeded')}"
+      th:text="#{form.messages.invalidError}"
+    ></strong>
+  </div>
+
+  <div class="method-switcher" th:if="${emailVerified} and ${totpConfigured}">
+    <button type="button" class="method-tab active" data-method="email" th:text="#{form.method.email}"></button>
+    <button type="button" class="method-tab" data-method="totp" th:text="#{form.method.totp}"></button>
+  </div>
+
+  <div class="form-item" th:if="${emailVerified}" id="email-method">
+    <label for="emailCode" th:text="#{form.emailCode.label}"></label>
+    <div class="form-input-group">
+      <div class="form-input">
+        <input
+          type="text"
+          inputmode="numeric"
+          id="emailCode"
+          name="emailCode"
+          autocomplete="one-time-code"
+          pattern="\d{6}"
+          maxlength="6"
+          required
+        />
+      </div>
+      <button id="emailCodeSendButton" type="button" th:text="#{form.emailCode.send}"></button>
+    </div>
+  </div>
+
+  <div class="form-item" th:if="${totpConfigured}" id="totp-method">
+    <label for="totpCode" th:text="#{form.totpCode.label}"></label>
+    <div class="form-input">
+      <input
+        type="text"
+        inputmode="numeric"
+        id="totpCode"
+        name="totpCode"
+        autocomplete="one-time-code"
+        pattern="\d{6}"
+        maxlength="6"
+        th:disabled="${emailVerified}"
+        required
+      />
+    </div>
+  </div>
+
+  <div class="form-item">
+    <button type="submit" th:text="#{form.submit}"></button>
+  </div>
+  <div class="form-item">
+    <a th:href="@{/uc/profile}" class="cancel-link" th:text="#{form.cancel}"></a>
+  </div>
+
+  <script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+      const headerName = /*[[${_csrf.headerName}]]*/ "";
+      const token = /*[[${_csrf.token}]]*/ "";
+      const form = document.getElementById("security-verification-form");
+      const emailMethod = document.getElementById("email-method");
+      const totpMethod = document.getElementById("totp-method");
+      const tabs = Array.from(document.querySelectorAll(".method-tab"));
+
+      function activateMethod(method) {
+        tabs.forEach((tab) => {
+          tab.classList.toggle("active", tab.dataset.method === method);
+        });
+        const useEmail = method === "email";
+        emailMethod.style.display = useEmail ? "" : "none";
+        totpMethod.style.display = useEmail ? "none" : "";
+        emailMethod.querySelector("input").disabled = !useEmail;
+        totpMethod.querySelector("input").disabled = useEmail;
+      }
+
+      tabs.forEach((tab) => {
+        tab.addEventListener("click", function () {
+          activateMethod(tab.dataset.method);
+        });
+      });
+
+      const emailCodeSendButton = document.getElementById("emailCodeSendButton");
+      if (emailCodeSendButton) {
+        async function sendRequest() {
+          const response = await fetch("/security-verification/email-code", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              [headerName]: token,
+            },
+          });
+
+          if (!response.ok) {
+            const json = await response.json();
+            if (json.errors && json.errors.length) {
+              throw new Error(json.errors[0]);
+            }
+            if (json.detail) {
+              throw new Error(json.detail);
+            }
+            throw new Error(i18nResources.sendVerificationCodeFailed);
+          }
+
+          return response;
+        }
+
+        sendVerificationCode(emailCodeSendButton, sendRequest);
+      }
+
+      const totpInput = document.getElementById("totpCode");
+      if (totpInput) {
+        let submitting = false;
+        totpInput.addEventListener("input", function (event) {
+          if (submitting || event.isComposing || totpInput.disabled) {
+            return;
+          }
+          if (/^\d{6}$/.test(totpInput.value)) {
+            submitting = true;
+            form.requestSubmit();
+          }
+        });
+      }
+    });
+  </script>
+</form>
