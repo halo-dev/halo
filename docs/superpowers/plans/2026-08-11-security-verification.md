@@ -15,7 +15,7 @@
 - 两种方式都可用时用户任选其一；任一通过即可。
 - 会话标记 TTL 固定 30 分钟（常量，不配置化）。
 - 验证页为服务端渲染 Thymeleaf 模板（`application/src/main/resources/templates/`），**不新增 Vue 页面**；主题可覆盖。
-- `redirect` 参数仅接受站内相对路径（`/` 开头且非 `//`），非法值回退 `/uc/profile`。
+- `redirect` 参数仅接受站内相对路径（`/` 开头、非 `//`、不含 `\`——浏览器会把 `\` 规范化为 `/` 形成协议相对外链），非法值回退 `/uc/profile`。
 - 全链路 reactive，禁止阻塞 I/O。
 - 契约变更后必须 `./gradlew generateOpenApiDocs && pnpm -C ui api-client:gen` 重新生成，**绝不手改 `ui/packages/api-client/src/`**。
 - 每次提交前运行 `./gradlew spotlessApply`；只 stage 本次任务涉及的文件。
@@ -1254,7 +1254,8 @@ class SecurityVerificationEndpoint {
     }
 
     private static String safeRedirect(String redirect) {
-        if (StringUtils.hasText(redirect) && redirect.startsWith("/") && !redirect.startsWith("//")) {
+        if (StringUtils.hasText(redirect) && redirect.startsWith("/")
+                && !redirect.startsWith("//") && !redirect.contains("\\")) {
             return redirect;
         }
         return DEFAULT_REDIRECT;
