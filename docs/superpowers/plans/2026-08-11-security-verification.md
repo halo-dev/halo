@@ -1217,13 +1217,23 @@ class SecurityVerificationEndpoint {
                                 var username = user.getMetadata().getName();
                                 var emailCode = form.getFirst("emailCode");
                                 var totpCode = form.getFirst("totpCode");
-                                var verifyMono = StringUtils.hasText(totpCode)
-                                        ? totpVerificationService.validate(user, totpCode)
-                                        : StringUtils.hasText(emailCode)
-                                                ? emailVerificationService.verifySecurityVerificationCode(
-                                                        username, emailCode)
-                                                : Mono.error(new ServerWebInputException(
-                                                        "Verification code is required"));
+                                var settings = TwoFactorUtils.getTwoFactorAuthSettings(user);
+                                Mono<Void> verifyMono;
+                                if (StringUtils.isNotBlank(totpCode)) {
+                                    // Only accept TOTP when the user actually has TOTP configured,
+                                    // otherwise TotpVerificationService.validate passes unconditionally.
+                                    verifyMono = settings.isTotpConfigured()
+                                            ? totpVerificationService.validate(user, totpCode)
+                                            : Mono.error(new ServerWebInputException("TOTP is not configured."));
+                                } else if (StringUtils.isNotBlank(emailCode)) {
+                                    verifyMono = settings.isEmailVerified()
+                                            ? emailVerificationService.verifySecurityVerificationCode(
+                                                    username, emailCode)
+                                            : Mono.error(new ServerWebInputException("Email is not verified."));
+                                } else {
+                                    verifyMono = Mono.error(new ServerWebInputException(
+                                            "Verification code is required"));
+                                }
                                 return verifyMono
                                         .then(request.exchange().getSession())
                                         .doOnNext(securityVerificationService::markVerified)
@@ -1256,7 +1266,12 @@ class SecurityVerificationEndpoint {
     private static String safeRedirect(String redirect) {
         if (StringUtils.hasText(redirect) && redirect.startsWith("/")
                 && !redirect.startsWith("//") && !redirect.contains("\\")) {
-            return redirect;
+            try {
+                URI.create(redirect);
+                return redirect;
+            } catch (IllegalArgumentException e) {
+                // fall through to default
+            }
         }
         return DEFAULT_REDIRECT;
     }
@@ -1446,19 +1461,25 @@ Expected: POST 路由未实现/限流未接入，至少 `shouldVerifyWithEmailCo
 
 ```java
 return verifyMono
-        .transformDeferred(rateLimiterForVerification(request))
+        .transformDeferred(rateLimiterForVerification(request, username))
         .then(request.exchange().getSession())
         .doOnNext(securityVerificationService::markVerified)
         .then(redirectTo(redirect));
 ```
 
 ```java
-private Function<Mono<Void>, Mono<Void>> rateLimiterForVerification(ServerRequest request) {
-    return mono -> request.exchange().getSession().flatMap(session -> {
-        var rateLimiterKey = "totp-validation-" + session.getId();
-        var rateLimiter = rateLimiterRegistry.rateLimiter(rateLimiterKey, "totp-validation");
-        return mono.transformDeferred(RateLimiterOperator.of(rateLimiter));
-    });
+private Function<Mono<Void>, Mono<Void>> rateLimiterForVerification(ServerRequest request, String username) {
+    return mono -> request.exchange()
+            .getSession()
+            .map(WebSession::getId)
+            // Fall back to a per-user key when no session can be derived
+            // (e.g. mock test environment), so the rate limit still applies.
+            .onErrorResume(throwable -> Mono.just(username))
+            .flatMap(key -> {
+                var rateLimiterKey = "totp-validation-" + key;
+                var rateLimiter = rateLimiterRegistry.rateLimiter(rateLimiterKey, "totp-validation");
+                return mono.transformDeferred(RateLimiterOperator.of(rateLimiter));
+            });
 }
 ```
 

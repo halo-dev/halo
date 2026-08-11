@@ -145,10 +145,13 @@ class SecurityVerificationEndpoint {
     }
 
     private Function<Mono<Void>, Mono<Void>> rateLimiterForVerification(ServerRequest request, String username) {
+        // Keyed by session id like the login TOTP validation, sharing the same
+        // totp-validation budget (5 attempts / 5 min). A user who rotates the
+        // session (log out / in) gets a fresh budget, but re-authentication is
+        // required each time, which bounds the practical attempt rate.
         return mono -> request.exchange()
                 .getSession()
                 .map(WebSession::getId)
-                .switchIfEmpty(Mono.just(username))
                 // Fall back to a per-user key when no session can be derived
                 // (e.g. mock test environment), so the rate limit still applies.
                 .onErrorResume(throwable -> Mono.just(username))

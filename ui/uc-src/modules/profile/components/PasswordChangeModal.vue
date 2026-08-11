@@ -54,7 +54,14 @@ const handleChangePassword = async () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const redirectURI = (e as any)?.response?.data?.redirectURI;
     if (redirectURI) {
-      window.location.href = redirectURI;
+      const verificationUrl = new URL(redirectURI, window.location.origin);
+      // Return to the profile page with the change-password modal reopened
+      // after the verification succeeds.
+      verificationUrl.searchParams.set(
+        "redirect",
+        "/uc/profile?password-change=1"
+      );
+      window.location.href = `${verificationUrl.pathname}${verificationUrl.search}`;
     }
   } finally {
     isSubmitting.value = false;

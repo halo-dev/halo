@@ -2,22 +2,41 @@ package run.halo.app.security.verification;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.core.authority.AuthorityUtils.createAuthorityList;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockUser;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.springSecurity;
 
 import io.github.resilience4j.ratelimiter.RateLimiter;
+import io.github.resilience4j.ratelimiter.RateLimiterConfig;
 import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
+import java.time.Duration;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpCookie;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextImpl;
+import org.springframework.security.web.server.context.ServerSecurityContextRepository;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.reactive.function.server.RouterFunction;
+import org.springframework.web.reactive.function.server.RouterFunctions;
+import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.User.UserSpec;
@@ -29,6 +48,7 @@ import run.halo.app.security.authentication.twofactor.totp.TotpAuthService;
 
 @SpringBootTest
 @AutoConfigureWebTestClient
+@Import(SecurityVerificationEndpointIntegrationTest.TestAuthenticationRouteConfiguration.class)
 class SecurityVerificationEndpointIntegrationTest {
 
     private static final String USERNAME = "faker";
@@ -50,6 +70,8 @@ class SecurityVerificationEndpointIntegrationTest {
     @MockitoBean
     RateLimiterRegistry rateLimiterRegistry;
 
+    private final Map<String, RateLimiter> rateLimiters = new ConcurrentHashMap<>();
+
     @BeforeEach
     void setUp() {
         webClient = WebTestClient.bindToApplicationContext(applicationContext)
@@ -57,9 +79,22 @@ class SecurityVerificationEndpointIntegrationTest {
                 .configureClient()
                 .build();
         // resilience4j configs (application.yaml) are shadowed by the test application.yaml,
-        // so the real registry has no named configs; stub with defaults like other endpoint tests.
+        // so the real registry has no named configs; emulate the registry with per-name
+        // caching like the real one, and give totp-validation a 1-permit budget so the
+        // rate limit can be exercised deterministically in tests.
         when(rateLimiterRegistry.rateLimiter(anyString(), anyString()))
-                .thenAnswer(invocation -> RateLimiter.ofDefaults(invocation.getArgument(0)));
+                .thenAnswer(invocation -> rateLimiters.computeIfAbsent(invocation.getArgument(0), name -> {
+                    var configName = invocation.<String>getArgument(1);
+                    if ("totp-validation".equals(configName)) {
+                        return RateLimiter.of(
+                                name,
+                                RateLimiterConfig.custom()
+                                        .limitForPeriod(1)
+                                        .limitRefreshPeriod(Duration.ofHours(1))
+                                        .build());
+                    }
+                    return RateLimiter.ofDefaults(name);
+                }));
     }
 
     User user(boolean emailVerified, String totpEncryptedSecret) {
@@ -316,5 +351,147 @@ class SecurityVerificationEndpointIntegrationTest {
                 .is3xxRedirection()
                 .expectHeader()
                 .valueEquals("Location", "/uc/profile");
+    }
+
+    @Test
+    void shouldAllowPasswordChangeAfterVerificationInSameSession() {
+        var user = userWithPassword(true, null);
+        when(userService.getUser(USERNAME)).thenReturn(Mono.just(user));
+        when(emailVerificationService.verifySecurityVerificationCode(USERNAME, "123456"))
+                .thenReturn(Mono.empty());
+        when(userService.confirmPassword(USERNAME, "old-password")).thenReturn(Mono.just(true));
+        when(userService.updateWithRawPassword(USERNAME, "new-password")).thenReturn(Mono.just(user));
+
+        var session = establishAuthenticatedSession();
+
+        // The password change is blocked before the session is verified.
+        webClient
+                .mutateWith(csrf())
+                .put()
+                .uri("/apis/uc.api.halo.run/v1alpha1/users/-/password")
+                .cookie(session.getName(), session.getValue())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "oldPassword": "old-password",
+                          "password": "new-password"
+                        }\
+                        """)
+                .exchange()
+                .expectStatus()
+                .isForbidden();
+
+        // Verify via email code within the same session.
+        webClient
+                .mutateWith(csrf())
+                .post()
+                .uri("/security-verification?redirect=/uc/profile")
+                .cookie(session.getName(), session.getValue())
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .bodyValue("redirect=/uc/profile&emailCode=123456")
+                .exchange()
+                .expectStatus()
+                .is3xxRedirection()
+                .expectHeader()
+                .valueEquals("Location", "/uc/profile");
+
+        // The verified session is allowed to change the password.
+        webClient
+                .mutateWith(csrf())
+                .put()
+                .uri("/apis/uc.api.halo.run/v1alpha1/users/-/password")
+                .cookie(session.getName(), session.getValue())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "oldPassword": "old-password",
+                          "password": "new-password"
+                        }\
+                        """)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.passwordSet")
+                .isEqualTo(true);
+
+        verify(userService, times(1)).updateWithRawPassword(USERNAME, "new-password");
+    }
+
+    @Test
+    void shouldRedirectWithRateLimitErrorWhenVerificationAttemptsExceeded() {
+        when(userService.getUser(USERNAME)).thenReturn(Mono.just(user(true, null)));
+        when(emailVerificationService.verifySecurityVerificationCode(USERNAME, "123456"))
+                .thenReturn(Mono.empty());
+
+        var session = establishAuthenticatedSession();
+
+        // First attempt consumes the only permit budgeted for this session.
+        webClient
+                .mutateWith(csrf())
+                .post()
+                .uri("/security-verification?redirect=/uc/profile")
+                .cookie(session.getName(), session.getValue())
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .bodyValue("redirect=/uc/profile&emailCode=123456")
+                .exchange()
+                .expectStatus()
+                .is3xxRedirection()
+                .expectHeader()
+                .valueEquals("Location", "/uc/profile");
+
+        // Second attempt in the same session exceeds the limit.
+        webClient
+                .mutateWith(csrf())
+                .post()
+                .uri("/security-verification?redirect=/uc/profile")
+                .cookie(session.getName(), session.getValue())
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .bodyValue("redirect=/uc/profile&emailCode=123456")
+                .exchange()
+                .expectStatus()
+                .is3xxRedirection()
+                .expectHeader()
+                .valueEquals("Location", "/security-verification?error=rate-limit-exceeded&redirect=/uc/profile");
+    }
+
+    User userWithPassword(boolean emailVerified, String totpEncryptedSecret) {
+        var user = user(emailVerified, totpEncryptedSecret);
+        user.getSpec().setPassword("fake-encoded-password");
+        return user;
+    }
+
+    private HttpCookie establishAuthenticatedSession() {
+        var result = webClient
+                .mutateWith(csrf())
+                .post()
+                .uri("/login/test/authentication")
+                .exchange()
+                .expectStatus()
+                .isNoContent()
+                .expectCookie()
+                .exists("SESSION")
+                .expectBody()
+                .returnResult();
+        return result.getResponseCookies().getFirst("SESSION");
+    }
+
+    @TestConfiguration
+    static class TestAuthenticationRouteConfiguration {
+
+        @Bean
+        @Order(Ordered.HIGHEST_PRECEDENCE)
+        RouterFunction<ServerResponse> testAuthenticationRoute(
+                ServerSecurityContextRepository securityContextRepository) {
+            return RouterFunctions.route()
+                    .POST("/login/test/authentication", request -> {
+                        var authentication = new UsernamePasswordAuthenticationToken(
+                                USERNAME, "password", createAuthorityList("ROLE_authenticated"));
+                        return securityContextRepository
+                                .save(request.exchange(), new SecurityContextImpl(authentication))
+                                .then(ServerResponse.noContent().build());
+                    })
+                    .build();
+        }
     }
 }
