@@ -24,6 +24,7 @@ import run.halo.app.core.extension.User.UserSpec;
 import run.halo.app.core.user.service.EmailVerificationService;
 import run.halo.app.core.user.service.UserService;
 import run.halo.app.extension.Metadata;
+import run.halo.app.infra.exception.EmailVerificationFailed;
 import run.halo.app.security.authentication.twofactor.totp.TotpAuthService;
 
 @SpringBootTest
@@ -217,6 +218,29 @@ class SecurityVerificationEndpointIntegrationTest {
                 .is3xxRedirection()
                 .expectHeader()
                 .valueEquals("Location", "/uc/profile");
+    }
+
+    @Test
+    void shouldRedirectWithRateLimitErrorWhenEmailCodeBlacklisted() {
+        when(userService.getUser(USERNAME)).thenReturn(Mono.just(user(true, null)));
+        when(emailVerificationService.verifySecurityVerificationCode(USERNAME, "123456"))
+                .thenReturn(Mono.error(new EmailVerificationFailed(
+                        "Too many attempts. Please try again later.",
+                        null,
+                        "problemDetail.user.email.verify.maxAttempts",
+                        null)));
+        webClient
+                .mutateWith(mockUser(USERNAME))
+                .mutateWith(csrf())
+                .post()
+                .uri("/security-verification?redirect=/uc/profile")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .bodyValue("redirect=/uc/profile&emailCode=123456")
+                .exchange()
+                .expectStatus()
+                .is3xxRedirection()
+                .expectHeader()
+                .valueEquals("Location", "/security-verification?error=rate-limit-exceeded&redirect=/uc/profile");
     }
 
     @Test

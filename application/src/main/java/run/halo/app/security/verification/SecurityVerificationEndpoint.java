@@ -29,6 +29,7 @@ import run.halo.app.core.user.service.EmailVerificationService;
 import run.halo.app.core.user.service.UserService;
 import run.halo.app.infra.actuator.GlobalInfoService;
 import run.halo.app.infra.exception.AccessDeniedException;
+import run.halo.app.infra.exception.EmailVerificationFailed;
 import run.halo.app.infra.exception.RateLimitExceededException;
 import run.halo.app.infra.utils.HaloUtils;
 import run.halo.app.security.authentication.twofactor.TotpVerificationService;
@@ -88,14 +89,24 @@ class SecurityVerificationEndpoint {
                     return redirectTo(redirect);
                 }
                 var username = user.getMetadata().getName();
-                var emailCode = formData.getFirst("emailCode");
                 var totpCode = formData.getFirst("totpCode");
-                var verifyMono = verifyMono(user, emailCode, totpCode);
+                var emailCode = formData.getFirst("emailCode");
+                var verifyMono = StringUtils.isNotBlank(totpCode)
+                        ? totpVerificationService.validate(user, totpCode)
+                        : StringUtils.isNotBlank(emailCode)
+                                ? emailVerificationService.verifySecurityVerificationCode(username, emailCode)
+                                : Mono.<Void>error(new ServerWebInputException("Verification code is required"));
                 return verifyMono
                         .transformDeferred(rateLimiterForVerification(request, username))
                         .then(request.exchange().getSession())
                         .doOnNext(securityVerificationService::markVerified)
                         .then(redirectTo(redirect))
+                        .onErrorResume(EmailVerificationFailed.class, e -> {
+                            var error = "problemDetail.user.email.verify.maxAttempts".equals(e.getDetailMessageCode())
+                                    ? "rate-limit-exceeded"
+                                    : "invalid-code";
+                            return redirectTo(redirectWithError(error, redirect));
+                        })
                         .onErrorResume(
                                 ServerWebInputException.class,
                                 e -> redirectTo(redirectWithError("invalid-code", redirect)))
@@ -104,17 +115,6 @@ class SecurityVerificationEndpoint {
                                 e -> redirectTo(redirectWithError("rate-limit-exceeded", redirect)));
             });
         });
-    }
-
-    private Mono<Void> verifyMono(User user, String emailCode, String totpCode) {
-        if (StringUtils.isNotBlank(emailCode)) {
-            return emailVerificationService.verifySecurityVerificationCode(
-                    user.getMetadata().getName(), emailCode);
-        }
-        if (StringUtils.isNotBlank(totpCode)) {
-            return totpVerificationService.validate(user, totpCode);
-        }
-        return Mono.error(new ServerWebInputException("Verification code is required"));
     }
 
     private Mono<ServerResponse> sendEmailCode(ServerRequest request) {
