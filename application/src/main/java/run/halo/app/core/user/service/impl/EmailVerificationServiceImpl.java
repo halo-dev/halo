@@ -119,8 +119,10 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
         if (log.isDebugEnabled()) {
             log.debug("Generated security verification code for user '{}' and email '{}': {}", username, email, code);
         }
-        var subscribeNotification = autoSubscribeVerificationEmailNotification(email);
-        var interestReasonSubject = createInterestReason(email).getSubject();
+        var subscribeNotification =
+                autoSubscribeVerificationEmailNotification(SECURITY_VERIFICATION_REASON_TYPE, email);
+        var interestReasonSubject =
+                createInterestReason(SECURITY_VERIFICATION_REASON_TYPE, email).getSubject();
         var emitReasonMono = reasonEmitter.emit(
                 SECURITY_VERIFICATION_REASON_TYPE,
                 builder -> builder.attribute("code", code)
@@ -195,8 +197,9 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
         if (log.isDebugEnabled()) {
             log.debug("Generated verification code for user '{}' and email '{}': {}", username, email, code);
         }
-        var subscribeNotification = autoSubscribeVerificationEmailNotification(email);
-        var interestReasonSubject = createInterestReason(email).getSubject();
+        var subscribeNotification = autoSubscribeVerificationEmailNotification(EMAIL_VERIFICATION_REASON_TYPE, email);
+        var interestReasonSubject =
+                createInterestReason(EMAIL_VERIFICATION_REASON_TYPE, email).getSubject();
         var emitReasonMono = reasonEmitter.emit(
                 EMAIL_VERIFICATION_REASON_TYPE,
                 builder -> builder.attribute("code", code)
@@ -212,10 +215,10 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
         return Mono.when(subscribeNotification).then(emitReasonMono);
     }
 
-    Mono<Void> autoSubscribeVerificationEmailNotification(String email) {
+    Mono<Void> autoSubscribeVerificationEmailNotification(String reasonType, String email) {
         var subscriber = new Subscription.Subscriber();
         subscriber.setName(UserIdentity.anonymousWithEmail(email).name());
-        var interestReason = createInterestReason(email);
+        var interestReason = createInterestReason(reasonType, email);
         return notificationCenter.subscribe(subscriber, interestReason).then();
     }
 
@@ -225,12 +228,13 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
         }
         var subscriber = new Subscription.Subscriber();
         subscriber.setName(UserIdentity.anonymousWithEmail(oldEmail).name());
-        return notificationCenter.unsubscribe(subscriber, createInterestReason(oldEmail));
+        return notificationCenter.unsubscribe(
+                subscriber, createInterestReason(EMAIL_VERIFICATION_REASON_TYPE, oldEmail));
     }
 
-    Subscription.InterestReason createInterestReason(String email) {
+    Subscription.InterestReason createInterestReason(String reasonType, String email) {
         var interestReason = new Subscription.InterestReason();
-        interestReason.setReasonType(EMAIL_VERIFICATION_REASON_TYPE);
+        interestReason.setReasonType(reasonType);
         interestReason.setSubject(Subscription.ReasonSubject.builder()
                 .apiVersion(new GroupVersion(User.GROUP, User.KIND).toString())
                 .kind(User.KIND)
