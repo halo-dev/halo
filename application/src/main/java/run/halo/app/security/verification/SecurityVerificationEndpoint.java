@@ -23,6 +23,7 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebInputException;
 import org.springframework.web.server.WebSession;
+import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.user.service.EmailVerificationService;
@@ -89,13 +90,23 @@ class SecurityVerificationEndpoint {
                     return redirectTo(redirect);
                 }
                 var username = user.getMetadata().getName();
+                var settings = TwoFactorUtils.getTwoFactorAuthSettings(user);
                 var totpCode = formData.getFirst("totpCode");
                 var emailCode = formData.getFirst("emailCode");
-                var verifyMono = StringUtils.isNotBlank(totpCode)
-                        ? totpVerificationService.validate(user, totpCode)
-                        : StringUtils.isNotBlank(emailCode)
-                                ? emailVerificationService.verifySecurityVerificationCode(username, emailCode)
-                                : Mono.<Void>error(new ServerWebInputException("Verification code is required"));
+                Mono<Void> verifyMono;
+                if (StringUtils.isNotBlank(totpCode)) {
+                    // Only accept TOTP when the user actually has TOTP configured,
+                    // otherwise TotpVerificationService.validate would pass unconditionally.
+                    verifyMono = settings.isTotpConfigured()
+                            ? totpVerificationService.validate(user, totpCode)
+                            : Mono.<Void>error(new ServerWebInputException("TOTP is not configured."));
+                } else if (StringUtils.isNotBlank(emailCode)) {
+                    verifyMono = settings.isEmailVerified()
+                            ? emailVerificationService.verifySecurityVerificationCode(username, emailCode)
+                            : Mono.<Void>error(new ServerWebInputException("Email is not verified."));
+                } else {
+                    verifyMono = Mono.<Void>error(new ServerWebInputException("Verification code is required"));
+                }
                 return verifyMono
                         .transformDeferred(rateLimiterForVerification(request, username))
                         .then(request.exchange().getSession())
@@ -162,13 +173,23 @@ class SecurityVerificationEndpoint {
                 && redirect.startsWith("/")
                 && !redirect.startsWith("//")
                 && !redirect.contains("\\")) {
-            return redirect;
+            try {
+                URI.create(redirect);
+                return redirect;
+            } catch (IllegalArgumentException e) {
+                // fall through to default
+            }
         }
         return DEFAULT_REDIRECT;
     }
 
     private static String redirectWithError(String error, String redirect) {
-        return "/security-verification?error=" + error + "&redirect=" + redirect;
+        return UriComponentsBuilder.fromPath("/security-verification")
+                .queryParam("error", error)
+                .queryParam("redirect", redirect)
+                .build()
+                .encode()
+                .toUriString();
     }
 
     private static Mono<ServerResponse> redirectTo(String location) {

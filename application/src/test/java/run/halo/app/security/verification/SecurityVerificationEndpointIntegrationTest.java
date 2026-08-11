@@ -221,6 +221,23 @@ class SecurityVerificationEndpointIntegrationTest {
     }
 
     @Test
+    void shouldRejectTotpCodeWhenTotpNotConfigured() {
+        when(userService.getUser(USERNAME)).thenReturn(Mono.just(user(true, null)));
+        webClient
+                .mutateWith(mockUser(USERNAME))
+                .mutateWith(csrf())
+                .post()
+                .uri("/security-verification?redirect=/uc/profile")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .bodyValue("redirect=/uc/profile&totpCode=123456")
+                .exchange()
+                .expectStatus()
+                .is3xxRedirection()
+                .expectHeader()
+                .valueEquals("Location", "/security-verification?error=invalid-code&redirect=/uc/profile");
+    }
+
+    @Test
     void shouldRedirectWithRateLimitErrorWhenEmailCodeBlacklisted() {
         when(userService.getUser(USERNAME)).thenReturn(Mono.just(user(true, null)));
         when(emailVerificationService.verifySecurityVerificationCode(USERNAME, "123456"))
