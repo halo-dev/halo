@@ -501,7 +501,7 @@ import java.time.Instant;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
 import org.springframework.mock.web.server.MockServerWebExchange;
-import org.springframework.mock.web.server.MockWebSession;
+import org.springframework.web.server.WebSession;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.User.UserSpec;
 import run.halo.app.extension.Metadata;
@@ -510,8 +510,8 @@ class SecurityVerificationServiceTest {
 
     final SecurityVerificationService service = new SecurityVerificationService();
 
-    MockWebSession session() {
-        return (MockWebSession) MockServerWebExchange.builder(MockServerHttpRequest.get("/")).build()
+    WebSession session() {
+        return MockServerWebExchange.builder(MockServerHttpRequest.get("/")).build()
                 .getSession()
                 .block();
     }
