@@ -5,8 +5,8 @@ autoInstallPeers: true
 strictPeerDependencies: false
 catalog:
   "@vitest/ui": 4.1.10
-  vite: npm:@voidzero-dev/vite-plus-core@0.2.8
-  vite-plus: 0.2.8
+  vite: npm:@voidzero-dev/vite-plus-core@0.2.9
+  vite-plus: 0.2.9
   vitest: 4.1.10
 overrides:
   axios: ^1.16.1
@@ -42,13 +42,13 @@ minimumReleaseAgeExclude:
   - "@vueuse/metadata@14.4.0"
   - "@vueuse/router@14.4.0"
   - "@vueuse/shared@14.4.0"
-  - "@voidzero-dev/vite-plus-core@0.2.8"
-  - "@voidzero-dev/vite-plus-darwin-arm64@0.2.8"
-  - "@voidzero-dev/vite-plus-darwin-x64@0.2.8"
-  - "@voidzero-dev/vite-plus-linux-arm64-gnu@0.2.8"
-  - "@voidzero-dev/vite-plus-linux-arm64-musl@0.2.8"
-  - "@voidzero-dev/vite-plus-linux-x64-gnu@0.2.8"
-  - "@voidzero-dev/vite-plus-linux-x64-musl@0.2.8"
-  - "@voidzero-dev/vite-plus-win32-arm64-msvc@0.2.8"
-  - "@voidzero-dev/vite-plus-win32-x64-msvc@0.2.8"
-  - vite-plus@0.2.8
+  - "@voidzero-dev/vite-plus-core@0.2.9"
+  - "@voidzero-dev/vite-plus-darwin-arm64@0.2.9"
+  - "@voidzero-dev/vite-plus-darwin-x64@0.2.9"
+  - "@voidzero-dev/vite-plus-linux-arm64-gnu@0.2.9"
+  - "@voidzero-dev/vite-plus-linux-arm64-musl@0.2.9"
+  - "@voidzero-dev/vite-plus-linux-x64-gnu@0.2.9"
+  - "@voidzero-dev/vite-plus-linux-x64-musl@0.2.9"
+  - "@voidzero-dev/vite-plus-win32-arm64-msvc@0.2.9"
+  - "@voidzero-dev/vite-plus-win32-x64-msvc@0.2.9"
+  - vite-plus@0.2.9
