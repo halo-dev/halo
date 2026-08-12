@@ -486,7 +486,7 @@ git commit -m "feat: add security verification email code service and notificati
 - Produces:
 - `SecurityVerificationService.isVerified(WebSession) → boolean`
 - `SecurityVerificationService.markVerified(WebSession) → void`
-- `SecurityVerificationService.isAvailable(User) → boolean`
+- `SecurityVerificationService.hasVerificationMethod(User) → boolean`
 - `SecurityVerificationRequiredException`（403，body 属性 `redirectURI = /security-verification`）——Task 6/7 使用
 
 - [ ] **Step 1: 写失败测试** `SecurityVerificationServiceTest.java`
@@ -549,17 +549,17 @@ class SecurityVerificationServiceTest {
 
     @Test
     void shouldBeAvailableWhenEmailVerified() {
-        assertThat(service.isAvailable(user(true, null))).isTrue();
+        assertThat(service.hasVerificationMethod(user(true, null))).isTrue();
     }
 
     @Test
     void shouldBeAvailableWhenTotpConfigured() {
-        assertThat(service.isAvailable(user(false, "encrypted-secret"))).isTrue();
+        assertThat(service.hasVerificationMethod(user(false, "encrypted-secret"))).isTrue();
     }
 
     @Test
     void shouldNotBeAvailableWithoutAnyMethod() {
-        assertThat(service.isAvailable(user(false, null))).isFalse();
+        assertThat(service.hasVerificationMethod(user(false, null))).isFalse();
     }
 }
 ```
@@ -609,7 +609,7 @@ public class SecurityVerificationService {
     /**
      * Whether the user has any security verification method (verified email or TOTP).
      */
-    public boolean isAvailable(User user) {
+    public boolean hasVerificationMethod(User user) {
         var settings = TwoFactorUtils.getTwoFactorAuthSettings(user);
         return settings.isEmailVerified() || settings.isTotpConfigured();
     }
@@ -661,14 +661,20 @@ git commit -m "feat: add security verification session service and exception"
 ### Task 4: 验证页模板
 
 **Files:**
-- Create: `application/src/main/resources/templates/security-verification.html`
+- Create: `application/src/main/resources/templates/security-verification.html`（页面壳，含方法切换链接样式）
 - Create: `application/src/main/resources/templates/security-verification.properties`、`_en.properties`、`_es.properties`、`_zh_TW.properties`
-- Create: `application/src/main/resources/templates/gateway_fragments/security-verification.html`
+- Create: `application/src/main/resources/templates/gateway_fragments/security-verification.html`（包装片段：错误提示 + 方法切换链接 + 动态包含方法表单）
+- Create: `application/src/main/resources/templates/security-verification_email.html`（邮箱验证码方法表单，独立模板文件，仿 `login_email-code.html`）
+- Create: `application/src/main/resources/templates/security-verification_totp.html`（TOTP 方法表单，独立模板文件）
 - Create: `application/src/main/resources/templates/gateway_fragments/security-verification.properties`、`_en.properties`、`_es.properties`、`_zh_TW.properties`
 
 **Interfaces:**
-- Consumes（render 模型，Task 5 提供）：`globalInfo`（Mono&lt;GlobalInfo&gt;）、`emailVerified`（boolean）、`totpConfigured`（boolean）、`redirect`（String）
+- Consumes（render 模型，Task 5 提供）：`globalInfo`（Mono&lt;GlobalInfo&gt;）、`redirect`（String）、`availableMethods`（`List&lt;SecurityVerificationService.SecurityVerificationMethod&gt;`，每项含 `name` 与 `fragmentTemplateName`，由 `SecurityVerificationService.availableMethods(User)` Bean 提供）、`fragmentTemplateName`（String，当前方法的表单片段，仿登录页 `fragmentTemplateName` 机制）
 - Produces: 模板 `security-verification` 及其 fragment（Task 5 渲染、Task 6 集成测试断言）
+
+设计要点：
+- 与登录页一致，**每个验证方法一个独立模板文件**，方法切换用页面链接（`/security-verification?method=totp`），不使用 JS 显隐切换；`gateway_fragments/security-verification.html` 通过 `th:replace="~{__${fragmentTemplateName}__::form}"` 动态包含当前方法表单。
+- **方法列表数据驱动**：tabs 由模型属性 `availableMethods` 经 `th:each` 渲染（tab 文案 key 按约定为 `form.method.<name>`），模板不硬编码任何方法。列表来自 `SecurityVerificationService` 的普通 Bean 方法——不引入扩展点机制；若未来 Pro 要新增短信方法，可在此基础上自行扩展列表来源（如主题覆盖页面模板或贡献模型数据）。
 
 - [ ] **Step 1: 页面模板** `security-verification.html`
 
@@ -684,7 +690,7 @@ git commit -m "feat: add security verification session service and exception"
       <div class="halo-form-wrapper">
         <h1 class="form-title" th:text="#{title}"></h1>
         <p class="form-description" th:text="#{subtitle}"></p>
-        <form th:replace="~{gateway_fragments/security-verification::form}"></form>
+        <div th:replace="~{gateway_fragments/security-verification::form}"></div>
       </div>
     </div>
   </th:block>
@@ -706,35 +712,30 @@ git commit -m "feat: add security verification session service and exception"
         cursor: pointer;
         color: var(--color-text);
         font-size: var(--text-sm);
+        text-align: center;
+        text-decoration: none;
       }
       .security-verification-form .method-tab.active {
         background: var(--color-primary);
         color: #fff;
       }
-      .security-verification-form .form-description {
-        margin-bottom: 1.25rem;
-        color: var(--color-text-secondary);
+      .security-verification-form .cancel-link {
+        color: var(--color-link);
         font-size: var(--text-sm);
+        text-decoration: none;
+        text-align: center;
       }
     </style>
   </th:block>
 </html>
 ```
 
-- [ ] **Step 2: 表单 fragment** `gateway_fragments/security-verification.html`
+> 注：`.method-tab` 现在是 `<a>` 链接（方法切换用 URL 而不是 JS tab 切换），需要 `text-align: center` 与 `text-decoration: none`。
+
+- [ ] **Step 2: 包装片段** `gateway_fragments/security-verification.html`
 
 ```html
-<form
-  th:fragment="form"
-  class="halo-form security-verification-form"
-  th:action="@{/security-verification}"
-  name="security-verification-form"
-  id="security-verification-form"
-  method="post"
->
-  <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-  <input type="hidden" name="redirect" th:value="${redirect}" />
-
+<div th:fragment="form" class="halo-form security-verification-form">
   <div class="alert alert-error" role="alert" th:if="${param.error.size() > 0}">
     <strong
       th:if="${#strings.equals(param.error[0], 'rate-limit-exceeded')}"
@@ -746,12 +747,38 @@ git commit -m "feat: add security verification session service and exception"
     ></strong>
   </div>
 
-  <div class="method-switcher" th:if="${emailVerified} and ${totpConfigured}">
-    <button type="button" class="method-tab active" data-method="email" th:text="#{form.method.email}"></button>
-    <button type="button" class="method-tab" data-method="totp" th:text="#{form.method.totp}"></button>
+  <div class="method-switcher" th:if="${availableMethods.size() > 1}">
+    <a
+      th:each="method : ${availableMethods}"
+      class="method-tab"
+      th:classappend="${method.fragmentTemplateName == fragmentTemplateName} ? 'active'"
+      th:href="@{/security-verification(method=${method.name})}"
+      th:text="#{'form.method.' + ${method.name}}"
+    ></a>
   </div>
 
-  <div class="form-item" th:if="${emailVerified}" id="email-method">
+  <div th:replace="~{__${fragmentTemplateName}__::form}"></div>
+
+  <div class="form-item">
+    <a th:href="@{/uc/profile}" class="cancel-link" th:text="#{form.cancel}"></a>
+  </div>
+</div>
+```
+
+- [ ] **Step 3: 邮箱方法表单** `security-verification_email.html`（独立模板文件，仿 `login_email-code.html`）
+
+```html
+<form
+  th:fragment="form"
+  class="halo-form security-verification-form"
+  th:action="@{/security-verification/email}"
+  name="security-verification-form-email"
+  id="security-verification-form-email"
+  method="post"
+>
+  <input type="hidden" name="redirect" th:value="${redirect}" />
+
+  <div class="form-item">
     <label for="emailCode" th:text="#{form.emailCode.label}"></label>
     <div class="form-input-group">
       <div class="form-input">
@@ -769,8 +796,59 @@ git commit -m "feat: add security verification session service and exception"
       <button id="emailCodeSendButton" type="button" th:text="#{form.emailCode.send}"></button>
     </div>
   </div>
+  <div class="form-item">
+    <button type="submit" th:text="#{form.submit}"></button>
+  </div>
 
-  <div class="form-item" th:if="${totpConfigured}" id="totp-method">
+  <script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+      const headerName = /*[[${_csrf.headerName}]]*/ "";
+      const token = /*[[${_csrf.token}]]*/ "";
+
+      async function sendRequest() {
+        const response = await fetch("/security-verification/email-code", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            [headerName]: token,
+          },
+        });
+
+        if (!response.ok) {
+          const json = await response.json();
+          if (json.errors && json.errors.length) {
+            throw new Error(json.errors[0]);
+          }
+          if (json.detail) {
+            throw new Error(json.detail);
+          }
+          throw new Error(i18nResources.sendVerificationCodeFailed);
+        }
+
+        return response;
+      }
+
+      const emailCodeSendButton = document.getElementById("emailCodeSendButton");
+      sendVerificationCode(emailCodeSendButton, sendRequest);
+    });
+  </script>
+</form>
+```
+
+- [ ] **Step 4: TOTP 方法表单** `security-verification_totp.html`（独立模板文件，满 6 位自动提交）
+
+```html
+<form
+  th:fragment="form"
+  class="halo-form security-verification-form"
+  th:action="@{/security-verification/totp}"
+  name="security-verification-form-totp"
+  id="security-verification-form-totp"
+  method="post"
+>
+  <input type="hidden" name="redirect" th:value="${redirect}" />
+
+  <div class="form-item">
     <label for="totpCode" th:text="#{form.totpCode.label}"></label>
     <div class="form-input">
       <input
@@ -781,94 +859,39 @@ git commit -m "feat: add security verification session service and exception"
         autocomplete="one-time-code"
         pattern="\d{6}"
         maxlength="6"
-        th:disabled="${emailVerified}"
         required
       />
     </div>
   </div>
-
   <div class="form-item">
     <button type="submit" th:text="#{form.submit}"></button>
   </div>
-  <div class="form-item">
-    <a th:href="@{/uc/profile}" class="cancel-link" th:text="#{form.cancel}"></a>
-  </div>
 
-  <script th:inline="javascript">
+  <script>
     document.addEventListener("DOMContentLoaded", function () {
-      const headerName = /*[[${_csrf.headerName}]]*/ "";
-      const token = /*[[${_csrf.token}]]*/ "";
-      const form = document.getElementById("security-verification-form");
-      const emailMethod = document.getElementById("email-method");
-      const totpMethod = document.getElementById("totp-method");
-      const tabs = Array.from(document.querySelectorAll(".method-tab"));
-
-      function activateMethod(method) {
-        tabs.forEach((tab) => {
-          tab.classList.toggle("active", tab.dataset.method === method);
-        });
-        const useEmail = method === "email";
-        emailMethod.style.display = useEmail ? "" : "none";
-        totpMethod.style.display = useEmail ? "none" : "";
-        emailMethod.querySelector("input").disabled = !useEmail;
-        totpMethod.querySelector("input").disabled = useEmail;
-      }
-
-      tabs.forEach((tab) => {
-        tab.addEventListener("click", function () {
-          activateMethod(tab.dataset.method);
-        });
-      });
-
-      const emailCodeSendButton = document.getElementById("emailCodeSendButton");
-      if (emailCodeSendButton) {
-        async function sendRequest() {
-          const response = await fetch("/security-verification/email-code", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              [headerName]: token,
-            },
-          });
-
-          if (!response.ok) {
-            const json = await response.json();
-            if (json.errors && json.errors.length) {
-              throw new Error(json.errors[0]);
-            }
-            if (json.detail) {
-              throw new Error(json.detail);
-            }
-            throw new Error(i18nResources.sendVerificationCodeFailed);
-          }
-
-          return response;
-        }
-
-        sendVerificationCode(emailCodeSendButton, sendRequest);
-      }
-
+      const form = document.getElementById("security-verification-form-totp");
       const totpInput = document.getElementById("totpCode");
-      if (totpInput) {
-        let submitting = false;
-        totpInput.addEventListener("input", function (event) {
-          if (submitting || event.isComposing || totpInput.disabled) {
-            return;
-          }
-          if (/^\d{6}$/.test(totpInput.value)) {
-            submitting = true;
-            form.requestSubmit();
-          }
-        });
-      }
+      let submitting = false;
+
+      totpInput.addEventListener("input", function (event) {
+        if (submitting || event.isComposing || totpInput.disabled) {
+          return;
+        }
+        if (/^\d{6}$/.test(totpInput.value)) {
+          submitting = true;
+          form.requestSubmit();
+        }
+      });
     });
   </script>
 </form>
 ```
 
-说明：`sendVerificationCode(button, sendRequest)` 是 `/js/main.js` 的共享助手（60 秒倒计时、`i18nResources` 文案、Toast），`login_email-code.html` 同款用法。`_csrf` 由 Spring Security 的 CsrfWebFilter 注入模板上下文。
+说明：`sendVerificationCode(button, sendRequest)` 是 `/js/main.js` 的共享助手（60 秒倒计时、`i18nResources` 文案、Toast），`login_email-code.html` 同款用法。CSRF 由 Spring Security 的 CsrfWebFilter 经 Thymeleaf `RequestDataValueProcessor` 自动注入每个 `th:action` 表单——**不要再手写 `_csrf` 隐藏域**，否则提交时会出现两个相同的 `_csrf` 参数。
 
-- [ ] **Step 3: 页面 properties**（`security-verification.properties` + 3 个语言变体）
+> 设计说明：每个方法一个独立模板文件（`security-verification_email.html` / `security-verification_totp.html`），包装片段按 `fragmentTemplateName` 动态包含当前方法表单。后续接入短信验证（Pro）时，新增 `security-verification_sms.html` + 自己的端点即可，社区版模板与端点零改动。
+
+- [ ] **Step 5: 页面 properties**（`security-verification.properties` + 3 个语言变体）
 
 `security-verification.properties`（默认，中文）：
 
@@ -898,7 +921,7 @@ title=安全驗證
 subtitle=為保障帳號安全，請完成安全驗證後繼續操作
 ```
 
-- [ ] **Step 4: fragment properties**（`gateway_fragments/security-verification.properties` + 3 个语言变体）
+- [ ] **Step 6: fragment properties**（`gateway_fragments/security-verification.properties` + 3 个语言变体）
 
 `gateway_fragments/security-verification.properties`（默认，中文）：
 
@@ -956,7 +979,7 @@ form.submit=驗證
 form.cancel=取消
 ```
 
-- [ ] **Step 5: 校验模板编译并提交**
+- [ ] **Step 7: 校验模板编译并提交**
 
 Run: `./gradlew :application:processResources`
 Expected: 成功（Thymeleaf 语法错误会在渲染时暴露，Task 5 集成测试覆盖渲染）。
@@ -964,6 +987,8 @@ Expected: 成功（Thymeleaf 语法错误会在渲染时暴露，Task 5 集成�
 ```bash
 git add application/src/main/resources/templates/security-verification.html \
   application/src/main/resources/templates/security-verification*.properties \
+  application/src/main/resources/templates/security-verification_email.html \
+  application/src/main/resources/templates/security-verification_totp.html \
   application/src/main/resources/templates/gateway_fragments/security-verification.html \
   application/src/main/resources/templates/gateway_fragments/security-verification*.properties
 git commit -m "feat: add security verification page templates"
@@ -975,12 +1000,16 @@ git commit -m "feat: add security verification page templates"
 
 **Files:**
 - Create: `application/src/main/java/run/halo/app/security/verification/SecurityVerificationEndpoint.java`
+- Create: `application/src/main/java/run/halo/app/security/verification/SecurityVerificationFlowService.java`（公开组件：`currentUser` / `verifyAndRedirect` / `safeRedirect` / `redirectWithError` / `redirectTo`，供方法端点复用——Pro 短信端点可直接注入）
+- Modify: `application/src/main/java/run/halo/app/security/verification/SecurityVerificationService.java`（新增 `availableMethods(User)` → `List<SecurityVerificationMethod>`，含嵌套记录 `SecurityVerificationMethod(name, fragmentTemplateName)`）
 - Modify: `application/src/main/java/run/halo/app/security/authorization/AuthorizationExchangeConfigurers.java`（Order 300 规则加路径）
 - Test: `application/src/test/java/run/halo/app/security/verification/SecurityVerificationEndpointIntegrationTest.java`
 
 **Interfaces:**
-- Consumes: `UserService.getUser(String)`、`GlobalInfoService.getGlobalInfo()`、`TwoFactorUtils.getTwoFactorAuthSettings(User)`、`SecurityVerificationService.isAvailable(User)`（Task 3）
-- Produces: `GET /security-verification`（渲染页面，注入 `globalInfo`/`emailVerified`/`totpConfigured`/`redirect`）、授权规则 `/security-verification/**` → authenticated
+- Consumes: `UserService.getUser(String)`、`GlobalInfoService.getGlobalInfo()`、`TwoFactorUtils.getTwoFactorAuthSettings(User)`、`SecurityVerificationService.availableMethods(User)` / `hasVerificationMethod(User)`（Task 3）、`SecurityVerificationFlowService`（本任务创建）
+- Produces: `GET /security-verification`（渲染页面，注入 `globalInfo`/`redirect`/`availableMethods`/`fragmentTemplateName`）、授权规则 `/security-verification/**` → authenticated
+
+> 设计说明：`availableMethods` 来自 `SecurityVerificationService` 的普通 Bean 方法（社区内置 email/totp），**不引入扩展点机制**；端点按用户可用方法过滤、按 `?method` 参数解析 `fragmentTemplateName`，模板用 `th:each` 渲染 tabs。共享验证流程（取会话/限流/markVerified/错误重定向）提取到公开的 `SecurityVerificationFlowService`，端点与未来的 Pro 短信端点共用。
 
 - [ ] **Step 1: 写失败集成测试** `SecurityVerificationEndpointIntegrationTest.java`
 
@@ -1133,26 +1162,30 @@ Expected: 404（端点不存在）。
 package run.halo.app.security.verification;
 
 import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
+import io.github.resilience4j.ratelimiter.RequestNotPermitted;
+import io.github.resilience4j.reactor.ratelimiter.operator.RateLimiterOperator;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
-import run.halo.app.core.extension.User;
 import run.halo.app.core.user.service.EmailVerificationService;
-import run.halo.app.core.user.service.UserService;
 import run.halo.app.infra.actuator.GlobalInfoService;
-import run.halo.app.infra.exception.AccessDeniedException;
+import run.halo.app.infra.exception.RateLimitExceededException;
 import run.halo.app.infra.utils.HaloUtils;
-import run.halo.app.security.authentication.twofactor.TwoFactorUtils;
 import run.halo.app.security.authentication.twofactor.TotpVerificationService;
+import run.halo.app.security.authentication.twofactor.TwoFactorUtils;
+import run.halo.app.security.verification.SecurityVerificationService.SecurityVerificationMethod;
 
 /**
  * Post-auth endpoint for the security verification page (sudo mode).
@@ -1164,13 +1197,11 @@ import run.halo.app.security.authentication.twofactor.TotpVerificationService;
 @RequiredArgsConstructor
 class SecurityVerificationEndpoint {
 
-    private static final String DEFAULT_REDIRECT = "/uc/profile";
-
-    private final UserService userService;
     private final GlobalInfoService globalInfoService;
     private final EmailVerificationService emailVerificationService;
     private final TotpVerificationService totpVerificationService;
     private final SecurityVerificationService securityVerificationService;
+    private final SecurityVerificationFlowService flowService;
     private final RateLimiterRegistry rateLimiterRegistry;
 
     @Bean
@@ -1178,122 +1209,106 @@ class SecurityVerificationEndpoint {
     RouterFunction<ServerResponse> securityVerificationEndpoints() {
         return RouterFunctions.route()
                 .GET("/security-verification", this::renderVerificationPage)
-                .POST("/security-verification", this::verifySecurityVerification)
+                .POST("/security-verification/email", this::verifyByEmail)
+                .POST("/security-verification/totp", this::verifyByTotp)
                 .POST("/security-verification/email-code", this::sendEmailCode)
                 .before(HaloUtils.noCache())
                 .build();
     }
 
     private Mono<ServerResponse> renderVerificationPage(ServerRequest request) {
-        var redirect = safeRedirect(request.queryParam("redirect").orElse(DEFAULT_REDIRECT));
-        return currentUser(request)
-                .flatMap(user -> {
-                    if (!securityVerificationService.isAvailable(user)) {
-                        return redirectTo(redirect);
-                    }
-                    var settings = TwoFactorUtils.getTwoFactorAuthSettings(user);
-                    var model = new HashMap<String, Object>();
-                    model.put("globalInfo", globalInfoService.getGlobalInfo());
-                    model.put("emailVerified", settings.isEmailVerified());
-                    model.put("totpConfigured", settings.isTotpConfigured());
-                    model.put("redirect", redirect);
-                    return ServerResponse.ok().render("security-verification", model);
-                });
+        var redirect = flowService.safeRedirect(
+                request.queryParam("redirect").orElse(SecurityVerificationFlowService.DEFAULT_REDIRECT));
+        return flowService.currentUser(request).flatMap(user -> {
+            var availableMethods = securityVerificationService.availableMethods(user);
+            if (availableMethods.isEmpty()) {
+                return flowService.redirectTo(redirect);
+            }
+            var model = new HashMap<String, Object>();
+            model.put("globalInfo", globalInfoService.getGlobalInfo());
+            model.put("redirect", redirect);
+            model.put("availableMethods", availableMethods);
+            model.put("fragmentTemplateName", resolveFragmentTemplateName(request, availableMethods));
+            return ServerResponse.ok().render("security-verification", model);
+        });
+    }
+
+    private static String resolveFragmentTemplateName(
+            ServerRequest request, List<SecurityVerificationMethod> availableMethods) {
+        var requestedMethod = request.queryParam("method").orElse(null);
+        return availableMethods.stream()
+                .filter(method -> Objects.equals(requestedMethod, method.name()))
+                .map(SecurityVerificationMethod::fragmentTemplateName)
+                .findFirst()
+                .orElseGet(() -> availableMethods.get(0).fragmentTemplateName());
     }
 
     private Mono<ServerResponse> sendEmailCode(ServerRequest request) {
-        return currentUser(request)
+        return flowService.currentUser(request)
                 .flatMap(user -> emailVerificationService
                         .sendSecurityVerificationCode(user.getMetadata().getName())
-                        .then(ServerResponse.accepted().build()));
+                        .transformDeferred(
+                                rateLimiterForSendingCode(user.getMetadata().getName()))
+                        .then(ServerResponse.accepted().build()))
+                .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new);
     }
 
-    private Mono<ServerResponse> verifySecurityVerification(ServerRequest request) {
-        return request.formData()
-                .flatMap(form -> {
-                    var redirect = safeRedirect(form.getFirst("redirect"));
-                    return currentUser(request)
-                            .flatMap(user -> {
-                                var username = user.getMetadata().getName();
-                                var emailCode = form.getFirst("emailCode");
-                                var totpCode = form.getFirst("totpCode");
-                                var settings = TwoFactorUtils.getTwoFactorAuthSettings(user);
-                                Mono<Void> verifyMono;
-                                if (StringUtils.isNotBlank(totpCode)) {
-                                    // Only accept TOTP when the user actually has TOTP configured,
-                                    // otherwise TotpVerificationService.validate passes unconditionally.
-                                    verifyMono = settings.isTotpConfigured()
-                                            ? totpVerificationService.validate(user, totpCode)
-                                            : Mono.error(new ServerWebInputException("TOTP is not configured."));
-                                } else if (StringUtils.isNotBlank(emailCode)) {
-                                    verifyMono = settings.isEmailVerified()
-                                            ? emailVerificationService.verifySecurityVerificationCode(
-                                                    username, emailCode)
-                                            : Mono.error(new ServerWebInputException("Email is not verified."));
-                                } else {
-                                    verifyMono = Mono.error(new ServerWebInputException(
-                                            "Verification code is required"));
-                                }
-                                return verifyMono
-                                        .then(request.exchange().getSession())
-                                        .doOnNext(securityVerificationService::markVerified)
-                                        .then(redirectTo(redirect));
-                            })
-                            .onErrorResume(RequestNotPermitted.class,
-                                    e -> redirectWithError(redirect, "rate-limit-exceeded"))
-                            .onErrorResume(EmailVerificationFailed.class, e -> {
-                                var error = "problemDetail.user.email.verify.maxAttempts"
-                                        .equals(e.getDetailMessageCode())
-                                                ? "rate-limit-exceeded"
-                                                : "invalid-code";
-                                return redirectWithError(redirect, error);
-                            })
-                            .onErrorResume(ServerWebInputException.class,
-                                    e -> redirectWithError(redirect, "invalid-code"));
-                });
+    private Mono<ServerResponse> verifyByEmail(ServerRequest request) {
+        return request.formData().flatMap(formData -> {
+            var redirect = flowService.safeRedirect(formData.getFirst("redirect"));
+            var emailCode = formData.getFirst("emailCode");
+            return flowService.currentUser(request).flatMap(user -> {
+                if (securityVerificationService.availableMethods(user).isEmpty()) {
+                    return flowService.redirectTo(redirect);
+                }
+                if (!TwoFactorUtils.getTwoFactorAuthSettings(user).isEmailVerified()) {
+                    return flowService.redirectTo(
+                            flowService.redirectWithError("invalid-code", redirect, "email"));
+                }
+                if (StringUtils.isBlank(emailCode)) {
+                    return flowService.redirectTo(
+                            flowService.redirectWithError("invalid-code", redirect, "email"));
+                }
+                return flowService.verifyAndRedirect(
+                        request,
+                        redirect,
+                        "email",
+                        emailVerificationService.verifySecurityVerificationCode(
+                                user.getMetadata().getName(), emailCode));
+            });
+        });
     }
 
-    private Mono<User> currentUser(ServerRequest request) {
-        return ReactiveSecurityContextHolder.getContext()
-                .map(SecurityContext::getAuthentication)
-                .filter(authentication -> authentication != null
-                        && !(authentication instanceof AnonymousAuthenticationToken))
-                .switchIfEmpty(Mono.error(AccessDeniedException::new))
-                .map(Authentication::getName)
-                .flatMap(userService::getUser);
+    private Mono<ServerResponse> verifyByTotp(ServerRequest request) {
+        return request.formData().flatMap(formData -> {
+            var redirect = flowService.safeRedirect(formData.getFirst("redirect"));
+            var totpCode = formData.getFirst("totpCode");
+            return flowService.currentUser(request).flatMap(user -> {
+                if (securityVerificationService.availableMethods(user).isEmpty()) {
+                    return flowService.redirectTo(redirect);
+                }
+                if (!TwoFactorUtils.getTwoFactorAuthSettings(user).isTotpConfigured()) {
+                    return flowService.redirectTo(
+                            flowService.redirectWithError("invalid-code", redirect, "totp"));
+                }
+                return flowService.verifyAndRedirect(
+                        request, redirect, "totp", totpVerificationService.validate(user, totpCode));
+            });
+        });
     }
 
-    private static String safeRedirect(String redirect) {
-        if (StringUtils.hasText(redirect) && redirect.startsWith("/")
-                && !redirect.startsWith("//") && !redirect.contains("\\")) {
-            try {
-                URI.create(redirect);
-                return redirect;
-            } catch (IllegalArgumentException e) {
-                // fall through to default
-            }
-        }
-        return DEFAULT_REDIRECT;
-    }
-
-    private static Mono<ServerResponse> redirectTo(String location) {
-        return ServerResponse.status(HttpStatus.FOUND).location(URI.create(location)).build();
-    }
-
-    private static Mono<ServerResponse> redirectWithError(String redirect, String error) {
-        var location = UriComponentsBuilder.fromPath("/security-verification")
-                .queryParam("error", error)
-                .queryParam("redirect", redirect)
-                .build()
-                .toUri();
-        return redirectTo(location.toString());
+    private Function<Mono<Void>, Mono<Void>> rateLimiterForSendingCode(String username) {
+        var rateLimiter =
+                rateLimiterRegistry.rateLimiter("send-security-verification-code-" + username, "send-login-email-code");
+        var operator = RateLimiterOperator.<Void>of(rateLimiter);
+        return mono -> mono.transformDeferred(operator);
     }
 }
 ```
 
-需要补全的 import（除文件头已有的）：`io.github.resilience4j.ratelimiter.RequestNotPermitted`、`java.net.URI`、`org.springframework.http.HttpStatus`、`org.springframework.security.authentication.AnonymousAuthenticationToken`、`org.springframework.security.core.Authentication`、`org.springframework.security.core.context.ReactiveSecurityContextHolder`、`org.springframework.security.core.context.SecurityContext`、`org.springframework.web.server.ServerWebInputException`、`org.springframework.web.util.UriComponentsBuilder`、`run.halo.app.infra.exception.EmailVerificationFailed`。
+共享的 `SecurityVerificationFlowService`（`currentUser` / `verifyAndRedirect` / `safeRedirect` / `redirectWithError` / `redirectTo` / 会话级限流）为公开组件，见本任务 Files 清单；端点只保留路由、渲染解析与 `rateLimiterForSendingCode`。
 
-> 注意：`verifySecurityVerification` 与限流（`rateLimiterRegistry` 字段）在 Task 6 中补全，本任务先实现 GET 渲染；`POST` 路由可以先返回未实现（本任务测试不涉及）。为了减少改动，直接按上方完整代码实现并在 Task 6 中补充限流部分亦可，但建议本任务只提交 GET + sendEmailCode（sendEmailCode 的限流在 Task 6 一并加）。
+> 注意：`verifyByEmail` / `verifyByTotp` 都委托 `SecurityVerificationFlowService.verifyAndRedirect`（限流 + 标记会话 + 重定向 + 错误映射，Task 6 补全限流实现）；`method` 查询参数由每个端点固定携带（email 端点回传 `method=email`、totp 端点回传 `method=totp`），页面据此在 `availableMethods` 中解析要渲染的方法表单（见 Task 4 的 `fragmentTemplateName`）。
 
 - [ ] **Step 4: 授权规则** `AuthorizationExchangeConfigurers.java`（`authenticatedAuthorizationConfigurer`，Order 300）
 
@@ -1331,12 +1346,13 @@ git commit -m "feat: render security verification page"
 ### Task 6: `SecurityVerificationEndpoint` POST 验证 + 发码 + 限流
 
 **Files:**
-- Modify: `application/src/main/java/run/halo/app/security/verification/SecurityVerificationEndpoint.java`（补全 `verifySecurityVerification`、`sendEmailCode`、限流方法）
+- Modify: `application/src/main/java/run/halo/app/security/verification/SecurityVerificationEndpoint.java`（补全 `sendEmailCode` 限流与委托 `SecurityVerificationFlowService`）
+- Modify: `application/src/main/java/run/halo/app/security/verification/SecurityVerificationFlowService.java`（补全 `verifyAndRedirect` 的会话级限流）
 - Test: `application/src/test/java/run/halo/app/security/verification/SecurityVerificationEndpointIntegrationTest.java`（追加测试）
 
 **Interfaces:**
 - Consumes: `TotpVerificationService.validate(User, String)`（Task 1）、`EmailVerificationService.sendSecurityVerificationCode/verifySecurityVerificationCode`（Task 2）、`SecurityVerificationService.markVerified(WebSession)`（Task 3）、限流配置 `totp-validation`（5 次/5 分钟）与 `send-login-email-code`（3 次/分钟）
-- Produces: `POST /security-verification`（表单，成功 → 302 + 会话标记；失败 → 302 `?error=`）、`POST /security-verification/email-code`（JSON，202）
+- Produces: `POST /security-verification/email` 与 `POST /security-verification/totp`（各自独立表单；成功 → 302 + 会话标记；失败 → 302 `?error=&method=`，`method` 决定页面渲染哪个方法表单）、`POST /security-verification/email-code`（JSON，202）
 
 - [ ] **Step 1: 写失败测试**（追加到 `SecurityVerificationEndpointIntegrationTest.java`）
 
@@ -1360,7 +1376,7 @@ git commit -m "feat: render security verification page"
                 .thenReturn(Mono.empty());
         webClient.mutateWith(mockUser(USERNAME))
                 .post()
-                .uri("/security-verification?redirect=/uc/profile")
+                .uri("/security-verification/email?redirect=/uc/profile")
                 .bodyValue("redirect=/uc/profile&emailCode=123456")
                 .exchange()
                 .expectStatus()
@@ -1376,7 +1392,7 @@ git commit -m "feat: render security verification page"
         when(totpAuthService.validateTotp("raw-secret", 123456)).thenReturn(true);
         webClient.mutateWith(mockUser(USERNAME))
                 .post()
-                .uri("/security-verification?redirect=/uc/profile")
+                .uri("/security-verification/totp?redirect=/uc/profile")
                 .bodyValue("redirect=/uc/profile&totpCode=123456")
                 .exchange()
                 .expectStatus()
@@ -1392,13 +1408,13 @@ git commit -m "feat: render security verification page"
         when(totpAuthService.validateTotp("raw-secret", 123456)).thenReturn(false);
         webClient.mutateWith(mockUser(USERNAME))
                 .post()
-                .uri("/security-verification?redirect=/uc/profile")
+                .uri("/security-verification/totp?redirect=/uc/profile")
                 .bodyValue("redirect=/uc/profile&totpCode=123456")
                 .exchange()
                 .expectStatus()
                 .is3xxRedirection()
                 .expectHeader()
-                .valueEquals("Location", "/security-verification?error=invalid-code&redirect=/uc/profile");
+                .valueEquals("Location", "/security-verification?error=invalid-code&redirect=/uc/profile&method=totp");
     }
 
     @Test
@@ -1408,7 +1424,7 @@ git commit -m "feat: render security verification page"
                 .thenReturn(Mono.empty());
         webClient.mutateWith(mockUser(USERNAME))
                 .post()
-                .uri("/security-verification")
+                .uri("/security-verification/email")
                 .bodyValue("redirect=http://evil.com&emailCode=123456")
                 .exchange()
                 .expectStatus()
@@ -1423,7 +1439,7 @@ git commit -m "feat: render security verification page"
 ```java
 webClient.mutateWith(mockUser(USERNAME)).mutateWith(csrf())
         .post()
-        .uri("/security-verification?redirect=/uc/profile")
+        .uri("/security-verification/email?redirect=/uc/profile")
         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
         .bodyValue("redirect=/uc/profile&emailCode=123456")
         ...
@@ -1436,13 +1452,13 @@ webClient.mutateWith(mockUser(USERNAME)).mutateWith(csrf())
 Run: `./gradlew :application:test --tests "run.halo.app.security.verification.SecurityVerificationEndpointIntegrationTest"`
 Expected: POST 路由未实现/限流未接入，至少 `shouldVerifyWithEmailCodeAndRedirect` 失败。
 
-- [ ] **Step 3: 补全端点实现**（`SecurityVerificationEndpoint.java`）
+- [ ] **Step 3: 补全端点与共享流程**（`SecurityVerificationEndpoint.java` + `SecurityVerificationFlowService.java`）
 
-`sendEmailCode` 改为带限流（按用户名，复用 `send-login-email-code` 配置 3 次/分钟）：
+`sendEmailCode` 带限流（按用户名，复用 `send-login-email-code` 配置 3 次/分钟；`currentUser` 委托 `SecurityVerificationFlowService`）：
 
 ```java
     private Mono<ServerResponse> sendEmailCode(ServerRequest request) {
-        return currentUser(request)
+        return flowService.currentUser(request)
                 .flatMap(user -> emailVerificationService
                         .sendSecurityVerificationCode(user.getMetadata().getName())
                         .transformDeferred(rateLimiterForSendingCode(user.getMetadata().getName()))
@@ -1450,40 +1466,50 @@ Expected: POST 路由未实现/限流未接入，至少 `shouldVerifyWithEmailCo
                 .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new);
     }
 
-    private RateLimiterOperator<Void> rateLimiterForSendingCode(String username) {
-        var rateLimiterKey = "send-security-verification-code-" + username;
-        var rateLimiter = rateLimiterRegistry.rateLimiter(rateLimiterKey, "send-login-email-code");
-        return RateLimiterOperator.of(rateLimiter);
+    private Function<Mono<Void>, Mono<Void>> rateLimiterForSendingCode(String username) {
+        var rateLimiter =
+                rateLimiterRegistry.rateLimiter("send-security-verification-code-" + username, "send-login-email-code");
+        var operator = RateLimiterOperator.<Void>of(rateLimiter);
+        return mono -> mono.transformDeferred(operator);
     }
 ```
 
-`verifySecurityVerification` 的 `verifyMono` 加限流（按会话，复用 `totp-validation` 配置 5 次/5 分钟，与登录 TOTP 同策略）：
+`SecurityVerificationFlowService.verifyAndRedirect`（`verifyByEmail` / `verifyByTotp` 共用，也供 Pro 短信端点复用）对 `verifyMono` 加限流（按会话，复用 `totp-validation` 配置 5 次/5 分钟，与登录 TOTP 同策略）：
 
 ```java
-return verifyMono
-        .transformDeferred(rateLimiterForVerification(request, username))
-        .then(request.exchange().getSession())
-        .doOnNext(securityVerificationService::markVerified)
-        .then(redirectTo(redirect));
+    public Mono<ServerResponse> verifyAndRedirect(
+            ServerRequest request, String redirect, String method, Mono<Void> verifyMono) {
+        return request.exchange()
+                .getSession()
+                .flatMap(session -> verifyMono
+                        .transformDeferred(rateLimiterForVerification(session))
+                        .then(Mono.fromRunnable(() -> securityVerificationService.markVerified(session)))
+                        .then(redirectTo(redirect)))
+                .onErrorResume(EmailVerificationFailed.class, e -> {
+                    var error = "problemDetail.user.email.verify.maxAttempts".equals(e.getDetailMessageCode())
+                            ? "rate-limit-exceeded"
+                            : "invalid-code";
+                    return redirectTo(redirectWithError(error, redirect, method));
+                })
+                .onErrorResume(
+                        ServerWebInputException.class,
+                        e -> redirectTo(redirectWithError("invalid-code", redirect, method)))
+                .onErrorResume(
+                        RequestNotPermitted.class,
+                        e -> redirectTo(redirectWithError("rate-limit-exceeded", redirect, method)));
+    }
+
+    private Function<Mono<Void>, Mono<Void>> rateLimiterForVerification(WebSession session) {
+        var rateLimiter = rateLimiterRegistry.rateLimiter(
+                "totp-validation-" + session.getId(), "totp-validation");
+        var operator = RateLimiterOperator.<Void>of(rateLimiter);
+        return mono -> mono.transformDeferred(operator);
+    }
 ```
 
-```java
-private Function<Mono<Void>, Mono<Void>> rateLimiterForVerification(ServerRequest request, String username) {
-    return mono -> request.exchange()
-            .getSession()
-            .map(WebSession::getId)
-            // Fall back to a per-user key when no session can be derived
-            // (e.g. mock test environment), so the rate limit still applies.
-            .onErrorResume(throwable -> Mono.just(username))
-            .flatMap(key -> {
-                var rateLimiterKey = "totp-validation-" + key;
-                var rateLimiter = rateLimiterRegistry.rateLimiter(rateLimiterKey, "totp-validation");
-                return mono.transformDeferred(RateLimiterOperator.of(rateLimiter));
-            });
-}
-```
+> 注：会话解析在 `verifyAndRedirect` 中先完成（`request.exchange().getSession()`），限流 key 直接用会话 id；会话在真实请求中总能创建，无需降级到用户名 key。
 
-需要补全的 import：`io.github.resilience4j.reactor.ratelimiter.operator.RateLimiterOperator`、`java.util.function.Function`、`run.halo.app.infra.exception.RateLimitExceededException`。
+需要补全的 import：`SecurityVerificationEndpoint`——`io.github.resilience4j.reactor.ratelimiter.operator.RateLimiterOperator`、`java.util.function.Function`、`run.halo.app.infra.exception.RateLimitExceededException`；`SecurityVerificationFlowService`——`io.github.resilience4j.ratelimiter.RequestNotPermitted`、`org.springframework.web.server.ServerWebInputException`、`run.halo.app.infra.exception.EmailVerificationFailed` 等（完整见最终代码）。
 
 - [ ] **Step 4: 运行测试确认通过**
 
@@ -1495,6 +1521,7 @@ Expected: PASS（全部测试，含 Task 5 的 4 个）。
 ```bash
 ./gradlew spotlessApply
 git add application/src/main/java/run/halo/app/security/verification/SecurityVerificationEndpoint.java \
+  application/src/main/java/run/halo/app/security/verification/SecurityVerificationFlowService.java \
   application/src/test/java/run/halo/app/security/verification/SecurityVerificationEndpointIntegrationTest.java
 git commit -m "feat: add security verification endpoints"
 ```
@@ -1509,7 +1536,7 @@ git commit -m "feat: add security verification endpoints"
 - Modify（生成）：`ui/packages/api-client/src/models/uc-user-vo.ts` 等——Task 8 统一再生成，本任务只改后端
 
 **Interfaces:**
-- Consumes: `SecurityVerificationService.isVerified(WebSession)` / `isAvailable(User)`（Task 3）、`SecurityVerificationRequiredException`（Task 3）
+- Consumes: `SecurityVerificationService.isVerified(WebSession)` / `hasVerificationMethod(User)`（Task 3）、`SecurityVerificationRequiredException`（Task 3）
 - Produces: `UcUserVo.passwordChangeVerificationRequired`（boolean）、`PUT /users/-/password` 的 403 守卫（body 含 `redirectURI`）
 
 - [ ] **Step 1: 写失败测试**（追加到 `UcUserEndpointTest.java`）
@@ -1531,7 +1558,7 @@ git commit -m "feat: add security verification endpoints"
     @Test
     void shouldGetPasswordChangeVerificationRequired() {
         when(userService.getUser("faker")).thenReturn(Mono.just(userWithEmailVerified(true)));
-        when(securityVerificationService.isAvailable(any())).thenReturn(true);
+        when(securityVerificationService.hasVerificationMethod(any())).thenReturn(true);
         when(securityVerificationService.isVerified(any())).thenReturn(false);
         webClient
                 .mutate()
@@ -1551,7 +1578,7 @@ git commit -m "feat: add security verification endpoints"
     @Test
     void shouldNotGetPasswordChangeVerificationRequiredWhenVerified() {
         when(userService.getUser("faker")).thenReturn(Mono.just(userWithEmailVerified(true)));
-        when(securityVerificationService.isAvailable(any())).thenReturn(true);
+        when(securityVerificationService.hasVerificationMethod(any())).thenReturn(true);
         when(securityVerificationService.isVerified(any())).thenReturn(true);
         webClient
                 .mutate()
@@ -1571,7 +1598,7 @@ git commit -m "feat: add security verification endpoints"
     @Test
     void shouldForbidPasswordChangeWithoutVerification() {
         when(userService.getUser("faker")).thenReturn(Mono.just(userWithEmailVerified(true)));
-        when(securityVerificationService.isAvailable(any())).thenReturn(true);
+        when(securityVerificationService.hasVerificationMethod(any())).thenReturn(true);
         when(securityVerificationService.isVerified(any())).thenReturn(false);
         webClient
                 .mutate()
@@ -1598,7 +1625,7 @@ git commit -m "feat: add security verification endpoints"
     @Test
     void shouldChangePasswordWhenVerified() {
         when(userService.getUser("faker")).thenReturn(Mono.just(userWithEmailVerified(true)));
-        when(securityVerificationService.isAvailable(any())).thenReturn(true);
+        when(securityVerificationService.hasVerificationMethod(any())).thenReturn(true);
         when(securityVerificationService.isVerified(any())).thenReturn(true);
         when(userService.confirmPassword("faker", "old-password")).thenReturn(Mono.just(true));
         when(userService.updateWithRawPassword("faker", "new-password")).thenReturn(Mono.just(createUser(true)));
@@ -1627,7 +1654,7 @@ git commit -m "feat: add security verification endpoints"
     @Test
     void shouldNotRequireVerificationWhenPasswordNotSet() {
         when(userService.getUser("faker")).thenReturn(Mono.just(userWithEmailVerified(false)));
-        when(securityVerificationService.isAvailable(any())).thenReturn(true);
+        when(securityVerificationService.hasVerificationMethod(any())).thenReturn(true);
         when(userService.updateWithRawPassword("faker", "new-password")).thenReturn(Mono.just(createUser(true)));
         webClient
                 .mutate()
@@ -1653,7 +1680,7 @@ git commit -m "feat: add security verification endpoints"
 - [ ] **Step 2: 运行确认失败**
 
 Run: `./gradlew :application:test --tests "run.halo.app.core.endpoint.uc.UcUserEndpointTest"`
-Expected: 编译失败（`passwordChangeVerificationRequired` / 守卫不存在）；注意现有测试可能因 `isAvailable` 默认 false 而仍通过，仅新测试失败。
+Expected: 编译失败（`passwordChangeVerificationRequired` / 守卫不存在）；注意现有测试可能因 `hasVerificationMethod` 默认 false 而仍通过，仅新测试失败。
 
 - [ ] **Step 3: 实现** `UcUserEndpoint.java`
 
@@ -1693,7 +1720,7 @@ private Mono<Void> requirePasswordChangeVerification(User user, ServerRequest re
     return request.exchange().getSession().flatMap(session -> {
         var passwordSet = StringUtils.hasText(user.getSpec().getPassword());
         if (passwordSet
-                && securityVerificationService.isAvailable(user)
+                && securityVerificationService.hasVerificationMethod(user)
                 && !securityVerificationService.isVerified(session)) {
             return Mono.error(new SecurityVerificationRequiredException());
         }
@@ -1708,7 +1735,7 @@ private Mono<Void> requirePasswordChangeVerification(User user, ServerRequest re
 private UcUserVo toUserVo(User user, WebSession session) {
     var passwordSet = StringUtils.hasText(user.getSpec().getPassword());
     var verificationRequired = passwordSet
-            && securityVerificationService.isAvailable(user)
+            && securityVerificationService.hasVerificationMethod(user)
             && !securityVerificationService.isVerified(session);
     return new UcUserVo(
             user.getMetadata().getName(),
@@ -1881,7 +1908,7 @@ Expected: 全部通过。
 
 ## 自检记录（写计划时核对）
 
-- **Spec 覆盖**：验证页主题模板（Task 4/5）、邮箱码/TOTP 任选其一（Task 4 模板 tab + Task 6 校验逻辑）、会话标记 TTL 30 分钟（Task 3）、仅已有密码需要验证（Task 7 守卫条件）、无能力回退（Task 5/7 的 `isAvailable` 条件）、redirect 站内校验（Task 6 `safeRedirect`）、`UcUserVo.passwordChangeVerificationRequired`（Task 7）、授权规则（Task 5）、通知原因/模板（Task 2）、TOTP 抽取复用（Task 1）、契约再生成（Task 8）。
+- **Spec 覆盖**：验证页主题模板（Task 4/5）、邮箱码/TOTP 任选其一（Task 4 模板链接 + Task 6 校验逻辑）、会话标记 TTL 30 分钟（Task 3）、仅已有密码需要验证（Task 7 守卫条件）、无能力回退（Task 5/7 的 `hasVerificationMethod` 条件）、redirect 站内校验（Task 6 `safeRedirect`）、`UcUserVo.passwordChangeVerificationRequired`（Task 7）、授权规则（Task 5）、通知原因/模板（Task 2）、TOTP 抽取复用（Task 1）、契约再生成（Task 8）。
 - **占位符扫描**：所有代码步骤均给出完整代码；无 TBD/TODO。
-- **类型一致性**：`TotpVerificationService.validate(User, String) → Mono<Void>`（Task 1 → 6）；`EmailVerificationService.sendSecurityVerificationCode(String) / verifySecurityVerificationCode(String, String) → Mono<Void>`（Task 2 → 6）；`SecurityVerificationService.isVerified(WebSession) / markVerified(WebSession) / isAvailable(User)`（Task 3 → 5/7）；`SecurityVerificationRequiredException.REDIRECT_LOCATION = /security-verification`（Task 3 → 7）；会话 key `security-verification.verified-at` 与 TTL 常量在 Task 3 定义，Task 3 测试引用同一常量。
+- **类型一致性**：`TotpVerificationService.validate(User, String) → Mono<Void>`（Task 1 → 6）；`EmailVerificationService.sendSecurityVerificationCode(String) / verifySecurityVerificationCode(String, String) → Mono<Void>`（Task 2 → 6）；`SecurityVerificationService.isVerified(WebSession) / markVerified(WebSession) / hasVerificationMethod(User)`（Task 3 → 5/7）；`SecurityVerificationRequiredException.REDIRECT_LOCATION = /security-verification`（Task 3 → 7）；会话 key `security-verification.verified-at` 与 TTL 常量在 Task 3 定义，Task 3 测试引用同一常量。
 
