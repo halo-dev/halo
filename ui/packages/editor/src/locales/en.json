@@ -215,5 +215,7 @@
   "editor.common.text.tip": "Tip",
   "editor.common.toast.save_success": "Saved successfully",
   "editor.common.line_height": "Line height",
-  "editor.common.clear_format": "Clear format"
+  "editor.common.clear_format": "Clear format",
+  "editor.components.editor_header.toolbar": "Editor toolbar",
+  "editor.components.editor_header.insert_content": "Insert content"
 }

@@ -5,10 +5,12 @@ defineProps<ToolboxItemComponentProps>();
 </script>
 
 <template>
-  <div
+  <button
+    type="button"
     role="menuitem"
     tabindex="-1"
-    class="group my-1.5 flex cursor-pointer flex-row items-center gap-3 rounded px-1.5 py-1 transition-colors first:mt-0 last:mb-0 hover:bg-gray-100"
+    class="group my-1.5 flex w-full cursor-pointer flex-row items-center gap-3 rounded px-1.5 py-1 text-left transition-colors first:mt-0 last:mb-0 hover:bg-gray-100 focus-visible:bg-gray-100 focus-visible:outline-none"
+    :aria-label="title"
     @click="action?.()"
   >
     <div
@@ -32,5 +34,5 @@ defineProps<ToolboxItemComponentProps>();
         {{ description }}
       </span>
     </div>
-  </div>
+  </button>
 </template>

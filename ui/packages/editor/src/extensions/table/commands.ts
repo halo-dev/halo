@@ -14,6 +14,7 @@ import {
   type Node as ProseMirrorNode,
   type Transaction,
   TableMap,
+  TextSelection,
   moveTableColumn as moveProseMirrorTableColumn,
   moveTableRow as moveProseMirrorTableRow,
   selectedRect,
@@ -364,12 +365,38 @@ export function deleteAxisCommand(
       state,
       dispatch
         ? (transaction) => {
+            if (!deletesWholeTable) {
+              keepCursorInTable(transaction, table.pos);
+            }
             closeHistory(transaction);
             dispatch(transaction);
           }
         : undefined
     );
   };
+}
+
+/**
+ * Keep the selection inside the table being edited after an axis deletion.
+ * ProseMirror tables do not set a new selection after deleting rows or columns,
+ * so a cursor in the last axis can otherwise map into following content.
+ */
+function keepCursorInTable(transaction: Transaction, tablePos: number) {
+  const mappedTablePos = transaction.mapping.map(tablePos);
+  const selectedTable = findTable(transaction.selection);
+  if (selectedTable?.pos === mappedTablePos) {
+    return;
+  }
+
+  const tableNode = transaction.doc.nodeAt(mappedTablePos);
+  if (tableNode?.type.spec.tableRole !== "table") {
+    return;
+  }
+
+  const endOfTable = mappedTablePos + tableNode.nodeSize - 1;
+  transaction.setSelection(
+    TextSelection.near(transaction.doc.resolve(endOfTable), -1)
+  );
 }
 
 export function moveAxisCommand(
