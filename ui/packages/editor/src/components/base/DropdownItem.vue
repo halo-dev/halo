@@ -24,16 +24,20 @@ function handleClick(e: MouseEvent) {
 }
 </script>
 <template>
-  <div
+  <button
+    type="button"
     role="menuitem"
     tabindex="-1"
+    :disabled="disabled"
+    :aria-disabled="disabled"
+    :data-state="isActive ? 'on' : 'off'"
     :class="[
       { 'cursor-not-allowed opacity-70': disabled },
       { 'hover:bg-gray-100': !disabled },
       { 'px-3': !$slots.icon },
       { 'px-1.5': !!$slots.icon },
     ]"
-    class="group my-1.5 flex min-h-9 cursor-pointer flex-row items-center gap-3 rounded py-1 transition-colors first:mt-0 last:mb-0"
+    class="group my-1.5 flex min-h-9 w-full cursor-pointer flex-row items-center gap-3 rounded py-1 text-left transition-colors first:mt-0 last:mb-0 focus-visible:bg-gray-100 focus-visible:outline-none"
     @click="handleClick"
   >
     <div
@@ -60,5 +64,5 @@ function handleClick(e: MouseEvent) {
       v-if="isActive"
       class="size-4 flex-none text-gray-900"
     />
-  </div>
+  </button>
 </template>

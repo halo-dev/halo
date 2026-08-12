@@ -9,6 +9,7 @@ defineProps<ToolbarItemComponentProps>();
 <template>
   <button
     v-tooltip="title"
+    type="button"
     :class="[
       { 'bg-gray-200/70': isActive },
       { 'cursor-not-allowed opacity-70': disabled },
@@ -19,6 +20,11 @@ defineProps<ToolbarItemComponentProps>();
     class="inline-flex items-center justify-center rounded-md p-1 transition-colors active:!bg-gray-200"
     :disabled="disabled"
     tabindex="-1"
+    data-editor-toolbar-control
+    :aria-label="title"
+    :aria-pressed="isActive ? 'true' : undefined"
+    :data-state="isActive ? 'on' : 'off'"
+    :title="title"
     @click="action"
   >
     <component :is="icon" />

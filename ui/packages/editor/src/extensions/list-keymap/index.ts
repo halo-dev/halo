@@ -14,6 +14,7 @@ export type ExtensionListKeymapOptions = Partial<ListKeymapOptions>;
 export const ExtensionListKeymap =
   ListKeymap.extend<ExtensionListKeymapOptions>({
     addKeyboardShortcuts() {
+      const parentShortcuts = this.parent?.() ?? {};
       const backspaceHandle = (editor: Editor) => {
         let handled = false;
 
@@ -29,6 +30,9 @@ export const ExtensionListKeymap =
             itemName: string;
             wrapperNames: string[];
           }) => {
+            if (editor.state.schema.nodes[itemName] === undefined) {
+              return;
+            }
             if (listHelpers.handleBackspace(editor, itemName, wrapperNames)) {
               handled = true;
             }
@@ -39,6 +43,10 @@ export const ExtensionListKeymap =
       };
 
       return {
+        ...(parentShortcuts.Delete ? { Delete: parentShortcuts.Delete } : {}),
+        ...(parentShortcuts["Mod-Delete"]
+          ? { "Mod-Delete": parentShortcuts["Mod-Delete"] }
+          : {}),
         Backspace: ({ editor }: { editor: Editor }) => backspaceHandle(editor),
 
         "Mod-Backspace": ({ editor }: { editor: Editor }) =>
