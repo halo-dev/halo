@@ -16,6 +16,8 @@
   "types": "./dist/index.d.mts",
   "exports": {
     ".": "./dist/index.mjs",
+    "./rsbuild": "./dist/rsbuild.mjs",
+    "./vite": "./dist/vite.mjs",
     "./package.json": "./package.json"
   },
   "scripts": {

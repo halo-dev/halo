@@ -17,7 +17,9 @@ interface HaloUIPluginBundlerKitOptions {
 }
 
 /**
- * @deprecated Use `viteConfig` or `rsbuildConfig` instead.
+ * @deprecated Import `viteConfig` from `@halo-dev/ui-plugin-bundler-kit/vite`
+ * or `rsbuildConfig` from `@halo-dev/ui-plugin-bundler-kit/rsbuild` instead.
+ * This function will be removed in 2.27.0.
  */
 export function HaloUIPluginBundlerKit(
   options: HaloUIPluginBundlerKitOptions = {}
