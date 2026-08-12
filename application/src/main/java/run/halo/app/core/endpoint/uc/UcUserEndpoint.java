@@ -85,22 +85,26 @@ class UcUserEndpoint implements CustomEndpoint {
                 .flatMap(username -> request.bodyToMono(ChangeMyPasswordRequest.class)
                         .switchIfEmpty(
                                 Mono.defer(() -> Mono.error(new ServerWebInputException("Request body is empty"))))
-                        .flatMap(changeRequest -> userService.getUser(username).flatMap(user -> {
-                            var passwordSet = StringUtils.hasText(user.getSpec().getPassword());
-                            return requirePasswordChangeVerification(user, request)
-                                    .then(Mono.defer(() -> {
-                                        var verifyPassword = passwordSet
-                                                ? verifyOldPassword(username, changeRequest.oldPassword())
-                                                : Mono.just(true);
-                                        return verifyPassword
-                                                .flatMap(ignored -> userService.updateWithRawPassword(
-                                                        username, changeRequest.password()))
-                                                .defaultIfEmpty(user)
-                                                .flatMap(u -> request.exchange()
-                                                        .getSession()
-                                                        .map(session -> toUserVo(u, session)));
-                                    }));
-                        })))
+                        .flatMap(changeRequest -> request.exchange()
+                                .getSession()
+                                .flatMap(session -> userService
+                                        .getUser(username)
+                                        .flatMap(user -> {
+                                            var passwordSet = StringUtils.hasText(
+                                                    user.getSpec().getPassword());
+                                            return requirePasswordChangeVerification(user, session)
+                                                    .then(Mono.defer(() -> {
+                                                        var verifyPassword = passwordSet
+                                                                ? verifyOldPassword(
+                                                                        username, changeRequest.oldPassword())
+                                                                : Mono.just(true);
+                                                        return verifyPassword
+                                                                .flatMap(ignored -> userService.updateWithRawPassword(
+                                                                        username, changeRequest.password()))
+                                                                .defaultIfEmpty(user)
+                                                                .map(u -> toUserVo(u, session));
+                                                    }));
+                                        }))))
                 .flatMap(userVo -> ServerResponse.ok().bodyValue(userVo));
     }
 
@@ -116,22 +120,20 @@ class UcUserEndpoint implements CustomEndpoint {
                         "Old password is incorrect.", "problemDetail.user.oldPassword.notMatch", null)));
     }
 
-    private Mono<Void> requirePasswordChangeVerification(User user, ServerRequest request) {
-        return request.exchange().getSession().flatMap(session -> {
-            var passwordSet = StringUtils.hasText(user.getSpec().getPassword());
-            if (passwordSet
-                    && securityVerificationService.isAvailable(user)
-                    && !securityVerificationService.isVerified(session)) {
-                return Mono.error(new SecurityVerificationRequiredException());
-            }
-            return Mono.empty();
-        });
+    private Mono<Void> requirePasswordChangeVerification(User user, WebSession session) {
+        var passwordSet = StringUtils.hasText(user.getSpec().getPassword());
+        if (passwordSet
+                && securityVerificationService.hasVerificationMethod(user)
+                && !securityVerificationService.isVerified(session)) {
+            return Mono.error(new SecurityVerificationRequiredException());
+        }
+        return Mono.empty();
     }
 
     private UcUserVo toUserVo(User user, WebSession session) {
         var passwordSet = StringUtils.hasText(user.getSpec().getPassword());
         var verificationRequired = passwordSet
-                && securityVerificationService.isAvailable(user)
+                && securityVerificationService.hasVerificationMethod(user)
                 && !securityVerificationService.isVerified(session);
         return new UcUserVo(
                 user.getMetadata().getName(),

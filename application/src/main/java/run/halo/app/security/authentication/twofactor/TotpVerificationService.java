@@ -22,6 +22,11 @@ public class TotpVerificationService {
             // TOTP is not configured, no need to validate
             return Mono.empty();
         }
+        return validate(totpEncryptedSecret, totpCode);
+    }
+
+    /** Validate the TOTP code against the given encrypted secret. */
+    public Mono<Void> validate(String totpEncryptedSecret, String totpCode) {
         if (StringUtils.isBlank(totpCode)) {
             return Mono.error(new ServerWebInputException("TOTP code is required"));
         }

@@ -11,7 +11,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import lombok.Data;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
@@ -249,7 +248,8 @@ public class TwoFactorAuthEndpoint implements CustomEndpoint {
                     .delayUntil(user -> {
                         var rawSecret = totpRequest.getSecret();
                         var encryptedSecret = totpAuthService.encryptSecret(rawSecret);
-                        return validateTotpCode(encryptedSecret, totpRequest.getCode())
+                        return totpVerificationService
+                                .validate(encryptedSecret, totpRequest.getCode())
                                 .then(Mono.fromRunnable(() -> user.getSpec().setTotpEncryptedSecret(encryptedSecret)));
                     })
                     .flatMap(client::update);
@@ -289,23 +289,6 @@ public class TwoFactorAuthEndpoint implements CustomEndpoint {
 
         /** Current TOTP code, required when replacing an existing TOTP authenticator. */
         private String currentTotpCode;
-    }
-
-    private Mono<Void> validateTotpCode(String totpEncryptedSecret, String totpCode) {
-        if (StringUtils.isBlank(totpCode)) {
-            return Mono.error(new ServerWebInputException("TOTP code is required"));
-        }
-        int code;
-        try {
-            code = Integer.parseInt(totpCode);
-        } catch (NumberFormatException e) {
-            return Mono.error(new ServerWebInputException("Invalid TOTP code"));
-        }
-        var rawSecret = totpAuthService.decryptSecret(totpEncryptedSecret);
-        if (!totpAuthService.validateTotp(rawSecret, code)) {
-            return Mono.error(new ServerWebInputException("Invalid TOTP code"));
-        }
-        return Mono.empty();
     }
 
     private Mono<ServerResponse> getTwoFactorSettings(ServerRequest request) {

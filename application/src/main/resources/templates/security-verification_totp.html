@@ -1,0 +1,47 @@
+<form
+  th:fragment="form"
+  class="halo-form security-verification-form"
+  th:action="@{/security-verification/totp}"
+  name="security-verification-form-totp"
+  id="security-verification-form-totp"
+  method="post"
+>
+  <input type="hidden" name="redirect" th:value="${redirect}" />
+
+  <div class="form-item">
+    <label for="totpCode" th:text="#{form.totpCode.label}"></label>
+    <div class="form-input">
+      <input
+        type="text"
+        inputmode="numeric"
+        id="totpCode"
+        name="totpCode"
+        autocomplete="one-time-code"
+        pattern="\d{6}"
+        maxlength="6"
+        required
+      />
+    </div>
+  </div>
+  <div class="form-item">
+    <button type="submit" th:text="#{form.submit}"></button>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const form = document.getElementById("security-verification-form-totp");
+      const totpInput = document.getElementById("totpCode");
+      let submitting = false;
+
+      totpInput.addEventListener("input", function (event) {
+        if (submitting || event.isComposing || totpInput.disabled) {
+          return;
+        }
+        if (/^\d{6}$/.test(totpInput.value)) {
+          submitting = true;
+          form.requestSubmit();
+        }
+      });
+    });
+  </script>
+</form>

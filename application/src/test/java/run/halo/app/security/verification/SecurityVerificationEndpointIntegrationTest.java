@@ -139,6 +139,10 @@ class SecurityVerificationEndpointIntegrationTest {
                     assertThat(body).contains("security-verification-form");
                     assertThat(body).contains("emailCode");
                     assertThat(body).doesNotContain("class=\"method-switcher\"");
+                    assertThat(body).contains("action=\"/security-verification/email\"");
+                    assertThat(body).doesNotContain("action=\"/security-verification/totp\"");
+                    // the single email form carries exactly one CSRF field
+                    assertThat(body).containsOnlyOnce("name=\"_csrf\"");
                 });
     }
 
@@ -156,7 +160,59 @@ class SecurityVerificationEndpointIntegrationTest {
                 .consumeWith(result -> {
                     var body = result.getResponseBody();
                     assertThat(body).contains("method-switcher");
+                    assertThat(body).contains("href=\"/security-verification?method=email\"");
+                    assertThat(body).contains("href=\"/security-verification?method=totp\"");
+                    // email is the default method, so its tab is active and only its form is rendered
+                    assertThat(body).contains("class=\"method-tab active\"");
+                    assertThat(body).contains("action=\"/security-verification/email\"");
+                    assertThat(body).doesNotContain("action=\"/security-verification/totp\"");
+                    assertThat(body).doesNotContain("totpCode");
+                    // the single rendered form carries exactly one CSRF field
+                    assertThat(body).containsOnlyOnce("name=\"_csrf\"");
+                });
+    }
+
+    @Test
+    void shouldRenderTotpMethodWhenRequested() {
+        when(userService.getUser(USERNAME)).thenReturn(Mono.just(user(true, "encrypted-secret")));
+        webClient
+                .mutateWith(mockUser(USERNAME))
+                .get()
+                .uri("/security-verification?method=totp")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(String.class)
+                .consumeWith(result -> {
+                    var body = result.getResponseBody();
+                    assertThat(body).contains("method-switcher");
+                    // only the TOTP form is rendered when it is requested explicitly
+                    assertThat(body).contains("action=\"/security-verification/totp\"");
                     assertThat(body).contains("totpCode");
+                    assertThat(body).doesNotContain("action=\"/security-verification/email\"");
+                    assertThat(body).doesNotContain("emailCode");
+                    assertThat(body).containsOnlyOnce("name=\"_csrf\"");
+                });
+    }
+
+    @Test
+    void shouldRenderTotpPageByDefaultWhenOnlyTotpAvailable() {
+        when(userService.getUser(USERNAME)).thenReturn(Mono.just(user(false, "encrypted-secret")));
+        webClient
+                .mutateWith(mockUser(USERNAME))
+                .get()
+                .uri("/security-verification")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(String.class)
+                .consumeWith(result -> {
+                    var body = result.getResponseBody();
+                    assertThat(body).doesNotContain("class=\"method-switcher\"");
+                    assertThat(body).contains("action=\"/security-verification/totp\"");
+                    assertThat(body).contains("totpCode");
+                    assertThat(body).doesNotContain("emailCode");
+                    assertThat(body).containsOnlyOnce("name=\"_csrf\"");
                 });
     }
 
@@ -226,7 +282,7 @@ class SecurityVerificationEndpointIntegrationTest {
                 .mutateWith(mockUser(USERNAME))
                 .mutateWith(csrf())
                 .post()
-                .uri("/security-verification?redirect=/uc/profile")
+                .uri("/security-verification/email?redirect=/uc/profile")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .bodyValue("redirect=/uc/profile&emailCode=123456")
                 .exchange()
@@ -245,7 +301,7 @@ class SecurityVerificationEndpointIntegrationTest {
                 .mutateWith(mockUser(USERNAME))
                 .mutateWith(csrf())
                 .post()
-                .uri("/security-verification?redirect=/uc/profile")
+                .uri("/security-verification/totp?redirect=/uc/profile")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .bodyValue("redirect=/uc/profile&totpCode=123456")
                 .exchange()
@@ -262,14 +318,14 @@ class SecurityVerificationEndpointIntegrationTest {
                 .mutateWith(mockUser(USERNAME))
                 .mutateWith(csrf())
                 .post()
-                .uri("/security-verification?redirect=/uc/profile")
+                .uri("/security-verification/totp?redirect=/uc/profile")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .bodyValue("redirect=/uc/profile&totpCode=123456")
                 .exchange()
                 .expectStatus()
                 .is3xxRedirection()
                 .expectHeader()
-                .valueEquals("Location", "/security-verification?error=invalid-code&redirect=/uc/profile");
+                .valueEquals("Location", "/security-verification?error=invalid-code&redirect=/uc/profile&method=totp");
     }
 
     @Test
@@ -285,14 +341,16 @@ class SecurityVerificationEndpointIntegrationTest {
                 .mutateWith(mockUser(USERNAME))
                 .mutateWith(csrf())
                 .post()
-                .uri("/security-verification?redirect=/uc/profile")
+                .uri("/security-verification/email?redirect=/uc/profile")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .bodyValue("redirect=/uc/profile&emailCode=123456")
                 .exchange()
                 .expectStatus()
                 .is3xxRedirection()
                 .expectHeader()
-                .valueEquals("Location", "/security-verification?error=rate-limit-exceeded&redirect=/uc/profile");
+                .valueEquals(
+                        "Location",
+                        "/security-verification?error=rate-limit-exceeded&redirect=/uc/profile&method=email");
     }
 
     @Test
@@ -304,14 +362,14 @@ class SecurityVerificationEndpointIntegrationTest {
                 .mutateWith(mockUser(USERNAME))
                 .mutateWith(csrf())
                 .post()
-                .uri("/security-verification?redirect=/uc/profile")
+                .uri("/security-verification/totp?redirect=/uc/profile")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .bodyValue("redirect=/uc/profile&totpCode=123456")
                 .exchange()
                 .expectStatus()
                 .is3xxRedirection()
                 .expectHeader()
-                .valueEquals("Location", "/security-verification?error=invalid-code&redirect=/uc/profile");
+                .valueEquals("Location", "/security-verification?error=invalid-code&redirect=/uc/profile&method=totp");
     }
 
     @Test
@@ -323,7 +381,7 @@ class SecurityVerificationEndpointIntegrationTest {
                 .mutateWith(mockUser(USERNAME))
                 .mutateWith(csrf())
                 .post()
-                .uri("/security-verification")
+                .uri("/security-verification/email")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .bodyValue("redirect=http://evil.com&emailCode=123456")
                 .exchange()
@@ -343,7 +401,7 @@ class SecurityVerificationEndpointIntegrationTest {
                 .mutateWith(mockUser(USERNAME))
                 .mutateWith(csrf())
                 .post()
-                .uri("/security-verification")
+                .uri("/security-verification/email")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .bodyValue("redirect=/\\evil.com&emailCode=123456")
                 .exchange()
@@ -385,7 +443,7 @@ class SecurityVerificationEndpointIntegrationTest {
         webClient
                 .mutateWith(csrf())
                 .post()
-                .uri("/security-verification?redirect=/uc/profile")
+                .uri("/security-verification/email?redirect=/uc/profile")
                 .cookie(session.getName(), session.getValue())
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .bodyValue("redirect=/uc/profile&emailCode=123456")
@@ -430,7 +488,7 @@ class SecurityVerificationEndpointIntegrationTest {
         webClient
                 .mutateWith(csrf())
                 .post()
-                .uri("/security-verification?redirect=/uc/profile")
+                .uri("/security-verification/email?redirect=/uc/profile")
                 .cookie(session.getName(), session.getValue())
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .bodyValue("redirect=/uc/profile&emailCode=123456")
@@ -444,7 +502,7 @@ class SecurityVerificationEndpointIntegrationTest {
         webClient
                 .mutateWith(csrf())
                 .post()
-                .uri("/security-verification?redirect=/uc/profile")
+                .uri("/security-verification/email?redirect=/uc/profile")
                 .cookie(session.getName(), session.getValue())
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .bodyValue("redirect=/uc/profile&emailCode=123456")
@@ -452,7 +510,9 @@ class SecurityVerificationEndpointIntegrationTest {
                 .expectStatus()
                 .is3xxRedirection()
                 .expectHeader()
-                .valueEquals("Location", "/security-verification?error=rate-limit-exceeded&redirect=/uc/profile");
+                .valueEquals(
+                        "Location",
+                        "/security-verification?error=rate-limit-exceeded&redirect=/uc/profile&method=email");
     }
 
     User userWithPassword(boolean emailVerified, String totpEncryptedSecret) {

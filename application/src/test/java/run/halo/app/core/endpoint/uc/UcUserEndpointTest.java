@@ -419,7 +419,7 @@ class UcUserEndpointTest {
     @Test
     void shouldGetPasswordChangeVerificationRequired() {
         when(userService.getUser("faker")).thenReturn(Mono.just(userWithEmailVerified(true)));
-        when(securityVerificationService.isAvailable(any())).thenReturn(true);
+        when(securityVerificationService.hasVerificationMethod(any())).thenReturn(true);
         when(securityVerificationService.isVerified(any())).thenReturn(false);
         webClient
                 .mutate()
@@ -439,7 +439,7 @@ class UcUserEndpointTest {
     @Test
     void shouldNotGetPasswordChangeVerificationRequiredWhenVerified() {
         when(userService.getUser("faker")).thenReturn(Mono.just(userWithEmailVerified(true)));
-        when(securityVerificationService.isAvailable(any())).thenReturn(true);
+        when(securityVerificationService.hasVerificationMethod(any())).thenReturn(true);
         when(securityVerificationService.isVerified(any())).thenReturn(true);
         webClient
                 .mutate()
@@ -459,7 +459,7 @@ class UcUserEndpointTest {
     @Test
     void shouldForbidPasswordChangeWithoutVerification() {
         when(userService.getUser("faker")).thenReturn(Mono.just(userWithEmailVerified(true)));
-        when(securityVerificationService.isAvailable(any())).thenReturn(true);
+        when(securityVerificationService.hasVerificationMethod(any())).thenReturn(true);
         when(securityVerificationService.isVerified(any())).thenReturn(false);
         webClient
                 .mutate()
@@ -486,7 +486,7 @@ class UcUserEndpointTest {
     @Test
     void shouldChangePasswordWhenVerified() {
         when(userService.getUser("faker")).thenReturn(Mono.just(userWithEmailVerified(true)));
-        when(securityVerificationService.isAvailable(any())).thenReturn(true);
+        when(securityVerificationService.hasVerificationMethod(any())).thenReturn(true);
         when(securityVerificationService.isVerified(any())).thenReturn(true);
         when(userService.confirmPassword("faker", "old-password")).thenReturn(Mono.just(true));
         when(userService.updateWithRawPassword("faker", "new-password")).thenReturn(Mono.just(createUser(true)));
@@ -515,7 +515,7 @@ class UcUserEndpointTest {
     @Test
     void shouldNotRequireVerificationWhenPasswordNotSet() {
         when(userService.getUser("faker")).thenReturn(Mono.just(userWithEmailVerified(false)));
-        when(securityVerificationService.isAvailable(any())).thenReturn(true);
+        when(securityVerificationService.hasVerificationMethod(any())).thenReturn(true);
         when(userService.updateWithRawPassword("faker", "new-password")).thenReturn(Mono.just(createUser(true)));
         webClient
                 .mutate()

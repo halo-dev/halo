@@ -115,27 +115,7 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
     }
 
     Mono<Void> sendSecurityVerificationNotification(String username, String email) {
-        var code = emailVerificationManager.generateCode(username, email);
-        if (log.isDebugEnabled()) {
-            log.debug("Generated security verification code for user '{}' and email '{}': {}", username, email, code);
-        }
-        var subscribeNotification =
-                autoSubscribeVerificationEmailNotification(SECURITY_VERIFICATION_REASON_TYPE, email);
-        var interestReasonSubject =
-                createInterestReason(SECURITY_VERIFICATION_REASON_TYPE, email).getSubject();
-        var emitReasonMono = reasonEmitter.emit(
-                SECURITY_VERIFICATION_REASON_TYPE,
-                builder -> builder.attribute("code", code)
-                        .attribute("expirationAtMinutes", CODE_EXPIRATION_MINUTES)
-                        .attribute("username", username)
-                        .author(UserIdentity.of(username))
-                        .subject(Reason.Subject.builder()
-                                .apiVersion(interestReasonSubject.getApiVersion())
-                                .kind(interestReasonSubject.getKind())
-                                .name(interestReasonSubject.getName())
-                                .title("安全验证：" + email)
-                                .build()));
-        return Mono.when(subscribeNotification).then(emitReasonMono);
+        return sendVerificationNotification(username, email, SECURITY_VERIFICATION_REASON_TYPE, "安全验证：" + email);
     }
 
     private Mono<Void> verifyUserEmail(User user, String code) {
@@ -193,15 +173,18 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
     }
 
     Mono<Void> sendVerificationNotification(String username, String email) {
+        return sendVerificationNotification(username, email, EMAIL_VERIFICATION_REASON_TYPE, "验证邮箱：" + email);
+    }
+
+    private Mono<Void> sendVerificationNotification(String username, String email, String reasonType, String title) {
         var code = emailVerificationManager.generateCode(username, email);
         if (log.isDebugEnabled()) {
             log.debug("Generated verification code for user '{}' and email '{}': {}", username, email, code);
         }
-        var subscribeNotification = autoSubscribeVerificationEmailNotification(EMAIL_VERIFICATION_REASON_TYPE, email);
-        var interestReasonSubject =
-                createInterestReason(EMAIL_VERIFICATION_REASON_TYPE, email).getSubject();
+        var subscribeNotification = autoSubscribeVerificationEmailNotification(reasonType, email);
+        var interestReasonSubject = createInterestReason(reasonType, email).getSubject();
         var emitReasonMono = reasonEmitter.emit(
-                EMAIL_VERIFICATION_REASON_TYPE,
+                reasonType,
                 builder -> builder.attribute("code", code)
                         .attribute("expirationAtMinutes", CODE_EXPIRATION_MINUTES)
                         .attribute("username", username)
@@ -210,7 +193,7 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
                                 .apiVersion(interestReasonSubject.getApiVersion())
                                 .kind(interestReasonSubject.getKind())
                                 .name(interestReasonSubject.getName())
-                                .title("验证邮箱：" + email)
+                                .title(title)
                                 .build()));
         return Mono.when(subscribeNotification).then(emitReasonMono);
     }

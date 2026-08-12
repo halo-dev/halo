@@ -2,6 +2,8 @@ package run.halo.app.security.verification;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.WebSession;
 import run.halo.app.core.extension.User;
@@ -28,8 +30,29 @@ public class SecurityVerificationService {
     }
 
     /** Whether the user has any security verification method (verified email or TOTP). */
-    public boolean isAvailable(User user) {
+    public boolean hasVerificationMethod(User user) {
         var settings = TwoFactorUtils.getTwoFactorAuthSettings(user);
         return settings.isEmailVerified() || settings.isTotpConfigured();
     }
+
+    /** The security verification methods available to the given user, in display order. */
+    public List<SecurityVerificationMethod> availableMethods(User user) {
+        var settings = TwoFactorUtils.getTwoFactorAuthSettings(user);
+        var methods = new ArrayList<SecurityVerificationMethod>();
+        if (settings.isEmailVerified()) {
+            methods.add(new SecurityVerificationMethod("email", "security-verification_email"));
+        }
+        if (settings.isTotpConfigured()) {
+            methods.add(new SecurityVerificationMethod("totp", "security-verification_totp"));
+        }
+        return methods;
+    }
+
+    /**
+     * A security verification method.
+     *
+     * @param name method identifier, used in the URL and the tab label key {@code form.method.<name>}
+     * @param fragmentTemplateName template fragment rendering this method's form
+     */
+    public record SecurityVerificationMethod(String name, String fragmentTemplateName) {}
 }

@@ -56,17 +56,39 @@ class SecurityVerificationServiceTest {
     }
 
     @Test
-    void shouldBeAvailableWhenEmailVerified() {
-        assertThat(service.isAvailable(user(true, null))).isTrue();
+    void shouldHaveVerificationMethodWhenEmailVerified() {
+        assertThat(service.hasVerificationMethod(user(true, null))).isTrue();
     }
 
     @Test
-    void shouldBeAvailableWhenTotpConfigured() {
-        assertThat(service.isAvailable(user(false, "encrypted-secret"))).isTrue();
+    void shouldHaveVerificationMethodWhenTotpConfigured() {
+        assertThat(service.hasVerificationMethod(user(false, "encrypted-secret")))
+                .isTrue();
     }
 
     @Test
-    void shouldNotBeAvailableWithoutAnyMethod() {
-        assertThat(service.isAvailable(user(false, null))).isFalse();
+    void shouldNotHaveVerificationMethodWithoutAnyMethod() {
+        assertThat(service.hasVerificationMethod(user(false, null))).isFalse();
+    }
+
+    @Test
+    void shouldListEmailWhenEmailVerified() {
+        assertThat(service.availableMethods(user(true, null)))
+                .extracting(SecurityVerificationService.SecurityVerificationMethod::name)
+                .containsExactly("email");
+    }
+
+    @Test
+    void shouldListMethodsInDisplayOrder() {
+        assertThat(service.availableMethods(user(true, "encrypted-secret")))
+                .extracting(SecurityVerificationService.SecurityVerificationMethod::name)
+                .containsExactly("email", "totp");
+    }
+
+    @Test
+    void shouldListOnlyTotpWhenEmailNotVerified() {
+        assertThat(service.availableMethods(user(false, "encrypted-secret")))
+                .extracting(SecurityVerificationService.SecurityVerificationMethod::name)
+                .containsExactly("totp");
     }
 }

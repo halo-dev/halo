@@ -3,38 +3,28 @@ package run.halo.app.security.verification;
 import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import io.github.resilience4j.reactor.ratelimiter.operator.RateLimiterOperator;
-import java.net.URI;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.ReactiveSecurityContextHolder;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import org.springframework.web.server.ServerWebInputException;
-import org.springframework.web.server.WebSession;
-import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
-import run.halo.app.core.extension.User;
 import run.halo.app.core.user.service.EmailVerificationService;
-import run.halo.app.core.user.service.UserService;
 import run.halo.app.infra.actuator.GlobalInfoService;
-import run.halo.app.infra.exception.AccessDeniedException;
-import run.halo.app.infra.exception.EmailVerificationFailed;
 import run.halo.app.infra.exception.RateLimitExceededException;
 import run.halo.app.infra.utils.HaloUtils;
 import run.halo.app.security.authentication.twofactor.TotpVerificationService;
 import run.halo.app.security.authentication.twofactor.TwoFactorUtils;
+import run.halo.app.security.verification.SecurityVerificationService.SecurityVerificationMethod;
 
 /**
  * Post-auth endpoint for the security verification page (sudo mode).
@@ -46,13 +36,11 @@ import run.halo.app.security.authentication.twofactor.TwoFactorUtils;
 @RequiredArgsConstructor
 class SecurityVerificationEndpoint {
 
-    private static final String DEFAULT_REDIRECT = "/uc/profile";
-
-    private final UserService userService;
     private final GlobalInfoService globalInfoService;
     private final EmailVerificationService emailVerificationService;
     private final TotpVerificationService totpVerificationService;
     private final SecurityVerificationService securityVerificationService;
+    private final SecurityVerificationFlowService flowService;
     private final RateLimiterRegistry rateLimiterRegistry;
 
     @Bean
@@ -60,76 +48,84 @@ class SecurityVerificationEndpoint {
     RouterFunction<ServerResponse> securityVerificationEndpoints() {
         return RouterFunctions.route()
                 .GET("/security-verification", this::renderVerificationPage)
-                .POST("/security-verification", this::verifySecurityVerification)
+                .POST("/security-verification/email", this::verifyByEmail)
+                .POST("/security-verification/totp", this::verifyByTotp)
                 .POST("/security-verification/email-code", this::sendEmailCode)
                 .before(HaloUtils.noCache())
                 .build();
     }
 
     private Mono<ServerResponse> renderVerificationPage(ServerRequest request) {
-        var redirect = safeRedirect(request.queryParam("redirect").orElse(DEFAULT_REDIRECT));
-        return currentUser(request).flatMap(user -> {
-            if (!securityVerificationService.isAvailable(user)) {
-                return redirectTo(redirect);
+        var redirect = flowService.safeRedirect(
+                request.queryParam("redirect").orElse(SecurityVerificationFlowService.DEFAULT_REDIRECT));
+        return flowService.currentUser(request).flatMap(user -> {
+            var availableMethods = securityVerificationService.availableMethods(user);
+            if (availableMethods.isEmpty()) {
+                return flowService.redirectTo(redirect);
             }
-            var settings = TwoFactorUtils.getTwoFactorAuthSettings(user);
             var model = new HashMap<String, Object>();
             model.put("globalInfo", globalInfoService.getGlobalInfo());
-            model.put("emailVerified", settings.isEmailVerified());
-            model.put("totpConfigured", settings.isTotpConfigured());
             model.put("redirect", redirect);
+            model.put("availableMethods", availableMethods);
+            model.put("fragmentTemplateName", resolveFragmentTemplateName(request, availableMethods));
             return ServerResponse.ok().render("security-verification", model);
         });
     }
 
-    private Mono<ServerResponse> verifySecurityVerification(ServerRequest request) {
+    private static String resolveFragmentTemplateName(
+            ServerRequest request, List<SecurityVerificationMethod> availableMethods) {
+        var requestedMethod = request.queryParam("method").orElse(null);
+        return availableMethods.stream()
+                .filter(method -> Objects.equals(requestedMethod, method.name()))
+                .map(SecurityVerificationMethod::fragmentTemplateName)
+                .findFirst()
+                .orElseGet(() -> availableMethods.get(0).fragmentTemplateName());
+    }
+
+    private Mono<ServerResponse> verifyByEmail(ServerRequest request) {
         return request.formData().flatMap(formData -> {
-            var redirect = safeRedirect(formData.getFirst("redirect"));
-            return currentUser(request).flatMap(user -> {
-                if (!securityVerificationService.isAvailable(user)) {
-                    return redirectTo(redirect);
+            var redirect = flowService.safeRedirect(formData.getFirst("redirect"));
+            var emailCode = formData.getFirst("emailCode");
+            return flowService.currentUser(request).flatMap(user -> {
+                if (securityVerificationService.availableMethods(user).isEmpty()) {
+                    return flowService.redirectTo(redirect);
                 }
-                var username = user.getMetadata().getName();
-                var settings = TwoFactorUtils.getTwoFactorAuthSettings(user);
-                var totpCode = formData.getFirst("totpCode");
-                var emailCode = formData.getFirst("emailCode");
-                Mono<Void> verifyMono;
-                if (StringUtils.isNotBlank(totpCode)) {
-                    // Only accept TOTP when the user actually has TOTP configured,
-                    // otherwise TotpVerificationService.validate would pass unconditionally.
-                    verifyMono = settings.isTotpConfigured()
-                            ? totpVerificationService.validate(user, totpCode)
-                            : Mono.<Void>error(new ServerWebInputException("TOTP is not configured."));
-                } else if (StringUtils.isNotBlank(emailCode)) {
-                    verifyMono = settings.isEmailVerified()
-                            ? emailVerificationService.verifySecurityVerificationCode(username, emailCode)
-                            : Mono.<Void>error(new ServerWebInputException("Email is not verified."));
-                } else {
-                    verifyMono = Mono.<Void>error(new ServerWebInputException("Verification code is required"));
+                if (!TwoFactorUtils.getTwoFactorAuthSettings(user).isEmailVerified()) {
+                    return flowService.redirectTo(flowService.redirectWithError("invalid-code", redirect, "email"));
                 }
-                return verifyMono
-                        .transformDeferred(rateLimiterForVerification(request, username))
-                        .then(request.exchange().getSession())
-                        .doOnNext(securityVerificationService::markVerified)
-                        .then(redirectTo(redirect))
-                        .onErrorResume(EmailVerificationFailed.class, e -> {
-                            var error = "problemDetail.user.email.verify.maxAttempts".equals(e.getDetailMessageCode())
-                                    ? "rate-limit-exceeded"
-                                    : "invalid-code";
-                            return redirectTo(redirectWithError(error, redirect));
-                        })
-                        .onErrorResume(
-                                ServerWebInputException.class,
-                                e -> redirectTo(redirectWithError("invalid-code", redirect)))
-                        .onErrorResume(
-                                RequestNotPermitted.class,
-                                e -> redirectTo(redirectWithError("rate-limit-exceeded", redirect)));
+                if (StringUtils.isBlank(emailCode)) {
+                    return flowService.redirectTo(flowService.redirectWithError("invalid-code", redirect, "email"));
+                }
+                return flowService.verifyAndRedirect(
+                        request,
+                        redirect,
+                        "email",
+                        emailVerificationService.verifySecurityVerificationCode(
+                                user.getMetadata().getName(), emailCode));
+            });
+        });
+    }
+
+    private Mono<ServerResponse> verifyByTotp(ServerRequest request) {
+        return request.formData().flatMap(formData -> {
+            var redirect = flowService.safeRedirect(formData.getFirst("redirect"));
+            var totpCode = formData.getFirst("totpCode");
+            return flowService.currentUser(request).flatMap(user -> {
+                if (securityVerificationService.availableMethods(user).isEmpty()) {
+                    return flowService.redirectTo(redirect);
+                }
+                if (!TwoFactorUtils.getTwoFactorAuthSettings(user).isTotpConfigured()) {
+                    return flowService.redirectTo(flowService.redirectWithError("invalid-code", redirect, "totp"));
+                }
+                return flowService.verifyAndRedirect(
+                        request, redirect, "totp", totpVerificationService.validate(user, totpCode));
             });
         });
     }
 
     private Mono<ServerResponse> sendEmailCode(ServerRequest request) {
-        return currentUser(request)
+        return flowService
+                .currentUser(request)
                 .flatMap(user -> emailVerificationService
                         .sendSecurityVerificationCode(user.getMetadata().getName())
                         .transformDeferred(
@@ -138,66 +134,10 @@ class SecurityVerificationEndpoint {
                 .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new);
     }
 
-    private RateLimiterOperator<Void> rateLimiterForSendingCode(String username) {
-        var rateLimiterKey = "send-security-verification-code-" + username;
-        var rateLimiter = rateLimiterRegistry.rateLimiter(rateLimiterKey, "send-login-email-code");
-        return RateLimiterOperator.of(rateLimiter);
-    }
-
-    private Function<Mono<Void>, Mono<Void>> rateLimiterForVerification(ServerRequest request, String username) {
-        // Keyed by session id like the login TOTP validation, sharing the same
-        // totp-validation budget (5 attempts / 5 min). A user who rotates the
-        // session (log out / in) gets a fresh budget, but re-authentication is
-        // required each time, which bounds the practical attempt rate.
-        return mono -> request.exchange()
-                .getSession()
-                .map(WebSession::getId)
-                // Fall back to a per-user key when no session can be derived
-                // (e.g. mock test environment), so the rate limit still applies.
-                .onErrorResume(throwable -> Mono.just(username))
-                .flatMap(key -> {
-                    var rateLimiter = rateLimiterRegistry.rateLimiter("totp-validation-" + key, "totp-validation");
-                    return mono.transformDeferred(RateLimiterOperator.of(rateLimiter));
-                });
-    }
-
-    private Mono<User> currentUser(ServerRequest request) {
-        return ReactiveSecurityContextHolder.getContext()
-                .map(SecurityContext::getAuthentication)
-                .filter(authentication ->
-                        authentication != null && !(authentication instanceof AnonymousAuthenticationToken))
-                .switchIfEmpty(Mono.error(AccessDeniedException::new))
-                .map(Authentication::getName)
-                .flatMap(userService::getUser);
-    }
-
-    private static String safeRedirect(String redirect) {
-        if (StringUtils.isNotBlank(redirect)
-                && redirect.startsWith("/")
-                && !redirect.startsWith("//")
-                && !redirect.contains("\\")) {
-            try {
-                URI.create(redirect);
-                return redirect;
-            } catch (IllegalArgumentException e) {
-                // fall through to default
-            }
-        }
-        return DEFAULT_REDIRECT;
-    }
-
-    private static String redirectWithError(String error, String redirect) {
-        return UriComponentsBuilder.fromPath("/security-verification")
-                .queryParam("error", error)
-                .queryParam("redirect", redirect)
-                .build()
-                .encode()
-                .toUriString();
-    }
-
-    private static Mono<ServerResponse> redirectTo(String location) {
-        return ServerResponse.status(HttpStatus.FOUND)
-                .location(URI.create(location))
-                .build();
+    private Function<Mono<Void>, Mono<Void>> rateLimiterForSendingCode(String username) {
+        var rateLimiter =
+                rateLimiterRegistry.rateLimiter("send-security-verification-code-" + username, "send-login-email-code");
+        var operator = RateLimiterOperator.<Void>of(rateLimiter);
+        return mono -> mono.transformDeferred(operator);
     }
 }
