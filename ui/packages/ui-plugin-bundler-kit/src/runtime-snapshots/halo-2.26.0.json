@@ -365,7 +365,7 @@
       }
     },
     "@halo-dev/ui-shared": {
-      "version": "2.25.2",
+      "version": "2.26.0",
       "exports": [
         "FormType",
         "THUMBNAIL_WIDTH_MAP",
@@ -381,7 +381,7 @@
       }
     },
     "@halo-dev/components": {
-      "version": "2.25.2",
+      "version": "2.26.0",
       "exports": [
         "AvatarGroupContextInjectionKey",
         "Dialog",
@@ -505,7 +505,7 @@
       }
     },
     "@halo-dev/api-client": {
-      "version": "2.25.2",
+      "version": "2.26.0",
       "exports": [
         "AddOperationOpEnum",
         "AnnotationSettingV1AlphaUcApi",
@@ -883,7 +883,7 @@
       }
     },
     "@halo-dev/richtext-editor": {
-      "version": "2.25.2",
+      "version": "2.26.0",
       "exports": [
         "AUDIO_BUBBLE_MENU_KEY",
         "AddMarkStep",
