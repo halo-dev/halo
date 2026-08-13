@@ -1,5 +1,6 @@
 import _dayjs from "dayjs";
 import "dayjs/locale/en";
+import "dayjs/locale/es";
 import "dayjs/locale/zh-cn";
 import "dayjs/locale/zh-tw";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -14,8 +15,10 @@ const DEFAULT_FORMAT = "YYYY-MM-DD HH:mm";
 
 const locales: Record<string, string> = {
   en: "en",
+  es: "es",
   zh: "zh-cn",
   "en-US": "en",
+  "es-ES": "es",
   "zh-CN": "zh-cn",
   "zh-TW": "zh-tw",
 };
@@ -120,6 +123,7 @@ export class DateUtils {
    * @remarks
    * Supported locales:
    * - "en" or "en-US" → English
+   * - "es" or "es-ES" → Spanish
    * - "zh" or "zh-CN" → Simplified Chinese
    * - "zh-TW" → Traditional Chinese
    *
