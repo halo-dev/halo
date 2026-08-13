@@ -264,7 +264,7 @@ function getManifestPath(provider: Provider, config?: RsBuildUserConfig) {
  *
  * @example
  * ```ts
- * import { rsbuildConfig } from "@halo-dev/ui-plugin-bundler-kit";
+ * import { rsbuildConfig } from "@halo-dev/ui-plugin-bundler-kit/rsbuild";
  *
  * export default rsbuildConfig({
  *   rsbuild: {

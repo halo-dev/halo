@@ -202,7 +202,7 @@ function getManifestPath(provider: Provider, config?: ViteUserConfig) {
  *
  * @example
  * ```ts
- * import { viteConfig } from "@halo-dev/ui-plugin-bundler-kit";
+ * import { viteConfig } from "@halo-dev/ui-plugin-bundler-kit/vite";
  *
  * export default viteConfig({
  *   vite: {

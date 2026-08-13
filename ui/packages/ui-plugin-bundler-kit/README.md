@@ -29,17 +29,19 @@ pnpm add @halo-dev/ui-plugin-bundler-kit
 
 ### Additional Dependencies
 
-**For Vite users**, you need to install Vite:
+**For Vite users**, install Vite and its Vue plugin:
 
 ```bash
-npm install vite
+npm install vite @vitejs/plugin-vue
 ```
 
-**For Rsbuild users**, you need to install Rsbuild:
+**For Rsbuild users**, install Rsbuild and its Vue plugin:
 
 ```bash
-npm install @rsbuild/core
+npm install @rsbuild/core @rsbuild/plugin-vue
 ```
+
+Since 2.26.0, import the configuration helper from its build-system-specific entry point. Imports from the package root are deprecated and will be removed in 2.27.0.
 
 ## Usage
 
@@ -48,7 +50,7 @@ npm install @rsbuild/core
 Create or update `vite.config.ts` file in your UI plugin project root:
 
 ```typescript
-import { viteConfig } from "@halo-dev/ui-plugin-bundler-kit";
+import { viteConfig } from "@halo-dev/ui-plugin-bundler-kit/vite";
 
 export default viteConfig({
   // provider defaults to "plugin"
@@ -69,7 +71,7 @@ export default viteConfig({
 Create or update `rsbuild.config.ts` file in your UI plugin project root:
 
 ```typescript
-import { rsbuildConfig } from "@halo-dev/ui-plugin-bundler-kit";
+import { rsbuildConfig } from "@halo-dev/ui-plugin-bundler-kit/rsbuild";
 
 export default rsbuildConfig({
   // provider defaults to "plugin"
@@ -101,7 +103,7 @@ theme-root/
 Vite:
 
 ```typescript
-import { viteConfig } from "@halo-dev/ui-plugin-bundler-kit";
+import { viteConfig } from "@halo-dev/ui-plugin-bundler-kit/vite";
 
 export default viteConfig({
   provider: "theme",
@@ -112,7 +114,7 @@ export default viteConfig({
 Rsbuild:
 
 ```typescript
-import { rsbuildConfig } from "@halo-dev/ui-plugin-bundler-kit";
+import { rsbuildConfig } from "@halo-dev/ui-plugin-bundler-kit/rsbuild";
 
 export default rsbuildConfig({
   provider: "theme",
@@ -190,7 +192,7 @@ The reactive record contains only Halo-owned `name`, `type`, `version`, and `pen
 
 ### Legacy Configuration (Deprecated)
 
-> ⚠️ **Note**: The `HaloUIPluginBundlerKit` function is deprecated. Please use `viteConfig` or `rsbuildConfig` instead. It does not support `provider: "theme"`.
+> ⚠️ **Note**: The `HaloUIPluginBundlerKit` function is deprecated and will be removed in 2.27.0. Import `viteConfig` from `@halo-dev/ui-plugin-bundler-kit/vite` or `rsbuildConfig` from `@halo-dev/ui-plugin-bundler-kit/rsbuild` instead. It does not support `provider: "theme"`.
 
 ```typescript
 import { HaloUIPluginBundlerKit } from "@halo-dev/ui-plugin-bundler-kit";
@@ -277,7 +279,7 @@ interface RsBuildUserConfig {
 Vite:
 
 ```typescript
-import { viteConfig } from "@halo-dev/ui-plugin-bundler-kit";
+import { viteConfig } from "@halo-dev/ui-plugin-bundler-kit/vite";
 
 export default viteConfig({
   vue: {
@@ -294,7 +296,7 @@ export default viteConfig({
 Rsbuild:
 
 ```typescript
-import { rsbuildConfig } from "@halo-dev/ui-plugin-bundler-kit";
+import { rsbuildConfig } from "@halo-dev/ui-plugin-bundler-kit/rsbuild";
 
 export default rsbuildConfig({
   vue: {
@@ -313,7 +315,7 @@ The helper owns the Vue plugin instance. Keep `@vitejs/plugin-vue` and `@rsbuild
 ### Adding Path Aliases (Vite)
 
 ```typescript
-import { viteConfig } from "@halo-dev/ui-plugin-bundler-kit";
+import { viteConfig } from "@halo-dev/ui-plugin-bundler-kit/vite";
 import path from "path";
 
 export default viteConfig({
@@ -331,7 +333,7 @@ export default viteConfig({
 ### Adding Path Aliases (Rsbuild)
 
 ```typescript
-import { rsbuildConfig } from "@halo-dev/ui-plugin-bundler-kit";
+import { rsbuildConfig } from "@halo-dev/ui-plugin-bundler-kit/rsbuild";
 
 export default rsbuildConfig({
   rsbuild: {
@@ -348,7 +350,7 @@ export default rsbuildConfig({
 ### Adding Additional Vite Plugins
 
 ```typescript
-import { viteConfig } from "@halo-dev/ui-plugin-bundler-kit";
+import { viteConfig } from "@halo-dev/ui-plugin-bundler-kit/vite";
 import { defineConfig } from "vite";
 import UnoCSS from "unocss/vite";
 
@@ -364,7 +366,7 @@ export default viteConfig({
 ### Adding Additional Rsbuild Plugins
 
 ```typescript
-import { rsbuildConfig } from "@halo-dev/ui-plugin-bundler-kit";
+import { rsbuildConfig } from "@halo-dev/ui-plugin-bundler-kit/rsbuild";
 import { pluginSass } from "@rsbuild/plugin-sass";
 
 export default rsbuildConfig({
@@ -379,7 +381,7 @@ export default rsbuildConfig({
 ### Custom Plugin Manifest Path
 
 ```typescript
-import { viteConfig } from "@halo-dev/ui-plugin-bundler-kit";
+import { viteConfig } from "@halo-dev/ui-plugin-bundler-kit/vite";
 
 export default viteConfig({
   manifestPath: "application/src/main/resources/plugin.yaml", // Custom manifest file path
@@ -392,7 +394,7 @@ export default viteConfig({
 ### Custom Theme Manifest Path
 
 ```typescript
-import { viteConfig } from "@halo-dev/ui-plugin-bundler-kit";
+import { viteConfig } from "@halo-dev/ui-plugin-bundler-kit/vite";
 
 export default viteConfig({
   provider: "theme",
