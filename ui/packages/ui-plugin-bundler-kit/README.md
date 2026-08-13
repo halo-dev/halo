@@ -469,19 +469,26 @@ Snapshot generation is currently an explicit maintainer action; it is not couple
   - `@vitejs/plugin-vue`: ^5.0.0 || ^6.0.0 (when using Vite)
   - `vite`: ^6.0.0 || ^7.0.0 || ^8.0.0 (when using Vite)
 
-## Vite vs Rsbuild
+## Choosing Between Vite and Rsbuild
 
-Both Vite and Rsbuild are excellent build tools, but they have different strengths depending on your use case:
+**Vite is the recommended default for new UI plugins.** Halo 2.26.0 and later can load ESM plugin resources, so Vite builds can use dynamic imports and emit separate asynchronous chunks. Rsbuild was originally introduced to support code splitting while UI plugins were limited to legacy IIFE output; that is no longer a reason to prefer Rsbuild when targeting Halo 2.26.0 or later.
 
-### When to Use Rsbuild
+### Use Vite by Default
 
-**Recommended for large-scale plugins**
+- **ESM code splitting** - Supports lazy loading and asynchronous chunks when the target Halo version selects ESM output.
+- **Broader ecosystem** - Provides wider plugin coverage and closer alignment with Vue ecosystem tooling.
+- **Strong build performance** - Recent Vite versions have substantially improved build performance, so build speed alone is usually not a reason to choose Rsbuild.
+- **Familiar configuration** - Keeps plugin projects aligned with the tooling commonly used by Vue applications.
 
-- ✅ **Code Splitting Support** - Rsbuild provides excellent support for code splitting and lazy loading
-- ✅ **Better Performance** - Generally faster build times and smaller bundle sizes for complex applications
-- ✅ **Dynamic Imports** - Perfect for plugins with heavy frontend components
+### Use Rsbuild When Needed
 
-**Example with dynamic imports:**
+Choose Rsbuild when at least one of these conditions applies:
+
+- The plugin must keep legacy IIFE output, such as when targeting Halo versions earlier than 2.26.0, but still needs code splitting.
+- The project already uses Rsbuild or depends on Rsbuild/Rspack-specific plugins and configuration.
+- Measurements on the actual project show a meaningful build-performance advantage.
+
+Do not choose a build system based only on plugin size. With ESM output, both Vite and Rsbuild support dynamic imports and code splitting. The following pattern works with either preset:
 
 ```typescript
 import { definePlugin } from "@halo-dev/ui-shared";
@@ -507,26 +514,15 @@ export default definePlugin({
 });
 ```
 
-### When to Use Vite
-
-**Recommended for simple to medium-scale plugins**
-
-- ✅ **Vue Ecosystem Friendly** - Better integration with Vue ecosystem tools and plugins
-- ✅ **Rich Plugin Ecosystem** - Extensive collection of Vite plugins available
-- ✅ **Simple Configuration** - Easier to configure for straightforward use cases
-
 ### Summary
 
-| Feature           | Vite         | Rsbuild      |
-| ----------------- | ------------ | ------------ |
-| Code Splitting    | ✅ ESM       | ✅ ESM       |
-| Vue Ecosystem     | ✅ Excellent | ✅ Good      |
-| Build Performance | ✅ Good      | ✅ Excellent |
-| Dev Experience    | ✅ Excellent | ✅ Excellent |
-| Plugin Ecosystem  | ✅ Rich      | ✅ Growing   |
-| Configuration     | ✅ Simple    | ⚖️ Moderate  |
-
-**Recommendation**: Use **Rsbuild** for complex plugins with large frontend codebases, and **Vite** for simpler plugins or when you need extensive Vue ecosystem integration.
+| Consideration              | Vite                                       | Rsbuild                                         |
+| -------------------------- | ------------------------------------------ | ----------------------------------------------- |
+| Recommended use            | New plugins targeting Halo 2.26.0 or later | Existing Rsbuild projects or legacy IIFE builds |
+| ESM code splitting         | Supported                                  | Supported                                       |
+| Legacy IIFE code splitting | Not supported by the default preset        | Supported                                       |
+| Plugin ecosystem           | Broader Vite and Vue ecosystem             | Smaller, focused on Rsbuild and Rspack          |
+| Build performance          | Fast; recommended default                  | Fast; benchmark when performance is decisive    |
 
 ## License
 
