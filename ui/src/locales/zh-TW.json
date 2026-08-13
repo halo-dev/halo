@@ -800,7 +800,7 @@
   "core.uc_profile.pat.list.fields.creationTimestamp.tooltip": "建立時間：{creationTimestamp}",
   "core.uc_profile.pat.list.fields.expiresAt.dynamic": "到期於 {expiresAt}",
   "core.uc_profile.pat.list.fields.expiresAt.forever": "永久有效",
-  "core.uc_profile.pat.list.fields.lastUsed.dynamic": "最後於{lastUsed}使用",
+  "core.uc_profile.pat.list.fields.lastUsed.dynamic": "最後使用時間：{lastUsed}",
   "core.uc_profile.pat.list.fields.lastUsed.never": "從未使用",
   "core.uc_profile.pat.list.fields.status.normal": "正常",
   "core.uc_profile.pat.list.fields.status.revoked": "已撤銷",

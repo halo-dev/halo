@@ -1147,7 +1147,7 @@
   "core.uc_profile.pat.list.fields.creationTimestamp.tooltip": "Creado el {creationTimestamp}",
   "core.uc_profile.pat.list.fields.expiresAt.dynamic": "Expira el {expiresAt}",
   "core.uc_profile.pat.list.fields.expiresAt.forever": "Nunca expira",
-  "core.uc_profile.pat.list.fields.lastUsed.dynamic": "Usado por última vez {lastUsed}",
+  "core.uc_profile.pat.list.fields.lastUsed.dynamic": "Último uso: {lastUsed}",
   "core.uc_profile.pat.list.fields.lastUsed.never": "Nunca se ha usado",
   "core.uc_profile.pat.list.fields.status.normal": "Normal",
   "core.uc_profile.pat.list.fields.status.revoked": "Revocado",

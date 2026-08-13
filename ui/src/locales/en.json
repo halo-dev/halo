@@ -802,7 +802,7 @@
   "core.uc_profile.pat.list.fields.creationTimestamp.tooltip": "Created at: {creationTimestamp}",
   "core.uc_profile.pat.list.fields.expiresAt.dynamic": "Expires on {expiresAt}",
   "core.uc_profile.pat.list.fields.expiresAt.forever": "Never expires",
-  "core.uc_profile.pat.list.fields.lastUsed.dynamic": "Last used {lastUsed}",
+  "core.uc_profile.pat.list.fields.lastUsed.dynamic": "Last used: {lastUsed}",
   "core.uc_profile.pat.list.fields.lastUsed.never": "Never used",
   "core.uc_profile.pat.list.fields.status.normal": "Normal",
   "core.uc_profile.pat.list.fields.status.revoked": "Revoked",
