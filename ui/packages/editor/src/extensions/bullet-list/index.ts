@@ -4,6 +4,8 @@ import {
 } from "@tiptap/extension-list";
 import { markRaw } from "vue";
 import MingcuteListCheckLine from "~icons/mingcute/list-check-line";
+import { defineHaloKeyboardShortcuts } from "@/keyboard-shortcuts";
+import { i18n } from "@/locales";
 import type { Editor, Range } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
 import { ExtensionListItem } from "../list-item";
@@ -12,6 +14,18 @@ export type ExtensionBulletListOptions = Partial<BulletListOptions> &
   ExtensionOptions;
 
 export const ExtensionBulletList = TiptapBulletList.extend<ExtensionOptions>({
+  addKeyboardShortcuts() {
+    return defineHaloKeyboardShortcuts(this, [
+      {
+        id: "editor.structure.bulletList",
+        keys: ["Mod-Shift-8"],
+        label: () => i18n.global.t("editor.shortcuts.commands.bullet_list"),
+        category: "structure",
+        priority: 90,
+      },
+    ]);
+  },
+
   addHaloEditorMetadata() {
     return {
       ai: {
@@ -40,6 +54,7 @@ export const ExtensionBulletList = TiptapBulletList.extend<ExtensionOptions>({
           icon: markRaw(MingcuteListCheckLine),
           title: "editor.common.bullet_list",
           keywords: ["bulletlist", "wuxuliebiao"],
+          shortcutId: "editor.structure.bulletList",
           command: ({ editor, range }: { editor: Editor; range: Range }) => {
             editor.chain().focus().deleteRange(range).toggleBulletList().run();
           },

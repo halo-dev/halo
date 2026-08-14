@@ -8,6 +8,7 @@ import { markRaw } from "vue";
 import MdiTable from "~icons/mdi/table";
 import MdiTablePlus from "~icons/mdi/table-plus";
 import { CONVERT_TO_KEY } from "@/components/drag/default-drag";
+import { defineHaloKeyboardShortcuts } from "@/keyboard-shortcuts";
 import { i18n } from "@/locales";
 import {
   Editor,
@@ -264,7 +265,7 @@ export const ExtensionTable = TiptapTable.extend<ExtensionTableOptions>({
       return fallback?.(props) ?? false;
     };
 
-    return {
+    const shortcuts: Record<string, KeyboardShortcutCommand> = {
       ...parentShortcuts,
       Backspace: (props) => handleBackspace(parentShortcuts.Backspace, props),
       "Mod-Backspace": (props) =>
@@ -300,6 +301,50 @@ export const ExtensionTable = TiptapTable.extend<ExtensionTableOptions>({
         });
       },
     };
+
+    return defineHaloKeyboardShortcuts(
+      {
+        editor: this.editor,
+        name: this.name,
+        parent: () => shortcuts,
+      },
+      [
+        {
+          id: "editor.table.mergeCells",
+          keys: ["Mod-Shift-1"],
+          label: () => i18n.global.t("editor.menus.table.merge_cells"),
+          category: "structure",
+          priority: 130,
+          command: () => this.editor.commands.mergeCells(),
+        },
+        {
+          id: "editor.table.verticalAlignTop",
+          keys: ["Mod-Alt-Shift-t"],
+          label: () => i18n.global.t("editor.menus.table.vertical_top"),
+          category: "structure",
+          priority: 131,
+          command: () => this.editor.commands.setTableCellVerticalAlign("top"),
+        },
+        {
+          id: "editor.table.verticalAlignMiddle",
+          keys: ["Mod-Alt-Shift-c"],
+          label: () => i18n.global.t("editor.menus.table.vertical_middle"),
+          category: "structure",
+          priority: 132,
+          command: () =>
+            this.editor.commands.setTableCellVerticalAlign("middle"),
+        },
+        {
+          id: "editor.table.verticalAlignBottom",
+          keys: ["Mod-Alt-Shift-b"],
+          label: () => i18n.global.t("editor.menus.table.vertical_bottom"),
+          category: "structure",
+          priority: 133,
+          command: () =>
+            this.editor.commands.setTableCellVerticalAlign("bottom"),
+        },
+      ]
+    );
   },
 
   addProseMirrorPlugins() {

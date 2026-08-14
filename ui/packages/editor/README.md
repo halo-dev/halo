@@ -52,6 +52,7 @@ onMounted(() => {
 
 ## Extension development
 
+- [Editor extensions, toolbar items, and keyboard shortcuts](./docs/extension.md)
 - [Editor extension runtime metadata](./docs/runtime-metadata.md)
 
 ## Links

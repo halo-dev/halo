@@ -847,7 +847,7 @@
   "core.components.default_editor.tabs.detail.fields.draft": "Borrador",
   "core.components.default_editor.tabs.detail.fields.owner": "Propietario",
   "core.components.default_editor.tabs.detail.fields.permalink": "Enlace permanente",
-  "core.components.default_editor.extensions.placeholder.options.placeholder": "Ingresa / para seleccionar el tipo de entrada.",
+  "core.components.default_editor.extensions.placeholder.options.placeholder": "Escribe / para insertar",
   "core.components.default_editor.toolbox.attachment": "Adjunto",
   "core.components.default_editor.toolbox.show_hide_sidebar": "Mostrar/Ocultar barra lateral",
   "core.components.default_editor.title_placeholder": "Por favor, introduce el título",

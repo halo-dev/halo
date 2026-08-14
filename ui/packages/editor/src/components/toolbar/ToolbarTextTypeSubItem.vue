@@ -4,36 +4,42 @@ import type { ToolbarItemComponentProps } from "@/types";
 import { formatShortcut } from "@/utils";
 import DropdownItem from "../base/DropdownItem.vue";
 
-const props = withDefaults(
-  defineProps<
-    ToolbarItemComponentProps & {
-      selectionIndicator?: "leading" | "trailing";
-    }
-  >(),
-  {
-    selectionIndicator: "leading",
+type TextTypeLevel = 0 | 1 | 2 | 3 | 4 | 5 | 6;
+
+const props = defineProps<
+  ToolbarItemComponentProps & {
+    level: TextTypeLevel;
   }
-);
+>();
 
 const shortcut = useHaloKeyboardShortcut(props.editor, () => props.shortcutId);
 
-const action = () => {
-  if (props.disabled) return;
-  props.action?.();
+const textTypeClasses: Record<TextTypeLevel, string> = {
+  0: "text-base font-normal leading-[30px]",
+  1: "text-[28px] font-bold leading-[44.8px]",
+  2: "text-2xl font-bold leading-[38.4px]",
+  3: "text-xl font-bold leading-8",
+  4: "text-base font-bold leading-[25.6px]",
+  5: "text-sm font-bold leading-[22.4px]",
+  6: "text-sm font-bold leading-[22.4px]",
 };
+
+function action() {
+  if (props.disabled) {
+    return;
+  }
+  props.action?.();
+}
 </script>
 
 <template>
   <DropdownItem
     :disabled="disabled"
     :is-active="isActive"
-    :selection-indicator="selectionIndicator"
+    selection-indicator="leading"
     @click="action"
   >
-    <template v-if="icon" #icon>
-      <component :is="icon" />
-    </template>
-    {{ title }}
+    <span :class="textTypeClasses[level]">{{ title }}</span>
     <template v-if="shortcut" #suffix>
       <span
         class="flex-none text-xs font-normal text-gray-400/80"

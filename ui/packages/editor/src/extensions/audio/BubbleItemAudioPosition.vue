@@ -75,6 +75,7 @@ const handleSetPosition = (position: string) => {
           v-for="option in positionOptions"
           :key="option.value"
           v-close-popper
+          selection-indicator="leading"
           :is-active="
             isActive(editor.state, ExtensionFigure.name, {
               alignItems: option.value,

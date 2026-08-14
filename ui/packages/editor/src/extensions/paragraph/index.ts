@@ -5,6 +5,7 @@ import { markRaw } from "vue";
 import MingcuteLineHeightLine from "~icons/mingcute/line-height-line";
 import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
 import ToolbarSubItem from "@/components/toolbar/ToolbarSubItem.vue";
+import { defineHaloKeyboardShortcuts } from "@/keyboard-shortcuts";
 import { i18n } from "@/locales";
 import {
   Editor,
@@ -19,8 +20,61 @@ import { deleteNodeByPos, isGapCursorTargetNode } from "@/utils";
 export type ExtensionParagraphOptions = ExtensionOptions &
   Partial<ParagraphOptions>;
 
+const LINE_HEIGHTS = [1, 1.5, 2, 2.5, 3] as const;
+
+function changeLineHeight(editor: Editor, direction: -1 | 1): boolean {
+  const currentValue = Number.parseFloat(
+    editor.getAttributes("paragraph").lineHeight ?? "1.5"
+  );
+  const target =
+    direction > 0
+      ? LINE_HEIGHTS.find((lineHeight) => lineHeight > currentValue)
+      : [...LINE_HEIGHTS]
+          .reverse()
+          .find((lineHeight) => lineHeight < currentValue);
+
+  if (!target) {
+    return false;
+  }
+  return editor
+    .chain()
+    .focus()
+    .updateAttributes("paragraph", { lineHeight: target })
+    .run();
+}
+
 export const ExtensionParagraph =
   TiptapParagraph.extend<ExtensionParagraphOptions>({
+    addKeyboardShortcuts() {
+      return defineHaloKeyboardShortcuts(this, [
+        {
+          id: "editor.structure.paragraph",
+          keys: ["Mod-Alt-0"],
+          label: () => i18n.global.t("editor.shortcuts.commands.paragraph"),
+          category: "structure",
+          priority: 10,
+        },
+        {
+          id: "editor.format.increaseLineHeight",
+          keys: ["Mod-Alt-]"],
+          label: () =>
+            i18n.global.t("editor.shortcuts.commands.increase_line_height"),
+          category: "formatting",
+          priority: 115,
+          command: () => changeLineHeight(this.editor, 1),
+        },
+        {
+          id: "editor.format.decreaseLineHeight",
+          keys: ["Mod-Alt-["],
+          label: () =>
+            i18n.global.t("editor.shortcuts.commands.decrease_line_height"),
+          category: "formatting",
+          priority: 116,
+          command: () => changeLineHeight(this.editor, -1),
+        },
+      ]);
+    },
+
     haloEditorIndentation: {
       legacyLineIndent: true,
     },
@@ -78,8 +132,12 @@ export const ExtensionParagraph =
                 ?.lineHeight,
               icon: markRaw(MingcuteLineHeightLine),
               title: i18n.global.t("editor.common.line_height"),
+              shortcutIds: [
+                "editor.format.increaseLineHeight",
+                "editor.format.decreaseLineHeight",
+              ],
             },
-            children: [0, 1, 1.5, 2, 2.5, 3].map((lineHeight) => {
+            children: [0, ...LINE_HEIGHTS].map((lineHeight) => {
               return {
                 priority: lineHeight,
                 component: markRaw(ToolbarSubItem),

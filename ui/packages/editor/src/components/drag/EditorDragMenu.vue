@@ -1,11 +1,10 @@
 <script lang="ts" setup>
-import { onMounted, onUnmounted, type PropType, ref } from "vue";
+import { type PropType } from "vue";
 import type { PMNode, VueEditor } from "@/tiptap";
 import type { DragButtonType } from "@/types";
-import { matchShortcut } from "@/utils/keyboard";
 import EditorDragButtonItem from "./EditorDragButtonItem.vue";
 
-const props = defineProps({
+defineProps({
   editor: {
     type: Object as PropType<VueEditor>,
     required: true,
@@ -27,43 +26,6 @@ const props = defineProps({
 const emit = defineEmits<{
   (e: "close"): void;
 }>();
-
-const itemRefs = ref<Map<string, InstanceType<typeof EditorDragButtonItem>>>(
-  new Map()
-);
-
-const handleKeyDown = (event: KeyboardEvent) => {
-  for (const item of props.items) {
-    if (item.keyboard && matchShortcut(event, item.keyboard)) {
-      event.preventDefault();
-      event.stopPropagation();
-
-      const key = item.key || "";
-      const itemRef = itemRefs.value.get(key);
-      if (itemRef) {
-        itemRef.triggerClick();
-      }
-      return;
-    }
-  }
-};
-
-onMounted(() => {
-  window.addEventListener("keydown", handleKeyDown);
-});
-
-onUnmounted(() => {
-  window.removeEventListener("keydown", handleKeyDown);
-});
-
-const setItemRef = (key: string, ref: unknown) => {
-  if (ref && typeof ref === "object" && "triggerClick" in ref) {
-    itemRefs.value.set(key, ref as InstanceType<typeof EditorDragButtonItem>);
-  }
-  if (!ref) {
-    itemRefs.value.delete(key);
-  }
-};
 </script>
 
 <template>
@@ -71,7 +33,6 @@ const setItemRef = (key: string, ref: unknown) => {
     <EditorDragButtonItem
       v-for="(item, index) in items"
       :key="item.key || String(index)"
-      :ref="(el) => setItemRef(item.key || String(index), el)"
       :editor="editor"
       :node="node"
       :pos="pos"

@@ -1,8 +1,10 @@
 <script lang="ts" setup>
 import { VDropdown } from "@halo-dev/components";
-import { ref, type Component } from "vue";
+import { shallowRef, type Component } from "vue";
+import { useHaloKeyboardShortcut } from "@/composables/use-halo-keyboard-shortcut";
 import type { Editor } from "@/tiptap";
 import type { BubbleItemComponentProps } from "@/types";
+import KeyboardShortcutTooltip from "../keyboard-shortcuts/KeyboardShortcutTooltip.vue";
 import BubbleButton from "./BubbleButton.vue";
 
 const props = withDefaults(defineProps<BubbleItemComponentProps>(), {
@@ -10,7 +12,8 @@ const props = withDefaults(defineProps<BubbleItemComponentProps>(), {
   visible: () => true,
 });
 
-const componentRef = ref<Component | void>();
+const componentRef = shallowRef<Component | void>();
+const shortcut = useHaloKeyboardShortcut(props.editor, () => props.shortcutId);
 const handleBubbleItemClick = (editor: Editor) => {
   if (!props.action) {
     return;
@@ -32,15 +35,22 @@ const handleBubbleItemClick = (editor: Editor) => {
     :distance="10"
     @hide="componentRef = undefined"
   >
-    <BubbleButton
+    <KeyboardShortcutTooltip
+      v-slot="tooltipProps"
       :title="title"
-      :is-active="isActive({ editor })"
-      @click="handleBubbleItemClick(editor)"
+      :shortcut="shortcut?.keys[0]"
     >
-      <template #icon>
-        <component :is="icon" :style="iconStyle" class="size-5" />
-      </template>
-    </BubbleButton>
+      <BubbleButton
+        :title="tooltipProps.ariaLabel"
+        :is-active="isActive({ editor })"
+        custom-tooltip
+        @click="handleBubbleItemClick(editor)"
+      >
+        <template #icon>
+          <component :is="icon" :style="iconStyle" class="size-5" />
+        </template>
+      </BubbleButton>
+    </KeyboardShortcutTooltip>
     <template #popper>
       <KeepAlive>
         <component :is="componentRef" v-bind="props"></component>

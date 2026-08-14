@@ -65,6 +65,7 @@ function handleSetGroupSize(size: number) {
         v-for="i in 10"
         :key="i"
         class="!min-w-36"
+        selection-indicator="leading"
         :is-active="i === groupSize"
         @click="handleSetGroupSize(i)"
       >

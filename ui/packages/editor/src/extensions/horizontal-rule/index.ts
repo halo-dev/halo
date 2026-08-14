@@ -1,6 +1,21 @@
 import { HorizontalRule as TiptapHorizontalRule } from "@tiptap/extension-horizontal-rule";
+import { defineHaloKeyboardShortcuts } from "@/keyboard-shortcuts";
+import { i18n } from "@/locales";
 
 export const ExtensionHorizontalRule = TiptapHorizontalRule.extend({
+  addKeyboardShortcuts() {
+    return defineHaloKeyboardShortcuts(this, [
+      {
+        id: "editor.structure.horizontalRule",
+        keys: ["Mod-Alt-s"],
+        label: () => i18n.global.t("editor.common.horizontal_rule"),
+        category: "structure",
+        priority: 120,
+        command: () => this.editor.commands.setHorizontalRule(),
+      },
+    ]);
+  },
+
   addHaloEditorMetadata() {
     return {
       ai: {

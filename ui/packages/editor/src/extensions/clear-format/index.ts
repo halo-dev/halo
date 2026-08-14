@@ -1,6 +1,7 @@
 import { markRaw } from "vue";
 import MingcuteEraserLine from "~icons/mingcute/eraser-line";
 import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
+import { defineHaloKeyboardShortcuts } from "@/keyboard-shortcuts";
 import { i18n } from "@/locales";
 import type { Editor } from "@/tiptap";
 import { Extension } from "@/tiptap";
@@ -23,6 +24,7 @@ export const ExtensionClearFormat =
               isActive: false,
               icon: markRaw(MingcuteEraserLine),
               title: i18n.global.t("editor.common.clear_format"),
+              shortcutId: "editor.format.clear",
               action: () => editor.chain().focus().unsetAllMarks().run(),
             },
           };
@@ -31,8 +33,15 @@ export const ExtensionClearFormat =
     },
 
     addKeyboardShortcuts() {
-      return {
-        "Mod-\\": () => this.editor.chain().focus().unsetAllMarks().run(),
-      };
+      return defineHaloKeyboardShortcuts(this, [
+        {
+          id: "editor.format.clear",
+          keys: ["Mod-\\"],
+          label: () => i18n.global.t("editor.common.clear_format"),
+          category: "formatting",
+          priority: 120,
+          command: () => this.editor.chain().focus().unsetAllMarks().run(),
+        },
+      ]);
     },
   });

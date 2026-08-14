@@ -5,6 +5,7 @@ import { EditorContent, VueEditor } from "@/tiptap";
 import EditorBubbleMenu from "./bubble/EditorBubbleMenu.vue";
 import EditorDragHandle from "./drag/EditorDragHandle.vue";
 import EditorHeader from "./EditorHeader.vue";
+import KeyboardShortcutHelp from "./keyboard-shortcuts/KeyboardShortcutHelp.vue";
 
 const props = defineProps({
   editor: {
@@ -38,6 +39,7 @@ watch(
     <editor-bubble-menu :editor="editor" />
     <editor-drag-handle :editor="editor" />
     <editor-header :editor="editor" />
+    <keyboard-shortcut-help :editor="editor" />
     <div class="editor-entry">
       <div class="editor-main">
         <div v-if="$slots.content" class="editor-main-extra">

@@ -86,6 +86,7 @@ function getListItems(editor: Editor) {
         isActive: editor.isActive(ExtensionBulletList.name),
         icon: markRaw(MingcuteListCheckLine),
         title: i18n.global.t("editor.common.bullet_list"),
+        shortcutId: "editor.structure.bulletList",
         action: () => editor.chain().focus().toggleBulletList().run(),
       },
     });
@@ -100,6 +101,7 @@ function getListItems(editor: Editor) {
         isActive: editor.isActive(ExtensionOrderedList.name),
         icon: markRaw(MingcuteListOrderedLine),
         title: i18n.global.t("editor.common.ordered_list"),
+        shortcutId: "editor.structure.orderedList",
         action: () => editor.chain().focus().toggleOrderedList().run(),
       },
     });
@@ -114,6 +116,7 @@ function getListItems(editor: Editor) {
         isActive: editor.isActive(ExtensionTaskList.name),
         icon: markRaw(MingcuteListCheck3Line),
         title: i18n.global.t("editor.common.task_list"),
+        shortcutId: "editor.structure.taskList",
         action: () => editor.chain().focus().toggleTaskList().run(),
       },
     });

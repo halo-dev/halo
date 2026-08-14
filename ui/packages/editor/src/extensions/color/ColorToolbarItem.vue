@@ -1,10 +1,28 @@
 <script lang="ts" setup>
+import { onMounted, onUnmounted, shallowRef } from "vue";
 import { ToolbarItem } from "@/components";
 import ColorPickerDropdown from "@/components/common/ColorPickerDropdown.vue";
 import { i18n } from "@/locales";
 import type { ToolbarItemComponentProps } from "@/types";
 
 const props = defineProps<ToolbarItemComponentProps>();
+const dropdownShown = shallowRef(false);
+
+const storage = props.editor.storage.color;
+
+function openColorPicker() {
+  dropdownShown.value = true;
+}
+
+onMounted(() => {
+  storage.openToolbarColorPicker = openColorPicker;
+});
+
+onUnmounted(() => {
+  if (storage.openToolbarColorPicker === openColorPicker) {
+    storage.openToolbarColorPicker = undefined;
+  }
+});
 
 function handleSetColor(color?: string) {
   if (!color) {
@@ -19,7 +37,10 @@ function handleUnsetColor() {
 </script>
 
 <template>
-  <ColorPickerDropdown @update:model-value="handleSetColor">
+  <ColorPickerDropdown
+    v-model:shown="dropdownShown"
+    @update:model-value="handleSetColor"
+  >
     <ToolbarItem v-bind="props" />
     <template #prefix>
       <div class="p-1">

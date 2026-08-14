@@ -80,6 +80,7 @@ const handleSetAlign = (align: string) => {
           v-for="option in alignOptions"
           :key="option.value"
           v-close-popper
+          selection-indicator="leading"
           :is-active="editor.isActive({ textAlign: option.value })"
           @click="handleSetAlign(option.value)"
         >

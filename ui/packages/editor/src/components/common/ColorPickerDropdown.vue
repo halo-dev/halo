@@ -12,18 +12,8 @@ interface Color {
   name: string;
 }
 
-withDefaults(
-  defineProps<{
-    modelValue?: string;
-  }>(),
-  {
-    modelValue: undefined,
-  }
-);
-
-const emit = defineEmits<{
-  (emit: "update:modelValue", value?: string): void;
-}>();
+const modelValue = defineModel<string | undefined>({ default: undefined });
+const shown = defineModel<boolean>("shown", { default: false });
 
 function getColors(): Color[] {
   const result: Color[] = [];
@@ -69,7 +59,7 @@ function getColors(): Color[] {
 }
 
 function handleSetColor(color: string) {
-  emit("update:modelValue", color);
+  modelValue.value = color;
 }
 
 function onColorChange(color: Payload) {
@@ -78,7 +68,7 @@ function onColorChange(color: Payload) {
 </script>
 
 <template>
-  <VDropdown class="inline-flex items-center">
+  <VDropdown v-model:shown="shown" class="inline-flex items-center">
     <slot />
     <template #popper>
       <slot name="prefix" />

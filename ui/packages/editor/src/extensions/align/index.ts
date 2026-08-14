@@ -69,11 +69,8 @@ export const ExtensionAlign = Extension.create<ExtensionOptions>({
                   editor.isActive({ alignItems: "start" }),
                 icon: markRaw(MingcuteAlignLeftLine),
                 title: i18n.global.t("editor.common.align_left"),
+                shortcutId: "editor.format.alignLeft",
                 action: () => {
-                  console.log(
-                    editor.isActive({ textAlign: "left" }),
-                    editor.isActive({ alignItems: "start" })
-                  );
                   return editor
                     .chain()
                     .focus()
@@ -93,6 +90,7 @@ export const ExtensionAlign = Extension.create<ExtensionOptions>({
                   editor.isActive({ alignItems: "center" }),
                 icon: markRaw(MingcuteAlignCenterLine),
                 title: i18n.global.t("editor.common.align_center"),
+                shortcutId: "editor.format.alignCenter",
                 action: () =>
                   editor
                     .chain()
@@ -112,6 +110,7 @@ export const ExtensionAlign = Extension.create<ExtensionOptions>({
                   editor.isActive({ alignItems: "end" }),
                 icon: markRaw(MingcuteAlignRightLine),
                 title: i18n.global.t("editor.common.align_right"),
+                shortcutId: "editor.format.alignRight",
                 action: () =>
                   editor
                     .chain()
@@ -129,6 +128,7 @@ export const ExtensionAlign = Extension.create<ExtensionOptions>({
                 isActive: editor.isActive({ textAlign: "justify" }),
                 icon: markRaw(MingcuteAlignJustifyLine),
                 title: i18n.global.t("editor.common.align_justify"),
+                shortcutId: "editor.format.alignJustify",
                 action: () =>
                   editor.chain().focus().setTextAlign("justify").run(),
               },

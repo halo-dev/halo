@@ -70,6 +70,7 @@ function handleSetLayout(layout: string) {
         v-for="option in options"
         :key="option.value"
         class="!min-w-36"
+        selection-indicator="leading"
         :is-active="option.value === layout"
         @click="handleSetLayout(option.value)"
       >
