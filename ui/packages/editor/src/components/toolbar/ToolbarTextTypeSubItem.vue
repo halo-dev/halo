@@ -15,7 +15,7 @@ const props = defineProps<
 const shortcut = useHaloKeyboardShortcut(props.editor, () => props.shortcutId);
 
 const textTypeClasses: Record<TextTypeLevel, string> = {
-  0: "text-base font-bold leading-[30px]",
+  0: "text-base font-normal leading-[30px]",
   1: "text-[28px] font-bold leading-[44.8px]",
   2: "text-2xl font-bold leading-[38.4px]",
   3: "text-xl font-bold leading-8",

@@ -11,7 +11,7 @@ const props = withDefaults(
     }
   >(),
   {
-    selectionIndicator: "trailing",
+    selectionIndicator: "leading",
   }
 );
 

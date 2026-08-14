@@ -4,6 +4,8 @@ import { useHaloKeyboardShortcuts } from "@/composables/use-halo-keyboard-shortc
 import type { ToolbarItemComponentProps } from "@/types";
 import KeyboardShortcutTooltip from "../keyboard-shortcuts/KeyboardShortcutTooltip.vue";
 
+defineOptions({ inheritAttrs: false });
+
 const props = defineProps<ToolbarItemComponentProps>();
 
 const shortcuts = useHaloKeyboardShortcuts(props.editor, () => {
@@ -21,6 +23,7 @@ const shortcuts = useHaloKeyboardShortcuts(props.editor, () => {
     :shortcuts="shortcuts.map((shortcut) => shortcut.keys[0]).filter(Boolean)"
   >
     <button
+      v-bind="$attrs"
       type="button"
       :class="[
         { 'bg-gray-200/70': isActive },
