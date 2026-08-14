@@ -34,19 +34,20 @@ function handleClick(e: MouseEvent) {
     :disabled="disabled"
     :aria-disabled="disabled"
     :data-state="isActive ? 'on' : 'off'"
+    :data-selection-indicator="selectionIndicator"
     :class="[
       { 'cursor-not-allowed opacity-70': disabled },
       { 'hover:bg-gray-100': !disabled },
       { 'px-3': !$slots.icon },
       { 'px-1.5': !!$slots.icon },
     ]"
-    class="group my-1.5 flex min-h-9 w-full cursor-pointer flex-row items-center gap-3 rounded py-1 text-left transition-colors first:mt-0 last:mb-0 focus-visible:bg-gray-100 focus-visible:outline-none"
+    class="dropdown-item group my-1.5 flex min-h-9 w-full cursor-pointer flex-row items-center gap-3 rounded py-1 text-left transition-colors first:mt-0 last:mb-0 focus-visible:bg-gray-100 focus-visible:outline-none"
     @click="handleClick"
   >
     <MingcuteCheckLine
       v-if="selectionIndicator === 'leading'"
       aria-hidden="true"
-      class="size-4 flex-none text-gray-900"
+      class="dropdown-item__leading-indicator size-4 flex-none text-gray-900"
       :class="{ invisible: !isActive }"
     />
 
@@ -82,3 +83,15 @@ function handleClick(e: MouseEvent) {
     />
   </button>
 </template>
+
+<style>
+.dropdown-item__leading-indicator {
+  display: none;
+}
+
+:has(> .dropdown-item[data-selection-indicator="leading"][data-state="on"])
+  > .dropdown-item[data-selection-indicator="leading"]
+  > .dropdown-item__leading-indicator {
+  display: block;
+}
+</style>
