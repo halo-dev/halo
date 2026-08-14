@@ -41,7 +41,7 @@
     "mitt": "^3.0.1"
   },
   "devDependencies": {
-    "dayjs": "^1.11.19",
+    "dayjs": "^1.11.21",
     "uuid": "^13.0.0"
   },
   "peerDependencies": {
@@ -50,7 +50,7 @@
   },
   "inlinedDependencies": {
     "@formkit/core": "2.1.2",
-    "dayjs": "1.11.19",
+    "dayjs": "1.11.21",
     "mitt": "3.0.1",
     "uuid": "13.0.0"
   }

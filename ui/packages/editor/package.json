@@ -37,7 +37,7 @@
     "typecheck": "vue-tsc --noEmit -p tsconfig.app.json --composite false"
   },
   "dependencies": {
-    "@floating-ui/dom": "^1.7.6",
+    "@floating-ui/dom": "^1.8.0",
     "@halo-dev/api-client": "workspace:*",
     "@halo-dev/components": "workspace:*",
     "@halo-dev/ui-shared": "workspace:*",
@@ -75,11 +75,11 @@
     "@tiptap/pm": "^3.29.0",
     "@tiptap/suggestion": "^3.29.0",
     "@tiptap/vue-3": "^3.29.0",
-    "@tiptap/y-tiptap": "^3.0.7",
-    "github-markdown-css": "^5.2.0",
+    "@tiptap/y-tiptap": "^3.0.8",
+    "github-markdown-css": "^5.9.0",
     "linkifyjs": "^4.3.2",
     "prosemirror-collab": "^1.3.1",
-    "prosemirror-markdown": "^1.13.4",
+    "prosemirror-markdown": "^1.13.5",
     "prosemirror-menu": "^1.3.2",
     "prosemirror-schema-basic": "^1.2.4",
     "prosemirror-trailing-node": "^3.0.0",

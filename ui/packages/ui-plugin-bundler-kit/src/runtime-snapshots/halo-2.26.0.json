@@ -2,7 +2,7 @@
   "haloVersion": "2.26.0",
   "packages": {
     "vue": {
-      "version": "3.5.40",
+      "version": "3.5.41",
       "exports": [
         "BaseTransition",
         "BaseTransitionPropsValidators",
@@ -216,7 +216,7 @@
       }
     },
     "pinia": {
-      "version": "4.0.2",
+      "version": "4.0.3",
       "exports": [
         "MutationType",
         "acceptHMRUpdate",
