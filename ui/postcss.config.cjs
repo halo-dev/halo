@@ -2,6 +2,6 @@ module.exports = {
   plugins: {
     tailwindcss: {},
     autoprefixer: {},
-    "postcss-viewport-height-correction": {},
+    "./src/vite/postcss-viewport-height-correction.cjs": {},
   },
 };
