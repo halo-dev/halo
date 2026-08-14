@@ -271,7 +271,7 @@
       }
     },
     "@formkit/vue": {
-      "version": "2.1.0",
+      "version": "2.1.2",
       "exports": [
         "FormKit",
         "FormKitIcon",
@@ -316,7 +316,7 @@
       }
     },
     "@formkit/core": {
-      "version": "2.1.0",
+      "version": "2.1.2",
       "exports": [
         "FORMKIT_VERSION",
         "bfs",
