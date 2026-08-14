@@ -15,17 +15,15 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: pnpm/action-setup@v6
-      name: Setup pnpm
+    - name: Setup Vite+
+      uses: voidzero-dev/setup-vp@v1
       with:
-        package_json_file: ui/package.json
-
-    - name: Set up Node.js
-      uses: actions/setup-node@v6
-      with:
+        working-directory: ui
+        version-file: pnpm-workspace.yaml
         node-version: ${{ inputs.node-version }}
-        cache: "pnpm"
-        cache-dependency-path: "ui/pnpm-lock.yaml"
+        cache: true
+        cache-dependency-path: pnpm-lock.yaml
+        run-install: false
 
     - name: Setup JDK
       uses: actions/setup-java@v5

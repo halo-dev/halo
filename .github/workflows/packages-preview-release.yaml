@@ -20,10 +20,13 @@ jobs:
         uses: ./.github/actions/setup-env
 
       - name: Install Dependencies
-        run: ./gradlew pnpmInstall
+        working-directory: ui
+        run: vp install --frozen-lockfile
 
       - name: Build Packages
-        run: cd ui && pnpm build:packages
+        working-directory: ui
+        run: vp run build:packages
 
       - name: Release
-        run: cd ui && pnpx pkg-pr-new publish --compact --pnpm './packages/*'
+        working-directory: ui
+        run: vp dlx pkg-pr-new publish --compact --pnpm './packages/*'
