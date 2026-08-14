@@ -1039,7 +1039,7 @@
   "core.components.default_editor.tabs.detail.fields.draft": "Draft",
   "core.components.default_editor.tabs.detail.fields.owner": "Owner",
   "core.components.default_editor.tabs.detail.fields.permalink": "Permalink",
-  "core.components.default_editor.extensions.placeholder.options.placeholder": "Enter / to select input type.",
+  "core.components.default_editor.extensions.placeholder.options.placeholder": "Type / to insert",
   "core.components.default_editor.toolbox.attachment": "Attachment",
   "core.components.default_editor.toolbox.show_hide_sidebar": "Show/Hide Sidebar",
   "core.components.default_editor.title_placeholder": "Please enter the title",

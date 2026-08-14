@@ -4,7 +4,7 @@ import { computed, ref, type Component } from "vue";
 import MaterialSymbolsArrowForwardIosRounded from "~icons/material-symbols/arrow-forward-ios-rounded";
 import type { PMNode, VueEditor } from "@/tiptap";
 import type { DragButtonType } from "@/types";
-import { formatShortcut } from "@/utils";
+import KeyboardShortcutKeys from "../keyboard-shortcuts/KeyboardShortcutKeys.vue";
 import EditorDragHandleMenu from "./EditorDragMenu.vue";
 
 const props = defineProps<
@@ -139,12 +139,10 @@ defineExpose({
         <div v-if="isChildrenComponent" class="flex items-center gap-2">
           <MaterialSymbolsArrowForwardIosRounded class="size-3" />
         </div>
-        <div
+        <KeyboardShortcutKeys
           v-else-if="props.keyboard"
-          class="flex items-center justify-center rounded-md border border-gray-200 bg-white p-0.5 px-1 font-sans text-xs font-bold text-gray-500"
-        >
-          {{ formatShortcut(props.keyboard) }}
-        </div>
+          :shortcuts="[props.keyboard]"
+        />
       </div>
     </template>
 

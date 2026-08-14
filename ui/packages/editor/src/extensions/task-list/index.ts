@@ -5,6 +5,8 @@ import {
 } from "@tiptap/extension-list";
 import { markRaw } from "vue";
 import MingcuteListCheck3Line from "~icons/mingcute/list-check-3-line";
+import { defineHaloKeyboardShortcuts } from "@/keyboard-shortcuts";
+import { i18n } from "@/locales";
 import type { Editor, Range } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
 
@@ -48,6 +50,19 @@ const ExtensionTaskItem = TiptapTaskItem.extend({
 
 export const ExtensionTaskList =
   TiptapTaskList.extend<ExtensionTaskListOptions>({
+    addKeyboardShortcuts() {
+      return defineHaloKeyboardShortcuts(this, [
+        {
+          id: "editor.structure.taskList",
+          keys: ["Mod-Alt-t", "Mod-Shift-9"],
+          label: () => i18n.global.t("editor.shortcuts.commands.task_list"),
+          category: "structure",
+          priority: 100,
+          command: () => this.editor.commands.toggleTaskList(),
+        },
+      ]);
+    },
+
     addHaloEditorMetadata() {
       return {
         ai: {
@@ -75,6 +90,7 @@ export const ExtensionTaskList =
             icon: markRaw(MingcuteListCheck3Line),
             title: "editor.common.task_list",
             keywords: ["tasklist", "renwuliebiao"],
+            shortcutId: "editor.structure.taskList",
             command: ({ editor, range }: { editor: Editor; range: Range }) => {
               editor.chain().focus().deleteRange(range).toggleTaskList().run();
             },

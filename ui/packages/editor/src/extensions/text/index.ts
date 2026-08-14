@@ -113,6 +113,7 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
                 isActive: ({ editor }) => editor.isActive(ExtensionBold.name),
                 icon: markRaw(MingcuteBoldLine),
                 title: i18n.global.t("editor.common.bold"),
+                shortcutId: "editor.format.bold",
                 action: ({ editor }) => {
                   editor.chain().focus().toggleBold().run();
                 },
@@ -124,6 +125,7 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
                 isActive: ({ editor }) => editor.isActive(ExtensionItalic.name),
                 icon: markRaw(MingcuteItalicLine),
                 title: i18n.global.t("editor.common.italic"),
+                shortcutId: "editor.format.italic",
                 action: ({ editor }) => {
                   editor.chain().focus().toggleItalic().run();
                 },
@@ -136,6 +138,7 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
                   editor.isActive(ExtensionUnderline.name),
                 icon: markRaw(MingcuteUnderlineLine),
                 title: i18n.global.t("editor.common.underline"),
+                shortcutId: "editor.format.underline",
                 action: ({ editor }) =>
                   editor.chain().focus().toggleUnderline().run(),
               },
@@ -146,6 +149,7 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
                 isActive: ({ editor }) => editor.isActive(ExtensionStrike.name),
                 icon: markRaw(MingcuteStrikethroughLine),
                 title: i18n.global.t("editor.common.strike"),
+                shortcutId: "editor.format.strike",
                 action: ({ editor }) =>
                   editor.chain().focus().toggleStrike().run(),
               },
@@ -158,6 +162,7 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
                   editor.isActive(ExtensionHighlight.name),
                 icon: markRaw(MingcuteMarkPenLine),
                 title: i18n.global.t("editor.common.highlight"),
+                shortcutId: "editor.format.highlight",
               },
             },
             {
@@ -175,6 +180,7 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
                 isActive: ({ editor }) => editor.isActive(ExtensionCode.name),
                 icon: markRaw(MingcuteCodeLine),
                 title: i18n.global.t("editor.common.code"),
+                shortcutId: "editor.format.code",
                 action: ({ editor }) =>
                   editor.chain().focus().toggleCode().run(),
               },
@@ -186,6 +192,7 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
                   editor.isActive(ExtensionSuperscript.name),
                 icon: markRaw(PhTextSuperscript),
                 title: i18n.global.t("editor.common.superscript"),
+                shortcutId: "editor.format.superscript",
                 action: ({ editor }) =>
                   editor.chain().focus().toggleSuperscript().run(),
               },
@@ -197,6 +204,7 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
                   editor.isActive(ExtensionSubscript.name),
                 icon: markRaw(PhTextSubscript),
                 title: i18n.global.t("editor.common.subscript"),
+                shortcutId: "editor.format.subscript",
                 action: ({ editor }) =>
                   editor.chain().focus().toggleSubscript().run(),
               },

@@ -3,8 +3,10 @@ import "./styles/index.scss";
 import "./styles/tailwind.css";
 
 export * from "./components";
+export * from "./composables/use-halo-keyboard-shortcut";
 export * from "./editor-metadata";
 export * from "./extensions";
+export * from "./keyboard-shortcuts";
 export * from "./tiptap";
 export * from "./types";
 export {

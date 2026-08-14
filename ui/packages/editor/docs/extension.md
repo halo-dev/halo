@@ -78,6 +78,8 @@ export interface ToolbarItemType {
     disabled?: boolean;
     icon?: Component;
     title?: string;
+    shortcutId?: string;
+    shortcutIds?: string[];
     action?: () => void;
   };
   children?: ToolbarItemType[];
@@ -107,7 +109,157 @@ addOptions() {
 },
 ```
 
-## 2. 工具箱扩展
+## 2. 快捷键与提示信息
+
+Halo 在 Tiptap 的 `addKeyboardShortcuts` 基础上提供了快捷键描述注册表。第三方扩展仍然只需要实现一个 `addKeyboardShortcuts`，同时即可获得以下能力：
+
+- 执行 Tiptap 快捷键命令；
+- 在“键盘快捷键”侧边栏中展示操作说明；
+- 通过同一个 `shortcutId` 在工具栏或悬浮菜单的 tooltip 中展示快捷键；
+- 根据当前操作系统将 `Mod`、`Alt` 等按键格式化为对应的展示形式。
+
+### 2.1 注册快捷键并关联工具栏
+
+使用 `defineHaloKeyboardShortcuts` 定义快捷键，再将相同的 `id` 传给工具栏组件的 `shortcutId`：
+
+```ts
+import {
+  defineHaloKeyboardShortcuts,
+  Extension,
+  ToolbarItem,
+  type Editor,
+  type ExtensionOptions,
+} from "@halo-dev/richtext-editor";
+import { markRaw } from "vue";
+import MyIcon from "./MyIcon.vue";
+
+const shortcutId = "plugin.example.insertGreeting";
+
+function insertGreeting(editor: Editor) {
+  return editor.chain().focus().insertContent("Hello Halo").run();
+}
+
+export const ExtensionExample = Extension.create<ExtensionOptions>({
+  name: "exampleShortcut",
+
+  addKeyboardShortcuts() {
+    return defineHaloKeyboardShortcuts(this, [
+      {
+        id: shortcutId,
+        keys: ["Mod-Alt-g"],
+        label: "插入问候语",
+        category: "general",
+        priority: 100,
+        command: () => insertGreeting(this.editor),
+      },
+    ]);
+  },
+
+  addOptions() {
+    return {
+      ...this.parent?.(),
+      getToolbarItems({ editor }: { editor: Editor }) {
+        return {
+          priority: 100,
+          component: markRaw(ToolbarItem),
+          props: {
+            editor,
+            isActive: false,
+            icon: markRaw(MyIcon),
+            title: "插入问候语",
+            shortcutId,
+            action: () => insertGreeting(editor),
+          },
+        };
+      },
+    };
+  },
+});
+```
+
+`ToolbarItem`、`ToolbarSubItem` 和 `BubbleItem` 都支持 `shortcutId`。`ToolbarItem` 还支持 `shortcutIds`，适用于一个按钮对应多个操作的情况，例如同时展示“增大字号”和“减小字号”。tooltip 会展示每个快捷键定义中的第一组按键，快捷键侧边栏则会展示 `keys` 中的全部可选按键。
+
+默认编辑器已经通过 `ExtensionsKit` 内置 `ExtensionKeyboardShortcuts`，插件通过 `default:editor:extension:create` 扩展点注册时无需重复添加。自行创建编辑器实例时，应使用 `ExtensionsKit`，或显式加入 `ExtensionKeyboardShortcuts`。
+
+### 2.2 描述字段
+
+`defineHaloKeyboardShortcuts` 接收的每一项都是一个 `HaloKeyboardShortcutDefinition`：
+
+| 字段 | 必填 | 说明 |
+| --- | --- | --- |
+| `id` | 是 | 编辑器内稳定且唯一的标识符，用于关联 tooltip。插件应使用包含插件标识的命名空间，例如 `plugin.example.insertGreeting`。 |
+| `keys` | 是 | Tiptap 格式的按键组合。第一项是 tooltip 展示的主快捷键，全部按键都会展示在快捷键侧边栏中。 |
+| `label` | 是 | 用户可见的操作名称，可以是字符串或返回字符串的函数。 |
+| `category` | 是 | 快捷键侧边栏分组：`general`、`formatting`、`structure` 或 `navigation`。 |
+| `command` | 视情况 | 新增快捷键时必须提供。扩展已有 Tiptap 快捷键时可以省略，此时复用父扩展中相同按键的命令。 |
+| `description` | 否 | 操作的补充说明，可以是字符串或返回字符串的函数。 |
+| `priority` | 否 | 在快捷键侧边栏同一分组中的排序值，数值越小越靠前，默认为 `100`。 |
+| `discoverable` | 否 | 是否出现在快捷键侧边栏中，默认为 `true`。即使设为 `false`，显式绑定了 `shortcutId` 的 tooltip 仍可展示。 |
+| `visible` | 否 | 根据当前编辑器状态决定是否出现在快捷键侧边栏中。 |
+
+按键名称遵循 [Tiptap 快捷键格式](https://tiptap.dev/docs/editor/core-concepts/keyboard-shortcuts)。建议使用 `Mod` 表示 macOS 的 `Command` 和 Windows/Linux 的 `Control`，例如 `Mod-b`。命令处理成功时应返回 `true`，这样 ProseMirror 会阻止浏览器继续执行同一按键的默认行为；未处理时应返回 `false`。
+
+如果扩展继承的 Tiptap 扩展已经实现了相同按键，可以只补充 Halo 的描述信息，不需要重新实现命令：
+
+```ts
+addKeyboardShortcuts() {
+  return defineHaloKeyboardShortcuts(this, [
+    {
+      id: "plugin.example.toggleFeature",
+      keys: ["Mod-b"],
+      label: "切换示例功能",
+      category: "formatting",
+    },
+  ]);
+},
+```
+
+只有父扩展确实定义了 `keys` 中对应的按键时才能省略 `command`。开发环境会对缺少实际命令的定义输出警告，并且不会注册这条描述。
+
+### 2.3 自定义组件中的 tooltip
+
+完全自定义工具栏组件时，可以通过 `useHaloKeyboardShortcut` 响应式读取注册表，再使用 `KeyboardShortcutTooltip` 保持与内置工具栏一致的视觉和无障碍信息：
+
+```vue
+<script setup lang="ts">
+import {
+  KeyboardShortcutTooltip,
+  useHaloKeyboardShortcut,
+  type Editor,
+} from "@halo-dev/richtext-editor";
+
+const props = defineProps<{
+  editor: Editor;
+  shortcutId: string;
+  title: string;
+}>();
+
+const shortcut = useHaloKeyboardShortcut(props.editor, () => props.shortcutId);
+</script>
+
+<template>
+  <KeyboardShortcutTooltip
+    v-slot="tooltipProps"
+    :title="title"
+    :shortcut="shortcut?.keys[0]"
+  >
+    <button :aria-label="tooltipProps.ariaLabel" type="button">
+      {{ title }}
+    </button>
+  </KeyboardShortcutTooltip>
+</template>
+```
+
+一个组件需要读取多条快捷键时，可以使用 `useHaloKeyboardShortcuts(editor, () => shortcutIds)`。这两个 composable 必须在 Vue 组件的 `setup` 阶段调用，以便组件卸载时自动取消注册表订阅。
+
+### 2.4 命名与冲突规则
+
+- `id` 应包含插件标识，避免覆盖其他扩展注册的描述；快捷键注册表不会自动为重复 ID 添加命名空间。
+- 只注册产品中真实可执行的快捷键，不要为了填满快捷键侧边栏而自行创造按键组合。
+- 添加按键前应检查 Halo 默认快捷键、Tiptap 默认快捷键以及浏览器常用快捷键。确实需要覆盖浏览器默认行为时，命令必须在成功处理后返回 `true`。
+- `label` 和 `description` 应面向用户描述操作，不要使用内部命令名或扩展名。
+
+## 3. 工具箱扩展
 
 编辑器工具箱区域的扩展，可用于增加编辑器附属操作，例如插入表格，插入第三方组件等功能。
 
@@ -176,7 +328,7 @@ addOptions() {
 }
 ```
 
-## 3. Slash Command 扩展
+## 4. Slash Command 扩展
 
 Slash Command （斜杠命令）的扩展，可用于在当前行快捷执行功能操作，例如转换当前行为标题、在当前行添加代码块等功能。
 
@@ -236,7 +388,7 @@ export interface CommandMenuItemType {
   }
 ```
 
-## 4. 悬浮菜单扩展
+## 5. 悬浮菜单扩展
 
 编辑器悬浮菜单的扩展。可用于支持目标元素组件的功能扩展及操作简化。例如 `Table` 扩展中的添加下一列、添加上一列等操作。
 
@@ -346,7 +498,7 @@ addOptions() {
 }
 ```
 
-## 5. 拖拽菜单扩展
+## 6. 拖拽菜单扩展
 
 拖拽菜单扩展主要用于拖拽的菜单功能扩展，例如转换为、复制、剪切、删除等操作。
 
@@ -493,7 +645,7 @@ export interface DragButtonType extends DragButtonItemProps {
 }
 ```
 
-## 6. 块缩进扩展
+## 7. 块缩进扩展
 
 编辑器会根据节点的 schema 元数据发现可缩进节点，不维护组件名称白名单。第三方节点只要属于 `block` group，且不属于 `list` group，就会自动获得块缩进属性、快捷键和拖拽缩进能力：
 

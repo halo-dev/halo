@@ -2,6 +2,7 @@ import type { HighlightOptions } from "@tiptap/extension-highlight";
 import TiptapHighlight from "@tiptap/extension-highlight";
 import { markRaw } from "vue";
 import MingcuteMarkPenLine from "~icons/mingcute/mark-pen-line";
+import { defineHaloKeyboardShortcuts } from "@/keyboard-shortcuts";
 import { i18n } from "@/locales";
 import type { Editor } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
@@ -12,6 +13,18 @@ export type ExtensionHighlightOptions = ExtensionOptions &
 
 export const ExtensionHighlight =
   TiptapHighlight.extend<ExtensionHighlightOptions>({
+    addKeyboardShortcuts() {
+      return defineHaloKeyboardShortcuts(this, [
+        {
+          id: "editor.format.highlight",
+          keys: ["Mod-Shift-h"],
+          label: () => i18n.global.t("editor.common.highlight"),
+          category: "formatting",
+          priority: 60,
+        },
+      ]);
+    },
+
     addHaloEditorMetadata() {
       return {
         ai: {
@@ -51,6 +64,7 @@ export const ExtensionHighlight =
               isActive: editor.isActive(TiptapHighlight.name),
               icon: markRaw(MingcuteMarkPenLine),
               title: i18n.global.t("editor.common.highlight"),
+              shortcutId: "editor.format.highlight",
             },
           };
         },

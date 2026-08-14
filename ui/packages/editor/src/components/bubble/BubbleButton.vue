@@ -8,12 +8,14 @@ const props = withDefaults(
     text?: string;
     isActive?: boolean;
     showMoreIndicator?: boolean;
+    customTooltip?: boolean;
   }>(),
   {
     showMoreIndicator: false,
     isActive: false,
     title: undefined,
     text: undefined,
+    customTooltip: false,
   }
 );
 
@@ -24,7 +26,7 @@ const onlyIcon = computed(() => {
 <template>
   <button
     v-tooltip="{
-      content: title,
+      content: customTooltip ? undefined : title,
       distance: 8,
       delay: {
         show: 0,
@@ -35,7 +37,7 @@ const onlyIcon = computed(() => {
       { 'size-8': onlyIcon },
       { 'h-8 gap-1 px-1': !onlyIcon },
     ]"
-    :title="title"
+    :aria-label="title"
     class="text inline-flex items-center justify-center rounded-md text-gray-600 hover:bg-gray-100 active:!bg-gray-200 [&>svg]:size-5"
   >
     <slot name="icon" />

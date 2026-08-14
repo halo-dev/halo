@@ -9,6 +9,8 @@ import {
   resolveHaloEditorIndentationSettings,
   resolveNodeIndentationMetadata,
 } from "@/editor-metadata/indentation";
+import { defineHaloKeyboardShortcuts } from "@/keyboard-shortcuts";
+import { i18n } from "@/locales";
 import {
   combineTransactionSteps,
   Extension,
@@ -345,31 +347,57 @@ export const ExtensionIndent = Extension.create<ExtensionIndentOptions>({
   },
 
   addKeyboardShortcuts() {
-    return {
-      Tab: getIndent(),
-      "Shift-Tab": getOutdent(false, true),
-      "Mod-]": getIndent(),
-      "Mod-[": getOutdent(false, true),
-      Backspace: ({ editor }) => {
-        const { selection } = editor.state;
-        if (
-          selection instanceof GapCursor ||
-          selection instanceof NodeSelection ||
-          (selection instanceof TextSelection &&
-            selection.empty &&
-            selection.$from.parentOffset === 0)
-        ) {
-          return getOutdent(false)({ editor });
-        }
-        return false;
+    return defineHaloKeyboardShortcuts(this, [
+      {
+        id: "editor.structure.indent",
+        keys: ["Mod-]", "Tab"],
+        label: () => i18n.global.t("editor.shortcuts.commands.indent"),
+        category: "structure",
+        priority: 120,
+        command: getIndent(),
       },
-      Delete: ({ editor }) => {
-        if (editor.state.selection instanceof GapCursor) {
-          return getOutdent(false)({ editor });
-        }
-        return false;
+      {
+        id: "editor.structure.outdent",
+        keys: ["Mod-[", "Shift-Tab"],
+        label: () => i18n.global.t("editor.shortcuts.commands.outdent"),
+        category: "structure",
+        priority: 130,
+        command: getOutdent(false, true),
       },
-    };
+      {
+        id: "editor.structure.outdentAtStart",
+        keys: ["Backspace"],
+        label: "Outdent at block start",
+        category: "structure",
+        discoverable: false,
+        command: ({ editor }) => {
+          const { selection } = editor.state;
+          if (
+            selection instanceof GapCursor ||
+            selection instanceof NodeSelection ||
+            (selection instanceof TextSelection &&
+              selection.empty &&
+              selection.$from.parentOffset === 0)
+          ) {
+            return getOutdent(false)({ editor });
+          }
+          return false;
+        },
+      },
+      {
+        id: "editor.structure.outdentGapCursor",
+        keys: ["Delete"],
+        label: "Outdent selected block",
+        category: "structure",
+        discoverable: false,
+        command: ({ editor }) => {
+          if (editor.state.selection instanceof GapCursor) {
+            return getOutdent(false)({ editor });
+          }
+          return false;
+        },
+      },
+    ]);
   },
 });
 

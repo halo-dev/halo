@@ -1037,7 +1037,7 @@
   "core.components.default_editor.tabs.detail.fields.draft": "未發布",
   "core.components.default_editor.tabs.detail.fields.owner": "創建者",
   "core.components.default_editor.tabs.detail.fields.permalink": "訪問連結",
-  "core.components.default_editor.extensions.placeholder.options.placeholder": "輸入 / 以選擇輸入類型",
+  "core.components.default_editor.extensions.placeholder.options.placeholder": "輸入 / 插入內容",
   "core.components.default_editor.toolbox.attachment": "選擇附件",
   "core.components.default_editor.toolbox.show_hide_sidebar": "顯示 / 隱藏側邊欄",
   "core.components.default_editor.title_placeholder": "請輸入標題",

@@ -1,5 +1,6 @@
 import { computePosition, flip, shift } from "@floating-ui/dom";
 import Suggestion, { type SuggestionOptions } from "@tiptap/suggestion";
+import { i18n } from "@/locales";
 import {
   Extension,
   PluginKey,
@@ -39,11 +40,12 @@ export const ExtensionCommandsMenu = Extension.create({
         });
       },
       items: ({ query }: { query: string }) => {
-        return commandMenuItems.filter((item) =>
-          [...item.keywords, item.title].some((keyword) =>
-            keyword.includes(query)
-          )
-        );
+        const normalizedQuery = query.trim().toLocaleLowerCase();
+        return commandMenuItems.filter((item) => {
+          return [...item.keywords, item.title, i18n.global.t(item.title)].some(
+            (keyword) => keyword.toLocaleLowerCase().includes(normalizedQuery)
+          );
+        });
       },
       render: () => {
         let component: VueRenderer | null = null;

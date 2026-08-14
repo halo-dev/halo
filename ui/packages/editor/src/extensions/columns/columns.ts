@@ -5,6 +5,7 @@ import RiInsertColumnLeft from "~icons/ri/insert-column-left";
 import RiInsertColumnRight from "~icons/ri/insert-column-right";
 import { BlockActionSeparator, ToolboxItem } from "@/components";
 import MingcuteDelete2Line from "@/components/icon/MingcuteDelete2Line.vue";
+import { defineHaloKeyboardShortcuts } from "@/keyboard-shortcuts";
 import { i18n } from "@/locales";
 import {
   Editor,
@@ -430,7 +431,7 @@ export const ExtensionColumns = Node.create<ExtensionColumnsOptions>({
   },
 
   addKeyboardShortcuts() {
-    return {
+    const shortcuts = {
       "Mod-Alt-G": () => this.editor.commands.insertColumns(),
       Tab: () => {
         return gotoCol(this.editor.state, this.editor.view.dispatch, "after");
@@ -439,6 +440,23 @@ export const ExtensionColumns = Node.create<ExtensionColumnsOptions>({
         return gotoCol(this.editor.state, this.editor.view.dispatch, "before");
       },
     };
+
+    return defineHaloKeyboardShortcuts(
+      {
+        editor: this.editor,
+        name: this.name,
+        parent: () => shortcuts,
+      },
+      [
+        {
+          id: "editor.structure.columns",
+          keys: ["Mod-Alt-G"],
+          label: () => i18n.global.t("editor.extensions.commands_menu.columns"),
+          category: "structure",
+          discoverable: false,
+        },
+      ]
+    );
   },
   addExtensions() {
     return [ExtensionColumn];

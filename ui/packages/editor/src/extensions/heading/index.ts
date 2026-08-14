@@ -9,8 +9,9 @@ import LucideHeading6 from "~icons/lucide/heading-6";
 import MingcuteParagraphLine from "~icons/mingcute/paragraph-line";
 import { CONVERT_TO_KEY } from "@/components/drag/default-drag";
 import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
-import ToolbarSubItem from "@/components/toolbar/ToolbarSubItem.vue";
+import ToolbarTextTypeSubItem from "@/components/toolbar/ToolbarTextTypeSubItem.vue";
 import { ExtensionParagraph } from "@/extensions/paragraph";
+import { defineHaloKeyboardShortcuts } from "@/keyboard-shortcuts";
 import { i18n } from "@/locales";
 import {
   AttrStep,
@@ -78,6 +79,20 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
     ];
   },
 
+  addKeyboardShortcuts() {
+    return defineHaloKeyboardShortcuts(
+      this,
+      this.options.levels.map((level) => ({
+        id: `editor.structure.heading${level}`,
+        keys: [`Mod-Alt-${level}`],
+        label: () =>
+          i18n.global.t("editor.shortcuts.commands.heading", { level }),
+        category: "structure" as const,
+        priority: 10 + level * 10,
+      }))
+    );
+  },
+
   addAttributes() {
     return {
       ...this.parent?.(),
@@ -105,83 +120,90 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
           children: [
             {
               priority: 10,
-              component: markRaw(ToolbarSubItem),
+              component: markRaw(ToolbarTextTypeSubItem),
               props: {
                 editor,
                 isActive: editor.isActive(ExtensionParagraph.name),
-                icon: markRaw(MingcuteParagraphLine),
+                level: 0,
                 title: i18n.global.t("editor.common.heading.paragraph"),
+                shortcutId: "editor.structure.paragraph",
                 action: () => editor.chain().focus().setParagraph().run(),
               },
             },
             {
               priority: 20,
-              component: markRaw(ToolbarSubItem),
+              component: markRaw(ToolbarTextTypeSubItem),
               props: {
                 editor,
                 isActive: editor.isActive(TiptapHeading.name, { level: 1 }),
-                icon: markRaw(LucideHeading1),
+                level: 1,
                 title: i18n.global.t("editor.common.heading.heading1"),
+                shortcutId: "editor.structure.heading1",
                 action: () =>
                   editor.chain().focus().toggleHeading({ level: 1 }).run(),
               },
             },
             {
               priority: 30,
-              component: markRaw(ToolbarSubItem),
+              component: markRaw(ToolbarTextTypeSubItem),
               props: {
                 editor,
                 isActive: editor.isActive(TiptapHeading.name, { level: 2 }),
-                icon: markRaw(LucideHeading2),
+                level: 2,
                 title: i18n.global.t("editor.common.heading.heading2"),
+                shortcutId: "editor.structure.heading2",
                 action: () =>
                   editor.chain().focus().toggleHeading({ level: 2 }).run(),
               },
             },
             {
               priority: 40,
-              component: markRaw(ToolbarSubItem),
+              component: markRaw(ToolbarTextTypeSubItem),
               props: {
                 editor,
                 isActive: editor.isActive(TiptapHeading.name, { level: 3 }),
-                icon: markRaw(LucideHeading3),
+                level: 3,
                 title: i18n.global.t("editor.common.heading.heading3"),
+                shortcutId: "editor.structure.heading3",
                 action: () =>
                   editor.chain().focus().toggleHeading({ level: 3 }).run(),
               },
             },
             {
               priority: 50,
-              component: markRaw(ToolbarSubItem),
+              component: markRaw(ToolbarTextTypeSubItem),
               props: {
                 editor,
                 isActive: editor.isActive(TiptapHeading.name, { level: 4 }),
-                icon: markRaw(LucideHeading4),
+                level: 4,
                 title: i18n.global.t("editor.common.heading.heading4"),
+                shortcutId: "editor.structure.heading4",
                 action: () =>
                   editor.chain().focus().toggleHeading({ level: 4 }).run(),
               },
             },
             {
               priority: 60,
-              component: markRaw(ToolbarSubItem),
+              component: markRaw(ToolbarTextTypeSubItem),
               props: {
                 editor,
                 isActive: editor.isActive(TiptapHeading.name, { level: 5 }),
-                icon: markRaw(LucideHeading5),
+                level: 5,
                 title: i18n.global.t("editor.common.heading.heading5"),
+                shortcutId: "editor.structure.heading5",
                 action: () =>
                   editor.chain().focus().toggleHeading({ level: 5 }).run(),
               },
             },
             {
               priority: 70,
-              component: markRaw(ToolbarSubItem),
+              component: markRaw(ToolbarTextTypeSubItem),
               props: {
                 editor,
                 isActive: editor.isActive(TiptapHeading.name, { level: 6 }),
-                icon: markRaw(LucideHeading6),
+                level: 6,
                 title: i18n.global.t("editor.common.heading.heading6"),
+                shortcutId: "editor.structure.heading6",
                 action: () =>
                   editor.chain().focus().toggleHeading({ level: 6 }).run(),
               },
@@ -196,6 +218,7 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
             icon: markRaw(MingcuteParagraphLine),
             title: "editor.common.heading.paragraph",
             keywords: ["paragraph", "text", "putongwenben"],
+            shortcutId: "editor.structure.paragraph",
             command: ({ editor, range }: { editor: Editor; range: Range }) => {
               editor.chain().focus().deleteRange(range).setParagraph().run();
             },
@@ -205,6 +228,7 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
             icon: markRaw(LucideHeading1),
             title: "editor.common.heading.heading1",
             keywords: ["h1", "heading1", "1", "yijibiaoti"],
+            shortcutId: "editor.structure.heading1",
             command: ({ editor, range }: { editor: Editor; range: Range }) => {
               editor
                 .chain()
@@ -219,6 +243,7 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
             icon: markRaw(LucideHeading2),
             title: "editor.common.heading.heading2",
             keywords: ["h2", "heading2", "2", "erjibiaoti"],
+            shortcutId: "editor.structure.heading2",
             command: ({ editor, range }: { editor: Editor; range: Range }) => {
               editor
                 .chain()
@@ -233,6 +258,7 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
             icon: markRaw(LucideHeading3),
             title: "editor.common.heading.heading3",
             keywords: ["h3", "heading3", "3", "sanjibiaoti"],
+            shortcutId: "editor.structure.heading3",
             command: ({ editor, range }: { editor: Editor; range: Range }) => {
               editor
                 .chain()
@@ -247,6 +273,7 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
             icon: markRaw(LucideHeading4),
             title: "editor.common.heading.heading4",
             keywords: ["h4", "heading4", "4", "sijibiaoti"],
+            shortcutId: "editor.structure.heading4",
             command: ({ editor, range }: { editor: Editor; range: Range }) => {
               editor
                 .chain()
@@ -261,6 +288,7 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
             icon: markRaw(LucideHeading5),
             title: "editor.common.heading.heading5",
             keywords: ["h5", "heading5", "5", "wujibiaoti"],
+            shortcutId: "editor.structure.heading5",
             command: ({ editor, range }: { editor: Editor; range: Range }) => {
               editor
                 .chain()
@@ -275,6 +303,7 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
             icon: markRaw(LucideHeading6),
             title: "editor.common.heading.heading6",
             keywords: ["h6", "heading6", "6", "liujibiaoti"],
+            shortcutId: "editor.structure.heading6",
             command: ({ editor, range }: { editor: Editor; range: Range }) => {
               editor
                 .chain()

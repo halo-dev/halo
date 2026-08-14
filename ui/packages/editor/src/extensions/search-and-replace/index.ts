@@ -5,6 +5,7 @@ import {
 import { h, markRaw, reactive, render } from "vue";
 import MingcuteListSearchLine from "~icons/mingcute/list-search-line";
 import { ToolbarItem } from "@/components";
+import { defineHaloKeyboardShortcuts } from "@/keyboard-shortcuts";
 import { i18n } from "@/locales";
 import { Editor, Extension } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
@@ -68,6 +69,7 @@ export const ExtensionSearchAndReplace = Extension.create<
               title: i18n.global.t(
                 "editor.extensions.search_and_replace.title"
               ),
+              shortcutId: "editor.general.find",
               action: () => {
                 if (panel.visible) {
                   editor.commands.closeSearch();
@@ -175,12 +177,20 @@ export const ExtensionSearchAndReplace = Extension.create<
   },
 
   addKeyboardShortcuts() {
-    return {
-      "Mod-f": () => {
-        this.editor.commands.openSearch();
-        return true;
+    return defineHaloKeyboardShortcuts(this, [
+      {
+        id: "editor.general.find",
+        keys: ["Mod-Shift-f", "Mod-f"],
+        label: () =>
+          i18n.global.t("editor.extensions.search_and_replace.title"),
+        category: "general",
+        priority: 25,
+        command: () => {
+          this.editor.commands.openSearch();
+          return true;
+        },
       },
-    };
+    ]);
   },
 });
 

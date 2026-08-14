@@ -4,6 +4,8 @@ import {
 } from "@tiptap/extension-list";
 import { markRaw } from "vue";
 import MingcuteListOrderedLine from "~icons/mingcute/list-ordered-line";
+import { defineHaloKeyboardShortcuts } from "@/keyboard-shortcuts";
+import { i18n } from "@/locales";
 import type { Editor, Range } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
 import { ExtensionListItem } from "../list-item";
@@ -13,6 +15,18 @@ export type ExtensionOrderedListOptions = Partial<OrderedListOptions> &
 
 export const ExtensionOrderedList =
   TiptapOrderedList.extend<ExtensionOrderedListOptions>({
+    addKeyboardShortcuts() {
+      return defineHaloKeyboardShortcuts(this, [
+        {
+          id: "editor.structure.orderedList",
+          keys: ["Mod-Shift-7"],
+          label: () => i18n.global.t("editor.shortcuts.commands.ordered_list"),
+          category: "structure",
+          priority: 80,
+        },
+      ]);
+    },
+
     addHaloEditorMetadata() {
       return {
         ai: {
@@ -53,6 +67,7 @@ export const ExtensionOrderedList =
             icon: markRaw(MingcuteListOrderedLine),
             title: "editor.common.ordered_list",
             keywords: ["orderedlist", "youxuliebiao"],
+            shortcutId: "editor.structure.orderedList",
             command: ({ editor, range }: { editor: Editor; range: Range }) => {
               editor
                 .chain()

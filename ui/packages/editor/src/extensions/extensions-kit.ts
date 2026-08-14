@@ -55,6 +55,7 @@ import { ExtensionIframe } from "./iframe";
 import { ExtensionImage, type ExtensionImageOptions } from "./image";
 import { ExtensionIndent, type ExtensionIndentOptions } from "./indent";
 import { ExtensionItalic, type ExtensionItalicOptions } from "./italic";
+import { ExtensionKeyboardShortcuts } from "./keyboard-shortcuts";
 import { ExtensionLink, type ExtensionLinkOptions } from "./link";
 import { ExtensionListExtra } from "./list-extra";
 import {
@@ -143,6 +144,7 @@ export interface ExtensionsKitOptions {
   image: Partial<ExtensionImageOptions> | false;
   indent: Partial<ExtensionIndentOptions> | false;
   italic: Partial<ExtensionItalicOptions> | false;
+  keyboardShortcuts?: boolean;
   link: Partial<ExtensionLinkOptions> | false;
   listKeymap: Partial<ExtensionListKeymapOptions> | false;
   nodeSelected: Partial<ExtensionNodeSelectedOptions> | false;
@@ -307,6 +309,10 @@ export const ExtensionsKit = Extension.create<ExtensionsKitOptions>({
 
     if (this.options.italic !== false) {
       internalExtensions.push(ExtensionItalic.configure(this.options.italic));
+    }
+
+    if (this.options.keyboardShortcuts !== false) {
+      internalExtensions.push(ExtensionKeyboardShortcuts);
     }
 
     if (this.options.link !== false) {

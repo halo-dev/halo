@@ -4,6 +4,7 @@ import TiptapSuperscript, {
 import { markRaw } from "vue";
 import PhTextSuperscript from "~icons/ph/text-superscript";
 import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
+import { defineHaloKeyboardShortcuts } from "@/keyboard-shortcuts";
 import { i18n } from "@/locales";
 import type { Editor } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
@@ -13,6 +14,19 @@ export type ExtensionSuperscriptOptions = Partial<SuperscriptExtensionOptions> &
 
 export const ExtensionSuperscript =
   TiptapSuperscript.extend<ExtensionSuperscriptOptions>({
+    addKeyboardShortcuts() {
+      return defineHaloKeyboardShortcuts(this, [
+        {
+          id: "editor.format.superscript",
+          keys: ["Mod-Shift-.", "Mod-."],
+          label: () => i18n.global.t("editor.common.superscript"),
+          category: "formatting",
+          priority: 110,
+          command: () => this.editor.commands.toggleSuperscript(),
+        },
+      ]);
+    },
+
     addHaloEditorMetadata() {
       return {
         ai: {
@@ -40,6 +54,7 @@ export const ExtensionSuperscript =
               isActive: editor.isActive(TiptapSuperscript.name),
               icon: markRaw(PhTextSuperscript),
               title: i18n.global.t("editor.common.superscript"),
+              shortcutId: "editor.format.superscript",
               action: () => editor.chain().focus().toggleSuperscript().run(),
             },
           };

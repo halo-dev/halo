@@ -150,9 +150,9 @@ export const ExtensionBlockPosition =
 
     addKeyboardShortcuts() {
       return {
-        "Mod-Shift-l": () => this.editor.commands.setBlockPosition("left"),
+        "Mod-Shift-l": () => this.editor.commands.setBlockPosition("start"),
         "Mod-Shift-e": () => this.editor.commands.setBlockPosition("center"),
-        "Mod-Shift-r": () => this.editor.commands.setBlockPosition("right"),
+        "Mod-Shift-r": () => this.editor.commands.setBlockPosition("end"),
       };
     },
   }).configure({
