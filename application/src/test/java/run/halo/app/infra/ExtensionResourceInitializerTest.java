@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,6 +25,7 @@ import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.util.FileSystemUtils;
 import reactor.core.publisher.Mono;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Unstructured;
@@ -164,5 +166,26 @@ class ExtensionResourceInitializerTest {
                  }
             ]
             """, JsonUtils.objectToJson(values), false);
+    }
+
+    @Test
+    void shouldNotUpdateExtensionWithDoNotOverwriteLabel() throws Exception {
+        when(haloProperties.isRequiredExtensionDisabled()).thenReturn(true);
+        var existing = new Unstructured(Map.of(
+                "apiVersion", "v1",
+                "kind", "FakeExtension",
+                "metadata",
+                        Map.of(
+                                "name",
+                                "fake-extension",
+                                "labels",
+                                Map.of(ExtensionUtil.DO_NOT_OVERWRITE_LABEL, "true"))));
+
+        when(extensionClient.fetch(any(GroupVersionKind.class), any())).thenReturn(Mono.just(existing));
+
+        extensionResourceInitializer.start();
+
+        verify(extensionClient, never()).update(any());
+        verify(extensionClient, never()).create(any());
     }
 }
