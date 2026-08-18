@@ -667,6 +667,30 @@ describe("ExtensionGapCursor", () => {
     ).not.toBeNull();
   });
 
+  it("keeps a terminal gap across a later transaction until Backspace replaces the block", () => {
+    const editor = createEditorWithTrailingNode([
+      { type: "testCard" },
+      { type: "paragraph" },
+    ]);
+    editor.view.dispatch(
+      editor.state.tr.setSelection(TextSelection.create(editor.state.doc, 2))
+    );
+
+    expect(runKey(editor, "Backspace")).toBe(true);
+    editor.view.dispatch(editor.state.tr.setMeta("testIntervening", true));
+
+    expect(editor.state.doc.childCount).toBe(1);
+    expect(editor.state.doc.firstChild?.type.name).toBe("testCard");
+    expect(editor.state.selection).toBeInstanceOf(GapCursor);
+    expect(editor.state.selection.from).toBe(1);
+
+    expect(runKey(editor, "Backspace")).toBe(true);
+
+    expect(editor.state.doc.childCount).toBe(1);
+    expect(editor.state.doc.firstChild?.type.name).toBe("paragraph");
+    expect(editor.state.selection).toBeInstanceOf(TextSelection);
+  });
+
   it("deletes an empty paragraph between structural blocks with forward Delete", () => {
     const editor = createEditorWithContent([
       { type: "testCard" },
