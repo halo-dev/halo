@@ -23,4 +23,9 @@
       }
     }
   }
+
+  [data-node-view-wrapper].ProseMirror-selectednode {
+    outline: 2px solid $editorNodeCardBorderSelected;
+    box-shadow: 0 0 0 3px rgba(47, 142, 244, 0.14);
+  }
 }
