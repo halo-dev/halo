@@ -174,6 +174,62 @@ describe("ExtensionGapCursor", () => {
     expect(editor.state.selection.from).toBe(0);
   });
 
+  it("places a click just inside a block's top-left corner before it", () => {
+    const editor = createEditor();
+    const card = editor.view.nodeDOM(0) as HTMLElement;
+    card.dataset.nodeViewWrapper = "";
+    setRect(editor.view.dom, 0, 0, 300, 300);
+    setRect(card, 50, 50, 200, 100);
+
+    const event = new MouseEvent("mousedown", {
+      bubbles: true,
+      cancelable: true,
+      button: 0,
+      clientX: 58,
+      clientY: 58,
+    });
+    card.dispatchEvent(event);
+
+    expect(event.defaultPrevented).toBe(true);
+    expect(editor.state.selection).toBeInstanceOf(GapCursor);
+    expect(editor.state.selection.from).toBe(0);
+    expect(
+      editor.view.dom.querySelector(".halo-gap-cursor--before")
+    ).not.toBeNull();
+
+    editor.view.dispatch(
+      editor.state.tr.setSelection(TextSelection.create(editor.state.doc, 2))
+    );
+    expect(runMouseDown(editor, 63, 58, card)).toBeFalsy();
+    expect(editor.state.selection).toBeInstanceOf(TextSelection);
+    expect(editor.state.selection.from).toBe(2);
+  });
+
+  it("keeps interactive content in the top-left corner clickable", () => {
+    const editor = createEditor();
+    const card = editor.view.nodeDOM(0) as HTMLElement;
+    card.dataset.nodeViewWrapper = "";
+    const button = document.createElement("button");
+    const codeMirror = document.createElement("div");
+    codeMirror.className = "cm-editor";
+    const stopPropagation = (event: Event) => event.stopPropagation();
+    button.addEventListener("mousedown", stopPropagation);
+    codeMirror.addEventListener("mousedown", stopPropagation);
+    card.append(button, codeMirror);
+    setRect(editor.view.dom, 0, 0, 300, 300);
+    setRect(card, 50, 50, 200, 100);
+    editor.view.dispatch(
+      editor.state.tr.setSelection(TextSelection.create(editor.state.doc, 2))
+    );
+
+    const buttonEvent = dispatchMouseDown(button, 58, 58);
+    const codeMirrorEvent = dispatchMouseDown(codeMirror, 58, 58);
+    expect(buttonEvent.defaultPrevented).toBe(false);
+    expect(codeMirrorEvent.defaultPrevented).toBe(false);
+    expect(editor.state.selection).toBeInstanceOf(TextSelection);
+    expect(editor.state.selection.from).toBe(2);
+  });
+
   it("places a click in the whitespace below a block after it", () => {
     const editor = createEditor();
     const card = editor.view.nodeDOM(0) as HTMLElement;
@@ -235,6 +291,12 @@ describe("ExtensionGapCursor", () => {
     );
     expect(editor.state.selection.from).toBe(1);
     expect(cursor?.style.transform).toBe("translate(150px, 150px)");
+
+    expect(runMouseDown(editor, 58, 58, visualAnchor)).toBe(true);
+    expect(editor.state.selection.from).toBe(0);
+    expect(
+      editor.view.dom.querySelector(".halo-gap-cursor--before")
+    ).not.toBeNull();
 
     expect(runMouseDown(editor, 100, 100, visualAnchor)).toBeFalsy();
   });
@@ -1202,6 +1264,18 @@ function runMouseDown(
   return editor.view.someProp("handleDOMEvents", (handlers) => {
     return handlers.mousedown?.(editor.view, event) ?? false;
   });
+}
+
+function dispatchMouseDown(target: Element, clientX: number, clientY: number) {
+  const event = new MouseEvent("mousedown", {
+    bubbles: true,
+    cancelable: true,
+    button: 0,
+    clientX,
+    clientY,
+  });
+  target.dispatchEvent(event);
+  return event;
 }
 
 function runTextInput(editor: Editor, text: string) {
