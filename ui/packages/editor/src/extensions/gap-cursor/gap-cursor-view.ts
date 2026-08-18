@@ -17,6 +17,7 @@ import {
 } from "./gap-cursor-selection";
 
 const VERTICAL_GAP_CLICK_DISTANCE = 24;
+const GAP_CURSOR_CORNER_CLICK_DISTANCE = 12;
 const INTERACTIVE_ELEMENT_SELECTOR = [
   "button",
   "a",
@@ -28,24 +29,34 @@ const INTERACTIVE_ELEMENT_SELECTOR = [
   ".grip-row",
   ".grip-column",
   ".grip-table",
+  ".cm-editor",
 ].join(", ");
 
 interface GapCursorMouseHit {
   pos: number;
   side: GapCursorSide;
   distance: number;
+  source: "corner" | "gutter";
 }
 
 export function handleGapCursorMouseDown(
   view: EditorView,
   event: MouseEvent
 ): boolean {
+  return handleGapCursorMouseDownFrom(view, event);
+}
+
+function handleGapCursorMouseDownFrom(
+  view: EditorView,
+  event: MouseEvent,
+  source?: GapCursorMouseHit["source"]
+): boolean {
   if (!canHandleMouseDown(view, event)) {
     return false;
   }
 
   const hit = findGapCursorMouseHit(view, event);
-  if (!hit) {
+  if (!hit || (source && hit.source !== source)) {
     return false;
   }
 
@@ -91,6 +102,7 @@ export class GapCursorPositioner {
 
   constructor(view: EditorView) {
     this.view = view;
+    view.dom.addEventListener("mousedown", this.handleCornerMouseDown, true);
     if (typeof ResizeObserver !== "undefined") {
       this.resizeObserver = new ResizeObserver(this.position);
       this.resizeObserver.observe(view.dom);
@@ -106,8 +118,23 @@ export class GapCursorPositioner {
 
   destroy() {
     this.resizeObserver?.disconnect();
+    this.view.dom.removeEventListener(
+      "mousedown",
+      this.handleCornerMouseDown,
+      true
+    );
     window.removeEventListener("resize", this.position);
   }
+
+  private handleCornerMouseDown = (event: MouseEvent) => {
+    if (!isPotentialCapturedCornerMouseDown(this.view, event)) {
+      return;
+    }
+    if (!handleGapCursorMouseDownFrom(this.view, event, "corner")) {
+      return;
+    }
+    event.stopImmediatePropagation();
+  };
 
   private position = () => {
     const { selection } = this.view.state;
@@ -170,6 +197,31 @@ function canHandleMouseDown(view: EditorView, event: MouseEvent): boolean {
   return !hasModifier;
 }
 
+function isPotentialCapturedCornerMouseDown(
+  view: EditorView,
+  event: MouseEvent
+): boolean {
+  if (!canHandleMouseDown(view, event)) {
+    return false;
+  }
+
+  const eventElement = event.target instanceof Element ? event.target : null;
+  if (!eventElement || eventElement.closest(INTERACTIVE_ELEMENT_SELECTOR)) {
+    return false;
+  }
+
+  const nodeViewElement = eventElement.closest<HTMLElement>(
+    "[data-node-view-wrapper], [data-gap-cursor-click-area]"
+  );
+  if (!nodeViewElement || !view.dom.contains(nodeViewElement)) {
+    return false;
+  }
+
+  const rect =
+    getGapCursorVisualElement(nodeViewElement).getBoundingClientRect();
+  return isPointInsideBeforeCorner(event.clientX, event.clientY, rect);
+}
+
 function findGapCursorMouseHit(
   view: EditorView,
   event: MouseEvent
@@ -201,6 +253,7 @@ function findGapCursorMouseHit(
 
     const visualElement = getGapCursorVisualElement(element);
     const rect = visualElement.getBoundingClientRect();
+    addBeforeCornerHit(hits, pos, x, y, rect);
     if (
       eventElement &&
       visualElement.contains(eventElement) &&
@@ -255,6 +308,34 @@ function isGapCursorClickArea(
   return nodeElement.contains(clickArea);
 }
 
+function addBeforeCornerHit(
+  hits: GapCursorMouseHit[],
+  pos: number,
+  x: number,
+  y: number,
+  rect: DOMRect
+) {
+  if (!isPointInsideBeforeCorner(x, y, rect)) {
+    return;
+  }
+
+  hits.push({
+    pos,
+    side: "before",
+    distance: Math.hypot(x - rect.left, y - rect.top),
+    source: "corner",
+  });
+}
+
+function isPointInsideBeforeCorner(x: number, y: number, rect: DOMRect) {
+  return (
+    x >= rect.left &&
+    x <= rect.left + GAP_CURSOR_CORNER_CLICK_DISTANCE &&
+    y >= rect.top &&
+    y <= rect.top + GAP_CURSOR_CORNER_CLICK_DISTANCE
+  );
+}
+
 function addHorizontalHit(
   hits: GapCursorMouseHit[],
   pos: number,
@@ -269,7 +350,12 @@ function addHorizontalHit(
   }
 
   if (x < rect.left) {
-    hits.push({ pos, side: "before", distance: rect.left - x });
+    hits.push({
+      pos,
+      side: "before",
+      distance: rect.left - x,
+      source: "gutter",
+    });
     return;
   }
   if (x > rect.right) {
@@ -277,6 +363,7 @@ function addHorizontalHit(
       pos: pos + nodeSize,
       side: "after",
       distance: x - rect.right,
+      source: "gutter",
     });
   }
 }
@@ -296,7 +383,12 @@ function addVerticalHit(
 
   const distanceAbove = rect.top - y;
   if (distanceAbove > 0 && distanceAbove <= VERTICAL_GAP_CLICK_DISTANCE) {
-    hits.push({ pos, side: "before", distance: distanceAbove });
+    hits.push({
+      pos,
+      side: "before",
+      distance: distanceAbove,
+      source: "gutter",
+    });
     return;
   }
 
@@ -306,6 +398,7 @@ function addVerticalHit(
       pos: pos + nodeSize,
       side: "after",
       distance: distanceBelow,
+      source: "gutter",
     });
   }
 }
