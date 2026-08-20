@@ -13,9 +13,12 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import reactor.core.publisher.Flux;
@@ -93,6 +96,20 @@ class CommentPublicQueryServiceIntegrationTest {
                                 .isEqualTo("comment-approved");
                     })
                     .verifyComplete();
+        }
+
+        @Test
+        @ExtendWith(OutputCaptureExtension.class)
+        void listWithRepliesDoesNotLogInvalidPageSizeWarning(CapturedOutput output) {
+            Ref ref = Ref.of("fake-post", GroupVersionKind.fromExtension(Post.class));
+            commentPublicQueryService
+                    .list(ref, 1, 10)
+                    .flatMap(comments -> commentPublicQueryService.convertToWithReplyVo(comments, 10))
+                    .as(StepVerifier::create)
+                    .expectNextCount(1)
+                    .verifyComplete();
+
+            assertThat(output.getAll()).doesNotContain("Page size must be greater than 0");
         }
 
         @Test

@@ -103,7 +103,7 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
                 .flatMap(listOptions -> {
                     var pageRequest = Optional.ofNullable(pageParam)
                             .map(page -> page.withSort(page.getSort().and(defaultReplySort())))
-                            .orElse(PageRequestImpl.ofSize(0));
+                            .orElseGet(() -> PageRequestImpl.ofSize(PageRequestImpl.MAX_SIZE));
                     return client.listBy(Reply.class, listOptions, pageRequest)
                             .flatMap(list -> Flux.fromStream(list.get().map(this::toReplyVo))
                                     .flatMapSequential(Function.identity())
