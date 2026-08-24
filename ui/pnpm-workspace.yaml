@@ -4,19 +4,19 @@ dedupePeers: true
 autoInstallPeers: true
 strictPeerDependencies: false
 catalog:
-  "@vitest/ui": 4.1.10
-  vite: npm:@voidzero-dev/vite-plus-core@0.2.9
-  vite-plus: 0.2.9
-  vitest: 4.1.10
+  "@vitest/ui": 4.1.11
+  vite: npm:@voidzero-dev/vite-plus-core@0.3.0
+  vite-plus: 0.3.0
+  vitest: 4.1.11
 overrides:
   axios: ^1.16.1
-  vite: "catalog:"
   vite-plus: "catalog:"
-  vitest: "catalog:"
   "@lezer/javascript": 1.5.4
   prosemirror-model: 1.25.1
   prosemirror-transform: 1.10.4
   prosemirror-view: 1.40.0
+  vite@*: "catalog:"
+  vitest@*: "catalog:"
 peerDependencyRules:
   allowAny:
     - vite
@@ -42,13 +42,13 @@ minimumReleaseAgeExclude:
   - "@vueuse/metadata@14.4.0"
   - "@vueuse/router@14.4.0"
   - "@vueuse/shared@14.4.0"
-  - "@voidzero-dev/vite-plus-core@0.2.9"
-  - "@voidzero-dev/vite-plus-darwin-arm64@0.2.9"
-  - "@voidzero-dev/vite-plus-darwin-x64@0.2.9"
-  - "@voidzero-dev/vite-plus-linux-arm64-gnu@0.2.9"
-  - "@voidzero-dev/vite-plus-linux-arm64-musl@0.2.9"
-  - "@voidzero-dev/vite-plus-linux-x64-gnu@0.2.9"
-  - "@voidzero-dev/vite-plus-linux-x64-musl@0.2.9"
-  - "@voidzero-dev/vite-plus-win32-arm64-msvc@0.2.9"
-  - "@voidzero-dev/vite-plus-win32-x64-msvc@0.2.9"
-  - vite-plus@0.2.9
+  - "@voidzero-dev/vite-plus-core@0.2.9 || 0.3.0"
+  - "@voidzero-dev/vite-plus-darwin-arm64@0.2.9 || 0.3.0"
+  - "@voidzero-dev/vite-plus-darwin-x64@0.2.9 || 0.3.0"
+  - "@voidzero-dev/vite-plus-linux-arm64-gnu@0.2.9 || 0.3.0"
+  - "@voidzero-dev/vite-plus-linux-arm64-musl@0.2.9 || 0.3.0"
+  - "@voidzero-dev/vite-plus-linux-x64-gnu@0.2.9 || 0.3.0"
+  - "@voidzero-dev/vite-plus-linux-x64-musl@0.2.9 || 0.3.0"
+  - "@voidzero-dev/vite-plus-win32-arm64-msvc@0.2.9 || 0.3.0"
+  - "@voidzero-dev/vite-plus-win32-x64-msvc@0.2.9 || 0.3.0"
+  - vite-plus@0.2.9 || 0.3.0
