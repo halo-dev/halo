@@ -10,7 +10,7 @@ import {
 } from "@tiptap/extension-list";
 import TiptapParagraph from "@tiptap/extension-paragraph";
 import Text from "@tiptap/extension-text";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vite-plus/test";
 import {
   getAdjacentBlockIndent,
   insertCommandBlockAfter,
