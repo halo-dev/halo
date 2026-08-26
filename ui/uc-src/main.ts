@@ -41,13 +41,13 @@ async function initApp() {
   try {
     setupCoreModules({ app, router, platform: "uc", modules });
 
+    await setLanguage();
+
     const currentUserStore = stores.currentUser();
     await currentUserStore.fetchCurrentUser();
 
     const globalInfoStore = stores.globalInfo();
     await globalInfoStore.fetchGlobalInfo();
-
-    await setLanguage();
 
     if (currentUserStore.isAnonymous) {
       setupAppComponents();
