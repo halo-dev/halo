@@ -125,6 +125,7 @@ class PluginReconcilerTest {
         @BeforeEach
         void setUp() throws IOException {
             lenient().when(pluginService.getRequiredDependencies(any(), any())).thenReturn(List.of());
+            lenient().when(pluginManager.getSystemVersion()).thenReturn("0.0.0");
             Files.createFile(tempPath.resolve("fake-plugin-1.2.3.jar"));
         }
 
@@ -269,6 +270,43 @@ class PluginReconcilerTest {
             assertEquals(PluginReconciler.ConditionReason.START_ERROR, condition.getReason());
             assertTrue(condition.getMessage().contains("Fake error"));
 
+            verify(pluginManager, never()).startPlugin(name);
+        }
+
+        @Test
+        void shouldNotRetryIfRequiresVersionIsNotSatisfied() {
+            var fakePlugin = createPlugin(name, plugin -> {
+                var spec = plugin.getSpec();
+                spec.setVersion("1.2.3");
+                spec.setRequires(">=2.26.0");
+                spec.setEnabled(true);
+            });
+            var disabledPlugin = mockPluginWrapper(PluginState.DISABLED);
+
+            when(client.fetch(Plugin.class, name)).thenReturn(Optional.of(fakePlugin));
+            when(pluginManager.getPluginsRoots()).thenReturn(List.of(tempPath));
+            when(pluginManager.getSystemVersion()).thenReturn("2.25.4");
+            when(pluginManager.getPlugin(name))
+                    // loading plugin
+                    .thenReturn(null)
+                    // resolving static resources
+                    .thenReturn(mockPluginWrapperForNoStaticResources())
+                    // before starting
+                    .thenReturn(disabledPlugin)
+                    // sync plugin state
+                    .thenReturn(disabledPlugin);
+
+            var result = reconciler.reconcile(new Request(name));
+
+            assertFalse(result.reEnqueue());
+            assertEquals(Plugin.Phase.FAILED, fakePlugin.getStatus().getPhase());
+            var condition = fakePlugin.getStatus().getConditions().peekFirst();
+            assertEquals(PluginReconciler.ConditionType.READY, condition.getType());
+            assertEquals(ConditionStatus.FALSE, condition.getStatus());
+            assertEquals("UnsatisfiedRequiresVersion", condition.getReason());
+            assertEquals(
+                    "Plugin requires Halo version [>=2.26.0], but the current version is [2.25.4].",
+                    condition.getMessage());
             verify(pluginManager, never()).startPlugin(name);
         }
 

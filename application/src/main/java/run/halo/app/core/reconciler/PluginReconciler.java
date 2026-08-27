@@ -69,6 +69,7 @@ import run.halo.app.infra.ConditionList;
 import run.halo.app.infra.ConditionStatus;
 import run.halo.app.infra.utils.PathUtils;
 import run.halo.app.infra.utils.SettingUtils;
+import run.halo.app.infra.utils.VersionUtils;
 import run.halo.app.infra.utils.YamlUnstructuredLoader;
 import run.halo.app.plugin.OptionalDependentResolver;
 import run.halo.app.plugin.PluginConst;
@@ -348,13 +349,30 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
     private Result enablePlugin(Plugin plugin) {
         // start the plugin
         var pluginName = plugin.getMetadata().getName();
-        log.info("Starting plugin {}", pluginName);
         var status = plugin.getStatus();
+        var conditions = status.getConditions();
+        var systemVersion = pluginManager.getSystemVersion();
+        var requires = plugin.getSpec().getRequires();
+        if (!VersionUtils.satisfiesRequires(systemVersion, requires)) {
+            removeConditionBy(conditions, ConditionType.PROGRESSING);
+            conditions.addAndEvictFIFO(Condition.builder()
+                    .type(ConditionType.READY)
+                    .status(ConditionStatus.FALSE)
+                    .reason(ConditionReason.UNSATISFIED_REQUIRES_VERSION)
+                    .message("Plugin requires Halo version [%s], but the current version is [%s]."
+                            .formatted(requires, systemVersion))
+                    .lastTransitionTime(clock.instant())
+                    .build());
+            status.setPhase(Plugin.Phase.FAILED);
+            removeStartTaskIfPresent(pluginName);
+            return Result.doNotRetry();
+        }
+
+        log.info("Starting plugin {}", pluginName);
 
         // check if the parent plugin is started
         var unstartedDependencies = pluginService.getRequiredDependencies(
                 plugin, pw -> pw == null || !PluginState.STARTED.equals(pw.getPluginState()));
-        var conditions = status.getConditions();
         if (!CollectionUtils.isEmpty(unstartedDependencies)) {
             removeConditionBy(conditions, ConditionType.READY);
             conditions.addAndEvictFIFO(Condition.builder()
@@ -1003,5 +1021,7 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
         public static final String DISABLE_ERROR = "DisableError";
         public static final String INVALID_RUNTIME_MODE = "InvalidRuntimeMode";
         public static final String PLUGIN_PATH_NOT_SET = "PluginPathNotSet";
+
+        public static final String UNSATISFIED_REQUIRES_VERSION = "UnsatisfiedRequiresVersion";
     }
 }
