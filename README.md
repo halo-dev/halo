@@ -23,7 +23,7 @@
 
 [![Watch the video](https://www.halo.run/upload/halo-github-screenshot.png)](https://www.bilibili.com/video/BV15x4y1U7RU/?share_source=copy_web&vd_source=0ab6cf86ca512a363f04f18b86f55b86)
 
-------------------------------
+---
 
 ## Halo 是什么？
 
@@ -37,7 +37,7 @@ Halo 是一款强大易用的开源建站工具，从个人博客、知识库，
 docker run -d --name halo -p 8090:8090 -v ~/.halo2:/root/.halo2 halohub/halo:2.26
 ```
 
-**以上方式仅作为体验使用，推荐使用开源 Linux 服务器运维管理面板 [1Panel](https://github.com/1Panel-dev/1Panel) 进行部署（[查看文档](https://docs.halo.run/getting-started/install/1panel)），轻松搞定反向代理、SSL 证书及升级备份任务。更多部署方式，请[查看文档](https://docs.halo.run/category/%E5%AE%89%E8%A3%85%E6%8C%87%E5%8D%97)。**
+**以上方式仅作为体验使用，推荐使用开源 Linux 服务器运维管理面板 [1Panel](https://github.com/1Panel-dev/1Panel) 进行部署（[查看文档](https://docs.halo.run/guide/install/1panel)），轻松搞定反向代理、SSL 证书及升级备份任务。更多部署方式，请[查看文档](https://docs.halo.run/guide/install/)。**
 
 ## 在线体验
 
@@ -72,9 +72,9 @@ docker run -d --name halo -p 8090:8090 -v ~/.halo2:/root/.halo2 halohub/halo:2.2
 
 ## 应用生态
 
-* **应用市场**：提供丰富的站点主题与功能插件，[立即访问](https://www.halo.run/store/apps)
-* **成为开发者**：支持自主发布并管理应用，[了解详情](https://www.halo.run/archives/halo-app-store-developer-onboarding-app-creation)
-* [halo-sigs/awesome-halo](https://github.com/halo-sigs/awesome-halo)
+- **应用市场**：提供丰富的站点主题与功能插件，[立即访问](https://www.halo.run/store/apps)
+- **成为开发者**：支持自主发布并管理应用，[了解详情](https://www.halo.run/archives/halo-app-store-developer-onboarding-app-creation)
+- [halo-sigs/awesome-halo](https://github.com/halo-sigs/awesome-halo)
 
 ## 许可证
 
