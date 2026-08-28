@@ -158,12 +158,10 @@
         return;
       }
 
-      rememberMeCheckbox.addEventListener("change", function (e) {
-        const rememberMe = e.target.checked;
-
-        socialAuthProviders.forEach((form) => {
+      socialAuthProviders.forEach((form) => {
+        form.addEventListener("submit", function () {
           const url = new URL(form.action, window.location.origin);
-          url.searchParams.set("remember-me", rememberMe ? "true" : "false");
+          url.searchParams.set("remember-me", rememberMeCheckbox.checked ? "true" : "false");
           form.action = url.pathname + url.search;
         });
       });
