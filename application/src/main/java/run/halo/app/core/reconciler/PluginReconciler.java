@@ -351,23 +351,6 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
         var pluginName = plugin.getMetadata().getName();
         var status = plugin.getStatus();
         var conditions = status.getConditions();
-        var systemVersion = pluginManager.getSystemVersion();
-        var requires = plugin.getSpec().getRequires();
-        if (!VersionUtils.satisfiesRequires(systemVersion, requires)) {
-            removeConditionBy(conditions, ConditionType.PROGRESSING);
-            conditions.addAndEvictFIFO(Condition.builder()
-                    .type(ConditionType.READY)
-                    .status(ConditionStatus.FALSE)
-                    .reason(ConditionReason.UNSATISFIED_REQUIRES_VERSION)
-                    .message("Plugin requires Halo version [%s], but the current version is [%s]."
-                            .formatted(requires, systemVersion))
-                    .lastTransitionTime(clock.instant())
-                    .build());
-            status.setPhase(Plugin.Phase.FAILED);
-            removeStartTaskIfPresent(pluginName);
-            return Result.doNotRetry();
-        }
-
         log.info("Starting plugin {}", pluginName);
 
         // check if the parent plugin is started
@@ -464,6 +447,29 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
             log.debug("Plugin {} is starting...", pluginName);
         }
         return Result.requeue(Duration.ofSeconds(2));
+    }
+
+    private Result checkRequiresVersion(Plugin plugin) {
+        var pluginName = plugin.getMetadata().getName();
+        var status = plugin.getStatus();
+        var conditions = status.getConditions();
+        var systemVersion = pluginManager.getSystemVersion();
+        var requires = plugin.getSpec().getRequires();
+        if (!VersionUtils.satisfiesRequires(systemVersion, requires)) {
+            removeConditionBy(conditions, ConditionType.PROGRESSING);
+            conditions.addAndEvictFIFO(Condition.builder()
+                    .type(ConditionType.READY)
+                    .status(ConditionStatus.FALSE)
+                    .reason(ConditionReason.UNSATISFIED_REQUIRES_VERSION)
+                    .message("Plugin requires Halo version [%s], but the current version is [%s]."
+                            .formatted(requires, systemVersion))
+                    .lastTransitionTime(clock.instant())
+                    .build());
+            status.setPhase(Plugin.Phase.FAILED);
+            removeStartTaskIfPresent(pluginName);
+            return Result.doNotRetry();
+        }
+        return null;
     }
 
     void requestToReloadPluginsOptionallyDependentOn(String pluginName) {
@@ -666,6 +672,13 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
 
             if (requestToReload) {
                 removeRequestToReload(plugin);
+            }
+        }
+
+        if (requestToEnable(plugin)) {
+            var result = checkRequiresVersion(plugin);
+            if (result != null) {
+                return result;
             }
         }
 
