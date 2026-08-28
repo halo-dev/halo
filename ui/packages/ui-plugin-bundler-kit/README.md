@@ -537,4 +537,4 @@ Issues and Pull Requests are welcome! Please check our [Contributing Guide](http
 - [Halo Website](https://www.halo.run/)
 - [Halo Documentation](https://docs.halo.run/)
 - [GitHub Repository](https://github.com/halo-dev/halo)
-- [Plugin Development Guide](https://docs.halo.run/category/ui)
+- [Plugin Development Guide](https://docs.halo.run/developer-guide/plugin/basics/ui/)
