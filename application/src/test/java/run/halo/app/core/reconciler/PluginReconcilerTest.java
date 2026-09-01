@@ -15,6 +15,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static run.halo.app.plugin.PluginConst.PLUGIN_PATH;
 import static run.halo.app.plugin.PluginConst.RELOAD_ANNO;
+import static run.halo.app.plugin.PluginConst.REQUEST_TO_UNLOAD_LABEL;
 import static run.halo.app.plugin.PluginConst.RUNTIME_MODE_ANNO;
 
 import java.io.FileOutputStream;
@@ -125,6 +126,7 @@ class PluginReconcilerTest {
         @BeforeEach
         void setUp() throws IOException {
             lenient().when(pluginService.getRequiredDependencies(any(), any())).thenReturn(List.of());
+            lenient().when(pluginManager.getSystemVersion()).thenReturn("0.0.0");
             Files.createFile(tempPath.resolve("fake-plugin-1.2.3.jar"));
         }
 
@@ -236,6 +238,63 @@ class PluginReconcilerTest {
         }
 
         @Test
+        void shouldUnloadBeforeReportingUnsatisfiedRequiresVersionOnReload() {
+            var fakePlugin = createPlugin(name, plugin -> {
+                var spec = plugin.getSpec();
+                spec.setVersion("1.2.3");
+                spec.setRequires(">=2.26.0");
+                spec.setEnabled(true);
+                plugin.getMetadata().setAnnotations(new HashMap<>(Map.of(RELOAD_ANNO, "true")));
+            });
+
+            when(client.fetch(Plugin.class, name)).thenReturn(Optional.of(fakePlugin));
+            when(pluginManager.getPluginsRoots()).thenReturn(List.of(tempPath));
+            when(pluginManager.getSystemVersion()).thenReturn("2.25.4");
+            var pluginWrapper = mockPluginWrapper(PluginState.RESOLVED);
+            when(pluginManager.getPlugin(name)).thenReturn(pluginWrapper);
+            lenient().when(pluginManager.getUnresolvedPlugins()).thenReturn(List.of(pluginWrapper));
+            lenient().when(pluginManager.getResolvedPlugins()).thenReturn(List.of());
+
+            var result = reconciler.reconcile(new Request(name));
+
+            assertFalse(result.reEnqueue());
+            assertFalse(fakePlugin.getMetadata().getAnnotations().containsKey(RELOAD_ANNO));
+            assertEquals(Plugin.Phase.FAILED, fakePlugin.getStatus().getPhase());
+            assertEquals(
+                    PluginReconciler.ConditionReason.UNSATISFIED_REQUIRES_VERSION,
+                    fakePlugin.getStatus().getConditions().peekFirst().getReason());
+            verify(pluginManager).unloadPlugin(name);
+            verify(pluginManager, never()).loadPlugin(any(Path.class));
+        }
+
+        @Test
+        void shouldHonorUnloadRequestBeforeReportingUnsatisfiedRequiresVersion() {
+            var fakePlugin = createPlugin(name, plugin -> {
+                var spec = plugin.getSpec();
+                spec.setVersion("1.2.3");
+                spec.setRequires(">=2.26.0");
+                spec.setEnabled(true);
+                plugin.getMetadata().setLabels(new HashMap<>(Map.of(REQUEST_TO_UNLOAD_LABEL, "parent-plugin")));
+            });
+
+            when(client.fetch(Plugin.class, name)).thenReturn(Optional.of(fakePlugin));
+            when(pluginManager.getPluginsRoots()).thenReturn(List.of(tempPath));
+            lenient().when(pluginManager.getSystemVersion()).thenReturn("2.25.4");
+            var pluginWrapper = mockPluginWrapper(PluginState.RESOLVED);
+            when(pluginManager.getPlugin(name)).thenReturn(pluginWrapper);
+            when(pluginManager.getResolvedPlugins()).thenReturn(List.of(pluginWrapper));
+
+            var result = reconciler.reconcile(new Request(name));
+
+            assertFalse(result.reEnqueue());
+            var condition = fakePlugin.getStatus().getConditions().peekFirst();
+            assertEquals(PluginReconciler.ConditionType.INITIALIZED, condition.getType());
+            assertEquals(PluginReconciler.ConditionReason.REQUEST_TO_UNLOAD, condition.getReason());
+            verify(pluginManager).unloadPlugin(name);
+            verify(pluginManager, never()).loadPlugin(any(Path.class));
+        }
+
+        @Test
         void shouldReportIfFailedToStartPlugin() throws IOException {
             var fakePlugin = createPlugin(name, plugin -> {
                 var spec = plugin.getSpec();
@@ -269,6 +328,36 @@ class PluginReconcilerTest {
             assertEquals(PluginReconciler.ConditionReason.START_ERROR, condition.getReason());
             assertTrue(condition.getMessage().contains("Fake error"));
 
+            verify(pluginManager, never()).startPlugin(name);
+        }
+
+        @Test
+        void shouldCheckRequiresVersionBeforeWaitingForDependencies() {
+            var fakePlugin = createPlugin(name, plugin -> {
+                var spec = plugin.getSpec();
+                spec.setVersion("1.2.3");
+                spec.setRequires(">=2.26.0");
+                spec.setPluginDependencies(Map.of("unresolved-plugin", "*"));
+                spec.setEnabled(true);
+            });
+            when(client.fetch(Plugin.class, name)).thenReturn(Optional.of(fakePlugin));
+            when(pluginManager.getPluginsRoots()).thenReturn(List.of(tempPath));
+            when(pluginManager.getSystemVersion()).thenReturn("2.25.4");
+            lenient()
+                    .when(pluginService.getRequiredDependencies(any(), any()))
+                    .thenReturn(List.of("unresolved-plugin"));
+
+            var result = reconciler.reconcile(new Request(name));
+
+            assertFalse(result.reEnqueue());
+            assertEquals(Plugin.Phase.FAILED, fakePlugin.getStatus().getPhase());
+            var condition = fakePlugin.getStatus().getConditions().peekFirst();
+            assertEquals(PluginReconciler.ConditionType.READY, condition.getType());
+            assertEquals(ConditionStatus.FALSE, condition.getStatus());
+            assertEquals("UnsatisfiedRequiresVersion", condition.getReason());
+            assertEquals(
+                    "Plugin requires Halo version [>=2.26.0], but the current version is [2.25.4].",
+                    condition.getMessage());
             verify(pluginManager, never()).startPlugin(name);
         }
 
