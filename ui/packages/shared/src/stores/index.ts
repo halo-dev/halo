@@ -80,7 +80,7 @@ export const stores = {
    * Store for managing the current visitor's user information.
    *
    * @remarks
-   * This store provides access to the current visitor's details and authentication state.
+   * This store provides access to the current user's details and authentication state.
    * Unauthenticated visitors are represented by Halo's `anonymousUser` account.
    * The store includes helper methods to fetch the latest user information from the server.
    *
