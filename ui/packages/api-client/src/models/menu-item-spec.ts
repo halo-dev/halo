@@ -47,12 +47,23 @@ export interface MenuItemSpec {
      */
     'priority'?: number;
     /**
+     * Built-in theme route resolved into status.href.
+     */
+    'routeRef'?: MenuItemSpecRouteRefEnum;
+    /**
      * HTML anchor target used by the menu item.
      */
     'target'?: MenuItemSpecTargetEnum;
     'targetRef'?: Ref;
 }
 
+export const MenuItemSpecRouteRefEnum = {
+    Archives: 'archives',
+    Categories: 'categories',
+    Tags: 'tags'
+} as const;
+
+export type MenuItemSpecRouteRefEnum = typeof MenuItemSpecRouteRefEnum[keyof typeof MenuItemSpecRouteRefEnum];
 export const MenuItemSpecTargetEnum = {
     Blank: '_blank',
     Self: '_self',

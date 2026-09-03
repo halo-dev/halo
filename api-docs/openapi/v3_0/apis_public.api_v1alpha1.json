@@ -2408,6 +2408,15 @@
             "description": "Sorting priority. Higher values sort before lower values where priority ordering is applied.",
             "format": "int32"
           },
+          "routeRef": {
+            "type": "string",
+            "description": "Built-in theme route resolved into status.href.",
+            "enum": [
+              "archives",
+              "categories",
+              "tags"
+            ]
+          },
           "target": {
             "type": "string",
             "description": "HTML anchor target used by the menu item.",

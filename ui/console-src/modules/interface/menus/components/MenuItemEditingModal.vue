@@ -3,10 +3,15 @@ import { createInput } from "@formkit/vue";
 import type {
   Menu,
   MenuItem,
+  MenuItemSpecRouteRefEnum,
   MenuItemTreeNode,
   Ref,
 } from "@halo-dev/api-client";
-import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
+import {
+  consoleApiClient,
+  coreApiClient,
+  MenuItemSpecRouteRefEnum as RouteRef,
+} from "@halo-dev/api-client";
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import { cloneDeep } from "es-toolkit";
 import { computed, nextTick, onMounted, ref } from "vue";
@@ -95,9 +100,10 @@ const handleSaveMenuItem = async () => {
       formState.value.spec.priority = siblingCount.value;
     }
 
-    const menuItemRef = menuItemRefs.find(
-      (ref) => ref.ref?.kind === selectedRefKind.value
-    );
+    const menuItemRef = selectedSource.value;
+
+    formState.value.spec.targetRef = undefined;
+    formState.value.spec.routeRef = undefined;
 
     if (menuItemRef?.ref) {
       formState.value.spec.targetRef = {
@@ -105,6 +111,9 @@ const handleSaveMenuItem = async () => {
         name: selectedRefName.value,
       };
       formState.value.spec.displayName = undefined;
+      formState.value.spec.href = undefined;
+    } else if (menuItemRef?.routeRef) {
+      formState.value.spec.routeRef = menuItemRef.routeRef;
       formState.value.spec.href = undefined;
     }
 
@@ -161,9 +170,11 @@ const handleSaveMenuItem = async () => {
 };
 
 interface MenuItemRef {
+  value: string;
   label: string;
   inputType?: string;
   ref?: Ref;
+  routeRef?: MenuItemSpecRouteRefEnum;
 }
 
 const baseRef: Omit<Ref, "kind"> = {
@@ -174,11 +185,32 @@ const baseRef: Omit<Ref, "kind"> = {
 
 const menuItemRefs: MenuItemRef[] = [
   {
+    value: "custom",
     label: t(
       "core.menu.menu_item_editing_modal.fields.ref_kind.options.custom"
     ),
   },
   {
+    value: RouteRef.Archives,
+    label: t(
+      "core.menu.menu_item_editing_modal.fields.ref_kind.options.archives"
+    ),
+    routeRef: RouteRef.Archives,
+  },
+  {
+    value: RouteRef.Categories,
+    label: t(
+      "core.menu.menu_item_editing_modal.fields.ref_kind.options.categories"
+    ),
+    routeRef: RouteRef.Categories,
+  },
+  {
+    value: RouteRef.Tags,
+    label: t("core.menu.menu_item_editing_modal.fields.ref_kind.options.tags"),
+    routeRef: RouteRef.Tags,
+  },
+  {
+    value: "Post",
     label: t("core.menu.menu_item_editing_modal.fields.ref_kind.options.post"),
     inputType: "postSelect",
     ref: {
@@ -187,6 +219,7 @@ const menuItemRefs: MenuItemRef[] = [
     },
   },
   {
+    value: "SinglePage",
     label: t(
       "core.menu.menu_item_editing_modal.fields.ref_kind.options.single_page"
     ),
@@ -197,6 +230,7 @@ const menuItemRefs: MenuItemRef[] = [
     },
   },
   {
+    value: "Category",
     label: t(
       "core.menu.menu_item_editing_modal.fields.ref_kind.options.category"
     ),
@@ -207,6 +241,7 @@ const menuItemRefs: MenuItemRef[] = [
     },
   },
   {
+    value: "Tag",
     label: t("core.menu.menu_item_editing_modal.fields.ref_kind.options.tag"),
     inputType: "tagSelect",
     ref: {
@@ -216,21 +251,29 @@ const menuItemRefs: MenuItemRef[] = [
   },
 ];
 
-const menuItemRefsMap = menuItemRefs.map((menuItemRef) => {
-  return {
-    label: menuItemRef.label,
-    value: menuItemRef.ref?.kind,
-  };
+const isResourceRefLocked = computed(() => !!props.menuItem?.spec.targetRef);
+
+const availableMenuItemRefs = computed(() => {
+  if (isUpdateMode && !isResourceRefLocked.value) {
+    return menuItemRefs.filter((menuItemRef) => !menuItemRef.ref);
+  }
+  return menuItemRefs;
 });
 
-const selectedRef = computed(() => {
-  return menuItemRefs.find(
-    (menuItemRef) => menuItemRef.ref?.kind === selectedRefKind.value
-  );
-});
+const menuItemRefsMap = computed(() =>
+  availableMenuItemRefs.value.map(({ label, value }) => ({ label, value }))
+);
 
-const selectedRefKind = ref<string>();
+const selectedSource = computed(() =>
+  menuItemRefs.find(
+    (menuItemRef) => menuItemRef.value === selectedSourceValue.value
+  )
+);
+
+const selectedSourceValue = ref("custom");
 const selectedRefName = ref<string>("");
+const isCustomSource = computed(() => selectedSourceValue.value === "custom");
+const isRouteSource = computed(() => !!selectedSource.value?.routeRef);
 
 const excludedParentNames = computed(() => {
   return props.menuItem?.metadata.name ? [props.menuItem.metadata.name] : [];
@@ -264,6 +307,21 @@ function findMenuItemTreeNode(
 
 const onMenuItemSourceChange = () => {
   selectedRefName.value = "";
+  const source = selectedSource.value;
+  if (source?.routeRef) {
+    formState.value.spec.displayName ||= source.label;
+    formState.value.spec.href = undefined;
+    formState.value.spec.targetRef = undefined;
+    formState.value.spec.routeRef = source.routeRef;
+    return;
+  }
+  if (!source?.ref) {
+    if (formState.value.spec.routeRef) {
+      formState.value.spec.href = props.menuItem?.status?.href;
+    }
+    formState.value.spec.routeRef = undefined;
+    formState.value.spec.targetRef = undefined;
+  }
 };
 
 onMounted(() => {
@@ -271,11 +329,13 @@ onMounted(() => {
     formState.value = cloneDeep(props.menuItem);
 
     // Set Ref related
-    const { targetRef } = formState.value.spec;
+    const { routeRef, targetRef } = formState.value.spec;
 
     if (targetRef) {
       selectedRefName.value = targetRef.name;
-      selectedRefKind.value = targetRef.kind as string;
+      selectedSourceValue.value = targetRef.kind as string;
+    } else if (routeRef) {
+      selectedSourceValue.value = routeRef;
     }
   }
 
@@ -317,9 +377,9 @@ onMounted(() => {
             />
 
             <FormKit
-              v-model="selectedRefKind"
+              v-model="selectedSourceValue"
               :options="menuItemRefsMap"
-              :disabled="isUpdateMode"
+              :disabled="isResourceRefLocked"
               :label="
                 $t('core.menu.menu_item_editing_modal.fields.ref_kind.label')
               "
@@ -328,7 +388,7 @@ onMounted(() => {
             />
 
             <FormKit
-              v-if="!selectedRefKind"
+              v-if="isCustomSource || isRouteSource"
               id="displayNameInput"
               v-model="formState.spec.displayName"
               :label="
@@ -342,7 +402,7 @@ onMounted(() => {
             />
 
             <FormKit
-              v-if="!selectedRefKind"
+              v-if="isCustomSource"
               v-model="formState.spec.href"
               :label="$t('core.menu.menu_item_editing_modal.fields.href.label')"
               type="text"
@@ -351,20 +411,20 @@ onMounted(() => {
             />
 
             <FormKit
-              v-if="selectedRef?.ref"
-              :id="selectedRef.inputType"
-              :key="selectedRef.inputType"
+              v-if="selectedSource?.ref"
+              :id="selectedSource.inputType"
+              :key="selectedSource.inputType"
               v-model="selectedRefName"
               :placeholder="
                 $t(
                   'core.menu.menu_item_editing_modal.fields.ref_kind.placeholder',
                   {
-                    label: selectedRef.label,
+                    label: selectedSource.label,
                   }
                 )
               "
-              :label="selectedRef.label"
-              :type="selectedRef.inputType as any"
+              :label="selectedSource.label"
+              :type="selectedSource.inputType as any"
               validation="required"
             />
 

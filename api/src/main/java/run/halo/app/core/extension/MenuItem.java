@@ -59,6 +59,25 @@ public class MenuItem extends AbstractExtension {
         }
     }
 
+    /** Built-in theme route used by this menu item. */
+    public enum RouteRef {
+        ARCHIVES("archives"),
+        CATEGORIES("categories"),
+        TAGS("tags");
+
+        private final String value;
+
+        @JsonCreator
+        RouteRef(String value) {
+            this.value = value;
+        }
+
+        @JsonValue
+        public String getValue() {
+            return value;
+        }
+    }
+
     /** Desired menu item configuration. */
     @Data
     public static class MenuItemSpec {
@@ -68,6 +87,11 @@ public class MenuItem extends AbstractExtension {
 
         /** Direct URL used by the menu item. */
         private String href;
+
+        /** Built-in theme route resolved into status.href. */
+        @Schema(description = "Built-in theme route resolved into status.href.")
+        @Nullable
+        private RouteRef routeRef;
 
         /** HTML anchor target used by the menu item. */
         private Target target;
