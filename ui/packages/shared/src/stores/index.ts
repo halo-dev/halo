@@ -100,7 +100,7 @@ export const stores = {
    */
   currentUser: defineStore("currentUser", () => {
     /**
-     * The current visitor's detailed information, including the anonymous user.
+     * The current user's detailed information, including the anonymous user.
      * Will be `undefined` until `fetchCurrentUser` is called.
      */
     const currentUser = ref<DetailedUser>();
