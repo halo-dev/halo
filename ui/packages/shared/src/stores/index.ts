@@ -77,7 +77,7 @@ export const stores = {
   /** Reactive metadata for UI providers discovered in the current descriptor. */
   uiPlugins: useUiPluginsStore as unknown as () => UiPluginsStore,
   /**
-   * Store for managing the current visitor's user information.
+   * Store for managing the current user information.
    *
    * @remarks
    * This store provides access to the current user's details and authentication state.
