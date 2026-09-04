@@ -301,6 +301,14 @@ watch(
 );
 
 watch(
+  fileNameMetaFields,
+  (metaFields) => {
+    uppy.getPlugin("Dashboard")?.setOptions({ metaFields });
+  },
+  { flush: "post" }
+);
+
+watch(
   [
     () => props.disabled,
     () => props.note,

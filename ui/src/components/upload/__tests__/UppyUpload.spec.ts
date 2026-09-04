@@ -144,6 +144,28 @@ describe("UppyUpload", () => {
     ]);
   });
 
+  it("updates file name editing when the prop changes", async () => {
+    const wrapper = mount(UppyUpload, {
+      props: { endpoint: "/upload" },
+    });
+    const uppy = getUppy(wrapper);
+
+    await wrapper.setProps({ allowFileNameEditing: true });
+
+    expect(uppy.getPlugin("Dashboard")?.opts.metaFields).toEqual([
+      {
+        id: "name",
+        name: "core.components.uppy_upload.fields.file_name",
+      },
+    ]);
+    expect(uppy.opts.restrictions.requiredMetaFields).toEqual(["name"]);
+
+    await wrapper.setProps({ allowFileNameEditing: false });
+
+    expect(uppy.getPlugin("Dashboard")?.opts.metaFields).toEqual([]);
+    expect(uppy.opts.restrictions.requiredMetaFields).toEqual([]);
+  });
+
   it.each([
     ["zh-CN", "重置", "裁剪为横向（16:9）"],
     ["es-MX", "Revertir", "Recortar horizontal (16:9)"],

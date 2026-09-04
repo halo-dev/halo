@@ -221,6 +221,30 @@ class LocalAttachmentUploadHandlerTest {
     }
 
     @Test
+    void shouldRejectRenamedFilenameExceeding255Utf8Bytes() {
+        var configMap = new ConfigMap();
+        configMap.setData(Map.of("default", """
+            {
+              "alwaysRenameFilename": true,
+              "renameStrategy": {
+                "method": "RANDOM",
+                "randomLength": 64
+              }
+            }
+            """));
+        var filename = "你".repeat(63) + ".png";
+        var uploadOption =
+                UploadOption.from(filename, Flux.empty(), MediaType.IMAGE_PNG, createPolicy("local"), configMap);
+
+        when(attachmentRootGetter.get()).thenReturn(attachmentRoot);
+        uploadHandler
+                .upload(uploadOption)
+                .as(StepVerifier::create)
+                .expectError(ServerWebInputException.class)
+                .verify();
+    }
+
+    @Test
     void shouldNotSetThumbnailsIfThumbnailIsDisabled() {
         attachmentProperties.getThumbnail().setDisabled(true);
 
