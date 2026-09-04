@@ -20,12 +20,15 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerWebInputException;
+import org.springframework.web.server.WebSession;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.core.user.service.UserService;
 import run.halo.app.extension.GroupVersion;
 import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
+import run.halo.app.security.verification.SecurityVerificationRequiredException;
+import run.halo.app.security.verification.SecurityVerificationService;
 
 /**
  * User endpoint for UC (User Center). It provides APIs for the current user to get their profile information and to set
@@ -41,6 +44,8 @@ class UcUserEndpoint implements CustomEndpoint {
     private final AuthenticationTrustResolver trustResolver = new AuthenticationTrustResolverImpl();
 
     private final UserService userService;
+
+    private final SecurityVerificationService securityVerificationService;
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
@@ -70,7 +75,7 @@ class UcUserEndpoint implements CustomEndpoint {
         return authenticated()
                 .map(Authentication::getName)
                 .flatMap(userService::getUser)
-                .map(this::toUserVo)
+                .flatMap(user -> request.exchange().getSession().map(session -> toUserVo(user, session)))
                 .flatMap(userVo -> ServerResponse.ok().bodyValue(userVo));
     }
 
@@ -80,17 +85,26 @@ class UcUserEndpoint implements CustomEndpoint {
                 .flatMap(username -> request.bodyToMono(ChangeMyPasswordRequest.class)
                         .switchIfEmpty(
                                 Mono.defer(() -> Mono.error(new ServerWebInputException("Request body is empty"))))
-                        .flatMap(changeRequest -> userService.getUser(username).flatMap(user -> {
-                            var passwordSet = StringUtils.hasText(user.getSpec().getPassword());
-                            var verifyPassword = passwordSet
-                                    ? verifyOldPassword(username, changeRequest.oldPassword())
-                                    : Mono.just(true);
-                            return verifyPassword
-                                    .flatMap(ignored ->
-                                            userService.updateWithRawPassword(username, changeRequest.password()))
-                                    .defaultIfEmpty(user)
-                                    .map(this::toUserVo);
-                        })))
+                        .flatMap(changeRequest -> request.exchange()
+                                .getSession()
+                                .flatMap(session -> userService
+                                        .getUser(username)
+                                        .flatMap(user -> {
+                                            var passwordSet = StringUtils.hasText(
+                                                    user.getSpec().getPassword());
+                                            return requirePasswordChangeVerification(user, session)
+                                                    .then(Mono.defer(() -> {
+                                                        var verifyPassword = passwordSet
+                                                                ? verifyOldPassword(
+                                                                        username, changeRequest.oldPassword())
+                                                                : Mono.just(true);
+                                                        return verifyPassword
+                                                                .flatMap(ignored -> userService.updateWithRawPassword(
+                                                                        username, changeRequest.password()))
+                                                                .defaultIfEmpty(user)
+                                                                .map(u -> toUserVo(u, session));
+                                                    }));
+                                        }))))
                 .flatMap(userVo -> ServerResponse.ok().bodyValue(userVo));
     }
 
@@ -106,12 +120,27 @@ class UcUserEndpoint implements CustomEndpoint {
                         "Old password is incorrect.", "problemDetail.user.oldPassword.notMatch", null)));
     }
 
-    private UcUserVo toUserVo(User user) {
+    private Mono<Void> requirePasswordChangeVerification(User user, WebSession session) {
+        var passwordSet = StringUtils.hasText(user.getSpec().getPassword());
+        if (passwordSet
+                && securityVerificationService.hasVerificationMethod(user)
+                && !securityVerificationService.isVerified(session)) {
+            return Mono.error(new SecurityVerificationRequiredException());
+        }
+        return Mono.empty();
+    }
+
+    private UcUserVo toUserVo(User user, WebSession session) {
+        var passwordSet = StringUtils.hasText(user.getSpec().getPassword());
+        var verificationRequired = passwordSet
+                && securityVerificationService.hasVerificationMethod(user)
+                && !securityVerificationService.isVerified(session);
         return new UcUserVo(
                 user.getMetadata().getName(),
                 user.getSpec().getDisplayName(),
                 user.getSpec().getAvatar(),
-                StringUtils.hasText(user.getSpec().getPassword()));
+                passwordSet,
+                verificationRequired);
     }
 
     private Mono<Authentication> authenticated() {
@@ -139,7 +168,8 @@ class UcUserEndpoint implements CustomEndpoint {
             @Schema(requiredMode = REQUIRED) String name,
             String displayName,
             String avatar,
-            @Schema(requiredMode = REQUIRED) boolean passwordSet) {}
+            @Schema(requiredMode = REQUIRED) boolean passwordSet,
+            @Schema(requiredMode = REQUIRED) boolean passwordChangeVerificationRequired) {}
 
     /**
      * Payload for setting or changing the current user's password.

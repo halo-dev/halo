@@ -41,9 +41,10 @@ import run.halo.app.notification.UserIdentity;
 public class EmailVerificationServiceImpl implements EmailVerificationService {
     public static final int MAX_ATTEMPTS = 5;
     public static final long CODE_EXPIRATION_MINUTES = 10;
+    public static final String SECURITY_VERIFICATION_REASON_TYPE = "security-verification";
     static final String EMAIL_VERIFICATION_REASON_TYPE = "email-verification";
 
-    private final EmailVerificationManager emailVerificationManager = new EmailVerificationManager();
+    final EmailVerificationManager emailVerificationManager = new EmailVerificationManager();
     private final ReactiveExtensionClient client;
     private final NotificationReasonEmitter reasonEmitter;
     private final NotificationCenter notificationCenter;
@@ -80,6 +81,41 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
         return Mono.defer(() -> client.get(User.class, username).flatMap(user -> verifyUserEmail(user, code)))
                 .retryWhen(Retry.backoff(8, Duration.ofMillis(100))
                         .filter(OptimisticLockingFailureException.class::isInstance));
+    }
+
+    @Override
+    public Mono<Void> sendSecurityVerificationCode(String username) {
+        Assert.state(StringUtils.isNotBlank(username), "Username must not be blank");
+        return Mono.defer(() -> client.get(User.class, username).flatMap(user -> {
+            var email = user.getSpec().getEmail();
+            if (!user.getSpec().isEmailVerified() || StringUtils.isBlank(email)) {
+                return Mono.error(new ServerWebInputException("Email is not verified."));
+            }
+            return sendSecurityVerificationNotification(username, email);
+        }));
+    }
+
+    @Override
+    public Mono<Void> verifySecurityVerificationCode(String username, String code) {
+        Assert.state(StringUtils.isNotBlank(username), "Username must not be blank");
+        Assert.state(StringUtils.isNotBlank(code), "Code must not be blank");
+        return Mono.defer(() -> client.get(User.class, username).flatMap(user -> {
+            var email = user.getSpec().getEmail();
+            if (!user.getSpec().isEmailVerified() || StringUtils.isBlank(email)) {
+                return Mono.error(new ServerWebInputException("Email is not verified."));
+            }
+            var verified = emailVerificationManager.verifyCode(username, email, code);
+            if (!verified) {
+                return Mono.error(EmailVerificationFailed::new);
+            }
+            // remove code when verified
+            emailVerificationManager.removeCode(username, email);
+            return Mono.empty();
+        }));
+    }
+
+    Mono<Void> sendSecurityVerificationNotification(String username, String email) {
+        return sendVerificationNotification(username, email, SECURITY_VERIFICATION_REASON_TYPE, "安全验证：" + email);
     }
 
     private Mono<Void> verifyUserEmail(User user, String code) {
@@ -137,14 +173,18 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
     }
 
     Mono<Void> sendVerificationNotification(String username, String email) {
+        return sendVerificationNotification(username, email, EMAIL_VERIFICATION_REASON_TYPE, "验证邮箱：" + email);
+    }
+
+    private Mono<Void> sendVerificationNotification(String username, String email, String reasonType, String title) {
         var code = emailVerificationManager.generateCode(username, email);
         if (log.isDebugEnabled()) {
             log.debug("Generated verification code for user '{}' and email '{}': {}", username, email, code);
         }
-        var subscribeNotification = autoSubscribeVerificationEmailNotification(email);
-        var interestReasonSubject = createInterestReason(email).getSubject();
+        var subscribeNotification = autoSubscribeVerificationEmailNotification(reasonType, email);
+        var interestReasonSubject = createInterestReason(reasonType, email).getSubject();
         var emitReasonMono = reasonEmitter.emit(
-                EMAIL_VERIFICATION_REASON_TYPE,
+                reasonType,
                 builder -> builder.attribute("code", code)
                         .attribute("expirationAtMinutes", CODE_EXPIRATION_MINUTES)
                         .attribute("username", username)
@@ -153,15 +193,15 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
                                 .apiVersion(interestReasonSubject.getApiVersion())
                                 .kind(interestReasonSubject.getKind())
                                 .name(interestReasonSubject.getName())
-                                .title("验证邮箱：" + email)
+                                .title(title)
                                 .build()));
         return Mono.when(subscribeNotification).then(emitReasonMono);
     }
 
-    Mono<Void> autoSubscribeVerificationEmailNotification(String email) {
+    Mono<Void> autoSubscribeVerificationEmailNotification(String reasonType, String email) {
         var subscriber = new Subscription.Subscriber();
         subscriber.setName(UserIdentity.anonymousWithEmail(email).name());
-        var interestReason = createInterestReason(email);
+        var interestReason = createInterestReason(reasonType, email);
         return notificationCenter.subscribe(subscriber, interestReason).then();
     }
 
@@ -171,12 +211,13 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
         }
         var subscriber = new Subscription.Subscriber();
         subscriber.setName(UserIdentity.anonymousWithEmail(oldEmail).name());
-        return notificationCenter.unsubscribe(subscriber, createInterestReason(oldEmail));
+        return notificationCenter.unsubscribe(
+                subscriber, createInterestReason(EMAIL_VERIFICATION_REASON_TYPE, oldEmail));
     }
 
-    Subscription.InterestReason createInterestReason(String email) {
+    Subscription.InterestReason createInterestReason(String reasonType, String email) {
         var interestReason = new Subscription.InterestReason();
-        interestReason.setReasonType(EMAIL_VERIFICATION_REASON_TYPE);
+        interestReason.setReasonType(reasonType);
         interestReason.setSubject(Subscription.ReasonSubject.builder()
                 .apiVersion(new GroupVersion(User.GROUP, User.KIND).toString())
                 .kind(User.KIND)

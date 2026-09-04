@@ -1,0 +1,28 @@
+<div th:fragment="form" class="halo-form security-verification-form">
+  <div class="alert alert-error" role="alert" th:if="${param.error.size() > 0}">
+    <strong
+      th:if="${#strings.equals(param.error[0], 'rate-limit-exceeded')}"
+      th:text="#{form.messages.rateLimitError}"
+    ></strong>
+    <strong
+      th:unless="${#strings.equals(param.error[0], 'rate-limit-exceeded')}"
+      th:text="#{form.messages.invalidError}"
+    ></strong>
+  </div>
+
+  <div class="method-switcher" th:if="${availableMethods.size() > 1}">
+    <a
+      th:each="method : ${availableMethods}"
+      class="method-tab"
+      th:classappend="${method.fragmentTemplateName == fragmentTemplateName} ? 'active'"
+      th:href="@{/security-verification(method=${method.name})}"
+      th:text="#{'form.method.' + ${method.name}}"
+    ></a>
+  </div>
+
+  <div th:replace="~{__${fragmentTemplateName}__::form}"></div>
+
+  <div class="form-item">
+    <a th:href="@{/uc/profile}" class="cancel-link" th:text="#{form.cancel}"></a>
+  </div>
+</div>

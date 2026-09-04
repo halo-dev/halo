@@ -1,0 +1,65 @@
+<form
+  th:fragment="form"
+  class="halo-form security-verification-form"
+  th:action="@{/security-verification/email}"
+  name="security-verification-form-email"
+  id="security-verification-form-email"
+  method="post"
+>
+  <input type="hidden" name="redirect" th:value="${redirect}" />
+
+  <div class="form-item">
+    <label for="emailCode" th:text="#{form.emailCode.label}"></label>
+    <div class="form-input-group">
+      <div class="form-input">
+        <input
+          type="text"
+          inputmode="numeric"
+          id="emailCode"
+          name="emailCode"
+          autocomplete="one-time-code"
+          pattern="\d{6}"
+          maxlength="6"
+          required
+        />
+      </div>
+      <button id="emailCodeSendButton" type="button" th:text="#{form.emailCode.send}"></button>
+    </div>
+  </div>
+  <div class="form-item">
+    <button type="submit" th:text="#{form.submit}"></button>
+  </div>
+
+  <script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+      const headerName = /*[[${_csrf.headerName}]]*/ "";
+      const token = /*[[${_csrf.token}]]*/ "";
+
+      async function sendRequest() {
+        const response = await fetch("/security-verification/email-code", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            [headerName]: token,
+          },
+        });
+
+        if (!response.ok) {
+          const json = await response.json();
+          if (json.errors && json.errors.length) {
+            throw new Error(json.errors[0]);
+          }
+          if (json.detail) {
+            throw new Error(json.detail);
+          }
+          throw new Error(i18nResources.sendVerificationCodeFailed);
+        }
+
+        return response;
+      }
+
+      const emailCodeSendButton = document.getElementById("emailCodeSendButton");
+      sendVerificationCode(emailCodeSendButton, sendRequest);
+    });
+  </script>
+</form>
