@@ -102,6 +102,7 @@ describe("UppyUpload", () => {
     });
     expect(xhrUpload?.opts.shouldRetry?.({} as XMLHttpRequest)).toBe(false);
     expect(dashboardPlugin?.opts.hideRetryButton).toBe(false);
+    expect(dashboardPlugin?.opts.metaFields).toEqual([]);
     expect(dashboard.props("props")).toMatchObject({
       disabled: true,
       note: "Upload a ZIP file",
@@ -117,6 +118,30 @@ describe("UppyUpload", () => {
     });
 
     expect(wrapper.find(".uppy-Dashboard").exists()).toBe(true);
+  });
+
+  it("enables file name editing only when requested", () => {
+    const wrapper = mount(UppyUpload, {
+      props: {
+        endpoint: "/upload",
+        allowFileNameEditing: true,
+        restrictions: {
+          requiredMetaFields: ["caption"],
+        },
+      },
+    });
+    const uppy = getUppy(wrapper);
+
+    expect(uppy.getPlugin("Dashboard")?.opts.metaFields).toEqual([
+      {
+        id: "name",
+        name: "core.components.uppy_upload.fields.file_name",
+      },
+    ]);
+    expect(uppy.opts.restrictions.requiredMetaFields).toEqual([
+      "caption",
+      "name",
+    ]);
   });
 
   it.each([

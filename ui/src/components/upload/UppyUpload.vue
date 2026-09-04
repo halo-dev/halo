@@ -13,7 +13,7 @@ import zh_TW from "@uppy/locales/lib/zh_TW";
 import Dashboard from "@uppy/vue/dashboard";
 import XHRUpload from "@uppy/xhr-upload";
 import objectHash from "object-hash";
-import { h, markRaw, onUnmounted, watch } from "vue";
+import { computed, h, markRaw, onUnmounted, watch } from "vue";
 import { i18n } from "@/locales";
 import type { ProblemDetail } from "@/setup/setupApiClient";
 import { createHTMLContentModal } from "@/utils/modal";
@@ -38,6 +38,7 @@ const props = withDefaults(
     width?: string;
     height?: string;
     doneButtonHandler?: () => void;
+    allowFileNameEditing?: boolean;
   }>(),
   {
     restrictions: undefined,
@@ -51,6 +52,7 @@ const props = withDefaults(
     width: "750px",
     height: "550px",
     doneButtonHandler: undefined,
+    allowFileNameEditing: false,
   }
 );
 
@@ -86,11 +88,35 @@ const defaultRestrictions: Restrictions = {
   requiredMetaFields: [],
 };
 
+function getRestrictions() {
+  if (!props.allowFileNameEditing) {
+    return props.restrictions;
+  }
+
+  return {
+    ...props.restrictions,
+    requiredMetaFields: [
+      ...new Set([...(props.restrictions?.requiredMetaFields || []), "name"]),
+    ],
+  };
+}
+
+const fileNameMetaFields = computed(() =>
+  props.allowFileNameEditing
+    ? [
+        {
+          id: "name",
+          name: i18n.global.t("core.components.uppy_upload.fields.file_name"),
+        },
+      ]
+    : []
+);
+
 const uppy = markRaw(
   new Uppy<Record<string, unknown>, Record<string, unknown>>({
     locale: getUppyLocale(i18n.global.locale.value),
     meta: props.meta,
-    restrictions: props.restrictions,
+    restrictions: getRestrictions(),
     autoProceed: props.autoProceed,
   })
     .use(XHRUpload, {
@@ -239,6 +265,7 @@ watch(
     () => props.allowedMetaFields,
     () => props.name,
     () => props.method,
+    () => props.allowFileNameEditing,
   ],
   () => {
     // The previous computed Uppy instance discarded queued files whenever
@@ -249,8 +276,7 @@ watch(
       meta: props.meta,
       restrictions: {
         ...defaultRestrictions,
-        ...props.restrictions,
-        requiredMetaFields: props.restrictions?.requiredMetaFields || [],
+        ...getRestrictions(),
       },
       autoProceed: props.autoProceed,
     });
@@ -312,6 +338,7 @@ onUnmounted(() => {
       width,
       height,
       doneButtonHandler: doneButtonHandler,
+      metaFields: fileNameMetaFields,
     }"
   />
 </template>

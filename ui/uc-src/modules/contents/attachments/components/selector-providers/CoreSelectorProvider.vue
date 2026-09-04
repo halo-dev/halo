@@ -363,6 +363,7 @@ function onUploaded(response: UppyUploadSuccessResponse) {
       <UppyUpload
         endpoint="/apis/uc.api.storage.halo.run/v1alpha1/attachments/-/upload"
         width="100%"
+        allow-file-name-editing
         :done-button-handler="onUploadDone"
         @uploaded="onUploaded"
       />

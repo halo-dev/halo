@@ -20,6 +20,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -27,6 +28,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import org.springframework.http.MediaType;
+import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 import run.halo.app.core.attachment.AttachmentRootGetter;
@@ -203,6 +205,19 @@ class LocalAttachmentUploadHandlerTest {
                     assertNotNull(attachment.getStatus().getThumbnails());
                 })
                 .verifyComplete();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", " ", ".", "..", "../halo.png", "nested/halo.png", "nested\\halo.png"})
+    void shouldRejectInvalidFilename(String filename) {
+        var uploadOption = UploadOption.from(filename, Flux.empty(), MediaType.IMAGE_PNG, createPolicy("local"), null);
+
+        when(attachmentRootGetter.get()).thenReturn(attachmentRoot);
+        uploadHandler
+                .upload(uploadOption)
+                .as(StepVerifier::create)
+                .expectError(ServerWebInputException.class)
+                .verify();
     }
 
     @Test

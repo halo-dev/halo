@@ -31,6 +31,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.util.unit.DataSize;
+import org.springframework.web.server.ServerWebInputException;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
@@ -367,6 +368,7 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
     }
 
     private String getFilename(String filename, PolicySetting setting) {
+        validateFilename(filename);
         if (!setting.isAlwaysRenameFilename()) {
             return filename;
         }
@@ -409,6 +411,17 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
                         },
                         excludeOriginalFilename);
             }
+        }
+    }
+
+    private static void validateFilename(String filename) {
+        if (!StringUtils.hasText(filename)
+                || ".".equals(filename)
+                || "..".equals(filename)
+                || filename.indexOf('/') >= 0
+                || filename.indexOf('\\') >= 0
+                || filename.indexOf('\0') >= 0) {
+            throw new ServerWebInputException("Filename must not be blank or contain path segments");
         }
     }
 
