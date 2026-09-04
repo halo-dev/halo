@@ -38,6 +38,7 @@ const FormKitStub = defineComponent({
     label: { type: String, default: undefined },
     name: { type: String, default: undefined },
     options: { type: Array, default: () => [] },
+    validation: { type: String, default: undefined },
   },
   setup(props, { slots }) {
     return () => h("div", { "data-name": props.name }, slots.default?.());
@@ -136,6 +137,12 @@ describe("MenuItemEditingModal", () => {
     });
     expect(saved.spec.href).toBeUndefined();
     expect(saved.spec.targetRef).toBeUndefined();
+    const displayNameInput = wrapper
+      .findAllComponents(FormKitStub)
+      .find((input) => input.props("name") === "displayName");
+    expect(displayNameInput?.props("validation")).toBe(
+      "required:trim|length:0,100"
+    );
   });
 
   it("preserves the display name while switching or converting to routes", async () => {
@@ -177,6 +184,26 @@ describe("MenuItemEditingModal", () => {
     expect(formState.spec.href).toBe("/writing");
     expect(formState.spec.routeRef).toBeUndefined();
     expect(formState.spec.displayName).toBe("Writing");
+  });
+
+  it("preserves unsupported resource references when saving", async () => {
+    apiMocks.updateMenuItem.mockImplementation(({ menuItem }) =>
+      Promise.resolve({ data: menuItem })
+    );
+    const targetRef = {
+      group: "example.halo.run",
+      version: "v1alpha1",
+      kind: "ExternalContent",
+      name: "external-content",
+    };
+    const wrapper = mountModal(existingMenuItem({ targetRef }));
+    const state = wrapper.vm.$.setupState as Record<string, unknown>;
+
+    await (state.handleSaveMenuItem as () => Promise<void>)();
+
+    const saved = apiMocks.updateMenuItem.mock.calls[0][0].menuItem as MenuItem;
+    expect(saved.spec.targetRef).toEqual(targetRef);
+    expect(saved.spec.routeRef).toBeUndefined();
   });
 
   it("keeps resource sources locked and hides derived route links", async () => {

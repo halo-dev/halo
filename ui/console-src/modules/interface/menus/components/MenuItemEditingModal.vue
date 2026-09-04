@@ -102,8 +102,10 @@ const handleSaveMenuItem = async () => {
 
     const menuItemRef = selectedSource.value;
 
-    formState.value.spec.targetRef = undefined;
-    formState.value.spec.routeRef = undefined;
+    if (menuItemRef) {
+      formState.value.spec.targetRef = undefined;
+      formState.value.spec.routeRef = undefined;
+    }
 
     if (menuItemRef?.ref) {
       formState.value.spec.targetRef = {
@@ -398,7 +400,7 @@ onMounted(() => {
               "
               type="text"
               name="displayName"
-              validation="required|length:0,100"
+              validation="required:trim|length:0,100"
             />
 
             <FormKit
