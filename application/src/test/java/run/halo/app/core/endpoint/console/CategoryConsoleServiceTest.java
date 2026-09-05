@@ -72,6 +72,35 @@ class CategoryConsoleServiceTest {
     }
 
     @Test
+    void updatePositionUsesDisplayedRootsForInvalidParents() {
+        var root = category("root", null, 0, "2024-01-01T00:00:00Z");
+        var orphan = category("orphan", "missing", 1, "2024-01-01T00:00:00Z");
+        var self = category("self", "self", 2, "2024-01-01T00:00:00Z");
+        var cycleA = category("cycle-a", "cycle-b", 3, "2024-01-01T00:00:00Z");
+        var cycleB = category("cycle-b", "cycle-a", 4, "2024-01-01T00:00:00Z");
+        var child = category("child", "cycle-a", 0, "2024-01-01T00:00:00Z");
+        var moved = category("moved", null, 5, "2024-01-01T00:00:00Z");
+        mockList(root, orphan, self, cycleA, cycleB, child, moved);
+        when(client.update(any(Category.class))).thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
+
+        service.updatePosition("moved", new CategoryPositionRequest(null, "orphan"))
+                .as(StepVerifier::create)
+                .assertNext(tree -> {
+                    assertThat(tree)
+                            .extracting(node -> node.getCategory().getMetadata().getName())
+                            .containsExactly("root", "moved", "orphan", "self", "cycle-a", "cycle-b");
+                    assertThat(tree.get(4).getChildren())
+                            .extracting(node -> node.getCategory().getMetadata().getName())
+                            .containsExactly("child");
+                })
+                .verifyComplete();
+        assertThat(List.of(root, orphan, self, cycleA, cycleB, moved))
+                .allSatisfy(
+                        category -> assertThat(category.getSpec().getParent()).isNull());
+        assertThat(child.getSpec().getParent()).isEqualTo("cycle-a");
+    }
+
+    @Test
     void updatePositionMovesCategoryBeforeSiblingAndPersistsChangedCategoriesOnly() {
         var parent = category("parent", null, 0, "2024-01-01T00:00:00Z");
         var child = category("child", "parent", 0, "2024-01-02T00:00:00Z");

@@ -78,7 +78,7 @@ class MenuItemHierarchyMigration {
         var context = new MigrationContext(menus, menuItems);
         return Flux.fromIterable(context.rootPaths())
                 .concatMap(path -> migratePath(context, path, false))
-                .then(labelAssignedMenuItems(context))
+                .then(Mono.defer(() -> labelAssignedMenuItems(context)))
                 .then(Mono.fromSupplier(context::getSummary));
     }
 
@@ -121,9 +121,12 @@ class MenuItemHierarchyMigration {
 
     private Mono<MenuItem> migrateOriginal(MigrationContext context, MenuItem item, LegacyPath path) {
         context.recordOriginalUse(item, path);
-        return updateIfChanged(context, item, () -> {
+        return updateIfChanged(context, item, latest -> {
+            if (TRUE.equals(labelsOf(latest).get(MenuItem.HIERARCHY_MIGRATED_LABEL))) {
+                return false;
+            }
             var changed = false;
-            var spec = ensureSpec(item);
+            var spec = ensureSpec(latest);
             if (!hasText(spec.getMenuName())) {
                 spec.setMenuName(path.getMenuName());
                 changed = true;
@@ -132,7 +135,7 @@ class MenuItemHierarchyMigration {
                 spec.setParent(path.getParentName());
                 changed = true;
             }
-            return markMigrated(item) || changed;
+            return markMigrated(latest) || changed;
         });
     }
 
@@ -140,9 +143,12 @@ class MenuItemHierarchyMigration {
         var existingClone = context.findClone(path);
         if (existingClone != null) {
             context.recordCloneReused();
-            return updateIfChanged(context, existingClone, () -> {
+            return updateIfChanged(context, existingClone, latest -> {
+                if (TRUE.equals(labelsOf(latest).get(MenuItem.HIERARCHY_MIGRATED_LABEL))) {
+                    return false;
+                }
                 var changed = false;
-                var spec = ensureSpec(existingClone);
+                var spec = ensureSpec(latest);
                 if (!hasText(spec.getMenuName())) {
                     spec.setMenuName(path.getMenuName());
                     changed = true;
@@ -151,7 +157,7 @@ class MenuItemHierarchyMigration {
                     spec.setParent(path.getParentName());
                     changed = true;
                 }
-                return markMigrated(existingClone) || changed;
+                return markMigrated(latest) || changed;
             });
         }
 
@@ -197,34 +203,39 @@ class MenuItemHierarchyMigration {
     }
 
     private Mono<MenuItem> updateIfChanged(MigrationContext context, MenuItem item, ChangeDetector detector) {
-        if (!detector.changed()) {
-            return Mono.just(item);
-        }
-        return client.update(item)
+        return Mono.defer(() -> client.fetch(MenuItem.class, item.getMetadata().getName())
+                        .flatMap(latest -> {
+                            if (!detector.changed(latest)) {
+                                return Mono.just(latest);
+                            }
+                            return client.update(latest).doOnNext(updated -> context.recordUpdated());
+                        }))
                 .retryWhen(Retry.backoff(3, Duration.ofMillis(100))
                         .filter(OptimisticLockingFailureException.class::isInstance))
-                .doOnNext(updated -> {
-                    context.addItem(updated);
-                    context.recordUpdated();
-                })
+                .doOnNext(context::addItem)
                 .onErrorResume(t -> {
+                    var name = item.getMetadata().getName();
+                    context.failedSubtreeNames.add(name);
+                    context.collectLegacyDescendants(name, context.failedSubtreeNames);
                     context.failure(
                             "Failed to update MenuItem '{}'.",
                             t,
                             item.getMetadata().getName());
-                    return Mono.just(item);
+                    return Mono.empty();
                 });
     }
 
     private Mono<Void> labelAssignedMenuItems(MigrationContext context) {
         return Flux.fromIterable(context.items())
+                .filter(item ->
+                        !context.failedSubtreeNames.contains(item.getMetadata().getName()))
                 .filter(item -> {
                     var spec = item.getSpec();
                     return spec != null
                             && hasText(spec.getMenuName())
                             && !TRUE.equals(labelsOf(item).get(MenuItem.HIERARCHY_MIGRATED_LABEL));
                 })
-                .concatMap(item -> updateIfChanged(context, item, () -> markMigrated(item)))
+                .concatMap(item -> updateIfChanged(context, item, MenuItemHierarchyMigration::markMigrated))
                 .then();
     }
 
@@ -281,7 +292,7 @@ class MenuItemHierarchyMigration {
 
     @FunctionalInterface
     private interface ChangeDetector {
-        boolean changed();
+        boolean changed(MenuItem item);
     }
 
     @Value
@@ -323,6 +334,7 @@ class MenuItemHierarchyMigration {
         private final List<Menu> menus;
         private final Map<String, MenuItem> itemsByName;
         private final Map<String, LegacyPath> originalUses = new HashMap<>();
+        private final Set<String> failedSubtreeNames = new HashSet<>();
         private final MutableMigrationSummary summary;
 
         MigrationContext(List<Menu> menus, List<MenuItem> items) {

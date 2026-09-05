@@ -105,9 +105,10 @@ public class MenuItemConsoleService {
                         item -> new HierarchyState(parentNameOf(item), priorityOf(item)),
                         (left, right) -> left,
                         LinkedHashMap::new));
-        var originalParentName = parentNameOf(moved);
+        var parentMap = effectiveParentMap(items);
+        var originalParentName = parentMap.get(name);
 
-        var targetSiblings = siblings(items, targetParentName, name);
+        var targetSiblings = siblings(items, parentMap, targetParentName, name);
         int insertIndex = targetSiblings.size();
         if (beforeName != null) {
             insertIndex = indexOf(targetSiblings, beforeName);
@@ -119,7 +120,7 @@ public class MenuItemConsoleService {
         assignPriorities(targetSiblings, targetParentName);
 
         if (!Objects.equals(originalParentName, targetParentName)) {
-            assignPriorities(siblings(items, originalParentName, name), originalParentName);
+            assignPriorities(siblings(items, parentMap, originalParentName, name), originalParentName);
         }
 
         var changedItems = items.stream()
@@ -146,12 +147,11 @@ public class MenuItemConsoleService {
                         Function.identity(),
                         (left, right) -> left,
                         LinkedHashMap::new));
-        Map<String, String> parentMap = validParentMap(itemMap);
-        Set<String> cyclicChainNames = cyclicChainNames(parentMap);
+        Map<String, String> parentMap = effectiveParentMap(items);
 
         itemMap.forEach((name, node) -> {
             var parentName = parentMap.get(name);
-            if (parentName != null && !cyclicChainNames.contains(name)) {
+            if (parentName != null) {
                 itemMap.get(parentName).getChildren().add(node);
             }
         });
@@ -159,21 +159,24 @@ public class MenuItemConsoleService {
         var roots = itemMap.values().stream()
                 .filter(node -> {
                     var name = node.getMenuItem().getMetadata().getName();
-                    return !parentMap.containsKey(name) || cyclicChainNames.contains(name);
+                    return !parentMap.containsKey(name);
                 })
                 .collect(Collectors.toCollection(ArrayList::new));
         sortTree(roots);
         return roots;
     }
 
-    private static Map<String, String> validParentMap(Map<String, MenuItemTreeNode> itemMap) {
+    private static Map<String, String> effectiveParentMap(Collection<MenuItem> items) {
+        var names = items.stream().map(item -> item.getMetadata().getName()).collect(Collectors.toSet());
         Map<String, String> parentMap = new LinkedHashMap<>();
-        itemMap.forEach((name, node) -> {
-            var parentName = parentNameOf(node.getMenuItem());
-            if (parentName != null && !Objects.equals(parentName, name) && itemMap.containsKey(parentName)) {
+        items.forEach(item -> {
+            var name = item.getMetadata().getName();
+            var parentName = parentNameOf(item);
+            if (parentName != null && !Objects.equals(parentName, name) && names.contains(parentName)) {
                 parentMap.put(name, parentName);
             }
         });
+        parentMap.keySet().removeAll(cyclicChainNames(parentMap));
         return parentMap;
     }
 
@@ -248,10 +251,11 @@ public class MenuItemConsoleService {
         return false;
     }
 
-    private static List<MenuItem> siblings(List<MenuItem> items, String parentName, String excludingName) {
+    private static List<MenuItem> siblings(
+            List<MenuItem> items, Map<String, String> parentMap, String parentName, String excludingName) {
         return items.stream()
                 .filter(item -> !Objects.equals(item.getMetadata().getName(), excludingName))
-                .filter(item -> Objects.equals(parentNameOf(item), parentName))
+                .filter(item -> Objects.equals(parentMap.get(item.getMetadata().getName()), parentName))
                 .sorted(defaultMenuItemComparator())
                 .collect(Collectors.toCollection(ArrayList::new));
     }

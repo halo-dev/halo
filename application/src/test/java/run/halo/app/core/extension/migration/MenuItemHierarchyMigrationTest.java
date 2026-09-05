@@ -2,6 +2,9 @@ package run.halo.app.core.extension.migration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -9,6 +12,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,6 +20,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.OptimisticLockingFailureException;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import run.halo.app.core.extension.Menu;
@@ -31,6 +36,7 @@ class MenuItemHierarchyMigrationTest {
     private ReactiveExtensionClient client;
 
     private final List<MenuItem> createdItems = new ArrayList<>();
+    private final Map<String, MenuItem> storedItems = new HashMap<>();
 
     private MenuItemHierarchyMigration migration;
 
@@ -39,15 +45,108 @@ class MenuItemHierarchyMigrationTest {
         migration = new MenuItemHierarchyMigration(client);
         var sequence = new AtomicInteger();
         Mockito.lenient()
-                .when(client.update(any(MenuItem.class)))
-                .thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
+                .when(client.fetch(eq(MenuItem.class), anyString()))
+                .thenAnswer(invocation -> Mono.justOrEmpty(storedItems.get(invocation.getArgument(1)))
+                        .map(JsonUtils::deepCopy));
+        Mockito.lenient().when(client.update(any(MenuItem.class))).thenAnswer(invocation -> {
+            MenuItem item = invocation.getArgument(0);
+            var stored = storedItems.get(item.getMetadata().getName());
+            stored.setSpec(item.getSpec());
+            stored.setMetadata(item.getMetadata());
+            stored.setStatus(item.getStatus());
+            return Mono.just(item);
+        });
         Mockito.lenient().when(client.create(any(MenuItem.class))).thenAnswer(invocation -> {
             MenuItem item = invocation.getArgument(0);
             item.getMetadata().setName(item.getMetadata().getGenerateName() + sequence.incrementAndGet());
             item.getMetadata().setCreationTimestamp(Instant.parse("2022-08-05T04:19:37.252228Z"));
             createdItems.add(item);
+            storedItems.put(item.getMetadata().getName(), item);
             return Mono.just(item);
         });
+    }
+
+    @Test
+    void retriesWithLatestVersionAndPreservesConcurrentChanges() {
+        var root = menuItem("root", null);
+        root.getMetadata().setVersion(1L);
+        Mockito.doAnswer(invocation -> {
+                    root.getMetadata().setVersion(2L);
+                    root.getSpec().setDisplayName("concurrent edit");
+                    return Mono.error(new OptimisticLockingFailureException("conflict"));
+                })
+                .when(client)
+                .update(argThat((MenuItem item) ->
+                        Long.valueOf(1L).equals(item.getMetadata().getVersion())));
+
+        StepVerifier.create(migration.migrate(List.of(menu("primary", children("root"))), List.of(root)))
+                .assertNext(summary -> {
+                    assertThat(summary.getFailures()).isZero();
+                    assertThat(summary.getUpdated()).isEqualTo(1);
+                    assertThat(root.getMetadata().getVersion()).isEqualTo(2L);
+                    assertThat(root.getSpec().getDisplayName()).isEqualTo("concurrent edit");
+                    assertThat(root.getSpec().getMenuName()).isEqualTo("primary");
+                })
+                .verifyComplete();
+        Mockito.verify(client, Mockito.times(2)).fetch(MenuItem.class, "root");
+    }
+
+    @Test
+    void failedParentUpdateDoesNotMigrateChildrenOrMarkFailedStateAsMigrated() {
+        var root = menuItem("root", children("child"));
+        var child = menuItem("child", null);
+        Mockito.doReturn(Mono.error(new IllegalStateException("failed")))
+                .when(client)
+                .update(any(MenuItem.class));
+
+        StepVerifier.create(migration.migrate(List.of(menu("primary", children("root"))), List.of(root, child)))
+                .assertNext(summary -> {
+                    assertThat(summary.getFailures()).isEqualTo(1);
+                    assertThat(summary.getUpdated()).isZero();
+                    assertThat(root.getSpec().getMenuName()).isNull();
+                    assertThat(root.getMetadata().getLabels()).isNull();
+                    assertThat(child.getSpec().getParent()).isNull();
+                    assertThat(child.getSpec().getMenuName()).isNull();
+                })
+                .verifyComplete();
+        Mockito.verify(client, Mockito.times(1)).update(any(MenuItem.class));
+    }
+
+    @Test
+    void failedSubtreeWithAssignedMenuRemainsRetryable() {
+        var root = menuItem("root", children("child"));
+        var child = menuItem("child", null);
+        root.getSpec().setMenuName("primary");
+        child.getSpec().setMenuName("primary");
+        Mockito.doReturn(Mono.error(new IllegalStateException("failed")))
+                .when(client)
+                .update(any(MenuItem.class));
+
+        StepVerifier.create(migration.migrate(List.of(menu("primary", children("root"))), List.of(root, child)))
+                .assertNext(summary -> {
+                    assertThat(summary.getFailures()).isEqualTo(1);
+                    assertThat(root.getMetadata().getLabels()).isNull();
+                    assertThat(child.getMetadata().getLabels()).isNull();
+                    assertThat(child.getSpec().getParent()).isNull();
+                })
+                .verifyComplete();
+        Mockito.verify(client, Mockito.times(1)).update(any(MenuItem.class));
+    }
+
+    @Test
+    void rerunPreservesMenuItemMovedToRoot() {
+        var root = menuItem("root", children("child"));
+        var child = menuItem("child", null);
+        var menus = List.of(menu("primary", children("root", "child")));
+        migration.migrate(menus, List.of(root, child)).block();
+        child.getSpec().setParent(null);
+
+        StepVerifier.create(migration.migrate(menus, List.of(root, child)))
+                .assertNext(summary -> {
+                    assertThat(summary.getUpdated()).isZero();
+                    assertThat(child.getSpec().getParent()).isNull();
+                })
+                .verifyComplete();
     }
 
     @Test
@@ -287,6 +386,7 @@ class MenuItemHierarchyMigrationTest {
         spec.setDisplayName(name);
         spec.setChildren(childNames);
         item.setSpec(spec);
+        storedItems.put(name, item);
         return item;
     }
 

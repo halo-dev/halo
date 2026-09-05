@@ -94,9 +94,10 @@ public class CategoryConsoleService {
                         category -> new HierarchyState(parentNameOf(category), priorityOf(category)),
                         (left, right) -> left,
                         LinkedHashMap::new));
-        var originalParentName = parentNameOf(moved);
+        var parentMap = effectiveParentMap(categories);
+        var originalParentName = parentMap.get(name);
 
-        var targetSiblings = siblings(categories, targetParentName, name);
+        var targetSiblings = siblings(categories, parentMap, targetParentName, name);
         int insertIndex = targetSiblings.size();
         if (beforeName != null) {
             insertIndex = indexOf(targetSiblings, beforeName);
@@ -108,7 +109,7 @@ public class CategoryConsoleService {
         assignPriorities(targetSiblings, targetParentName);
 
         if (!Objects.equals(originalParentName, targetParentName)) {
-            assignPriorities(siblings(categories, originalParentName, name), originalParentName);
+            assignPriorities(siblings(categories, parentMap, originalParentName, name), originalParentName);
         }
 
         var changedCategories = categories.stream()
@@ -133,12 +134,11 @@ public class CategoryConsoleService {
                         Function.identity(),
                         (left, right) -> left,
                         LinkedHashMap::new));
-        Map<String, String> parentMap = validParentMap(categoryMap);
-        Set<String> cyclicNames = cyclicNames(parentMap);
+        Map<String, String> parentMap = effectiveParentMap(categories);
 
         categoryMap.forEach((name, node) -> {
             var parentName = parentMap.get(name);
-            if (parentName != null && !cyclicNames.contains(name)) {
+            if (parentName != null) {
                 categoryMap.get(parentName).getChildren().add(node);
             }
         });
@@ -146,21 +146,26 @@ public class CategoryConsoleService {
         var roots = categoryMap.values().stream()
                 .filter(node -> {
                     var name = node.getCategory().getMetadata().getName();
-                    return !parentMap.containsKey(name) || cyclicNames.contains(name);
+                    return !parentMap.containsKey(name);
                 })
                 .collect(Collectors.toCollection(ArrayList::new));
         sortTree(roots);
         return roots;
     }
 
-    private static Map<String, String> validParentMap(Map<String, CategoryTreeNode> categoryMap) {
+    private static Map<String, String> effectiveParentMap(Collection<Category> categories) {
+        var names = categories.stream()
+                .map(category -> category.getMetadata().getName())
+                .collect(Collectors.toSet());
         Map<String, String> parentMap = new LinkedHashMap<>();
-        categoryMap.forEach((name, node) -> {
-            var parentName = parentNameOf(node.getCategory());
-            if (parentName != null && !Objects.equals(parentName, name) && categoryMap.containsKey(parentName)) {
+        categories.forEach(category -> {
+            var name = category.getMetadata().getName();
+            var parentName = parentNameOf(category);
+            if (parentName != null && !Objects.equals(parentName, name) && names.contains(parentName)) {
                 parentMap.put(name, parentName);
             }
         });
+        parentMap.keySet().removeAll(cyclicNames(parentMap));
         return parentMap;
     }
 
@@ -229,10 +234,12 @@ public class CategoryConsoleService {
         return false;
     }
 
-    private static List<Category> siblings(List<Category> categories, String parentName, String excludingName) {
+    private static List<Category> siblings(
+            List<Category> categories, Map<String, String> parentMap, String parentName, String excludingName) {
         return categories.stream()
                 .filter(category -> !Objects.equals(category.getMetadata().getName(), excludingName))
-                .filter(category -> Objects.equals(parentNameOf(category), parentName))
+                .filter(category ->
+                        Objects.equals(parentMap.get(category.getMetadata().getName()), parentName))
                 .sorted(defaultCategoryComparator())
                 .collect(Collectors.toCollection(ArrayList::new));
     }
