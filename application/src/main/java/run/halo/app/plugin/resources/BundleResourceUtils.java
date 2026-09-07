@@ -55,18 +55,6 @@ public abstract class BundleResourceUtils {
         return getBundleResource(resourceLoader, bundleLocation, bundleName);
     }
 
-    /**
-     * Gets bundle resource by plugin name in the selected location.
-     *
-     * @return bundle resource if exists, otherwise null
-     * @deprecated use {@link #getSelectedBundleResource(PluginManager, String, String)} instead
-     */
-    @Deprecated
-    public static @Nullable Resource getJsBundleResource(
-            PluginManager pluginManager, String pluginName, String bundleName) {
-        return getSelectedBundleResource(pluginManager, pluginName, bundleName);
-    }
-
     public static @Nullable Resource getBundleResource(
             PluginManager pluginManager, String pluginName, String bundleLocation, String bundleName) {
         Assert.hasText(pluginName, "The pluginName must not be blank");
