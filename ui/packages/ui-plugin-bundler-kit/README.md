@@ -41,7 +41,7 @@ npm install vite @vitejs/plugin-vue
 npm install @rsbuild/core @rsbuild/plugin-vue
 ```
 
-Since 2.26.0, import the configuration helper from its build-system-specific entry point. Imports from the package root are deprecated and will be removed in 2.27.0.
+The Vite and Rsbuild peer dependencies are optional. Install only the build tool and Vue plugin you use, and import its configuration helper from `@halo-dev/ui-plugin-bundler-kit/vite` or `@halo-dev/ui-plugin-bundler-kit/rsbuild`. The package root exports and the deprecated `HaloUIPluginBundlerKit` helper have been removed.
 
 ## Usage
 
@@ -189,22 +189,6 @@ uiPlugins.get("plugin-search");
 ```
 
 The reactive record contains only Halo-owned `name`, `type`, `version`, and `pending | registered | failed` status. `isEnabled` means the provider was discovered in the current descriptor; `isRegistered` becomes true after its current-page registration succeeds. Provider code treats this store as read-only and must not depend on another provider's evaluation order or module object.
-
-### Legacy Configuration (Deprecated)
-
-> ⚠️ **Note**: The `HaloUIPluginBundlerKit` function is deprecated and will be removed in 2.27.0. Import `viteConfig` from `@halo-dev/ui-plugin-bundler-kit/vite` or `rsbuildConfig` from `@halo-dev/ui-plugin-bundler-kit/rsbuild` instead. It does not support `provider: "theme"`.
-
-```typescript
-import { HaloUIPluginBundlerKit } from "@halo-dev/ui-plugin-bundler-kit";
-
-export default {
-  plugins: [
-    HaloUIPluginBundlerKit({
-      // Configuration options
-    }),
-  ],
-};
-```
 
 ## Configuration Options
 
@@ -442,8 +426,6 @@ Theme provider:
 
 - **Development**: `dist`
 - **Production**: `dist`
-
-> **Note**: The production build output directory of `HaloUIPluginBundlerKit` is still `src/main/resources/console` to ensure compatibility.
 
 An ESM output additionally contains the reserved, generated `ui-plugin.json` manifest and may contain content-hashed `chunks/` and `assets/`. The manifest contains `format`, the actual content-hashed `entry`, and an optional content-hashed `style`; asynchronous chunk CSS is not listed. Keep the complete output directory together. Halo serves these canonical paths through the existing plugin or theme static resource mapping without adding query cache keys, so imports back to the entry resolve to the same ESM module URL. Callers that replace the default content-hashed filenames accept the risk of stale resources under Halo's production static-resource cache. Legacy IIFE resources retain their version query behavior. The Halo 2.x compatibility `bundle.css` endpoint remains available for older callers, but now contains ordered `@import` rules pointing at those direct styles so relative asset URLs keep the correct provider base; it is not used by the new runtime.
 
