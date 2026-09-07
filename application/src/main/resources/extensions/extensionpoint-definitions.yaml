@@ -102,6 +102,7 @@ apiVersion: plugin.halo.run/v1alpha1
 kind: ExtensionPointDefinition
 metadata:
   name: thumbnail-provider
+  deletionTimestamp: 2026-09-07T00:00:00Z
 spec:
   className: run.halo.app.core.attachment.ThumbnailProvider
   displayName: 图片缩略图生成
