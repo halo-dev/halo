@@ -122,11 +122,11 @@ class MenuItemHierarchyMigration {
     private Mono<MenuItem> migrateOriginal(MigrationContext context, MenuItem item, LegacyPath path) {
         context.recordOriginalUse(item, path);
         return updateIfChanged(context, item, latest -> {
-            if (TRUE.equals(labelsOf(latest).get(MenuItem.HIERARCHY_MIGRATED_LABEL))) {
+            var spec = ensureSpec(latest);
+            if (TRUE.equals(labelsOf(latest).get(MenuItem.HIERARCHY_MIGRATED_LABEL)) && hasText(spec.getMenuName())) {
                 return false;
             }
             var changed = false;
-            var spec = ensureSpec(latest);
             if (!hasText(spec.getMenuName())) {
                 spec.setMenuName(path.getMenuName());
                 changed = true;
@@ -144,11 +144,12 @@ class MenuItemHierarchyMigration {
         if (existingClone != null) {
             context.recordCloneReused();
             return updateIfChanged(context, existingClone, latest -> {
-                if (TRUE.equals(labelsOf(latest).get(MenuItem.HIERARCHY_MIGRATED_LABEL))) {
+                var spec = ensureSpec(latest);
+                if (TRUE.equals(labelsOf(latest).get(MenuItem.HIERARCHY_MIGRATED_LABEL))
+                        && hasText(spec.getMenuName())) {
                     return false;
                 }
                 var changed = false;
-                var spec = ensureSpec(latest);
                 if (!hasText(spec.getMenuName())) {
                     spec.setMenuName(path.getMenuName());
                     changed = true;

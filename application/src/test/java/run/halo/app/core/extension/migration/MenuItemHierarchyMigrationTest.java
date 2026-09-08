@@ -150,6 +150,43 @@ class MenuItemHierarchyMigrationTest {
     }
 
     @Test
+    void shouldRepairMigratedMenuItemWithoutMenuName() {
+        var item = menuItem("item", null);
+        item.getMetadata().setLabels(new HashMap<>());
+        item.getMetadata().getLabels().put(MenuItem.HIERARCHY_MIGRATED_LABEL, "true");
+        item.getSpec().setParent("keep-parent");
+
+        StepVerifier.create(migration.migrate(List.of(menu("primary", children("item"))), List.of(item)))
+                .assertNext(summary -> {
+                    assertThat(summary.getUpdated()).isEqualTo(1);
+                    assertThat(item.getSpec().getMenuName()).isEqualTo("primary");
+                    assertThat(item.getSpec().getParent()).isEqualTo("keep-parent");
+                })
+                .verifyComplete();
+    }
+
+    @Test
+    void shouldRepairMigratedCloneWithoutMenuName() {
+        var shared = menuItem("shared", null);
+        var menus = List.of(
+                menu("menu-a", children("shared"), "2022-08-05T04:19:37Z"),
+                menu("menu-b", children("shared"), "2022-08-05T04:19:38Z"));
+        migration.migrate(menus, List.of(shared)).block();
+        var clone = createdItems.getFirst();
+        clone.getSpec().setMenuName(null);
+
+        StepVerifier.create(migration.migrate(menus, List.of(shared, clone)))
+                .assertNext(summary -> {
+                    assertThat(summary.getUpdated()).isEqualTo(1);
+                    assertThat(summary.getClonesReused()).isEqualTo(1);
+                    assertThat(summary.getClonesCreated()).isZero();
+                    assertThat(clone.getSpec().getMenuName()).isEqualTo("menu-b");
+                    assertThat(clone.getSpec().getParent()).isNull();
+                })
+                .verifyComplete();
+    }
+
+    @Test
     void shouldMigrateLegacyTreeWithoutChangingLegacyFields() {
         var root = menuItem("root", children("child"));
         var child = menuItem("child", children("grandchild"));
