@@ -257,7 +257,6 @@ const {
   templates,
   isInitialLoading: templatesLoading,
   isError: templatesError,
-  refetch: refetchTemplates,
 } = useThemeCustomTemplates("post", () => formState.value.spec.template);
 
 const annotationsFormRef = ref<InstanceType<typeof AnnotationsForm>>();
@@ -494,9 +493,6 @@ const showCancelPublishButton = computed(() => {
               name="template"
               type="select"
             ></FormKit>
-            <VButton v-if="templatesError" @click="refetchTemplates()">{{
-              $t("core.common.buttons.retry")
-            }}</VButton>
           </div>
         </div>
       </div>

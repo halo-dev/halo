@@ -256,7 +256,6 @@ const {
   templates,
   isInitialLoading: templatesLoading,
   isError: templatesError,
-  refetch: refetchTemplates,
 } = useThemeCustomTemplates("page", () => formState.value.spec.template);
 
 // slug
@@ -449,9 +448,6 @@ async function slugUniqueValidation(node: FormKitNode) {
               type="select"
               name="template"
             ></FormKit>
-            <VButton v-if="templatesError" @click="refetchTemplates()">{{
-              $t("core.common.buttons.retry")
-            }}</VButton>
           </div>
         </div>
       </div>

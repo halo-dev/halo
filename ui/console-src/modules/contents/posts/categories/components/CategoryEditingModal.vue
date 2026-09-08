@@ -191,7 +191,6 @@ const {
   templates,
   isInitialLoading: templatesLoading,
   isError: templatesError,
-  refetch: refetchTemplates,
 } = useThemeCustomTemplates("category", () => formState.value.spec.template);
 const { templates: postTemplates } = useThemeCustomTemplates(
   "post",
@@ -324,9 +323,6 @@ async function slugUniqueValidation(node: FormKitNode) {
               type="select"
               name="template"
             ></FormKit>
-            <VButton v-if="templatesError" @click="refetchTemplates()">{{
-              $t("core.common.buttons.retry")
-            }}</VButton>
             <FormKit
               v-model="formState.spec.postTemplate"
               :options="postTemplates"
