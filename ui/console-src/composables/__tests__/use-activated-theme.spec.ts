@@ -1,3 +1,4 @@
+import InstalledThemes from "@console/modules/interface/themes/components/list-tabs/InstalledThemes.vue";
 import { useInstalledThemes } from "@console/modules/interface/themes/composables/use-installed-themes";
 import { useThemeCustomTemplates } from "@console/modules/interface/themes/composables/use-theme";
 import { FormKit, defaultConfig, plugin as formKitPlugin } from "@formkit/vue";
@@ -51,6 +52,12 @@ async function setup(
     }),
     {
       global: {
+        directives: { permission: () => {}, tooltip: () => {} },
+        stubs: {
+          ThemeListItem: true,
+          ThemePreviewModal: true,
+          SearchInput: true,
+        },
         plugins: [
           [VueQueryPlugin, { queryClient: client }],
           [formKitPlugin, defaultConfig()],
@@ -218,4 +225,35 @@ it("invalidates all theme-dependent caches after a mutation", async () => {
     expect(client.getQueryState(key)?.isInvalidated).toBe(true)
   );
   client.clear();
+});
+
+it("keeps batch selections after late activation and removes only missing themes", async () => {
+  const other = { ...theme, metadata: { name: "other" } };
+  const pending = Promise.withResolvers<{ data: Theme }>();
+  vi.mocked(consoleApiClient.theme.theme.fetchActivatedTheme).mockReturnValue(
+    pending.promise as never
+  );
+  vi.mocked(consoleApiClient.theme.theme.listThemes).mockResolvedValue({
+    data: { items: [other, theme], hasNext: false },
+  } as never);
+  const { wrapper, client } = await setup(() => () => h(InstalledThemes));
+  await wrapper.get('input[value="other"]').setValue(true);
+  await wrapper.get('input[value="earth"]').setValue(true);
+  pending.resolve({ data: theme });
+  await flushPromises();
+  expect(
+    wrapper
+      .findAll<HTMLInputElement>('input[type="checkbox"]:checked')
+      .map((input) => input.element.value)
+  ).toEqual(["earth", "other"]);
+  client.setQueryData(["installed-themes"], [theme]);
+  await flushPromises();
+  expect(
+    wrapper.get<HTMLInputElement>('input[value="earth"]').element.checked
+  ).toBe(true);
+  client.setQueryData(["installed-themes"], [other, theme]);
+  await flushPromises();
+  expect(
+    wrapper.get<HTMLInputElement>('input[value="other"]').element.checked
+  ).toBe(false);
 });

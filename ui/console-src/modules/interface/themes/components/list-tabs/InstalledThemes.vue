@@ -67,8 +67,10 @@ const selectedThemes = computed(() => {
 
 watch(
   () => themes.value,
-  () => {
-    selectedThemeNames.value.length = 0;
+  (themes) => {
+    selectedThemeNames.value = selectedThemeNames.value.filter((name) =>
+      themes?.some((theme) => theme.metadata.name === name)
+    );
   },
   {
     immediate: true,

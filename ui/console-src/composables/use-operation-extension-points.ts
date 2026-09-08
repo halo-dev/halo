@@ -10,7 +10,7 @@ export function useOperationItemExtensionPoint<T>(
 ) {
   const { pluginModules } = usePluginModuleStore();
 
-  return useQuery({
+  const query = useQuery({
     queryKey: computed(() => [
       "core:extension-points:operation-items",
       extensionPointName,
@@ -31,10 +31,19 @@ export function useOperationItemExtensionPoint<T>(
         itemsFromPlugins.push(...items);
       }
 
-      return [...presets.value, ...itemsFromPlugins].sort(
-        (a, b) => a.priority - b.priority
-      );
+      return itemsFromPlugins;
     },
     enabled: computed(() => !!presets.value && !!entity.value),
   });
+
+  return {
+    ...query,
+    data: computed(() =>
+      query.data.value
+        ? [...presets.value, ...query.data.value].sort(
+            (a, b) => a.priority - b.priority
+          )
+        : undefined
+    ),
+  };
 }
