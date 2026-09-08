@@ -111,7 +111,11 @@ const activeSettingTab = ref("");
 const settingsVisible = ref(false);
 
 const { data: setting } = useQuery<Setting>({
-  queryKey: ["theme-setting", selectedTheme],
+  queryKey: [
+    "theme-setting",
+    computed(() => selectedTheme.value?.metadata.name),
+    computed(() => selectedTheme.value?.spec.settingName),
+  ],
   queryFn: async () => {
     const { data } = await consoleApiClient.theme.theme.fetchThemeSetting({
       name: selectedTheme?.value?.metadata.name as string,
@@ -136,7 +140,11 @@ const { data: setting } = useQuery<Setting>({
 });
 
 const { data: configMapData } = useQuery({
-  queryKey: ["core:theme:configMap:data", selectedTheme],
+  queryKey: [
+    "core:theme:configMap:data",
+    computed(() => selectedTheme?.value?.metadata.name),
+    computed(() => selectedTheme?.value?.spec.configMapName),
+  ],
   queryFn: async () => {
     const { data } = await consoleApiClient.theme.theme.fetchThemeJsonConfig({
       name: selectedTheme?.value?.metadata.name as string,
