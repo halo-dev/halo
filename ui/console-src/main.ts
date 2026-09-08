@@ -1,5 +1,4 @@
 import modules from "@console/modules";
-import { useThemeStore } from "@console/stores/theme";
 import { stores } from "@halo-dev/ui-shared";
 import { createPinia } from "pinia";
 import "@/setup/setupStyles";
@@ -27,11 +26,6 @@ setupVueQuery(app);
 setupApiClient();
 
 app.use(createPinia());
-
-async function loadActivatedTheme() {
-  const themeStore = useThemeStore();
-  await themeStore.fetchActivatedTheme();
-}
 
 function setupAppComponents(options?: SetupComponentsOptions) {
   if (componentsReady) {
@@ -69,8 +63,6 @@ async function initApp() {
       setupComponents: setupAppComponents,
       registeredFormKitInputs: builtinFormKitInputs,
     });
-
-    await loadActivatedTheme();
   } catch (e) {
     console.error(e);
   } finally {

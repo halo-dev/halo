@@ -1,6 +1,6 @@
 <script lang="ts" setup>
+import { useActivatedTheme } from "@console/composables/use-activated-theme";
 import BasicLayout from "@console/layouts/BasicLayout.vue";
-import { useThemeStore } from "@console/stores/theme";
 import type { Setting, Theme } from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
 import {
@@ -18,7 +18,6 @@ import {
 } from "@halo-dev/components";
 import { utils } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
-import { storeToRefs } from "pinia";
 import { computed, provide, ref, watch, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
@@ -50,7 +49,12 @@ const initialTabs: ThemeTab[] = [
   },
 ];
 
-const { activatedTheme } = storeToRefs(useThemeStore());
+const {
+  data: activatedTheme,
+  isInitialLoading: activeThemeLoading,
+  isError: activeThemeError,
+  refetch: refetchActiveTheme,
+} = useActivatedTheme();
 const hasThemeQuery = computed(() => route.query.theme !== undefined);
 const themeName = computed(() =>
   typeof route.query.theme === "string" ? route.query.theme : undefined
@@ -63,7 +67,7 @@ const {
 } = useInstalledThemes(computed(() => !!themeName.value));
 const selectedTheme = computed(() => {
   if (!hasThemeQuery.value) {
-    return activatedTheme.value;
+    return activatedTheme.value ?? undefined;
   }
   return themes.value?.find(
     (theme) =>
@@ -80,7 +84,8 @@ const activeTab = computed(() =>
 provide<Ref<string>>("activeTab", activeTab);
 provide<Ref<boolean>>("themesModal", themesModal);
 
-const { isActivated, handleActiveTheme } = useThemeLifeCycle(selectedTheme);
+const { isActivated, isActivationKnown, handleActiveTheme } =
+  useThemeLifeCycle(selectedTheme);
 
 provide<Ref<Theme | undefined>>("selectedTheme", selectedTheme);
 
@@ -185,7 +190,12 @@ watch(
       </template>
       <template #actions>
         <VButton
-          v-if="selectedTheme && !isActivated"
+          v-if="hasThemeQuery && activeThemeError"
+          @click="refetchActiveTheme()"
+          >{{ $t("core.common.buttons.retry") }}</VButton
+        >
+        <VButton
+          v-if="selectedTheme && isActivationKnown && !isActivated"
           v-permission="['system:themes:manage']"
           size="sm"
           type="primary"
@@ -214,13 +224,22 @@ watch(
     </VPageHeader>
 
     <div class="m-0 md:m-4">
-      <VLoading v-if="themeName && themesLoading" />
+      <VLoading
+        v-if="
+          (themeName && themesLoading) || (!hasThemeQuery && activeThemeLoading)
+        "
+      />
       <VEmpty
-        v-else-if="themeName && themesError && !themes"
+        v-else-if="
+          (themeName && themesError && !themes) ||
+          (!hasThemeQuery && activeThemeError && !activatedTheme)
+        "
         :title="$t('core.common.status.loading_error')"
       >
         <template #actions>
-          <VButton @click="refetchThemes()">
+          <VButton
+            @click="hasThemeQuery ? refetchThemes() : refetchActiveTheme()"
+          >
             {{ $t("core.common.buttons.retry") }}
           </VButton>
         </template>

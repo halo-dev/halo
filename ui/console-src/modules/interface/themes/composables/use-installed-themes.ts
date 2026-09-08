@@ -1,4 +1,4 @@
-import { useThemeStore } from "@console/stores/theme";
+import { useActivatedTheme } from "@console/composables/use-activated-theme";
 import type {
   Theme,
   ThemeV1alpha1ConsoleApiListThemesRequest,
@@ -8,8 +8,8 @@ import { useQuery } from "@tanstack/vue-query";
 import { computed, toValue, type MaybeRefOrGetter } from "vue";
 
 export function useInstalledThemes(enabled: MaybeRefOrGetter<boolean> = true) {
-  const themeStore = useThemeStore();
-  return useQuery<Theme[]>({
+  const { data: activatedTheme } = useActivatedTheme(enabled);
+  const query = useQuery<Theme[]>({
     enabled: computed(() => toValue(enabled)),
     queryKey: ["installed-themes"],
     queryFn: async () => {
@@ -21,16 +21,7 @@ export function useInstalledThemes(enabled: MaybeRefOrGetter<boolean> = true) {
         size: 1000,
       });
 
-      return themes.sort((a, b) => {
-        const activatedThemeName = themeStore.activatedTheme?.metadata.name;
-        if (a.metadata.name === activatedThemeName) {
-          return -1;
-        }
-        if (b.metadata.name === activatedThemeName) {
-          return 1;
-        }
-        return 0;
-      });
+      return themes;
     },
     refetchInterval(data) {
       const hasDeletingTheme = data?.some(
@@ -40,4 +31,16 @@ export function useInstalledThemes(enabled: MaybeRefOrGetter<boolean> = true) {
       return hasDeletingTheme ? 1000 : false;
     },
   });
+  return {
+    ...query,
+    data: computed(() =>
+      query.data.value
+        ?.slice()
+        .sort(
+          (a, b) =>
+            Number(b.metadata.name === activatedTheme.value?.metadata.name) -
+            Number(a.metadata.name === activatedTheme.value?.metadata.name)
+        )
+    ),
+  };
 }

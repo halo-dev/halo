@@ -1,17 +1,21 @@
-import { useThemeStore } from "@console/stores/theme";
+import {
+  useActivatedTheme,
+  invalidateThemeQueries,
+} from "@console/composables/use-activated-theme";
 import type { Theme } from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
 import { Dialog, Toast } from "@halo-dev/components";
+import { useQueryClient } from "@tanstack/vue-query";
 import { useFileDialog } from "@vueuse/core";
 import { merge } from "es-toolkit";
-import { storeToRefs } from "pinia";
 import type { ComputedRef, Ref } from "vue";
-import { computed, ref } from "vue";
+import { computed, ref, toValue, type MaybeRefOrGetter } from "vue";
 import { useI18n } from "vue-i18n";
 
 interface useThemeLifeCycleReturn {
   loading: Ref<boolean>;
   isActivated: ComputedRef<boolean>;
+  isActivationKnown: ComputedRef<boolean>;
   getFailedMessage: () => string | undefined;
   handleActiveTheme: (reload?: boolean) => void;
   handleResetSettingConfig: () => void;
@@ -24,9 +28,10 @@ export function useThemeLifeCycle(
 
   const loading = ref(false);
 
-  const themeStore = useThemeStore();
+  const queryClient = useQueryClient();
+  const { data: activatedTheme } = useActivatedTheme();
 
-  const { activatedTheme } = storeToRefs(themeStore);
+  const isActivationKnown = computed(() => activatedTheme.value !== undefined);
 
   const isActivated = computed(() => {
     return activatedTheme?.value?.metadata.name === theme.value?.metadata.name;
@@ -66,7 +71,7 @@ export function useThemeLifeCycle(
         } catch (e) {
           console.error("Failed to active theme", e);
         } finally {
-          themeStore.fetchActivatedTheme();
+          void invalidateThemeQueries(queryClient);
         }
       },
     });
@@ -100,14 +105,23 @@ export function useThemeLifeCycle(
   return {
     loading,
     isActivated,
+    isActivationKnown,
     getFailedMessage,
     handleActiveTheme,
     handleResetSettingConfig,
   };
 }
 
-export function useThemeCustomTemplates(type: "post" | "page" | "category") {
-  const themeStore = useThemeStore();
+export function useThemeCustomTemplates(
+  type: "post" | "page" | "category",
+  currentTemplate: MaybeRefOrGetter<string | undefined> = undefined
+) {
+  const {
+    data: activatedTheme,
+    isInitialLoading,
+    isError,
+    refetch,
+  } = useActivatedTheme();
   const { t } = useI18n();
 
   const templates = computed(() => {
@@ -118,16 +132,10 @@ export function useThemeCustomTemplates(type: "post" | "page" | "category") {
       },
     ];
 
-    if (!themeStore.activatedTheme) {
-      return defaultTemplate;
-    }
-    const { customTemplates } = themeStore.activatedTheme.spec;
-    if (!customTemplates?.[type]) {
-      return defaultTemplate;
-    }
-    return [
+    const customTemplates = activatedTheme.value?.spec.customTemplates;
+    const options = [
       ...defaultTemplate,
-      ...(customTemplates[type]?.map((template) => {
+      ...(customTemplates?.[type]?.map((template) => {
         return {
           value: template.file,
           label: template.name || template.file,
@@ -135,9 +143,16 @@ export function useThemeCustomTemplates(type: "post" | "page" | "category") {
         };
       }) || []),
     ];
+    const current = toValue(currentTemplate);
+    if (current && !options.some((option) => option.value === current))
+      options.push({ value: current, label: current });
+    return options;
   });
 
   return {
+    isInitialLoading,
+    isError,
+    refetch,
     templates,
   };
 }
