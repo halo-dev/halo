@@ -2590,6 +2590,37 @@
         ]
       }
     },
+    "/apis/api.console.halo.run/v1alpha1/themes/{name}/capabilities": {
+      "get": {
+        "description": "Inspect templates, page layout and UI resources of an installed theme.",
+        "operationId": "fetchThemeCapabilities",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ThemeCapabilities"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "ThemeV1alpha1Console"
+        ]
+      }
+    },
     "/apis/api.console.halo.run/v1alpha1/themes/{name}/invalidate-cache": {
       "put": {
         "description": "Invalidate theme template cache.",
@@ -7269,6 +7300,34 @@
         },
         "description": "Theme extension that describes an installable frontend theme and its runtime state."
       },
+      "ThemeCapabilities": {
+        "required": [
+          "complete",
+          "pageLayout",
+          "templates",
+          "ui"
+        ],
+        "type": "object",
+        "properties": {
+          "complete": {
+            "type": "boolean",
+            "description": "Whether the entire template directory was inspected."
+          },
+          "pageLayout": {
+            "$ref": "#/components/schemas/PageLayout"
+          },
+          "templates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ThemeTemplateFile"
+            }
+          },
+          "ui": {
+            "$ref": "#/components/schemas/UiPluginResources"
+          }
+        },
+        "description": "File capabilities of an installed theme; these do not imply successful rendering or UI registration."
+      },
       "ThemeInstallRequest": {
         "type": "object",
         "description": "Multipart payload for installing a theme."
@@ -7446,6 +7505,61 @@
         },
         "description": "Observed theme lifecycle and installation state."
       },
+      "ThemeTemplateFile": {
+        "required": [
+          "path",
+          "state",
+          "usages"
+        ],
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Path relative to the templates directory."
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "available",
+              "missing",
+              "unreadable",
+              "invalid"
+            ]
+          },
+          "usages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ThemeTemplateUsage"
+            }
+          }
+        }
+      },
+      "ThemeTemplateUsage": {
+        "required": [
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "contentType": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "system",
+              "custom",
+              "layout",
+              "other"
+            ]
+          }
+        }
+      },
       "UiPluginProvider": {
         "required": [
           "kind",
@@ -7510,6 +7624,33 @@
           }
         },
         "description": "Browser descriptor for the currently enabled plugin and theme UI providers."
+      },
+      "UiPluginResources": {
+        "required": [
+          "kind"
+        ],
+        "type": "object",
+        "properties": {
+          "entry": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "none",
+              "legacy",
+              "esm",
+              "invalid"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          },
+          "style": {
+            "type": "string"
+          }
+        },
+        "description": "UI resources included in an installed provider, independent of browser registration."
       },
       "UpgradeFromUriRequest": {
         "required": [

@@ -48,6 +48,8 @@ import run.halo.app.infra.ThemeRootGetter;
 import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.theme.TemplateEngineManager;
+import run.halo.app.theme.ThemeCapabilities;
+import run.halo.app.theme.ThemeCapabilitiesService;
 import run.halo.app.theme.service.ThemeService;
 import run.halo.app.theme.service.ThemeUtils;
 import tools.jackson.databind.node.ObjectNode;
@@ -76,6 +78,8 @@ public class ThemeEndpoint implements CustomEndpoint {
 
     private final SettingConfigService settingConfigService;
 
+    private final ThemeCapabilitiesService themeCapabilitiesService;
+
     public ThemeEndpoint(
             ReactiveExtensionClient client,
             ThemeRootGetter themeRoot,
@@ -83,7 +87,8 @@ public class ThemeEndpoint implements CustomEndpoint {
             TemplateEngineManager templateEngineManager,
             SystemConfigFetcher systemEnvironmentFetcher,
             ReactiveUrlDataBufferFetcher urlDataBufferFetcher,
-            SettingConfigService settingConfigService) {
+            SettingConfigService settingConfigService,
+            ThemeCapabilitiesService themeCapabilitiesService) {
         this.client = client;
         this.themeRoot = themeRoot;
         this.themeService = themeService;
@@ -91,6 +96,7 @@ public class ThemeEndpoint implements CustomEndpoint {
         this.systemEnvironmentFetcher = systemEnvironmentFetcher;
         this.urlDataBufferFetcher = urlDataBufferFetcher;
         this.settingConfigService = settingConfigService;
+        this.themeCapabilitiesService = themeCapabilitiesService;
     }
 
     @Override
@@ -230,6 +236,20 @@ public class ThemeEndpoint implements CustomEndpoint {
                                         .required(true)
                                         .implementation(String.class))
                                 .response(responseBuilder().responseCode(String.valueOf(NO_CONTENT.value()))))
+                .GET(
+                        "themes/{name}/capabilities",
+                        request -> client.get(Theme.class, request.pathVariable("name"))
+                                .flatMap(themeCapabilitiesService::inspect)
+                                .flatMap(capabilities -> ServerResponse.ok().bodyValue(capabilities)),
+                        builder -> builder.operationId("fetchThemeCapabilities")
+                                .description("Inspect templates, page layout and UI resources of an installed theme.")
+                                .tag(tag)
+                                .parameter(parameterBuilder()
+                                        .name("name")
+                                        .in(ParameterIn.PATH)
+                                        .required(true)
+                                        .implementation(String.class))
+                                .response(responseBuilder().implementation(ThemeCapabilities.class)))
                 .GET("themes", this::listThemes, builder -> {
                     builder.operationId("ListThemes")
                             .description("List themes.")

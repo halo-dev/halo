@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,7 +41,10 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.ReactiveUrlDataBufferFetcher;
 import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.ThemeRootGetter;
+import run.halo.app.plugin.UiPluginResources;
 import run.halo.app.theme.TemplateEngineManager;
+import run.halo.app.theme.ThemeCapabilities;
+import run.halo.app.theme.ThemeCapabilitiesService;
 import run.halo.app.theme.service.ThemeService;
 
 /**
@@ -76,6 +80,9 @@ class ThemeEndpointTest {
     @InjectMocks
     ThemeEndpoint themeEndpoint;
 
+    @Mock
+    ThemeCapabilitiesService themeCapabilitiesService;
+
     private Path tmpHaloWorkDir;
 
     WebTestClient webTestClient;
@@ -94,6 +101,27 @@ class ThemeEndpointTest {
     @AfterEach
     void tearDown() throws IOException {
         FileSystemUtils.deleteRecursively(tmpHaloWorkDir);
+    }
+
+    @Test
+    void shouldInspectTheRequestedInstalledTheme() {
+        var theme = new Theme();
+        var capabilities = new ThemeCapabilities(
+                List.of(), true, new Theme.ThemeStatus.PageLayout(), new UiPluginResources("none", null, null, null));
+        when(client.get(Theme.class, "inactive")).thenReturn(Mono.just(theme));
+        when(themeCapabilitiesService.inspect(theme)).thenReturn(Mono.just(capabilities));
+
+        webTestClient
+                .get()
+                .uri("/themes/inactive/capabilities")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.complete")
+                .isEqualTo(true)
+                .jsonPath("$.ui.kind")
+                .isEqualTo("none");
     }
 
     @Nested
