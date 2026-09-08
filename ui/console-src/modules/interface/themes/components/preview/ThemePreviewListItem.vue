@@ -30,7 +30,8 @@ const previewImage = computed(
   () => theme.value.status?.screenshot || theme.value.spec.logo
 );
 
-const { isActivated, handleActiveTheme } = useThemeLifeCycle(theme);
+const { isActivated, isActivationKnown, handleActiveTheme } =
+  useThemeLifeCycle(theme);
 </script>
 
 <template>
@@ -83,7 +84,10 @@ const { isActivated, handleActiveTheme } = useThemeLifeCycle(theme);
     </template>
 
     <template #dropdownItems>
-      <VDropdownItem v-if="!isActivated" @click="handleActiveTheme(true)">
+      <VDropdownItem
+        v-if="isActivationKnown && !isActivated"
+        @click="handleActiveTheme(true)"
+      >
         {{ $t("core.common.buttons.activate") }}
       </VDropdownItem>
       <VDropdownItem @click="emit('open-settings')">

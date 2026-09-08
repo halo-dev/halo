@@ -6,15 +6,7 @@ import { consoleApiClient } from "@halo-dev/api-client";
 import { QueryClient, VueQueryPlugin } from "@tanstack/vue-query";
 import { flushPromises, mount } from "@vue/test-utils";
 import { afterEach, beforeEach, expect, it, vi } from "vite-plus/test";
-import {
-  defineComponent,
-  h,
-  inject,
-  ref,
-  reactive,
-  toRefs,
-  type Ref,
-} from "vue";
+import { defineComponent, h, inject, ref, type Ref } from "vue";
 import { createI18n } from "vue-i18n";
 import { createMemoryHistory, createRouter, RouterView } from "vue-router";
 import ThemeSetting from "../../ThemeSetting.vue";
@@ -50,21 +42,15 @@ const { themes, state } = vi.hoisted(() => ({
 vi.mock("@console/layouts/BasicLayout.vue", () => ({
   default: { template: "<slot />" },
 }));
-vi.mock("@console/stores/theme", () => ({
-  useThemeStore: () =>
-    reactive({
-      activatedTheme:
-        state.activeIndex === undefined
-          ? undefined
-          : structuredClone(themes[state.activeIndex]),
-    }),
-}));
-vi.mock("pinia", () => ({ storeToRefs: (store: object) => toRefs(store) }));
 vi.mock("@/stores/plugin", () => ({
   usePluginModuleStore: () => ({ pluginModules: [] }),
 }));
 vi.mock("../../composables/use-theme", () => ({
-  useThemeLifeCycle: () => ({ loading: ref(false), isActivated: ref(true) }),
+  useThemeLifeCycle: () => ({
+    loading: ref(false),
+    isActivated: ref(true),
+    isActivationKnown: ref(true),
+  }),
 }));
 vi.mock("../../components/preview/ThemePreviewModal.vue", () => ({
   default: { template: "<div />" },
@@ -77,6 +63,7 @@ vi.mock("@halo-dev/api-client", async (importOriginal) => ({
   consoleApiClient: {
     theme: {
       theme: {
+        fetchActivatedTheme: vi.fn(),
         fetchThemeSetting: vi.fn(),
         listThemes: vi.fn(),
         fetchThemeJsonConfig: vi.fn(),
@@ -126,6 +113,17 @@ beforeEach(() => {
   state.activeIndex = 0;
   state.formLoad = undefined;
   vi.clearAllMocks();
+  vi.mocked(
+    consoleApiClient.theme.theme.fetchActivatedTheme
+  ).mockImplementation(
+    async () =>
+      ({
+        data:
+          state.activeIndex === undefined
+            ? null
+            : structuredClone(themes[state.activeIndex]),
+      }) as never
+  );
   closeModal.mockImplementation((complete) => complete());
   vi.mocked(consoleApiClient.theme.theme.listThemes).mockResolvedValue({
     data: { items: structuredClone(themes), hasNext: false },
@@ -536,3 +534,26 @@ it.each(["/theme?theme=other", "/theme/settings/style?theme=other"])(
     );
   }
 );
+
+it("waits for the default active theme and retries failures without showing a false empty state", async () => {
+  const pending =
+    Promise.withResolvers<
+      Awaited<
+        ReturnType<typeof consoleApiClient.theme.theme.fetchActivatedTheme>
+      >
+    >();
+  vi.mocked(
+    consoleApiClient.theme.theme.fetchActivatedTheme
+  ).mockReturnValueOnce(pending.promise);
+  const { wrapper } = await setup();
+  expect(wrapper.text()).not.toContain("core.theme.empty.title");
+  pending.reject(new Error("active theme unavailable"));
+  await flushPromises();
+  expect(wrapper.text()).toContain("core.common.status.loading_error");
+  await wrapper
+    .findAll("button")
+    .find((button) => button.text() === "core.common.buttons.retry")!
+    .trigger("click");
+  await flushPromises();
+  expect(wrapper.text()).toContain("active style");
+});

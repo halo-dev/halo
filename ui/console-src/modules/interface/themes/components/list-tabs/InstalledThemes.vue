@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { invalidateThemeQueries } from "@console/composables/use-activated-theme";
 import type { Theme } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
 import {
@@ -13,6 +14,7 @@ import {
   VLoading,
   VSpace,
 } from "@halo-dev/components";
+import { useQueryClient } from "@tanstack/vue-query";
 import { useFuse } from "@vueuse/integrations/useFuse";
 import { computed, inject, ref, shallowRef, watch, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
@@ -21,6 +23,7 @@ import ThemePreviewModal from "../preview/ThemePreviewModal.vue";
 import ThemeListItem from "../ThemeListItem.vue";
 
 const { t } = useI18n();
+const queryClient = useQueryClient();
 
 const selectedTheme = inject<Ref<Theme | undefined>>("selectedTheme", ref());
 const activeTabId = inject<Ref<string>>("activeTabId", ref(""));
@@ -64,8 +67,10 @@ const selectedThemes = computed(() => {
 
 watch(
   () => themes.value,
-  () => {
-    selectedThemeNames.value.length = 0;
+  (themes) => {
+    selectedThemeNames.value = selectedThemeNames.value.filter((name) =>
+      themes?.some((theme) => theme.metadata.name === name)
+    );
   },
   {
     immediate: true,
@@ -124,7 +129,7 @@ const uninstallSelectedThemes = async (
     Toast.error(t("core.common.toast.operation_failed"));
     console.error("Failed to uninstall themes in batch", error);
   } finally {
-    await refetch();
+    await invalidateThemeQueries(queryClient);
   }
 };
 

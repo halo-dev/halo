@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { useThemeStore } from "@console/stores/theme";
+import { useActivatedTheme } from "@console/composables/use-activated-theme";
 import type { FormKitSchemaCondition, FormKitSchemaNode } from "@formkit/core";
 import type {
   Setting,
@@ -19,6 +19,7 @@ import {
   Toast,
   VButton,
   VEntityContainer,
+  VEmpty,
   VLoading,
   VModal,
   VTabbar,
@@ -27,8 +28,7 @@ import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { cloneDeep } from "es-toolkit";
 import { set } from "es-toolkit/compat";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
-import { storeToRefs } from "pinia";
-import { computed, markRaw, onMounted, ref, toRaw } from "vue";
+import { computed, markRaw, watch, ref, toRaw } from "vue";
 import { useI18n } from "vue-i18n";
 import StickyBlock from "@/components/sticky-block/StickyBlock.vue";
 import ThemePreviewListItem from "./ThemePreviewListItem.vue";
@@ -56,12 +56,18 @@ interface SettingTab {
   label: string;
 }
 
-const { activatedTheme } = storeToRefs(useThemeStore());
+const selectedTheme = ref<Theme | undefined>(props.theme);
+
+const {
+  data: activatedTheme,
+  isInitialLoading: activeThemeLoading,
+  isError: activeThemeError,
+  refetch: refetchActiveTheme,
+} = useActivatedTheme(() => !props.theme && !selectedTheme.value);
 
 const previewFrame = ref<HTMLIFrameElement | null>(null);
 const themesVisible = ref(false);
 const switching = ref(false);
-const selectedTheme = ref<Theme>();
 
 const { data: themes } = useQuery<Theme[]>({
   queryKey: ["themes"],
@@ -75,9 +81,13 @@ const { data: themes } = useQuery<Theme[]>({
   },
 });
 
-onMounted(() => {
-  selectedTheme.value = toRaw(props.theme) || toRaw(activatedTheme?.value);
-});
+watch(
+  activatedTheme,
+  (theme) => {
+    if (!selectedTheme.value && theme) selectedTheme.value = toRaw(theme);
+  },
+  { immediate: true }
+);
 
 const handleOpenThemes = () => {
   settingsVisible.value = false;
@@ -90,7 +100,7 @@ const handleSelect = (theme: Theme) => {
 
 const previewUrl = computed(() => {
   if (!selectedTheme.value) {
-    return "#";
+    return undefined;
   }
   return `/?preview-theme=${selectedTheme.value.metadata.name}`;
 });
@@ -396,7 +406,23 @@ const iframeClasses = computed(() => {
       <div
         class="flex h-full flex-1 items-center justify-center transition-all duration-300"
       >
-        <VLoading v-if="!previewUrl" />
+        <VLoading v-if="!selectedTheme && activeThemeLoading" />
+        <VEmpty
+          v-else-if="!selectedTheme"
+          :title="
+            $t(
+              activeThemeError
+                ? 'core.common.status.loading_error'
+                : 'core.theme.empty.title'
+            )
+          "
+        >
+          <template v-if="activeThemeError" #actions>
+            <VButton @click="refetchActiveTheme()">{{
+              $t("core.common.buttons.retry")
+            }}</VButton>
+          </template>
+        </VEmpty>
         <iframe
           v-else
           ref="previewFrame"
