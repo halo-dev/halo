@@ -1,4 +1,6 @@
 /* eslint-disable vue/one-component-per-file -- Local component stubs for the selection integration test. */
+import { getNode } from "@formkit/core";
+import { defaultConfig, plugin as formKitPlugin } from "@formkit/vue";
 import type { Theme } from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
 import { QueryClient, VueQueryPlugin } from "@tanstack/vue-query";
@@ -15,6 +17,7 @@ import {
 } from "vue";
 import { createI18n } from "vue-i18n";
 import { createMemoryHistory, createRouter, RouterView } from "vue-router";
+import ThemeSetting from "../../ThemeSetting.vue";
 import ThemeLayout from "../ThemeLayout.vue";
 
 const { themes, state } = vi.hoisted(() => ({
@@ -72,7 +75,13 @@ vi.mock("@halo-dev/ui-shared", () => ({
 vi.mock("@halo-dev/api-client", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@halo-dev/api-client")>()),
   consoleApiClient: {
-    theme: { theme: { fetchThemeSetting: vi.fn(), listThemes: vi.fn() } },
+    theme: {
+      theme: {
+        fetchThemeSetting: vi.fn(),
+        listThemes: vi.fn(),
+        fetchThemeJsonConfig: vi.fn(),
+      },
+    },
   },
 }));
 vi.mock("../../components/list-tabs/InstalledThemes.vue", () => ({
@@ -145,7 +154,7 @@ const SettingsPage = defineComponent({
   },
 });
 
-async function setup(url = "/theme") {
+async function setup(url = "/theme", settingsPage = SettingsPage) {
   const router = createRouter({
     history: createMemoryHistory(),
     routes: [
@@ -153,11 +162,15 @@ async function setup(url = "/theme") {
         path: "/theme",
         component: ThemeLayout,
         children: [
-          { path: "", name: "ThemeDetail", component: { template: "<div />" } },
+          {
+            path: "",
+            name: "ThemeDetail",
+            component: { template: "<div data-detail />" },
+          },
           {
             path: "settings/:group",
             name: "ThemeSetting",
-            component: SettingsPage,
+            component: settingsPage,
           },
         ],
       },
@@ -171,6 +184,7 @@ async function setup(url = "/theme") {
     global: {
       plugins: [
         router,
+        [formKitPlugin, defaultConfig()],
         createI18n({
           legacy: false,
           locale: "en",
@@ -181,6 +195,8 @@ async function setup(url = "/theme") {
       ],
       directives: { permission: () => {} },
       stubs: {
+        BackToTop: true,
+        StickyBlock: SlotContainer,
         PageHeader: {
           ...SlotContainer,
           props: ["title"],
@@ -337,12 +353,15 @@ it("allows selecting a theme when none is activated", async () => {
   expect(wrapper.text()).toContain("other style");
 });
 
-it("replaces unavailable setting groups after loading and keeps the selection", async () => {
-  const { router } = await setup("/theme/settings/missing?theme=other");
-  await flushPromises();
-  expect(router.currentRoute.value.name).toBe("ThemeDetail");
-  expect(router.currentRoute.value.query.theme).toBe("other");
-});
+it.each(["missing", "detail"])(
+  "replaces unavailable setting group %s and keeps the selection",
+  async (group) => {
+    const { router } = await setup(`/theme/settings/${group}?theme=other`);
+    await flushPromises();
+    expect(router.currentRoute.value.name).toBe("ThemeDetail");
+    expect(router.currentRoute.value.query.theme).toBe("other");
+  }
+);
 
 it("clears a deleted selection after the installed list is invalidated", async () => {
   const { wrapper, queryClient } = await setup("/theme?theme=other");
@@ -417,7 +436,7 @@ it("allows retry after an installed-themes request fails without selecting the a
 it("removes the previous form while the next theme's async form loads", async () => {
   const { wrapper, router, queryClient } = await setup("/theme/settings/style");
   queryClient.setQueryData(["installed-themes"], themes);
-  queryClient.setQueryData(["theme-setting", themes[1]], {
+  queryClient.setQueryData(["theme-setting", "other", "other-setting"], {
     spec: { forms: [{ group: "style", label: "other style" }] },
   });
   const pending = Promise.withResolvers<void>();
@@ -453,3 +472,67 @@ it("replaces theme selections in history and waits for the modal close event", a
     expect(router.currentRoute.value.fullPath).toBe("/theme")
   );
 });
+
+it("preserves the real settings form when selected theme metadata changes", async () => {
+  vi.mocked(consoleApiClient.theme.theme.fetchThemeSetting).mockResolvedValue({
+    data: {
+      spec: {
+        forms: [
+          {
+            group: "style",
+            label: "Style",
+            formSchema: [{ $formkit: "text", name: "title" }],
+          },
+        ],
+      },
+    },
+  } as never);
+  vi.mocked(
+    consoleApiClient.theme.theme.fetchThemeJsonConfig
+  ).mockResolvedValue({ data: { style: { title: "saved" } } } as never);
+  const { wrapper, queryClient } = await setup(
+    "/theme/settings/style?theme=other",
+    ThemeSetting
+  );
+  const form = getNode("style")!;
+  await form.input({ title: "unsaved draft" });
+  await flushPromises();
+  const refreshed = structuredClone(themes);
+  refreshed[1].metadata.version = 2;
+  vi.mocked(consoleApiClient.theme.theme.listThemes).mockResolvedValue({
+    data: { items: refreshed, hasNext: false },
+  } as never);
+  await queryClient.invalidateQueries({ queryKey: ["installed-themes"] });
+  await flushPromises();
+  expect(getNode("style") === form).toBe(true);
+  expect(wrapper.get("input").element.value).toBe("unsaved draft");
+  expect(consoleApiClient.theme.theme.fetchThemeSetting).toHaveBeenCalledOnce();
+  expect(
+    consoleApiClient.theme.theme.fetchThemeJsonConfig
+  ).toHaveBeenCalledOnce();
+});
+
+it.each(["/theme?theme=other", "/theme/settings/style?theme=other"])(
+  "allows settings retry without blocking details at %s",
+  async (url) => {
+    vi.mocked(
+      consoleApiClient.theme.theme.fetchThemeSetting
+    ).mockRejectedValueOnce(new Error("settings unavailable"));
+    const { wrapper, router } = await setup(url);
+    expect(wrapper.find("[data-detail]").exists()).toBe(
+      router.currentRoute.value.name === "ThemeDetail"
+    );
+    expect(wrapper.find("[data-draft]").exists()).toBe(false);
+    expect(wrapper.text()).toContain("core.common.status.loading_error");
+    await wrapper
+      .findAll("button")
+      .find((button) => button.text() === "core.common.buttons.retry")!
+      .trigger("click");
+    await flushPromises();
+    expect(wrapper.text()).toContain("other style");
+    expect(wrapper.text()).not.toContain("core.common.status.loading_error");
+    expect(wrapper.find("[data-draft]").exists()).toBe(
+      router.currentRoute.value.name === "ThemeSetting"
+    );
+  }
+);

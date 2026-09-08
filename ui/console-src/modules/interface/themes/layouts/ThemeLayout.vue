@@ -90,7 +90,11 @@ const {
   isError: settingError,
   refetch: refetchSetting,
 } = useQuery<Setting>({
-  queryKey: ["theme-setting", selectedTheme],
+  queryKey: [
+    "theme-setting",
+    computed(() => selectedTheme.value?.metadata.name),
+    computed(() => selectedTheme.value?.spec.settingName),
+  ],
   queryFn: async () => {
     const { data } = await consoleApiClient.theme.theme.fetchThemeSetting({
       name: selectedTheme.value?.metadata.name as string,
@@ -157,7 +161,11 @@ watch(
       selectedTheme.value &&
       !settingLoading.value &&
       !settingError.value &&
-      !tabs.value.some((tab) => tab.id === route.params.group)
+      !tabs.value.some(
+        (tab) =>
+          tab.route.name === "ThemeSetting" &&
+          tab.route.params?.group === route.params.group
+      )
     ) {
       void router.replace({
         name: "ThemeDetail",
@@ -206,15 +214,13 @@ watch(
     </VPageHeader>
 
     <div class="m-0 md:m-4">
-      <VLoading v-if="(themeName && themesLoading) || settingLoading" />
+      <VLoading v-if="themeName && themesLoading" />
       <VEmpty
-        v-else-if="
-          (themeName && themesError && !themes) || (settingError && !setting)
-        "
+        v-else-if="themeName && themesError && !themes"
         :title="$t('core.common.status.loading_error')"
       >
         <template #actions>
-          <VButton @click="settingError ? refetchSetting() : refetchThemes()">
+          <VButton @click="refetchThemes()">
             {{ $t("core.common.buttons.retry") }}
           </VButton>
         </template>
@@ -257,7 +263,24 @@ watch(
             ></VTabbar>
           </template>
           <div class="rounded-b-base bg-white">
-            <RouterView v-slot="{ Component }">
+            <VEmpty
+              v-if="settingError && !setting"
+              :title="$t('core.common.status.loading_error')"
+            >
+              <template #actions>
+                <VButton @click="refetchSetting()">{{
+                  $t("core.common.buttons.retry")
+                }}</VButton>
+              </template>
+            </VEmpty>
+            <VLoading v-if="route.name === 'ThemeSetting' && settingLoading" />
+            <RouterView
+              v-if="
+                route.name !== 'ThemeSetting' ||
+                (!settingLoading && !(settingError && !setting))
+              "
+              v-slot="{ Component }"
+            >
               <template v-if="Component">
                 <Suspense :key="selectedTheme.metadata.name">
                   <component :is="Component"></component>
