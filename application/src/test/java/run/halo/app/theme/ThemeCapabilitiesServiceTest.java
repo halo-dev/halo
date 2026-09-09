@@ -12,16 +12,23 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.boot.thymeleaf.autoconfigure.ThymeleafProperties;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 import run.halo.app.core.extension.Theme;
 import run.halo.app.extension.Metadata;
+import run.halo.app.infra.SystemConfigFetcher;
+import run.halo.app.infra.SystemSetting.ThemeRouteRules;
 import run.halo.app.infra.ThemeRootGetter;
 import run.halo.app.plugin.UiPluginBundleService;
+import run.halo.app.plugin.UiPluginResources;
 
 class ThemeCapabilitiesServiceTest {
     @TempDir
     Path root;
 
     ThemeCapabilitiesService service;
+    SystemConfigFetcher configFetcher;
+    UiPluginBundleService uiBundleService;
     Theme theme;
     Path templates;
 
@@ -29,11 +36,14 @@ class ThemeCapabilitiesServiceTest {
     void setUp() throws IOException {
         var getter = mock(ThemeRootGetter.class);
         when(getter.get()).thenReturn(root);
+        configFetcher = mock(SystemConfigFetcher.class);
+        uiBundleService = mock(UiPluginBundleService.class);
         service = new ThemeCapabilitiesService(
                 getter,
                 new ThymeleafProperties(),
                 new ThemeLayoutCompatibilityChecker(),
-                mock(UiPluginBundleService.class));
+                uiBundleService,
+                configFetcher);
         theme = new Theme();
         theme.setMetadata(new Metadata());
         theme.getMetadata().setName("sample");
@@ -56,7 +66,6 @@ class ThemeCapabilitiesServiceTest {
 
         var result = service.inspectTemplates(theme);
 
-        assertThat(result.complete()).isTrue();
         assertThat(result.templates())
                 .filteredOn(file -> file.path().equals("signup.html"))
                 .singleElement()
@@ -65,16 +74,13 @@ class ThemeCapabilitiesServiceTest {
                 .filteredOn(file -> file.path().equals("post.html"))
                 .singleElement()
                 .satisfies(file -> {
-                    assertThat(file.state()).isEqualTo("available");
                     assertThat(file.usages())
                             .extracting(ThemeCapabilities.ThemeTemplateUsage::type)
                             .containsExactly("system", "custom");
                 });
         assertThat(result.templates())
-                .filteredOn(file -> file.path().equals("missing.html"))
-                .singleElement()
-                .extracting(ThemeCapabilities.ThemeTemplateFile::state)
-                .isEqualTo("missing");
+                .extracting(ThemeCapabilities.ThemeTemplateFile::path)
+                .doesNotContain("missing.html", "index.html", "layout.html");
         assertThat(result.templates())
                 .filteredOn(file -> file.path().equals("moments.html"))
                 .singleElement()
@@ -98,22 +104,40 @@ class ThemeCapabilitiesServiceTest {
         var result = service.inspectTemplates(theme);
 
         assertThat(result.pageLayout().getState()).isEqualTo(Theme.PageLayoutState.INVALID);
-        assertThat(result.templates())
-                .filteredOn(file -> file.usages().stream()
-                        .anyMatch(usage ->
-                                usage.type().equals("custom") || usage.type().equals("layout")))
-                .allSatisfy(file -> assertThat(file.state()).isEqualTo("invalid"));
+        assertThat(result.templates()).isEmpty();
     }
 
     @Test
-    void shouldReportIncompleteScanForLinkedDirectoriesAndEntryLimit() throws IOException {
+    void shouldScanAllTemplatesWithoutFollowingLinkedDirectories() throws IOException {
         Files.createSymbolicLink(templates.resolve("linked"), root);
-        assertThat(service.inspectTemplates(theme).complete()).isFalse();
-        Files.delete(templates.resolve("linked"));
-        for (int i = 0; i < ThemeCapabilitiesService.MAX_ENTRIES; i++) {
+        for (int i = 0; i < 2100; i++) {
             Files.createFile(templates.resolve(i + ".html"));
         }
-        assertThat(service.inspectTemplates(theme).complete()).isFalse();
+        assertThat(service.inspectTemplates(theme).templates()).hasSize(2100);
+    }
+
+    @Test
+    void shouldSkipStaticAssets() throws IOException {
+        var assets = Files.createDirectories(templates.resolve("assets"));
+        Files.writeString(assets.resolve("qrcode-share.html"), "static page");
+        for (int i = 0; i < 2100; i++) {
+            Files.createFile(assets.resolve(i + ".html"));
+        }
+        Files.writeString(templates.resolve("moments.html"), "plugin page");
+
+        var result = service.inspectTemplates(theme);
+
+        assertThat(result.templates())
+                .extracting(ThemeCapabilities.ThemeTemplateFile::path)
+                .contains("moments.html")
+                .noneMatch(path -> path.startsWith("assets/"));
+    }
+
+    @Test
+    void shouldSkipLinkedStaticAssets() throws IOException {
+        Files.createSymbolicLink(templates.resolve("assets"), root);
+
+        assertThat(service.inspectTemplates(theme).templates()).isEmpty();
     }
 
     @Test
@@ -123,6 +147,41 @@ class ThemeCapabilitiesServiceTest {
         assertThat(service.inspectTemplates(theme).pageLayout().getState()).isEqualTo(Theme.PageLayoutState.SUPPORTED);
         Files.writeString(templates.resolve("layout.html"), "<html></html>");
         assertThat(service.inspectTemplates(theme).pageLayout().getState()).isEqualTo(Theme.PageLayoutState.INVALID);
+    }
+
+    @Test
+    void shouldProvideCurrentNormalizedRoutePatterns() {
+        when(uiBundleService.getThemeUiResources(theme))
+                .thenReturn(Mono.just(new UiPluginResources("none", null, null, null)));
+        var rules = ThemeRouteRules.empty();
+        when(configFetcher.fetchRouteRules()).thenReturn(Mono.just(rules));
+
+        StepVerifier.create(service.inspect(theme))
+                .assertNext(result -> assertThat(result.routes())
+                        .containsEntry("archives.html", "/archives")
+                        .containsEntry("category.html", "/categories/{slug}")
+                        .containsEntry("tag.html", "/tags/{slug}")
+                        .containsEntry("post.html", "/archives/{slug}")
+                        .containsEntry("author.html", "/authors/{name}")
+                        .containsEntry("page.html", "/{slug}"))
+                .verifyComplete();
+
+        rules.setArchives(" journal/ ");
+        rules.setCategories(" topics/ ");
+        rules.setTags(" labels/ ");
+        rules.setPost("/categories/{categorySlug}/{slug}");
+        StepVerifier.create(service.inspect(theme))
+                .assertNext(result -> assertThat(result.routes())
+                        .containsEntry("archives.html", "/journal")
+                        .containsEntry("category.html", "/topics/{slug}")
+                        .containsEntry("tag.html", "/labels/{slug}")
+                        .containsEntry("post.html", "/topics/{categorySlug}/{slug}"))
+                .verifyComplete();
+
+        rules.setPost("/archives/{name}");
+        StepVerifier.create(service.inspect(theme))
+                .assertNext(result -> assertThat(result.routes()).containsEntry("post.html", "/journal/{name}"))
+                .verifyComplete();
     }
 
     private static Theme.TemplateDescriptor declaration(String file) {

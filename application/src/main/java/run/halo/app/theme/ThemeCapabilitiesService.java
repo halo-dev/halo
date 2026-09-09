@@ -1,5 +1,8 @@
 package run.halo.app.theme;
 
+import static run.halo.app.theme.utils.PatternUtils.normalizePattern;
+import static run.halo.app.theme.utils.PatternUtils.normalizePostPattern;
+
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -19,6 +22,8 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import run.halo.app.core.extension.Theme;
+import run.halo.app.infra.SystemConfigFetcher;
+import run.halo.app.infra.SystemSetting.ThemeRouteRules;
 import run.halo.app.infra.ThemeRootGetter;
 import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.plugin.UiPluginBundleService;
@@ -28,9 +33,6 @@ import run.halo.app.theme.ThemeCapabilities.ThemeTemplateUsage;
 @Component
 @RequiredArgsConstructor
 public class ThemeCapabilitiesService {
-    // ponytail: bound directory inspection; use paginated traversal if larger themes need full inventories.
-    static final int MAX_ENTRIES = 2000;
-
     private static final Set<String> SYSTEM_PAGE_TEMPLATES = Set.of(
             "login",
             "signup",
@@ -47,13 +49,41 @@ public class ThemeCapabilitiesService {
     private final ThemeLayoutCompatibilityChecker layoutChecker;
     private final UiPluginBundleService uiPluginBundleService;
 
+    private final SystemConfigFetcher systemConfigFetcher;
+
     public Mono<ThemeCapabilities> inspect(Theme theme) {
-        return Mono.fromCallable(() -> inspectTemplates(theme))
-                .subscribeOn(Schedulers.boundedElastic())
-                .zipWith(uiPluginBundleService.getThemeUiResources(theme))
+        return Mono.zip(
+                        Mono.fromCallable(() -> inspectTemplates(theme)).subscribeOn(Schedulers.boundedElastic()),
+                        uiPluginBundleService.getThemeUiResources(theme),
+                        systemConfigFetcher.fetchRouteRules().defaultIfEmpty(ThemeRouteRules.empty()))
                 .map(result -> new ThemeCapabilities(
-                        result.getT1().templates(), result.getT1().complete(),
+                        result.getT1().templates(), routes(result.getT3()),
                         result.getT1().pageLayout(), result.getT2()));
+    }
+
+    private Map<String, String> routes(ThemeRouteRules rules) {
+        var suffix = thymeleafProperties.getSuffix();
+        var categories = normalizePattern(rules.getCategories());
+        var tags = normalizePattern(rules.getTags());
+        return Map.of(
+                "index" + suffix,
+                "/",
+                "archives" + suffix,
+                normalizePattern(rules.getArchives()),
+                "categories" + suffix,
+                categories,
+                "category" + suffix,
+                categories + "/{slug}",
+                "tags" + suffix,
+                tags,
+                "tag" + suffix,
+                tags + "/{slug}",
+                "post" + suffix,
+                normalizePostPattern(rules),
+                "page" + suffix,
+                "/{slug}",
+                "author" + suffix,
+                "/authors/{name}");
     }
 
     TemplateInventory inspectTemplates(Theme theme) throws IOException {
@@ -79,77 +109,49 @@ public class ThemeCapabilitiesService {
             addCustomTemplates(usages, custom.getPage(), "page", suffix);
         }
 
-        var complete = new boolean[] {true};
         if (Files.exists(templates, LinkOption.NOFOLLOW_LINKS)) {
-            if (!Files.isDirectory(templates) || !templates.toRealPath().startsWith(realThemePath)) {
-                complete[0] = false;
-            } else {
-                try {
-                    var realTemplates = templates.toRealPath();
-                    Files.walkFileTree(realTemplates, new SimpleFileVisitor<>() {
-                        private int visited;
-
-                        private FileVisitResult visit() {
-                            if (++visited > MAX_ENTRIES) {
-                                complete[0] = false;
-                                return FileVisitResult.TERMINATE;
-                            }
-                            return FileVisitResult.CONTINUE;
-                        }
-
-                        @Override
-                        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
-                            return visit();
-                        }
-
-                        @Override
-                        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                            if (visit() == FileVisitResult.TERMINATE) {
-                                return FileVisitResult.TERMINATE;
-                            }
-                            if (attrs.isSymbolicLink() && Files.isDirectory(file)) {
-                                complete[0] = false;
-                            }
-                            var path = realTemplates.relativize(file).toString().replace('\\', '/');
-                            if (path.endsWith(suffix)) {
-                                var name = path.substring(0, path.length() - suffix.length());
-                                var errorTemplate =
-                                        name.equals("error") || name.matches("error/(?:[45][0-9]{2}|[45]xx|error)");
-                                if (errorTemplate || SYSTEM_PAGE_TEMPLATES.contains(name)) {
-                                    addUsage(
-                                            usages,
-                                            path,
-                                            new ThemeTemplateUsage(
-                                                    "system", errorTemplate ? "error" : null, null, null));
-                                } else {
-                                    usages.computeIfAbsent(
-                                            path,
-                                            ignored -> new ArrayList<>(
-                                                    List.of(new ThemeTemplateUsage("other", null, null, null))));
-                                }
-                            }
-                            return FileVisitResult.CONTINUE;
-                        }
-
-                        @Override
-                        public FileVisitResult visitFileFailed(Path file, IOException exc) {
-                            complete[0] = false;
-                            return visit();
-                        }
-                    });
-                } catch (IOException e) {
-                    complete[0] = false;
-                }
+            var realTemplates = templates.toRealPath();
+            if (!Files.isDirectory(realTemplates) || !realTemplates.startsWith(realThemePath)) {
+                throw new IOException("The templates directory must be inside the theme directory.");
             }
+            Files.walkFileTree(realTemplates, new SimpleFileVisitor<>() {
+                @Override
+                public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
+                    return dir.equals(realTemplates.resolve("assets"))
+                            ? FileVisitResult.SKIP_SUBTREE
+                            : FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+                    var path = realTemplates.relativize(file).toString().replace('\\', '/');
+                    if (path.endsWith(suffix)) {
+                        var name = path.substring(0, path.length() - suffix.length());
+                        var errorTemplate = name.equals("error") || name.matches("error/(?:[45][0-9]{2}|[45]xx|error)");
+                        if (errorTemplate || SYSTEM_PAGE_TEMPLATES.contains(name)) {
+                            addUsage(
+                                    usages,
+                                    path,
+                                    new ThemeTemplateUsage("system", errorTemplate ? "error" : null, null, null));
+                        } else {
+                            usages.computeIfAbsent(
+                                    path,
+                                    ignored -> new ArrayList<>(
+                                            List.of(new ThemeTemplateUsage("other", null, null, null))));
+                        }
+                    }
+                    return FileVisitResult.CONTINUE;
+                }
+            });
         }
         var files = usages.entrySet().stream()
+                .filter(entry -> isReadableTemplate(templates, realThemePath, entry.getKey()))
                 .sorted(Map.Entry.comparingByKey())
-                .map(entry -> new ThemeTemplateFile(
-                        entry.getKey(), fileState(templates, realThemePath, entry.getKey()), entry.getValue()))
+                .map(entry -> new ThemeTemplateFile(entry.getKey(), entry.getValue()))
                 .toList();
-        var layoutState = fileState(templates, realThemePath, "layout.html");
         Theme.ThemeStatus.PageLayout layout;
-        if (layoutState.equals("available") || layoutState.equals("missing")) {
+        if (!Files.exists(templates.resolve("layout.html"), LinkOption.NOFOLLOW_LINKS)
+                || isReadableTemplate(templates, realThemePath, "layout.html")) {
             layout = layoutChecker.check(realThemePath);
         } else {
             layout = new Theme.ThemeStatus.PageLayout();
@@ -158,7 +160,7 @@ public class ThemeCapabilitiesService {
             layout.setReason("UnreadableLayoutTemplate");
             layout.setMessage("The layout template is not readable inside the theme templates directory.");
         }
-        return new TemplateInventory(files, complete[0], layout);
+        return new TemplateInventory(files, layout);
     }
 
     private static void addCustomTemplates(
@@ -175,7 +177,7 @@ public class ThemeCapabilitiesService {
                 var normalized = Path.of(file).normalize().toString().replace('\\', '/');
                 file = normalized.endsWith(suffix) ? normalized : normalized + suffix;
             } catch (InvalidPathException e) {
-                // Preserve invalid declarations so administrators can see the problem.
+                // Invalid declarations are excluded by the readability check.
             }
             addUsage(
                     usages,
@@ -188,33 +190,20 @@ public class ThemeCapabilitiesService {
         usages.computeIfAbsent(file, ignored -> new ArrayList<>()).add(usage);
     }
 
-    private static String fileState(Path templates, Path themePath, String file) {
+    private static boolean isReadableTemplate(Path templates, Path themePath, String file) {
         try {
             var path = templates.resolve(file).normalize();
-            if (!path.startsWith(templates) || Path.of(file).isAbsolute()) {
-                return "invalid";
-            }
-            if (!Files.exists(templates, LinkOption.NOFOLLOW_LINKS)) {
-                return "missing";
+            if (!path.startsWith(templates) || Path.of(file).isAbsolute() || !Files.isRegularFile(path)) {
+                return false;
             }
             var realTemplates = templates.toRealPath();
-            if (!realTemplates.startsWith(themePath)) {
-                return "invalid";
-            }
-            if (!Files.exists(path, LinkOption.NOFOLLOW_LINKS)) {
-                return "missing";
-            }
-            if (!path.toRealPath().startsWith(realTemplates)) {
-                return "invalid";
-            }
-            return Files.isRegularFile(path) && Files.isReadable(path) ? "available" : "unreadable";
-        } catch (InvalidPathException e) {
-            return "invalid";
-        } catch (IOException e) {
-            return "unreadable";
+            return realTemplates.startsWith(themePath)
+                    && path.toRealPath().startsWith(realTemplates)
+                    && Files.isReadable(path);
+        } catch (InvalidPathException | IOException e) {
+            return false;
         }
     }
 
-    record TemplateInventory(
-            List<ThemeTemplateFile> templates, boolean complete, Theme.ThemeStatus.PageLayout pageLayout) {}
+    record TemplateInventory(List<ThemeTemplateFile> templates, Theme.ThemeStatus.PageLayout pageLayout) {}
 }

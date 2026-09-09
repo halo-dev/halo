@@ -22,17 +22,6 @@ export interface ThemeTemplateFile {
      * Path relative to the templates directory.
      */
     'path': string;
-    'state': ThemeTemplateFileStateEnum;
     'usages': Array<ThemeTemplateUsage>;
 }
-
-export const ThemeTemplateFileStateEnum = {
-    Available: 'available',
-    Missing: 'missing',
-    Unreadable: 'unreadable',
-    Invalid: 'invalid'
-} as const;
-
-export type ThemeTemplateFileStateEnum = typeof ThemeTemplateFileStateEnum[keyof typeof ThemeTemplateFileStateEnum];
-
 

@@ -107,7 +107,10 @@ class ThemeEndpointTest {
     void shouldInspectTheRequestedInstalledTheme() {
         var theme = new Theme();
         var capabilities = new ThemeCapabilities(
-                List.of(), true, new Theme.ThemeStatus.PageLayout(), new UiPluginResources("none", null, null, null));
+                List.of(),
+                Map.of("archives.html", "/archives"),
+                new Theme.ThemeStatus.PageLayout(),
+                new UiPluginResources("none", null, null, null));
         when(client.get(Theme.class, "inactive")).thenReturn(Mono.just(theme));
         when(themeCapabilitiesService.inspect(theme)).thenReturn(Mono.just(capabilities));
 
@@ -118,8 +121,10 @@ class ThemeEndpointTest {
                 .expectStatus()
                 .isOk()
                 .expectBody()
+                .jsonPath("$.routes['archives.html']")
+                .isEqualTo("/archives")
                 .jsonPath("$.complete")
-                .isEqualTo(true)
+                .doesNotExist()
                 .jsonPath("$.ui.kind")
                 .isEqualTo("none");
     }

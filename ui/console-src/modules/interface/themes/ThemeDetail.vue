@@ -231,12 +231,6 @@ const { handleExportThemeConfiguration, openSelectImportFileDialog } =
                     : t("core.common.status.not_activated")
                 }}
               </VTag>
-              <VTag
-                v-if="selectedTheme?.status?.inDevelopment"
-                v-tooltip="$t('core.theme.detail.in_development_tooltip')"
-              >
-                {{ $t("core.theme.detail.in_development") }}
-              </VTag>
               <VStatusDot
                 v-if="getFailedMessage()"
                 v-tooltip="getFailedMessage()"
@@ -420,21 +414,7 @@ const { handleExportThemeConfiguration, openSelectImportFileDialog } =
               <span v-for="summary in templateSummaries" :key="summary.type">
                 {{ $t(getUsageTypeLabelKey(summary.type)) }}
                 <span class="font-medium">{{ summary.total }}</span>
-                <span
-                  v-if="summary.unavailable > 0"
-                  v-tooltip="
-                    $t('core.theme.templates.unavailable_count', {
-                      count: summary.unavailable,
-                    })
-                  "
-                  class="text-red-600"
-                >
-                  ({{ summary.unavailable }})
-                </span>
               </span>
-            </p>
-            <p v-if="!capabilities.complete" class="text-xs text-yellow-600">
-              {{ $t("core.theme.templates.incomplete_notice") }}
             </p>
             <div>
               <VButton size="sm" @click="templatesModalVisible = true">
@@ -445,35 +425,27 @@ const { handleExportThemeConfiguration, openSelectImportFileDialog } =
         </VDescriptionItem>
         <VDescriptionItem :label="$t('core.theme.detail.fields.ui')">
           <div class="space-y-2">
-            <div class="flex flex-wrap items-center gap-2">
-              <VTag v-if="uiResources?.kind === 'esm'">ESM</VTag>
-              <VTag v-else-if="uiResources?.kind === 'legacy'">Legacy</VTag>
-              <template v-else-if="uiResources?.kind === 'invalid'">
+            <span v-if="uiResources?.kind === 'none'">
+              {{ $t("core.theme.ui.kind.none") }}
+            </span>
+            <template v-else>
+              <div
+                v-if="uiResources?.kind === 'invalid'"
+                class="flex flex-wrap items-center gap-2"
+              >
                 <VStatusDot state="error" />
                 <span>{{ $t("core.theme.ui.kind.invalid") }}</span>
-              </template>
-              <span v-else>{{ $t("core.theme.ui.kind.none") }}</span>
-              <span
-                v-if="uiResources?.reason"
-                class="break-all text-xs text-gray-500"
+                <span
+                  v-if="uiResources?.reason"
+                  class="break-all text-xs text-gray-500"
+                >
+                  {{ uiResources.reason }}
+                </span>
+              </div>
+              <div
+                v-if="uiLoadStateLabelKey"
+                class="flex flex-wrap items-center gap-2"
               >
-                {{ uiResources.reason }}
-              </span>
-            </div>
-            <template v-if="uiResources?.kind !== 'none'">
-              <p
-                v-if="uiResources?.entry"
-                class="break-all text-xs text-gray-500"
-              >
-                {{ uiResources.entry }}
-              </p>
-              <p
-                v-if="uiResources?.style"
-                class="break-all text-xs text-gray-500"
-              >
-                {{ uiResources.style }}
-              </p>
-              <div v-if="uiLoadStateLabelKey" class="flex items-center gap-2">
                 <VStatusDot
                   :state="uiLoadStateDotState"
                   :animate="loadState === 'pending'"
@@ -498,25 +470,25 @@ const { handleExportThemeConfiguration, openSelectImportFileDialog } =
               <p v-if="versionMismatch" class="text-xs text-yellow-600">
                 {{ $t("core.theme.ui.version_mismatch") }}
               </p>
-            </template>
-            <template v-if="moduleSummary">
-              <p
-                v-if="hasDeclaredCapabilities(moduleSummary)"
-                class="flex flex-wrap items-center gap-x-4 gap-y-1"
-              >
-                <span v-for="entry in uiSummaryEntries" :key="entry.labelKey">
-                  {{ $t(entry.labelKey) }}
-                  <span class="font-medium">{{ entry.count }}</span>
-                </span>
-              </p>
-              <p v-else class="text-xs text-gray-500">
-                {{ $t("core.theme.ui.declared.none") }}
-              </p>
-              <div v-if="hasDeclaredCapabilities(moduleSummary)">
-                <VButton size="sm" @click="uiCapabilitiesModalVisible = true">
-                  {{ $t("core.theme.ui.declared.view") }}
-                </VButton>
-              </div>
+              <template v-if="moduleSummary">
+                <p
+                  v-if="hasDeclaredCapabilities(moduleSummary)"
+                  class="flex flex-wrap items-center gap-x-4 gap-y-1"
+                >
+                  <span v-for="entry in uiSummaryEntries" :key="entry.labelKey">
+                    {{ $t(entry.labelKey) }}
+                    <span class="font-medium">{{ entry.count }}</span>
+                  </span>
+                </p>
+                <p v-else class="text-xs text-gray-500">
+                  {{ $t("core.theme.ui.declared.none") }}
+                </p>
+                <div v-if="hasDeclaredCapabilities(moduleSummary)">
+                  <VButton size="sm" @click="uiCapabilitiesModalVisible = true">
+                    {{ $t("core.theme.ui.declared.view") }}
+                  </VButton>
+                </div>
+              </template>
             </template>
           </div>
         </VDescriptionItem>
@@ -525,7 +497,7 @@ const { handleExportThemeConfiguration, openSelectImportFileDialog } =
     <ThemeTemplatesModal
       v-if="templatesModalVisible && capabilities"
       :templates="capabilities.templates"
-      :complete="capabilities.complete"
+      :routes="capabilities.routes"
       @close="templatesModalVisible = false"
     />
     <ThemeUiCapabilitiesModal

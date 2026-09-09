@@ -27,11 +27,11 @@ import type { UiPluginResources } from './ui-plugin-resources';
  * File capabilities of an installed theme; these do not imply successful rendering or UI registration.
  */
 export interface ThemeCapabilities {
-    /**
-     * Whether the entire template directory was inspected.
-     */
-    'complete': boolean;
     'pageLayout': PageLayout;
+    /**
+     * Public route patterns indexed by template path.
+     */
+    'routes': { [key: string]: string; };
     'templates': Array<ThemeTemplateFile>;
     'ui': UiPluginResources;
 }

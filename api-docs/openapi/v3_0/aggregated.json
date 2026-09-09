@@ -23815,19 +23815,23 @@
       },
       "ThemeCapabilities": {
         "required": [
-          "complete",
           "pageLayout",
+          "routes",
           "templates",
           "ui"
         ],
         "type": "object",
         "properties": {
-          "complete": {
-            "type": "boolean",
-            "description": "Whether the entire template directory was inspected."
-          },
           "pageLayout": {
             "$ref": "#/components/schemas/PageLayout"
+          },
+          "routes": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "description": "Public route patterns indexed by template path."
+            },
+            "description": "Public route patterns indexed by template path."
           },
           "templates": {
             "type": "array",
@@ -24021,7 +24025,6 @@
       "ThemeTemplateFile": {
         "required": [
           "path",
-          "state",
           "usages"
         ],
         "type": "object",
@@ -24029,15 +24032,6 @@
           "path": {
             "type": "string",
             "description": "Path relative to the templates directory."
-          },
-          "state": {
-            "type": "string",
-            "enum": [
-              "available",
-              "missing",
-              "unreadable",
-              "invalid"
-            ]
           },
           "usages": {
             "type": "array",

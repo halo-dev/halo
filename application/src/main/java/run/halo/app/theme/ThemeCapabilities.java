@@ -4,6 +4,7 @@ import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
+import java.util.Map;
 import org.jspecify.annotations.Nullable;
 import run.halo.app.core.extension.Theme.ThemeStatus.PageLayout;
 import run.halo.app.plugin.UiPluginResources;
@@ -12,8 +13,8 @@ import run.halo.app.plugin.UiPluginResources;
 public record ThemeCapabilities(
         @Schema(requiredMode = REQUIRED) List<ThemeTemplateFile> templates,
 
-        @Schema(requiredMode = REQUIRED, description = "Whether the entire template directory was inspected.")
-        boolean complete,
+        @Schema(requiredMode = REQUIRED, description = "Public route patterns indexed by template path.")
+        Map<String, String> routes,
 
         @Schema(requiredMode = REQUIRED) PageLayout pageLayout,
         @Schema(requiredMode = REQUIRED) UiPluginResources ui) {
@@ -21,11 +22,6 @@ public record ThemeCapabilities(
     public record ThemeTemplateFile(
             @Schema(requiredMode = REQUIRED, description = "Path relative to the templates directory.")
             String path,
-
-            @Schema(
-                    requiredMode = REQUIRED,
-                    allowableValues = {"available", "missing", "unreadable", "invalid"})
-            String state,
 
             @Schema(requiredMode = REQUIRED) List<ThemeTemplateUsage> usages) {}
 
