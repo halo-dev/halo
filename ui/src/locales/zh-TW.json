@@ -1065,6 +1065,7 @@
   "core.components.pagination.page_label": "頁",
   "core.components.pagination.size_label": "條 / 頁",
   "core.components.pagination.total_label": "共 {total} 項資料",
+  "core.components.uppy_upload.fields.file_name": "檔案名稱",
   "core.components.user_avatar.title": "頭像",
   "core.components.user_avatar.toast_upload_failed": "上傳頭像失敗",
   "core.components.user_avatar.toast_remove_failed": "刪除頭像失敗",
