@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -75,11 +76,13 @@ public class UserReconciler implements Reconciler<Request>, UserPreCreatingHandl
                 var personalAccessTokensPending = deleteUserPersonalAccessTokens(request.name());
                 var connectionsPending = deleteUserConnections(request.name());
                 var roleBindingsPending = deleteUserRoleBindings(request.name());
+                var avatarsPending = deleteUserAvatars(user);
                 if (rememberMeTokensPending
                         || devicesPending
                         || personalAccessTokensPending
                         || connectionsPending
-                        || roleBindingsPending) {
+                        || roleBindingsPending
+                        || avatarsPending) {
                     throw new RequeueException(new Result(true, null), "User data is not deleted yet");
                 }
                 removeFinalizers(user.getMetadata(), Set.of(FINALIZER_NAME));
@@ -194,6 +197,22 @@ public class UserReconciler implements Reconciler<Request>, UserPreCreatingHandl
         return UriComponentsBuilder.fromUri(externalUrlSupplier.get())
                 .pathSegment("authors", user.getMetadata().getName())
                 .toUriString();
+    }
+
+    private boolean deleteUserAvatars(User user) {
+        var annotations = user.getMetadata().getAnnotations();
+        if (CollectionUtils.isEmpty(annotations)) {
+            return false;
+        }
+        var attachments = Stream.of(
+                        annotations.get(User.AVATAR_ATTACHMENT_NAME_ANNO),
+                        annotations.get(User.LAST_AVATAR_ATTACHMENT_NAME_ANNO))
+                .filter(StringUtils::isNotBlank)
+                .distinct()
+                .flatMap(name -> client.fetch(Attachment.class, name).stream())
+                .toList();
+        attachments.stream().filter(attachment -> !isDeleted(attachment)).forEach(client::delete);
+        return !attachments.isEmpty();
     }
 
     boolean deleteUserConnections(String username) {

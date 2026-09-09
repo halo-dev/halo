@@ -15,11 +15,15 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -31,6 +35,7 @@ import run.halo.app.core.extension.RememberMeToken;
 import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.UserConnection;
+import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.user.service.RoleService;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
@@ -195,6 +200,66 @@ class UserReconcilerTest {
 
         userReconciler.reconcile(new Reconciler.Request("fake-user"));
 
+        verify(client).update(user);
+        assertFalse(user.getMetadata().getFinalizers().contains("user-protection"));
+    }
+
+    @ParameterizedTest
+    @CsvSource({"avatar, avatar", "new-avatar, old-avatar", "avatar, ''", "'', old-avatar"})
+    void shouldWaitForAvatarDeletionBeforeRemovingUserFinalizer(String currentAvatar, String lastAvatar) {
+        var user = deletingUser("fake-user");
+        user.getMetadata()
+                .setAnnotations(Map.of(
+                        User.AVATAR_ATTACHMENT_NAME_ANNO, currentAvatar,
+                        User.LAST_AVATAR_ATTACHMENT_NAME_ANNO, lastAvatar));
+        when(client.fetch(User.class, "fake-user")).thenReturn(Optional.of(user));
+        when(roleService.listRoleBindings(any())).thenReturn(Flux.empty());
+        var attachments = Stream.of(currentAvatar, lastAvatar)
+                .filter(name -> !name.isBlank())
+                .distinct()
+                .map(name -> {
+                    var attachment = new Attachment();
+                    attachment.setMetadata(new Metadata());
+                    attachment.getMetadata().setName(name);
+                    when(client.fetch(Attachment.class, name)).thenReturn(Optional.of(attachment));
+                    return attachment;
+                })
+                .toList();
+
+        assertThrows(RequeueException.class, () -> userReconciler.reconcile(new Reconciler.Request("fake-user")));
+        attachments.forEach(attachment -> {
+            verify(client).delete(attachment);
+            attachment.getMetadata().setDeletionTimestamp(Instant.now());
+        });
+
+        assertThrows(RequeueException.class, () -> userReconciler.reconcile(new Reconciler.Request("fake-user")));
+        verify(client, never()).update(user);
+        assertEquals(Set.of("user-protection"), user.getMetadata().getFinalizers());
+        attachments.forEach(attachment -> {
+            verify(client).delete(attachment);
+            when(client.fetch(Attachment.class, attachment.getMetadata().getName()))
+                    .thenReturn(Optional.empty());
+        });
+
+        userReconciler.reconcile(new Reconciler.Request("fake-user"));
+
+        verify(client).update(user);
+        assertFalse(user.getMetadata().getFinalizers().contains("user-protection"));
+    }
+
+    @Test
+    void shouldRemoveUserFinalizerWithBlankAvatarAnnotations() {
+        var user = deletingUser("fake-user");
+        user.getMetadata()
+                .setAnnotations(Map.of(
+                        User.AVATAR_ATTACHMENT_NAME_ANNO, " ",
+                        User.LAST_AVATAR_ATTACHMENT_NAME_ANNO, ""));
+        when(client.fetch(User.class, "fake-user")).thenReturn(Optional.of(user));
+        when(roleService.listRoleBindings(any())).thenReturn(Flux.empty());
+
+        userReconciler.reconcile(new Reconciler.Request("fake-user"));
+
+        verify(client, never()).fetch(eq(Attachment.class), any());
         verify(client).update(user);
         assertFalse(user.getMetadata().getFinalizers().contains("user-protection"));
     }
