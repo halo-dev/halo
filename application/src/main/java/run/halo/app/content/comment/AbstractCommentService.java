@@ -4,8 +4,13 @@ import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Safelist;
+import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.counter.CounterService;
 import run.halo.app.core.counter.MeterUtils;
@@ -14,6 +19,7 @@ import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Reply;
 import run.halo.app.core.user.service.RoleService;
 import run.halo.app.core.user.service.UserService;
+import run.halo.app.extension.MetadataOperator;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.security.authorization.AuthorityUtils;
 
@@ -89,5 +95,28 @@ public abstract class AbstractCommentService {
      */
     protected boolean isSafeHtml(String html) {
         return Jsoup.isValid(html, safelist);
+    }
+
+    protected void updateContent(
+            Comment.BaseCommentSpec spec, MetadataOperator metadata, CommentContentRequest request) {
+        if (!StringUtils.hasText(request.raw())
+                || !StringUtils.hasText(request.content())
+                || request.version() == null
+                || !isSafeHtml(request.content())) {
+            throw new ServerWebInputException("A version and non-empty, safe comment body are required.");
+        }
+        var body = Jsoup.parseBodyFragment(request.content()).body();
+        if (body.text().isBlank()
+                && body.select("img[src]").stream().noneMatch(image -> StringUtils.hasText(image.attr("src")))) {
+            throw new ServerWebInputException("The comment body must not be empty.");
+        }
+        if (metadata.getDeletionTimestamp() != null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Cannot edit a deleted comment or reply.");
+        }
+        if (!request.version().equals(metadata.getVersion())) {
+            throw new OptimisticLockingFailureException("The comment or reply has changed. Reload before editing.");
+        }
+        spec.setRaw(request.raw());
+        spec.setContent(request.content());
     }
 }

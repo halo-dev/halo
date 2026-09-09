@@ -7,9 +7,11 @@ import { setFocus } from "@/formkit/utils/focus";
 const props = withDefaults(
   defineProps<{
     autoFocus?: boolean;
+    initialContent?: string;
   }>(),
   {
     autoFocus: true,
+    initialContent: "",
   }
 );
 
@@ -38,7 +40,7 @@ const handleCreateEmojiPicker = async () => {
   emojiPickerRef.value?.appendChild(emojiPicker as unknown as Node);
 };
 
-const raw = ref("");
+const raw = ref(props.initialContent);
 
 const onEmojiSelect = (emoji: { native: string }) => {
   raw.value += emoji.native;
@@ -67,9 +69,9 @@ watch(
     v-model="raw"
     type="textarea"
     name="raw"
+    :aria-label="$t('core.comment.reply_modal.fields.content.label')"
     :validation-label="$t('core.comment.reply_modal.fields.content.label')"
     :rows="6"
-    value=""
   ></FormKit>
   <div class="flex w-full justify-end sm:max-w-lg">
     <VDropdown

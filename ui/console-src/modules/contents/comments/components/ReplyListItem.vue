@@ -20,6 +20,7 @@ import { useI18n } from "vue-i18n";
 import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
 import { useCommentLastReadTimeMutate } from "../composables/use-comment-last-readtime-mutate";
 import { useContentProviderExtensionPoint } from "../composables/use-content-provider-extension-point";
+import CommentEditingModal from "./CommentEditingModal.vue";
 import OwnerButton from "./OwnerButton.vue";
 import ReplyCreationModal from "./ReplyCreationModal.vue";
 import ReplyDetailModal from "./ReplyDetailModal.vue";
@@ -127,6 +128,7 @@ const isHoveredReply = computed(() => {
 // Create reply
 const replyModal = ref(false);
 const detailModalVisible = ref(false);
+const editingModalVisible = ref(false);
 
 const { mutate: updateCommentLastReadTimeMutate } =
   useCommentLastReadTimeMutate(props.comment);
@@ -165,6 +167,16 @@ const { data: operationItems } = useOperationItemExtensionPoint<ListedReply>(
       },
     },
     {
+      priority: 15,
+      component: markRaw(VDropdownItem),
+      label: t("core.common.buttons.edit"),
+      permissions: ["system:comments:manage"],
+      hidden: !!props.reply.reply.metadata.deletionTimestamp,
+      action: () => {
+        editingModalVisible.value = true;
+      },
+    },
+    {
       priority: 20,
       component: markRaw(VDropdownDivider),
     },
@@ -195,6 +207,11 @@ const { data: contentProvider } = useContentProviderExtensionPoint();
 </script>
 
 <template>
+  <CommentEditingModal
+    v-if="editingModalVisible"
+    :target="reply.reply"
+    @close="editingModalVisible = false"
+  />
   <ReplyCreationModal
     v-if="replyModal"
     :comment="comment"

@@ -78,6 +78,14 @@ public class ReplyServiceImpl extends AbstractCommentService implements ReplySer
                 .flatMap(approvedQuoteReply -> client.create(prepared));
     }
 
+    @Override
+    public Mono<Reply> updateContent(String name, CommentContentRequest request) {
+        return client.get(Reply.class, name).flatMap(reply -> {
+            updateContent(reply.getSpec(), reply.getMetadata(), request);
+            return client.update(reply);
+        });
+    }
+
     private Mono<Comment> approveComment(Comment comment) {
         return hasCommentManagePermission().flatMap(hasPermission -> {
             if (hasPermission) {

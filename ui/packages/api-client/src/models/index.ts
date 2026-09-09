@@ -30,6 +30,7 @@ export * from './change-my-password-request';
 export * from './change-own-password-request';
 export * from './change-password-request';
 export * from './comment';
+export * from './comment-content-request';
 export * from './comment-email-owner';
 export * from './comment-list';
 export * from './comment-owner';

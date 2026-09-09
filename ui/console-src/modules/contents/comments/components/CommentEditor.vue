@@ -2,21 +2,24 @@
 import { VLoading } from "@halo-dev/components";
 import type { CommentEditorProvider } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
-import { markRaw } from "vue";
+import { computed, markRaw } from "vue";
 import { usePluginModuleStore } from "@/stores/plugin";
 import DefaultCommentEditor from "./DefaultCommentEditor.vue";
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     autoFocus?: boolean;
+    initialContent?: string;
   }>(),
   {
     autoFocus: false,
+    initialContent: undefined,
   }
 );
 
 const defaultProvider: CommentEditorProvider = {
   component: markRaw(DefaultCommentEditor),
+  supportsEditing: true,
 };
 
 const { pluginModules } = usePluginModuleStore();
@@ -50,6 +53,13 @@ const { data: provider, isLoading } = useQuery({
   },
 });
 
+const editorProvider = computed(() => {
+  if (props.initialContent !== undefined && !provider.value?.supportsEditing) {
+    return defaultProvider;
+  }
+  return provider.value;
+});
+
 function onUpdate(value: { content: string; characterCount: number }) {
   emit("update", value);
 }
@@ -57,9 +67,20 @@ function onUpdate(value: { content: string; characterCount: number }) {
 <template>
   <VLoading v-if="isLoading" />
   <component
-    :is="provider?.component"
+    :is="editorProvider?.component"
     v-else
     :auto-focus="autoFocus"
+    :initial-content="initialContent"
     @update="onUpdate"
   />
+  <p
+    v-if="
+      !isLoading &&
+      initialContent !== undefined &&
+      editorProvider?.component === defaultProvider.component
+    "
+    class="mt-2 text-sm text-gray-500"
+  >
+    {{ $t("core.comment.edit_modal.source_help") }}
+  </p>
 </template>

@@ -109,6 +109,14 @@ public class CommentServiceImpl extends AbstractCommentService implements Commen
                 .flatMap(client::create);
     }
 
+    @Override
+    public Mono<Comment> updateContent(String name, CommentContentRequest request) {
+        return client.get(Comment.class, name).flatMap(comment -> {
+            updateContent(comment.getSpec(), comment.getMetadata(), request);
+            return client.update(comment);
+        });
+    }
+
     private Mono<Void> populateApproveState(Comment comment) {
         return hasCommentManagePermission()
                 .filter(Boolean::booleanValue)
