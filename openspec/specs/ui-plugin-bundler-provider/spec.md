@@ -24,10 +24,12 @@ helpers to select the UI plugin provider type with `provider?: "plugin" |
   "theme"`
 - **THEN** the helper SHALL use theme provider defaults
 
-#### Scenario: Legacy helper remains unchanged
+#### Scenario: Build-system-specific entry points
 
-- **WHEN** a caller uses the deprecated `HaloUIPluginBundlerKit` helper
-- **THEN** the helper SHALL NOT provide theme provider behavior
+- **WHEN** a caller uses the bundler kit
+- **THEN** the caller SHALL import `viteConfig` from `@halo-dev/ui-plugin-bundler-kit/vite` or `rsbuildConfig` from `@halo-dev/ui-plugin-bundler-kit/rsbuild`
+- **THEN** the package SHALL NOT expose a root entry point or the deprecated `HaloUIPluginBundlerKit` helper
+- **THEN** both build tools and their Vue plugins SHALL be optional peer dependencies so callers only need to install their selected toolchain
 
 ### Requirement: Plugin provider compatibility
 
