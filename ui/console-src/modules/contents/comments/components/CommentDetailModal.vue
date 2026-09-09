@@ -117,7 +117,7 @@ const { data: contentProvider } = useContentProviderExtensionPoint();
           <div class="flex items-center gap-3">
             <OwnerButton
               v-if="comment.comment.spec.owner.kind === 'User'"
-              :owner="comment.comment.spec.owner"
+              :owner="comment.owner"
               @click="
                 $router.push({
                   name: 'UserDetail',

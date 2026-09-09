@@ -13,9 +13,7 @@
     "directory": "ui/packages/ui-plugin-bundler-kit"
   },
   "type": "module",
-  "types": "./dist/index.d.mts",
   "exports": {
-    ".": "./dist/index.mjs",
     "./rsbuild": "./dist/rsbuild.mjs",
     "./vite": "./dist/vite.mjs",
     "./package.json": "./package.json"
@@ -48,6 +46,20 @@
     "@rsbuild/plugin-vue": "^1.0.0 || ^2.0.0",
     "@vitejs/plugin-vue": "^5.0.0 || ^6.0.0",
     "vite": "^6.0.0 || ^7.0.0 || ^8.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@rsbuild/core": {
+      "optional": true
+    },
+    "@rsbuild/plugin-vue": {
+      "optional": true
+    },
+    "@vitejs/plugin-vue": {
+      "optional": true
+    },
+    "vite": {
+      "optional": true
+    }
   },
   "engines": {
     "node": "^18.0.0 || >=20.0.0"

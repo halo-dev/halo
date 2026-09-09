@@ -1067,6 +1067,7 @@
   "core.components.pagination.page_label": "page",
   "core.components.pagination.size_label": "items per page",
   "core.components.pagination.total_label": "Total {total} items",
+  "core.components.uppy_upload.fields.file_name": "File name",
   "core.components.user_avatar.title": "Avatar",
   "core.components.user_avatar.toast_upload_failed": "Failed to upload avatar",
   "core.components.user_avatar.toast_remove_failed": "Failed to delete avatar",

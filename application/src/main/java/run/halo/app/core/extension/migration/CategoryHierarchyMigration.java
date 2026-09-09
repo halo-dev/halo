@@ -83,23 +83,19 @@ class CategoryHierarchyMigration {
     private Mono<Category> updateIfNecessary(
             Category category, Map<String, String> assignedParents, MigrationSummary summary) {
         var categoryName = category.getMetadata().getName();
-        var changed = false;
         var assignedParent = assignedParents.get(categoryName);
-        if (StringUtils.hasText(assignedParent) && !StringUtils.hasText(parentName(category))) {
-            ensureSpec(category).setParent(assignedParent);
-            changed = true;
-        }
-        ensureMetadata(category);
-        var labels = nullSafeLabels(category);
-        if (!MIGRATION_LABEL_VALUE.equals(labels.get(Category.HIERARCHY_MIGRATED_LABEL))) {
-            labels.put(Category.HIERARCHY_MIGRATED_LABEL, MIGRATION_LABEL_VALUE);
-            changed = true;
-        }
-        if (!changed) {
-            summary.skipped++;
-            return Mono.empty();
-        }
-        return client.update(category)
+        return Mono.defer(() -> client.fetch(Category.class, categoryName).flatMap(latest -> {
+                    if (isMigrated(latest)) {
+                        summary.skipped++;
+                        return Mono.empty();
+                    }
+                    if (StringUtils.hasText(assignedParent) && !StringUtils.hasText(parentName(latest))) {
+                        ensureSpec(latest).setParent(assignedParent);
+                    }
+                    ensureMetadata(latest);
+                    nullSafeLabels(latest).put(Category.HIERARCHY_MIGRATED_LABEL, MIGRATION_LABEL_VALUE);
+                    return client.update(latest);
+                }))
                 .retryWhen(Retry.backoff(UPDATE_RETRIES, Duration.ofMillis(100))
                         .filter(CategoryHierarchyMigration::isRetryableUpdateFailure))
                 .doOnNext(updated -> summary.updated++)
@@ -134,6 +130,9 @@ class CategoryHierarchyMigration {
                         "Skipped missing legacy child reference during category hierarchy migration. parent={}, child={}",
                         parentName,
                         childName);
+                continue;
+            }
+            if (isMigrated(child)) {
                 continue;
             }
             var existingParent = parentName(child);
@@ -236,6 +235,13 @@ class CategoryHierarchyMigration {
     private static @Nullable String parentName(Category category) {
         var spec = category.getSpec();
         return spec == null ? null : spec.getParent();
+    }
+
+    private static boolean isMigrated(Category category) {
+        var metadata = category.getMetadata();
+        return metadata != null
+                && metadata.getLabels() != null
+                && MIGRATION_LABEL_VALUE.equals(metadata.getLabels().get(Category.HIERARCHY_MIGRATED_LABEL));
     }
 
     private static Category.CategorySpec ensureSpec(Category category) {
