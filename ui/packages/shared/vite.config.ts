@@ -6,6 +6,7 @@ export default defineConfig({
     entry: ["./src/index.ts"],
     format: ["esm", "iife"],
     deps: {
+      resolveDepSubpath: true,
       neverBundle: ["vue", "vue-router", "pinia", "@halo-dev/api-client"],
       alwaysBundle: ["mitt"],
       onlyBundle: false,
@@ -27,7 +28,7 @@ export default defineConfig({
     minify: true,
     exports: true,
     dts: {
-      tsgo: true,
+      generator: "tsgo",
     },
   },
 });
