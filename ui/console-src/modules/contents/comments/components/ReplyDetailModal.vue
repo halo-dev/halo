@@ -200,11 +200,16 @@ const replyEditingModalVisible = ref(false);
             :is="contentProvider?.component"
             :content="comment.comment.spec.content"
           />
-          <div class="mt-2">
-            <VButton size="sm" @click="commentEditingModalVisible = true">
-              {{ $t("core.common.buttons.edit") }}
-            </VButton>
-          </div>
+          <HasPermission :permissions="['system:comments:manage']">
+            <div
+              v-if="!comment.comment.metadata.deletionTimestamp"
+              class="mt-2"
+            >
+              <VButton size="sm" @click="commentEditingModalVisible = true">
+                {{ $t("core.common.buttons.edit") }}
+              </VButton>
+            </div>
+          </HasPermission>
         </VDescriptionItem>
         <VDescriptionItem
           :label="$t('core.comment.reply_detail_modal.fields.content')"
@@ -232,11 +237,13 @@ const replyEditingModalVisible = ref(false);
               :content="reply?.reply.spec.content"
             />
           </div>
-          <div class="mt-2">
-            <VButton size="sm" @click="replyEditingModalVisible = true">
-              {{ $t("core.common.buttons.edit") }}
-            </VButton>
-          </div>
+          <HasPermission :permissions="['system:comments:manage']">
+            <div v-if="!reply.reply.metadata.deletionTimestamp" class="mt-2">
+              <VButton size="sm" @click="replyEditingModalVisible = true">
+                {{ $t("core.common.buttons.edit") }}
+              </VButton>
+            </div>
+          </HasPermission>
         </VDescriptionItem>
         <VDescriptionItem
           v-if="!reply.reply.spec.approved"

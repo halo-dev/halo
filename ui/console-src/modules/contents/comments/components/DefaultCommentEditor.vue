@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import i18n from "@emoji-mart/data/i18n/zh.json";
 import { IconMotionLine, VDropdown } from "@halo-dev/components";
-import { onMounted, ref, watch } from "vue";
+import { onMounted, ref, useId, watch } from "vue";
 import { setFocus } from "@/formkit/utils/focus";
 
 const props = withDefaults(
@@ -40,16 +40,17 @@ const handleCreateEmojiPicker = async () => {
   emojiPickerRef.value?.appendChild(emojiPicker as unknown as Node);
 };
 
+const inputId = useId();
 const raw = ref(props.initialContent);
 
 const onEmojiSelect = (emoji: { native: string }) => {
   raw.value += emoji.native;
-  setFocus("content-input");
+  setFocus(inputId);
 };
 
 onMounted(() => {
   if (props.autoFocus) {
-    setFocus("content-input");
+    setFocus(inputId);
   }
 });
 
@@ -65,7 +66,7 @@ watch(
 </script>
 <template>
   <FormKit
-    id="content-input"
+    :id="inputId"
     v-model="raw"
     type="textarea"
     name="raw"

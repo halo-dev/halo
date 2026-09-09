@@ -119,13 +119,32 @@ async function setup(editReply = false) {
   };
   const edit = async (value: string) => {
     await wrapper.get("textarea").setValue(value);
-    await getNode("content-input")?.settled;
+    await getNode(wrapper.get("textarea").attributes("id"))?.settled;
     await flushPromises();
   };
-  return { wrapper, invalidate, submit, edit };
+  return { wrapper, invalidate, submit, edit, client };
 }
 
 describe("comment editing", () => {
+  it.each([false, true])(
+    "does not mount an editor for a deleting resource (reply=%s)",
+    async (isReply) => {
+      const target = isReply ? reply().reply : comment().comment;
+      target.metadata.deletionTimestamp = "2026-09-09T00:00:00Z";
+      (isReply ? api.getReply : api.getComment).mockResolvedValue({
+        data: target,
+      });
+      const { wrapper, submit } = await setup(isReply);
+      expect(wrapper.find("textarea").exists()).toBe(false);
+      expect(wrapper.get('[role="alert"]').text()).toBe(
+        "core.common.status.deleting"
+      );
+      await submit();
+      expect(api.comment).not.toHaveBeenCalled();
+      expect(api.reply).not.toHaveBeenCalled();
+    }
+  );
+
   it.each([false, true])(
     "loads the latest body and version on open (reply=%s)",
     async (isReply) => {
@@ -176,7 +195,12 @@ describe("comment editing", () => {
   it.each([false, true])(
     "saves the selected resource and refreshes its lists (reply=%s)",
     async (isReply) => {
-      const { wrapper, submit, edit, invalidate } = await setup(isReply);
+      const { wrapper, submit, edit, invalidate, client } =
+        await setup(isReply);
+      const subjectKey = ["core:comments:with-subject", 1, 20, "post"];
+      const widgetKey = ["widget-pending-comments"];
+      client.setQueryData(subjectKey, { items: [comment()] });
+      client.setQueryData(widgetKey, [comment()]);
       expect(wrapper.get("textarea").element.value).toBe(
         isReply ? "Original reply" : "Original"
       );
@@ -203,6 +227,8 @@ describe("comment editing", () => {
       expect(invalidate).toHaveBeenCalledWith({
         queryKey: ["core:comment-replies", "parent"],
       });
+      expect(client.getQueryState(subjectKey)?.isInvalidated).toBe(true);
+      expect(client.getQueryState(widgetKey)?.isInvalidated).toBe(true);
       expect(wrapper.emitted("close")).toHaveLength(1);
     }
   );

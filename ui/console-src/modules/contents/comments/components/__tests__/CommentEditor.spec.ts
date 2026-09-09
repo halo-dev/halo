@@ -12,6 +12,7 @@ import {
 import { defineComponent, h, markRaw, ref } from "vue";
 import { createI18n } from "vue-i18n";
 import CommentEditor from "../CommentEditor.vue";
+import DefaultCommentEditor from "../DefaultCommentEditor.vue";
 
 const plugins = vi.hoisted(() => ({ modules: [] as unknown[] }));
 vi.mock("@/stores/plugin", () => ({
@@ -112,4 +113,34 @@ describe("comment editor initialization", () => {
     expect(wrapper.get("textarea").element.value).toBe("<p>Formatted body</p>");
     expect(wrapper.text()).not.toContain("core.comment.edit_modal.source_help");
   });
+});
+
+it("focuses its own input when another default editor is already mounted", async () => {
+  const Host = () =>
+    h("div", [
+      h(DefaultCommentEditor, {
+        autoFocus: false,
+        initialContent: "Reply draft",
+      }),
+      h(DefaultCommentEditor, {
+        autoFocus: true,
+        initialContent: "Edit body",
+      }),
+    ]);
+  const wrapper = mount(Host, {
+    attachTo: document.body,
+    global: {
+      plugins: [
+        [formKitPlugin, defaultConfig()],
+        createI18n({ legacy: false, missingWarn: false, fallbackWarn: false }),
+      ],
+      stubs: { Dropdown: { template: "<div><slot /></div>" } },
+    },
+  });
+  cleanups.push(() => wrapper.unmount());
+  await flushPromises();
+  await new Promise((resolve) => setTimeout(resolve, 30));
+  const inputs = wrapper.findAll("textarea");
+  expect(inputs[0].attributes("id")).not.toBe(inputs[1].attributes("id"));
+  expect(document.activeElement).toBe(inputs[1].element);
 });

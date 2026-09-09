@@ -189,11 +189,16 @@ const editingModalVisible = ref(false);
             :is="contentProvider?.component"
             :content="comment.comment.spec.content"
           />
-          <div class="mt-2">
-            <VButton size="sm" @click="editingModalVisible = true">
-              {{ $t("core.common.buttons.edit") }}
-            </VButton>
-          </div>
+          <HasPermission :permissions="['system:comments:manage']">
+            <div
+              v-if="!comment.comment.metadata.deletionTimestamp"
+              class="mt-2"
+            >
+              <VButton size="sm" @click="editingModalVisible = true">
+                {{ $t("core.common.buttons.edit") }}
+              </VButton>
+            </div>
+          </HasPermission>
         </VDescriptionItem>
         <HasPermission :permissions="['system:comments:manage']">
           <VDescriptionItem

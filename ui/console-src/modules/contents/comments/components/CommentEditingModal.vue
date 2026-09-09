@@ -40,6 +40,10 @@ onMounted(async () => {
     const { data } = isReply
       ? await coreApiClient.content.reply.getReply({ name })
       : await coreApiClient.content.comment.getComment({ name });
+    if (data.metadata.deletionTimestamp) {
+      errorMessage.value = t("core.common.status.deleting");
+      return;
+    }
     latestTarget.value = data;
     content.value = data.spec.raw;
   } catch {
@@ -89,6 +93,8 @@ async function handleSubmit() {
       await consoleApiClient.content.comment.updateCommentContent(request);
     }
     queryClient.invalidateQueries({ queryKey: ["core:comments"] });
+    queryClient.invalidateQueries({ queryKey: ["core:comments:with-subject"] });
+    queryClient.invalidateQueries({ queryKey: ["widget-pending-comments"] });
     queryClient.invalidateQueries({
       queryKey: ["core:comment-replies", commentName],
     });
