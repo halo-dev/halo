@@ -59,13 +59,17 @@ export function useThemeLifeCycle(
         try {
           if (!theme.value) return;
 
+          const name = theme.value.metadata.name;
           await consoleApiClient.theme.theme.activateTheme({
-            name: theme.value?.metadata.name,
+            name,
           });
 
           Toast.success(t("core.theme.operations.active.toast_success"));
 
           if (reload) {
+            const url = new URL(window.location.href);
+            url.searchParams.set("theme", name);
+            window.history.replaceState(window.history.state, "", url);
             window.location.reload();
           }
         } catch (e) {
