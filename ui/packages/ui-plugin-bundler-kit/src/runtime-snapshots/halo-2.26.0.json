@@ -614,6 +614,7 @@
         "ListSinglePagesPublishPhaseEnum",
         "ListSinglePagesVisibleEnum",
         "ListedAuthProviderAuthTypeEnum",
+        "MenuItemSpecRouteRefEnum",
         "MenuItemSpecTargetEnum",
         "MenuItemV1alpha1Api",
         "MenuItemV1alpha1ApiAxiosParamCreator",
