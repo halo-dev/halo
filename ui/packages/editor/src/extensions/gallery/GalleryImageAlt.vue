@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { VDropdown } from "@halo-dev/components";
-import { ref } from "vue";
+import { nextTick, ref, useTemplateRef } from "vue";
 import MingcuteEdit4Line from "~icons/mingcute/edit-4-line";
 import Input from "@/components/base/Input.vue";
 import { i18n } from "@/locales";
@@ -9,19 +9,27 @@ const props = defineProps<{ alt: string }>();
 const emit = defineEmits<{ "update:alt": [alt: string] }>();
 const shown = ref(false);
 const draft = ref("");
+const trigger = useTemplateRef<HTMLButtonElement>("trigger");
+
+async function close() {
+  shown.value = false;
+  await nextTick();
+  trigger.value?.focus();
+}
+
 function save(event: Event) {
   const input = (event.target as HTMLFormElement).elements.item(
     0
   ) as HTMLInputElement;
   emit("update:alt", input.value.trim());
-  shown.value = false;
+  close();
 }
 </script>
 
 <template>
   <VDropdown
     v-model:shown="shown"
-    class="pointer-events-auto"
+    class="pointer-events-none group-focus-within/actions:pointer-events-auto group-hover/image:pointer-events-auto [@media(hover:none)]:pointer-events-auto"
     :triggers="['click']"
     :distance="10"
     :no-auto-focus="true"
@@ -31,6 +39,7 @@ function save(event: Event) {
     @dragstart.stop.prevent
   >
     <button
+      ref="trigger"
       v-tooltip="i18n.global.t('editor.extensions.image.edit_alt')"
       type="button"
       :aria-label="i18n.global.t('editor.extensions.image.edit_alt')"
@@ -46,7 +55,7 @@ function save(event: Event) {
         @submit.prevent="save"
         @click.stop
         @mousedown.stop
-        @keydown.esc.stop.prevent="shown = false"
+        @keydown.esc.stop.prevent="close"
       >
         <Input
           v-model="draft"

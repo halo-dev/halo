@@ -265,7 +265,7 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
             @load="handleImageLoad($event, groupIndex * groupSize + imgIndex)"
           />
           <div
-            class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/0 via-black/5 to-black/30 p-1 opacity-0 transition-all focus-within:opacity-100 group-hover/image:opacity-100"
+            class="group/actions pointer-events-none absolute inset-0 bg-gradient-to-t from-black/0 via-black/5 to-black/30 p-1 opacity-0 transition-all focus-within:opacity-100 group-hover/image:opacity-100 [@media(hover:none)]:opacity-100"
           >
             <div class="flex justify-end gap-1">
               <GalleryImageAlt
@@ -281,7 +281,7 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
                   )
                 "
                 aria-label="Delete"
-                class="text-grey-900 group pointer-events-auto relative flex size-8 cursor-pointer items-center justify-center rounded-md bg-white/90 transition-all hover:bg-white hover:text-black active:!bg-white/80"
+                class="text-grey-900 group pointer-events-none relative flex size-8 cursor-pointer items-center justify-center rounded-md bg-white/90 transition-all hover:bg-white hover:text-black active:!bg-white/80 group-focus-within/actions:pointer-events-auto group-hover/image:pointer-events-auto [@media(hover:none)]:pointer-events-auto"
                 type="button"
                 @click.stop="removeImage(groupIndex * groupSize + imgIndex)"
               >

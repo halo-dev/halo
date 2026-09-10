@@ -90,6 +90,7 @@ describe("GalleryView", () => {
   it("submits and clears alternative text through the input form", async () => {
     const updateAlt = vi.fn();
     const wrapper = mount(GalleryImageAlt, {
+      attachTo: document.body,
       props: { alt: "Existing", "onUpdate:alt": updateAlt },
     });
     wrapper.findComponent({ name: "VDropdown" }).vm.$emit("update:shown", true);
@@ -97,7 +98,9 @@ describe("GalleryView", () => {
     await wrapper.vm.$nextTick();
     expect(wrapper.get("input").element.value).toBe("Existing");
     await wrapper.get("input").setValue("Sunrise");
+    wrapper.get("input").element.focus();
     await wrapper.get("form").trigger("submit");
+    expect(document.activeElement).toBe(wrapper.get("button").element);
     wrapper.findComponent({ name: "VDropdown" }).vm.$emit("update:shown", true);
     await wrapper.vm.$nextTick();
     wrapper.get("input").element.value = "";
@@ -111,7 +114,9 @@ describe("GalleryView", () => {
     expect(wrapper.get("input").element.value).toBe("Updated");
     wrapper.get("input").element.value = "Unsaved";
     await wrapper.get("input").trigger("input");
+    wrapper.get("input").element.focus();
     await wrapper.get("input").trigger("keydown", { key: "Escape" });
+    expect(document.activeElement).toBe(wrapper.get("button").element);
     expect(updateAlt).toHaveBeenCalledTimes(2);
     wrapper.unmount();
   });
