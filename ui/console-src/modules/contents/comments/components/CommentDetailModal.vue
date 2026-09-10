@@ -21,6 +21,7 @@ import { computed, ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import { useContentProviderExtensionPoint } from "../composables/use-content-provider-extension-point";
 import { useSubjectRef } from "../composables/use-subject-ref";
+import CommentEditingModal from "./CommentEditingModal.vue";
 import CommentEditor from "./CommentEditor.vue";
 import OwnerButton from "./OwnerButton.vue";
 
@@ -100,6 +101,8 @@ const websiteOfAnonymous = computed(() => {
 });
 
 const { data: contentProvider } = useContentProviderExtensionPoint();
+
+const editingModalVisible = ref(false);
 </script>
 <template>
   <VModal
@@ -186,6 +189,16 @@ const { data: contentProvider } = useContentProviderExtensionPoint();
             :is="contentProvider?.component"
             :content="comment.comment.spec.content"
           />
+          <HasPermission :permissions="['system:comments:manage']">
+            <div
+              v-if="!comment.comment.metadata.deletionTimestamp"
+              class="mt-2"
+            >
+              <VButton size="sm" @click="editingModalVisible = true">
+                {{ $t("core.common.buttons.edit") }}
+              </VButton>
+            </div>
+          </HasPermission>
         </VDescriptionItem>
         <HasPermission :permissions="['system:comments:manage']">
           <VDescriptionItem
@@ -218,6 +231,12 @@ const { data: contentProvider } = useContentProviderExtensionPoint();
       </VSpace>
     </template>
   </VModal>
+
+  <CommentEditingModal
+    v-if="editingModalVisible"
+    :target="comment.comment"
+    @close="editingModalVisible = false"
+  />
 </template>
 
 <style scoped>

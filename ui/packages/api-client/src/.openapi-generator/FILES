@@ -120,6 +120,7 @@ models/category.ts
 models/change-my-password-request.ts
 models/change-own-password-request.ts
 models/change-password-request.ts
+models/comment-content-request.ts
 models/comment-email-owner.ts
 models/comment-list.ts
 models/comment-owner.ts

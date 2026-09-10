@@ -22,7 +22,11 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
+import type { CommentContentRequest } from '../models';
+// @ts-ignore
 import type { ListedReplyList } from '../models';
+// @ts-ignore
+import type { Reply } from '../models';
 /**
  * ReplyV1alpha1ConsoleApi - axios parameter creator
  */
@@ -97,6 +101,53 @@ export const ReplyV1alpha1ConsoleApiAxiosParamCreator = function (configuration?
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * Update only the body of an existing reply. Requires its current version.
+         * @param {string} name 
+         * @param {CommentContentRequest} commentContentRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateReplyContent: async (name: string, commentContentRequest: CommentContentRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'name' is not null or undefined
+            assertParamExists('updateReplyContent', 'name', name)
+            // verify required parameter 'commentContentRequest' is not null or undefined
+            assertParamExists('updateReplyContent', 'commentContentRequest', commentContentRequest)
+            const localVarPath = `/apis/api.console.halo.run/v1alpha1/replies/{name}/content`
+                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(commentContentRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -123,6 +174,19 @@ export const ReplyV1alpha1ConsoleApiFp = function(configuration?: Configuration)
             const localVarOperationServerBasePath = operationServerMap['ReplyV1alpha1ConsoleApi.listReplies']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
+        /**
+         * Update only the body of an existing reply. Requires its current version.
+         * @param {string} name 
+         * @param {CommentContentRequest} commentContentRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updateReplyContent(name: string, commentContentRequest: CommentContentRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Reply>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateReplyContent(name, commentContentRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ReplyV1alpha1ConsoleApi.updateReplyContent']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
     }
 };
 
@@ -140,6 +204,15 @@ export const ReplyV1alpha1ConsoleApiFactory = function (configuration?: Configur
          */
         listReplies(requestParameters: ReplyV1alpha1ConsoleApiListRepliesRequest, options?: RawAxiosRequestConfig): AxiosPromise<ListedReplyList> {
             return localVarFp.listReplies(requestParameters.commentName, requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Update only the body of an existing reply. Requires its current version.
+         * @param {ReplyV1alpha1ConsoleApiUpdateReplyContentRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateReplyContent(requestParameters: ReplyV1alpha1ConsoleApiUpdateReplyContentRequest, options?: RawAxiosRequestConfig): AxiosPromise<Reply> {
+            return localVarFp.updateReplyContent(requestParameters.name, requestParameters.commentContentRequest, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -180,6 +253,15 @@ export interface ReplyV1alpha1ConsoleApiListRepliesRequest {
 }
 
 /**
+ * Request parameters for updateReplyContent operation in ReplyV1alpha1ConsoleApi.
+ */
+export interface ReplyV1alpha1ConsoleApiUpdateReplyContentRequest {
+    readonly name: string
+
+    readonly commentContentRequest: CommentContentRequest
+}
+
+/**
  * ReplyV1alpha1ConsoleApi - object-oriented interface
  */
 export class ReplyV1alpha1ConsoleApi extends BaseAPI {
@@ -191,6 +273,16 @@ export class ReplyV1alpha1ConsoleApi extends BaseAPI {
      */
     public listReplies(requestParameters: ReplyV1alpha1ConsoleApiListRepliesRequest, options?: RawAxiosRequestConfig) {
         return ReplyV1alpha1ConsoleApiFp(this.configuration).listReplies(requestParameters.commentName, requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Update only the body of an existing reply. Requires its current version.
+     * @param {ReplyV1alpha1ConsoleApiUpdateReplyContentRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public updateReplyContent(requestParameters: ReplyV1alpha1ConsoleApiUpdateReplyContentRequest, options?: RawAxiosRequestConfig) {
+        return ReplyV1alpha1ConsoleApiFp(this.configuration).updateReplyContent(requestParameters.name, requestParameters.commentContentRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

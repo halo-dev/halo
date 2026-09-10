@@ -14,6 +14,8 @@ public interface ReplyService {
 
     Mono<Reply> create(String commentName, Reply reply);
 
+    Mono<Reply> updateContent(String name, CommentContentRequest request);
+
     Mono<ListResult<ListedReply>> list(ReplyQuery query);
 
     Mono<Void> removeAllByComment(String commentName);

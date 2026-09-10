@@ -36,6 +36,7 @@ import { useCommentLastReadTimeMutate } from "../composables/use-comment-last-re
 import { useContentProviderExtensionPoint } from "../composables/use-content-provider-extension-point";
 import { useSubjectRef } from "../composables/use-subject-ref";
 import CommentDetailModal from "./CommentDetailModal.vue";
+import CommentEditingModal from "./CommentEditingModal.vue";
 import OwnerButton from "./OwnerButton.vue";
 import ReplyCreationModal from "./ReplyCreationModal.vue";
 import ReplyListItem from "./ReplyListItem.vue";
@@ -59,6 +60,7 @@ const hoveredReply = ref<ListedReply>();
 const showReplies = ref(false);
 const replyModal = ref(false);
 const detailModalVisible = ref(false);
+const editingModalVisible = ref(false);
 
 provide<Ref<ListedReply | undefined>>("hoveredReply", hoveredReply);
 
@@ -234,6 +236,16 @@ const { data: operationItems } = useOperationItemExtensionPoint<ListedComment>(
       },
     },
     {
+      priority: 15,
+      component: markRaw(VDropdownItem),
+      label: t("core.common.buttons.edit"),
+      permissions: ["system:comments:manage"],
+      hidden: !!props.comment.comment.metadata.deletionTimestamp,
+      action: () => {
+        editingModalVisible.value = true;
+      },
+    },
+    {
       priority: 20,
       component: markRaw(VDropdownItem),
       label: t("core.comment.operations.approve_applies_in_batch.button"),
@@ -269,6 +281,11 @@ const { data: contentProvider } = useContentProviderExtensionPoint();
 </script>
 
 <template>
+  <CommentEditingModal
+    v-if="editingModalVisible"
+    :target="comment.comment"
+    @close="editingModalVisible = false"
+  />
   <ReplyCreationModal
     v-if="replyModal"
     :comment="comment"
