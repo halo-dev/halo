@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { GetThumbnailByUriSizeEnum } from "@halo-dev/api-client";
-import { VButton, VSpace } from "@halo-dev/components";
+import { Toast, VButton, VSpace } from "@halo-dev/components";
 import { utils, type AttachmentLike } from "@halo-dev/ui-shared";
-import { computed, ref } from "vue";
+import { computed, ref, toRaw } from "vue";
 import MingcuteDelete2Line from "@/components/icon/MingcuteDelete2Line.vue";
 import { i18n } from "@/locales";
 import { NodeViewWrapper, type NodeViewProps } from "@/tiptap";
@@ -12,6 +12,7 @@ import {
   GALLERY_LAYOUT_SQUARE,
 } from "./constants";
 import GalleryImageAlt from "./GalleryImageAlt.vue";
+import GalleryImageReplace from "./GalleryImageReplace.vue";
 import type { ExtensionGalleryImageItem } from "./index";
 import { useUploadGalleryImage } from "./useGalleryImages";
 
@@ -40,11 +41,64 @@ function removeImage(index: number) {
   images.value = newImages;
 }
 
+// Keep replacement targets stable across reordering and immutable attribute updates.
+const imageIdentities = new WeakMap<
+  ExtensionGalleryImageItem,
+  ExtensionGalleryImageItem
+>();
+
+function imageIdentity(image: ExtensionGalleryImageItem) {
+  const rawImage = toRaw(image);
+  return imageIdentities.get(rawImage) || rawImage;
+}
+
+function updateImage(
+  image: ExtensionGalleryImageItem,
+  attributes: Partial<ExtensionGalleryImageItem>
+) {
+  const updated = { ...image, ...attributes };
+  imageIdentities.set(updated, imageIdentity(image));
+  return updated;
+}
+
 function updateImageAlt(index: number, alt: string) {
   images.value = images.value.map(
     (image: ExtensionGalleryImageItem, i: number) =>
-      i === index ? { ...image, alt } : image
+      i === index ? updateImage(image, { alt }) : image
   );
+}
+
+const pendingUploads = new WeakMap<ExtensionGalleryImageItem, symbol>();
+
+function replaceImage(target: ExtensionGalleryImageItem, src: string) {
+  pendingUploads.delete(target);
+  const index = images.value.findIndex(
+    (image: ExtensionGalleryImageItem) => imageIdentity(image) === target
+  );
+  const image = images.value[index];
+  if (!image || image.src === src) {
+    return;
+  }
+  const newImages = [...images.value];
+  newImages[index] = updateImage(image, { src, aspectRatio: 0 });
+  images.value = newImages;
+}
+
+async function uploadReplacement(image: ExtensionGalleryImageItem, file: File) {
+  const target = imageIdentity(image);
+  const upload = Symbol();
+  pendingUploads.set(target, upload);
+  try {
+    const attachment = await props.extension.options.uploadImage?.(file);
+    const url = attachment?.status?.permalink;
+    if (url && pendingUploads.get(target) === upload) {
+      replaceImage(target, url);
+    }
+  } catch (error) {
+    Toast.error(
+      `${i18n.global.t("editor.extensions.upload.error")} - ${(error as Error).message}`
+    );
+  }
 }
 
 function handleImageLoad(event: Event, index: number) {
@@ -57,10 +111,7 @@ function handleImageLoad(event: Event, index: number) {
   if (img.naturalWidth && img.naturalHeight) {
     const ratio = img.naturalWidth / img.naturalHeight;
     const newImages = [...images.value];
-    newImages[index] = {
-      ...currentImage,
-      aspectRatio: ratio,
-    };
+    newImages[index] = updateImage(currentImage, { aspectRatio: ratio });
     images.value = newImages;
   }
 }
@@ -273,6 +324,11 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
                 @update:alt="
                   updateImageAlt(groupIndex * groupSize + imgIndex, $event)
                 "
+              />
+              <GalleryImageReplace
+                :upload-enabled="!!extension.options.uploadImage"
+                @upload="uploadReplacement(image, $event)"
+                @replace="replaceImage(imageIdentity(image), $event)"
               />
               <button
                 v-tooltip="
