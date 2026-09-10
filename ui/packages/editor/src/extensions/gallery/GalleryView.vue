@@ -12,6 +12,7 @@ import {
   GALLERY_LAYOUT_SQUARE,
 } from "./constants";
 import GalleryImageAlt from "./GalleryImageAlt.vue";
+import GalleryImageReplace from "./GalleryImageReplace.vue";
 import type { ExtensionGalleryImageItem } from "./index";
 import { useUploadGalleryImage } from "./useGalleryImages";
 
@@ -44,6 +45,13 @@ function updateImageAlt(index: number, alt: string) {
   images.value = images.value.map(
     (image: ExtensionGalleryImageItem, i: number) =>
       i === index ? { ...image, alt } : image
+  );
+}
+
+function replaceImage(index: number, src: string) {
+  images.value = images.value.map(
+    (image: ExtensionGalleryImageItem, i: number) =>
+      i === index ? { ...image, src, aspectRatio: 0 } : image
   );
 }
 
@@ -272,6 +280,12 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
                 :alt="image.alt ?? ''"
                 @update:alt="
                   updateImageAlt(groupIndex * groupSize + imgIndex, $event)
+                "
+              />
+              <GalleryImageReplace
+                :upload="extension.options.uploadImage"
+                @replace="
+                  replaceImage(groupIndex * groupSize + imgIndex, $event)
                 "
               />
               <button
