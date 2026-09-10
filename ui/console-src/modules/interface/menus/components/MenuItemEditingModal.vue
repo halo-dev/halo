@@ -14,7 +14,7 @@ import {
 } from "@halo-dev/api-client";
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import { cloneDeep } from "es-toolkit";
-import { computed, nextTick, onMounted, ref } from "vue";
+import { computed, nextTick, onMounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import SubmitButton from "@/components/button/SubmitButton.vue";
 import type AnnotationsForm from "@/components/form/AnnotationsForm.vue";
@@ -52,21 +52,26 @@ const { t } = useI18n();
 const modal = ref<InstanceType<typeof VModal> | null>(null);
 const selectedParentMenuItem = ref<string>("");
 const originalParentMenuItem = ref<string>("");
-const formState = ref<MenuItem>({
-  spec: {
-    displayName: "",
-    href: "",
-    target: "_self",
-    menuName: props.menu.metadata.name,
-    priority: 0,
-  },
-  apiVersion: "v1alpha1",
-  kind: "MenuItem",
-  metadata: {
-    name: "",
-    generateName: "menu-item-",
-  },
-});
+const formState = ref<MenuItem>(
+  props.menuItem
+    ? cloneDeep(props.menuItem)
+    : {
+        spec: {
+          // Undefined allows a route default; an empty string preserves deliberate clearing.
+          displayName: undefined,
+          href: "",
+          target: "_self",
+          menuName: props.menu.metadata.name,
+          priority: 0,
+        },
+        apiVersion: "v1alpha1",
+        kind: "MenuItem",
+        metadata: {
+          name: "",
+          generateName: "menu-item-",
+        },
+      }
+);
 const saving = ref(false);
 
 const isUpdateMode = !!props.menuItem;
@@ -87,42 +92,24 @@ const handleSaveMenuItem = async () => {
     return;
   }
 
-  formState.value.metadata.annotations = {
+  const menuItem = cloneDeep(normalizedMenuItem.value);
+  menuItem.metadata.annotations = {
     ...annotations,
     ...customAnnotations,
   };
 
   try {
     saving.value = true;
-    formState.value.spec.menuName = props.menu.metadata.name;
+    menuItem.spec.menuName = props.menu.metadata.name;
     if (!isUpdateMode) {
-      formState.value.spec.parent = selectedParentMenuItem.value || undefined;
-      formState.value.spec.priority = siblingCount.value;
-    }
-
-    const menuItemRef = selectedSource.value;
-
-    if (menuItemRef) {
-      formState.value.spec.targetRef = undefined;
-      formState.value.spec.routeRef = undefined;
-    }
-
-    if (menuItemRef?.ref) {
-      formState.value.spec.targetRef = {
-        ...menuItemRef.ref,
-        name: selectedRefName.value,
-      };
-      formState.value.spec.displayName = undefined;
-      formState.value.spec.href = undefined;
-    } else if (menuItemRef?.routeRef) {
-      formState.value.spec.routeRef = menuItemRef.routeRef;
-      formState.value.spec.href = undefined;
+      menuItem.spec.parent = selectedParentMenuItem.value || undefined;
+      menuItem.spec.priority = siblingCount.value;
     }
 
     if (isUpdateMode) {
       const { data } = await coreApiClient.menuItem.updateMenuItem({
         name: formState.value.metadata.name,
-        menuItem: formState.value,
+        menuItem,
       });
 
       const positionRequest = buildMenuItemParentMovePosition(
@@ -155,7 +142,7 @@ const handleSaveMenuItem = async () => {
       }
     } else {
       const { data } = await coreApiClient.menuItem.createMenuItem({
-        menuItem: formState.value,
+        menuItem,
       });
 
       emit("saved", data);
@@ -253,18 +240,24 @@ const menuItemRefs: MenuItemRef[] = [
   },
 ];
 
-const isResourceRefLocked = computed(() => !!props.menuItem?.spec.targetRef);
-
-const availableMenuItemRefs = computed(() => {
-  if (isUpdateMode && !isResourceRefLocked.value) {
-    return menuItemRefs.filter((menuItemRef) => !menuItemRef.ref);
-  }
-  return menuItemRefs;
-});
-
-const menuItemRefsMap = computed(() =>
-  availableMenuItemRefs.value.map(({ label, value }) => ({ label, value }))
+const originalTargetRef = props.menuItem?.spec.targetRef;
+const originalResourceSource = menuItemRefs.find(
+  ({ ref }) =>
+    ref &&
+    originalTargetRef &&
+    ref.group === originalTargetRef.group &&
+    ref.version === originalTargetRef.version &&
+    ref.kind === originalTargetRef.kind
 );
+const isResourceRefLocked = !!originalTargetRef && !originalResourceSource;
+const menuItemRefsMap = isResourceRefLocked
+  ? [
+      {
+        value: "unsupported",
+        label: `${originalTargetRef.group}/${originalTargetRef.version}/${originalTargetRef.kind}`,
+      },
+    ]
+  : menuItemRefs.map(({ label, value }) => ({ label, value }));
 
 const selectedSource = computed(() =>
   menuItemRefs.find(
@@ -272,10 +265,42 @@ const selectedSource = computed(() =>
   )
 );
 
-const selectedSourceValue = ref("custom");
-const selectedRefName = ref<string>("");
+const selectedSourceValue = ref(
+  isResourceRefLocked
+    ? "unsupported"
+    : originalResourceSource?.value || props.menuItem?.spec.routeRef || "custom"
+);
+const selectedRefName = ref(originalTargetRef?.name || "");
 const isCustomSource = computed(() => selectedSourceValue.value === "custom");
 const isRouteSource = computed(() => !!selectedSource.value?.routeRef);
+
+if (originalResourceSource) {
+  formState.value.spec.displayName = props.menuItem?.status?.displayName;
+}
+if (
+  !isResourceRefLocked &&
+  (originalResourceSource || props.menuItem?.spec.routeRef)
+) {
+  formState.value.spec.href = props.menuItem?.status?.href;
+}
+
+const normalizedMenuItem = computed<MenuItem>(() => {
+  const spec = { ...formState.value.spec };
+  const source = selectedSource.value;
+  if (source) {
+    spec.targetRef = undefined;
+    spec.routeRef = undefined;
+    if (source.ref) {
+      spec.targetRef = { ...source.ref, name: selectedRefName.value };
+      spec.displayName = undefined;
+      spec.href = undefined;
+    } else if (source.routeRef) {
+      spec.routeRef = source.routeRef;
+      spec.href = undefined;
+    }
+  }
+  return { ...formState.value, spec };
+});
 
 const excludedParentNames = computed(() => {
   return props.menuItem?.metadata.name ? [props.menuItem.metadata.name] : [];
@@ -307,40 +332,19 @@ function findMenuItemTreeNode(
   }
 }
 
-const onMenuItemSourceChange = () => {
-  selectedRefName.value = "";
-  const source = selectedSource.value;
-  if (source?.routeRef) {
-    formState.value.spec.displayName ||= source.label;
-    formState.value.spec.href = undefined;
-    formState.value.spec.targetRef = undefined;
-    formState.value.spec.routeRef = source.routeRef;
-    return;
-  }
-  if (!source?.ref) {
-    if (formState.value.spec.routeRef) {
-      formState.value.spec.href = props.menuItem?.status?.href;
+watch(
+  selectedSourceValue,
+  () => {
+    selectedRefName.value = "";
+    const source = selectedSource.value;
+    if (source?.routeRef) {
+      formState.value.spec.displayName ??= source.label;
     }
-    formState.value.spec.routeRef = undefined;
-    formState.value.spec.targetRef = undefined;
-  }
-};
+  },
+  { flush: "sync" }
+);
 
 onMounted(() => {
-  if (props.menuItem) {
-    formState.value = cloneDeep(props.menuItem);
-
-    // Set Ref related
-    const { routeRef, targetRef } = formState.value.spec;
-
-    if (targetRef) {
-      selectedRefName.value = targetRef.name;
-      selectedSourceValue.value = targetRef.kind as string;
-    } else if (routeRef) {
-      selectedSourceValue.value = routeRef;
-    }
-  }
-
   selectedParentMenuItem.value =
     props.parentMenuItem?.metadata.name || props.menuItem?.spec.parent || "";
   originalParentMenuItem.value = props.menuItem?.spec.parent || "";
@@ -386,7 +390,6 @@ onMounted(() => {
                 $t('core.menu.menu_item_editing_modal.fields.ref_kind.label')
               "
               type="select"
-              @change="onMenuItemSourceChange"
             />
 
             <FormKit
@@ -487,7 +490,7 @@ onMounted(() => {
           ref="annotationsFormRef"
           :value="formState.metadata.annotations"
           kind="MenuItem"
-          :form-data="formState"
+          :form-data="normalizedMenuItem"
           group=""
         />
       </div>
