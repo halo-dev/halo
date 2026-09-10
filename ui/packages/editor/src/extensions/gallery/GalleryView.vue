@@ -11,6 +11,7 @@ import {
   DEFAULT_GALLERY_LAYOUT,
   GALLERY_LAYOUT_SQUARE,
 } from "./constants";
+import GalleryImageAlt from "./GalleryImageAlt.vue";
 import type { ExtensionGalleryImageItem } from "./index";
 import { useUploadGalleryImage } from "./useGalleryImages";
 
@@ -37,6 +38,13 @@ function removeImage(index: number) {
   const newImages = [...images.value];
   newImages.splice(index, 1);
   images.value = newImages;
+}
+
+function updateImageAlt(index: number, alt: string) {
+  images.value = images.value.map(
+    (image: ExtensionGalleryImageItem, i: number) =>
+      i === index ? { ...image, alt } : image
+  );
 }
 
 function handleImageLoad(event: Event, index: number) {
@@ -251,15 +259,21 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
                 getThumbnailSize(group.length)
               )
             "
-            :alt="`Gallery image ${groupIndex * groupSize + imgIndex + 1}`"
+            :alt="image.alt ?? ''"
             :loading="image.aspectRatio > 0 ? 'lazy' : 'eager'"
             class="pointer-events-none block size-full object-cover"
             @load="handleImageLoad($event, groupIndex * groupSize + imgIndex)"
           />
           <div
-            class="pointer-events-none invisible absolute inset-0 bg-gradient-to-t from-black/0 via-black/5 to-black/30 p-1 opacity-0 transition-all group-hover/image:visible group-hover/image:opacity-100"
+            class="group/actions pointer-events-none absolute inset-0 bg-gradient-to-t from-black/0 via-black/5 to-black/30 p-1 opacity-0 transition-all focus-within:opacity-100 group-hover/image:opacity-100 [@media(hover:none)]:opacity-100"
           >
-            <div class="flex flex-row-reverse">
+            <div class="flex justify-end gap-1">
+              <GalleryImageAlt
+                :alt="image.alt ?? ''"
+                @update:alt="
+                  updateImageAlt(groupIndex * groupSize + imgIndex, $event)
+                "
+              />
               <button
                 v-tooltip="
                   i18n.global.t(
@@ -267,7 +281,7 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
                   )
                 "
                 aria-label="Delete"
-                class="text-grey-900 group pointer-events-auto relative flex size-8 cursor-pointer items-center justify-center rounded-md bg-white/90 transition-all hover:bg-white hover:text-black active:!bg-white/80"
+                class="text-grey-900 group pointer-events-none relative flex size-8 cursor-pointer items-center justify-center rounded-md bg-white/90 transition-all hover:bg-white hover:text-black active:!bg-white/80 group-focus-within/actions:pointer-events-auto group-hover/image:pointer-events-auto [@media(hover:none)]:pointer-events-auto"
                 type="button"
                 @click.stop="removeImage(groupIndex * groupSize + imgIndex)"
               >
