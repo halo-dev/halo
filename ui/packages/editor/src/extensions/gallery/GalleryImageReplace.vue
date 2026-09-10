@@ -1,15 +1,23 @@
 <script setup lang="ts">
-import { Toast, VDropdown, VDropdownItem } from "@halo-dev/components";
+import { VDropdown, VDropdownItem } from "@halo-dev/components";
 import { utils, type AttachmentLike } from "@halo-dev/ui-shared";
 import { useFileDialog } from "@vueuse/core";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import MingcuteRefresh2Line from "~icons/mingcute/refresh-2-line";
 import { i18n } from "@/locales";
-import type { UploadFile } from "@/utils/upload";
 
-const props = defineProps<{ upload?: UploadFile }>();
+const props = defineProps<{ uploadEnabled: boolean }>();
 
-const emit = defineEmits<{ replace: [src: string] }>();
+const emit = defineEmits<{ replace: [src: string]; upload: [file: File] }>();
+
+const canUpload = computed(
+  () =>
+    props.uploadEnabled &&
+    utils.permission.has(["uc:attachments:manage", "system:attachments:manage"])
+);
+const canSelect = computed(() =>
+  utils.permission.has(["system:attachments:view", "uc:attachments:manage"])
+);
 
 const shown = ref(false);
 
@@ -25,19 +33,7 @@ onFileDialogChange((files) => {
   if (!file) {
     return;
   }
-  props
-    .upload?.(file)
-    .then((attachment) => {
-      const url = attachment?.status?.permalink;
-      if (url) {
-        emit("replace", url);
-      }
-    })
-    .catch((e: Error) => {
-      Toast.error(
-        `${i18n.global.t("editor.extensions.upload.error")} - ${e.message}`
-      );
-    });
+  emit("upload", file);
 });
 
 // Attachment Selector Modal
@@ -56,6 +52,7 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
 
 <template>
   <VDropdown
+    v-if="canUpload || canSelect"
     v-model:shown="shown"
     class="pointer-events-none group-focus-within/actions:pointer-events-auto group-hover/image:pointer-events-auto [@media(hover:none)]:pointer-events-auto"
     :triggers="['click']"
@@ -78,25 +75,11 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
       <MingcuteRefresh2Line class="size-4" />
     </button>
     <template #popper>
-      <VDropdownItem
-        v-if="
-          upload &&
-          utils.permission.has([
-            'uc:attachments:manage',
-            'system:attachments:manage',
-          ])
-        "
-        @click="openFileDialog()"
-      >
+      <VDropdownItem v-if="canUpload" @click="openFileDialog()">
         {{ i18n.global.t("editor.common.button.upload") }}
       </VDropdownItem>
       <VDropdownItem
-        v-if="
-          utils.permission.has(
-            ['system:attachments:view', 'uc:attachments:manage'],
-            true
-          )
-        "
+        v-if="canSelect"
         @click="attachmentSelectorModalVisible = true"
       >
         {{ i18n.global.t("editor.extensions.upload.attachment.title") }}
