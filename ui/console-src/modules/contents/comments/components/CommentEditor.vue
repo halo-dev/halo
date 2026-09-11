@@ -29,6 +29,8 @@ const emit = defineEmits<{
 }>();
 
 const { data: provider, isLoading } = useQuery({
+  // Deep structural sharing would clone component definitions and lose markRaw.
+  structuralSharing: false,
   queryKey: ["core:comment:provider"],
   queryFn: async () => {
     const result: CommentEditorProvider[] = [];
@@ -42,6 +44,7 @@ const { data: provider, isLoading } = useQuery({
 
       const item = await callbackFunction();
 
+      markRaw(item.component);
       result.push(item);
     }
 

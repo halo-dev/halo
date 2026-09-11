@@ -1,7 +1,18 @@
 import type { OperationItem } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
-import { computed, toValue, type ComputedRef, type Ref } from "vue";
+import { computed, markRaw, toValue, type ComputedRef, type Ref } from "vue";
 import { usePluginModuleStore } from "@/stores/plugin";
+
+function markOperationComponentsRaw<T>(items: OperationItem<T>[]) {
+  for (const item of items) {
+    if (item.component) {
+      markRaw(item.component);
+    }
+    if (item.children) {
+      markOperationComponentsRaw(item.children);
+    }
+  }
+}
 
 export function useOperationItemExtensionPoint<T>(
   extensionPointName: string,
@@ -11,6 +22,8 @@ export function useOperationItemExtensionPoint<T>(
   const { pluginModules } = usePluginModuleStore();
 
   const query = useQuery({
+    // Deep structural sharing would clone component definitions and lose markRaw.
+    structuralSharing: false,
     queryKey: computed(() => [
       "core:extension-points:operation-items",
       extensionPointName,
@@ -28,6 +41,7 @@ export function useOperationItemExtensionPoint<T>(
           entity
         ) as OperationItem<T>[];
 
+        markOperationComponentsRaw(items);
         itemsFromPlugins.push(...items);
       }
 
