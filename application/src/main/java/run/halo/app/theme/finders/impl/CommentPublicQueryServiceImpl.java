@@ -278,7 +278,11 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
     }
 
     static Sort defaultReplySort() {
-        return Sort.by(Sort.Order.asc("spec.creationTime"), Sort.Order.asc("metadata.name"));
+        return Sort.by(
+                Sort.Order.desc("spec.top"),
+                Sort.Order.asc("spec.priority"),
+                Sort.Order.asc("spec.creationTime"),
+                Sort.Order.asc("metadata.name"));
     }
 
     int pageNullSafe(Integer page) {
