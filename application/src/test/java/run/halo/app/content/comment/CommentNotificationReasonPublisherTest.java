@@ -9,6 +9,8 @@ import java.util.Optional;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -541,6 +543,54 @@ class CommentNotificationReasonPublisherTest {
                                         "content", reply.getSpec().getContent(),
                                         "replyName", reply.getMetadata().getName()));
                     }));
+        }
+
+        @ParameterizedTest
+        @CsvSource(
+                value = {
+                    "false, false, true,  false, 0",
+                    "false, true,  false, false, 1",
+                    "false, null,  false, false, 1",
+                    "true,  false, true,  false, 0",
+                    "true,  true,  false, false, 1",
+                    "true,  null,  false, false, 1",
+                    "false, true,  true,  true,  0",
+                    "true,  true,  true,  true,  0"
+                },
+                nullValues = "null")
+        void publishRespectsRecipientNotificationPreference(
+                boolean isQuoteReply,
+                Boolean allowNotification,
+                boolean replierAllowNotification,
+                boolean selfReply,
+                int notifications) {
+            var comment = createComment();
+            comment.getSpec().setContent("comment-content");
+            comment.getSpec().setAllowNotification(false);
+            var reply = createReply("current");
+            reply.getSpec().setAllowNotification(replierAllowNotification);
+            Comment.BaseCommentSpec repliedSpec = comment.getSpec();
+            if (isQuoteReply) {
+                var quoteReply = createReply("quote");
+                quoteReply.getSpec().getOwner().setName("another-user");
+                reply.getSpec().setQuoteReply("quote");
+                when(client.fetch(Reply.class, "quote")).thenReturn(Optional.of(quoteReply));
+                repliedSpec = quoteReply.getSpec();
+            }
+            repliedSpec.setAllowNotification(allowNotification);
+            if (selfReply) {
+                reply.getSpec().setOwner(repliedSpec.getOwner());
+            }
+            lenient().when(extensionGetter.getExtensions(CommentSubject.class)).thenReturn(Flux.empty());
+            lenient()
+                    .when(commentContentConverter.convertRelativeLinks(anyString()))
+                    .thenAnswer(invocation -> invocation.getArgument(0));
+            lenient().when(notificationReasonEmitter.emit(any(), any())).thenReturn(Mono.empty());
+
+            newReplyReasonPublisher.publishReasonBy(reply, comment);
+
+            verify(notificationReasonEmitter, times(notifications))
+                    .emit(eq(NotificationReasonConst.SOMEONE_REPLIED_TO_YOU), any());
         }
 
         @Test
