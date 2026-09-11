@@ -2,16 +2,14 @@ import { utils } from "@halo-dev/ui-shared";
 import type { RouteLocationNormalized, Router } from "vue-router";
 
 export function setupPermissionGuard(router: Router) {
-  router.beforeEach(async (to, _from, next) => {
+  router.beforeEach(async (to) => {
     if (
-      await checkRoutePermissions(
+      !(await checkRoutePermissions(
         to,
         utils.permission.getUserPermissions() || []
-      )
+      ))
     ) {
-      next();
-    } else {
-      next({ name: "Forbidden" });
+      return { name: "Forbidden" };
     }
   });
 }
