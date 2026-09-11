@@ -22,7 +22,7 @@ import type { CommentEmailOwner } from './comment-email-owner';
  */
 export interface ReplyRequest {
     /**
-     * Whether to subscribe the owner to notifications for future replies.
+     * Whether to notify the owner of future replies. Only an explicit false disables notifications.
      */
     'allowNotification'?: boolean;
     /**

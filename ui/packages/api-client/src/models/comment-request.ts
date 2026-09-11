@@ -25,7 +25,7 @@ import type { Ref } from './ref';
  */
 export interface CommentRequest {
     /**
-     * Whether to subscribe the owner to notifications for future replies.
+     * Whether to notify the owner of future replies. Only an explicit false disables notifications.
      */
     'allowNotification'?: boolean;
     /**
