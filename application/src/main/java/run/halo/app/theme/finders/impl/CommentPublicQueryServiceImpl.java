@@ -54,7 +54,12 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
 
     @Override
     public Mono<CommentVo> getByName(String name) {
-        return client.fetch(Comment.class, name).flatMap(this::toCommentVo);
+        return populateVisibleListOptions(null)
+                .map(builder -> builder.andQuery(equal("metadata.name", name)).build())
+                .flatMap(options -> client.listBy(Comment.class, options, PageRequestImpl.ofSize(1)))
+                .flatMapIterable(ListResult::getItems)
+                .next()
+                .flatMap(this::toCommentVo);
     }
 
     @Override

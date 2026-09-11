@@ -14,11 +14,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import reactor.core.publisher.Flux;
@@ -56,6 +61,66 @@ class CommentPublicQueryServiceIntegrationTest {
         return storeClient
                 .delete(storeName, extension.getMetadata().getVersion())
                 .thenReturn(extension);
+    }
+
+    @Nested
+    class GetCommentTest {
+        @Autowired
+        private CommentPublicQueryServiceImpl commentPublicQueryService;
+
+        private Comment storedComment;
+
+        @AfterEach
+        void tearDown() {
+            deleteImmediately(storedComment).block();
+        }
+
+        @ParameterizedTest
+        @CsvSource({
+            "anonymousUser, User,  true,  false, false, false, true",
+            "anonymousUser, User,  true,  true,  false, false, false",
+            "anonymousUser, User,  false, false, false, false, false",
+            "another,       User,  true,  false, false, false, true",
+            "another,       User,  true,  true,  false, false, false",
+            "another,       User,  false, false, false, false, false",
+            "fake-user,     User,  true,  true,  false, false, true",
+            "fake-user,     User,  false, false, false, false, true",
+            "fake-user,     Email, true,  true,  false, false, false",
+            "moderator,     User,  true,  true,  false, true,  true",
+            "moderator,     User,  false, false, false, true,  true",
+            "anonymousUser, User,  true,  false, true,  false, false",
+            "fake-user,     User,  true,  true,  true,  false, false",
+            "moderator,     User,  true,  true,  true,  true,  false"
+        })
+        void getByNameRespectsVisibility(
+                String username,
+                String ownerKind,
+                boolean approved,
+                boolean hidden,
+                boolean deleted,
+                boolean canViewComments,
+                boolean visible) {
+            var comment = createComment();
+            comment.getSpec().getOwner().setKind(ownerKind);
+            comment.getSpec().setApproved(approved);
+            comment.getSpec().setHidden(hidden);
+            storedComment = client.create(comment).block();
+            if (deleted) {
+                storedComment = client.delete(storedComment).block();
+            }
+            var authentication = new UsernamePasswordAuthenticationToken(
+                    username,
+                    "password",
+                    AuthorityUtils.createAuthorityList(
+                            canViewComments ? "ROLE_role-template-view-comments" : "ROLE_USER"));
+
+            commentPublicQueryService
+                    .getByName(comment.getMetadata().getName())
+                    .contextWrite(ReactiveSecurityContextHolder.withAuthentication(authentication))
+                    .as(StepVerifier::create)
+                    .expectNextCount(visible ? 1 : 0)
+                    .verifyComplete();
+        }
     }
 
     @Nested
