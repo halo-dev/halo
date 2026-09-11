@@ -134,23 +134,23 @@ importers:
         specifier: ^3.13.35
         version: 3.13.35(vue@3.5.41)
       '@uppy/core':
+        specifier: ^6.0.1
+        version: 6.0.1
+      '@uppy/dashboard':
+        specifier: ^6.0.0
+        version: 6.0.0(@uppy/core@6.0.1)
+      '@uppy/image-editor':
+        specifier: ^5.0.0
+        version: 5.0.0(@uppy/core@6.0.1)
+      '@uppy/locales':
         specifier: ^5.2.0
         version: 5.2.0
-      '@uppy/dashboard':
-        specifier: ^5.1.1
-        version: 5.1.1(@uppy/core@5.2.0)
-      '@uppy/image-editor':
-        specifier: ^4.2.0
-        version: 4.2.0(@uppy/core@5.2.0)
-      '@uppy/locales':
-        specifier: ^5.1.1
-        version: 5.1.1
       '@uppy/vue':
-        specifier: ^3.2.0
-        version: 3.2.0(@uppy/core@5.2.0)(@uppy/dashboard@5.1.1)(@uppy/image-editor@4.2.0)(vue@3.5.41)
+        specifier: ^4.0.0
+        version: 4.0.0(@uppy/core@6.0.1)(@uppy/dashboard@6.0.0)(@uppy/google-drive-picker@2.0.0)(@uppy/google-photos-picker@2.0.0)(@uppy/image-editor@5.0.0)(vue@3.5.41)
       '@uppy/xhr-upload':
-        specifier: ^5.2.0
-        version: 5.2.0(@uppy/core@5.2.0)
+        specifier: ^6.0.0
+        version: 6.0.0(@uppy/core@6.0.1)
       '@vue/devtools-api':
         specifier: ^8.2.1
         version: 8.2.1
@@ -3258,8 +3258,9 @@ packages:
   '@tokenizer/token@0.3.0':
     resolution: {integrity: sha512-OvjF+z51L3ov0OyAU0duzsYuvO01PH7x4t6DJx+guahgTnBHkhJdG7soQeTSFLWN3efnHyibZ4Z8l2EuWwJN3A==}
 
-  '@transloadit/prettier-bytes@0.3.4':
-    resolution: {integrity: sha512-8/SnIF9Q2k52mbjRVAYLranwkaDTLb+O9r4Z/uo8uNw//SjygKvvbF4BHSOuReufaAyum1q13602VcNud25Dfg==}
+  '@transloadit/prettier-bytes@2.0.0':
+    resolution: {integrity: sha512-GYzxSL3y9XlhwamBLkHT1y2jFrRsHkZZ1jNctn8NeMNyTtIbMK1Qf0f1koHkDdW+MwOUowCmpm8zP6ZpQ36G5w==}
+    engines: {node: '>=22'}
 
   '@tsconfig/node10@1.0.12':
     resolution: {integrity: sha512-UCYBaeFvM11aU2y3YPZ//O5Rhj+xKyzy7mvcIoAjASbigy8mHMryP5cK7dgjlz2hWxh1g5pLw084E0a/wlUSFQ==}
@@ -3543,18 +3544,15 @@ packages:
     engines: {node: '>=16.20.0'}
     hasBin: true
 
-  '@uppy/companion-client@5.1.1':
-    resolution: {integrity: sha512-DzrOWTbIZHvtgAFXBMYHk2wD27NjpBSVhY2tEiEIUhPd2CxbFRZjHM/N3HOt3VwZEAP471QWFLlJRWPcIY3A2Q==}
+  '@uppy/components@2.0.0':
+    resolution: {integrity: sha512-wviwX37ISeJQEaHh5ijyfSW7wDb5Ctvy10dnkRjuN9hddJo59N7lx+dKe985cP4OBBSr+wAzAkrvP6I8MmMvMg==}
     peerDependencies:
-      '@uppy/core': ^5.1.1
-
-  '@uppy/components@1.2.0':
-    resolution: {integrity: sha512-rtIr+77Rw/q5Vw++xazF1dCg2d4A4zT9CV+ZyN8Rsx8xiIr2CxCR4TaHHBy+WeC0b7Mk6yNuJ0wUa34tFJ6pKg==}
-    peerDependencies:
-      '@uppy/core': ^5.2.0
-      '@uppy/image-editor': ^4.2.0
-      '@uppy/screen-capture': ^5.1.0
-      '@uppy/webcam': ^5.1.0
+      '@uppy/core': ^6.0.0
+      '@uppy/google-drive-picker': ^2.0.0
+      '@uppy/google-photos-picker': ^2.0.0
+      '@uppy/image-editor': ^5.0.0
+      '@uppy/screen-capture': ^6.0.0
+      '@uppy/webcam': ^6.0.0
     peerDependenciesMeta:
       '@uppy/image-editor':
         optional: true
@@ -3563,46 +3561,45 @@ packages:
       '@uppy/webcam':
         optional: true
 
-  '@uppy/core@5.2.0':
-    resolution: {integrity: sha512-uvfNyz4cnaplt7LYJmEZHuqOuav0tKp4a9WKJIaH6iIj7XiqYvS2J5SEByexAlUFlzefOAyjzj4Ja2dd/8aMrw==}
+  '@uppy/core@6.0.1':
+    resolution: {integrity: sha512-H+v4tOBPYY8Cf0JWoGa3+JPTl9Of8SBaVUH5TNwGgynncTWrQtuyGK91hv9wOjm0SFds3X5psPx1ArhngdSrBg==}
 
-  '@uppy/dashboard@5.1.1':
-    resolution: {integrity: sha512-6H/xVvhhdfwp1+FRMp2C+tudyaedqD5+LMDB8Iw20k9+QCL1eGzOh4wXm6MCqJtNfQ1tLaprGMG1jlo7yS/uyw==}
+  '@uppy/dashboard@6.0.0':
+    resolution: {integrity: sha512-8ODlTuK4yTCSwTIXrt7kRmsJLpnZdOOJG8MaRMOQdr3VxsOxkvifnYFXNdjTgCnmq09KAtXP3Tssuwt6BpK5oQ==}
     peerDependencies:
-      '@uppy/core': ^5.2.0
+      '@uppy/core': ^6.0.0
 
-  '@uppy/image-editor@4.2.0':
-    resolution: {integrity: sha512-7Mn40hQMEwy9lufXYfNhSDuY24LUUSSmumXEoivGgUnXsNgcmppyzVjY94/Q6S6yX7Bg3L/sMvayjPXhYwt64A==}
+  '@uppy/google-drive-picker@2.0.0':
+    resolution: {integrity: sha512-i3XPwEWPCZJtHM9bYRIQ89cjIrSx6dqm3C81bb63Z0H3bet9Yz8E5BJS7ofyppJiOiJg19Vec4evx5QOCZ45aQ==}
     peerDependencies:
-      '@uppy/core': ^5.2.0
+      '@uppy/core': ^6.0.0
 
-  '@uppy/locales@5.1.1':
-    resolution: {integrity: sha512-zSbDU27JzfdssRJoa5/xmGOsrEtS+2Z9j41weaoCa/NoK4wqZzkFNQ0Z44etbTg3PDVFakZVDu/Z+c+vsJCfdQ==}
-
-  '@uppy/provider-views@5.2.2':
-    resolution: {integrity: sha512-NAazIJ5sjrAc6++CeJ/u9dB5gDaaAOLHrYeEmWs/HqLlftlIinRZOybnyzJRXwI8jWI/FK5moluzt2HXu6dPQQ==}
+  '@uppy/google-photos-picker@2.0.0':
+    resolution: {integrity: sha512-mWad0IRAgZaAYCjIAytWS3t8MK3u3ZyAgXFgmeCqz15i3hXOXmrzlez/MEpMR9QJc9Hsju9yHShP/lKWF2tbIA==}
     peerDependencies:
-      '@uppy/core': ^5.2.0
+      '@uppy/core': ^6.0.0
 
-  '@uppy/store-default@5.0.0':
-    resolution: {integrity: sha512-hQtCSQ1yGiaval/wVYUWquYGDJ+bpQ7e4FhUUAsRQz1x1K+o7NBtjfp63O9I4Ks1WRoKunpkarZ+as09l02cPw==}
-
-  '@uppy/thumbnail-generator@5.1.0':
-    resolution: {integrity: sha512-QAKJHHkMrD/30GOyUb5U9HyJ7Ie3jiMLp4pVdw27PoA4pNV7fDQz0tyDeRPj2H+BWPEB1NsTSSfHI2pjHNI+OQ==}
+  '@uppy/image-editor@5.0.0':
+    resolution: {integrity: sha512-XTFEJalEwM4MME+/olLsqqTClqXrNw9JYrYqPR0/FZqFDcgmUsv1O1qTm7+YbJOvtlJfKx1d5l+xbgLmtJebUA==}
     peerDependencies:
-      '@uppy/core': ^5.2.0
+      '@uppy/core': ^6.0.0
 
-  '@uppy/utils@7.2.0':
-    resolution: {integrity: sha512-6lC246qszMv6bTyl/+QyHwrudgeguWkA94ME1wHn+a6uRAvmtAEaUManIfGqTJfoKvWAiCJqdJPl5xRJjhAloQ==}
+  '@uppy/locales@5.2.0':
+    resolution: {integrity: sha512-nW+jrrljbVVBRmYhfUBn5eU7rQV27/NkgJyo7VB+G3OHCaG4EhWoGcGrF5qu/apHkaQx+3a+jKwCueAuzff6Fw==}
 
-  '@uppy/vue@3.2.0':
-    resolution: {integrity: sha512-BZiyUZxpadf3uUp8YzgwRZTIde/m9Ne4ILFygJg7ilFq/Qfb1pBVspG9FJoG23RbOiRuxd4JixwFh0gaFdfL+w==}
+  '@uppy/thumbnail-generator@6.0.0':
+    resolution: {integrity: sha512-7564MpbWL6MsvpAhSZ4or7uorp2KrJQneYsPbC7Wy+yuPozdieKJPNxWVqeBQcn6ZMF+1FUjLJrna+3h+teKbA==}
     peerDependencies:
-      '@uppy/core': ^5.2.0
-      '@uppy/dashboard': ^5.1.1
-      '@uppy/screen-capture': ^5.1.0
-      '@uppy/status-bar': ^5.1.0
-      '@uppy/webcam': ^5.1.0
+      '@uppy/core': ^6.0.0
+
+  '@uppy/vue@4.0.0':
+    resolution: {integrity: sha512-/LKYVXzVossCzxu2nKDANsfmhmiCKr8hsTOO0u0FMgoRPdTopjzRKC1FTpKZw6Ixvv0BFebLncER79Pc2V3zdw==}
+    peerDependencies:
+      '@uppy/core': ^6.0.0
+      '@uppy/dashboard': ^6.0.0
+      '@uppy/screen-capture': ^6.0.0
+      '@uppy/status-bar': ^6.0.0
+      '@uppy/webcam': ^6.0.0
       vue: '>=3.0.0'
     peerDependenciesMeta:
       '@uppy/dashboard':
@@ -3614,10 +3611,10 @@ packages:
       '@uppy/webcam':
         optional: true
 
-  '@uppy/xhr-upload@5.2.0':
-    resolution: {integrity: sha512-3LV/X5Of6BINnKplP+CwUJ0a4/7cRFfzxwGyXnW+uCrNQHoo09dttcz3begWHejGvzenQHuUnMO3Fxyc71Pryg==}
+  '@uppy/xhr-upload@6.0.0':
+    resolution: {integrity: sha512-r1EV5LUoMCQjeQVkc+qupCXA5wn8vRV7m3iB5K7z/4nkSj7lEt4Hk0fkudeQ/h4sF9wi3SqAM1x2Syhbt6Ar8A==}
     peerDependencies:
-      '@uppy/core': ^5.2.0
+      '@uppy/core': ^6.0.0
 
   '@virtual-list/vue@1.2.1':
     resolution: {integrity: sha512-sVangNRLgHJsrwjf2EeXuc8mUExbLRJO39J9/FXFWXXQkue/FBT4ZWN7GH5+GJTeVaEEfHW1W2UuVaf3LEB3jQ==}
@@ -4526,8 +4523,8 @@ packages:
     resolution: {integrity: sha512-Wdy2Igu8OcBpI2pZePZ5oWjPC38tmDVx5WKUXKwlLYkA0ozo85sLsLvkBbBn/sZaSCMFOGZJ14fvW9t5/d7kdA==}
     engines: {node: '>=8'}
 
-  classnames@2.3.2:
-    resolution: {integrity: sha512-CSbhY4cFEJRe6/GQzIk5qXZ4Jeg5pcsP7b5peFSDpffpe1cqjASH/n9UTjBwOp6XpMSTwQ8Za2K5V02ueA7Tmw==}
+  classnames@2.5.1:
+    resolution: {integrity: sha512-saHYOzhIQs6wy2sVxTM6bUDsQO4F50V9RQ22qBpEdCW+I+/Wmke2HOl6lS6dTpdxVhb88/I6+Hs+438c3lfUow==}
 
   clean-css@5.3.1:
     resolution: {integrity: sha512-lCr8OHhiWCTw4v8POJovCoh4T7I9U11yVsPjMWWnnMmp9ZowCxyad1Pathle/9HjaDp+fdQKjO9fQydE6RHTZg==}
@@ -5150,6 +5147,9 @@ packages:
 
   eventemitter3@5.0.1:
     resolution: {integrity: sha512-GWkBvjiSZK87ELrYOSESUYeVIc9mvLLf/nXalMOS5dYrgZq9o5OVkbZAVM06CVxYsCwH9BDZFPlQTlPA1j4ahA==}
+
+  eventemitter3@5.0.4:
+    resolution: {integrity: sha512-mlsTRyGaPBjPedk6Bvw+aqbsXDtoAyAzm5MO7JgU+yVRyMQ5O8bD4Kcci7BS85f93veegeCPkL8R4GLClnjLFw==}
 
   events@3.3.0:
     resolution: {integrity: sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q==}
@@ -6278,17 +6278,17 @@ packages:
     resolution: {integrity: sha512-tkAQEw8ysMzmkhgw8k+1U/iPhWNhykKnSk4Rd5zLoPJCuJaGRPo6YposrZgaxHKzDHdDWWZvE/Sk7hsL2X/CpQ==}
     engines: {node: '>=18'}
 
-  p-queue@8.1.1:
-    resolution: {integrity: sha512-aNZ+VfjobsWryoiPnEApGGmf5WmNsCo9xu8dfaYamG5qaLP7ClhLN6NgsFe6SwJ2UbLEBK5dv9x8Mn5+RVhMWQ==}
-    engines: {node: '>=18'}
+  p-queue@9.3.3:
+    resolution: {integrity: sha512-NXAOdnEe5FsZJfT4oK84lE1Y5cFFdWlRuOo5tww8DyNMxyRXwn39fIkUtNLKppcPC+UYU/bXujNCUGDv01y7CA==}
+    engines: {node: '>=20'}
 
   p-retry@6.2.0:
     resolution: {integrity: sha512-JA6nkq6hKyWLLasXQXUrO4z8BUZGUt/LjlJxx8Gb2+2ntodU/SS63YZ8b0LUTbQ8ZB9iwOfhEPhg4ykKnn2KsA==}
     engines: {node: '>=16.17'}
 
-  p-timeout@6.1.4:
-    resolution: {integrity: sha512-MyIV3ZA/PmyBN/ud8vV9XzwTrNtR4jFrObymZYnZqMmW0zA8Z17vnT0rBgFE/TlohB+YCHqXMgZzb3Csp49vqg==}
-    engines: {node: '>=14.16'}
+  p-timeout@7.0.1:
+    resolution: {integrity: sha512-AxTM2wDGORHGEkPCt8yqxOTMgpfbEHqF51f/5fJCmwFC3C/zNcGT63SymH2ttOAaiIws2zVg4+izQCjrakcwHg==}
+    engines: {node: '>=20'}
 
   p-try@2.2.0:
     resolution: {integrity: sha512-R4nPAVTAU0B9D35/Gk3uJf/7XYbQcyohSKdvAxIRSNghFl4e71hVoGnBNQz9cWaXxO2I10KTC+3jMdvvoKw6dQ==}
@@ -6517,6 +6517,10 @@ packages:
   pretty-bytes@6.1.1:
     resolution: {integrity: sha512-mQUvGU6aUFQ+rNvTIAcZuWGRT9a6f6Yrg9bHs4ImKF+HZCEK+plBvnAZYSIQztknZF2qnzNtr6F8s0+IuptdlQ==}
     engines: {node: ^14.13.1 || >=16.0.0}
+
+  pretty-bytes@7.1.3:
+    resolution: {integrity: sha512-U2KZ675nqba6XSBppSjU2pRgc9Ffx9+uUtd/RTWYmOawVkZuUbBYuwdtFZQmLv+yMgQ2TQxWWuOpyNje67J9tg==}
+    engines: {node: '>=20'}
 
   pretty-format@27.5.1:
     resolution: {integrity: sha512-Qb1gy5OrP5+zDf2Bvnzdl3jsTf1qXVMazbvCoKhtKqVs4/YK4ozX4gKQJJVyNe+cajNPn0KoC0MC3FUmaHWEmQ==}
@@ -10302,7 +10306,7 @@ snapshots:
 
   '@tokenizer/token@0.3.0': {}
 
-  '@transloadit/prettier-bytes@0.3.4': {}
+  '@transloadit/prettier-bytes@2.0.0': {}
 
   '@tsconfig/node10@1.0.12':
     optional: true
@@ -10615,48 +10619,40 @@ snapshots:
       '@typescript/native-preview-win32-arm64': 7.0.0-dev.20260707.2
       '@typescript/native-preview-win32-x64': 7.0.0-dev.20260707.2
 
-  '@uppy/companion-client@5.1.1(@uppy/core@5.2.0)':
+  '@uppy/components@2.0.0(@uppy/core@6.0.1)(@uppy/google-drive-picker@2.0.0)(@uppy/google-photos-picker@2.0.0)(@uppy/image-editor@5.0.0)':
     dependencies:
-      '@uppy/core': 5.2.0
-      '@uppy/utils': 7.2.0
-      namespace-emitter: 2.0.1
-      p-retry: 6.2.0
-    transitivePeerDependencies:
-      - preact-render-to-string
-
-  '@uppy/components@1.2.0(@uppy/core@5.2.0)(@uppy/image-editor@4.2.0)':
-    dependencies:
-      '@uppy/core': 5.2.0
+      '@uppy/core': 6.0.1
+      '@uppy/google-drive-picker': 2.0.0(@uppy/core@6.0.1)
+      '@uppy/google-photos-picker': 2.0.0(@uppy/core@6.0.1)
       clsx: 2.1.1
       dequal: 2.0.3
       preact: 10.29.7
-      pretty-bytes: 6.1.1
+      pretty-bytes: 7.1.3
     optionalDependencies:
-      '@uppy/image-editor': 4.2.0(@uppy/core@5.2.0)
+      '@uppy/image-editor': 5.0.0(@uppy/core@6.0.1)
     transitivePeerDependencies:
       - preact-render-to-string
 
-  '@uppy/core@5.2.0':
+  '@uppy/core@6.0.1':
     dependencies:
-      '@transloadit/prettier-bytes': 0.3.4
-      '@uppy/store-default': 5.0.0
-      '@uppy/utils': 7.2.0
+      '@transloadit/prettier-bytes': 2.0.0
+      classnames: 2.5.1
       lodash: 4.18.1
       mime-match: 1.0.2
       namespace-emitter: 2.0.1
       nanoid: 5.1.16
+      p-queue: 9.3.3
+      p-retry: 6.2.0
       preact: 10.29.7
     transitivePeerDependencies:
       - preact-render-to-string
 
-  '@uppy/dashboard@5.1.1(@uppy/core@5.2.0)':
+  '@uppy/dashboard@6.0.0(@uppy/core@6.0.1)':
     dependencies:
-      '@transloadit/prettier-bytes': 0.3.4
-      '@uppy/core': 5.2.0
-      '@uppy/provider-views': 5.2.2(@uppy/core@5.2.0)
-      '@uppy/thumbnail-generator': 5.1.0(@uppy/core@5.2.0)
-      '@uppy/utils': 7.2.0
-      classnames: 2.3.2
+      '@transloadit/prettier-bytes': 2.0.0
+      '@uppy/core': 6.0.1
+      '@uppy/thumbnail-generator': 6.0.0(@uppy/core@6.0.1)
+      classnames: 2.5.1
       lodash: 4.18.1
       nanoid: 5.1.16
       preact: 10.29.7
@@ -10664,70 +10660,57 @@ snapshots:
     transitivePeerDependencies:
       - preact-render-to-string
 
-  '@uppy/image-editor@4.2.0(@uppy/core@5.2.0)':
+  '@uppy/google-drive-picker@2.0.0(@uppy/core@6.0.1)':
     dependencies:
-      '@uppy/core': 5.2.0
-      '@uppy/utils': 7.2.0
+      '@uppy/core': 6.0.1
+      preact: 10.29.7
+    transitivePeerDependencies:
+      - preact-render-to-string
+
+  '@uppy/google-photos-picker@2.0.0(@uppy/core@6.0.1)':
+    dependencies:
+      '@uppy/core': 6.0.1
+      preact: 10.29.7
+    transitivePeerDependencies:
+      - preact-render-to-string
+
+  '@uppy/image-editor@5.0.0(@uppy/core@6.0.1)':
+    dependencies:
+      '@uppy/core': 6.0.1
       cropperjs: 1.6.2
       preact: 10.29.7
     transitivePeerDependencies:
       - preact-render-to-string
 
-  '@uppy/locales@5.1.1':
+  '@uppy/locales@5.2.0':
     dependencies:
-      '@uppy/utils': 7.2.0
+      '@uppy/core': 6.0.1
     transitivePeerDependencies:
       - preact-render-to-string
 
-  '@uppy/provider-views@5.2.2(@uppy/core@5.2.0)':
+  '@uppy/thumbnail-generator@6.0.0(@uppy/core@6.0.1)':
     dependencies:
-      '@uppy/core': 5.2.0
-      '@uppy/utils': 7.2.0
-      classnames: 2.3.2
-      lodash: 4.18.1
-      nanoid: 5.1.16
-      p-queue: 8.1.1
-      preact: 10.29.7
-    transitivePeerDependencies:
-      - preact-render-to-string
-
-  '@uppy/store-default@5.0.0': {}
-
-  '@uppy/thumbnail-generator@5.1.0(@uppy/core@5.2.0)':
-    dependencies:
-      '@uppy/core': 5.2.0
-      '@uppy/utils': 7.2.0
+      '@uppy/core': 6.0.1
       exifr: 7.1.3
-    transitivePeerDependencies:
-      - preact-render-to-string
 
-  '@uppy/utils@7.2.0':
+  '@uppy/vue@4.0.0(@uppy/core@6.0.1)(@uppy/dashboard@6.0.0)(@uppy/google-drive-picker@2.0.0)(@uppy/google-photos-picker@2.0.0)(@uppy/image-editor@5.0.0)(vue@3.5.41)':
     dependencies:
-      lodash: 4.18.1
-      preact: 10.29.7
-    transitivePeerDependencies:
-      - preact-render-to-string
-
-  '@uppy/vue@3.2.0(@uppy/core@5.2.0)(@uppy/dashboard@5.1.1)(@uppy/image-editor@4.2.0)(vue@3.5.41)':
-    dependencies:
-      '@uppy/components': 1.2.0(@uppy/core@5.2.0)(@uppy/image-editor@4.2.0)
-      '@uppy/core': 5.2.0
+      '@uppy/components': 2.0.0(@uppy/core@6.0.1)(@uppy/google-drive-picker@2.0.0)(@uppy/google-photos-picker@2.0.0)(@uppy/image-editor@5.0.0)
+      '@uppy/core': 6.0.1
       preact: 10.29.7
       shallow-equal: 3.1.0
       vue: 3.5.41(typescript@6.0.3)
     optionalDependencies:
-      '@uppy/dashboard': 5.1.1(@uppy/core@5.2.0)
+      '@uppy/dashboard': 6.0.0(@uppy/core@6.0.1)
     transitivePeerDependencies:
+      - '@uppy/google-drive-picker'
+      - '@uppy/google-photos-picker'
       - '@uppy/image-editor'
       - preact-render-to-string
 
-  '@uppy/xhr-upload@5.2.0(@uppy/core@5.2.0)':
+  '@uppy/xhr-upload@6.0.0(@uppy/core@6.0.1)':
     dependencies:
-      '@uppy/companion-client': 5.1.1(@uppy/core@5.2.0)
-      '@uppy/core': 5.2.0
-      '@uppy/utils': 7.2.0
-    transitivePeerDependencies:
-      - preact-render-to-string
+      '@uppy/core': 6.0.1
 
   '@virtual-list/vue@1.2.1(vue@3.5.41)':
     dependencies:
@@ -11626,7 +11609,7 @@ snapshots:
 
   ci-info@4.3.1: {}
 
-  classnames@2.3.2: {}
+  classnames@2.5.1: {}
 
   clean-css@5.3.1:
     dependencies:
@@ -12370,6 +12353,8 @@ snapshots:
   esutils@2.0.3: {}
 
   eventemitter3@5.0.1: {}
+
+  eventemitter3@5.0.4: {}
 
   events@3.3.0:
     optional: true
@@ -13540,10 +13525,10 @@ snapshots:
 
   p-map@7.0.4: {}
 
-  p-queue@8.1.1:
+  p-queue@9.3.3:
     dependencies:
-      eventemitter3: 5.0.1
-      p-timeout: 6.1.4
+      eventemitter3: 5.0.4
+      p-timeout: 7.0.1
 
   p-retry@6.2.0:
     dependencies:
@@ -13551,7 +13536,7 @@ snapshots:
       is-network-error: 1.0.0
       retry: 0.13.1
 
-  p-timeout@6.1.4: {}
+  p-timeout@7.0.1: {}
 
   p-try@2.2.0: {}
 
@@ -13744,6 +13729,8 @@ snapshots:
   prettier@3.6.2: {}
 
   pretty-bytes@6.1.1: {}
+
+  pretty-bytes@7.1.3: {}
 
   pretty-format@27.5.1:
     dependencies:
