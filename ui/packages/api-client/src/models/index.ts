@@ -40,7 +40,6 @@ export * from './comment-stats';
 export * from './comment-stats-vo';
 export * from './comment-status';
 export * from './comment-vo';
-export * from './comment-vo-list';
 export * from './comment-with-reply-vo';
 export * from './comment-with-reply-vo-list';
 export * from './condition';

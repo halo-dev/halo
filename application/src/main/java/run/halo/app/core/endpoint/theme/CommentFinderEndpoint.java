@@ -117,8 +117,7 @@ public class CommentFinderEndpoint implements CustomEndpoint {
                                     .in(ParameterIn.PATH)
                                     .required(true)
                                     .implementation(String.class))
-                            .response(
-                                    responseBuilder().implementation(ListResult.generateGenericClass(CommentVo.class)));
+                            .response(responseBuilder().implementation(CommentVo.class));
                 })
                 .GET("comments/{name}/reply", this::listCommentReplies, builder -> {
                     builder.operationId("ListCommentReplies")
