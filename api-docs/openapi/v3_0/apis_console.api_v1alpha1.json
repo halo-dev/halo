@@ -4496,8 +4496,8 @@
         "properties": {
           "allowNotification": {
             "type": "boolean",
-            "description": "Whether to subscribe the owner to notifications for future replies.",
-            "default": false
+            "description": "Whether to notify the owner of future replies. Only an explicit false disables notifications.",
+            "default": true
           },
           "content": {
             "minLength": 1,
@@ -6639,8 +6639,8 @@
         "properties": {
           "allowNotification": {
             "type": "boolean",
-            "description": "Whether to subscribe the owner to notifications for future replies.",
-            "default": false
+            "description": "Whether to notify the owner of future replies. Only an explicit false disables notifications.",
+            "default": true
           },
           "content": {
             "minLength": 1,

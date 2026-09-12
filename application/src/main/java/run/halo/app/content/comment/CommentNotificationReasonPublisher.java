@@ -360,9 +360,11 @@ public class CommentNotificationReasonPublisher {
                 throw new IllegalArgumentException("quoteReply can not be null when currentReply is reply to quote");
             }
 
-            Comment.CommentOwner commentOwner = isQuoteReply
-                    ? quoteReply.getSpec().getOwner()
-                    : comment.getSpec().getOwner();
+            var repliedSpec = isQuoteReply ? quoteReply.getSpec() : comment.getSpec();
+            if (Boolean.FALSE.equals(repliedSpec.getAllowNotification())) {
+                return true;
+            }
+            var commentOwner = repliedSpec.getOwner();
 
             var currentReplyOwner = currentReply.getSpec().getOwner();
             // reply to oneself do not emit reason
