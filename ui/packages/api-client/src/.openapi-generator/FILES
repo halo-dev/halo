@@ -321,9 +321,12 @@ models/tag.ts
 models/template-content.ts
 models/template-descriptor.ts
 models/test-operation.ts
+models/theme-capabilities.ts
 models/theme-list.ts
 models/theme-spec.ts
 models/theme-status.ts
+models/theme-template-file.ts
+models/theme-template-usage.ts
 models/theme.ts
 models/totp-auth-link-response.ts
 models/totp-request.ts
@@ -332,6 +335,7 @@ models/uc-upload-from-url-request.ts
 models/uc-user-vo.ts
 models/ui-plugin-provider-descriptor.ts
 models/ui-plugin-provider.ts
+models/ui-plugin-resources.ts
 models/upgrade-from-uri-request.ts
 models/upload-from-url-request.ts
 models/user-connection-list.ts
