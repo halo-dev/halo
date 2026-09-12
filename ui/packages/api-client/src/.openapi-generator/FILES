@@ -129,7 +129,6 @@ models/comment-spec.ts
 models/comment-stats-vo.ts
 models/comment-stats.ts
 models/comment-status.ts
-models/comment-vo-list.ts
 models/comment-vo.ts
 models/comment-with-reply-vo-list.ts
 models/comment-with-reply-vo.ts

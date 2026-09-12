@@ -117,8 +117,7 @@ public class CommentFinderEndpoint implements CustomEndpoint {
                                     .in(ParameterIn.PATH)
                                     .required(true)
                                     .implementation(String.class))
-                            .response(
-                                    responseBuilder().implementation(ListResult.generateGenericClass(CommentVo.class)));
+                            .response(responseBuilder().implementation(CommentVo.class));
                 })
                 .GET("comments/{name}/reply", this::listCommentReplies, builder -> {
                     builder.operationId("ListCommentReplies")
@@ -221,7 +220,7 @@ public class CommentFinderEndpoint implements CustomEndpoint {
 
     Mono<ServerResponse> getComment(ServerRequest request) {
         String name = request.pathVariable("name");
-        return Mono.defer(() -> Mono.justOrEmpty(commentPublicQueryService.getByName(name)))
+        return Mono.defer(() -> commentPublicQueryService.getByName(name))
                 .subscribeOn(Schedulers.boundedElastic())
                 .flatMap(comment -> ServerResponse.ok().bodyValue(comment));
     }
