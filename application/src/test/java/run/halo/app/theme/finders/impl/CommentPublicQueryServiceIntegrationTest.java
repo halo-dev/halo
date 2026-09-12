@@ -385,6 +385,58 @@ class CommentPublicQueryServiceIntegrationTest {
             JSONAssert.assertEquals(jsonObject.toString(), JsonUtils.objectToJson(result), true);
         }
 
+        @Test
+        void listRepliesWithPinnedFirst() {
+            var replies = List.of(
+                    replyForSort("pinned-later", true, 0, 3),
+                    replyForSort("pinned-earlier-b", true, 0, 2),
+                    replyForSort("pinned-earlier-a", true, 0, 2),
+                    replyForSort("pinned-priority", true, 1, 1),
+                    replyForSort("normal-earlier", false, 9, 0),
+                    replyForSort("normal-later", false, 0, 1));
+            try {
+                Flux.fromIterable(replies)
+                        .concatMap(client::create)
+                        .as(StepVerifier::create)
+                        .expectNextCount(replies.size())
+                        .verifyComplete();
+
+                commentPublicQueryService
+                        .listReply("fake-comment", 1, 20)
+                        .as(StepVerifier::create)
+                        .consumeNextWith(result -> assertThat(result.getItems())
+                                .extracting(reply -> reply.getMetadata().getName())
+                                .containsExactly(
+                                        "pinned-earlier-a",
+                                        "pinned-earlier-b",
+                                        "pinned-later",
+                                        "pinned-priority",
+                                        "normal-earlier",
+                                        "normal-later",
+                                        "reply-approved",
+                                        "reply-approved-but-another-owner"))
+                        .verifyComplete();
+            } finally {
+                Flux.fromIterable(replies)
+                        .flatMap(reply ->
+                                client.fetch(Reply.class, reply.getMetadata().getName()))
+                        .flatMap(client::delete)
+                        .flatMap(CommentPublicQueryServiceIntegrationTest.this::deleteImmediately)
+                        .blockLast();
+            }
+        }
+
+        Reply replyForSort(String name, boolean top, int priority, int seconds) {
+            var reply = createReply();
+            reply.getMetadata().setName(name);
+            reply.getSpec().setApproved(true);
+            reply.getSpec().setTop(top);
+            reply.getSpec().setPriority(priority);
+            reply.getSpec()
+                    .setCreationTime(Instant.parse("2024-01-01T00:00:00Z").plusSeconds(seconds));
+            return reply;
+        }
+
         String fakeReplyJson() {
             return """
                     {

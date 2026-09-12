@@ -372,6 +372,17 @@ class SchemeInitializer implements SmartLifecycle {
                             }));
         });
         schemeManager.register(Reply.class, indexSpecs -> {
+            indexSpecs.add(IndexSpecs.<Reply, Boolean>single("spec.top", Boolean.class)
+                    .indexFunc(reply -> Optional.ofNullable(reply.getSpec())
+                            .map(ReplySpec::getTop)
+                            .orElse(false))
+                    .nullable(false));
+            indexSpecs.add(IndexSpecs.<Reply, Integer>single("spec.priority", Integer.class)
+                    .indexFunc(reply -> Optional.ofNullable(reply.getSpec())
+                            .filter(spec -> Boolean.TRUE.equals(spec.getTop()))
+                            .map(ReplySpec::getPriority)
+                            .orElse(0))
+                    .nullable(false));
             indexSpecs.add(IndexSpecs.<Reply, Instant>single("spec.creationTime", Instant.class)
                     .indexFunc(reply -> Optional.ofNullable(reply.getSpec())
                             .map(ReplySpec::getCreationTime)
