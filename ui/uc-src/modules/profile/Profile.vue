@@ -18,12 +18,14 @@ import {
   shallowRef,
 } from "vue";
 import { useI18n } from "vue-i18n";
+import { useRoute } from "vue-router";
 import UserAvatar from "@/components/user-avatar/UserAvatar.vue";
 import { usePluginModuleStore } from "@/stores/plugin";
 import PasswordChangeModal from "./components/PasswordChangeModal.vue";
 import ProfileEditingModal from "./components/ProfileEditingModal.vue";
 
 const { t } = useI18n();
+const route = useRoute();
 
 const editingModal = ref(false);
 const passwordChangeModal = ref(false);
@@ -33,16 +35,33 @@ const { fetchCurrentUser } = stores.currentUser();
 fetchCurrentUser();
 
 const hasPassword = ref(false);
+const passwordChangeVerificationRequired = ref(false);
 
-async function fetchHasPassword() {
+async function fetchPasswordState() {
   try {
     const { data } = await ucApiClient.user.currentUser.getMyUser();
     hasPassword.value = data.passwordSet;
+    passwordChangeVerificationRequired.value =
+      data.passwordChangeVerificationRequired;
   } catch (error) {
     console.error("Failed to get current user password status", error);
   }
 }
-fetchHasPassword();
+fetchPasswordState();
+
+function navigateToSecurityVerification() {
+  const redirect = encodeURIComponent("/uc/profile?password-change=1");
+  window.location.href = `/security-verification?redirect=${redirect}`;
+}
+
+async function handleChangePassword() {
+  await fetchPasswordState();
+  if (passwordChangeVerificationRequired.value) {
+    navigateToSecurityVerification();
+    return;
+  }
+  passwordChangeModal.value = true;
+}
 
 const changePasswordLabel = computed(() =>
   hasPassword.value
@@ -102,6 +121,15 @@ const tabs = shallowRef<UserProfileTab[]>([
 const { pluginModules } = usePluginModuleStore();
 
 onMounted(async () => {
+  if (route.query["password-change"] === "1") {
+    await fetchPasswordState();
+    if (passwordChangeVerificationRequired.value) {
+      navigateToSecurityVerification();
+    } else {
+      passwordChangeModal.value = true;
+    }
+  }
+
   for (const pluginModule of pluginModules) {
     try {
       const callbackFunction =
@@ -169,7 +197,7 @@ const activeTab = useRouteQuery<string>("tab", tabs.value[0].id, {
               <VDropdownItem @click="editingModal = true">
                 {{ $t("core.uc_profile.actions.update_profile.title") }}
               </VDropdownItem>
-              <VDropdownItem @click="passwordChangeModal = true">
+              <VDropdownItem @click="handleChangePassword">
                 {{ changePasswordLabel }}
               </VDropdownItem>
             </template>

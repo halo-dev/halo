@@ -29,6 +29,23 @@ public interface EmailVerificationService {
     Mono<Void> verify(String username, String code);
 
     /**
+     * Send a security verification code to the verified email of the given user.
+     *
+     * @param username username of the user must not be blank
+     */
+    Mono<Void> sendSecurityVerificationCode(String username);
+
+    /**
+     * Verify the security verification code of the given user. The code is removed after verification and the email
+     * binding is never changed.
+     *
+     * @param username username of the user must not be blank
+     * @param code code to verify must not be blank
+     * @throws run.halo.app.infra.exception.EmailVerificationFailed if the code is invalid or too many attempts
+     */
+    Mono<Void> verifySecurityVerificationCode(String username, String code);
+
+    /**
      * Send verification code. The only difference is use email as username.
      *
      * @param email email to send must not be blank

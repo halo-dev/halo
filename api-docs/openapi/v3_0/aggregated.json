@@ -24171,6 +24171,7 @@
       "UcUserVo": {
         "required": [
           "name",
+          "passwordChangeVerificationRequired",
           "passwordSet"
         ],
         "type": "object",
@@ -24186,6 +24187,9 @@
           "name": {
             "type": "string",
             "description": "username of the current user"
+          },
+          "passwordChangeVerificationRequired": {
+            "type": "boolean"
           },
           "passwordSet": {
             "type": "boolean",
