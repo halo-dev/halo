@@ -99,6 +99,63 @@ class PostReconcilerTest {
     }
 
     @Test
+    void shouldIncludeOwnerInContributorsEvenIfOwnerNeverEditedContent() {
+        // https://github.com/halo-dev/halo/issues/8284
+        String name = "post-A";
+        Post post = TestPost.postV1();
+        post.getSpec().setPublish(false);
+        post.getSpec().setHeadSnapshot("post-A-head-snapshot");
+        post.getSpec().setOwner("test1");
+        when(client.fetch(eq(Post.class), eq(name))).thenReturn(Optional.of(post));
+        when(postService.getContent(
+                        eq(post.getSpec().getReleaseSnapshot()),
+                        eq(post.getSpec().getBaseSnapshot())))
+                .thenReturn(Mono.empty());
+
+        Snapshot snapshotV1 = TestPost.snapshotV1();
+        Snapshot snapshotV2 = TestPost.snapshotV2();
+        snapshotV1.getSpec().setContributors(Set.of("guqing"));
+        snapshotV2.getSpec().setContributors(Set.of("guqing", "zhangsan"));
+        when(client.listAll(eq(Snapshot.class), any(), any())).thenReturn(List.of(snapshotV1, snapshotV2));
+
+        ArgumentCaptor<Post> captor = ArgumentCaptor.forClass(Post.class);
+        postReconciler.reconcile(new Reconciler.Request(name));
+
+        verify(client, times(1)).update(captor.capture());
+
+        Post value = captor.getValue();
+        assertThat(value.getStatus().getContributors()).isEqualTo(List.of("guqing", "test1", "zhangsan"));
+    }
+
+    @Test
+    void shouldNotDuplicateOwnerWhenOwnerAlreadyContributed() {
+        String name = "post-A";
+        Post post = TestPost.postV1();
+        post.getSpec().setPublish(false);
+        post.getSpec().setHeadSnapshot("post-A-head-snapshot");
+        post.getSpec().setOwner("guqing");
+        when(client.fetch(eq(Post.class), eq(name))).thenReturn(Optional.of(post));
+        when(postService.getContent(
+                        eq(post.getSpec().getReleaseSnapshot()),
+                        eq(post.getSpec().getBaseSnapshot())))
+                .thenReturn(Mono.empty());
+
+        Snapshot snapshotV1 = TestPost.snapshotV1();
+        Snapshot snapshotV2 = TestPost.snapshotV2();
+        snapshotV1.getSpec().setContributors(Set.of("guqing"));
+        snapshotV2.getSpec().setContributors(Set.of("guqing", "zhangsan"));
+        when(client.listAll(eq(Snapshot.class), any(), any())).thenReturn(List.of(snapshotV1, snapshotV2));
+
+        ArgumentCaptor<Post> captor = ArgumentCaptor.forClass(Post.class);
+        postReconciler.reconcile(new Reconciler.Request(name));
+
+        verify(client, times(1)).update(captor.capture());
+
+        Post value = captor.getValue();
+        assertThat(value.getStatus().getContributors()).isEqualTo(List.of("guqing", "zhangsan"));
+    }
+
+    @Test
     void shouldGenerateBlankExcerptWhenContentIsNull() {
         var name = "post-A";
         Post post = TestPost.postV1();
