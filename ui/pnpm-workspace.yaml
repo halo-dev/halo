@@ -9,6 +9,7 @@ catalog:
   vite-plus: 0.3.1
   vitest: 4.1.11
 overrides:
+  vue: "$vue"
   axios: ^1.16.1
   vite-plus: "catalog:"
   "@lezer/javascript": 1.5.4
