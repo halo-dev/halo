@@ -26,7 +26,7 @@ import type { Comment } from '../models';
 // @ts-ignore
 import type { CommentRequest } from '../models';
 // @ts-ignore
-import type { CommentVoList } from '../models';
+import type { CommentVo } from '../models';
 // @ts-ignore
 import type { CommentWithReplyVoList } from '../models';
 // @ts-ignore
@@ -350,7 +350,7 @@ export const CommentV1alpha1PublicApiFp = function(configuration?: Configuration
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getComment(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CommentVoList>> {
+        async getComment(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CommentVo>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getComment(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CommentV1alpha1PublicApi.getComment']?.[localVarOperationServerIndex]?.url;
@@ -423,7 +423,7 @@ export const CommentV1alpha1PublicApiFactory = function (configuration?: Configu
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getComment(requestParameters: CommentV1alpha1PublicApiGetCommentRequest, options?: RawAxiosRequestConfig): AxiosPromise<CommentVoList> {
+        getComment(requestParameters: CommentV1alpha1PublicApiGetCommentRequest, options?: RawAxiosRequestConfig): AxiosPromise<CommentVo> {
             return localVarFp.getComment(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**

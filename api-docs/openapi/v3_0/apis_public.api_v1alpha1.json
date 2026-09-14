@@ -800,7 +800,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/CommentVoList"
+                  "$ref": "#/components/schemas/CommentVo"
                 }
               }
             },
@@ -1685,66 +1685,7 @@
             "$ref": "#/components/schemas/CommentStatus"
           }
         },
-        "description": "A chunk of items."
-      },
-      "CommentVoList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
-        "type": "object",
-        "properties": {
-          "first": {
-            "type": "boolean",
-            "description": "Indicates whether current page is the first page."
-          },
-          "hasNext": {
-            "type": "boolean",
-            "description": "Indicates whether current page has next page."
-          },
-          "hasPrevious": {
-            "type": "boolean",
-            "description": "Indicates whether current page has previous page."
-          },
-          "items": {
-            "type": "array",
-            "description": "A chunk of items.",
-            "items": {
-              "$ref": "#/components/schemas/CommentVo"
-            }
-          },
-          "last": {
-            "type": "boolean",
-            "description": "Indicates whether current page is the last page."
-          },
-          "page": {
-            "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
-          },
-          "size": {
-            "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
-          },
-          "total": {
-            "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
-          },
-          "totalPages": {
-            "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
-          }
-        }
+        "description": "A value object for {@link Comment Comment}."
       },
       "CommentWithReplyVo": {
         "required": [

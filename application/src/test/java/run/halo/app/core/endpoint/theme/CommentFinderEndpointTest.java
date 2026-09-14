@@ -30,6 +30,7 @@ import run.halo.app.extension.Ref;
 import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.theme.finders.CommentFinder;
 import run.halo.app.theme.finders.CommentPublicQueryService;
+import run.halo.app.theme.finders.vo.CommentVo;
 
 /**
  * Tests for {@link CommentFinderEndpoint}.
@@ -101,14 +102,20 @@ class CommentFinderEndpointTest {
 
     @Test
     void getComment() {
-        when(commentPublicQueryService.getByName(any())).thenReturn(null);
+        var spec = new Comment.CommentSpec();
+        spec.setContent("Test comment content");
+        var comment = new CommentVo().setSpec(spec);
+        when(commentPublicQueryService.getByName(any())).thenReturn(Mono.just(comment));
 
         webTestClient
                 .get()
                 .uri("/comments/test-comment")
                 .exchange()
                 .expectStatus()
-                .isOk();
+                .isOk()
+                .expectBody()
+                .jsonPath("$.spec.content")
+                .isEqualTo("Test comment content");
 
         verify(commentPublicQueryService, times(1)).getByName(eq("test-comment"));
     }

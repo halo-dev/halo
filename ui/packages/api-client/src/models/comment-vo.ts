@@ -30,7 +30,7 @@ import type { Metadata } from './metadata';
 import type { OwnerInfo } from './owner-info';
 
 /**
- * A chunk of items.
+ * A value object for {@link Comment Comment}.
  */
 export interface CommentVo {
     'metadata': Metadata;
