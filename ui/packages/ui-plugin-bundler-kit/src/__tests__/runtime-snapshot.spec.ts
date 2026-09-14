@@ -54,6 +54,20 @@ describe("Halo host runtime snapshot", () => {
     }
   });
 
+  it("accepts prerelease dependency versions and rejects invalid versions", () => {
+    const snapshot = structuredClone(HALO_HOST_RUNTIME_SNAPSHOTS[0]);
+    snapshot.packages.vue.version = "3.6.0-rc.8";
+
+    expect(validateHaloHostRuntimeSnapshot(snapshot).packages.vue.version).toBe(
+      "3.6.0-rc.8"
+    );
+
+    snapshot.packages.vue.version = "invalid";
+    expect(() => validateHaloHostRuntimeSnapshot(snapshot)).toThrow(
+      "vue snapshot version must be valid semver."
+    );
+  });
+
   it("reuses the latest eligible sparse snapshot", () => {
     const selected = selectHaloHostRuntimeSnapshot("3.2.9");
 

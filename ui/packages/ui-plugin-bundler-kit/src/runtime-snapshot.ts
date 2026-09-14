@@ -181,9 +181,9 @@ function validateSnapshotEntry(
   if (
     !isRecord(value) ||
     typeof value.version !== "string" ||
-    !parseStableVersion(value.version)
+    !parse(value.version)
   ) {
-    throw new Error(`${root} snapshot version must be stable semver.`);
+    throw new Error(`${root} snapshot version must be valid semver.`);
   }
   if (
     !Array.isArray(value.exports) ||
