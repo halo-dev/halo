@@ -654,10 +654,10 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
         public FilePart getFile() {
             var part = multipartData.getFirst("file");
             if (part == null) {
-                throw new ServerWebInputException("Form field file is required");
+                throw new ServerWebInputException("problemDetail.upload.fileRequired");
             }
             if (!(part instanceof FilePart file)) {
-                throw new ServerWebInputException("Invalid parameter of file");
+                throw new ServerWebInputException("problemDetail.upload.fileRequired");
             }
             if (!Paths.get(file.filename()).toString().endsWith(".jar")) {
                 throw new UnsatisfiedAttributeValueException(

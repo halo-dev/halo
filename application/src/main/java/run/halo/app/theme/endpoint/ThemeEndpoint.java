@@ -450,7 +450,7 @@ public class ThemeEndpoint implements CustomEndpoint {
         public FilePart getFile() {
             var part = multipartData.getFirst("file");
             if (!(part instanceof FilePart filePart)) {
-                throw new ServerWebInputException("Invalid multipart type of file");
+                throw new ServerWebInputException("problemDetail.upload.fileRequired");
             }
             if (!filePart.filename().endsWith(".zip")) {
                 throw new UnsatisfiedAttributeValueException(
@@ -529,7 +529,7 @@ public class ThemeEndpoint implements CustomEndpoint {
         FilePart getFile() {
             Part part = multipartData.getFirst("file");
             if (!(part instanceof FilePart file)) {
-                throw new ServerWebInputException("Invalid parameter of file, binary data is required");
+                throw new ServerWebInputException("problemDetail.upload.fileRequired");
             }
             if (!Paths.get(file.filename()).toString().endsWith(".zip")) {
                 throw new UnsatisfiedAttributeValueException(

@@ -1,35 +1,88 @@
 package run.halo.app.infra.exception.handlers;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
 import org.springframework.mock.web.server.MockServerWebExchange;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.server.WebFilterExchange;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.HandlerStrategies;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
+import run.halo.app.core.endpoint.console.PluginEndpoint;
 import run.halo.app.infra.exception.AgreementNotAcceptedException;
 import run.halo.app.infra.exception.EmailAlreadyTakenException;
 import run.halo.app.infra.exception.Exceptions;
 import run.halo.app.infra.exception.RestrictedNameException;
+import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.security.LoginHandlerEnhancer;
 import run.halo.app.security.authentication.LoginFailureHandler;
 import run.halo.app.security.authentication.UserAccountStatusChecker;
 import run.halo.app.security.authentication.exception.TooManyRequestsException;
 import run.halo.app.security.authentication.twofactor.TwoFactorAuthRequiredException;
+import run.halo.app.theme.endpoint.ThemeEndpoint;
 
 class UserFacingExceptionI18nTest {
+
+    @ParameterizedTest
+    @CsvSource({"en, Please select a file to upload.", "zh, 请选择要上传的文件。", "es, Selecciona un archivo para subir."})
+    void shouldTranslateMissingAndNonFileUploads(String language, String detail) {
+        var messages = new ReloadableResourceBundleMessageSource();
+        messages.setBasename("file:src/main/resources/config/i18n/messages");
+        messages.setDefaultEncoding("UTF-8");
+        messages.setFallbackToSystemLocale(false);
+        var plugins = mock(PluginEndpoint.class, CALLS_REAL_METHODS);
+        var themes = mock(ThemeEndpoint.class, CALLS_REAL_METHODS);
+        var webClient = WebTestClient.bindToRouterFunction(plugins.endpoint().and(themes.endpoint()))
+                .webFilter((exchange, chain) -> chain.filter(exchange)
+                        .onErrorResume(ServerWebInputException.class, error -> {
+                            var body = Exceptions.createErrorResponse(error, null, exchange, messages)
+                                    .getBody();
+                            var response = exchange.getResponse();
+                            response.setStatusCode(error.getStatusCode());
+                            response.getHeaders().setContentType(MediaType.APPLICATION_PROBLEM_JSON);
+                            return response.writeWith(Mono.just(response.bufferFactory()
+                                    .wrap(JsonUtils.objectToJson(body).getBytes(StandardCharsets.UTF_8))));
+                        }))
+                .build();
+        for (var path :
+                new String[] {"/plugins/install", "/plugins/test/upgrade", "/themes/install", "/themes/test/upgrade"}) {
+            for (var nonFilePart : new boolean[] {false, true}) {
+                var multipart = new MultipartBodyBuilder();
+                multipart.part("source", "file");
+                if (nonFilePart) {
+                    multipart.part("file", "not a file");
+                }
+                webClient
+                        .post()
+                        .uri(path)
+                        .header("Accept-Language", language)
+                        .body(BodyInserters.fromMultipartData(multipart.build()))
+                        .exchange()
+                        .expectStatus()
+                        .isBadRequest()
+                        .expectBody()
+                        .jsonPath("$.detail")
+                        .isEqualTo(detail);
+            }
+        }
+    }
 
     @ParameterizedTest
     @CsvSource({
