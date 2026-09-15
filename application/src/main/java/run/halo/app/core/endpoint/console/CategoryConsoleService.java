@@ -19,7 +19,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.server.ServerWebInputException;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -29,6 +28,7 @@ import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.MetadataOperator;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.exception.NotFoundException;
+import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 
 @Component
 public class CategoryConsoleService {
@@ -49,8 +49,7 @@ public class CategoryConsoleService {
                         .filter(OptimisticLockingFailureException.class::isInstance))
                 .onErrorMap(
                         Exceptions::isRetryExhausted,
-                        error -> new ResponseStatusException(
-                                HttpStatus.CONFLICT, "Category position update conflicted.", error));
+                        error -> new ResponseStatusException(HttpStatus.CONFLICT, "problemDetail.conflict", error));
     }
 
     private Mono<List<CategoryTreeNode>> move(String name, String targetParentName, String beforeName) {
@@ -69,23 +68,32 @@ public class CategoryConsoleService {
                         LinkedHashMap::new));
         var moved = categoryMap.get(name);
         if (moved == null) {
-            return Mono.error(new NotFoundException("Category with name " + name + " not found"));
+            return Mono.error(new NotFoundException(
+                    "problemDetail.category.notFound",
+                    new Object[] {name},
+                    "Category with name " + name + " not found"));
         }
 
         if (targetParentName != null) {
             if (Objects.equals(targetParentName, name)) {
-                return Mono.error(new ServerWebInputException("Cannot move a Category under itself."));
+                return Mono.error(new UnsatisfiedAttributeValueException(
+                        "Cannot move a Category under itself.", "problemDetail.hierarchy.self", null));
             }
             if (!categoryMap.containsKey(targetParentName)) {
-                return Mono.error(new ServerWebInputException("Parent Category was not found."));
+                return Mono.error(new UnsatisfiedAttributeValueException(
+                        "Parent Category was not found.", "problemDetail.hierarchy.parentMissing", null));
             }
             if (isDescendant(targetParentName, name, categoryMap)) {
-                return Mono.error(new ServerWebInputException("Cannot move a Category under one of its descendants."));
+                return Mono.error(new UnsatisfiedAttributeValueException(
+                        "Cannot move a Category under one of its descendants.",
+                        "problemDetail.hierarchy.descendant",
+                        null));
             }
         }
 
         if (beforeName != null && !categoryMap.containsKey(beforeName)) {
-            return Mono.error(new ServerWebInputException("Before Category was not found."));
+            return Mono.error(new UnsatisfiedAttributeValueException(
+                    "Before Category was not found.", "problemDetail.hierarchy.beforeMissing", null));
         }
 
         var originalStates = categories.stream()
@@ -102,7 +110,8 @@ public class CategoryConsoleService {
         if (beforeName != null) {
             insertIndex = indexOf(targetSiblings, beforeName);
             if (insertIndex < 0) {
-                return Mono.error(new ServerWebInputException("Before Category is not a target sibling."));
+                return Mono.error(new UnsatisfiedAttributeValueException(
+                        "Before Category is not a target sibling.", "problemDetail.hierarchy.notSibling", null));
             }
         }
         targetSiblings.add(insertIndex, moved);
@@ -225,7 +234,8 @@ public class CategoryConsoleService {
                 return true;
             }
             if (!visited.add(current)) {
-                throw new ServerWebInputException("Target parent has a cyclic parent chain.");
+                throw new UnsatisfiedAttributeValueException(
+                        "Target parent has a cyclic parent chain.", "problemDetail.hierarchy.cycle", null);
             }
             current = Optional.ofNullable(categoryMap.get(current))
                     .map(CategoryConsoleService::parentNameOf)

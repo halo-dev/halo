@@ -69,6 +69,7 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.IListRequest;
 import run.halo.app.extension.router.SortableRequest;
 import run.halo.app.infra.ReactiveUrlDataBufferFetcher;
+import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.infra.utils.SettingUtils;
 import run.halo.app.plugin.PluginService;
 import run.halo.app.plugin.UiPluginBundleService;
@@ -659,7 +660,8 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
                 throw new ServerWebInputException("Invalid parameter of file");
             }
             if (!Paths.get(file.filename()).toString().endsWith(".jar")) {
-                throw new ServerWebInputException("Invalid file type, only jar is supported");
+                throw new UnsatisfiedAttributeValueException(
+                        "Invalid file type, only jar is supported", "problemDetail.plugin.archiveType", null);
             }
             return file;
         }

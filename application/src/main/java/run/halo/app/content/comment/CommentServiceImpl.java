@@ -64,9 +64,7 @@ public class CommentServiceImpl extends AbstractCommentService implements Commen
         if (comment.getSpec() == null
                 || comment.getSpec().getContent() == null
                 || !isSafeHtml(comment.getSpec().getContent())) {
-            return Mono.error(new ServerWebInputException("""
-                The content of comment must not be empty or contains unsafe HTML.\
-                """));
+            return Mono.error(new ServerWebInputException("problemDetail.comment.content.unsafe"));
         }
         return environmentFetcher
                 .fetchComment()

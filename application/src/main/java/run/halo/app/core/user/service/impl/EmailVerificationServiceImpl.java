@@ -14,7 +14,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
-import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import reactor.util.retry.Retry;
@@ -25,6 +24,7 @@ import run.halo.app.core.user.service.EmailVerificationService;
 import run.halo.app.extension.*;
 import run.halo.app.extension.index.query.Queries;
 import run.halo.app.infra.exception.EmailVerificationFailed;
+import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.notification.NotificationCenter;
 import run.halo.app.notification.NotificationReasonEmitter;
 import run.halo.app.notification.UserIdentity;
@@ -56,7 +56,8 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
                     var userEmail = user.getSpec().getEmail();
                     var isVerified = user.getSpec().isEmailVerified();
                     if (StringUtils.equalsIgnoreCase(userEmail, email) && isVerified) {
-                        return Mono.error(() -> new ServerWebInputException("Email already verified."));
+                        return Mono.error(() -> new UnsatisfiedAttributeValueException(
+                                "Email already verified.", "problemDetail.user.email.alreadyVerified", null));
                     }
                     var annotations = MetadataUtil.nullSafeAnnotations(user);
                     var oldEmailToVerify = annotations.get(User.EMAIL_TO_VERIFY);

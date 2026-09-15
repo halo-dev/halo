@@ -1,6 +1,7 @@
 package run.halo.app.security;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.savedrequest.ServerRequestCache;
@@ -19,9 +20,12 @@ class ProfileCompletionSecurityConfigurer implements SecurityConfigurer {
 
     private final ServerResponse.Context responseContext;
 
+    private final MessageSource messageSource;
+
     @Override
     public void configure(ServerHttpSecurity http) {
-        var profileCompletionFilter = new ProfileCompletionFilter(profileCompletionFlow, requestCache, responseContext);
+        var profileCompletionFilter =
+                new ProfileCompletionFilter(profileCompletionFlow, requestCache, responseContext, messageSource);
         http.addFilterAfter(profileCompletionFilter, SecurityWebFiltersOrder.ANONYMOUS_AUTHENTICATION);
     }
 }

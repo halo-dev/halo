@@ -51,6 +51,7 @@ import run.halo.app.extension.ListResult;
 import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.exception.NotFoundException;
+import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 
 @Component
 @RequiredArgsConstructor
@@ -159,8 +160,10 @@ public class AttachmentUcEndpoint implements CustomEndpoint {
                 .mapNotNull(SystemSetting.Attachment::uc)
                 .filter(uo -> StringUtils.isNotBlank(uo.policyName()))
                 .switchIfEmpty(Mono.defer(() -> getConfigFromUser))
-                .switchIfEmpty(Mono.error(
-                        () -> new ServerWebInputException("Attachment system setting is not configured for console")));
+                .switchIfEmpty(Mono.error(() -> new UnsatisfiedAttributeValueException(
+                        "Attachment system setting is not configured for console",
+                        "problemDetail.attachment.settingsMissing",
+                        null)));
         return attachmentHandler.handleUpload(request, getConfig);
     }
 
@@ -255,7 +258,10 @@ public class AttachmentUcEndpoint implements CustomEndpoint {
         return systemSettingFetcher.fetchPost().handle((postSetting, sink) -> {
             var attachmentPolicyName = postSetting.getAttachmentPolicyName();
             if (StringUtils.isBlank(attachmentPolicyName)) {
-                sink.error(new ServerWebInputException("Please configure storage policy for post attachment first."));
+                sink.error(new UnsatisfiedAttributeValueException(
+                        "Please configure storage policy for post attachment first.",
+                        "problemDetail.attachment.policyMissing",
+                        null));
                 return;
             }
             sink.next(postSetting);

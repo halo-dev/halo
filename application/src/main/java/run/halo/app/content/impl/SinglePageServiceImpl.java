@@ -27,6 +27,7 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Ref;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
+import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 
 /**
  * Single page service implementation.
@@ -193,12 +194,11 @@ public class SinglePageServiceImpl extends AbstractContentService implements Sin
                     var baseSnapshotName = page.getSpec().getBaseSnapshot();
                     var releaseSnapshotName = page.getSpec().getReleaseSnapshot();
                     if (StringUtils.equals(releaseSnapshotName, snapshotName)) {
-                        return Mono.error(
-                                new ServerWebInputException("The snapshot to delete is the release snapshot, please"
-                                        + " revert to another snapshot first."));
+                        return Mono.error(new ServerWebInputException("problemDetail.content.snapshot.published"));
                     }
                     if (StringUtils.equals(baseSnapshotName, snapshotName)) {
-                        return Mono.error(new ServerWebInputException("The first snapshot cannot be deleted."));
+                        return Mono.error(new UnsatisfiedAttributeValueException(
+                                "The first snapshot cannot be deleted.", "problemDetail.content.snapshot.first", null));
                     }
                     return client.fetch(Snapshot.class, snapshotName)
                             .flatMap(client::delete)

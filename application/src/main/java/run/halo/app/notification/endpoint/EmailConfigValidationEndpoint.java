@@ -24,6 +24,7 @@ import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.extension.GroupVersion;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.notification.EmailSenderHelper;
 
 /**
@@ -75,7 +76,7 @@ public class EmailConfigValidationEndpoint implements CustomEndpoint {
                     } catch (MailException e) {
                         String errorMsg = "Failed to send email, please check your email configuration.";
                         log.error(errorMsg, e);
-                        throw new ServerWebInputException(errorMsg, null, e);
+                        throw new ServerWebInputException("problemDetail.email.sendFailed", null, e);
                     }
                     return ServerResponse.ok().build();
                 }));
@@ -89,8 +90,10 @@ public class EmailConfigValidationEndpoint implements CustomEndpoint {
                 .flatMap(user -> {
                     var email = user.getSpec().getEmail();
                     if (StringUtils.isBlank(email)) {
-                        return Mono.error(
-                                new ServerWebInputException("Your email is missing, please set it in your profile."));
+                        return Mono.error(new UnsatisfiedAttributeValueException(
+                                "Your email is missing, please set it in your profile.",
+                                "problemDetail.user.email.missing",
+                                null));
                     }
                     return Mono.just(email);
                 });

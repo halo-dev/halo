@@ -7,7 +7,14 @@ public class OAuth2RegistrationException extends ServerWebInputException {
     private final Error error;
 
     public OAuth2RegistrationException(Error error) {
-        super(error.reason());
+        super(
+                error.reason(),
+                null,
+                null,
+                error == Error.REGISTRATION_CLOSED
+                        ? "problemDetail.user.signUpFailed.disallowed"
+                        : "problemDetail.user.signup.defaultRoleMissing",
+                null);
         this.error = error;
     }
 
