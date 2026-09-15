@@ -175,8 +175,8 @@ export const CommentV1alpha1PublicApiAxiosParamCreator = function (configuration
         },
         /**
          * Get a visible reply under a comment.
-         * @param {string} name
-         * @param {string} replyName
+         * @param {string} name 
+         * @param {string} replyName 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -208,7 +208,7 @@ export const CommentV1alpha1PublicApiAxiosParamCreator = function (configuration
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
 
-
+    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -405,8 +405,8 @@ export const CommentV1alpha1PublicApiFp = function(configuration?: Configuration
         },
         /**
          * Get a visible reply under a comment.
-         * @param {string} name
-         * @param {string} replyName
+         * @param {string} name 
+         * @param {string} replyName 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
