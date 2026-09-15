@@ -72,6 +72,9 @@ class CommentServiceImplTest {
     @Mock
     CounterService counterService;
 
+    @Mock
+    CommentPermalinkService permalinkService;
+
     private static User createUser(String name) {
         User user = new User();
         user.setMetadata(new Metadata());
@@ -85,6 +88,7 @@ class CommentServiceImplTest {
 
     @Test
     void listComment() {
+        when(permalinkService.getPermalink(any())).thenReturn(Mono.empty());
         var comments = new ListResult<Comment>(1, 10, 3, comments());
         when(client.listBy(eq(Comment.class), any(ListOptions.class), any(PageRequest.class)))
                 .thenReturn(Mono.just(comments));

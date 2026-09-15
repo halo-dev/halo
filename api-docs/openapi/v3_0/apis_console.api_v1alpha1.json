@@ -5265,6 +5265,10 @@
           "owner": {
             "$ref": "#/components/schemas/OwnerInfo"
           },
+          "permalink": {
+            "type": "string",
+            "description": "Frontend permalink to this comment, when its subject URL is available."
+          },
           "stats": {
             "$ref": "#/components/schemas/CommentStats"
           },
@@ -5446,6 +5450,10 @@
         "properties": {
           "owner": {
             "$ref": "#/components/schemas/OwnerInfo"
+          },
+          "permalink": {
+            "type": "string",
+            "description": "Frontend permalink to this reply, when its subject URL is available."
           },
           "reply": {
             "$ref": "#/components/schemas/Reply"

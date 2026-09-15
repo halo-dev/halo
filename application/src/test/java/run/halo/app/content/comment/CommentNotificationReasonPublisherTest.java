@@ -277,7 +277,10 @@ class CommentNotificationReasonPublisherTest {
             var metadata = new Metadata();
             metadata.setName("fake-post");
             when(post.getMetadata()).thenReturn(metadata);
-            when(post.getStatusOrDefault()).thenReturn(new Post.PostStatus());
+            var status = new Post.PostStatus();
+            status.setPermalink("/archives/post");
+            when(post.getStatusOrDefault()).thenReturn(status);
+            when(externalLinkProcessor.processLink("/archives/post")).thenReturn("https://example.test/archives/post");
             when(post.getSpec()).thenReturn(spec);
             when(spec.getTitle()).thenReturn("fake-title");
 
@@ -300,6 +303,7 @@ class CommentNotificationReasonPublisherTest {
                         .kind(post.getKind())
                         .name(post.getMetadata().getName())
                         .title(post.getSpec().getTitle())
+                        .url("https://example.test/archives/post")
                         .build();
                 assertThat(reasonPayload.getSubject()).isEqualTo(reasonSubject);
 
@@ -308,6 +312,11 @@ class CommentNotificationReasonPublisherTest {
                                 comment.getSpec().getOwner().getName()));
 
                 assertThat(reasonPayload.getAttributes())
+                        .containsEntry(
+                                "commentUrl",
+                                "https://example.test/archives/post#halo-comment="
+                                        + comment.getMetadata().getName())
+                        .containsEntry("postUrl", "https://example.test/archives/post")
                         .containsAllEntriesOf(Map.of(
                                 "postName", post.getMetadata().getName(),
                                 "postTitle", post.getSpec().getTitle(),
@@ -388,7 +397,10 @@ class CommentNotificationReasonPublisherTest {
             var metadata = new Metadata();
             metadata.setName("fake-page");
             when(page.getMetadata()).thenReturn(metadata);
-            when(page.getStatusOrDefault()).thenReturn(new SinglePage.SinglePageStatus());
+            var status = new SinglePage.SinglePageStatus();
+            status.setPermalink("/page");
+            when(page.getStatusOrDefault()).thenReturn(status);
+            when(externalLinkProcessor.processLink("/page")).thenReturn("https://example.test/page");
             when(page.getSpec()).thenReturn(spec);
             when(spec.getTitle()).thenReturn("fake-title");
 
@@ -411,6 +423,7 @@ class CommentNotificationReasonPublisherTest {
                         .kind(page.getKind())
                         .name(page.getMetadata().getName())
                         .title(page.getSpec().getTitle())
+                        .url("https://example.test/page")
                         .build();
                 assertThat(reasonPayload.getSubject()).isEqualTo(reasonSubject);
 
@@ -419,6 +432,11 @@ class CommentNotificationReasonPublisherTest {
                                 comment.getSpec().getOwner().getName()));
 
                 assertThat(reasonPayload.getAttributes())
+                        .containsEntry(
+                                "commentUrl",
+                                "https://example.test/page#halo-comment="
+                                        + comment.getMetadata().getName())
+                        .containsEntry("pageUrl", "https://example.test/page")
                         .containsAllEntriesOf(Map.of(
                                 "pageName", page.getMetadata().getName(),
                                 "pageTitle", page.getSpec().getTitle(),
@@ -474,6 +492,9 @@ class CommentNotificationReasonPublisherTest {
     class NewReplyReasonPublisherTest {
 
         @Mock
+        ExternalLinkProcessor externalLinkProcessor;
+
+        @Mock
         ExtensionClient client;
 
         @Mock
@@ -490,7 +511,12 @@ class CommentNotificationReasonPublisherTest {
 
         @Test
         void publishReasonByTest() {
-            when(extensionGetter.getExtensions(CommentSubject.class)).thenReturn(Flux.empty());
+            var subject = mock(PostCommentSubject.class);
+            when(extensionGetter.getExtensions(CommentSubject.class)).thenReturn(Flux.just(subject));
+            when(subject.supports(any())).thenReturn(true);
+            when(subject.getSubjectDisplay(any()))
+                    .thenReturn(Mono.just(new CommentSubject.SubjectDisplay("Post", "/post", "Post")));
+            when(externalLinkProcessor.processLink("/post")).thenReturn("https://example.test/post");
             var reply = createReply("fake-reply");
 
             reply.getSpec().setQuoteReply("fake-quote-reply");
@@ -534,6 +560,11 @@ class CommentNotificationReasonPublisherTest {
                                         reply.getSpec().getOwner().getName()));
 
                         assertThat(reasonPayload.getAttributes())
+                                .containsEntry(
+                                        "replyUrl",
+                                        "https://example.test/post#halo-comment="
+                                                + comment.getMetadata().getName() + "&reply=fake-reply")
+                                .containsEntry("commentSubjectUrl", "https://example.test/post")
                                 .containsAllEntriesOf(Map.of(
                                         "commentContent", comment.getSpec().getContent(),
                                         "isQuoteReply", true,

@@ -35,6 +35,9 @@ public class CommentVo implements ExtensionVoOperator {
     @Schema(requiredMode = REQUIRED)
     private CommentStatsVo stats;
 
+    @Schema(description = "Frontend permalink to this comment, when its subject URL is available.")
+    private String permalink;
+
     /**
      * Convert {@link Comment} to {@link CommentVo}.
      *

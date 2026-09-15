@@ -27,11 +27,15 @@ import type { OwnerInfo } from './owner-info';
 import type { ReplySpec } from './reply-spec';
 
 /**
- * A chunk of items.
+ * A value object for {@link Reply Reply}.
  */
 export interface ReplyVo {
     'metadata': Metadata;
     'owner': OwnerInfo;
+    /**
+     * Frontend permalink to this reply, when its subject URL is available.
+     */
+    'permalink'?: string;
     'spec': ReplySpec;
     'stats': CommentStatsVo;
 }

@@ -8,7 +8,6 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Ref;
-import run.halo.app.infra.ExternalLinkProcessor;
 
 /**
  * Comment subject for post.
@@ -21,7 +20,6 @@ import run.halo.app.infra.ExternalLinkProcessor;
 public class PostCommentSubject implements CommentSubject<Post> {
 
     private final ReactiveExtensionClient client;
-    private final ExternalLinkProcessor externalLinkProcessor;
 
     @Override
     public Mono<Post> get(String name) {
@@ -30,11 +28,9 @@ public class PostCommentSubject implements CommentSubject<Post> {
 
     @Override
     public Mono<SubjectDisplay> getSubjectDisplay(String name) {
-        return get(name).map(post -> {
-            var url =
-                    externalLinkProcessor.processLink(post.getStatusOrDefault().getPermalink());
-            return new SubjectDisplay(post.getSpec().getTitle(), url, "文章");
-        });
+        return get(name)
+                .map(post -> new SubjectDisplay(
+                        post.getSpec().getTitle(), post.getStatusOrDefault().getPermalink(), "文章"));
     }
 
     @Override

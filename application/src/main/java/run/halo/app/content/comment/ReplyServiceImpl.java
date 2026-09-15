@@ -37,6 +37,8 @@ import run.halo.app.infra.exception.RequestRestrictedException;
 @Service
 public class ReplyServiceImpl extends AbstractCommentService implements ReplyService {
 
+    private final CommentPermalinkService permalinkService;
+
     private final Supplier<RequestRestrictedException> requestRestrictedExceptionSupplier =
             () -> new RequestRestrictedException("problemDetail.comment.waitingForApproval");
 
@@ -44,8 +46,10 @@ public class ReplyServiceImpl extends AbstractCommentService implements ReplySer
             RoleService roleService,
             ReactiveExtensionClient client,
             UserService userService,
-            CounterService counterService) {
+            CounterService counterService,
+            CommentPermalinkService permalinkService) {
         super(roleService, client, userService, counterService);
+        this.permalinkService = permalinkService;
     }
 
     @Override
@@ -172,11 +176,19 @@ public class ReplyServiceImpl extends AbstractCommentService implements ReplySer
     @Override
     public Mono<ListResult<ListedReply>> list(ReplyQuery query) {
         return client.listBy(Reply.class, query.toListOptions(), query.toPageRequest())
-                .flatMap(list -> Flux.fromStream(list.get().map(this::toListedReply))
-                        .flatMapSequential(Function.identity())
-                        .collectList()
-                        .map(listedReplies ->
-                                new ListResult<>(list.getPage(), list.getSize(), list.getTotal(), listedReplies)));
+                .flatMap(list -> client.fetch(Comment.class, query.getCommentName())
+                        .flatMap(comment ->
+                                permalinkService.getSubjectUrl(comment.getSpec().getSubjectRef()))
+                        .defaultIfEmpty("")
+                        .flatMap(subjectUrl -> Flux.fromStream(list.get().map(this::toListedReply))
+                                .flatMapSequential(Function.identity())
+                                .doOnNext(item -> item.setPermalink(CommentPermalinkService.getPermalink(
+                                        subjectUrl,
+                                        query.getCommentName(),
+                                        item.getReply().getMetadata().getName())))
+                                .collectList()
+                                .map(listedReplies -> new ListResult<>(
+                                        list.getPage(), list.getSize(), list.getTotal(), listedReplies))));
     }
 
     @Override

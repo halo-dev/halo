@@ -130,8 +130,8 @@ class CommentContentUpdateTest {
 
     private Mono<? extends Extension> edit(boolean reply, CommentContentRequest request) {
         return reply
-                ? new ReplyServiceImpl(null, client, null, null).updateContent("entry", request)
-                : new CommentServiceImpl(null, client, null, null, null, null).updateContent("entry", request);
+                ? new ReplyServiceImpl(null, client, null, null, null).updateContent("entry", request)
+                : new CommentServiceImpl(null, client, null, null, null, null, null).updateContent("entry", request);
     }
 
     private Extension stored(boolean reply, boolean approved) {
