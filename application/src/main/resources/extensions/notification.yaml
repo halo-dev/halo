@@ -248,3 +248,23 @@ spec:
     - name: expirationAtMinutes
       type: string
       description: "The expiration minutes of the verification code."
+---
+apiVersion: notification.halo.run/v1alpha1
+kind: ReasonType
+metadata:
+  name: security-verification
+  labels:
+    halo.run/hidden: "true"
+spec:
+  displayName: "安全验证"
+  description: "当你的账号正在进行安全验证时，会收到一条带有验证码的邮件。"
+  properties:
+    - name: username
+      type: string
+      description: "The username of the user."
+    - name: code
+      type: string
+      description: "The verification code."
+    - name: expirationAtMinutes
+      type: string
+      description: "The expiration minutes of the verification code, such as 10 minutes."

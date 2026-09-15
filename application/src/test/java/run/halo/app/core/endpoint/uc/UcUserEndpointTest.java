@@ -1,6 +1,7 @@
 package run.halo.app.core.endpoint.uc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -11,6 +12,8 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockUser;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.springSecurity;
 
+import java.nio.charset.StandardCharsets;
+import java.util.LinkedHashMap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,12 +22,16 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.user.service.UserService;
 import run.halo.app.extension.Metadata;
 import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
+import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.security.verification.SecurityVerificationService;
 
 @ExtendWith(MockitoExtension.class)
 class UcUserEndpointTest {
@@ -37,9 +44,30 @@ class UcUserEndpointTest {
     @Mock
     UserService userService;
 
+    @Mock
+    SecurityVerificationService securityVerificationService;
+
     @BeforeEach
     void setUp() {
         webClient = WebTestClient.bindToRouterFunction(endpoint.endpoint())
+                .webFilter((exchange, chain) -> chain.filter(exchange)
+                        .onErrorResume(ResponseStatusException.class, error -> {
+                            var response = exchange.getResponse();
+                            response.setStatusCode(error.getStatusCode());
+                            response.getHeaders().setContentType(MediaType.APPLICATION_PROBLEM_JSON);
+                            var problemDetail = error.getBody();
+                            var bodyMap = new LinkedHashMap<String, Object>();
+                            if (problemDetail.getProperties() != null) {
+                                bodyMap.putAll(problemDetail.getProperties());
+                            }
+                            bodyMap.put("type", problemDetail.getType());
+                            bodyMap.put("title", problemDetail.getTitle());
+                            bodyMap.put("status", problemDetail.getStatus());
+                            bodyMap.put("detail", problemDetail.getDetail());
+                            var body = JsonUtils.objectToJson(bodyMap).getBytes(StandardCharsets.UTF_8);
+                            return response.writeWith(
+                                    Mono.just(response.bufferFactory().wrap(body)));
+                        }))
                 .apply(springSecurity())
                 .build();
     }
@@ -386,6 +414,131 @@ class UcUserEndpointTest {
                 .exchange()
                 .expectStatus()
                 .isForbidden();
+    }
+
+    @Test
+    void shouldGetPasswordChangeVerificationRequired() {
+        when(userService.getUser("faker")).thenReturn(Mono.just(userWithEmailVerified(true)));
+        when(securityVerificationService.hasVerificationMethod(any())).thenReturn(true);
+        when(securityVerificationService.isVerified(any())).thenReturn(false);
+        webClient
+                .mutate()
+                .apply(mockAuthentication(
+                        new UsernamePasswordAuthenticationToken("faker", "password", createAuthorityList("ROLE_USER"))))
+                .build()
+                .get()
+                .uri("/users/-")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.passwordChangeVerificationRequired")
+                .isEqualTo(true);
+    }
+
+    @Test
+    void shouldNotGetPasswordChangeVerificationRequiredWhenVerified() {
+        when(userService.getUser("faker")).thenReturn(Mono.just(userWithEmailVerified(true)));
+        when(securityVerificationService.hasVerificationMethod(any())).thenReturn(true);
+        when(securityVerificationService.isVerified(any())).thenReturn(true);
+        webClient
+                .mutate()
+                .apply(mockAuthentication(
+                        new UsernamePasswordAuthenticationToken("faker", "password", createAuthorityList("ROLE_USER"))))
+                .build()
+                .get()
+                .uri("/users/-")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.passwordChangeVerificationRequired")
+                .isEqualTo(false);
+    }
+
+    @Test
+    void shouldForbidPasswordChangeWithoutVerification() {
+        when(userService.getUser("faker")).thenReturn(Mono.just(userWithEmailVerified(true)));
+        when(securityVerificationService.hasVerificationMethod(any())).thenReturn(true);
+        when(securityVerificationService.isVerified(any())).thenReturn(false);
+        webClient
+                .mutate()
+                .apply(mockAuthentication(
+                        new UsernamePasswordAuthenticationToken("faker", "password", createAuthorityList("ROLE_USER"))))
+                .build()
+                .put()
+                .uri("/users/-/password")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "oldPassword": "old-password",
+                          "password": "new-password"
+                        }\
+                        """)
+                .exchange()
+                .expectStatus()
+                .isForbidden()
+                .expectBody()
+                .jsonPath("$.redirectURI")
+                .isEqualTo("/security-verification");
+    }
+
+    @Test
+    void shouldChangePasswordWhenVerified() {
+        when(userService.getUser("faker")).thenReturn(Mono.just(userWithEmailVerified(true)));
+        when(securityVerificationService.hasVerificationMethod(any())).thenReturn(true);
+        when(securityVerificationService.isVerified(any())).thenReturn(true);
+        when(userService.confirmPassword("faker", "old-password")).thenReturn(Mono.just(true));
+        when(userService.updateWithRawPassword("faker", "new-password")).thenReturn(Mono.just(createUser(true)));
+        webClient
+                .mutate()
+                .apply(mockAuthentication(
+                        new UsernamePasswordAuthenticationToken("faker", "password", createAuthorityList("ROLE_USER"))))
+                .build()
+                .put()
+                .uri("/users/-/password")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "oldPassword": "old-password",
+                          "password": "new-password"
+                        }\
+                        """)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.passwordSet")
+                .isEqualTo(true);
+    }
+
+    @Test
+    void shouldNotRequireVerificationWhenPasswordNotSet() {
+        when(userService.getUser("faker")).thenReturn(Mono.just(userWithEmailVerified(false)));
+        when(securityVerificationService.hasVerificationMethod(any())).thenReturn(true);
+        when(userService.updateWithRawPassword("faker", "new-password")).thenReturn(Mono.just(createUser(true)));
+        webClient
+                .mutate()
+                .apply(mockAuthentication(
+                        new UsernamePasswordAuthenticationToken("faker", "password", createAuthorityList("ROLE_USER"))))
+                .build()
+                .put()
+                .uri("/users/-/password")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "password": "new-password"
+                        }\
+                        """)
+                .exchange()
+                .expectStatus()
+                .isOk();
+    }
+
+    User userWithEmailVerified(boolean passwordSet) {
+        var user = createUser(passwordSet);
+        user.getSpec().setEmailVerified(true);
+        return user;
     }
 
     User createUser(boolean passwordSet) {
