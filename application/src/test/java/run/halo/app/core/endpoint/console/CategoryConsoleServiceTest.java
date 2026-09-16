@@ -10,12 +10,14 @@ import static org.mockito.Mockito.when;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Flux;
@@ -197,7 +199,15 @@ class CategoryConsoleServiceTest {
 
         service.updatePosition("root", new CategoryPositionRequest("missing", null))
                 .as(StepVerifier::create)
-                .expectError(ServerWebInputException.class)
+                .expectErrorSatisfies(error -> {
+                    var messages = new ReloadableResourceBundleMessageSource();
+                    messages.setBasename("file:src/main/resources/config/i18n/messages");
+                    messages.setDefaultEncoding("UTF-8");
+                    assertThat(((ServerWebInputException) error)
+                                    .updateAndGetBody(messages, Locale.CHINESE)
+                                    .getDetail())
+                            .isEqualTo("目标父节点不存在，请刷新后重试。");
+                })
                 .verify();
 
         verify(client, never()).update(any(Category.class));

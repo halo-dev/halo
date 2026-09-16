@@ -57,9 +57,7 @@ public class ReplyServiceImpl extends AbstractCommentService implements ReplySer
         if (reply.getSpec() == null
                 || reply.getSpec().getContent() == null
                 || !isSafeHtml(reply.getSpec().getContent())) {
-            return Mono.error(new ServerWebInputException("""
-                The content of reply must not be empty or contains unsafe HTML.\
-                """));
+            return Mono.error(new ServerWebInputException("problemDetail.comment.content.unsafe"));
         }
         return client.get(Comment.class, commentName)
                 .flatMap(this::approveComment)

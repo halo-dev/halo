@@ -3,7 +3,6 @@ package run.halo.app.core.user.service.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -398,7 +397,9 @@ class UserServiceImplTest {
                     .as(StepVerifier::create)
                     .consumeErrorWith(e -> {
                         assertInstanceOf(ServerWebInputException.class, e);
-                        assertTrue(e.getMessage().contains("registration is not allowed"));
+                        assertEquals(
+                                "problemDetail.user.signUpFailed.disallowed",
+                                ((ServerWebInputException) e).getReason());
                     })
                     .verify();
         }
@@ -467,7 +468,9 @@ class UserServiceImplTest {
                     .as(StepVerifier::create)
                     .consumeErrorWith(e -> {
                         assertInstanceOf(ServerWebInputException.class, e);
-                        assertTrue(e.getMessage().contains("default role is not configured"));
+                        assertEquals(
+                                "problemDetail.user.signup.defaultRoleMissing",
+                                ((ServerWebInputException) e).getReason());
                     })
                     .verify();
         }

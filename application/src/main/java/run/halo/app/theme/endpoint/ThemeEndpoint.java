@@ -46,6 +46,7 @@ import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.ThemeRootGetter;
 import run.halo.app.infra.exception.NotFoundException;
+import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.theme.TemplateEngineManager;
 import run.halo.app.theme.service.ThemeService;
@@ -378,8 +379,8 @@ public class ThemeEndpoint implements CustomEndpoint {
         if ("-".equals(themeName)) {
             return themeService
                     .fetchActivatedThemeName()
-                    .switchIfEmpty(Mono.error(() ->
-                            new ServerWebInputException("No activated theme found, unable to proceed the request.")));
+                    .switchIfEmpty(Mono.error(
+                            () -> new UnsatisfiedAttributeValueException("problemDetail.theme.notActivated")));
         }
         return Mono.just(themeName);
     }
@@ -447,10 +448,10 @@ public class ThemeEndpoint implements CustomEndpoint {
         public FilePart getFile() {
             var part = multipartData.getFirst("file");
             if (!(part instanceof FilePart filePart)) {
-                throw new ServerWebInputException("Invalid multipart type of file");
+                throw new ServerWebInputException("problemDetail.upload.fileRequired");
             }
             if (!filePart.filename().endsWith(".zip")) {
-                throw new ServerWebInputException("Only zip extension supported");
+                throw new UnsatisfiedAttributeValueException("problemDetail.theme.archiveType");
             }
             return filePart;
         }
@@ -525,10 +526,10 @@ public class ThemeEndpoint implements CustomEndpoint {
         FilePart getFile() {
             Part part = multipartData.getFirst("file");
             if (!(part instanceof FilePart file)) {
-                throw new ServerWebInputException("Invalid parameter of file, binary data is required");
+                throw new ServerWebInputException("problemDetail.upload.fileRequired");
             }
             if (!Paths.get(file.filename()).toString().endsWith(".zip")) {
-                throw new ServerWebInputException("Invalid file type, only zip format is supported");
+                throw new UnsatisfiedAttributeValueException("problemDetail.theme.archiveType");
             }
             return file;
         }
