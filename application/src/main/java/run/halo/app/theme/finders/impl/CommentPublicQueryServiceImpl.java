@@ -20,7 +20,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.comment.OwnerInfo;
@@ -32,6 +31,7 @@ import run.halo.app.core.extension.content.Reply;
 import run.halo.app.core.user.service.UserService;
 import run.halo.app.extension.*;
 import run.halo.app.infra.AnonymousUserConst;
+import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.theme.finders.CommentPublicQueryService;
 import run.halo.app.theme.finders.vo.*;
 
@@ -244,7 +244,7 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
                         boolean hasPermission = (!commentHidden) || (hasViewPermission || isCommentOwner);
                         if (ExtensionUtil.isDeleted(comment) || !hasPermission) {
                             return Mono.error(
-                                    new ServerWebInputException("The comment was not found, hidden or deleted."));
+                                    new UnsatisfiedAttributeValueException("problemDetail.comment.unavailable"));
                         }
                     }
 

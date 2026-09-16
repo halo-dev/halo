@@ -12,13 +12,13 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.endpoint.AttachmentHandler;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.extension.GroupVersion;
 import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
+import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 
 @Slf4j
 @Component
@@ -65,7 +65,7 @@ class AttachmentConsoleEndpoint implements CustomEndpoint {
                 .mapNotNull(SystemSetting.Attachment::console)
                 .filter(ac -> StringUtils.hasText(ac.policyName()))
                 .switchIfEmpty(Mono.error(
-                        () -> new ServerWebInputException("Attachment system setting is not configured for console")));
+                        () -> new UnsatisfiedAttributeValueException("problemDetail.attachment.settingsMissing")));
         return attachmentHandler.handleUpload(serverRequest, getConfig);
     }
 }

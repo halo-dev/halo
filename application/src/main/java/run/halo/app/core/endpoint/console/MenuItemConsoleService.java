@@ -31,6 +31,7 @@ import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.MetadataOperator;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.exception.NotFoundException;
+import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 
 @Component
 public class MenuItemConsoleService {
@@ -52,17 +53,22 @@ public class MenuItemConsoleService {
                         .filter(OptimisticLockingFailureException.class::isInstance))
                 .onErrorMap(
                         Exceptions::isRetryExhausted,
-                        error -> new ResponseStatusException(
-                                HttpStatus.CONFLICT, "Menu item position update conflicted.", error));
+                        error -> new ResponseStatusException(HttpStatus.CONFLICT, "problemDetail.conflict", error));
     }
 
     private Mono<List<MenuItemTreeNode>> move(
             String name, String menuName, String targetParentName, String beforeName) {
         return client.fetch(MenuItem.class, name)
-                .switchIfEmpty(Mono.error(() -> new NotFoundException("MenuItem with name " + name + " not found")))
+                .switchIfEmpty(Mono.error(() -> new NotFoundException(
+                        "problemDetail.menuItem.notFound",
+                        new Object[] {name},
+                        "MenuItem with name " + name + " not found")))
                 .flatMap(moved -> {
                     if (!Objects.equals(menuName, menuNameOf(moved))) {
-                        return Mono.error(new ServerWebInputException("MenuItem does not belong to menu " + menuName));
+                        return Mono.error(new UnsatisfiedAttributeValueException(
+                                "MenuItem does not belong to menu " + menuName,
+                                "problemDetail.menuItem.wrongMenu",
+                                new Object[] {menuName}));
                     }
                     return listMenuItems(menuName)
                             .collectList()
@@ -80,23 +86,26 @@ public class MenuItemConsoleService {
                         LinkedHashMap::new));
         var moved = itemMap.get(name);
         if (moved == null) {
-            return Mono.error(new ServerWebInputException("MenuItem does not belong to menu " + menuName));
+            return Mono.error(new UnsatisfiedAttributeValueException(
+                    "MenuItem does not belong to menu " + menuName,
+                    "problemDetail.menuItem.wrongMenu",
+                    new Object[] {menuName}));
         }
 
         if (targetParentName != null) {
             if (Objects.equals(targetParentName, name)) {
-                return Mono.error(new ServerWebInputException("Cannot move a MenuItem under itself."));
+                return Mono.error(new UnsatisfiedAttributeValueException("problemDetail.hierarchy.self"));
             }
             if (!itemMap.containsKey(targetParentName)) {
-                return Mono.error(new ServerWebInputException("Parent MenuItem was not found in the selected menu."));
+                return Mono.error(new UnsatisfiedAttributeValueException("problemDetail.hierarchy.parentMissing"));
             }
             if (isDescendant(targetParentName, name, itemMap)) {
-                return Mono.error(new ServerWebInputException("Cannot move a MenuItem under one of its descendants."));
+                return Mono.error(new UnsatisfiedAttributeValueException("problemDetail.hierarchy.descendant"));
             }
         }
 
         if (beforeName != null && !itemMap.containsKey(beforeName)) {
-            return Mono.error(new ServerWebInputException("Before MenuItem was not found in the selected menu."));
+            return Mono.error(new UnsatisfiedAttributeValueException("problemDetail.hierarchy.beforeMissing"));
         }
 
         var originalStates = items.stream()
@@ -113,7 +122,7 @@ public class MenuItemConsoleService {
         if (beforeName != null) {
             insertIndex = indexOf(targetSiblings, beforeName);
             if (insertIndex < 0) {
-                return Mono.error(new ServerWebInputException("Before MenuItem is not a target sibling."));
+                return Mono.error(new UnsatisfiedAttributeValueException("problemDetail.hierarchy.notSibling"));
             }
         }
         targetSiblings.add(insertIndex, moved);
@@ -242,7 +251,7 @@ public class MenuItemConsoleService {
                 return true;
             }
             if (!visited.add(current)) {
-                throw new ServerWebInputException("Target parent has a cyclic parent chain.");
+                throw new UnsatisfiedAttributeValueException("problemDetail.hierarchy.cycle");
             }
             current = Optional.ofNullable(itemMap.get(current))
                     .map(MenuItemConsoleService::parentNameOf)

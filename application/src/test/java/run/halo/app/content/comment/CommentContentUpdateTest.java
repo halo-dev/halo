@@ -7,6 +7,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.Instant;
+import java.util.Locale;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -16,6 +17,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerWebInputException;
@@ -120,10 +122,17 @@ class CommentContentUpdateTest {
         stored(reply, true).getMetadata().setDeletionTimestamp(Instant.now());
         edit(reply, new CommentContentRequest("corrected", "corrected", 12L))
                 .as(StepVerifier::create)
-                .expectErrorSatisfies(error -> assertThat(((ResponseStatusException) error)
-                                .getStatusCode()
-                                .value())
-                        .isEqualTo(409))
+                .expectErrorSatisfies(error -> {
+                    var exception = (ResponseStatusException) error;
+                    assertThat(exception.getStatusCode().value()).isEqualTo(409);
+                    var messages = new ReloadableResourceBundleMessageSource();
+                    messages.setBasename("file:src/main/resources/config/i18n/messages");
+                    messages.setDefaultEncoding("UTF-8");
+                    assertThat(exception
+                                    .updateAndGetBody(messages, Locale.CHINESE)
+                                    .getDetail())
+                            .isEqualTo("不能编辑已删除的评论或回复。");
+                })
                 .verify();
         verify(client, never()).update(any());
     }

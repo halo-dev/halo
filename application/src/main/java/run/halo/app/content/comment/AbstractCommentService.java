@@ -10,7 +10,6 @@ import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.counter.CounterService;
 import run.halo.app.core.counter.MeterUtils;
@@ -21,6 +20,7 @@ import run.halo.app.core.user.service.RoleService;
 import run.halo.app.core.user.service.UserService;
 import run.halo.app.extension.MetadataOperator;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.security.authorization.AuthorityUtils;
 
 @RequiredArgsConstructor
@@ -103,15 +103,15 @@ public abstract class AbstractCommentService {
                 || !StringUtils.hasText(request.content())
                 || request.version() == null
                 || !isSafeHtml(request.content())) {
-            throw new ServerWebInputException("A version and non-empty, safe comment body are required.");
+            throw new UnsatisfiedAttributeValueException("problemDetail.comment.content.invalid");
         }
         var body = Jsoup.parseBodyFragment(request.content()).body();
         if (body.text().isBlank()
                 && body.select("img[src]").stream().noneMatch(image -> StringUtils.hasText(image.attr("src")))) {
-            throw new ServerWebInputException("The comment body must not be empty.");
+            throw new UnsatisfiedAttributeValueException("problemDetail.comment.content.empty");
         }
         if (metadata.getDeletionTimestamp() != null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Cannot edit a deleted comment or reply.");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "problemDetail.comment.deleted");
         }
         if (!request.version().equals(metadata.getVersion())) {
             throw new OptimisticLockingFailureException("The comment or reply has changed. Reload before editing.");

@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.net.URI;
+import java.util.Locale;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpMethod;
@@ -166,7 +168,12 @@ class DefaultAttachmentServiceTest {
         StepVerifier.create(attachmentService.uploadFromUrl(url, "fake-policy", "", ""))
                 .consumeErrorWith(error -> {
                     var exception = assertInstanceOf(ServerWebInputException.class, error);
-                    assertTrue(exception.getMessage().contains(HttpStatus.BAD_GATEWAY.toString()));
+                    var messages = new ReloadableResourceBundleMessageSource();
+                    messages.setBasename("file:src/main/resources/config/i18n/messages");
+                    messages.setDefaultEncoding("UTF-8");
+                    assertEquals(
+                            "下载文件失败，远程服务器返回 502 BAD_GATEWAY。",
+                            exception.updateAndGetBody(messages, Locale.CHINESE).getDetail());
                 })
                 .verify();
         verify(exchangeFunction).exchange(assertArg(r -> {
