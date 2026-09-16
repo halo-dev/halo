@@ -94,28 +94,18 @@ public class MenuItemConsoleService {
 
         if (targetParentName != null) {
             if (Objects.equals(targetParentName, name)) {
-                return Mono.error(new UnsatisfiedAttributeValueException(
-                        "Cannot move a MenuItem under itself.", "problemDetail.hierarchy.self", null));
+                return Mono.error(new UnsatisfiedAttributeValueException("problemDetail.hierarchy.self"));
             }
             if (!itemMap.containsKey(targetParentName)) {
-                return Mono.error(new UnsatisfiedAttributeValueException(
-                        "Parent MenuItem was not found in the selected menu.",
-                        "problemDetail.hierarchy.parentMissing",
-                        null));
+                return Mono.error(new UnsatisfiedAttributeValueException("problemDetail.hierarchy.parentMissing"));
             }
             if (isDescendant(targetParentName, name, itemMap)) {
-                return Mono.error(new UnsatisfiedAttributeValueException(
-                        "Cannot move a MenuItem under one of its descendants.",
-                        "problemDetail.hierarchy.descendant",
-                        null));
+                return Mono.error(new UnsatisfiedAttributeValueException("problemDetail.hierarchy.descendant"));
             }
         }
 
         if (beforeName != null && !itemMap.containsKey(beforeName)) {
-            return Mono.error(new UnsatisfiedAttributeValueException(
-                    "Before MenuItem was not found in the selected menu.",
-                    "problemDetail.hierarchy.beforeMissing",
-                    null));
+            return Mono.error(new UnsatisfiedAttributeValueException("problemDetail.hierarchy.beforeMissing"));
         }
 
         var originalStates = items.stream()
@@ -132,8 +122,7 @@ public class MenuItemConsoleService {
         if (beforeName != null) {
             insertIndex = indexOf(targetSiblings, beforeName);
             if (insertIndex < 0) {
-                return Mono.error(new UnsatisfiedAttributeValueException(
-                        "Before MenuItem is not a target sibling.", "problemDetail.hierarchy.notSibling", null));
+                return Mono.error(new UnsatisfiedAttributeValueException("problemDetail.hierarchy.notSibling"));
             }
         }
         targetSiblings.add(insertIndex, moved);
@@ -262,8 +251,7 @@ public class MenuItemConsoleService {
                 return true;
             }
             if (!visited.add(current)) {
-                throw new UnsatisfiedAttributeValueException(
-                        "Target parent has a cyclic parent chain.", "problemDetail.hierarchy.cycle", null);
+                throw new UnsatisfiedAttributeValueException("problemDetail.hierarchy.cycle");
             }
             current = Optional.ofNullable(itemMap.get(current))
                     .map(MenuItemConsoleService::parentNameOf)

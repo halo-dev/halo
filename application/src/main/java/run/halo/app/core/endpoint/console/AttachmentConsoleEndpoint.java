@@ -64,10 +64,8 @@ class AttachmentConsoleEndpoint implements CustomEndpoint {
                 .fetch(SystemSetting.Attachment.GROUP, SystemSetting.Attachment.class)
                 .mapNotNull(SystemSetting.Attachment::console)
                 .filter(ac -> StringUtils.hasText(ac.policyName()))
-                .switchIfEmpty(Mono.error(() -> new UnsatisfiedAttributeValueException(
-                        "Attachment system setting is not configured for console",
-                        "problemDetail.attachment.settingsMissing",
-                        null)));
+                .switchIfEmpty(Mono.error(
+                        () -> new UnsatisfiedAttributeValueException("problemDetail.attachment.settingsMissing")));
         return attachmentHandler.handleUpload(serverRequest, getConfig);
     }
 }

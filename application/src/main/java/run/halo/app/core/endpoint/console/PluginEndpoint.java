@@ -660,8 +660,7 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
                 throw new ServerWebInputException("problemDetail.upload.fileRequired");
             }
             if (!Paths.get(file.filename()).toString().endsWith(".jar")) {
-                throw new UnsatisfiedAttributeValueException(
-                        "Invalid file type, only jar is supported", "problemDetail.plugin.archiveType", null);
+                throw new UnsatisfiedAttributeValueException("problemDetail.plugin.archiveType");
             }
             return file;
         }

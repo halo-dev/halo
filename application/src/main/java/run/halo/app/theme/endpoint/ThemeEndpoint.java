@@ -379,10 +379,8 @@ public class ThemeEndpoint implements CustomEndpoint {
         if ("-".equals(themeName)) {
             return themeService
                     .fetchActivatedThemeName()
-                    .switchIfEmpty(Mono.error(() -> new UnsatisfiedAttributeValueException(
-                            "No activated theme found, unable to proceed the request.",
-                            "problemDetail.theme.notActivated",
-                            null)));
+                    .switchIfEmpty(Mono.error(
+                            () -> new UnsatisfiedAttributeValueException("problemDetail.theme.notActivated")));
         }
         return Mono.just(themeName);
     }
@@ -453,8 +451,7 @@ public class ThemeEndpoint implements CustomEndpoint {
                 throw new ServerWebInputException("problemDetail.upload.fileRequired");
             }
             if (!filePart.filename().endsWith(".zip")) {
-                throw new UnsatisfiedAttributeValueException(
-                        "Only zip extension supported", "problemDetail.theme.archiveType", null);
+                throw new UnsatisfiedAttributeValueException("problemDetail.theme.archiveType");
             }
             return filePart;
         }
@@ -532,8 +529,7 @@ public class ThemeEndpoint implements CustomEndpoint {
                 throw new ServerWebInputException("problemDetail.upload.fileRequired");
             }
             if (!Paths.get(file.filename()).toString().endsWith(".zip")) {
-                throw new UnsatisfiedAttributeValueException(
-                        "Invalid file type, only zip format is supported", "problemDetail.theme.archiveType", null);
+                throw new UnsatisfiedAttributeValueException("problemDetail.theme.archiveType");
             }
             return file;
         }

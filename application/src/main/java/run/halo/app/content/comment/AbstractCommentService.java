@@ -103,16 +103,12 @@ public abstract class AbstractCommentService {
                 || !StringUtils.hasText(request.content())
                 || request.version() == null
                 || !isSafeHtml(request.content())) {
-            throw new UnsatisfiedAttributeValueException(
-                    "A version and non-empty, safe comment body are required.",
-                    "problemDetail.comment.content.invalid",
-                    null);
+            throw new UnsatisfiedAttributeValueException("problemDetail.comment.content.invalid");
         }
         var body = Jsoup.parseBodyFragment(request.content()).body();
         if (body.text().isBlank()
                 && body.select("img[src]").stream().noneMatch(image -> StringUtils.hasText(image.attr("src")))) {
-            throw new UnsatisfiedAttributeValueException(
-                    "The comment body must not be empty.", "problemDetail.comment.content.empty", null);
+            throw new UnsatisfiedAttributeValueException("problemDetail.comment.content.empty");
         }
         if (metadata.getDeletionTimestamp() != null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "problemDetail.comment.deleted");

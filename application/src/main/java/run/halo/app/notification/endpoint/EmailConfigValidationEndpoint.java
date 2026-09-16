@@ -90,10 +90,7 @@ public class EmailConfigValidationEndpoint implements CustomEndpoint {
                 .flatMap(user -> {
                     var email = user.getSpec().getEmail();
                     if (StringUtils.isBlank(email)) {
-                        return Mono.error(new UnsatisfiedAttributeValueException(
-                                "Your email is missing, please set it in your profile.",
-                                "problemDetail.user.email.missing",
-                                null));
+                        return Mono.error(new UnsatisfiedAttributeValueException("problemDetail.user.email.missing"));
                     }
                     return Mono.just(email);
                 });

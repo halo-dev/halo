@@ -197,8 +197,8 @@ public class SinglePageServiceImpl extends AbstractContentService implements Sin
                         return Mono.error(new ServerWebInputException("problemDetail.content.snapshot.published"));
                     }
                     if (StringUtils.equals(baseSnapshotName, snapshotName)) {
-                        return Mono.error(new UnsatisfiedAttributeValueException(
-                                "The first snapshot cannot be deleted.", "problemDetail.content.snapshot.first", null));
+                        return Mono.error(
+                                new UnsatisfiedAttributeValueException("problemDetail.content.snapshot.first"));
                     }
                     return client.fetch(Snapshot.class, snapshotName)
                             .flatMap(client::delete)

@@ -32,7 +32,8 @@ class AttachmentUploadI18nIntegrationTest {
     @CsvSource({
         "zh, 无法解析远程主机，或其地址不允许访问。",
         "en, The remote host cannot be resolved or resolves to a restricted address.",
-        "es, No se puede resolver el servidor remoto o su dirección está restringida."
+        "es, No se puede resolver el servidor remoto o su dirección está restringida.",
+        "fr, The remote host cannot be resolved or resolves to a restricted address."
     })
     void shouldTranslateRealDnsFailureOverHttp(String language, String detail) throws Exception {
         var client = mock(ReactiveExtensionClient.class);

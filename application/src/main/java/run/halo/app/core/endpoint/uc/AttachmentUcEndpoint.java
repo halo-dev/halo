@@ -160,10 +160,8 @@ public class AttachmentUcEndpoint implements CustomEndpoint {
                 .mapNotNull(SystemSetting.Attachment::uc)
                 .filter(uo -> StringUtils.isNotBlank(uo.policyName()))
                 .switchIfEmpty(Mono.defer(() -> getConfigFromUser))
-                .switchIfEmpty(Mono.error(() -> new UnsatisfiedAttributeValueException(
-                        "Attachment system setting is not configured for console",
-                        "problemDetail.attachment.settingsMissing",
-                        null)));
+                .switchIfEmpty(Mono.error(
+                        () -> new UnsatisfiedAttributeValueException("problemDetail.attachment.settingsMissing")));
         return attachmentHandler.handleUpload(request, getConfig);
     }
 
@@ -258,10 +256,7 @@ public class AttachmentUcEndpoint implements CustomEndpoint {
         return systemSettingFetcher.fetchPost().handle((postSetting, sink) -> {
             var attachmentPolicyName = postSetting.getAttachmentPolicyName();
             if (StringUtils.isBlank(attachmentPolicyName)) {
-                sink.error(new UnsatisfiedAttributeValueException(
-                        "Please configure storage policy for post attachment first.",
-                        "problemDetail.attachment.policyMissing",
-                        null));
+                sink.error(new UnsatisfiedAttributeValueException("problemDetail.attachment.policyMissing"));
                 return;
             }
             sink.next(postSetting);

@@ -56,8 +56,8 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
                     var userEmail = user.getSpec().getEmail();
                     var isVerified = user.getSpec().isEmailVerified();
                     if (StringUtils.equalsIgnoreCase(userEmail, email) && isVerified) {
-                        return Mono.error(() -> new UnsatisfiedAttributeValueException(
-                                "Email already verified.", "problemDetail.user.email.alreadyVerified", null));
+                        return Mono.error(() ->
+                                new UnsatisfiedAttributeValueException("problemDetail.user.email.alreadyVerified"));
                     }
                     var annotations = MetadataUtil.nullSafeAnnotations(user);
                     var oldEmailToVerify = annotations.get(User.EMAIL_TO_VERIFY);

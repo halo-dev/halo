@@ -88,8 +88,8 @@ class PatServiceImpl implements PatService {
                 .map(SecurityContext::getAuthentication)
                 // TODO We only allow authenticated users to create PATs.
                 .filter(authTrustResolver::isAuthenticated)
-                .switchIfEmpty(Mono.error(() -> new UnsatisfiedAttributeValueException(
-                        "Authentication required.", "problemDetail.authentication.required", null)))
+                .switchIfEmpty(Mono.error(
+                        () -> new UnsatisfiedAttributeValueException("problemDetail.authentication.required")))
                 .flatMap(auth -> create(patRequest, auth.getName(), auth.getAuthorities()));
     }
 
@@ -106,14 +106,13 @@ class PatServiceImpl implements PatService {
         // preflight check
         var expiresAt = patSpec.getExpiresAt();
         if (expiresAt != null && expiresAt.isBefore(clock.instant())) {
-            return Mono.error(new UnsatisfiedAttributeValueException(
-                    "Invalid expiresAt.", "problemDetail.pat.invalidExpiry", null));
+            return Mono.error(new UnsatisfiedAttributeValueException("problemDetail.pat.invalidExpiry"));
         }
         var roles = patSpec.getRoles();
         return hasSufficientRoles(authorities, roles)
                 .filter(has -> has)
-                .switchIfEmpty(Mono.error(() -> new UnsatisfiedAttributeValueException(
-                        "Insufficient roles.", "problemDetail.pat.insufficientRoles", null)))
+                .switchIfEmpty(
+                        Mono.error(() -> new UnsatisfiedAttributeValueException("problemDetail.pat.insufficientRoles")))
                 .map(has -> {
                     var pat = new PersonalAccessToken();
                     pat.setMetadata(new Metadata());
@@ -163,8 +162,8 @@ class PatServiceImpl implements PatService {
     public Mono<PersonalAccessToken> revoke(String patName, String username) {
         return get(patName, username)
                 .filter(pat -> !pat.getSpec().isRevoked())
-                .switchIfEmpty(Mono.error(() -> new UnsatisfiedAttributeValueException(
-                        "The token has been revoked before.", "problemDetail.pat.alreadyRevoked", null)))
+                .switchIfEmpty(
+                        Mono.error(() -> new UnsatisfiedAttributeValueException("problemDetail.pat.alreadyRevoked")))
                 .doOnNext(pat -> {
                     pat.getSpec().setRevoked(true);
                     pat.getSpec().setRevokesAt(clock.instant());
@@ -176,8 +175,7 @@ class PatServiceImpl implements PatService {
     public Mono<PersonalAccessToken> restore(String patName, String username) {
         return get(patName, username)
                 .filter(pat -> pat.getSpec().isRevoked())
-                .switchIfEmpty(Mono.error(() -> new UnsatisfiedAttributeValueException(
-                        "The token has not been revoked before.", "problemDetail.pat.notRevoked", null)))
+                .switchIfEmpty(Mono.error(() -> new UnsatisfiedAttributeValueException("problemDetail.pat.notRevoked")))
                 .doOnNext(pat -> {
                     pat.getSpec().setRevoked(false);
                     pat.getSpec().setRevokesAt(null);

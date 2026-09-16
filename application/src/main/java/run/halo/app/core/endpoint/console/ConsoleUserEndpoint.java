@@ -72,8 +72,8 @@ class ConsoleUserEndpoint implements CustomEndpoint {
     private Mono<ServerResponse> handleEnableUser(ServerRequest request) {
         return userService
                 .enable(request.pathVariable("username"))
-                .switchIfEmpty(Mono.error(() -> new UnsatisfiedAttributeValueException(
-                        "The user was not found or has been enabled.", "problemDetail.user.notFoundOrEnabled", null)))
+                .switchIfEmpty(Mono.error(
+                        () -> new UnsatisfiedAttributeValueException("problemDetail.user.notFoundOrEnabled")))
                 .flatMap(user -> ServerResponse.ok().bodyValue(user));
     }
 
@@ -82,16 +82,14 @@ class ConsoleUserEndpoint implements CustomEndpoint {
         return ReactiveSecurityContextHolder.getContext()
                 .map(SecurityContext::getAuthentication)
                 .map(Authentication::getName)
-                .switchIfEmpty(Mono.error(() -> new UnsatisfiedAttributeValueException(
-                        "The current user is not authenticated.", "problemDetail.authentication.required", null)))
+                .switchIfEmpty(Mono.error(
+                        () -> new UnsatisfiedAttributeValueException("problemDetail.authentication.required")))
                 .filter(currentUsername -> !Objects.equals(currentUsername, username))
-                .switchIfEmpty(Mono.error(() -> new UnsatisfiedAttributeValueException(
-                        "The user is the current user, can't disable it.",
-                        "problemDetail.user.cannotDisableSelf",
-                        null)))
+                .switchIfEmpty(Mono.error(
+                        () -> new UnsatisfiedAttributeValueException("problemDetail.user.cannotDisableSelf")))
                 .then(Mono.defer(() -> userService.disable(username)))
-                .switchIfEmpty(Mono.error(() -> new UnsatisfiedAttributeValueException(
-                        "The user was not found or has been disabled.", "problemDetail.user.notFoundOrDisabled", null)))
+                .switchIfEmpty(Mono.error(
+                        () -> new UnsatisfiedAttributeValueException("problemDetail.user.notFoundOrDisabled")))
                 .flatMap(user -> ServerResponse.ok().bodyValue(user));
     }
 

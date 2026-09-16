@@ -5,11 +5,16 @@ import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Locale;
+import java.util.Properties;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -30,6 +35,7 @@ import run.halo.app.infra.exception.AgreementNotAcceptedException;
 import run.halo.app.infra.exception.EmailAlreadyTakenException;
 import run.halo.app.infra.exception.Exceptions;
 import run.halo.app.infra.exception.RestrictedNameException;
+import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.security.LoginHandlerEnhancer;
 import run.halo.app.security.authentication.LoginFailureHandler;
@@ -39,6 +45,62 @@ import run.halo.app.security.authentication.twofactor.TwoFactorAuthRequiredExcep
 import run.halo.app.theme.endpoint.ThemeEndpoint;
 
 class UserFacingExceptionI18nTest {
+
+    @ParameterizedTest
+    @ValueSource(
+            strings = {
+                "problemDetail.attachment.policyMissing",
+                "problemDetail.attachment.settingsMissing",
+                "problemDetail.authentication.required",
+                "problemDetail.comment.content.empty",
+                "problemDetail.comment.content.invalid",
+                "problemDetail.comment.unavailable",
+                "problemDetail.content.snapshot.first",
+                "problemDetail.hierarchy.beforeMissing",
+                "problemDetail.hierarchy.cycle",
+                "problemDetail.hierarchy.descendant",
+                "problemDetail.hierarchy.notSibling",
+                "problemDetail.hierarchy.parentMissing",
+                "problemDetail.hierarchy.self",
+                "problemDetail.pat.alreadyRevoked",
+                "problemDetail.pat.insufficientRoles",
+                "problemDetail.pat.invalidExpiry",
+                "problemDetail.pat.notRevoked",
+                "problemDetail.plugin.archiveType",
+                "problemDetail.theme.archiveType",
+                "problemDetail.theme.notActivated",
+                "problemDetail.user.cannotDisableSelf",
+                "problemDetail.user.email.alreadyVerified",
+                "problemDetail.user.email.missing",
+                "problemDetail.user.notFoundOrDisabled",
+                "problemDetail.user.notFoundOrEnabled",
+                "problemDetail.user.password.notMatch",
+                "problemDetail.user.signUpFailed.disallowed",
+                "problemDetail.user.signup.defaultRoleMissing",
+                "problemDetail.user.twoFactor.code.invalid",
+                "problemDetail.user.twoFactor.code.required"
+            })
+    void shouldFallBackToEnglishForCodeOnlyExceptions(String code) throws IOException {
+        var english = new Properties();
+        try (var reader = Files.newBufferedReader(Path.of("src/main/resources/config/i18n/messages.properties"))) {
+            english.load(reader);
+        }
+        var expected = english.getProperty(code);
+        assertThat(expected).isNotBlank();
+        var messages = new ReloadableResourceBundleMessageSource();
+        messages.setBasename("file:src/main/resources/config/i18n/messages");
+        messages.setDefaultEncoding("UTF-8");
+        messages.setFallbackToSystemLocale(false);
+        for (var locale : new Locale[] {Locale.ENGLISH, Locale.FRENCH}) {
+            var exchange = MockServerWebExchange.from(
+                    MockServerHttpRequest.get("/apis/test").acceptLanguageAsLocales(locale));
+            var body = Exceptions.createErrorResponse(
+                            new UnsatisfiedAttributeValueException(code), null, exchange, messages)
+                    .getBody();
+            assertThat(body.getStatus()).isEqualTo(400);
+            assertThat(body.getDetail()).isEqualTo(expected);
+        }
+    }
 
     @ParameterizedTest
     @CsvSource({"en, Please select a file to upload.", "zh, 请选择要上传的文件。", "es, Selecciona un archivo para subir."})

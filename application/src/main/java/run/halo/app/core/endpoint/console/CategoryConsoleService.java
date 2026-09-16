@@ -76,24 +76,18 @@ public class CategoryConsoleService {
 
         if (targetParentName != null) {
             if (Objects.equals(targetParentName, name)) {
-                return Mono.error(new UnsatisfiedAttributeValueException(
-                        "Cannot move a Category under itself.", "problemDetail.hierarchy.self", null));
+                return Mono.error(new UnsatisfiedAttributeValueException("problemDetail.hierarchy.self"));
             }
             if (!categoryMap.containsKey(targetParentName)) {
-                return Mono.error(new UnsatisfiedAttributeValueException(
-                        "Parent Category was not found.", "problemDetail.hierarchy.parentMissing", null));
+                return Mono.error(new UnsatisfiedAttributeValueException("problemDetail.hierarchy.parentMissing"));
             }
             if (isDescendant(targetParentName, name, categoryMap)) {
-                return Mono.error(new UnsatisfiedAttributeValueException(
-                        "Cannot move a Category under one of its descendants.",
-                        "problemDetail.hierarchy.descendant",
-                        null));
+                return Mono.error(new UnsatisfiedAttributeValueException("problemDetail.hierarchy.descendant"));
             }
         }
 
         if (beforeName != null && !categoryMap.containsKey(beforeName)) {
-            return Mono.error(new UnsatisfiedAttributeValueException(
-                    "Before Category was not found.", "problemDetail.hierarchy.beforeMissing", null));
+            return Mono.error(new UnsatisfiedAttributeValueException("problemDetail.hierarchy.beforeMissing"));
         }
 
         var originalStates = categories.stream()
@@ -110,8 +104,7 @@ public class CategoryConsoleService {
         if (beforeName != null) {
             insertIndex = indexOf(targetSiblings, beforeName);
             if (insertIndex < 0) {
-                return Mono.error(new UnsatisfiedAttributeValueException(
-                        "Before Category is not a target sibling.", "problemDetail.hierarchy.notSibling", null));
+                return Mono.error(new UnsatisfiedAttributeValueException("problemDetail.hierarchy.notSibling"));
             }
         }
         targetSiblings.add(insertIndex, moved);
@@ -234,8 +227,7 @@ public class CategoryConsoleService {
                 return true;
             }
             if (!visited.add(current)) {
-                throw new UnsatisfiedAttributeValueException(
-                        "Target parent has a cyclic parent chain.", "problemDetail.hierarchy.cycle", null);
+                throw new UnsatisfiedAttributeValueException("problemDetail.hierarchy.cycle");
             }
             current = Optional.ofNullable(categoryMap.get(current))
                     .map(CategoryConsoleService::parentNameOf)

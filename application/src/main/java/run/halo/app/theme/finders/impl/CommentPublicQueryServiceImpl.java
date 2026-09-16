@@ -243,10 +243,8 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
                                         ownerIdentity(User.KIND, username));
                         boolean hasPermission = (!commentHidden) || (hasViewPermission || isCommentOwner);
                         if (ExtensionUtil.isDeleted(comment) || !hasPermission) {
-                            return Mono.error(new UnsatisfiedAttributeValueException(
-                                    "The comment was not found, hidden or deleted.",
-                                    "problemDetail.comment.unavailable",
-                                    null));
+                            return Mono.error(
+                                    new UnsatisfiedAttributeValueException("problemDetail.comment.unavailable"));
                         }
                     }
 
