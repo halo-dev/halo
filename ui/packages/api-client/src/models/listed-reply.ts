@@ -28,6 +28,10 @@ import type { Reply } from './reply';
  */
 export interface ListedReply {
     'owner': OwnerInfo;
+    /**
+     * Frontend permalink to this reply, when its subject URL is available.
+     */
+    'permalink'?: string;
     'reply': Reply;
     'stats': CommentStats;
 }

@@ -32,6 +32,10 @@ import type { OwnerInfo } from './owner-info';
 export interface ListedComment {
     'comment': Comment;
     'owner': OwnerInfo;
+    /**
+     * Frontend permalink to this comment, when its subject URL is available.
+     */
+    'permalink'?: string;
     'stats': CommentStats;
     'subject'?: Extension;
 }

@@ -35,6 +35,10 @@ import type { OwnerInfo } from './owner-info';
 export interface CommentVo {
     'metadata': Metadata;
     'owner': OwnerInfo;
+    /**
+     * Frontend permalink to this comment, when its subject URL is available.
+     */
+    'permalink'?: string;
     'spec': CommentSpec;
     'stats': CommentStatsVo;
     'status'?: CommentStatus;

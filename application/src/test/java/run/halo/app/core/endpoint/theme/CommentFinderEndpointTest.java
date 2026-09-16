@@ -31,6 +31,7 @@ import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.theme.finders.CommentFinder;
 import run.halo.app.theme.finders.CommentPublicQueryService;
 import run.halo.app.theme.finders.vo.CommentVo;
+import run.halo.app.theme.finders.vo.ReplyVo;
 
 /**
  * Tests for {@link CommentFinderEndpoint}.
@@ -68,6 +69,50 @@ class CommentFinderEndpointTest {
         lenient().when(environmentFetcher.fetchComment()).thenReturn(Mono.empty());
         webTestClient = WebTestClient.bindToRouterFunction(commentFinderEndpoint.endpoint())
                 .build();
+    }
+
+    @Test
+    void getReplyReturnsPrivateUncachedDisplayOrNotFound() {
+        when(commentPublicQueryService.getReply("comment-a", "reply-b"))
+                .thenReturn(Mono.just(ReplyVo.builder()
+                        .permalink("/post#halo-comment=comment-a&reply=reply-b")
+                        .build()))
+                .thenReturn(Mono.empty());
+        webTestClient
+                .get()
+                .uri("/comments/comment-a/reply/reply-b")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectHeader()
+                .valueEquals("Cache-Control", "no-store, private")
+                .expectHeader()
+                .value("Vary", value -> assertThat(value).contains("Cookie", "Authorization"))
+                .expectBody()
+                .jsonPath("$.permalink")
+                .isEqualTo("/post#halo-comment=comment-a&reply=reply-b");
+        webTestClient
+                .get()
+                .uri("/comments/comment-a/reply/reply-b")
+                .exchange()
+                .expectStatus()
+                .isNotFound()
+                .expectHeader()
+                .valueEquals("Cache-Control", "no-store, private")
+                .expectHeader()
+                .value("Vary", value -> assertThat(value).contains("Cookie", "Authorization"));
+    }
+
+    @Test
+    void getReplyDoesNotHideServiceFailuresAsNotFound() {
+        when(commentPublicQueryService.getReply("comment-a", "reply-b"))
+                .thenReturn(Mono.error(new IllegalStateException("storage failure")));
+        webTestClient
+                .get()
+                .uri("/comments/comment-a/reply/reply-b")
+                .exchange()
+                .expectStatus()
+                .is5xxServerError();
     }
 
     @Test

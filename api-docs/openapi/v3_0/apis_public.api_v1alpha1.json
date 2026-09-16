@@ -902,6 +902,48 @@
         ]
       }
     },
+    "/apis/api.halo.run/v1alpha1/comments/{name}/reply/{replyName}": {
+      "get": {
+        "description": "Get a visible reply under a comment.",
+        "operationId": "GetCommentReply",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "replyName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReplyVo"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Comment or reply is unavailable."
+          }
+        },
+        "tags": [
+          "CommentV1alpha1Public"
+        ]
+      }
+    },
     "/apis/api.halo.run/v1alpha1/indices/-/search": {
       "post": {
         "description": "Search indices.",
@@ -1675,6 +1717,10 @@
           "owner": {
             "$ref": "#/components/schemas/OwnerInfo"
           },
+          "permalink": {
+            "type": "string",
+            "description": "Frontend permalink to this comment, when its subject URL is available."
+          },
           "spec": {
             "$ref": "#/components/schemas/CommentSpec"
           },
@@ -1701,6 +1747,10 @@
           },
           "owner": {
             "$ref": "#/components/schemas/OwnerInfo"
+          },
+          "permalink": {
+            "type": "string",
+            "description": "Frontend permalink to this comment, when its subject URL is available."
           },
           "replies": {
             "$ref": "#/components/schemas/ListResultReplyVo"
@@ -3057,6 +3107,10 @@
           "owner": {
             "$ref": "#/components/schemas/OwnerInfo"
           },
+          "permalink": {
+            "type": "string",
+            "description": "Frontend permalink to this reply, when its subject URL is available."
+          },
           "spec": {
             "$ref": "#/components/schemas/ReplySpec"
           },
@@ -3064,7 +3118,7 @@
             "$ref": "#/components/schemas/CommentStatsVo"
           }
         },
-        "description": "A chunk of items."
+        "description": "A value object for {@link Reply Reply}."
       },
       "ReplyVoList": {
         "required": [

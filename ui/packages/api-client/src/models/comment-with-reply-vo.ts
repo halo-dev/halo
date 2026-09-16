@@ -38,6 +38,10 @@ import type { OwnerInfo } from './owner-info';
 export interface CommentWithReplyVo {
     'metadata': Metadata;
     'owner': OwnerInfo;
+    /**
+     * Frontend permalink to this comment, when its subject URL is available.
+     */
+    'permalink'?: string;
     'replies'?: ListResultReplyVo;
     'spec': CommentSpec;
     'stats': CommentStatsVo;

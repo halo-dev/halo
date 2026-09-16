@@ -178,8 +178,8 @@ const replyEditingModalVisible = ref(false);
               {{ subjectRefResult.title }}
             </RouterLink>
             <a
-              v-if="subjectRefResult.externalUrl"
-              :href="subjectRefResult.externalUrl"
+              v-if="reply.permalink || subjectRefResult.externalUrl"
+              :href="reply.permalink || subjectRefResult.externalUrl"
               target="_blank"
               class="text-gray-600 hover:text-gray-900"
             >

@@ -85,6 +85,10 @@ spec:
       type: string
     - name: postUrl
       type: string
+    - name: commentUrl
+      type: string
+      optional: true
+      description: "The frontend permalink of the new comment."
     - name: commenter
       type: string
       description: "The display name of the commenter."
@@ -116,6 +120,10 @@ spec:
       type: string
     - name: pageUrl
       type: string
+    - name: commentUrl
+      type: string
+      optional: true
+      description: "The frontend permalink of the new comment."
     - name: commenter
       type: string
       description: "The display name of the commenter."
@@ -141,6 +149,10 @@ spec:
       type: string
     - name: commentSubjectUrl
       type: string
+    - name: replyUrl
+      type: string
+      optional: true
+      description: "The frontend permalink of the new reply."
     - name: quoteContent
       type: string
       optional: true

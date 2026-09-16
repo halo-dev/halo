@@ -30,4 +30,7 @@ public class ListedComment {
 
     @Schema(description = "Aggregated counters for the comment.", requiredMode = REQUIRED)
     private CommentStats stats;
+
+    @Schema(description = "Frontend permalink to this comment, when its subject URL is available.")
+    private String permalink;
 }

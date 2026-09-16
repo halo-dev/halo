@@ -139,6 +139,8 @@ public class CommentNotificationReasonPublisher {
                                 .postOwner(post.getSpec().getOwner())
                                 .postTitle(post.getSpec().getTitle())
                                 .postUrl(postUrl)
+                                .commentUrl(CommentPermalinkService.getPermalink(
+                                        postUrl, comment.getMetadata().getName(), null))
                                 .commenter(owner.getDisplayName())
                                 .content(commentContentConverter.convertRelativeLinks(
                                         comment.getSpec().getContent()))
@@ -174,6 +176,7 @@ public class CommentNotificationReasonPublisher {
                 String postOwner,
                 String postTitle,
                 String postUrl,
+                String commentUrl,
                 String commenter,
                 String content,
                 String commentName) {}
@@ -215,6 +218,8 @@ public class CommentNotificationReasonPublisher {
                                 .pageOwner(singlePage.getSpec().getOwner())
                                 .pageTitle(singlePage.getSpec().getTitle())
                                 .pageUrl(pageUrl)
+                                .commentUrl(CommentPermalinkService.getPermalink(
+                                        pageUrl, comment.getMetadata().getName(), null))
                                 .commenter(defaultIfBlank(owner.getDisplayName(), owner.getName()))
                                 .content(commentContentConverter.convertRelativeLinks(
                                         comment.getSpec().getContent()))
@@ -250,6 +255,7 @@ public class CommentNotificationReasonPublisher {
                 String pageOwner,
                 String pageTitle,
                 String pageUrl,
+                String commentUrl,
                 String commenter,
                 String content,
                 String commentName) {}
@@ -270,6 +276,7 @@ public class CommentNotificationReasonPublisher {
         private final NotificationReasonEmitter notificationReasonEmitter;
         private final ExtensionGetter extensionGetter;
         private final CommentContentConverter commentContentConverter;
+        private final ExternalLinkProcessor externalLinkProcessor;
 
         public void publishReasonBy(Reply reply, Comment comment) {
             boolean isQuoteReply = StringUtils.isNotBlank(reply.getSpec().getQuoteReply());
@@ -323,8 +330,13 @@ public class CommentNotificationReasonPublisher {
                     .repliedOwner(identityFrom(repliedOwner).name());
 
             getCommentSubjectDisplay(comment.getSpec().getSubjectRef()).ifPresent(subject -> {
+                var subjectUrl = externalLinkProcessor.processLink(subject.url());
                 reasonAttributesBuilder.commentSubjectTitle(subject.title());
-                reasonAttributesBuilder.commentSubjectUrl(subject.url());
+                reasonAttributesBuilder.commentSubjectUrl(subjectUrl);
+                reasonAttributesBuilder.replyUrl(CommentPermalinkService.getPermalink(
+                        subjectUrl,
+                        comment.getMetadata().getName(),
+                        reply.getMetadata().getName()));
             });
 
             notificationReasonEmitter
@@ -377,6 +389,7 @@ public class CommentNotificationReasonPublisher {
                 String commentContent,
                 String commentSubjectTitle,
                 String commentSubjectUrl,
+                String replyUrl,
                 boolean isQuoteReply,
                 String quoteContent,
                 String commentName,
