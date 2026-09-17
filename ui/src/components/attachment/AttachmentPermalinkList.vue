@@ -64,7 +64,7 @@ const htmlText = computed(() => {
   if (isImage.value) {
     return `<img src="${permalink.value}" alt="${displayName}" />`;
   } else if (isVideo.value) {
-    return `<video src="${permalink.value}"></video>`;
+    return `<video src="${permalink.value}" controls></video>`;
   } else if (isAudio.value) {
     return `<audio src="${permalink.value}"></audio>`;
   }
