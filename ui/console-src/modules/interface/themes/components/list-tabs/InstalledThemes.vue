@@ -1,14 +1,7 @@
 <script lang="ts" setup>
-import { useThemeStore } from "@console/stores/theme";
-import type {
-  Theme,
-  ThemeV1alpha1ConsoleApiListThemesRequest,
-} from "@halo-dev/api-client";
-import {
-  consoleApiClient,
-  coreApiClient,
-  paginate,
-} from "@halo-dev/api-client";
+import { invalidateThemeQueries } from "@console/composables/use-activated-theme";
+import type { Theme } from "@halo-dev/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
   IconAddCircle,
@@ -21,15 +14,16 @@ import {
   VLoading,
   VSpace,
 } from "@halo-dev/components";
-import { useQuery } from "@tanstack/vue-query";
+import { useQueryClient } from "@tanstack/vue-query";
 import { useFuse } from "@vueuse/integrations/useFuse";
 import { computed, inject, ref, shallowRef, watch, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
+import { useInstalledThemes } from "../../composables/use-installed-themes";
 import ThemePreviewModal from "../preview/ThemePreviewModal.vue";
 import ThemeListItem from "../ThemeListItem.vue";
 
-const themeStore = useThemeStore();
 const { t } = useI18n();
+const queryClient = useQueryClient();
 
 const selectedTheme = inject<Ref<Theme | undefined>>("selectedTheme", ref());
 const activeTabId = inject<Ref<string>>("activeTabId", ref(""));
@@ -39,41 +33,7 @@ function handleSelectTheme(theme: Theme) {
   selectedTheme.value = theme;
 }
 
-const {
-  data: themes,
-  isLoading,
-  isFetching,
-  refetch,
-} = useQuery<Theme[]>({
-  queryKey: ["installed-themes"],
-  queryFn: async () => {
-    const themes = await paginate<
-      ThemeV1alpha1ConsoleApiListThemesRequest,
-      Theme
-    >((params) => consoleApiClient.theme.theme.listThemes(params), {
-      uninstalled: false,
-      size: 1000,
-    });
-
-    return themes.sort((a, b) => {
-      const activatedThemeName = themeStore.activatedTheme?.metadata.name;
-      if (a.metadata.name === activatedThemeName) {
-        return -1;
-      }
-      if (b.metadata.name === activatedThemeName) {
-        return 1;
-      }
-      return 0;
-    });
-  },
-  refetchInterval(data) {
-    const hasDeletingTheme = data?.some(
-      (theme) => !!theme.metadata.deletionTimestamp
-    );
-
-    return hasDeletingTheme ? 1000 : false;
-  },
-});
+const { data: themes, isLoading, isFetching, refetch } = useInstalledThemes();
 
 const { results } = useFuse(
   keyword,
@@ -107,8 +67,10 @@ const selectedThemes = computed(() => {
 
 watch(
   () => themes.value,
-  () => {
-    selectedThemeNames.value.length = 0;
+  (themes) => {
+    selectedThemeNames.value = selectedThemeNames.value.filter((name) =>
+      themes?.some((theme) => theme.metadata.name === name)
+    );
   },
   {
     immediate: true,
@@ -167,7 +129,7 @@ const uninstallSelectedThemes = async (
     Toast.error(t("core.common.toast.operation_failed"));
     console.error("Failed to uninstall themes in batch", error);
   } finally {
-    await refetch();
+    await invalidateThemeQueries(queryClient);
   }
 };
 

@@ -15,7 +15,7 @@ rules:
     resources: ["comments", "replies"]
     verbs: ["*"]
   - apiGroups: ["api.console.halo.run"]
-    resources: ["comments", "comments/reply", "replies"]
+    resources: ["comments", "comments/reply", "comments/content", "replies", "replies/content"]
     verbs: ["*"]
 ---
 apiVersion: v1alpha1

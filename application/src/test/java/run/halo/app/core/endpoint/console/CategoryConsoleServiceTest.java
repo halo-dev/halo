@@ -10,12 +10,14 @@ import static org.mockito.Mockito.when;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Flux;
@@ -69,6 +71,35 @@ class CategoryConsoleServiceTest {
                             .containsExactly("child");
                 })
                 .verifyComplete();
+    }
+
+    @Test
+    void updatePositionUsesDisplayedRootsForInvalidParents() {
+        var root = category("root", null, 0, "2024-01-01T00:00:00Z");
+        var orphan = category("orphan", "missing", 1, "2024-01-01T00:00:00Z");
+        var self = category("self", "self", 2, "2024-01-01T00:00:00Z");
+        var cycleA = category("cycle-a", "cycle-b", 3, "2024-01-01T00:00:00Z");
+        var cycleB = category("cycle-b", "cycle-a", 4, "2024-01-01T00:00:00Z");
+        var child = category("child", "cycle-a", 0, "2024-01-01T00:00:00Z");
+        var moved = category("moved", null, 5, "2024-01-01T00:00:00Z");
+        mockList(root, orphan, self, cycleA, cycleB, child, moved);
+        when(client.update(any(Category.class))).thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
+
+        service.updatePosition("moved", new CategoryPositionRequest(null, "orphan"))
+                .as(StepVerifier::create)
+                .assertNext(tree -> {
+                    assertThat(tree)
+                            .extracting(node -> node.getCategory().getMetadata().getName())
+                            .containsExactly("root", "moved", "orphan", "self", "cycle-a", "cycle-b");
+                    assertThat(tree.get(4).getChildren())
+                            .extracting(node -> node.getCategory().getMetadata().getName())
+                            .containsExactly("child");
+                })
+                .verifyComplete();
+        assertThat(List.of(root, orphan, self, cycleA, cycleB, moved))
+                .allSatisfy(
+                        category -> assertThat(category.getSpec().getParent()).isNull());
+        assertThat(child.getSpec().getParent()).isEqualTo("cycle-a");
     }
 
     @Test
@@ -168,7 +199,15 @@ class CategoryConsoleServiceTest {
 
         service.updatePosition("root", new CategoryPositionRequest("missing", null))
                 .as(StepVerifier::create)
-                .expectError(ServerWebInputException.class)
+                .expectErrorSatisfies(error -> {
+                    var messages = new ReloadableResourceBundleMessageSource();
+                    messages.setBasename("file:src/main/resources/config/i18n/messages");
+                    messages.setDefaultEncoding("UTF-8");
+                    assertThat(((ServerWebInputException) error)
+                                    .updateAndGetBody(messages, Locale.CHINESE)
+                                    .getDetail())
+                            .isEqualTo("目标父节点不存在，请刷新后重试。");
+                })
                 .verify();
 
         verify(client, never()).update(any(Category.class));

@@ -8,6 +8,9 @@ import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -56,6 +59,23 @@ class SinglePageCommentSubjectTest {
                 .verifyComplete();
 
         verify(client, times(1)).fetch(eq(SinglePage.class), eq("fake-single-page"));
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = {"/archives/example?lang=zh", "https://example.test/archives/example?lang=zh"})
+    void subjectDisplayPreservesStoredPermalink(String permalink) {
+        var subject = new SinglePage();
+        subject.setSpec(new SinglePage.SinglePageSpec());
+        subject.getSpec().setTitle("Subject");
+        subject.getStatusOrDefault().setPermalink(permalink);
+        when(client.fetch(SinglePage.class, "subject")).thenReturn(Mono.just(subject));
+
+        singlePageCommentSubject
+                .getSubjectDisplay("subject")
+                .as(StepVerifier::create)
+                .expectNext(new CommentSubject.SubjectDisplay("Subject", permalink, "页面"))
+                .verifyComplete();
     }
 
     @Test

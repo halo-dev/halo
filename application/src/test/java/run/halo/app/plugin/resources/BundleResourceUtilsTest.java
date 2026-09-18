@@ -70,17 +70,6 @@ class BundleResourceUtilsTest {
                 .isInstanceOf(AccessDeniedException.class);
     }
 
-    @SuppressWarnings("deprecation")
-    @Test
-    void getJsBundleResourceShouldDelegateToSelectedBundleResource() throws IOException {
-        lenient().when(pluginClassLoader.getResource(eq("ui/main.js"))).thenReturn(new URL("file://ui/main.js"));
-
-        Resource jsBundleResource = BundleResourceUtils.getJsBundleResource(pluginManager, "fake-plugin", "main.js");
-
-        assertThat(jsBundleResource).isNotNull();
-        assertThat(jsBundleResource.getURL().toString()).isEqualTo("file://ui/main.js");
-    }
-
     @Test
     void shouldPreferUiBundleLocation() throws IOException {
         lenient().when(pluginClassLoader.getResource(eq("ui/main.js"))).thenReturn(new URL("file://ui/main.js"));

@@ -43,6 +43,7 @@ declare module "@/tiptap" {
 export type ExtensionGalleryImageItem = {
   src: string;
   aspectRatio: number;
+  alt?: string;
 };
 
 export const GALLERY_BUBBLE_MENU_KEY = new PluginKey("galleryBubbleMenu");
@@ -84,8 +85,9 @@ export const ExtensionGallery = Node.create<
         attributeGuidance: {
           images: {
             description:
-              "Ordered gallery items, each containing a source URL and aspect ratio.",
-            format: "array of { src: string, aspectRatio: number }",
+              "Ordered gallery items, each containing a source URL, aspect ratio, and optional alternative text.",
+            format:
+              "array of { src: string, aspectRatio: number, alt?: string }",
           },
           groupSize: {
             description: "Maximum number of images in each visual group.",
@@ -132,6 +134,7 @@ export const ExtensionGallery = Node.create<
             return {
               src: img.getAttribute("src") || "",
               aspectRatio: aspectRatio || 0,
+              alt: img.getAttribute("alt") ?? "",
             };
           });
         },
@@ -220,6 +223,7 @@ export const ExtensionGallery = Node.create<
               "img",
               {
                 src: image.src,
+                alt: image.alt ?? "",
                 "data-type": "gallery-image",
                 style:
                   "width: 100%; height: 100%; margin: 0; object-fit: cover;",

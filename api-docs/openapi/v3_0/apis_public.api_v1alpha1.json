@@ -2,7 +2,7 @@
   "openapi": "3.0.1",
   "info": {
     "title": "Halo",
-    "version": "2.26.0-SNAPSHOT"
+    "version": "2.27.0-SNAPSHOT"
   },
   "servers": [
     {
@@ -800,7 +800,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/CommentVoList"
+                  "$ref": "#/components/schemas/CommentVo"
                 }
               }
             },
@@ -895,6 +895,48 @@
               }
             },
             "description": "default response"
+          }
+        },
+        "tags": [
+          "CommentV1alpha1Public"
+        ]
+      }
+    },
+    "/apis/api.halo.run/v1alpha1/comments/{name}/reply/{replyName}": {
+      "get": {
+        "description": "Get a visible reply under a comment.",
+        "operationId": "GetCommentReply",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "replyName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReplyVo"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Comment or reply is unavailable."
           }
         },
         "tags": [
@@ -1506,8 +1548,8 @@
         "properties": {
           "allowNotification": {
             "type": "boolean",
-            "description": "Whether to subscribe the owner to notifications for future replies.",
-            "default": false
+            "description": "Whether to notify the owner of future replies. Only an explicit false disables notifications.",
+            "default": true
           },
           "content": {
             "minLength": 1,
@@ -1675,6 +1717,10 @@
           "owner": {
             "$ref": "#/components/schemas/OwnerInfo"
           },
+          "permalink": {
+            "type": "string",
+            "description": "Frontend permalink to this comment, when its subject URL is available."
+          },
           "spec": {
             "$ref": "#/components/schemas/CommentSpec"
           },
@@ -1685,66 +1731,7 @@
             "$ref": "#/components/schemas/CommentStatus"
           }
         },
-        "description": "A chunk of items."
-      },
-      "CommentVoList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
-        "type": "object",
-        "properties": {
-          "first": {
-            "type": "boolean",
-            "description": "Indicates whether current page is the first page."
-          },
-          "hasNext": {
-            "type": "boolean",
-            "description": "Indicates whether current page has next page."
-          },
-          "hasPrevious": {
-            "type": "boolean",
-            "description": "Indicates whether current page has previous page."
-          },
-          "items": {
-            "type": "array",
-            "description": "A chunk of items.",
-            "items": {
-              "$ref": "#/components/schemas/CommentVo"
-            }
-          },
-          "last": {
-            "type": "boolean",
-            "description": "Indicates whether current page is the last page."
-          },
-          "page": {
-            "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
-          },
-          "size": {
-            "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
-          },
-          "total": {
-            "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
-          },
-          "totalPages": {
-            "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
-          }
-        }
+        "description": "A value object for {@link Comment Comment}."
       },
       "CommentWithReplyVo": {
         "required": [
@@ -1760,6 +1747,10 @@
           },
           "owner": {
             "$ref": "#/components/schemas/OwnerInfo"
+          },
+          "permalink": {
+            "type": "string",
+            "description": "Frontend permalink to this comment, when its subject URL is available."
           },
           "replies": {
             "$ref": "#/components/schemas/ListResultReplyVo"
@@ -2408,6 +2399,15 @@
             "description": "Sorting priority. Higher values sort before lower values where priority ordering is applied.",
             "format": "int32"
           },
+          "routeRef": {
+            "type": "string",
+            "description": "Built-in theme route resolved into status.href.",
+            "enum": [
+              "archives",
+              "categories",
+              "tags"
+            ]
+          },
           "target": {
             "type": "string",
             "description": "HTML anchor target used by the menu item.",
@@ -2970,8 +2970,8 @@
         "properties": {
           "allowNotification": {
             "type": "boolean",
-            "description": "Whether to subscribe the owner to notifications for future replies.",
-            "default": false
+            "description": "Whether to notify the owner of future replies. Only an explicit false disables notifications.",
+            "default": true
           },
           "content": {
             "minLength": 1,
@@ -3107,6 +3107,10 @@
           "owner": {
             "$ref": "#/components/schemas/OwnerInfo"
           },
+          "permalink": {
+            "type": "string",
+            "description": "Frontend permalink to this reply, when its subject URL is available."
+          },
           "spec": {
             "$ref": "#/components/schemas/ReplySpec"
           },
@@ -3114,7 +3118,7 @@
             "$ref": "#/components/schemas/CommentStatsVo"
           }
         },
-        "description": "A chunk of items."
+        "description": "A value object for {@link Reply Reply}."
       },
       "ReplyVoList": {
         "required": [

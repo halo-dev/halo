@@ -1,4 +1,4 @@
-import { useThemeStore } from "@console/stores/theme";
+import { useActivatedTheme } from "@console/composables/use-activated-theme";
 import {
   consoleApiClient,
   coreApiClient,
@@ -22,7 +22,6 @@ import {
   IconUserSettings,
 } from "@halo-dev/components";
 import { utils } from "@halo-dev/ui-shared";
-import { storeToRefs } from "pinia";
 import { markRaw } from "vue";
 import { useI18n, type ComposerTranslation } from "vue-i18n";
 import { useRouter, type RouteRecordNormalized } from "vue-router";
@@ -465,11 +464,11 @@ export function createGlobalSearchProviders(
 export function useGlobalSearchProviders(): GlobalSearchProvider[] {
   const { t } = useI18n();
   const router = useRouter();
-  const { activatedTheme } = storeToRefs(useThemeStore());
+  const { data: activatedTheme } = useActivatedTheme();
 
   return createGlobalSearchProviders({
     t,
     routes: router.getRoutes(),
-    getActivatedTheme: () => activatedTheme.value,
+    getActivatedTheme: () => activatedTheme.value ?? undefined,
   });
 }

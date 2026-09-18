@@ -10,7 +10,6 @@ import {
   provide,
   ref,
   shallowRef,
-  watch,
   type Ref,
 } from "vue";
 import { useI18n } from "vue-i18n";
@@ -26,6 +25,10 @@ const emit = defineEmits<{
 }>();
 
 const modal = ref<InstanceType<typeof VModal> | null>(null);
+
+defineExpose({
+  close: () => modal.value?.close(),
+});
 
 const tabs = shallowRef<ThemeListTab[]>([
   {
@@ -66,14 +69,14 @@ const tabs = shallowRef<ThemeListTab[]>([
   },
 ]);
 
-watch(
-  () => selectedTheme.value,
-  (value, oldValue) => {
-    if (value && oldValue) {
-      emit("select", value);
-      modal.value?.close();
-    }
-  }
+provide<Ref<Theme | undefined>>(
+  "selectedTheme",
+  computed({
+    get: () => selectedTheme.value,
+    set: (theme) => {
+      emit("select", theme);
+    },
+  })
 );
 
 const activeTabId = ref();

@@ -42,7 +42,18 @@
     document.addEventListener("DOMContentLoaded", function () {
       const form = document.getElementById("two-factor-form");
       const codeInput = document.getElementById("code");
+      const submitButton = form.querySelector('button[type="submit"]');
       let submitting = false;
+
+      form.addEventListener("submit", function (event) {
+        if (submitting) {
+          event.preventDefault();
+          return;
+        }
+
+        submitting = true;
+        submitButton.disabled = true;
+      });
 
       codeInput.addEventListener("input", function (event) {
         if (submitting || event.isComposing) {
@@ -50,7 +61,6 @@
         }
 
         if (/^\d{6}$/.test(codeInput.value)) {
-          submitting = true;
           form.requestSubmit();
         }
       });

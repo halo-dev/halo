@@ -2,7 +2,7 @@
   "openapi": "3.0.1",
   "info": {
     "title": "Halo",
-    "version": "2.26.0-SNAPSHOT"
+    "version": "2.27.0-SNAPSHOT"
   },
   "servers": [
     {
@@ -11082,6 +11082,15 @@
             "type": "integer",
             "description": "Sorting priority. Higher values sort before lower values where priority ordering is applied.",
             "format": "int32"
+          },
+          "routeRef": {
+            "type": "string",
+            "description": "Built-in theme route resolved into status.href.",
+            "enum": [
+              "archives",
+              "categories",
+              "tags"
+            ]
           },
           "target": {
             "type": "string",

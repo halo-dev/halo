@@ -187,8 +187,15 @@ onMounted(() => {
 });
 
 // custom templates
-const { templates } = useThemeCustomTemplates("category");
-const { templates: postTemplates } = useThemeCustomTemplates("post");
+const {
+  templates,
+  isInitialLoading: templatesLoading,
+  isError: templatesError,
+} = useThemeCustomTemplates("category", () => formState.value.spec.template);
+const { templates: postTemplates } = useThemeCustomTemplates(
+  "post",
+  () => formState.value.spec.postTemplate
+);
 
 // slug
 const { handleGenerateSlug } = useSlugify(
@@ -306,6 +313,7 @@ async function slugUniqueValidation(node: FormKitNode) {
             <FormKit
               v-model="formState.spec.template"
               :options="templates"
+              :disabled="templatesLoading || templatesError"
               :label="
                 $t('core.post_category.editing_modal.fields.template.label')
               "
@@ -318,6 +326,7 @@ async function slugUniqueValidation(node: FormKitNode) {
             <FormKit
               v-model="formState.spec.postTemplate"
               :options="postTemplates"
+              :disabled="templatesLoading || templatesError"
               :label="
                 $t(
                   'core.post_category.editing_modal.fields.post_template.label'

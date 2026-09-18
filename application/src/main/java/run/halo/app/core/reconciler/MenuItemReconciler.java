@@ -1,12 +1,20 @@
 package run.halo.app.core.reconciler;
 
+import static java.util.Objects.requireNonNullElse;
+import static run.halo.app.infra.utils.SystemConfigUtils.mergeMap;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.time.Instant;
+import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.MenuItem;
@@ -23,6 +31,10 @@ import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.extension.controller.Reconciler.Request;
 import run.halo.app.extension.index.query.Queries;
+import run.halo.app.infra.SystemConfigChangedEvent;
+import run.halo.app.infra.SystemSetting;
+import run.halo.app.infra.SystemSetting.ThemeRouteRules;
+import run.halo.app.theme.utils.PatternUtils;
 
 @Slf4j
 @Component
@@ -48,7 +60,20 @@ class MenuItemReconciler implements Reconciler<Request> {
             }
             var spec = menuItem.getSpec();
             var targetRef = spec.getTargetRef();
-            if (targetRef != null) {
+            if (spec.getRouteRef() != null) {
+                if (targetRef != null || !StringUtils.hasText(spec.getDisplayName())) {
+                    log.error("Invalid route-bound MenuItem {}", request.name());
+                    resetStatus(menuItem);
+                    client.update(menuItem);
+                    return;
+                }
+                try {
+                    handleRouteRef(menuItem, resolveRouteRules());
+                } catch (JsonProcessingException | RuntimeException e) {
+                    log.error("Failed to resolve routeRef for MenuItem {}", request.name(), e);
+                    return;
+                }
+            } else if (targetRef != null) {
                 if (Ref.groupKindEquals(targetRef, Category.GVK)) {
                     handleCategoryRef(menuItem, targetRef.getName());
                 } else if (Ref.groupKindEquals(targetRef, Tag.GVK)) {
@@ -74,6 +99,34 @@ class MenuItemReconciler implements Reconciler<Request> {
             client.update(menuItem);
         });
         return Result.doNotRetry();
+    }
+
+    private void handleRouteRef(MenuItem menuItem, ThemeRouteRules rules) {
+        var spec = menuItem.getSpec();
+        var href =
+                switch (spec.getRouteRef()) {
+                    case ARCHIVES -> rules.getArchives();
+                    case CATEGORIES -> rules.getCategories();
+                    case TAGS -> rules.getTags();
+                };
+        if (menuItem.getStatus() == null) {
+            menuItem.setStatus(new MenuItemStatus());
+        }
+        menuItem.getStatus().setHref(PatternUtils.normalizePattern(href));
+        menuItem.getStatus().setDisplayName(spec.getDisplayName());
+    }
+
+    private ThemeRouteRules resolveRouteRules() throws JsonProcessingException {
+        var defaultData = client.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG_DEFAULT)
+                .map(ConfigMap::getData)
+                .map(data -> requireNonNullElse(data, Map.<String, String>of()))
+                .orElse(Map.of());
+        var currentData = client.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG)
+                .map(ConfigMap::getData)
+                .map(data -> requireNonNullElse(data, Map.<String, String>of()))
+                .orElse(Map.of());
+        var rules = SystemSetting.get(mergeMap(defaultData, currentData), ThemeRouteRules.GROUP, ThemeRouteRules.class);
+        return requireNonNullElse(rules, ThemeRouteRules.empty());
     }
 
     private void handlePostRef(MenuItem menuItem, String postName) {
@@ -206,6 +259,43 @@ class MenuItemReconciler implements Reconciler<Request> {
                 .doOnNext(MenuItemReconciler::requestUpdate)
                 .flatMap(reactiveClient::update)
                 .then();
+    }
+
+    @EventListener
+    Mono<Void> onSystemConfigChanged(SystemConfigChangedEvent event) {
+        var oldRules = routeRulesFrom(event.getOldData());
+        var newRules = routeRulesFrom(event.getNewData());
+        var changedRefs = EnumSet.noneOf(MenuItem.RouteRef.class);
+        if (!Objects.equals(oldRules.getArchives(), newRules.getArchives())) {
+            changedRefs.add(MenuItem.RouteRef.ARCHIVES);
+        }
+        if (!Objects.equals(oldRules.getCategories(), newRules.getCategories())) {
+            changedRefs.add(MenuItem.RouteRef.CATEGORIES);
+        }
+        if (!Objects.equals(oldRules.getTags(), newRules.getTags())) {
+            changedRefs.add(MenuItem.RouteRef.TAGS);
+        }
+        if (changedRefs.isEmpty()) {
+            return Mono.empty();
+        }
+        return reactiveClient
+                .listAll(MenuItem.class, ListOptions.builder().build(), Sort.unsorted())
+                .filter(menuItem -> menuItem.getSpec() != null
+                        && changedRefs.contains(menuItem.getSpec().getRouteRef()))
+                .doOnNext(MenuItemReconciler::requestUpdate)
+                .flatMap(menuItem -> reactiveClient.update(menuItem).onErrorResume(error -> {
+                    log.error(
+                            "Failed to request MenuItem {} reconciliation",
+                            menuItem.getMetadata().getName(),
+                            error);
+                    return Mono.empty();
+                }))
+                .then();
+    }
+
+    private static ThemeRouteRules routeRulesFrom(Map<String, String> data) {
+        return requireNonNullElse(
+                SystemSetting.get(data, ThemeRouteRules.GROUP, ThemeRouteRules.class), ThemeRouteRules.empty());
     }
 
     private Flux<MenuItem> findMenuItemsByRef(Ref ref) {

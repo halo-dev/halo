@@ -33,6 +33,9 @@ public class ReplyNotificationSubscriptionHelper {
      * @param comment comment
      */
     public void subscribeNewReplyReasonForComment(Comment comment) {
+        if (Boolean.FALSE.equals(comment.getSpec().getAllowNotification())) {
+            return;
+        }
         subscribeReply(identityFrom(comment.getSpec().getOwner()));
     }
 
@@ -42,6 +45,9 @@ public class ReplyNotificationSubscriptionHelper {
      * @param reply reply
      */
     public void subscribeNewReplyReasonForReply(Reply reply) {
+        if (Boolean.FALSE.equals(reply.getSpec().getAllowNotification())) {
+            return;
+        }
         var subjectOwner = reply.getSpec().getOwner();
         subscribeReply(identityFrom(subjectOwner));
     }

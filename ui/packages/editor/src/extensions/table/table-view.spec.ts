@@ -1,6 +1,13 @@
 // @vitest-environment jsdom
 
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vite-plus/test";
 import type { Editor } from "@/tiptap";
 import { HaloTableView } from "./table-view";
 import { createTableEditor, getTableNode, insertTable } from "./test-editor";

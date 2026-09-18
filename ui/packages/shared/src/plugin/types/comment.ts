@@ -68,6 +68,9 @@ export type CommentSubjectRefProvider = {
  * Useful for providing rich-text editing, markdown support, or specialized input methods.
  */
 export interface CommentEditorProvider {
+  /** Whether the component can initialize its body from the `initialContent` prop. */
+  supportsEditing?: boolean;
+
   /**
    * The Vue component that implements the custom comment editor.
    * Must be wrapped with `markRaw` to prevent Vue from making it reactive.

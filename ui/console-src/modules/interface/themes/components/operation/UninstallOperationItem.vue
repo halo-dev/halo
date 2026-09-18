@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { invalidateThemeQueries } from "@console/composables/use-activated-theme";
 import type { Theme } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
 import { Dialog, Toast, VDropdown, VDropdownItem } from "@halo-dev/components";
@@ -58,7 +59,7 @@ const uninstallTheme = async (deleteExtensions?: boolean) => {
 
     Toast.success(t("core.common.toast.uninstall_success"));
   } finally {
-    queryClient.invalidateQueries({ queryKey: ["installed-themes"] });
+    void invalidateThemeQueries(queryClient);
   }
 };
 

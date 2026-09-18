@@ -26,4 +26,7 @@ public class ListedReply {
 
     @Schema(description = "Aggregated counters for the reply.", requiredMode = REQUIRED)
     private CommentStats stats;
+
+    @Schema(description = "Frontend permalink to this reply, when its subject URL is available.")
+    private String permalink;
 }

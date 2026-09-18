@@ -253,7 +253,11 @@ const publishTimeHelp = computed(() => {
 });
 
 // custom templates
-const { templates } = useThemeCustomTemplates("post");
+const {
+  templates,
+  isInitialLoading: templatesLoading,
+  isError: templatesError,
+} = useThemeCustomTemplates("post", () => formState.value.spec.template);
 
 const annotationsFormRef = ref<InstanceType<typeof AnnotationsForm>>();
 
@@ -484,6 +488,7 @@ const showCancelPublishButton = computed(() => {
             <FormKit
               v-model="formState.spec.template"
               :options="templates"
+              :disabled="templatesLoading || templatesError"
               :label="$t('core.post.settings.fields.template.label')"
               name="template"
               type="select"

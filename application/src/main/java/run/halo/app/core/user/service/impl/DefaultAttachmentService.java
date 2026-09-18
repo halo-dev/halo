@@ -6,7 +6,6 @@ import java.net.URI;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.file.Paths;
-import java.text.MessageFormat;
 import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
@@ -46,6 +45,7 @@ import run.halo.app.core.extension.attachment.endpoint.UploadOption;
 import run.halo.app.core.extension.service.AttachmentService;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.infra.utils.HttpSecurityUtils;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 
@@ -201,16 +201,15 @@ class DefaultAttachmentService implements AttachmentService {
                         .retrieve()
                         .onStatus(
                                 HttpStatusCode::isError,
-                                response -> Mono.error(
-                                        new ServerWebInputException(MessageFormat.format("""
-                            Failed to fetch the content from the external URL due to \
-                            non-successful response status: {0}""", response.statusCode()))))
+                                response -> Mono.error(new UnsatisfiedAttributeValueException(
+                                        "Failed to fetch the content from the external URL due to non-successful response status: "
+                                                + response.statusCode(),
+                                        "problemDetail.attachment.remote.status",
+                                        new Object[] {response.statusCode()})))
                         .toEntityFlux(DataBuffer.class)
                         .flatMap(response -> {
                             if (!response.hasBody() || Flux.empty().equals(response.getBody())) {
-                                return Mono.error(new ServerWebInputException(
-                                        "Failed to fetch the content from the external URL due to empty "
-                                                + "response body."));
+                                return Mono.error(new ServerWebInputException("problemDetail.attachment.remote.empty"));
                             }
                             var body = response.getBody();
                             var headers = response.getHeaders();
@@ -222,17 +221,13 @@ class DefaultAttachmentService implements AttachmentService {
                         })
                         .onErrorMap(WebClientRequestException.class, e -> {
                             if (e.getCause() instanceof UnknownHostException ex) {
-                                return new ServerWebInputException("""
-                            Unable to resolve host or private IP resolved: %s
-                            """.formatted(ex.getMessage()));
+                                return new ServerWebInputException("problemDetail.attachment.remote.host", null, ex);
                             }
                             return e;
                         })
                         .onErrorMap(WebClientResponseException.class, e -> {
                             if (e.getCause() instanceof DataBufferLimitException) {
-                                return new ServerWebInputException("""
-                            Response body from the external URL is too large to be buffered in \
-                            memory. Please ensure the file size is within the allowed limit.""");
+                                return new ServerWebInputException("problemDetail.attachment.remote.tooLarge", null, e);
                             }
                             return e;
                         }));

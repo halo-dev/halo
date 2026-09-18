@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 import { ExtensionsKit } from "@/extensions";
 import { Editor, Extension, Node, type Extensions } from "@/tiptap";
 import { createHaloEditorManifest } from "./manifest";

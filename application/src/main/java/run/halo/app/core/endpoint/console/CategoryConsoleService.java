@@ -19,7 +19,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.server.ServerWebInputException;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -29,6 +28,7 @@ import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.MetadataOperator;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.exception.NotFoundException;
+import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 
 @Component
 public class CategoryConsoleService {
@@ -49,8 +49,7 @@ public class CategoryConsoleService {
                         .filter(OptimisticLockingFailureException.class::isInstance))
                 .onErrorMap(
                         Exceptions::isRetryExhausted,
-                        error -> new ResponseStatusException(
-                                HttpStatus.CONFLICT, "Category position update conflicted.", error));
+                        error -> new ResponseStatusException(HttpStatus.CONFLICT, "problemDetail.conflict", error));
     }
 
     private Mono<List<CategoryTreeNode>> move(String name, String targetParentName, String beforeName) {
@@ -69,23 +68,26 @@ public class CategoryConsoleService {
                         LinkedHashMap::new));
         var moved = categoryMap.get(name);
         if (moved == null) {
-            return Mono.error(new NotFoundException("Category with name " + name + " not found"));
+            return Mono.error(new NotFoundException(
+                    "problemDetail.category.notFound",
+                    new Object[] {name},
+                    "Category with name " + name + " not found"));
         }
 
         if (targetParentName != null) {
             if (Objects.equals(targetParentName, name)) {
-                return Mono.error(new ServerWebInputException("Cannot move a Category under itself."));
+                return Mono.error(new UnsatisfiedAttributeValueException("problemDetail.hierarchy.self"));
             }
             if (!categoryMap.containsKey(targetParentName)) {
-                return Mono.error(new ServerWebInputException("Parent Category was not found."));
+                return Mono.error(new UnsatisfiedAttributeValueException("problemDetail.hierarchy.parentMissing"));
             }
             if (isDescendant(targetParentName, name, categoryMap)) {
-                return Mono.error(new ServerWebInputException("Cannot move a Category under one of its descendants."));
+                return Mono.error(new UnsatisfiedAttributeValueException("problemDetail.hierarchy.descendant"));
             }
         }
 
         if (beforeName != null && !categoryMap.containsKey(beforeName)) {
-            return Mono.error(new ServerWebInputException("Before Category was not found."));
+            return Mono.error(new UnsatisfiedAttributeValueException("problemDetail.hierarchy.beforeMissing"));
         }
 
         var originalStates = categories.stream()
@@ -94,21 +96,22 @@ public class CategoryConsoleService {
                         category -> new HierarchyState(parentNameOf(category), priorityOf(category)),
                         (left, right) -> left,
                         LinkedHashMap::new));
-        var originalParentName = parentNameOf(moved);
+        var parentMap = effectiveParentMap(categories);
+        var originalParentName = parentMap.get(name);
 
-        var targetSiblings = siblings(categories, targetParentName, name);
+        var targetSiblings = siblings(categories, parentMap, targetParentName, name);
         int insertIndex = targetSiblings.size();
         if (beforeName != null) {
             insertIndex = indexOf(targetSiblings, beforeName);
             if (insertIndex < 0) {
-                return Mono.error(new ServerWebInputException("Before Category is not a target sibling."));
+                return Mono.error(new UnsatisfiedAttributeValueException("problemDetail.hierarchy.notSibling"));
             }
         }
         targetSiblings.add(insertIndex, moved);
         assignPriorities(targetSiblings, targetParentName);
 
         if (!Objects.equals(originalParentName, targetParentName)) {
-            assignPriorities(siblings(categories, originalParentName, name), originalParentName);
+            assignPriorities(siblings(categories, parentMap, originalParentName, name), originalParentName);
         }
 
         var changedCategories = categories.stream()
@@ -133,12 +136,11 @@ public class CategoryConsoleService {
                         Function.identity(),
                         (left, right) -> left,
                         LinkedHashMap::new));
-        Map<String, String> parentMap = validParentMap(categoryMap);
-        Set<String> cyclicNames = cyclicNames(parentMap);
+        Map<String, String> parentMap = effectiveParentMap(categories);
 
         categoryMap.forEach((name, node) -> {
             var parentName = parentMap.get(name);
-            if (parentName != null && !cyclicNames.contains(name)) {
+            if (parentName != null) {
                 categoryMap.get(parentName).getChildren().add(node);
             }
         });
@@ -146,21 +148,26 @@ public class CategoryConsoleService {
         var roots = categoryMap.values().stream()
                 .filter(node -> {
                     var name = node.getCategory().getMetadata().getName();
-                    return !parentMap.containsKey(name) || cyclicNames.contains(name);
+                    return !parentMap.containsKey(name);
                 })
                 .collect(Collectors.toCollection(ArrayList::new));
         sortTree(roots);
         return roots;
     }
 
-    private static Map<String, String> validParentMap(Map<String, CategoryTreeNode> categoryMap) {
+    private static Map<String, String> effectiveParentMap(Collection<Category> categories) {
+        var names = categories.stream()
+                .map(category -> category.getMetadata().getName())
+                .collect(Collectors.toSet());
         Map<String, String> parentMap = new LinkedHashMap<>();
-        categoryMap.forEach((name, node) -> {
-            var parentName = parentNameOf(node.getCategory());
-            if (parentName != null && !Objects.equals(parentName, name) && categoryMap.containsKey(parentName)) {
+        categories.forEach(category -> {
+            var name = category.getMetadata().getName();
+            var parentName = parentNameOf(category);
+            if (parentName != null && !Objects.equals(parentName, name) && names.contains(parentName)) {
                 parentMap.put(name, parentName);
             }
         });
+        parentMap.keySet().removeAll(cyclicNames(parentMap));
         return parentMap;
     }
 
@@ -220,7 +227,7 @@ public class CategoryConsoleService {
                 return true;
             }
             if (!visited.add(current)) {
-                throw new ServerWebInputException("Target parent has a cyclic parent chain.");
+                throw new UnsatisfiedAttributeValueException("problemDetail.hierarchy.cycle");
             }
             current = Optional.ofNullable(categoryMap.get(current))
                     .map(CategoryConsoleService::parentNameOf)
@@ -229,10 +236,12 @@ public class CategoryConsoleService {
         return false;
     }
 
-    private static List<Category> siblings(List<Category> categories, String parentName, String excludingName) {
+    private static List<Category> siblings(
+            List<Category> categories, Map<String, String> parentMap, String parentName, String excludingName) {
         return categories.stream()
                 .filter(category -> !Objects.equals(category.getMetadata().getName(), excludingName))
-                .filter(category -> Objects.equals(parentNameOf(category), parentName))
+                .filter(category ->
+                        Objects.equals(parentMap.get(category.getMetadata().getName()), parentName))
                 .sorted(defaultCategoryComparator())
                 .collect(Collectors.toCollection(ArrayList::new));
     }

@@ -7,18 +7,26 @@ import static org.mockito.Mockito.*;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
+import org.jsoup.Jsoup;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import run.halo.app.core.extension.notification.NotificationTemplate;
 import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
+import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.infra.utils.YamlUnstructuredLoader;
 
 /**
  * Tests for {@link DefaultNotificationTemplateRender}.
@@ -120,5 +128,51 @@ class DefaultNotificationTemplateRenderTest {
                 .as(StepVerifier::create)
                 .expectNext(expected)
                 .verifyComplete();
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "template-new-comment-on-post, commentUrl, true",
+        "template-new-comment-on-post, commentUrl, false",
+        "template-new-comment-on-single-page, commentUrl, true",
+        "template-new-comment-on-single-page, commentUrl, false",
+        "template-someone-replied-to-you, replyUrl, true",
+        "template-someone-replied-to-you, replyUrl, false"
+    })
+    void defaultCommentTemplatesKeepSourceLinksAndOptionallyLinkTargets(
+            String name, String attribute, boolean available) {
+        var resource = new YamlUnstructuredLoader(new ClassPathResource("extensions/notification-templates.yaml"))
+                .load().stream()
+                        .filter(item -> name.equals(item.getMetadata().getName()))
+                        .findFirst()
+                        .orElseThrow();
+        var template = JsonUtils.jsonToObject(JsonUtils.objectToJson(resource), NotificationTemplate.class)
+                .getSpec()
+                .getTemplate();
+        var model = new HashMap<String, Object>();
+        model.put("subscriber", Map.of("displayName", "Reader"));
+        for (var key :
+                new String[] {"postTitle", "pageTitle", "commentSubjectTitle", "commenter", "replier", "commentContent"
+                }) {
+            model.put(key, "Example");
+        }
+        model.put("content", "<p>New content</p>");
+        model.put("isQuoteReply", false);
+        for (var key : new String[] {"postUrl", "pageUrl", "commentSubjectUrl"}) {
+            model.put(key, "https://example.test/post");
+        }
+        var target = "https://example.test/post#halo-comment=comment-a&reply=reply-b";
+        if (available) {
+            model.put(attribute, target);
+        }
+        when(environmentFetcher.fetch(SystemSetting.Basic.GROUP, SystemSetting.Basic.class))
+                .thenReturn(Mono.empty());
+        var html =
+                Jsoup.parse(templateRender.render(template.getHtmlBody(), model).block());
+        assertThat(html.select("a").eachAttr("href")).contains("https://example.test/post");
+        assertThat(html.select("a").eachAttr("href").contains(target)).isEqualTo(available);
+        var text = templateRender.render(template.getRawBody(), model).block();
+        assertThat(text.contains(target)).isEqualTo(available);
+        assertThat(text).doesNotContain("null");
     }
 }

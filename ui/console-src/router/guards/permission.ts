@@ -3,23 +3,21 @@ import type { RouteLocationNormalized, Router } from "vue-router";
 import { isConsoleAccessDisallowed } from "@/utils/role";
 
 export function setupPermissionGuard(router: Router) {
-  router.beforeEach(async (to, _, next) => {
+  router.beforeEach(async (to) => {
     const currentUserStore = stores.currentUser();
 
     if (isConsoleAccessDisallowed(currentUserStore.currentUser?.roles)) {
       window.location.href = "/uc";
-      return;
+      return false;
     }
 
     if (
-      await checkRoutePermissions(
+      !(await checkRoutePermissions(
         to,
         utils.permission.getUserPermissions() || []
-      )
+      ))
     ) {
-      next();
-    } else {
-      next({ name: "Forbidden" });
+      return { name: "Forbidden" };
     }
   });
 }

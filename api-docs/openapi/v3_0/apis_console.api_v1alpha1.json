@@ -2,7 +2,7 @@
   "openapi": "3.0.1",
   "info": {
     "title": "Halo",
-    "version": "2.26.0-SNAPSHOT"
+    "version": "2.27.0-SNAPSHOT"
   },
   "servers": [
     {
@@ -441,6 +441,47 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/CommentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Comment"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "CommentV1alpha1Console"
+        ]
+      }
+    },
+    "/apis/api.console.halo.run/v1alpha1/comments/{name}/content": {
+      "put": {
+        "description": "Update only the body of an existing comment. Requires its current version.",
+        "operationId": "UpdateCommentContent",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/CommentContentRequest"
               }
             }
           },
@@ -1798,6 +1839,47 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ListedReplyList"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "ReplyV1alpha1Console"
+        ]
+      }
+    },
+    "/apis/api.console.halo.run/v1alpha1/replies/{name}/content": {
+      "put": {
+        "description": "Update only the body of an existing reply. Requires its current version.",
+        "operationId": "UpdateReplyContent",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/CommentContentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Reply"
                 }
               }
             },
@@ -4324,6 +4406,30 @@
         },
         "description": "Comment extension for a post, single page, or another commentable subject."
       },
+      "CommentContentRequest": {
+        "required": [
+          "content",
+          "raw",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "content": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "raw": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "description": "Resource version when the editor was opened.",
+            "format": "int64"
+          }
+        },
+        "description": "Body-only update for an existing comment or reply."
+      },
       "CommentEmailOwner": {
         "required": [
           "displayName"
@@ -4390,8 +4496,8 @@
         "properties": {
           "allowNotification": {
             "type": "boolean",
-            "description": "Whether to subscribe the owner to notifications for future replies.",
-            "default": false
+            "description": "Whether to notify the owner of future replies. Only an explicit false disables notifications.",
+            "default": true
           },
           "content": {
             "minLength": 1,
@@ -5159,6 +5265,10 @@
           "owner": {
             "$ref": "#/components/schemas/OwnerInfo"
           },
+          "permalink": {
+            "type": "string",
+            "description": "Frontend permalink to this comment, when its subject URL is available."
+          },
           "stats": {
             "$ref": "#/components/schemas/CommentStats"
           },
@@ -5340,6 +5450,10 @@
         "properties": {
           "owner": {
             "$ref": "#/components/schemas/OwnerInfo"
+          },
+          "permalink": {
+            "type": "string",
+            "description": "Frontend permalink to this reply, when its subject URL is available."
           },
           "reply": {
             "$ref": "#/components/schemas/Reply"
@@ -5654,6 +5768,15 @@
             "type": "integer",
             "description": "Sorting priority. Higher values sort before lower values where priority ordering is applied.",
             "format": "int32"
+          },
+          "routeRef": {
+            "type": "string",
+            "description": "Built-in theme route resolved into status.href.",
+            "enum": [
+              "archives",
+              "categories",
+              "tags"
+            ]
           },
           "target": {
             "type": "string",
@@ -6513,7 +6636,7 @@
             "$ref": "#/components/schemas/ReplyStatus"
           }
         },
-        "description": "Reply extension data."
+        "description": "Reply extension that belongs to a top-level {@link Comment Comment}."
       },
       "ReplyRequest": {
         "required": [
@@ -6524,8 +6647,8 @@
         "properties": {
           "allowNotification": {
             "type": "boolean",
-            "description": "Whether to subscribe the owner to notifications for future replies.",
-            "default": false
+            "description": "Whether to notify the owner of future replies. Only an explicit false disables notifications.",
+            "default": true
           },
           "content": {
             "minLength": 1,

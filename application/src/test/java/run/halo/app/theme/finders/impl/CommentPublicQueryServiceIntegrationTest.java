@@ -13,9 +13,17 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import reactor.core.publisher.Flux;
@@ -56,6 +64,66 @@ class CommentPublicQueryServiceIntegrationTest {
     }
 
     @Nested
+    class GetCommentTest {
+        @Autowired
+        private CommentPublicQueryServiceImpl commentPublicQueryService;
+
+        private Comment storedComment;
+
+        @AfterEach
+        void tearDown() {
+            deleteImmediately(storedComment).block();
+        }
+
+        @ParameterizedTest
+        @CsvSource({
+            "anonymousUser, User,  true,  false, false, false, true",
+            "anonymousUser, User,  true,  true,  false, false, false",
+            "anonymousUser, User,  false, false, false, false, false",
+            "another,       User,  true,  false, false, false, true",
+            "another,       User,  true,  true,  false, false, false",
+            "another,       User,  false, false, false, false, false",
+            "fake-user,     User,  true,  true,  false, false, true",
+            "fake-user,     User,  false, false, false, false, true",
+            "fake-user,     Email, true,  true,  false, false, false",
+            "moderator,     User,  true,  true,  false, true,  true",
+            "moderator,     User,  false, false, false, true,  true",
+            "anonymousUser, User,  true,  false, true,  false, false",
+            "fake-user,     User,  true,  true,  true,  false, false",
+            "moderator,     User,  true,  true,  true,  true,  false"
+        })
+        void getByNameRespectsVisibility(
+                String username,
+                String ownerKind,
+                boolean approved,
+                boolean hidden,
+                boolean deleted,
+                boolean canViewComments,
+                boolean visible) {
+            var comment = createComment();
+            comment.getSpec().getOwner().setKind(ownerKind);
+            comment.getSpec().setApproved(approved);
+            comment.getSpec().setHidden(hidden);
+            storedComment = client.create(comment).block();
+            if (deleted) {
+                storedComment = client.delete(storedComment).block();
+            }
+            var authentication = new UsernamePasswordAuthenticationToken(
+                    username,
+                    "password",
+                    AuthorityUtils.createAuthorityList(
+                            canViewComments ? "ROLE_role-template-view-comments" : "ROLE_USER"));
+
+            commentPublicQueryService
+                    .getByName(comment.getMetadata().getName())
+                    .contextWrite(ReactiveSecurityContextHolder.withAuthentication(authentication))
+                    .as(StepVerifier::create)
+                    .expectNextCount(visible ? 1 : 0)
+                    .verifyComplete();
+        }
+    }
+
+    @Nested
     class CommentListTest {
         private final List<Comment> storedComments = commentsForStore();
 
@@ -93,6 +161,20 @@ class CommentPublicQueryServiceIntegrationTest {
                                 .isEqualTo("comment-approved");
                     })
                     .verifyComplete();
+        }
+
+        @Test
+        @ExtendWith(OutputCaptureExtension.class)
+        void listWithRepliesDoesNotLogInvalidPageSizeWarning(CapturedOutput output) {
+            Ref ref = Ref.of("fake-post", GroupVersionKind.fromExtension(Post.class));
+            commentPublicQueryService
+                    .list(ref, 1, 10)
+                    .flatMap(comments -> commentPublicQueryService.convertToWithReplyVo(comments, 10))
+                    .as(StepVerifier::create)
+                    .expectNextCount(1)
+                    .verifyComplete();
+
+            assertThat(output.getAll()).doesNotContain("Page size must be greater than 0");
         }
 
         @Test
@@ -366,6 +448,58 @@ class CommentPublicQueryServiceIntegrationTest {
             var jsonObject = JsonUtils.jsonToObject(fakeReplyJson(), JsonNode.class);
             ((ObjectNode) jsonObject.get("owner")).put("displayName", "已删除用户");
             JSONAssert.assertEquals(jsonObject.toString(), JsonUtils.objectToJson(result), true);
+        }
+
+        @Test
+        void listRepliesWithPinnedFirst() {
+            var replies = List.of(
+                    replyForSort("pinned-later", true, 0, 3),
+                    replyForSort("pinned-earlier-b", true, 0, 2),
+                    replyForSort("pinned-earlier-a", true, 0, 2),
+                    replyForSort("pinned-priority", true, 1, 1),
+                    replyForSort("normal-earlier", false, 9, 0),
+                    replyForSort("normal-later", false, 0, 1));
+            try {
+                Flux.fromIterable(replies)
+                        .concatMap(client::create)
+                        .as(StepVerifier::create)
+                        .expectNextCount(replies.size())
+                        .verifyComplete();
+
+                commentPublicQueryService
+                        .listReply("fake-comment", 1, 20)
+                        .as(StepVerifier::create)
+                        .consumeNextWith(result -> assertThat(result.getItems())
+                                .extracting(reply -> reply.getMetadata().getName())
+                                .containsExactly(
+                                        "pinned-earlier-a",
+                                        "pinned-earlier-b",
+                                        "pinned-later",
+                                        "pinned-priority",
+                                        "normal-earlier",
+                                        "normal-later",
+                                        "reply-approved",
+                                        "reply-approved-but-another-owner"))
+                        .verifyComplete();
+            } finally {
+                Flux.fromIterable(replies)
+                        .flatMap(reply ->
+                                client.fetch(Reply.class, reply.getMetadata().getName()))
+                        .flatMap(client::delete)
+                        .flatMap(CommentPublicQueryServiceIntegrationTest.this::deleteImmediately)
+                        .blockLast();
+            }
+        }
+
+        Reply replyForSort(String name, boolean top, int priority, int seconds) {
+            var reply = createReply();
+            reply.getMetadata().setName(name);
+            reply.getSpec().setApproved(true);
+            reply.getSpec().setTop(top);
+            reply.getSpec().setPriority(priority);
+            reply.getSpec()
+                    .setCreationTime(Instant.parse("2024-01-01T00:00:00Z").plusSeconds(seconds));
+            return reply;
         }
 
         String fakeReplyJson() {

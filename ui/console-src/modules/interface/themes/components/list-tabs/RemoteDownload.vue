@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { useThemeStore } from "@console/stores/theme";
+import { invalidateThemeQueries } from "@console/composables/use-activated-theme";
 import { consoleApiClient } from "@halo-dev/api-client";
 import { Dialog, Toast, VAlert, VButton } from "@halo-dev/components";
 import { useQueryClient } from "@tanstack/vue-query";
@@ -11,7 +11,6 @@ import type { ThemeInstallationErrorResponse } from "../../types";
 
 const { t } = useI18n();
 const queryClient = useQueryClient();
-const themeStore = useThemeStore();
 
 const activeTabId = inject<Ref<string>>("activeTabId", ref(""));
 const remoteDownloadUrl = ref("");
@@ -29,8 +28,7 @@ const handleDownloadTheme = async () => {
 
     Toast.success(t("core.common.toast.install_success"));
 
-    queryClient.invalidateQueries({ queryKey: ["themes"] });
-    themeStore.fetchActivatedTheme();
+    void invalidateThemeQueries(queryClient);
 
     activeTabId.value = "installed";
 
@@ -67,8 +65,7 @@ const handleCatchExistsException = async (
 
       Toast.success(t("core.common.toast.upgrade_success"));
 
-      queryClient.invalidateQueries({ queryKey: ["themes"] });
-      themeStore.fetchActivatedTheme();
+      void invalidateThemeQueries(queryClient);
 
       activeTabId.value = "installed";
     },

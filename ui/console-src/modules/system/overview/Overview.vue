@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { useThemeStore } from "@console/stores/theme";
+import { useActivatedTheme } from "@console/composables/use-activated-theme";
 import type {
   Plugin,
   PluginV1alpha1ConsoleApiListPluginsRequest,
@@ -29,7 +29,12 @@ import H2WarningAlert from "@/components/alerts/H2WarningAlert.vue";
 import ExternalUrlItem from "./components/ExternalUrlItem.vue";
 
 const { t } = useI18n();
-const themeStore = useThemeStore();
+const {
+  data: activatedTheme,
+  isInitialLoading: themeLoading,
+  isError: themeError,
+  refetch: refetchTheme,
+} = useActivatedTheme();
 
 const { data: info } = useQuery<Info>({
   queryKey: ["system-info"],
@@ -130,10 +135,14 @@ const handleCopy = () => {
     },
     {
       label: t("core.overview.fields.activated_theme"),
-      value: `${themeStore.activatedTheme?.spec.displayName} ${themeStore.activatedTheme?.spec.version}`,
+      value: [
+        activatedTheme.value?.spec.displayName,
+        activatedTheme.value?.spec.version,
+      ]
+        .filter(Boolean)
+        .join(" "),
       href:
-        themeStore.activatedTheme?.spec.repo ||
-        themeStore.activatedTheme?.spec.homepage,
+        activatedTheme.value?.spec.repo || activatedTheme.value?.spec.homepage,
     },
     {
       label: t("core.overview.fields.enabled_plugins"),
@@ -229,18 +238,25 @@ const handleDownloadLogfile = () => {
               :content="utils.date.format(startup?.timeline.startTime)"
             />
             <VDescriptionItem
-              v-if="themeStore.activatedTheme"
+              v-if="activatedTheme || themeLoading || themeError"
               :label="$t('core.overview.fields.activated_theme')"
             >
-              <VTag @click="$router.push({ name: 'ThemeDetail' })">
-                <template v-if="themeStore.activatedTheme.spec.logo" #leftIcon>
+              <VLoading v-if="themeLoading" />
+              <VButton v-else-if="themeError" @click="refetchTheme()">{{
+                $t("core.common.buttons.retry")
+              }}</VButton>
+              <VTag
+                v-else-if="activatedTheme"
+                @click="$router.push({ name: 'ThemeDetail' })"
+              >
+                <template v-if="activatedTheme.spec.logo" #leftIcon>
                   <img
                     class="h-3.5 w-3.5 rounded-sm"
-                    :src="themeStore.activatedTheme.spec.logo"
-                    :alt="themeStore.activatedTheme.spec.displayName"
+                    :src="activatedTheme.spec.logo"
+                    :alt="activatedTheme.spec.displayName"
                   />
                 </template>
-                {{ themeStore.activatedTheme.spec.displayName }}
+                {{ activatedTheme.spec.displayName }}
               </VTag>
             </VDescriptionItem>
             <VDescriptionItem

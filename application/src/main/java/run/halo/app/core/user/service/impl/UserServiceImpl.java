@@ -261,7 +261,7 @@ public class UserServiceImpl implements UserService {
                 .fetch(SystemSetting.User.GROUP, SystemSetting.User.class)
                 .filter(SystemSetting.User::isAllowRegistration)
                 .switchIfEmpty(Mono.error(
-                        () -> new ServerWebInputException("The registration is not allowed by the administrator.")))
+                        () -> new UnsatisfiedAttributeValueException("problemDetail.user.signUpFailed.disallowed")))
                 .filter(setting -> isUsernameAllowed(setting, signUpData.getUsername()))
                 .switchIfEmpty(Mono.error(() -> new RestrictedNameException(
                         "The username is restricted.",
@@ -274,7 +274,7 @@ public class UserServiceImpl implements UserService {
                         new Object[] {signUpData.getDisplayName()})))
                 .filter(setting -> StringUtils.hasText(setting.getDefaultRole()))
                 .switchIfEmpty(Mono.error(
-                        () -> new ServerWebInputException("The default role is not configured by the administrator.")))
+                        () -> new UnsatisfiedAttributeValueException("problemDetail.user.signup.defaultRoleMissing")))
                 .filter(setting -> {
                     var pages = setting.getRequiredAgreementPages();
                     if (CollectionUtils.isEmpty(pages)) {

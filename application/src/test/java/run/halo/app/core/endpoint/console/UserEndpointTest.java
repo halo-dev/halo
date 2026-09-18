@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -17,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,9 +31,12 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Flux;
@@ -71,6 +76,9 @@ class UserEndpointTest {
     @Mock
     UserService userService;
 
+    @Mock
+    Validator validator;
+
     @InjectMocks
     UserEndpoint endpoint;
 
@@ -82,13 +90,39 @@ class UserEndpointTest {
                             var response = exchange.getResponse();
                             response.setStatusCode(error.getStatusCode());
                             response.getHeaders().setContentType(MediaType.APPLICATION_PROBLEM_JSON);
-                            var body = JsonUtils.objectToJson(error.getBody()).getBytes(StandardCharsets.UTF_8);
+                            var messages = new ReloadableResourceBundleMessageSource();
+                            messages.setBasename("file:src/main/resources/config/i18n/messages");
+                            messages.setDefaultEncoding("UTF-8");
+                            var body = JsonUtils.objectToJson(error.updateAndGetBody(messages, Locale.CHINESE))
+                                    .getBytes(StandardCharsets.UTF_8);
                             return response.writeWith(
                                     Mono.just(response.bufferFactory().wrap(body)));
                         }))
                 .apply(springSecurity())
                 .build()
                 .mutateWith(mockUser("fake-user").password("fake-password").roles("fake-super-role"));
+    }
+
+    @Test
+    void shouldUseMessageCodeForInvalidEmail() {
+        doAnswer(invocation -> {
+                    Errors errors = invocation.getArgument(1);
+                    errors.rejectValue("email", "validation.error.email.pattern");
+                    return null;
+                })
+                .when(validator)
+                .validate(any(), any());
+        webClient
+                .post()
+                .uri("/users/-/send-email-verification-code")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(Map.of("email", "invalid"))
+                .exchange()
+                .expectStatus()
+                .isBadRequest()
+                .expectBody()
+                .jsonPath("$.detail")
+                .isEqualTo("邮箱格式不正确");
     }
 
     @Nested

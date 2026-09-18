@@ -23,6 +23,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.fn.builders.operation.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.CacheControl;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
@@ -117,9 +119,28 @@ public class CommentFinderEndpoint implements CustomEndpoint {
                                     .in(ParameterIn.PATH)
                                     .required(true)
                                     .implementation(String.class))
-                            .response(
-                                    responseBuilder().implementation(ListResult.generateGenericClass(CommentVo.class)));
+                            .response(responseBuilder().implementation(CommentVo.class));
                 })
+                .GET(
+                        "comments/{name}/reply/{replyName}",
+                        this::getCommentReply,
+                        builder -> builder.operationId("GetCommentReply")
+                                .description("Get a visible reply under a comment.")
+                                .tag(tag)
+                                .parameter(parameterBuilder()
+                                        .name("name")
+                                        .in(ParameterIn.PATH)
+                                        .required(true)
+                                        .implementation(String.class))
+                                .parameter(parameterBuilder()
+                                        .name("replyName")
+                                        .in(ParameterIn.PATH)
+                                        .required(true)
+                                        .implementation(String.class))
+                                .response(responseBuilder().responseCode("200").implementation(ReplyVo.class))
+                                .response(responseBuilder()
+                                        .responseCode("404")
+                                        .description("Comment or reply is unavailable.")))
                 .GET("comments/{name}/reply", this::listCommentReplies, builder -> {
                     builder.operationId("ListCommentReplies")
                             .description("List comment replies.")
@@ -221,7 +242,7 @@ public class CommentFinderEndpoint implements CustomEndpoint {
 
     Mono<ServerResponse> getComment(ServerRequest request) {
         String name = request.pathVariable("name");
-        return Mono.defer(() -> Mono.justOrEmpty(commentPublicQueryService.getByName(name)))
+        return Mono.defer(() -> commentPublicQueryService.getByName(name))
                 .subscribeOn(Schedulers.boundedElastic())
                 .flatMap(comment -> ServerResponse.ok().bodyValue(comment));
     }
@@ -232,6 +253,19 @@ public class CommentFinderEndpoint implements CustomEndpoint {
         return commentPublicQueryService
                 .listReply(commentName, queryParams.getPage(), queryParams.getSize())
                 .flatMap(list -> ServerResponse.ok().bodyValue(list));
+    }
+
+    Mono<ServerResponse> getCommentReply(ServerRequest request) {
+        return commentPublicQueryService
+                .getReply(request.pathVariable("name"), request.pathVariable("replyName"))
+                .flatMap(reply -> ServerResponse.ok()
+                        .cacheControl(CacheControl.noStore().cachePrivate())
+                        .varyBy(HttpHeaders.COOKIE, HttpHeaders.AUTHORIZATION)
+                        .bodyValue(reply))
+                .switchIfEmpty(ServerResponse.notFound()
+                        .cacheControl(CacheControl.noStore().cachePrivate())
+                        .varyBy(HttpHeaders.COOKIE, HttpHeaders.AUTHORIZATION)
+                        .build());
     }
 
     public static class CommentQuery extends PageableRequest {

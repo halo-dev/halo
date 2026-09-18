@@ -1,6 +1,6 @@
 import type { EntityFieldItem } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
-import { computed, toValue, type ComputedRef, type Ref } from "vue";
+import { computed, markRaw, toValue, type ComputedRef, type Ref } from "vue";
 import { usePluginModuleStore } from "@/stores/plugin";
 
 export function useEntityFieldItemExtensionPoint<T>(
@@ -11,6 +11,8 @@ export function useEntityFieldItemExtensionPoint<T>(
   const { pluginModules } = usePluginModuleStore();
 
   return useQuery({
+    // Deep structural sharing would clone component definitions and lose markRaw.
+    structuralSharing: false,
     queryKey: computed(() => [
       "core:extension-points:list-item:fields",
       extensionPointName,
@@ -27,6 +29,9 @@ export function useEntityFieldItemExtensionPoint<T>(
         const items = extensionPoints[extensionPointName](
           entity
         ) as EntityFieldItem[];
+        for (const item of items) {
+          markRaw(item.component);
+        }
         itemsFromPlugins.push(...items);
       }
 

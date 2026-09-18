@@ -14,6 +14,8 @@ spec:
         [(${commenter})] 评论了你的文章 《[(${postTitle})]》，以下是评论的具体内容：
 
         [(${content})]
+
+        [(${commentUrl != null ? '查看评论：' + commentUrl : ''})]
     htmlBody: |
       <div class="notification-content">
         <div class="head">
@@ -26,6 +28,7 @@ spec:
             <span>，以下是评论的具体内容：</span>
           </p>
           <div class="content" th:utext="${content}"></div>
+          <p th:if="${commentUrl}"><a th:href="${commentUrl}" target="_blank">查看评论</a></p>
         </div>
         <div></div>
       </div>
@@ -47,6 +50,8 @@ spec:
         [(${commenter})] 评论了你的页面 《[(${pageTitle})]》，以下是评论的具体内容：
 
         [(${content})]
+
+        [(${commentUrl != null ? '查看评论：' + commentUrl : ''})]
     htmlBody: |
       <div class="notification-content">
         <div class="head">
@@ -59,6 +64,7 @@ spec:
             <span>，以下是评论的具体内容：</span>
           </p>
           <div class="content" th:utext="${content}"></div>
+          <p th:if="${commentUrl}"><a th:href="${commentUrl}" target="_blank">查看评论</a></p>
         </div>
         <div></div>
       </div>
@@ -80,6 +86,8 @@ spec:
         [(${replier})] 在评论“[(${isQuoteReply ? quoteContent : commentContent})]”中回复了你，以下是回复的具体内容：
 
         [(${content})]
+
+        [(${replyUrl != null ? '查看回复：' + replyUrl : ''})]
     htmlBody: |
       <div class="notification-content">
         <div class="head">
@@ -99,6 +107,7 @@ spec:
           <div class="content" th:utext="${isQuoteReply ? quoteContent : commentContent}"></div>
           <p>回复的内容：</p>
           <div class="content" th:utext="${content}"></div>
+          <p th:if="${replyUrl}"><a th:href="${replyUrl}" target="_blank">查看回复</a></p>
         </div>
         <div></div>
       </div>

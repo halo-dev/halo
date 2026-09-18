@@ -20,9 +20,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import run.halo.app.content.comment.CommentPermalinkService;
 import run.halo.app.content.comment.OwnerInfo;
 import run.halo.app.core.counter.CounterService;
 import run.halo.app.core.counter.MeterUtils;
@@ -32,6 +32,8 @@ import run.halo.app.core.extension.content.Reply;
 import run.halo.app.core.user.service.UserService;
 import run.halo.app.extension.*;
 import run.halo.app.infra.AnonymousUserConst;
+import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
+import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.theme.finders.CommentPublicQueryService;
 import run.halo.app.theme.finders.vo.*;
 
@@ -51,10 +53,44 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
     private final ReactiveExtensionClient client;
     private final UserService userService;
     private final CounterService counterService;
+    private final CommentPermalinkService permalinkService;
 
     @Override
     public Mono<CommentVo> getByName(String name) {
-        return client.fetch(Comment.class, name).flatMap(this::toCommentVo);
+        return getVisibleComment(name).flatMap(this::toCommentVoWithPermalink);
+    }
+
+    private Mono<CommentVo> toCommentVoWithPermalink(Comment comment) {
+        return toCommentVo(comment)
+                .flatMap(vo -> permalinkService
+                        .getPermalink(comment)
+                        .doOnNext(vo::setPermalink)
+                        .thenReturn(vo));
+    }
+
+    private Mono<Comment> getVisibleComment(String name) {
+        return populateVisibleListOptions(null)
+                .map(builder -> builder.andQuery(equal("metadata.name", name)).build())
+                .flatMap(options -> client.listBy(Comment.class, options, PageRequestImpl.ofSize(1)))
+                .flatMapIterable(ListResult::getItems)
+                .next();
+    }
+
+    @Override
+    public Mono<ReplyVo> getReply(String commentName, String replyName) {
+        return getVisibleComment(commentName)
+                .flatMap(comment -> populateReplyListOptions(comment)
+                        .doOnNext(options -> options.setFieldSelector(
+                                options.getFieldSelector().andQuery(equal("metadata.name", replyName))))
+                        .flatMap(options -> client.listBy(Reply.class, options, PageRequestImpl.ofSize(1)))
+                        .flatMapIterable(ListResult::getItems)
+                        .next()
+                        .flatMap(this::toReplyVo)
+                        .flatMap(vo -> permalinkService
+                                .getSubjectUrl(comment.getSpec().getSubjectRef())
+                                .doOnNext(url -> vo.setPermalink(
+                                        CommentPermalinkService.getPermalink(url, commentName, replyName)))
+                                .thenReturn(vo)));
     }
 
     @Override
@@ -69,12 +105,24 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
                 .orElseGet(() -> PageRequestImpl.ofSize(10));
         return populateCommentListOptions(ref)
                 .flatMap(listOptions -> client.listBy(Comment.class, listOptions, pageRequest))
-                .flatMap(listResult -> Flux.fromStream(listResult.get())
-                        .map(this::toCommentVo)
-                        .flatMapSequential(Function.identity())
-                        .collectList()
-                        .map(commentVos -> new ListResult<>(
-                                listResult.getPage(), listResult.getSize(), listResult.getTotal(), commentVos)))
+                .flatMap(listResult -> permalinkService
+                        .getSubjectUrl(ref)
+                        .defaultIfEmpty("")
+                        .flatMap(subjectUrl -> Flux.fromStream(listResult.get())
+                                .map(comment -> ref == null ? toCommentVoWithPermalink(comment) : toCommentVo(comment))
+                                .flatMapSequential(Function.identity())
+                                .doOnNext(vo -> {
+                                    if (ref != null) {
+                                        vo.setPermalink(CommentPermalinkService.getPermalink(
+                                                subjectUrl, vo.getMetadata().getName(), null));
+                                    }
+                                })
+                                .collectList()
+                                .map(commentVos -> new ListResult<>(
+                                        listResult.getPage(),
+                                        listResult.getSize(),
+                                        listResult.getTotal(),
+                                        commentVos))))
                 .defaultIfEmpty(ListResult.emptyResult());
     }
 
@@ -99,24 +147,31 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
     public Mono<ListResult<ReplyVo>> listReply(String commentName, PageRequest pageParam) {
         // check comment
         return client.get(Comment.class, commentName)
-                .flatMap(this::populateReplyListOptions)
-                .flatMap(listOptions -> {
+                .flatMap(comment -> populateReplyListOptions(comment).flatMap(listOptions -> {
                     var pageRequest = Optional.ofNullable(pageParam)
                             .map(page -> page.withSort(page.getSort().and(defaultReplySort())))
-                            .orElse(PageRequestImpl.ofSize(0));
+                            .orElseGet(() -> PageRequestImpl.ofSize(PageRequestImpl.MAX_SIZE));
                     return client.listBy(Reply.class, listOptions, pageRequest)
-                            .flatMap(list -> Flux.fromStream(list.get().map(this::toReplyVo))
-                                    .flatMapSequential(Function.identity())
-                                    .collectList()
-                                    .map(replyVos -> new ListResult<>(
-                                            list.getPage(), list.getSize(), list.getTotal(), replyVos)));
-                })
+                            .flatMap(list -> permalinkService
+                                    .getSubjectUrl(comment.getSpec().getSubjectRef())
+                                    .defaultIfEmpty("")
+                                    .flatMap(subjectUrl -> Flux.fromStream(
+                                                    list.get().map(this::toReplyVo))
+                                            .flatMapSequential(Function.identity())
+                                            .doOnNext(vo -> vo.setPermalink(CommentPermalinkService.getPermalink(
+                                                    subjectUrl,
+                                                    commentName,
+                                                    vo.getMetadata().getName())))
+                                            .collectList()
+                                            .map(replyVos -> new ListResult<>(
+                                                    list.getPage(), list.getSize(), list.getTotal(), replyVos))));
+                }))
                 .defaultIfEmpty(ListResult.emptyResult());
     }
 
     Mono<CommentVo> toCommentVo(Comment comment) {
         Comment.CommentOwner owner = comment.getSpec().getOwner();
-        return Mono.just(CommentVo.from(comment))
+        return Mono.just(CommentVo.from(JsonUtils.deepCopy(comment)))
                 .flatMap(commentVo -> populateStats(Comment.class, commentVo)
                         .doOnNext(commentVo::setStats)
                         .thenReturn(commentVo))
@@ -163,7 +218,7 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
     // @formatter:on
 
     Mono<ReplyVo> toReplyVo(Reply reply) {
-        return Mono.just(ReplyVo.from(reply))
+        return Mono.just(ReplyVo.from(JsonUtils.deepCopy(reply)))
                 .flatMap(replyVo -> populateStats(Reply.class, replyVo)
                         .doOnNext(replyVo::setStats)
                         .thenReturn(replyVo))
@@ -184,17 +239,19 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
         replyVo.getSpec().setIpAddress("");
         var specOwner = replyVo.getSpec().getOwner();
         specOwner.setName("");
+        var annotations = new HashMap<String, String>();
+        for (var key : Set.of(Comment.CommentOwner.WEBSITE_ANNO, Comment.CommentOwner.AVATAR_ANNO)) {
+            var value = specOwner.getAnnotation(key);
+            if (value != null) {
+                annotations.put(key, value);
+            }
+        }
+        specOwner.setAnnotations(annotations);
         var email = owner.getEmail();
         if (StringUtils.isNotBlank(email)) {
             var emailHash =
                     Hashing.sha256().hashString(email.toLowerCase(), UTF_8).toString();
-            if (specOwner.getAnnotations() == null) {
-                specOwner.setAnnotations(new HashMap<>(2));
-            }
-            specOwner.getAnnotations().put(Comment.CommentOwner.EMAIL_HASH_ANNO, emailHash);
-        }
-        if (specOwner.getAnnotations() != null) {
-            specOwner.getAnnotations().remove("Email");
+            annotations.put(Comment.CommentOwner.EMAIL_HASH_ANNO, emailHash);
         }
         return Mono.just(replyVo);
     }
@@ -239,7 +296,7 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
                         boolean hasPermission = (!commentHidden) || (hasViewPermission || isCommentOwner);
                         if (ExtensionUtil.isDeleted(comment) || !hasPermission) {
                             return Mono.error(
-                                    new ServerWebInputException("The comment was not found, hidden or deleted."));
+                                    new UnsatisfiedAttributeValueException("problemDetail.comment.unavailable"));
                         }
                     }
 
@@ -278,7 +335,11 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
     }
 
     static Sort defaultReplySort() {
-        return Sort.by(Sort.Order.asc("spec.creationTime"), Sort.Order.asc("metadata.name"));
+        return Sort.by(
+                Sort.Order.desc("spec.top"),
+                Sort.Order.asc("spec.priority"),
+                Sort.Order.asc("spec.creationTime"),
+                Sort.Order.asc("metadata.name"));
     }
 
     int pageNullSafe(Integer page) {

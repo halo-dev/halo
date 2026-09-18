@@ -37,6 +37,8 @@ import run.halo.app.infra.exception.RequestRestrictedException;
 @Service
 public class ReplyServiceImpl extends AbstractCommentService implements ReplyService {
 
+    private final CommentPermalinkService permalinkService;
+
     private final Supplier<RequestRestrictedException> requestRestrictedExceptionSupplier =
             () -> new RequestRestrictedException("problemDetail.comment.waitingForApproval");
 
@@ -44,8 +46,10 @@ public class ReplyServiceImpl extends AbstractCommentService implements ReplySer
             RoleService roleService,
             ReactiveExtensionClient client,
             UserService userService,
-            CounterService counterService) {
+            CounterService counterService,
+            CommentPermalinkService permalinkService) {
         super(roleService, client, userService, counterService);
+        this.permalinkService = permalinkService;
     }
 
     @Override
@@ -53,9 +57,7 @@ public class ReplyServiceImpl extends AbstractCommentService implements ReplySer
         if (reply.getSpec() == null
                 || reply.getSpec().getContent() == null
                 || !isSafeHtml(reply.getSpec().getContent())) {
-            return Mono.error(new ServerWebInputException("""
-                The content of reply must not be empty or contains unsafe HTML.\
-                """));
+            return Mono.error(new ServerWebInputException("problemDetail.comment.content.unsafe"));
         }
         return client.get(Comment.class, commentName)
                 .flatMap(this::approveComment)
@@ -76,6 +78,14 @@ public class ReplyServiceImpl extends AbstractCommentService implements ReplySer
                 .doOnNext(approvedQuoteReply -> prepared.getSpec()
                         .setHidden(approvedQuoteReply.getSpec().getHidden()))
                 .flatMap(approvedQuoteReply -> client.create(prepared));
+    }
+
+    @Override
+    public Mono<Reply> updateContent(String name, CommentContentRequest request) {
+        return client.get(Reply.class, name).flatMap(reply -> {
+            updateContent(reply.getSpec(), reply.getMetadata(), request);
+            return client.update(reply);
+        });
     }
 
     private Mono<Comment> approveComment(Comment comment) {
@@ -164,11 +174,19 @@ public class ReplyServiceImpl extends AbstractCommentService implements ReplySer
     @Override
     public Mono<ListResult<ListedReply>> list(ReplyQuery query) {
         return client.listBy(Reply.class, query.toListOptions(), query.toPageRequest())
-                .flatMap(list -> Flux.fromStream(list.get().map(this::toListedReply))
-                        .flatMapSequential(Function.identity())
-                        .collectList()
-                        .map(listedReplies ->
-                                new ListResult<>(list.getPage(), list.getSize(), list.getTotal(), listedReplies)));
+                .flatMap(list -> client.fetch(Comment.class, query.getCommentName())
+                        .flatMap(comment ->
+                                permalinkService.getSubjectUrl(comment.getSpec().getSubjectRef()))
+                        .defaultIfEmpty("")
+                        .flatMap(subjectUrl -> Flux.fromStream(list.get().map(this::toListedReply))
+                                .flatMapSequential(Function.identity())
+                                .doOnNext(item -> item.setPermalink(CommentPermalinkService.getPermalink(
+                                        subjectUrl,
+                                        query.getCommentName(),
+                                        item.getReply().getMetadata().getName())))
+                                .collectList()
+                                .map(listedReplies -> new ListResult<>(
+                                        list.getPage(), list.getSize(), list.getTotal(), listedReplies))));
     }
 
     @Override

@@ -3,13 +3,18 @@ import { createInput } from "@formkit/vue";
 import type {
   Menu,
   MenuItem,
+  MenuItemSpecRouteRefEnum,
   MenuItemTreeNode,
   Ref,
 } from "@halo-dev/api-client";
-import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
+import {
+  consoleApiClient,
+  coreApiClient,
+  MenuItemSpecRouteRefEnum as RouteRef,
+} from "@halo-dev/api-client";
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import { cloneDeep } from "es-toolkit";
-import { computed, nextTick, onMounted, ref } from "vue";
+import { computed, nextTick, onMounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import SubmitButton from "@/components/button/SubmitButton.vue";
 import type AnnotationsForm from "@/components/form/AnnotationsForm.vue";
@@ -47,21 +52,26 @@ const { t } = useI18n();
 const modal = ref<InstanceType<typeof VModal> | null>(null);
 const selectedParentMenuItem = ref<string>("");
 const originalParentMenuItem = ref<string>("");
-const formState = ref<MenuItem>({
-  spec: {
-    displayName: "",
-    href: "",
-    target: "_self",
-    menuName: props.menu.metadata.name,
-    priority: 0,
-  },
-  apiVersion: "v1alpha1",
-  kind: "MenuItem",
-  metadata: {
-    name: "",
-    generateName: "menu-item-",
-  },
-});
+const formState = ref<MenuItem>(
+  props.menuItem
+    ? cloneDeep(props.menuItem)
+    : {
+        spec: {
+          // Undefined allows a route default; an empty string preserves deliberate clearing.
+          displayName: undefined,
+          href: "",
+          target: "_self",
+          menuName: props.menu.metadata.name,
+          priority: 0,
+        },
+        apiVersion: "v1alpha1",
+        kind: "MenuItem",
+        metadata: {
+          name: "",
+          generateName: "menu-item-",
+        },
+      }
+);
 const saving = ref(false);
 
 const isUpdateMode = !!props.menuItem;
@@ -82,36 +92,24 @@ const handleSaveMenuItem = async () => {
     return;
   }
 
-  formState.value.metadata.annotations = {
+  const menuItem = cloneDeep(normalizedMenuItem.value);
+  menuItem.metadata.annotations = {
     ...annotations,
     ...customAnnotations,
   };
 
   try {
     saving.value = true;
-    formState.value.spec.menuName = props.menu.metadata.name;
+    menuItem.spec.menuName = props.menu.metadata.name;
     if (!isUpdateMode) {
-      formState.value.spec.parent = selectedParentMenuItem.value || undefined;
-      formState.value.spec.priority = siblingCount.value;
-    }
-
-    const menuItemRef = menuItemRefs.find(
-      (ref) => ref.ref?.kind === selectedRefKind.value
-    );
-
-    if (menuItemRef?.ref) {
-      formState.value.spec.targetRef = {
-        ...menuItemRef.ref,
-        name: selectedRefName.value,
-      };
-      formState.value.spec.displayName = undefined;
-      formState.value.spec.href = undefined;
+      menuItem.spec.parent = selectedParentMenuItem.value || undefined;
+      menuItem.spec.priority = siblingCount.value;
     }
 
     if (isUpdateMode) {
       const { data } = await coreApiClient.menuItem.updateMenuItem({
         name: formState.value.metadata.name,
-        menuItem: formState.value,
+        menuItem,
       });
 
       const positionRequest = buildMenuItemParentMovePosition(
@@ -144,7 +142,7 @@ const handleSaveMenuItem = async () => {
       }
     } else {
       const { data } = await coreApiClient.menuItem.createMenuItem({
-        menuItem: formState.value,
+        menuItem,
       });
 
       emit("saved", data);
@@ -161,9 +159,11 @@ const handleSaveMenuItem = async () => {
 };
 
 interface MenuItemRef {
+  value: string;
   label: string;
   inputType?: string;
   ref?: Ref;
+  routeRef?: MenuItemSpecRouteRefEnum;
 }
 
 const baseRef: Omit<Ref, "kind"> = {
@@ -174,11 +174,32 @@ const baseRef: Omit<Ref, "kind"> = {
 
 const menuItemRefs: MenuItemRef[] = [
   {
+    value: "custom",
     label: t(
       "core.menu.menu_item_editing_modal.fields.ref_kind.options.custom"
     ),
   },
   {
+    value: RouteRef.Archives,
+    label: t(
+      "core.menu.menu_item_editing_modal.fields.ref_kind.options.archives"
+    ),
+    routeRef: RouteRef.Archives,
+  },
+  {
+    value: RouteRef.Categories,
+    label: t(
+      "core.menu.menu_item_editing_modal.fields.ref_kind.options.categories"
+    ),
+    routeRef: RouteRef.Categories,
+  },
+  {
+    value: RouteRef.Tags,
+    label: t("core.menu.menu_item_editing_modal.fields.ref_kind.options.tags"),
+    routeRef: RouteRef.Tags,
+  },
+  {
+    value: "Post",
     label: t("core.menu.menu_item_editing_modal.fields.ref_kind.options.post"),
     inputType: "postSelect",
     ref: {
@@ -187,6 +208,7 @@ const menuItemRefs: MenuItemRef[] = [
     },
   },
   {
+    value: "SinglePage",
     label: t(
       "core.menu.menu_item_editing_modal.fields.ref_kind.options.single_page"
     ),
@@ -197,6 +219,7 @@ const menuItemRefs: MenuItemRef[] = [
     },
   },
   {
+    value: "Category",
     label: t(
       "core.menu.menu_item_editing_modal.fields.ref_kind.options.category"
     ),
@@ -207,6 +230,7 @@ const menuItemRefs: MenuItemRef[] = [
     },
   },
   {
+    value: "Tag",
     label: t("core.menu.menu_item_editing_modal.fields.ref_kind.options.tag"),
     inputType: "tagSelect",
     ref: {
@@ -216,21 +240,67 @@ const menuItemRefs: MenuItemRef[] = [
   },
 ];
 
-const menuItemRefsMap = menuItemRefs.map((menuItemRef) => {
-  return {
-    label: menuItemRef.label,
-    value: menuItemRef.ref?.kind,
-  };
-});
+const originalTargetRef = props.menuItem?.spec.targetRef;
+const originalResourceSource = menuItemRefs.find(
+  ({ ref }) =>
+    ref &&
+    originalTargetRef &&
+    ref.group === originalTargetRef.group &&
+    ref.version === originalTargetRef.version &&
+    ref.kind === originalTargetRef.kind
+);
+const isResourceRefLocked = !!originalTargetRef && !originalResourceSource;
+const menuItemRefsMap = isResourceRefLocked
+  ? [
+      {
+        value: "unsupported",
+        label: `${originalTargetRef.group}/${originalTargetRef.version}/${originalTargetRef.kind}`,
+      },
+    ]
+  : menuItemRefs.map(({ label, value }) => ({ label, value }));
 
-const selectedRef = computed(() => {
-  return menuItemRefs.find(
-    (menuItemRef) => menuItemRef.ref?.kind === selectedRefKind.value
-  );
-});
+const selectedSource = computed(() =>
+  menuItemRefs.find(
+    (menuItemRef) => menuItemRef.value === selectedSourceValue.value
+  )
+);
 
-const selectedRefKind = ref<string>();
-const selectedRefName = ref<string>("");
+const selectedSourceValue = ref(
+  isResourceRefLocked
+    ? "unsupported"
+    : originalResourceSource?.value || props.menuItem?.spec.routeRef || "custom"
+);
+const selectedRefName = ref(originalTargetRef?.name || "");
+const isCustomSource = computed(() => selectedSourceValue.value === "custom");
+const isRouteSource = computed(() => !!selectedSource.value?.routeRef);
+
+if (originalResourceSource) {
+  formState.value.spec.displayName = props.menuItem?.status?.displayName;
+}
+if (
+  !isResourceRefLocked &&
+  (originalResourceSource || props.menuItem?.spec.routeRef)
+) {
+  formState.value.spec.href = props.menuItem?.status?.href;
+}
+
+const normalizedMenuItem = computed<MenuItem>(() => {
+  const spec = { ...formState.value.spec };
+  const source = selectedSource.value;
+  if (source) {
+    spec.targetRef = undefined;
+    spec.routeRef = undefined;
+    if (source.ref) {
+      spec.targetRef = { ...source.ref, name: selectedRefName.value };
+      spec.displayName = undefined;
+      spec.href = undefined;
+    } else if (source.routeRef) {
+      spec.routeRef = source.routeRef;
+      spec.href = undefined;
+    }
+  }
+  return { ...formState.value, spec };
+});
 
 const excludedParentNames = computed(() => {
   return props.menuItem?.metadata.name ? [props.menuItem.metadata.name] : [];
@@ -262,23 +332,19 @@ function findMenuItemTreeNode(
   }
 }
 
-const onMenuItemSourceChange = () => {
-  selectedRefName.value = "";
-};
+watch(
+  selectedSourceValue,
+  () => {
+    selectedRefName.value = "";
+    const source = selectedSource.value;
+    if (source?.routeRef) {
+      formState.value.spec.displayName ??= source.label;
+    }
+  },
+  { flush: "sync" }
+);
 
 onMounted(() => {
-  if (props.menuItem) {
-    formState.value = cloneDeep(props.menuItem);
-
-    // Set Ref related
-    const { targetRef } = formState.value.spec;
-
-    if (targetRef) {
-      selectedRefName.value = targetRef.name;
-      selectedRefKind.value = targetRef.kind as string;
-    }
-  }
-
   selectedParentMenuItem.value =
     props.parentMenuItem?.metadata.name || props.menuItem?.spec.parent || "";
   originalParentMenuItem.value = props.menuItem?.spec.parent || "";
@@ -317,18 +383,17 @@ onMounted(() => {
             />
 
             <FormKit
-              v-model="selectedRefKind"
+              v-model="selectedSourceValue"
               :options="menuItemRefsMap"
-              :disabled="isUpdateMode"
+              :disabled="isResourceRefLocked"
               :label="
                 $t('core.menu.menu_item_editing_modal.fields.ref_kind.label')
               "
               type="select"
-              @change="onMenuItemSourceChange"
             />
 
             <FormKit
-              v-if="!selectedRefKind"
+              v-if="isCustomSource || isRouteSource"
               id="displayNameInput"
               v-model="formState.spec.displayName"
               :label="
@@ -338,11 +403,11 @@ onMounted(() => {
               "
               type="text"
               name="displayName"
-              validation="required|length:0,100"
+              validation="required:trim|length:0,100"
             />
 
             <FormKit
-              v-if="!selectedRefKind"
+              v-if="isCustomSource"
               v-model="formState.spec.href"
               :label="$t('core.menu.menu_item_editing_modal.fields.href.label')"
               type="text"
@@ -351,20 +416,20 @@ onMounted(() => {
             />
 
             <FormKit
-              v-if="selectedRef?.ref"
-              :id="selectedRef.inputType"
-              :key="selectedRef.inputType"
+              v-if="selectedSource?.ref"
+              :id="selectedSource.inputType"
+              :key="selectedSource.inputType"
               v-model="selectedRefName"
               :placeholder="
                 $t(
                   'core.menu.menu_item_editing_modal.fields.ref_kind.placeholder',
                   {
-                    label: selectedRef.label,
+                    label: selectedSource.label,
                   }
                 )
               "
-              :label="selectedRef.label"
-              :type="selectedRef.inputType as any"
+              :label="selectedSource.label"
+              :type="selectedSource.inputType as any"
               validation="required"
             />
 
@@ -425,7 +490,7 @@ onMounted(() => {
           ref="annotationsFormRef"
           :value="formState.metadata.annotations"
           kind="MenuItem"
-          :form-data="formState"
+          :form-data="normalizedMenuItem"
           group=""
         />
       </div>

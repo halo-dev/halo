@@ -11,10 +11,13 @@ import static org.mockito.Mockito.when;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -50,7 +53,44 @@ class ProfileCompletionFilterTest {
     private final ServerRequestCache requestCache = mock(ServerRequestCache.class);
     private final WebFilterChain chain = mock(WebFilterChain.class);
     private final ProfileCompletionFilter filter =
-            new ProfileCompletionFilter(profileCompletionFlow, requestCache, responseContext());
+            new ProfileCompletionFilter(profileCompletionFlow, requestCache, responseContext(), messageSource());
+
+    private static ReloadableResourceBundleMessageSource messageSource() {
+        var messages = new ReloadableResourceBundleMessageSource();
+        messages.setBasename("file:src/main/resources/config/i18n/messages");
+        messages.setDefaultEncoding("UTF-8");
+        messages.setFallbackToSystemLocale(false);
+        return messages;
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "en, Profile Completion Required, A verified email address is required.",
+        "zh, 请完善个人资料, 请先设置并验证邮箱。",
+        "es, Es necesario completar el perfil, Se requiere una dirección de correo electrónico verificada."
+    })
+    void shouldTranslateEmailRequirement(String language, String title, String detail) {
+        var exchange = exchange(MockServerHttpRequest.get("/apis/api.console.halo.run/v1alpha1/users")
+                .accept(MediaType.APPLICATION_JSON)
+                .acceptLanguageAsLocales(Locale.forLanguageTag(language)));
+        when(profileCompletionFlow.findNext(USERNAME))
+                .thenReturn(Mono.just(new ProfileCompletionStep(
+                        URI.create("/complete-profile"),
+                        URI.create("email-not-set"),
+                        "A verified email address is required.")));
+
+        var body = filter.filter(exchange, chain)
+                .contextWrite(ReactiveSecurityContextHolder.withAuthentication(authenticatedUser()))
+                .then(Mono.defer(exchange.getResponse()::getBodyAsString))
+                .block();
+
+        assertThat(exchange.getResponse().getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+        assertThat(body)
+                .contains("\"type\":\"email-not-set\"")
+                .contains("\"title\":\"" + title + "\"")
+                .contains("\"detail\":\"" + detail + "\"");
+        verifyNoInteractions(chain, requestCache);
+    }
 
     @Test
     void shouldRedirectToRequiredCompletionStep() {
@@ -196,7 +236,8 @@ class ProfileCompletionFilterTest {
     void shouldInstallFilterAfterAnonymousAuthentication() {
         var http = mock(ServerHttpSecurity.class);
 
-        new ProfileCompletionSecurityConfigurer(profileCompletionFlow, requestCache, responseContext()).configure(http);
+        new ProfileCompletionSecurityConfigurer(profileCompletionFlow, requestCache, responseContext(), messageSource())
+                .configure(http);
 
         verify(http)
                 .addFilterAfter(

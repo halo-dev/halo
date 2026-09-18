@@ -3,6 +3,7 @@ package run.halo.app.security;
 import static org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers.pathMatchers;
 
 import java.util.Optional;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -23,6 +24,7 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
+import run.halo.app.infra.exception.Exceptions;
 import run.halo.app.infra.utils.HaloUtils;
 import run.halo.app.security.authentication.WebExchangeMatchers;
 import run.halo.app.security.authorization.AuthorityUtils;
@@ -39,6 +41,8 @@ class ProfileCompletionFilter implements WebFilter {
 
     private final ServerResponse.Context responseContext;
 
+    private final MessageSource messageSource;
+
     private final AuthenticationTrustResolver authenticationTrustResolver = new AuthenticationTrustResolverImpl();
 
     private final ServerRedirectStrategy redirectStrategy = new DefaultServerRedirectStrategy();
@@ -50,10 +54,12 @@ class ProfileCompletionFilter implements WebFilter {
     ProfileCompletionFilter(
             ProfileCompletionFlow profileCompletionFlow,
             ServerRequestCache requestCache,
-            ServerResponse.Context responseContext) {
+            ServerResponse.Context responseContext,
+            MessageSource messageSource) {
         this.profileCompletionFlow = profileCompletionFlow;
         this.requestCache = requestCache;
         this.responseContext = responseContext;
+        this.messageSource = messageSource;
     }
 
     @Override
@@ -86,7 +92,12 @@ class ProfileCompletionFilter implements WebFilter {
                         .saveRequest(exchange)
                         .then(redirectStrategy.sendRedirect(exchange, step.location()));
             }
-            var problem = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, step.problemDetail());
+            var locale = Exceptions.getLocale(exchange);
+            var detail = messageSource.getMessage(
+                    "problemDetail.profile." + step.problemType(), null, step.problemDetail(), locale);
+            var problem = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, detail);
+            problem.setTitle(messageSource.getMessage(
+                    "problemDetail.title.profileCompletionRequired", null, problem.getTitle(), locale));
             problem.setType(step.problemType());
             return ServerResponse.status(HttpStatus.FORBIDDEN)
                     .contentType(MediaType.APPLICATION_PROBLEM_JSON)

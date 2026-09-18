@@ -82,8 +82,10 @@ class GcReconciler implements Reconciler<GcRequest> {
                         .subscribeOn(this.scheduler))
                 .as(tx::transactional)
                 .then()
-                .doOnSuccess(
-                        ignored -> log.info("Extension {}/{} was deleted", extension.groupVersionKind(), extension));
+                .doOnSuccess(ignored -> log.info(
+                        "Extension {}/{} was deleted",
+                        extension.groupVersionKind(),
+                        extension.getMetadata().getName()));
     }
 
     @Override

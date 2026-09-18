@@ -33,6 +33,7 @@ import run.halo.app.extension.*;
 import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
+import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 
 /**
  * A default implementation of {@link PostService}.
@@ -347,12 +348,11 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
                     var baseSnapshotName = post.getSpec().getBaseSnapshot();
                     var releaseSnapshotName = post.getSpec().getReleaseSnapshot();
                     if (StringUtils.equals(releaseSnapshotName, snapshotName)) {
-                        return Mono.error(
-                                new ServerWebInputException("The snapshot to delete is the release snapshot, please"
-                                        + " revert to another snapshot first."));
+                        return Mono.error(new ServerWebInputException("problemDetail.content.snapshot.published"));
                     }
                     if (StringUtils.equals(baseSnapshotName, snapshotName)) {
-                        return Mono.error(new ServerWebInputException("The first snapshot cannot be deleted."));
+                        return Mono.error(
+                                new UnsatisfiedAttributeValueException("problemDetail.content.snapshot.first"));
                     }
                     return client.fetch(Snapshot.class, snapshotName)
                             .flatMap(client::delete)

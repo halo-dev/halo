@@ -1,5 +1,4 @@
 import modules from "@console/modules";
-import { useThemeStore } from "@console/stores/theme";
 import { stores } from "@halo-dev/ui-shared";
 import { createPinia } from "pinia";
 import "@/setup/setupStyles";
@@ -28,11 +27,6 @@ setupApiClient();
 
 app.use(createPinia());
 
-async function loadActivatedTheme() {
-  const themeStore = useThemeStore();
-  await themeStore.fetchActivatedTheme();
-}
-
 function setupAppComponents(options?: SetupComponentsOptions) {
   if (componentsReady) {
     return;
@@ -47,13 +41,13 @@ async function initApp() {
   try {
     setupCoreModules({ app, router, platform: "console", modules });
 
+    await setLanguage();
+
     const currentUserStore = stores.currentUser();
     await currentUserStore.fetchCurrentUser();
 
     const globalInfoStore = stores.globalInfo();
     await globalInfoStore.fetchGlobalInfo();
-
-    await setLanguage();
 
     if (currentUserStore.isAnonymous) {
       setupAppComponents();
@@ -69,8 +63,6 @@ async function initApp() {
       setupComponents: setupAppComponents,
       registeredFormKitInputs: builtinFormKitInputs,
     });
-
-    await loadActivatedTheme();
   } catch (e) {
     console.error(e);
   } finally {

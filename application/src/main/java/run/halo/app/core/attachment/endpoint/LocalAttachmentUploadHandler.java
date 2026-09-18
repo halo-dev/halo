@@ -31,6 +31,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.util.unit.DataSize;
+import org.springframework.web.server.ServerWebInputException;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
@@ -65,6 +66,7 @@ import run.halo.app.infra.utils.JsonUtils;
 class LocalAttachmentUploadHandler implements AttachmentHandler {
 
     private static final String UPLOAD_PATH = "upload";
+    private static final int MAX_FILENAME_BYTES = 255;
 
     private final AttachmentRootGetter attachmentDirGetter;
 
@@ -100,6 +102,7 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
                     final var file = option.file();
                     final Path attachmentPath;
                     final String filename = getFilename(file.filename(), setting);
+                    validateFilenameLength(filename);
                     if (StringUtils.hasText(setting.getLocation())) {
                         attachmentPath =
                                 uploadRoot.resolve(setting.getLocation()).resolve(filename);
@@ -367,6 +370,7 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
     }
 
     private String getFilename(String filename, PolicySetting setting) {
+        validateFilename(filename);
         if (!setting.isAlwaysRenameFilename()) {
             return filename;
         }
@@ -409,6 +413,23 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
                         },
                         excludeOriginalFilename);
             }
+        }
+    }
+
+    private static void validateFilename(String filename) {
+        if (!StringUtils.hasText(filename)
+                || ".".equals(filename)
+                || "..".equals(filename)
+                || filename.indexOf('/') >= 0
+                || filename.indexOf('\\') >= 0
+                || filename.indexOf('\0') >= 0) {
+            throw new ServerWebInputException("Filename must not be blank or contain path segments");
+        }
+    }
+
+    private static void validateFilenameLength(String filename) {
+        if (filename.getBytes(StandardCharsets.UTF_8).length > MAX_FILENAME_BYTES) {
+            throw new ServerWebInputException("Filename must not exceed 255 bytes");
         }
     }
 

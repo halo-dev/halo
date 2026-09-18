@@ -14,7 +14,11 @@
 
 .halo-rich-text-editor {
   .ProseMirror {
-    :where(* > :first-child, [data-editor-ui="true"] + *) {
+    :where(
+      * > :first-child,
+      * > .ProseMirror-gapcursor:first-child + *,
+      [data-editor-ui="true"] + *
+    ) {
       margin-top: 0 !important;
     }
   }

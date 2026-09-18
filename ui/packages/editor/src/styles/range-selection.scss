@@ -37,4 +37,10 @@
       }
     }
   }
+
+  [data-node-view-wrapper].ProseMirror-selectednoderange,
+  [data-node-view-wrapper].range-fake-selection {
+    outline: 2px solid rgba(47, 142, 244);
+    box-shadow: 0 0 0 3px rgba(47, 142, 244, 0.14);
+  }
 }

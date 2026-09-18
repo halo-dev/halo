@@ -2,7 +2,7 @@ import type {
   DragHandleRule,
   RuleContext,
 } from "@tiptap/extension-drag-handle";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import type { PMNode } from "@/tiptap";
 import {
   BLOCK_DRAG_HANDLE_OFFSET,

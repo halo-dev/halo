@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import { shallowMount } from "@vue/test-utils";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vite-plus/test";
 import type { NodeViewProps } from "@/tiptap/vue-3";
 import CodeBlockSelect from "./CodeBlockSelect.vue";
 import CodeBlockViewRenderer from "./CodeBlockViewRenderer.vue";

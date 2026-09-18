@@ -16,7 +16,7 @@ runs:
   using: "composite"
   steps:
     - name: Setup Vite+
-      uses: voidzero-dev/setup-vp@v1
+      uses: voidzero-dev/setup-vp@v1.19.0
       with:
         working-directory: ui
         version-file: pnpm-workspace.yaml

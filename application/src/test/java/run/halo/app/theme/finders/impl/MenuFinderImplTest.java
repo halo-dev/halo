@@ -76,6 +76,39 @@ class MenuFinderImplTest {
     }
 
     @Test
+    void getByNamesBuildsTreesInRequestedOrder() {
+        Mockito.when(client.listAll(eq(Menu.class), any(ListOptions.class), eq(Sort.unsorted())))
+                .thenReturn(Flux.just(menu("D", of()), menu("X", of()), menu("Y", of())));
+        Mockito.when(client.listAll(eq(MenuItem.class), any(ListOptions.class), eq(Sort.unsorted())))
+                .thenReturn(Flux.fromIterable(testMenuItems()));
+
+        var menuVos = menuFinder
+                .getByNames(List.of("Y", "missing", "D", "Y"))
+                .collectList()
+                .block();
+
+        assertThat(menuVos).extracting(menuVo -> menuVo.getMetadata().getName()).containsExactly("Y", "D");
+        assertThat(visualizeTree(menuVos)).isEqualTo("""
+            Y
+            └── F
+                └── H
+            D
+            └── E
+                ├── A
+                │   └── B
+                └── C
+            """);
+        Mockito.verify(client).listAll(eq(Menu.class), any(ListOptions.class), eq(Sort.unsorted()));
+        Mockito.verify(client).listAll(eq(MenuItem.class), any(ListOptions.class), eq(Sort.unsorted()));
+    }
+
+    @Test
+    void getByNamesReturnsEmptyForEmptyNames() {
+        assertThat(menuFinder.getByNames(List.of()).collectList().block()).isEmpty();
+        Mockito.verifyNoInteractions(client);
+    }
+
+    @Test
     void getPrimaryBuildsConfiguredMenuFromNewFields() {
         var primary = new SystemSetting.Menu();
         primary.setPrimary("Y");

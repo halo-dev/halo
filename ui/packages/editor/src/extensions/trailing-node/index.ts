@@ -3,7 +3,13 @@ import {
   TrailingNode,
   type TrailingNodeOptions,
 } from "@tiptap/extensions";
-import { Plugin, type Transaction } from "@/tiptap/pm";
+import {
+  GapCursor,
+  Plugin,
+  type EditorState,
+  type Transaction,
+} from "@/tiptap/pm";
+import { isGapCursorTargetNode } from "@/utils/gap-cursor";
 
 function shouldSkipTrailingNode(transaction: Transaction) {
   let current: Transaction | undefined = transaction;
@@ -23,6 +29,15 @@ function shouldSkipTrailingNode(transaction: Transaction) {
   }
 
   return false;
+}
+
+function shouldPreserveTerminalGapCursor(state: EditorState) {
+  const { doc, selection } = state;
+  return (
+    selection instanceof GapCursor &&
+    selection.from === doc.content.size &&
+    isGapCursorTargetNode(selection.$from.nodeBefore)
+  );
 }
 
 export const ExtensionTrailingNode = TrailingNode.extend<TrailingNodeOptions>({
@@ -56,6 +71,9 @@ function preserveSkipMetaAcrossAppendRounds(plugin: Plugin) {
       // after the direct skip was observed. ProseMirror links that transaction
       // to its root through `appendedTransaction`.
       if (transactions.some(shouldSkipTrailingNode)) {
+        return null;
+      }
+      if (shouldPreserveTerminalGapCursor(newState)) {
         return null;
       }
       return appendTransaction.call(plugin, transactions, oldState, newState);
