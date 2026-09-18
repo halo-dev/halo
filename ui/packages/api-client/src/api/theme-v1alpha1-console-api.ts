@@ -30,6 +30,8 @@ import type { Setting } from '../models';
 // @ts-ignore
 import type { Theme } from '../models';
 // @ts-ignore
+import type { ThemeCapabilities } from '../models';
+// @ts-ignore
 import type { ThemeList } from '../models';
 // @ts-ignore
 import type { UpgradeFromUriRequest } from '../models';
@@ -86,6 +88,47 @@ export const ThemeV1alpha1ConsoleApiAxiosParamCreator = function (configuration?
          */
         fetchActivatedTheme: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/api.console.halo.run/v1alpha1/themes/-/activation`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Inspect templates, page layout and UI resources of an installed theme.
+         * @param {string} name 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        fetchThemeCapabilities: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'name' is not null or undefined
+            assertParamExists('fetchThemeCapabilities', 'name', name)
+            const localVarPath = `/apis/api.console.halo.run/v1alpha1/themes/{name}/capabilities`
+                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -642,6 +685,18 @@ export const ThemeV1alpha1ConsoleApiFp = function(configuration?: Configuration)
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * Inspect templates, page layout and UI resources of an installed theme.
+         * @param {string} name 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async fetchThemeCapabilities(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ThemeCapabilities>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.fetchThemeCapabilities(name, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ThemeV1alpha1ConsoleApi.fetchThemeCapabilities']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Fetch converted json config of theme by configured configMapName.
          * @param {string} name metadata.name of the theme whose JSON config will be fetched.
          * @param {*} [options] Override http request option.
@@ -806,6 +861,15 @@ export const ThemeV1alpha1ConsoleApiFactory = function (configuration?: Configur
             return localVarFp.fetchActivatedTheme(options).then((request) => request(axios, basePath));
         },
         /**
+         * Inspect templates, page layout and UI resources of an installed theme.
+         * @param {ThemeV1alpha1ConsoleApiFetchThemeCapabilitiesRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        fetchThemeCapabilities(requestParameters: ThemeV1alpha1ConsoleApiFetchThemeCapabilitiesRequest, options?: RawAxiosRequestConfig): AxiosPromise<ThemeCapabilities> {
+            return localVarFp.fetchThemeCapabilities(requestParameters.name, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Fetch converted json config of theme by configured configMapName.
          * @param {ThemeV1alpha1ConsoleApiFetchThemeJsonConfigRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -913,6 +977,13 @@ export interface ThemeV1alpha1ConsoleApiActivateThemeRequest {
     /**
      * metadata.name of the theme to activate.
      */
+    readonly name: string
+}
+
+/**
+ * Request parameters for fetchThemeCapabilities operation in ThemeV1alpha1ConsoleApi.
+ */
+export interface ThemeV1alpha1ConsoleApiFetchThemeCapabilitiesRequest {
     readonly name: string
 }
 
@@ -1063,6 +1134,16 @@ export class ThemeV1alpha1ConsoleApi extends BaseAPI {
      */
     public fetchActivatedTheme(options?: RawAxiosRequestConfig) {
         return ThemeV1alpha1ConsoleApiFp(this.configuration).fetchActivatedTheme(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Inspect templates, page layout and UI resources of an installed theme.
+     * @param {ThemeV1alpha1ConsoleApiFetchThemeCapabilitiesRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public fetchThemeCapabilities(requestParameters: ThemeV1alpha1ConsoleApiFetchThemeCapabilitiesRequest, options?: RawAxiosRequestConfig) {
+        return ThemeV1alpha1ConsoleApiFp(this.configuration).fetchThemeCapabilities(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

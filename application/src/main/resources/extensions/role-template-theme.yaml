@@ -53,6 +53,7 @@ rules:
         "themes",
         "themes/activation",
         "themes/setting",
+        "themes/capabilities",
         "themes/config",
         "themes/json-config",
       ]
