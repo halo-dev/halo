@@ -10,6 +10,8 @@ apiVersion: storage.halo.run/v1alpha1
 kind: Policy
 metadata:
   name: default-policy
+  labels:
+    halo.run/do-not-overwrite: "true"
   finalizers:
     - system-protection
 spec:
