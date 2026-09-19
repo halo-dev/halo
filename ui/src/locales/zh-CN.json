@@ -329,6 +329,7 @@
   "core.comment.filters.sort.items.create_time_desc": "较近创建",
   "core.comment.filters.sort.items.create_time_asc": "较早创建",
   "core.comment.list.fields.reply_count": "{count} 条回复",
+  "core.comment.list.fields.pending_reply_count": "{count} 条待审核回复",
   "core.comment.list.fields.has_new_replies": "有新的回复",
   "core.comment.list.fields.pending_review": "待审核",
   "core.comment.list.fields.private": "私密",

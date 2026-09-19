@@ -401,6 +401,14 @@
             }
           },
           {
+            "description": "Approval state filter. When false, comments with pending replies are also included.",
+            "in": "query",
+            "name": "approved",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "description": "Kind of the commenter identity. Defaults to User when ownerName is provided.",
             "in": "query",
             "name": "ownerKind",
@@ -4632,6 +4640,11 @@
             "type": "integer",
             "description": "Metadata version observed by the last successful reconciliation.",
             "format": "int64"
+          },
+          "pendingReplyCount": {
+            "type": "integer",
+            "description": "Total number of not yet approved replies under this comment.",
+            "format": "int32"
           },
           "replyCount": {
             "type": "integer",
