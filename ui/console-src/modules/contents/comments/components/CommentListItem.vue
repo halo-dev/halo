@@ -48,16 +48,23 @@ const props = withDefaults(
   defineProps<{
     comment: ListedComment;
     isSelected?: boolean;
+    defaultExpandReplies?: boolean;
   }>(),
   {
     isSelected: false,
+    defaultExpandReplies: false,
   }
 );
 
 const { comment } = toRefs(props);
 
 const hoveredReply = ref<ListedReply>();
-const showReplies = ref(false);
+const pendingReplyCount = computed(
+  () => props.comment.comment.status?.pendingReplyCount || 0
+);
+const showReplies = ref(
+  props.defaultExpandReplies && pendingReplyCount.value > 0
+);
 const replyModal = ref(false);
 const detailModalVisible = ref(false);
 const editingModalVisible = ref(false);
@@ -346,6 +353,17 @@ const { data: contentProvider } = useContentProviderExtensionPoint();
                 {{
                   $t("core.comment.list.fields.reply_count", {
                     count: comment?.comment?.status?.replyCount || 0,
+                  })
+                }}
+              </span>
+              <span
+                v-if="pendingReplyCount > 0"
+                class="cursor-pointer select-none text-gray-700 hover:text-gray-900"
+                @click="handleToggleShowReplies"
+              >
+                {{
+                  $t("core.comment.list.fields.pending_reply_count", {
+                    count: pendingReplyCount,
                   })
                 }}
               </span>

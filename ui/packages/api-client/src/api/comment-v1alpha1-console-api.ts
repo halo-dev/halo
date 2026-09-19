@@ -136,12 +136,13 @@ export const CommentV1alpha1ConsoleApiAxiosParamCreator = function (configuratio
          * @param {Array<string>} [fieldSelector] Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
          * @param {Array<string>} [sort] Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
          * @param {string} [keyword] Keyword used to match the raw comment text.
+         * @param {string} [approved] Approval state filter. When false, comments with pending replies are also included.
          * @param {string} [ownerKind] Kind of the commenter identity. Defaults to User when ownerName is provided.
          * @param {string} [ownerName] Name of the commenter identity to filter by.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listComments: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, keyword?: string, ownerKind?: string, ownerName?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listComments: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, keyword?: string, approved?: string, ownerKind?: string, ownerName?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/api.console.halo.run/v1alpha1/comments`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -184,6 +185,10 @@ export const CommentV1alpha1ConsoleApiAxiosParamCreator = function (configuratio
 
             if (keyword !== undefined) {
                 localVarQueryParameter['keyword'] = keyword;
+            }
+
+            if (approved !== undefined) {
+                localVarQueryParameter['approved'] = approved;
             }
 
             if (ownerKind !== undefined) {
@@ -294,13 +299,14 @@ export const CommentV1alpha1ConsoleApiFp = function(configuration?: Configuratio
          * @param {Array<string>} [fieldSelector] Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
          * @param {Array<string>} [sort] Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
          * @param {string} [keyword] Keyword used to match the raw comment text.
+         * @param {string} [approved] Approval state filter. When false, comments with pending replies are also included.
          * @param {string} [ownerKind] Kind of the commenter identity. Defaults to User when ownerName is provided.
          * @param {string} [ownerName] Name of the commenter identity to filter by.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listComments(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, keyword?: string, ownerKind?: string, ownerName?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListedCommentList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listComments(page, size, labelSelector, fieldSelector, sort, keyword, ownerKind, ownerName, options);
+        async listComments(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, keyword?: string, approved?: string, ownerKind?: string, ownerName?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListedCommentList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listComments(page, size, labelSelector, fieldSelector, sort, keyword, approved, ownerKind, ownerName, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CommentV1alpha1ConsoleApi.listComments']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -352,7 +358,7 @@ export const CommentV1alpha1ConsoleApiFactory = function (configuration?: Config
          * @throws {RequiredError}
          */
         listComments(requestParameters: CommentV1alpha1ConsoleApiListCommentsRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ListedCommentList> {
-            return localVarFp.listComments(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.keyword, requestParameters.ownerKind, requestParameters.ownerName, options).then((request) => request(axios, basePath));
+            return localVarFp.listComments(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.keyword, requestParameters.approved, requestParameters.ownerKind, requestParameters.ownerName, options).then((request) => request(axios, basePath));
         },
         /**
          * Update only the body of an existing comment. Requires its current version.
@@ -420,6 +426,11 @@ export interface CommentV1alpha1ConsoleApiListCommentsRequest {
     readonly keyword?: string
 
     /**
+     * Approval state filter. When false, comments with pending replies are also included.
+     */
+    readonly approved?: string
+
+    /**
      * Kind of the commenter identity. Defaults to User when ownerName is provided.
      */
     readonly ownerKind?: string
@@ -470,7 +481,7 @@ export class CommentV1alpha1ConsoleApi extends BaseAPI {
      * @throws {RequiredError}
      */
     public listComments(requestParameters: CommentV1alpha1ConsoleApiListCommentsRequest = {}, options?: RawAxiosRequestConfig) {
-        return CommentV1alpha1ConsoleApiFp(this.configuration).listComments(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.keyword, requestParameters.ownerKind, requestParameters.ownerName, options).then((request) => request(this.axios, this.basePath));
+        return CommentV1alpha1ConsoleApiFp(this.configuration).listComments(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.keyword, requestParameters.approved, requestParameters.ownerKind, requestParameters.ownerName, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

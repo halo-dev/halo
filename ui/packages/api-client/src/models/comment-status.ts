@@ -31,6 +31,10 @@ export interface CommentStatus {
      */
     'observedVersion'?: number;
     /**
+     * Total number of not yet approved replies under this comment.
+     */
+    'pendingReplyCount'?: number;
+    /**
      * Total number of replies under this comment.
      */
     'replyCount'?: number;

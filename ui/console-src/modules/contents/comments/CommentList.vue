@@ -346,6 +346,7 @@ const handleApproveInBatch = async () => {
             :key="comment.comment.metadata.name"
             :comment="comment"
             :is-selected="isSelection(comment)"
+            :default-expand-replies="selectedApprovedStatus === 'false'"
           >
             <template #checkbox>
               <input

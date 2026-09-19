@@ -358,6 +358,10 @@ class SchemeInitializer implements SmartLifecycle {
                     .indexFunc(comment -> Optional.ofNullable(comment.getStatus())
                             .map(CommentStatus::getReplyCount)
                             .orElse(0)));
+            indexSpecs.add(IndexSpecs.<Comment, Integer>single("status.pendingReplyCount", Integer.class)
+                    .indexFunc(comment -> Optional.ofNullable(comment.getStatus())
+                            .map(CommentStatus::getPendingReplyCount)
+                            .orElse(null)));
             indexSpecs.add(
                     IndexSpecs.<Comment, Boolean>single(Comment.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME, Boolean.class)
                             .indexFunc(comment -> {

@@ -321,6 +321,7 @@
   "core.comment.filters.sort.items.create_time_desc": "較近創建",
   "core.comment.filters.sort.items.create_time_asc": "較早創建",
   "core.comment.list.fields.reply_count": "{count} 條回覆",
+  "core.comment.list.fields.pending_reply_count": "{count} 條待審核回覆",
   "core.comment.list.fields.has_new_replies": "有新的回覆",
   "core.comment.list.fields.pending_review": "待審核",
   "core.comment.list.fields.private": "私密",
