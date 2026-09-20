@@ -4,12 +4,14 @@ Thank you for your interest in contributing to Halo. As a contributor, you shoul
 
 a. The producer can adjust the open-source agreement to be more strict or relaxed as deemed necessary. b. Your contributed code may be used for commercial purposes, including but not limited to its cloud business operations.
 
-This document explains the recommended workflow for submitting high-quality contributions, including code, tests, and documentation updates.
+Pull requests to this repository are restricted to project maintainers. We are not accepting pull requests from external contributors at this time. Bug reports, feature proposals, and discussions are still welcome.
+
+This document explains how to share feedback and the development workflow for maintainers, including code, tests, and documentation updates.
 
 ## Before You Start
 
-- For new features or major behavior changes, please open an issue first so we can align on scope and design.
-- For clear bug fixes, you can submit a pull request directly.
+- For bugs, new features, or major behavior changes, please open an issue with reproduction steps or a clear description of the proposal.
+- Opening an issue does not grant permission to submit a pull request; PR creation remains restricted to maintainers.
 - If your report is not about the core project itself (for example, deployment questions), please use Discussions instead of Issues.
 
 ## Development Environment
@@ -25,7 +27,9 @@ This repository mainly contains:
 - JDK (version compatible with the project build)
 - Node.js and `pnpm` (see `ui/package.json` for the current package manager)
 
-## Contribution Workflow
+## Maintainer Development Workflow
+
+The following pull request workflow is for project maintainers.
 
 ### 1. Fork and Clone
 
