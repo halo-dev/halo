@@ -1,8 +1,5 @@
 package run.halo.app.security.sudo;
 
-import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
-
-import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
 import java.util.List;
 
@@ -15,7 +12,4 @@ import java.util.List;
  * @author johnniang
  * @since 2.27.0
  */
-public record SudoStatus(
-        @Schema(requiredMode = REQUIRED) boolean active,
-        Instant expiresAt,
-        @Schema(requiredMode = REQUIRED) List<SudoMethod> methods) {}
+record SudoStatus(boolean active, Instant expiresAt, List<SudoMethod> methods) {}

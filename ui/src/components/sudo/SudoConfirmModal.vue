@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import type { SudoMethod } from "@halo-dev/api-client";
-import { ucApiClient } from "@halo-dev/api-client";
 import { Toast, VAlert, VButton, VModal, VSpace } from "@halo-dev/components";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import { useIntervalFn } from "@vueuse/shared";
@@ -9,7 +7,11 @@ import { useI18n } from "vue-i18n";
 import {
   cancelSudoConfirm,
   completeSudoConfirm,
+  confirmSudo,
+  fetchSudoStatus,
+  sendSudoCode,
   useSudoConfirmModalState,
+  type SudoMethod,
 } from "@/composables/use-sudo-confirm";
 
 const { t } = useI18n();
@@ -40,7 +42,7 @@ const {
 } = useQuery({
   queryKey: ["sudo-status"],
   queryFn: async () => {
-    const { data } = await ucApiClient.security.sudo.getSudoStatus();
+    const { data } = await fetchSudoStatus();
     return data;
   },
   enabled: visible,
@@ -94,9 +96,7 @@ watch(error, (value) => {
 const { mutate: sendCode, isLoading: isSending } = useMutation({
   mutationKey: ["sudo-send-code"],
   mutationFn: async () => {
-    await ucApiClient.security.sudo.sendSudoCode({
-      sudoCodeRequest: { method: selectedMethod.value },
-    });
+    await sendSudoCode(selectedMethod.value);
   },
   onSuccess() {
     Toast.success(t("core.sudo.operations.send_code.toast_success"));
@@ -108,12 +108,7 @@ const { mutate: sendCode, isLoading: isSending } = useMutation({
 const { mutate: confirm, isLoading: isConfirming } = useMutation({
   mutationKey: ["sudo-confirm"],
   mutationFn: async () => {
-    await ucApiClient.security.sudo.confirmSudo({
-      sudoConfirmRequest: {
-        method: selectedMethod.value,
-        code: String(code.value),
-      },
-    });
+    await confirmSudo(selectedMethod.value, String(code.value));
   },
   onSuccess() {
     Toast.success(t("core.sudo.operations.confirm.toast_success"));

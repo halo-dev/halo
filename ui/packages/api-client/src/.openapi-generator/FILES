@@ -67,7 +67,6 @@ api/single-page-v1alpha1-public-api.ts
 api/snapshot-v1alpha1-api.ts
 api/snapshot-v1alpha1-uc-api.ts
 api/subscription-v1alpha1-api.ts
-api/sudo-v1alpha1-uc-api.ts
 api/system-config-v1alpha1-console-api.ts
 api/system-v1alpha1-console-api.ts
 api/system-v1alpha1-public-api.ts
@@ -312,10 +311,6 @@ models/subscription-list.ts
 models/subscription-spec.ts
 models/subscription-subscriber.ts
 models/subscription.ts
-models/sudo-code-request.ts
-models/sudo-confirm-request.ts
-models/sudo-method.ts
-models/sudo-status.ts
 models/tag-list.ts
 models/tag-spec.ts
 models/tag-status.ts

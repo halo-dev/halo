@@ -132,6 +132,8 @@ class ProfileCompletionFilterTest {
                 "/password-reset/email/reset-token",
                 "/logout",
                 "/logout/impersonate",
+                "/sudo",
+                "/sudo/code",
                 "/complete-profile",
                 "/complete-profile/send-email-code",
                 "/complete-profile/phone",

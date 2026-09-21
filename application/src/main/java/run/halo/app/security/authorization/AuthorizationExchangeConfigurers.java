@@ -51,7 +51,9 @@ class AuthorizationExchangeConfigurers {
     @Bean
     @Order(200)
     SecurityConfigurer preAuthenticationAuthorizationConfigurer() {
-        return http -> http.authorizeExchange(spec -> spec.pathMatchers("/login/impersonate")
+        return http -> http.authorizeExchange(spec -> spec.pathMatchers("/sudo", "/sudo/**")
+                .authenticated()
+                .pathMatchers("/login/impersonate")
                 .hasRole(AuthorityUtils.SUPER_ROLE_NAME)
                 .pathMatchers("/logout/impersonate")
                 .hasAuthority(SwitchUserWebFilter.ROLE_PREVIOUS_ADMINISTRATOR)

@@ -1,3 +1,4 @@
+import { axiosInstance } from "@halo-dev/api-client";
 import type { AxiosError, InternalAxiosRequestConfig } from "axios";
 import { nextTick, ref } from "vue";
 
@@ -6,6 +7,33 @@ interface SudoProblemDetail {
 }
 
 export const SUDO_REQUIRED_TYPE = "https://halo.run/probs/sudo-required";
+
+export interface SudoMethod {
+  name: string;
+  sendable: boolean;
+  maskedTarget?: string;
+}
+
+export interface SudoStatus {
+  active: boolean;
+  expiresAt?: string | null;
+  methods: SudoMethod[];
+}
+
+export function fetchSudoStatus() {
+  return axiosInstance.get<SudoStatus>("/sudo");
+}
+
+export function sendSudoCode(method: string) {
+  return axiosInstance.post("/sudo/code", new URLSearchParams({ method }));
+}
+
+export function confirmSudo(method: string, code: string) {
+  return axiosInstance.post(
+    "/sudo/confirm",
+    new URLSearchParams({ method, code })
+  );
+}
 
 const visible = ref(false);
 

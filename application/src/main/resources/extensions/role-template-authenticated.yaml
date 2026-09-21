@@ -153,8 +153,6 @@ rules:
         "authentications",
         "authentications/totp",
         "authentications/settings",
-        "authentications/code",
-        "authentications/confirm",
       ]
     verbs: ["*"]
   - apiGroups: ["uc.api.security.halo.run"]
