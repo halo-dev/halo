@@ -1,5 +1,8 @@
 package run.halo.app.security.sudo;
 
+import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
+import io.github.resilience4j.ratelimiter.RequestNotPermitted;
+import io.github.resilience4j.reactor.ratelimiter.operator.RateLimiterOperator;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -19,6 +22,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.user.service.UserService;
 import run.halo.app.infra.exception.AccessDeniedException;
+import run.halo.app.infra.exception.RateLimitExceededException;
 import run.halo.app.infra.exception.UserNotFoundException;
 
 /**
@@ -33,15 +37,22 @@ class SudoService {
 
     static final String SESSION_ATTRIBUTE = "halo.sudo.expiresAt";
     static final Duration SUDO_TTL = Duration.ofMinutes(30);
+    static final String SEND_CODE_RATE_LIMITER_CONFIG = "send-sudo-code";
+    static final String CONFIRM_RATE_LIMITER_CONFIG = "sudo-confirm";
 
     private final List<SudoVerificationProvider> providers;
     private final UserService userService;
+    private final RateLimiterRegistry rateLimiterRegistry;
 
     private Clock clock = Clock.systemUTC();
 
-    SudoService(List<SudoVerificationProvider> providers, UserService userService) {
+    SudoService(
+            List<SudoVerificationProvider> providers,
+            UserService userService,
+            RateLimiterRegistry rateLimiterRegistry) {
         this.providers = providers;
         this.userService = userService;
+        this.rateLimiterRegistry = rateLimiterRegistry;
     }
 
     void setClock(Clock clock) {
@@ -63,22 +74,27 @@ class SudoService {
     Mono<Void> sendCode(String method, ServerWebExchange exchange) {
         return requireSessionAuthentication()
                 .map(Authentication::getName)
-                .flatMap(userService::getUser)
-                .flatMap(user ->
-                        requireSupported(user, method).flatMap(provider -> Mono.defer(() -> provider.sendCode(user))));
+                .flatMap(username -> Mono.just(username)
+                        .transformDeferred(sendCodeRateLimiter(username))
+                        .flatMap(userService::getUser)
+                        .flatMap(user -> requireSupported(user, method)
+                                .flatMap(provider -> Mono.defer(() -> provider.sendCode(user))))
+                        .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new));
     }
 
     Mono<Void> confirm(String method, String code, ServerWebExchange exchange) {
         return requireSessionAuthentication()
-                .flatMap(auth -> userService
-                        .getUser(auth.getName())
+                .flatMap(auth -> Mono.just(auth.getName())
+                        .transformDeferred(confirmRateLimiter(auth.getName()))
+                        .flatMap(userService::getUser)
                         .flatMap(user -> requireSupported(user, method)
                                 .flatMap(provider -> Mono.defer(() -> provider.verify(user, code))))
                         .then(Mono.defer(() -> activate(exchange)))
                         .doOnSuccess(
                                 unused -> log.info("Sudo confirmed for user '{}' via '{}'", auth.getName(), method))
                         .doOnError(error ->
-                                log.info("Sudo confirmation failed for user '{}' via '{}'", auth.getName(), method)));
+                                log.info("Sudo confirmation failed for user '{}' via '{}'", auth.getName(), method))
+                        .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new));
     }
 
     Mono<Void> requireSudo(ServerWebExchange exchange, String username) {
@@ -132,6 +148,16 @@ class SudoService {
                 && authentication.isAuthenticated()
                 && !(authentication instanceof AnonymousAuthenticationToken)
                 && !isJwtAuthentication(authentication);
+    }
+
+    private <T> RateLimiterOperator<T> sendCodeRateLimiter(String username) {
+        var key = SEND_CODE_RATE_LIMITER_CONFIG + "-" + username;
+        return RateLimiterOperator.of(rateLimiterRegistry.rateLimiter(key, SEND_CODE_RATE_LIMITER_CONFIG));
+    }
+
+    private <T> RateLimiterOperator<T> confirmRateLimiter(String username) {
+        var key = CONFIRM_RATE_LIMITER_CONFIG + "-" + username;
+        return RateLimiterOperator.of(rateLimiterRegistry.rateLimiter(key, CONFIRM_RATE_LIMITER_CONFIG));
     }
 
     private Mono<SudoVerificationProvider> requireSupported(User user, String method) {

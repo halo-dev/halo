@@ -1,12 +1,18 @@
 package run.halo.app.security.sudo;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import io.github.resilience4j.ratelimiter.RateLimiter;
+import io.github.resilience4j.ratelimiter.RateLimiterConfig;
+import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
 import java.time.Clock;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -31,6 +37,7 @@ import run.halo.app.core.extension.User;
 import run.halo.app.core.user.service.UserService;
 import run.halo.app.extension.Metadata;
 import run.halo.app.infra.exception.AccessDeniedException;
+import run.halo.app.infra.exception.RateLimitExceededException;
 import run.halo.app.infra.exception.UserNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,6 +46,9 @@ class SudoServiceTest {
 
     @Mock
     UserService userService;
+
+    @Mock
+    RateLimiterRegistry rateLimiterRegistry;
 
     @Mock
     SudoVerificationProvider totpProvider;
@@ -54,7 +64,9 @@ class SudoServiceTest {
     void setUp() {
         when(totpProvider.method()).thenReturn("totp");
         when(emailProvider.method()).thenReturn("email");
-        sudoService = new SudoService(List.of(totpProvider, emailProvider), userService);
+        when(rateLimiterRegistry.rateLimiter(anyString(), anyString()))
+                .thenAnswer(invocation -> RateLimiter.ofDefaults(invocation.getArgument(0)));
+        sudoService = new SudoService(List.of(totpProvider, emailProvider), userService, rateLimiterRegistry);
         clock = Clock.fixed(Instant.parse("2026-01-01T00:00:00Z"), ZoneOffset.UTC);
         sudoService.setClock(clock);
     }
@@ -167,11 +179,39 @@ class SudoServiceTest {
     }
 
     @Test
+    void shouldRateLimitSendCode() {
+        stubExhaustedRateLimiter("send-sudo-code-alice", "send-sudo-code");
+
+        StepVerifier.create(sudoService
+                        .sendCode("email", exchange())
+                        .contextWrite(ReactiveSecurityContextHolder.withAuthentication(sessionAuth())))
+                .expectError(RateLimitExceededException.class)
+                .verify();
+
+        verify(userService, never()).getUser(anyString());
+        verify(emailProvider, never()).sendCode(any());
+    }
+
+    @Test
+    void shouldRateLimitConfirm() {
+        stubExhaustedRateLimiter("sudo-confirm-alice", "sudo-confirm");
+
+        StepVerifier.create(sudoService
+                        .confirm("totp", "123456", exchange())
+                        .contextWrite(ReactiveSecurityContextHolder.withAuthentication(sessionAuth())))
+                .expectError(RateLimitExceededException.class)
+                .verify();
+
+        verify(userService, never()).getUser(anyString());
+        verify(totpProvider, never()).verify(any(), anyString());
+    }
+
+    @Test
     void extraProviderBeanShouldAppearInMethods() {
         var extra = mock(SudoVerificationProvider.class);
         when(extra.method()).thenReturn("phone");
         when(extra.sendable()).thenReturn(true);
-        sudoService = new SudoService(List.of(totpProvider, emailProvider, extra), userService);
+        sudoService = new SudoService(List.of(totpProvider, emailProvider, extra), userService, rateLimiterRegistry);
         sudoService.setClock(clock);
 
         var user = user(false, false);
@@ -185,6 +225,18 @@ class SudoServiceTest {
                 .assertNext(methods ->
                         assertThat(methods).extracting(SudoMethod::name).containsExactly("phone"))
                 .verifyComplete();
+    }
+
+    private void stubExhaustedRateLimiter(String key, String configName) {
+        var rateLimiter = RateLimiter.of(
+                key,
+                RateLimiterConfig.custom()
+                        .limitForPeriod(1)
+                        .limitRefreshPeriod(Duration.ofMinutes(1))
+                        .timeoutDuration(Duration.ZERO)
+                        .build());
+        assertThat(rateLimiter.acquirePermission()).isTrue();
+        when(rateLimiterRegistry.rateLimiter(key, configName)).thenReturn(rateLimiter);
     }
 
     private static UsernamePasswordAuthenticationToken sessionAuth() {

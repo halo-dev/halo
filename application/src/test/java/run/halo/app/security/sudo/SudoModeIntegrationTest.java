@@ -12,11 +12,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
+import run.halo.app.infra.exception.RateLimitExceededException;
 
 @SpringBootTest
 @AutoConfigureWebTestClient
@@ -90,6 +92,40 @@ class SudoModeIntegrationTest {
                 .isNoContent();
 
         verify(sudoService).confirm(eq("totp"), eq("123456"), any());
+    }
+
+    @Test
+    @WithMockUser(username = "alice")
+    void shouldRejectSendCodeWhenRateLimited() {
+        doReturn(Mono.error(new RateLimitExceededException(null)))
+                .when(sudoService)
+                .sendCode(eq("email"), any());
+
+        webClient
+                .post()
+                .uri("/sudo/code")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .body(fromFormData("method", "email"))
+                .exchange()
+                .expectStatus()
+                .isEqualTo(HttpStatus.TOO_MANY_REQUESTS);
+    }
+
+    @Test
+    @WithMockUser(username = "alice")
+    void shouldRejectConfirmWhenRateLimited() {
+        doReturn(Mono.error(new RateLimitExceededException(null)))
+                .when(sudoService)
+                .confirm(eq("totp"), eq("123456"), any());
+
+        webClient
+                .post()
+                .uri("/sudo/confirm")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .body(fromFormData("method", "totp").with("code", "123456"))
+                .exchange()
+                .expectStatus()
+                .isEqualTo(HttpStatus.TOO_MANY_REQUESTS);
     }
 
     @Test
