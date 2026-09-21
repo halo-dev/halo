@@ -1276,5 +1276,18 @@
   "core.formkit.secret.required_keys_tip": "Los campos requeridos para el elemento del formulario actual incluyen:",
   "core.dashboard.widgets.presets.upvotes_stats.title": "Me gusta",
   "core.plugin.detail.operations.copy_error_message.button": "Copiar mensaje de error",
-  "core.plugin.detail.operations.copy_error_message.copied": "Copiado"
+  "core.plugin.detail.operations.copy_error_message.copied": "Copiado",
+  "core.sudo.modal.title": "Confirmación de seguridad",
+  "core.sudo.modal.alert": "Esta es una operación sensible. Confirma tu identidad para continuar. No se te volverá a pedir durante 30 minutos.",
+  "core.sudo.fields.method.label": "Método de verificación",
+  "core.sudo.fields.code.label": "Código de verificación",
+  "core.sudo.fields.code.help_totp": "Introduce el código de 6 dígitos de tu aplicación de autenticación.",
+  "core.sudo.fields.code.help_email": "Introduce el código de 6 dígitos enviado a {target}.",
+  "core.sudo.methods.totp": "Aplicación de autenticación",
+  "core.sudo.methods.email": "Correo electrónico",
+  "core.sudo.operations.send_code.buttons.send": "Enviar código",
+  "core.sudo.operations.send_code.buttons.sending": "Enviando",
+  "core.sudo.operations.send_code.buttons.countdown": "Reenviar en {timer}s",
+  "core.sudo.operations.send_code.toast_success": "Código de verificación enviado",
+  "core.sudo.operations.confirm.toast_success": "Identidad confirmada"
 }

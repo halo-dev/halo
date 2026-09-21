@@ -1276,5 +1276,18 @@
   "core.snapshots.diff_mode.legend.modified": "This line represents modification",
   "core.post_snapshots.title": "Post snapshot history",
   "core.page_snapshots.title": "Page snapshot history",
-  "core.dashboard.widgets.presets.upvotes_stats.title": "Upvotes"
+  "core.dashboard.widgets.presets.upvotes_stats.title": "Upvotes",
+  "core.sudo.modal.title": "Security confirmation",
+  "core.sudo.modal.alert": "This is a sensitive operation. Confirm your identity to continue. You will not be asked again for 30 minutes.",
+  "core.sudo.fields.method.label": "Verification method",
+  "core.sudo.fields.code.label": "Verification code",
+  "core.sudo.fields.code.help_totp": "Enter the 6-digit code from your authenticator app.",
+  "core.sudo.fields.code.help_email": "Enter the 6-digit code sent to {target}.",
+  "core.sudo.methods.totp": "Authenticator app",
+  "core.sudo.methods.email": "Email",
+  "core.sudo.operations.send_code.buttons.send": "Send code",
+  "core.sudo.operations.send_code.buttons.sending": "Sending",
+  "core.sudo.operations.send_code.buttons.countdown": "Resend in {timer}s",
+  "core.sudo.operations.send_code.toast_success": "Verification code sent",
+  "core.sudo.operations.confirm.toast_success": "Identity confirmed"
 }

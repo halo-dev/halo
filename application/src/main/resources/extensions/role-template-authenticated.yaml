@@ -149,7 +149,13 @@ metadata:
 rules:
   - apiGroups: ["uc.api.security.halo.run"]
     resources:
-      ["authentications", "authentications/totp", "authentications/settings"]
+      [
+        "authentications",
+        "authentications/totp",
+        "authentications/settings",
+        "authentications/code",
+        "authentications/confirm",
+      ]
     verbs: ["*"]
   - apiGroups: ["uc.api.security.halo.run"]
     resources: ["devices"]

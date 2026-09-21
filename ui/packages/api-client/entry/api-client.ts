@@ -62,6 +62,7 @@ import {
   SnapshotV1alpha1Api,
   SnapshotV1alpha1UcApi,
   SubscriptionV1alpha1Api,
+  SudoV1alpha1UcApi,
   SystemConfigV1alpha1ConsoleApi,
   SystemV1alpha1ConsoleApi,
   SystemV1alpha1PublicApi,
@@ -399,6 +400,7 @@ function createUcApiClient(axiosInstance: AxiosInstance) {
         axiosInstance
       ),
       device: new DeviceV1alpha1UcApi(undefined, baseURL, axiosInstance),
+      sudo: new SudoV1alpha1UcApi(undefined, baseURL, axiosInstance),
     },
     notification: {
       notification: new NotificationV1alpha1UcApi(

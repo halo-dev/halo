@@ -14953,6 +14953,75 @@
         ]
       }
     },
+    "/apis/uc.api.security.halo.run/v1alpha1/authentications/sudo": {
+      "get": {
+        "description": "Get sudo confirmation status and available methods.",
+        "operationId": "GetSudoStatus",
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SudoStatus"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "SudoV1alpha1Uc"
+        ]
+      }
+    },
+    "/apis/uc.api.security.halo.run/v1alpha1/authentications/sudo/code": {
+      "post": {
+        "description": "Send a one-time sudo verification code.",
+        "operationId": "SendSudoCode",
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/SudoCodeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "SudoV1alpha1Uc"
+        ]
+      }
+    },
+    "/apis/uc.api.security.halo.run/v1alpha1/authentications/sudo/confirm": {
+      "post": {
+        "description": "Confirm sudo with a verification method and code.",
+        "operationId": "ConfirmSudo",
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/SudoConfirmRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "SudoV1alpha1Uc"
+        ]
+      }
+    },
     "/apis/uc.api.security.halo.run/v1alpha1/authentications/two-factor/settings": {
       "get": {
         "description": "Get Two-factor authentication settings.",
@@ -23454,6 +23523,85 @@
           }
         },
         "description": "Subscriber that receives notifications."
+      },
+      "SudoCodeRequest": {
+        "required": [
+          "method"
+        ],
+        "type": "object",
+        "properties": {
+          "method": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "description": "Request body for sending a sudo verification code."
+      },
+      "SudoConfirmRequest": {
+        "required": [
+          "code",
+          "method"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "method": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "description": "Request body for confirming sudo."
+      },
+      "SudoMethod": {
+        "required": [
+          "name",
+          "sendable"
+        ],
+        "type": "object",
+        "properties": {
+          "maskedTarget": {
+            "type": "string",
+            "description": "optional masked destination shown in the UI"
+          },
+          "name": {
+            "type": "string",
+            "description": "method name, such as \u003ccode\u003etotp\u003c/code\u003e or \u003ccode\u003eemail\u003c/code\u003e"
+          },
+          "sendable": {
+            "type": "boolean",
+            "description": "whether a one-time code must be sent first"
+          }
+        },
+        "description": "A sudo confirmation method available to the current user."
+      },
+      "SudoStatus": {
+        "required": [
+          "active",
+          "methods"
+        ],
+        "type": "object",
+        "properties": {
+          "active": {
+            "type": "boolean",
+            "description": "whether the session is inside the sudo window"
+          },
+          "expiresAt": {
+            "type": "string",
+            "description": "when the current sudo window ends, if active",
+            "format": "date-time"
+          },
+          "methods": {
+            "type": "array",
+            "description": "methods the current user can use to confirm",
+            "items": {
+              "$ref": "#/components/schemas/SudoMethod"
+            }
+          }
+        },
+        "description": "Current sudo confirmation status of the session."
       },
       "Tag": {
         "required": [
