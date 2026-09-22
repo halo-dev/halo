@@ -20,9 +20,11 @@ import reactor.core.publisher.Mono;
 import run.halo.app.content.PostService;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.SinglePage;
+import run.halo.app.core.user.service.RoleService;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.infra.exception.NotFoundException;
+import run.halo.app.security.authorization.AuthorityUtils;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.ViewNameResolver;
 import run.halo.app.theme.dialect.HaloTrackerProcessor;
@@ -41,6 +43,8 @@ import run.halo.app.theme.finders.vo.PostVo;
 @RequiredArgsConstructor
 public class PreviewRouterFunction {
     static final String SNAPSHOT_NAME_PARAM = "snapshotName";
+    static final String POST_VIEW_ROLE_NAME = "role-template-view-posts";
+    static final String SINGLE_PAGE_VIEW_ROLE_NAME = "role-template-view-singlepages";
 
     private final ReactiveExtensionClient client;
 
@@ -51,6 +55,8 @@ public class PreviewRouterFunction {
     private final PostViewNameResolver postViewNameResolver;
 
     private final PostService postService;
+
+    private final RoleService roleService;
 
     private final SinglePageConversionService singlePageConversionService;
 
@@ -71,7 +77,7 @@ public class PreviewRouterFunction {
                             .orElse(post.getSpec().getHeadSnapshot());
                     return convertToPostVo(post, snapshotName);
                 })
-                .flatMap(post -> canPreview(post.getContributors())
+                .flatMap(post -> canPreview(post.getContributors(), POST_VIEW_ROLE_NAME)
                         .doOnNext(canPreview -> {
                             if (!canPreview) {
                                 throw new NotFoundException("Post not found.");
@@ -138,7 +144,7 @@ public class PreviewRouterFunction {
                         status.setLastModifyTime(Instant.now());
                     }
                 })
-                .flatMap(singlePageVo -> canPreview(singlePageVo.getContributors())
+                .flatMap(singlePageVo -> canPreview(singlePageVo.getContributors(), SINGLE_PAGE_VIEW_ROLE_NAME)
                         .doOnNext(canPreview -> {
                             if (!canPreview) {
                                 throw new NotFoundException("Single page not found.");
@@ -158,11 +164,21 @@ public class PreviewRouterFunction {
                 });
     }
 
-    private Mono<Boolean> canPreview(List<ContributorVo> contributors) {
+    private Mono<Boolean> canPreview(List<ContributorVo> contributors, String viewRoleName) {
         Assert.notNull(contributors, "The contributors must not be null");
         Set<String> contributorNames =
                 contributors.stream().map(ContributorVo::getName).collect(Collectors.toSet());
-        return currentAuthenticatedUserName().map(contributorNames::contains).defaultIfEmpty(false);
+        return ReactiveSecurityContextHolder.getContext()
+                .map(SecurityContext::getAuthentication)
+                .filter(authentication -> !AnonymousUserConst.isAnonymousUser(authentication.getName()))
+                .flatMap(authentication -> {
+                    if (contributorNames.contains(authentication.getName())) {
+                        return Mono.just(true);
+                    }
+                    var roles = AuthorityUtils.authoritiesToRoles(authentication.getAuthorities());
+                    return roleService.contains(roles, Set.of(viewRoleName));
+                })
+                .defaultIfEmpty(false);
     }
 
     Mono<String> currentAuthenticatedUserName() {
