@@ -76,9 +76,9 @@ class SudoServiceTest {
         var user = user(true, true);
         when(userService.getUser("alice")).thenReturn(Mono.just(user));
         when(totpProvider.supports(user)).thenReturn(Mono.just(true));
-        when(totpProvider.sendable()).thenReturn(false);
+        when(totpProvider.canSendCode()).thenReturn(false);
         when(emailProvider.supports(user)).thenReturn(Mono.just(true));
-        when(emailProvider.sendable()).thenReturn(true);
+        when(emailProvider.canSendCode()).thenReturn(true);
         when(emailProvider.maskedTarget(user)).thenReturn("a***@example.com");
 
         StepVerifier.create(sudoService.availableMethods("alice"))
@@ -170,7 +170,7 @@ class SudoServiceTest {
         var user = user(true, false);
         when(userService.getUser("alice")).thenReturn(Mono.just(user));
         when(totpProvider.supports(user)).thenReturn(Mono.just(true));
-        when(totpProvider.sendable()).thenReturn(false);
+        when(totpProvider.canSendCode()).thenReturn(false);
         when(emailProvider.supports(user)).thenReturn(Mono.just(false));
 
         StepVerifier.create(sudoService.requireSudo(exchange(), "alice"))
@@ -183,7 +183,7 @@ class SudoServiceTest {
         stubExhaustedRateLimiter("send-sudo-code-alice", "send-sudo-code");
 
         StepVerifier.create(sudoService
-                        .sendCode("email", exchange())
+                        .sendCode("email")
                         .contextWrite(ReactiveSecurityContextHolder.withAuthentication(sessionAuth())))
                 .expectError(RateLimitExceededException.class)
                 .verify();
@@ -210,7 +210,7 @@ class SudoServiceTest {
     void extraProviderBeanShouldAppearInMethods() {
         var extra = mock(SudoVerificationProvider.class);
         when(extra.method()).thenReturn("phone");
-        when(extra.sendable()).thenReturn(true);
+        when(extra.canSendCode()).thenReturn(true);
         sudoService = new SudoService(List.of(totpProvider, emailProvider, extra), userService, rateLimiterRegistry);
         sudoService.setClock(clock);
 

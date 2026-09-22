@@ -46,7 +46,7 @@ class EmailSudoVerificationProvider implements SudoVerificationProvider {
     }
 
     @Override
-    public boolean sendable() {
+    public boolean canSendCode() {
         return true;
     }
 

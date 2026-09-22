@@ -88,7 +88,7 @@ class SudoModeWebFilter implements WebFilter {
     private Mono<ServerResponse> sendCode(ServerRequest request) {
         return request.formData()
                 .map(form -> requiredFormValue(form, "method"))
-                .flatMap(method -> sudoService.sendCode(method, request.exchange()))
+                .flatMap(sudoService::sendCode)
                 .then(ServerResponse.noContent().build());
     }
 

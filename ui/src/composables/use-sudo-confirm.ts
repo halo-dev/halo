@@ -8,9 +8,15 @@ interface SudoProblemDetail {
 
 export const SUDO_REQUIRED_TYPE = "https://halo.run/probs/sudo-required";
 
+/** Mirrors {@code SudoService.SUDO_TTL} on the backend. */
+export const SUDO_TTL_MINUTES = 30;
+
+/** Mirrors the {@code send-sudo-code} rate limiter on the backend. */
+export const SUDO_RESEND_INTERVAL_SECONDS = 60;
+
 export interface SudoMethod {
   name: string;
-  sendable: boolean;
+  canSendCode: boolean;
   maskedTarget?: string;
 }
 
@@ -35,15 +41,13 @@ export function confirmSudo(method: string, code: string) {
   );
 }
 
-const visible = ref(false);
+const sudoConfirmVisible = ref(false);
 
 let inFlight: Promise<void> | null = null;
 let resolveConfirm: (() => void) | null = null;
 let rejectConfirm: ((reason?: unknown) => void) | null = null;
 
-export function useSudoConfirmModalState() {
-  return { visible };
-}
+export { sudoConfirmVisible };
 
 export function isSudoRequiredError(error: AxiosError): boolean {
   const data = error.response?.data as SudoProblemDetail | undefined;
@@ -63,18 +67,18 @@ export function requestSudoConfirm(): Promise<void> {
   // Open after the failing mutation has finished patching, so VModal is not
   // inserted into a node OverlayScrollbars already rewrote.
   nextTick(() => {
-    visible.value = true;
+    sudoConfirmVisible.value = true;
   });
   return inFlight;
 }
 
 export function completeSudoConfirm() {
-  visible.value = false;
+  sudoConfirmVisible.value = false;
   resolveConfirm?.();
 }
 
 export function cancelSudoConfirm() {
-  visible.value = false;
+  sudoConfirmVisible.value = false;
   rejectConfirm?.(new Error("sudo cancelled"));
 }
 

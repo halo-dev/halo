@@ -32,7 +32,7 @@ class TotpSudoVerificationProvider implements SudoVerificationProvider {
     }
 
     @Override
-    public boolean sendable() {
+    public boolean canSendCode() {
         return false;
     }
 

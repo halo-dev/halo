@@ -14,13 +14,13 @@ interface SudoVerificationProvider {
     /** Stable method name returned to the client, e.g. {@code totp} or {@code email}. */
     String method();
 
-    /** Whether this method requires sending a one-time code before confirmation. */
-    boolean sendable();
+    /** Whether this method sends a one-time code, so the client should offer a "send code" action. */
+    boolean canSendCode();
 
     /** Whether this method is currently available for the given user. */
     Mono<Boolean> supports(User user);
 
-    /** Send a one-time code. Providers that are not sendable should error. */
+    /** Send a one-time code. Providers that cannot send a code should error. */
     Mono<Void> sendCode(User user);
 
     /** Verify the submitted code for the given user. */

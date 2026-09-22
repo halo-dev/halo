@@ -3,13 +3,11 @@ package run.halo.app.security.sudo;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Clock;
-import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
-import run.halo.app.infra.exception.RateLimitExceededException;
 
 class InMemorySudoCodeStoreTest {
 
@@ -32,11 +30,28 @@ class InMemorySudoCodeStoreTest {
     }
 
     @Test
+    void shouldFailWhenNoCodeWasGenerated() {
+        StepVerifier.create(store.verify("email:alice", "000000"))
+                .expectError(SudoVerificationFailedException.class)
+                .verify();
+    }
+
+    @Test
     void shouldFailWhenCodeIsWrong() {
         store.generate("email:alice").block();
         StepVerifier.create(store.verify("email:alice", "000000"))
                 .expectError(SudoVerificationFailedException.class)
                 .verify();
+    }
+
+    @Test
+    void shouldKeepCodeUsableAfterWrongAttempt() {
+        // Attempt limiting is owned by the SudoService rate limiter, not by the store.
+        var code = store.generate("email:alice").block();
+        StepVerifier.create(store.verify("email:alice", "000000"))
+                .expectError(SudoVerificationFailedException.class)
+                .verify();
+        StepVerifier.create(store.verify("email:alice", code)).verifyComplete();
     }
 
     @Test
@@ -49,39 +64,6 @@ class InMemorySudoCodeStoreTest {
     }
 
     @Test
-    void shouldBlacklistAfterMaxAttempts() {
-        store.generate("email:alice").block();
-        for (int i = 0; i < InMemorySudoCodeStore.MAX_ATTEMPTS; i++) {
-            StepVerifier.create(store.verify("email:alice", "000000"))
-                    .expectError(SudoVerificationFailedException.class)
-                    .verify();
-        }
-        StepVerifier.create(store.generate("email:alice"))
-                .expectError(RateLimitExceededException.class)
-                .verify();
-    }
-
-    @Test
-    void shouldRateLimitResendWithinCooldown() {
-        store.generate("email:alice").block();
-        StepVerifier.create(store.generate("email:alice"))
-                .expectError(RateLimitExceededException.class)
-                .verify();
-    }
-
-    @Test
-    void shouldAllowResendAfterCooldown() {
-        var first = store.generate("email:alice").block();
-        store.setClock(Clock.offset(baseClock, InMemorySudoCodeStore.RESEND_INTERVAL.plusSeconds(1)));
-        var second = store.generate("email:alice").block();
-        assertThat(second).isNotEqualTo(first);
-        StepVerifier.create(store.verify("email:alice", first))
-                .expectError(SudoVerificationFailedException.class)
-                .verify();
-        StepVerifier.create(store.verify("email:alice", second)).verifyComplete();
-    }
-
-    @Test
     void shouldNotReuseVerifiedCode() {
         var code = store.generate("email:alice").block();
         StepVerifier.create(store.verify("email:alice", code)).verifyComplete();
@@ -91,9 +73,19 @@ class InMemorySudoCodeStoreTest {
     }
 
     @Test
+    void shouldInvalidatePreviousCodeWhenRegenerated() {
+        var first = store.generate("email:alice").block();
+        var second = store.generate("email:alice").block();
+        StepVerifier.create(store.verify("email:alice", first))
+                .expectError(SudoVerificationFailedException.class)
+                .verify();
+        StepVerifier.create(store.verify("email:alice", second)).verifyComplete();
+    }
+
+    @Test
     void shouldAllowGenerateAfterCodeExpired() {
         store.generate("email:alice").block();
-        store.setClock(Clock.offset(baseClock, Duration.ofMinutes(11)));
+        store.setClock(Clock.offset(baseClock, InMemorySudoCodeStore.CODE_TTL.plusSeconds(1)));
         StepVerifier.create(store.generate("email:alice")).expectNextCount(1).verifyComplete();
     }
 }

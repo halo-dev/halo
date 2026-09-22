@@ -7,7 +7,7 @@ import {
   isSudoRequiredError,
   requestSudoConfirm,
   SUDO_REQUIRED_TYPE,
-  useSudoConfirmModalState,
+  sudoConfirmVisible,
 } from "../use-sudo-confirm";
 
 function sudoError(): AxiosError {
@@ -36,15 +36,14 @@ describe("use-sudo-confirm", () => {
   });
 
   it("reuses a single in-flight confirmation", async () => {
-    const { visible } = useSudoConfirmModalState();
     const first = requestSudoConfirm();
     const second = requestSudoConfirm();
     await nextTick();
-    expect(visible.value).toBe(true);
+    expect(sudoConfirmVisible.value).toBe(true);
     completeSudoConfirm();
     await expect(first).resolves.toBeUndefined();
     await expect(second).resolves.toBeUndefined();
-    expect(visible.value).toBe(false);
+    expect(sudoConfirmVisible.value).toBe(false);
   });
 
   it("rejects when confirmation is cancelled", async () => {

@@ -7,6 +7,7 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.function.BiFunction;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -71,30 +72,45 @@ class SudoService {
                         }));
     }
 
-    Mono<Void> sendCode(String method, ServerWebExchange exchange) {
+    Mono<Void> sendCode(String method) {
         return requireSessionAuthentication()
-                .map(Authentication::getName)
-                .flatMap(username -> Mono.just(username)
-                        .transformDeferred(sendCodeRateLimiter(username))
-                        .flatMap(userService::getUser)
-                        .flatMap(user -> requireSupported(user, method)
-                                .flatMap(provider -> Mono.defer(() -> provider.sendCode(user))))
-                        .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new));
+                .flatMap(auth -> invoke(
+                        auth.getName(),
+                        SEND_CODE_RATE_LIMITER_CONFIG,
+                        method,
+                        (user, provider) -> provider.sendCode(user)));
     }
 
     Mono<Void> confirm(String method, String code, ServerWebExchange exchange) {
         return requireSessionAuthentication()
-                .flatMap(auth -> Mono.just(auth.getName())
-                        .transformDeferred(confirmRateLimiter(auth.getName()))
-                        .flatMap(userService::getUser)
-                        .flatMap(user -> requireSupported(user, method)
-                                .flatMap(provider -> Mono.defer(() -> provider.verify(user, code))))
+                .flatMap(auth -> invoke(
+                                auth.getName(),
+                                CONFIRM_RATE_LIMITER_CONFIG,
+                                method,
+                                (user, provider) -> provider.verify(user, code))
                         .then(Mono.defer(() -> activate(exchange)))
                         .doOnSuccess(
                                 unused -> log.info("Sudo confirmed for user '{}' via '{}'", auth.getName(), method))
                         .doOnError(error ->
-                                log.info("Sudo confirmation failed for user '{}' via '{}'", auth.getName(), method))
-                        .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new));
+                                log.info("Sudo confirmation failed for user '{}' via '{}'", auth.getName(), method)));
+    }
+
+    /**
+     * Applies the method rate limiter, resolves the user, and runs the provider action for the requested method. Both
+     * {@link #sendCode(String)} and {@link #confirm(String, String, ServerWebExchange)} share this pipeline so that
+     * every method is throttled and resolved identically.
+     */
+    private <T> Mono<T> invoke(
+            String username,
+            String rateLimiterConfig,
+            String method,
+            BiFunction<User, SudoVerificationProvider, Mono<T>> action) {
+        return Mono.just(username)
+                .transformDeferred(rateLimiter(username, rateLimiterConfig))
+                .flatMap(userService::getUser)
+                .flatMap(user -> requireSupported(user, method)
+                        .flatMap(provider -> Mono.defer(() -> action.apply(user, provider))))
+                .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new);
     }
 
     Mono<Void> requireSudo(ServerWebExchange exchange, String username) {
@@ -125,11 +141,13 @@ class SudoService {
     }
 
     Flux<SudoMethod> availableMethods(User user) {
-        return Flux.fromIterable(providers)
-                .concatMap(provider -> provider.supports(user)
-                        .filter(Boolean::booleanValue)
-                        .map(supported ->
-                                new SudoMethod(provider.method(), provider.sendable(), provider.maskedTarget(user))));
+        return supportedProviders(user)
+                .map(provider ->
+                        new SudoMethod(provider.method(), provider.canSendCode(), provider.maskedTarget(user)));
+    }
+
+    private Flux<SudoVerificationProvider> supportedProviders(User user) {
+        return Flux.fromIterable(providers).filterWhen(provider -> provider.supports(user));
     }
 
     Mono<Authentication> requireSessionAuthentication() {
@@ -150,25 +168,16 @@ class SudoService {
                 && !isJwtAuthentication(authentication);
     }
 
-    private <T> RateLimiterOperator<T> sendCodeRateLimiter(String username) {
-        var key = SEND_CODE_RATE_LIMITER_CONFIG + "-" + username;
-        return RateLimiterOperator.of(rateLimiterRegistry.rateLimiter(key, SEND_CODE_RATE_LIMITER_CONFIG));
-    }
-
-    private <T> RateLimiterOperator<T> confirmRateLimiter(String username) {
-        var key = CONFIRM_RATE_LIMITER_CONFIG + "-" + username;
-        return RateLimiterOperator.of(rateLimiterRegistry.rateLimiter(key, CONFIRM_RATE_LIMITER_CONFIG));
+    private <T> RateLimiterOperator<T> rateLimiter(String username, String configName) {
+        var key = configName + "-" + username;
+        return RateLimiterOperator.of(rateLimiterRegistry.rateLimiter(key, configName));
     }
 
     private Mono<SudoVerificationProvider> requireSupported(User user, String method) {
-        return Flux.fromIterable(providers)
+        return supportedProviders(user)
                 .filter(provider -> provider.method().equals(method))
                 .next()
-                .switchIfEmpty(Mono.error(() -> new ServerWebInputException("Unknown sudo method")))
-                .flatMap(provider -> provider.supports(user)
-                        .filter(Boolean::booleanValue)
-                        .switchIfEmpty(Mono.error(() -> new ServerWebInputException("Sudo method is not available")))
-                        .thenReturn(provider));
+                .switchIfEmpty(Mono.error(() -> new ServerWebInputException("Sudo method is not available")));
     }
 
     private Mono<Void> activate(ServerWebExchange exchange) {

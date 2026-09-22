@@ -10,12 +10,13 @@ import {
   confirmSudo,
   fetchSudoStatus,
   sendSudoCode,
-  useSudoConfirmModalState,
+  SUDO_RESEND_INTERVAL_SECONDS,
+  SUDO_TTL_MINUTES,
+  sudoConfirmVisible as visible,
   type SudoMethod,
 } from "@/composables/use-sudo-confirm";
 
 const { t } = useI18n();
-const { visible } = useSudoConfirmModalState();
 
 const modal = ref<InstanceType<typeof VModal> | null>(null);
 const selectedMethod = ref("");
@@ -54,6 +55,10 @@ const methods = computed<SudoMethod[]>(() => status.value?.methods ?? []);
 
 const currentMethod = computed(() =>
   methods.value.find((method) => method.name === selectedMethod.value)
+);
+
+const canSubmit = computed(
+  () => Boolean(currentMethod.value) && code.value.trim().length > 0
 );
 
 const methodOptions = computed(() =>
@@ -100,7 +105,7 @@ const { mutate: sendCode, isLoading: isSending } = useMutation({
   },
   onSuccess() {
     Toast.success(t("core.sudo.operations.send_code.toast_success"));
-    timer.value = 60;
+    timer.value = SUDO_RESEND_INTERVAL_SECONDS;
     resume();
   },
 });
@@ -142,6 +147,9 @@ function methodLabel(method: SudoMethod) {
 }
 
 function onSubmit() {
+  if (!canSubmit.value) {
+    return;
+  }
   confirm();
 }
 
@@ -169,11 +177,19 @@ function onSendCode() {
   >
     <VAlert
       :title="$t('core.common.text.tip')"
-      :description="$t('core.sudo.modal.alert')"
+      :description="$t('core.sudo.modal.alert', { minutes: SUDO_TTL_MINUTES })"
+      type="warning"
+      :closable="false"
+    />
+    <VAlert
+      v-if="!methods.length"
+      :title="$t('core.common.text.tip')"
+      :description="$t('core.sudo.modal.no_method')"
       type="warning"
       :closable="false"
     />
     <FormKit
+      v-else
       id="sudo-confirm-form"
       type="form"
       name="sudo-confirm-form"
@@ -196,7 +212,7 @@ function onSendCode() {
         name="code"
         :label="$t('core.sudo.fields.code.label')"
         :help="
-          currentMethod?.sendable
+          currentMethod?.canSendCode
             ? $t('core.sudo.fields.code.help_email', {
                 target: currentMethod.maskedTarget || '',
               })
@@ -206,7 +222,7 @@ function onSendCode() {
       >
         <template #suffix>
           <VButton
-            v-show="currentMethod?.sendable"
+            v-show="currentMethod?.canSendCode"
             :loading="isSending"
             :disabled="isActive"
             class="rounded-none border-y-0 border-l border-r-0 tabular-nums"
@@ -221,6 +237,7 @@ function onSendCode() {
       <VSpace>
         <VButton
           :loading="isConfirming"
+          :disabled="!canSubmit"
           type="secondary"
           @click="$formkit.submit('sudo-confirm-form')"
         >

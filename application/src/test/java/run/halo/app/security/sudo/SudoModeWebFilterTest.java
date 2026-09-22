@@ -90,7 +90,7 @@ class SudoModeWebFilterTest {
         var exchange = MockServerWebExchange.from(MockServerHttpRequest.post("/sudo/code")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body("method=email"));
-        when(sudoService.sendCode(eq("email"), eq(exchange))).thenReturn(Mono.empty());
+        when(sudoService.sendCode(eq("email"))).thenReturn(Mono.empty());
 
         StepVerifier.create(filter.filter(exchange, chain)
                         .contextWrite(ReactiveSecurityContextHolder.withAuthentication(sessionAuth())))
@@ -98,7 +98,7 @@ class SudoModeWebFilterTest {
 
         assertThat(exchange.getResponse().getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
         verify(chain, never()).filter(exchange);
-        verify(sudoService).sendCode("email", exchange);
+        verify(sudoService).sendCode("email");
     }
 
     @Test

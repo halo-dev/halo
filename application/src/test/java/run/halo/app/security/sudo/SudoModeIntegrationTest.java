@@ -9,15 +9,20 @@ import static org.springframework.web.reactive.function.BodyInserters.fromFormDa
 import java.time.Instant;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
+import run.halo.app.infra.exception.Exceptions;
 import run.halo.app.infra.exception.RateLimitExceededException;
 
 @SpringBootTest
@@ -56,14 +61,14 @@ class SudoModeIntegrationTest {
                 .isEqualTo("2026-01-01T00:30:00Z")
                 .jsonPath("$.methods[0].name")
                 .isEqualTo("totp")
-                .jsonPath("$.methods[0].sendable")
+                .jsonPath("$.methods[0].canSendCode")
                 .isEqualTo(false);
     }
 
     @Test
     @WithMockUser(username = "alice")
     void shouldSendSudoCode() {
-        doReturn(Mono.empty()).when(sudoService).sendCode(eq("email"), any());
+        doReturn(Mono.empty()).when(sudoService).sendCode(eq("email"));
 
         webClient
                 .post()
@@ -74,7 +79,7 @@ class SudoModeIntegrationTest {
                 .expectStatus()
                 .isNoContent();
 
-        verify(sudoService).sendCode(eq("email"), any());
+        verify(sudoService).sendCode(eq("email"));
     }
 
     @Test
@@ -99,7 +104,7 @@ class SudoModeIntegrationTest {
     void shouldRejectSendCodeWhenRateLimited() {
         doReturn(Mono.error(new RateLimitExceededException(null)))
                 .when(sudoService)
-                .sendCode(eq("email"), any());
+                .sendCode(eq("email"));
 
         webClient
                 .post()
@@ -138,5 +143,47 @@ class SudoModeIntegrationTest {
                 .exchange()
                 .expectStatus()
                 .isBadRequest();
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "PUT,/apis/uc.api.halo.run/v1alpha1/users/-/password",
+        "PUT,/apis/api.console.halo.run/v1alpha1/users/-/password",
+        "PUT,/apis/api.console.halo.run/v1alpha1/users/bob/password",
+        "POST,/apis/uc.api.security.halo.run/v1alpha1/personalaccesstokens",
+        "DELETE,/apis/uc.api.security.halo.run/v1alpha1/personalaccesstokens/pat-1",
+        "PUT,/apis/uc.api.security.halo.run/v1alpha1/personalaccesstokens/pat-1/actions/revocation",
+        "PUT,/apis/uc.api.security.halo.run/v1alpha1/personalaccesstokens/pat-1/actions/restoration"
+    })
+    @WithMockUser(username = "alice")
+    void shouldReportSudoRequiredForSensitiveApis(HttpMethod method, String path) {
+        doReturn(Mono.error(new SudoRequiredException(List.of("totp", "email"))))
+                .when(sudoService)
+                .requireSudo(any(), eq("alice"));
+
+        webClient
+                .method(method)
+                .uri(path)
+                .exchange()
+                .expectStatus()
+                .isForbidden()
+                .expectBody()
+                .jsonPath("$.type")
+                .isEqualTo(Exceptions.SUDO_REQUIRED_TYPE)
+                .jsonPath("$.methods[0]")
+                .isEqualTo("totp")
+                .jsonPath("$.methods[1]")
+                .isEqualTo("email");
+    }
+
+    @Test
+    void shouldRejectJwtOnSudoProtocol() {
+        webClient
+                .mutateWith(SecurityMockServerConfigurers.mockJwt())
+                .get()
+                .uri("/sudo")
+                .exchange()
+                .expectStatus()
+                .isForbidden();
     }
 }

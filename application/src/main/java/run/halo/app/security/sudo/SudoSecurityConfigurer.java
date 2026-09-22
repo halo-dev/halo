@@ -10,6 +10,11 @@ import run.halo.app.security.authentication.SecurityConfigurer;
 /**
  * Registers {@link SudoModeWebFilter} after authentication is populated.
  *
+ * <p>The filter runs before authorization on purpose: {@code /sudo} protocol requests are guarded by
+ * {@link SudoService#requireSessionAuthentication()} rather than by the {@code authenticated()} rule (which still
+ * covers any other {@code /sudo/**} path), and sensitive APIs must report "sudo required" before their own role check
+ * so the client can always start the confirmation flow.
+ *
  * @author johnniang
  * @since 2.27.0
  */
