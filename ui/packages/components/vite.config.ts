@@ -2,8 +2,8 @@ import path from "node:path";
 import { fileURLToPath, URL } from "node:url";
 import Vue from "@vitejs/plugin-vue";
 import VueJsx from "@vitejs/plugin-vue-jsx";
+import Dts from "unplugin-dts/vite";
 import Icons from "unplugin-icons/vite";
-import Dts from "vite-plugin-dts";
 import { defineConfig, type Plugin } from "vite-plus";
 import { configDefaults } from "vite-plus";
 
@@ -13,6 +13,7 @@ export default defineConfig({
     VueJsx(),
     Icons({ compiler: "vue3" }),
     Dts({
+      processor: "vue",
       tsconfigPath: "./tsconfig.app.json",
       entryRoot: "./src",
       outDirs: "./dist",

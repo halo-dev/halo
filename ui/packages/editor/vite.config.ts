@@ -2,8 +2,8 @@ import path from "node:path";
 import { fileURLToPath, URL } from "node:url";
 import VueI18nPlugin from "@intlify/unplugin-vue-i18n/vite";
 import Vue from "@vitejs/plugin-vue";
+import dts from "unplugin-dts/vite";
 import Icons from "unplugin-icons/vite";
-import dts from "vite-plugin-dts";
 import { defineConfig } from "vite-plus";
 
 export default ({ mode }: { mode: string }) => {
@@ -17,6 +17,7 @@ export default ({ mode }: { mode: string }) => {
       }),
       isProduction &&
         dts({
+          processor: "vue",
           tsconfigPath: "./tsconfig.app.json",
           entryRoot: "./src",
           outDirs: "./dist",
