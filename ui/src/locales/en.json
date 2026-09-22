@@ -323,6 +323,7 @@
   "core.comment.filters.sort.items.create_time_desc": "Latest Created",
   "core.comment.filters.sort.items.create_time_asc": "Earliest Created",
   "core.comment.list.fields.reply_count": "{count} Replies",
+  "core.comment.list.fields.pending_reply_count": "{count} Pending Replies",
   "core.comment.list.fields.has_new_replies": "New replies",
   "core.comment.list.fields.pending_review": "Pending review",
   "core.comment.list.fields.private": "Private",

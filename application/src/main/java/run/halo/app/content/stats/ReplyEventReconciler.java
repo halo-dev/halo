@@ -82,6 +82,13 @@ public class ReplyEventReconciler implements Reconciler<ReplyEventReconciler.Com
                             pageRequest);
                     status.setVisibleReplyCount((int) visibleReplyPageResult.getTotal());
 
+                    // calculate pending reply count(not approved yet)
+                    var pendingReplyPageResult = client.listBy(
+                            Reply.class,
+                            listOptionsWithFieldQuery(and(baseQuery, equal("spec.approved", BooleanUtils.FALSE))),
+                            pageRequest);
+                    status.setPendingReplyCount((int) pendingReplyPageResult.getTotal());
+
                     // calculate unread reply count(after last read time)
                     var unReadQuery = Optional.ofNullable(comment.getSpec().getLastReadTime())
                             .map(lastReadTime ->
@@ -120,6 +127,33 @@ public class ReplyEventReconciler implements Reconciler<ReplyEventReconciler.Com
     public void start() {
         this.replyEventController.start();
         this.running = true;
+        enqueueCommentsWithoutPendingReplyCount();
+    }
+
+    /**
+     * Backfills {@code status.pendingReplyCount} for comments whose replies were reconciled before the field existed.
+     * Steady-state startup cost is an empty indexed query.
+     */
+    private void enqueueCommentsWithoutPendingReplyCount() {
+        var pageQuery = and(isNull("status.pendingReplyCount"), greaterThan("status.replyCount", "0"));
+        var page = 1;
+        while (true) {
+            var pageResult = client.listBy(
+                    Comment.class,
+                    listOptionsWithFieldQuery(pageQuery),
+                    PageRequestImpl.of(page, 100, Sort.by("metadata.name")));
+            var items = pageResult
+                    .get()
+                    .map(comment -> CommentName.of(comment.getMetadata().getName()))
+                    .toList();
+            items.forEach(replyEventQueue::addImmediately);
+            if (!pageResult.hasNext()) {
+                return;
+            }
+            // items are fixed asynchronously by the controller and may leave the result set while
+            // paging; anything skipped is picked up again on the next startup
+            page++;
+        }
     }
 
     @Override

@@ -25,7 +25,6 @@ export default function useCommentsFetch(
     ],
     queryFn: async () => {
       const fieldSelectorMap: Record<string, string | boolean | undefined> = {
-        "spec.approved": approved.value,
         "spec.subjectRef": subjectRefKey?.value,
       };
 
@@ -48,6 +47,7 @@ export default function useCommentsFetch(
         size: size.value,
         sort: sort.value ? [sort.value] : defaultSort,
         keyword: keyword.value,
+        approved: approved.value,
         ownerName: user.value,
         ownerKind: user.value ? "User" : undefined,
       });

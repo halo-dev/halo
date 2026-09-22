@@ -9997,6 +9997,11 @@
             "description": "Metadata version observed by the last successful reconciliation.",
             "format": "int64"
           },
+          "pendingReplyCount": {
+            "type": "integer",
+            "description": "Total number of not yet approved replies under this comment.",
+            "format": "int32"
+          },
           "replyCount": {
             "type": "integer",
             "description": "Total number of replies under this comment.",

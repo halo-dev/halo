@@ -4,6 +4,8 @@ import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springframework.data.domain.Sort.Order.desc;
 import static run.halo.app.extension.index.query.Queries.contains;
 import static run.halo.app.extension.index.query.Queries.equal;
+import static run.halo.app.extension.index.query.Queries.greaterThan;
+import static run.halo.app.extension.index.query.Queries.or;
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import java.util.Optional;
@@ -39,6 +41,11 @@ public class CommentQuery extends SortableRequest {
         return queryParams.getFirst("ownerKind");
     }
 
+    /** Approval state filter: {@code true} for approved comments, {@code false} for pending. */
+    public @Nullable String getApproved() {
+        return queryParams.getFirst("approved");
+    }
+
     public @Nullable String getOwnerName() {
         return queryParams.getFirst("ownerName");
     }
@@ -58,6 +65,19 @@ public class CommentQuery extends SortableRequest {
                 .filter(StringUtils::isNotBlank)
                 .ifPresent(keyword -> builder.andQuery(contains("spec.raw", keyword)));
 
+        Optional.ofNullable(getApproved())
+                .filter(value -> "true".equals(value) || "false".equals(value))
+                .ifPresent(approved -> {
+                    var pendingCommentQuery = equal("spec.approved", approved);
+                    if (Boolean.parseBoolean(approved)) {
+                        builder.andQuery(pendingCommentQuery);
+                    } else {
+                        // also match comments having pending replies, so that the whole tree
+                        // containing a pending reply is listed when filtering by pending review
+                        builder.andQuery(or(pendingCommentQuery, greaterThan("status.pendingReplyCount", "0")));
+                    }
+                });
+
         Optional.ofNullable(getOwnerName()).filter(StringUtils::isNotBlank).ifPresent(ownerName -> {
             var ownerKind = Optional.ofNullable(getOwnerKind())
                     .filter(StringUtils::isNotBlank)
@@ -75,6 +95,12 @@ public class CommentQuery extends SortableRequest {
                         .in(ParameterIn.QUERY)
                         .name("keyword")
                         .description("Keyword used to match the raw comment text.")
+                        .implementation(String.class))
+                .parameter(parameterBuilder()
+                        .in(ParameterIn.QUERY)
+                        .name("approved")
+                        .description("Approval state filter. When false, comments with pending replies "
+                                + "are also included.")
                         .implementation(String.class))
                 .parameter(parameterBuilder()
                         .in(ParameterIn.QUERY)

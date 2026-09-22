@@ -158,6 +158,9 @@ public class Comment extends AbstractExtension {
         /** Total number of approved and non-hidden replies under this comment. */
         private Integer visibleReplyCount;
 
+        /** Total number of not yet approved replies under this comment. */
+        private Integer pendingReplyCount;
+
         /** Number of replies created after the comment owner's last read time. */
         private Integer unreadReplyCount;
 
