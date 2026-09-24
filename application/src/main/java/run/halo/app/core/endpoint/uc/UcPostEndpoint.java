@@ -7,7 +7,10 @@ import static org.springdoc.webflux.core.fn.SpringdocRouteBuilder.route;
 import static org.springframework.web.reactive.function.server.RequestPredicates.path;
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
@@ -25,6 +28,7 @@ import run.halo.app.content.PostQuery;
 import run.halo.app.content.PostRequest;
 import run.halo.app.content.PostService;
 import run.halo.app.content.SnapshotService;
+import run.halo.app.core.extension.content.Constant;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.Snapshot;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
@@ -49,6 +53,15 @@ public class UcPostEndpoint implements CustomEndpoint {
      * {@link Snapshot} payload.
      */
     private static final String CONTENT_JSON_ANNO = "content.halo.run/content-json";
+
+    private static final Set<String> MANAGED_ANNOTATIONS = Set.of(
+            Constant.CHECKSUM_CONFIG_ANNO,
+            Constant.CONTENT_CHECKSUM_ANNO,
+            Constant.PERMALINK_PATTERN_ANNO,
+            Post.LAST_RELEASED_SNAPSHOT_ANNO,
+            Post.LAST_ASSOCIATED_TAGS_ANNO,
+            Post.LAST_ASSOCIATED_CATEGORIES_ANNO,
+            Post.STATS_ANNO);
 
     private final PostService postService;
 
@@ -311,17 +324,13 @@ public class UcPostEndpoint implements CustomEndpoint {
                 .switchIfEmpty(Mono.error(() -> new ServerWebInputException("Request body required.")));
 
         var updatedPost = getMyPost(name)
-                .flatMap(oldPost -> postBody.doOnNext(post -> {
-                    var oldSpec = oldPost.getSpec();
-                    // restrict fields of post.spec.
-                    var spec = post.getSpec();
-                    spec.setOwner(oldSpec.getOwner());
-                    spec.setPublish(oldSpec.getPublish());
-                    spec.setHeadSnapshot(oldSpec.getHeadSnapshot());
-                    spec.setBaseSnapshot(oldSpec.getBaseSnapshot());
-                    spec.setReleaseSnapshot(oldSpec.getReleaseSnapshot());
-                    spec.setDeleted(oldSpec.getDeleted());
-                    post.getMetadata().setName(oldPost.getMetadata().getName());
+                .flatMap(oldPost -> postBody.map(post -> {
+                    copyEditableSpec(post.getSpec(), oldPost.getSpec());
+                    oldPost.getMetadata()
+                            .setAnnotations(editableAnnotations(
+                                    post.getMetadata().getAnnotations(),
+                                    oldPost.getMetadata().getAnnotations()));
+                    return oldPost;
                 }))
                 .flatMap(postService::updateBy);
         return ServerResponse.ok().body(updatedPost, Post.class);
@@ -333,14 +342,58 @@ public class UcPostEndpoint implements CustomEndpoint {
 
         var createdPost = getCurrentUser()
                 .flatMap(username -> postFromRequest.doOnNext(post -> {
-                    if (post.getSpec() == null) {
-                        post.setSpec(new Post.PostSpec());
+                    var spec = new Post.PostSpec();
+                    if (post.getSpec() != null) {
+                        copyEditableSpec(post.getSpec(), spec);
                     }
-                    post.getSpec().setOwner(username);
+                    spec.setOwner(username);
+                    spec.setPublish(false);
+                    spec.setPinned(false);
+                    spec.setPriority(0);
+                    spec.setDeleted(false);
+                    post.setSpec(spec);
+                    post.setStatus(null);
+
+                    var submittedMetadata = post.getMetadata();
+                    var metadata = new Metadata();
+                    metadata.setName(submittedMetadata.getName());
+                    metadata.setGenerateName(submittedMetadata.getGenerateName());
+                    metadata.setAnnotations(editableAnnotations(submittedMetadata.getAnnotations(), null));
+                    post.setMetadata(metadata);
                 }))
                 .map(post -> new PostRequest(post, ContentUpdateParam.from(getContent(post))))
                 .flatMap(postService::draftPost);
         return ServerResponse.ok().body(createdPost, Post.class);
+    }
+
+    private static void copyEditableSpec(Post.PostSpec source, Post.PostSpec target) {
+        target.setTitle(source.getTitle());
+        target.setSlug(source.getSlug());
+        target.setTemplate(source.getTemplate());
+        target.setCover(source.getCover());
+        target.setPublishTime(source.getPublishTime());
+        target.setAllowComment(source.getAllowComment());
+        target.setVisible(source.getVisible());
+        target.setExcerpt(source.getExcerpt());
+        target.setCategories(source.getCategories());
+        target.setTags(source.getTags());
+        target.setHtmlMetas(source.getHtmlMetas());
+    }
+
+    private static Map<String, String> editableAnnotations(
+            Map<String, String> submitted, Map<String, String> existing) {
+        var annotations = new HashMap<String, String>();
+        if (submitted != null) {
+            annotations.putAll(submitted);
+        }
+        MANAGED_ANNOTATIONS.forEach(key -> {
+            if (existing != null && existing.containsKey(key)) {
+                annotations.put(key, existing.get(key));
+            } else {
+                annotations.remove(key);
+            }
+        });
+        return annotations;
     }
 
     private Content getContent(Post post) {
