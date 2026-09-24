@@ -1286,5 +1286,19 @@
   "core.formkit.secret.includes_keys": "包含字段：{keys}",
   "core.formkit.secret.no_fields": "没有字段",
   "core.formkit.secret.required_keys_tip": "当前表单项所需的密钥字段包括：",
-  "core.dashboard.widgets.presets.upvotes_stats.title": "点赞"
+  "core.dashboard.widgets.presets.upvotes_stats.title": "点赞",
+  "core.sudo.modal.title": "安全确认",
+  "core.sudo.modal.alert": "这是一项敏感操作，请先确认身份。确认成功后 {minutes} 分钟内无需再次确认。",
+  "core.sudo.modal.no_method": "当前账号没有可用的验证方式，请先开启两步验证或验证邮箱后再试。",
+  "core.sudo.fields.method.label": "验证方式",
+  "core.sudo.fields.code.label": "验证码",
+  "core.sudo.fields.code.help_totp": "请输入身份验证器应用中的 6 位验证码。",
+  "core.sudo.fields.code.help_email": "请输入发送到 {target} 的 6 位验证码。",
+  "core.sudo.methods.totp": "身份验证器",
+  "core.sudo.methods.email": "邮箱",
+  "core.sudo.operations.send_code.buttons.send": "发送验证码",
+  "core.sudo.operations.send_code.buttons.sending": "发送中",
+  "core.sudo.operations.send_code.buttons.countdown": "{timer} 秒后可重发",
+  "core.sudo.operations.send_code.toast_success": "验证码已发送",
+  "core.sudo.operations.confirm.toast_success": "身份确认成功"
 }

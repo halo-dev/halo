@@ -10,6 +10,7 @@ import {
 import { storeToRefs } from "pinia";
 import { computed, inject, onMounted, provide, reactive } from "vue";
 import { RouterView } from "vue-router";
+import SudoConfirmModal from "@/components/sudo/SudoConfirmModal.vue";
 import { useAppTitle } from "@/composables/use-title";
 import { i18n } from "@/locales";
 
@@ -80,6 +81,7 @@ window.addEventListener(
 
 <template>
   <RouterView />
+  <SudoConfirmModal />
 </template>
 
 <style lang="scss">

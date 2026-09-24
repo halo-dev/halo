@@ -137,6 +137,14 @@ resilience4j.ratelimiter:
       limitForPeriod: 3
       limitRefreshPeriod: 1m
       timeoutDuration: 0s
+    send-sudo-code:
+      limitForPeriod: 1
+      limitRefreshPeriod: 1m
+      timeoutDuration: 0s
+    sudo-confirm:
+      limitForPeriod: 5
+      limitRefreshPeriod: 5m
+      timeoutDuration: 0s
 r2dbc:
   migrate:
     resources-path: classpath:/db/migration/${spring.sql.init.platform}/*.sql

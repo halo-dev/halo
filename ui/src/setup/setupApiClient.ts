@@ -3,6 +3,12 @@ import { Dialog, Toast } from "@halo-dev/components";
 import type { AxiosError } from "axios";
 import objectHash from "object-hash";
 import { h } from "vue";
+import {
+  isSudoRequiredError,
+  markSudoRetried,
+  requestSudoConfirm,
+  wasSudoRetried,
+} from "@/composables/use-sudo-confirm";
 import { i18n } from "@/locales";
 import { createHTMLContentModal } from "@/utils/modal";
 
@@ -35,6 +41,15 @@ export function setupApiClient() {
       if (!errorResponse) {
         Toast.error(i18n.global.t("core.common.toast.network_error"));
         return Promise.reject(error);
+      }
+
+      if (isSudoRequiredError(error) && !wasSudoRetried(error.config)) {
+        try {
+          await requestSudoConfirm();
+          return axiosInstance.request(markSudoRetried(error.config!));
+        } catch {
+          return Promise.reject(error);
+        }
       }
 
       // Don't show error toast

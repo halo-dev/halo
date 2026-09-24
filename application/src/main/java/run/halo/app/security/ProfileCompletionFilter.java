@@ -119,6 +119,8 @@ class ProfileCompletionFilter implements WebFilter {
                 "/password-reset/**",
                 "/logout",
                 "/logout/impersonate",
+                "/sudo",
+                "/sudo/**",
                 "/complete-profile/**",
                 "/system/setup",
                 "/error",

@@ -34,6 +34,8 @@ public enum Exceptions {
 
     public static final String CONFLICT_TYPE = "https://halo.run/probs/conflict";
 
+    public static final String SUDO_REQUIRED_TYPE = "https://halo.run/probs/sudo-required";
+
     /** Non-ErrorResponse exception to type map. */
     public static final Map<Class<? extends Throwable>, String> EXCEPTION_TYPE_MAP = Map.of(
             RequestNotPermitted.class, REQUEST_NOT_PERMITTED_TYPE,

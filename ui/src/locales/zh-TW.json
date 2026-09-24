@@ -1286,5 +1286,19 @@
   "core.formkit.secret.required_keys_tip": "當前表單項所需的密鈅字段包括：",
   "core.dashboard.widgets.presets.upvotes_stats.title": "點讚",
   "core.plugin.detail.operations.copy_error_message.button": "複製錯誤訊息",
-  "core.plugin.detail.operations.copy_error_message.copied": "已複製"
+  "core.plugin.detail.operations.copy_error_message.copied": "已複製",
+  "core.sudo.modal.title": "安全確認",
+  "core.sudo.modal.alert": "這是一項敏感操作，請先確認身份。確認成功後 {minutes} 分鐘內無需再次確認。",
+  "core.sudo.modal.no_method": "目前帳號沒有可用的驗證方式，請先開啟兩步驗證或驗證電子郵件後再試。",
+  "core.sudo.fields.method.label": "驗證方式",
+  "core.sudo.fields.code.label": "驗證碼",
+  "core.sudo.fields.code.help_totp": "請輸入身份驗證器應用中的 6 位驗證碼。",
+  "core.sudo.fields.code.help_email": "請輸入發送到 {target} 的 6 位驗證碼。",
+  "core.sudo.methods.totp": "身份驗證器",
+  "core.sudo.methods.email": "電子郵件",
+  "core.sudo.operations.send_code.buttons.send": "發送驗證碼",
+  "core.sudo.operations.send_code.buttons.sending": "發送中",
+  "core.sudo.operations.send_code.buttons.countdown": "{timer} 秒後可重發",
+  "core.sudo.operations.send_code.toast_success": "驗證碼已發送",
+  "core.sudo.operations.confirm.toast_success": "身份確認成功"
 }
