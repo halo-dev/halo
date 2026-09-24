@@ -1,10 +1,4 @@
-import {
-  Decoration,
-  DecorationSet,
-  Extension,
-  Plugin,
-  PluginKey,
-} from "@/tiptap";
+import { Decoration, Extension } from "@/tiptap/core";
 
 export interface ExtensionNodeSelectedOptions {
   className: string;
@@ -20,40 +14,43 @@ export const ExtensionNodeSelected =
       };
     },
 
-    addProseMirrorPlugins() {
-      return [
-        new Plugin({
-          key: new PluginKey("nodeSelectedByAttr"),
-          props: {
-            decorations: ({ doc }) => {
-              const { isEditable, isFocused } = this.editor;
-              const decorations: Decoration[] = [];
+    onUpdate({ transaction }) {
+      if (!transaction.docChanged) {
+        this.editor.commands.updateDecorations(this.name);
+      }
+    },
 
-              if (!isEditable || !isFocused) {
-                return DecorationSet.create(doc, []);
-              }
+    addDecorations() {
+      return {
+        create: ({ state }) => {
+          const { isEditable, isFocused } = this.editor;
+          const decorations: Decoration[] = [];
 
-              doc.descendants((node, pos) => {
-                if (node.isText) {
-                  return false;
-                }
+          if (!isEditable || !isFocused) {
+            return decorations;
+          }
 
-                const isSelected = node.attrs.selected;
-                if (!isSelected) {
-                  return false;
-                }
+          state.doc.descendants((node, pos) => {
+            if (node.isText) {
+              return false;
+            }
 
-                decorations.push(
-                  Decoration.node(pos, pos + node.nodeSize, {
-                    class: this.options.className,
-                  })
-                );
-              });
+            if (node.attrs.selected) {
+              decorations.push(
+                Decoration.Node(pos, pos + node.nodeSize, {
+                  class: this.options.className,
+                })
+              );
+            }
+            return true;
+          });
 
-              return DecorationSet.create(doc, decorations);
-            },
-          },
-        }),
-      ];
+          return decorations;
+        },
+        shouldUpdate: ({ tr }) =>
+          tr.docChanged ||
+          tr.getMeta("focus") !== undefined ||
+          tr.getMeta("blur") !== undefined,
+      };
     },
   });

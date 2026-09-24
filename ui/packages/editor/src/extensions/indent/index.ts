@@ -20,9 +20,8 @@ import {
   type Editor,
   type KeyboardShortcutCommand,
 } from "@/tiptap";
+import { Decoration } from "@/tiptap/core";
 import {
-  Decoration,
-  DecorationSet,
   GapCursor,
   isHistoryTransaction,
   NodeSelection,
@@ -278,31 +277,33 @@ export const ExtensionIndent = Extension.create<ExtensionIndentOptions>({
 
           return tr.docChanged ? tr : null;
         },
-        props: {
-          decorations(state) {
-            const decorations: Decoration[] = [];
-            state.doc.descendants((node, pos) => {
-              if (!isNodeIndentable(node.type)) {
-                return true;
-              }
-              const indent = Number(node.attrs.indent) || 0;
-              if (indent <= 0) {
-                return true;
-              }
-              decorations.push(
-                Decoration.node(
-                  pos,
-                  pos + node.nodeSize,
-                  getIndentHTMLAttributes(indent)
-                )
-              );
-              return true;
-            });
-            return DecorationSet.create(state.doc, decorations);
-          },
-        },
       }),
     ];
+  },
+
+  addDecorations() {
+    return {
+      create: ({ state }) => {
+        const decorations: Decoration[] = [];
+        state.doc.descendants((node, pos) => {
+          if (!isNodeIndentable(node.type)) {
+            return true;
+          }
+          const indent = Number(node.attrs.indent) || 0;
+          if (indent > 0) {
+            decorations.push(
+              Decoration.Node(
+                pos,
+                pos + node.nodeSize,
+                getIndentHTMLAttributes(indent)
+              )
+            );
+          }
+          return true;
+        });
+        return decorations;
+      },
+    };
   },
 
   addCommands(this) {

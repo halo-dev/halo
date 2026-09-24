@@ -1,5 +1,4 @@
 import NodeRange, {
-  getNodeRangeDecorations,
   getSelectionRanges,
   isNodeRangeSelection,
   NodeRangeSelection,
@@ -7,8 +6,6 @@ import NodeRange, {
 } from "@tiptap/extension-node-range";
 import {
   callOrReturn,
-  Decoration,
-  DecorationSet,
   getExtensionField,
   Plugin,
   PluginKey,
@@ -18,6 +15,7 @@ import {
   type ResolvedPos,
   TextSelection,
 } from "@/tiptap";
+import { Decoration } from "@/tiptap/core";
 
 declare module "@tiptap/core" {
   export interface NodeConfig<Options, Storage> {
@@ -50,12 +48,26 @@ export interface ExtensionRangeSelectionOptions extends NodeRangeOptions {
 
 interface MouseFallbackPluginState {
   active: boolean;
-  decorations: DecorationSet;
+  ranges: NodeDecorationRange[];
 }
 
 interface MouseFallbackPluginMeta {
   active?: boolean;
-  decorations?: DecorationSet;
+  ranges?: NodeDecorationRange[];
+}
+
+interface NodeDecorationRange {
+  from: number;
+  to: number;
+}
+
+function nodeDecorationRanges(
+  ranges: readonly { $from: ResolvedPos }[]
+): NodeDecorationRange[] {
+  return ranges.flatMap(({ $from }) => {
+    const node = $from.nodeAfter;
+    return node ? [{ from: $from.pos, to: $from.pos + node.nodeSize }] : [];
+  });
 }
 
 const mouseFallbackPluginKey = new PluginKey<MouseFallbackPluginState>(
@@ -154,7 +166,7 @@ function clampPosition(position: number, range: EditableNodeViewRange) {
 function getMixedSelectionDecorations(state: EditorState) {
   const { doc, selection } = state;
   if (!(selection instanceof TextSelection) || selection.empty) {
-    return DecorationSet.empty;
+    return [];
   }
 
   const decorations: Decoration[] = [];
@@ -165,14 +177,14 @@ function getMixedSelectionDecorations(state: EditorState) {
       pos + node.nodeSize <= selection.to
     ) {
       decorations.push(
-        Decoration.node(pos, pos + node.nodeSize, {
+        Decoration.Node(pos, pos + node.nodeSize, {
           class: "no-selection range-fake-selection",
         })
       );
     }
   });
 
-  return DecorationSet.create(doc, decorations);
+  return decorations;
 }
 
 function getTopLevelNodeStart($pos: ResolvedPos) {
@@ -203,6 +215,35 @@ export const ExtensionRangeSelection =
       return shortcuts;
     },
 
+    addDecorations() {
+      return {
+        create: ({ state }) => {
+          if (isNodeRangeSelection(state.selection)) {
+            return nodeDecorationRanges(state.selection.ranges).map(
+              ({ from, to }) =>
+                Decoration.Node(from, to, {
+                  class: "ProseMirror-selectednoderange",
+                })
+            );
+          }
+
+          const ranges = mouseFallbackPluginKey.getState(state)?.ranges ?? [];
+          if (ranges.length) {
+            return ranges.map(({ from, to }) =>
+              Decoration.Node(from, to, {
+                class: "ProseMirror-selectednoderange",
+              })
+            );
+          }
+          return getMixedSelectionDecorations(state);
+        },
+        shouldUpdate: ({ tr }) =>
+          tr.docChanged ||
+          tr.selectionSet ||
+          tr.getMeta(mouseFallbackPluginKey) !== undefined,
+      };
+    },
+
     addProseMirrorPlugins() {
       let activeView: EditorView | undefined;
       let anchorPos: number | undefined;
@@ -213,7 +254,7 @@ export const ExtensionRangeSelection =
 
       const updatePointerPreview = (view: EditorView) => {
         const { doc, selection, tr } = view.state;
-        let decorations = DecorationSet.empty;
+        let ranges: NodeDecorationRange[] = [];
 
         if (
           movedAcrossPosition &&
@@ -231,19 +272,19 @@ export const ExtensionRangeSelection =
                 tr.setSelection(TextSelection.between($anchor, $head));
               }
             } else {
-              const ranges = getSelectionRanges(
+              const selectionRanges = getSelectionRanges(
                 $anchor.min($head),
                 $anchor.max($head),
                 this.options.depth
               );
-              decorations = getNodeRangeDecorations(ranges);
+              ranges = nodeDecorationRanges(selectionRanges);
             }
           }
         }
 
         tr.setMeta(mouseFallbackPluginKey, {
           active: true,
-          decorations,
+          ranges,
         } satisfies MouseFallbackPluginMeta);
         view.dispatch(tr);
       };
@@ -287,7 +328,7 @@ export const ExtensionRangeSelection =
           }
           tr.setMeta(mouseFallbackPluginKey, {
             active: true,
-            decorations: DecorationSet.empty,
+            ranges: [],
           } satisfies MouseFallbackPluginMeta);
           activeView.dispatch(tr);
           return;
@@ -326,7 +367,7 @@ export const ExtensionRangeSelection =
         const { doc, selection } = view.state;
         const tr = view.state.tr.setMeta(mouseFallbackPluginKey, {
           active: false,
-          decorations: DecorationSet.empty,
+          ranges: [],
         } satisfies MouseFallbackPluginMeta);
 
         if (
@@ -387,7 +428,7 @@ export const ExtensionRangeSelection =
           state: {
             init: () => ({
               active: false,
-              decorations: DecorationSet.empty,
+              ranges: [],
             }),
             apply: (tr, value) => {
               const meta = tr.getMeta(mouseFallbackPluginKey) as
@@ -396,9 +437,14 @@ export const ExtensionRangeSelection =
 
               return {
                 active: meta?.active ?? value.active,
-                decorations:
-                  meta?.decorations ??
-                  value.decorations.map(tr.mapping, tr.doc),
+                ranges:
+                  meta?.ranges ??
+                  value.ranges
+                    .map(({ from, to }) => ({
+                      from: tr.mapping.map(from),
+                      to: tr.mapping.map(to),
+                    }))
+                    .filter(({ from, to }) => to > from),
               };
             },
           },
@@ -406,30 +452,10 @@ export const ExtensionRangeSelection =
             destroy: resetMouseSelection,
           }),
           props: {
-            decorations: (state) => {
-              const { selection } = state;
-              if (isNodeRangeSelection(selection)) {
-                return getNodeRangeDecorations([...selection.ranges]);
-              }
-
-              const pointerDecorations =
-                mouseFallbackPluginKey.getState(state)?.decorations ??
-                DecorationSet.empty;
-              if (pointerDecorations.find().length) {
-                return pointerDecorations;
-              }
-
-              const mixedSelectionDecorations =
-                getMixedSelectionDecorations(state);
-              return mixedSelectionDecorations.find().length
-                ? mixedSelectionDecorations
-                : null;
-            },
             attributes: (state) => {
               const isNodeRange = isNodeRangeSelection(state.selection);
               const hasPointerPreview = Boolean(
-                mouseFallbackPluginKey.getState(state)?.decorations.find()
-                  .length
+                mouseFallbackPluginKey.getState(state)?.ranges.length
               );
 
               return {
@@ -477,7 +503,7 @@ export const ExtensionRangeSelection =
                   isNativeTextSelectionTarget(view, event.target);
                 const tr = view.state.tr.setMeta(mouseFallbackPluginKey, {
                   active: true,
-                  decorations: DecorationSet.empty,
+                  ranges: [],
                 } satisfies MouseFallbackPluginMeta);
                 if (editableNodeViewRange) {
                   tr.setSelection(

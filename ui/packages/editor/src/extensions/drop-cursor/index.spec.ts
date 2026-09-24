@@ -12,10 +12,16 @@ import {
 import Paragraph from "@tiptap/extension-paragraph";
 import Text from "@tiptap/extension-text";
 import { afterEach, describe, expect, it } from "vite-plus/test";
-import { Editor, type JSONContent, type PMNode } from "@/tiptap";
+import { resolveHaloEditorIndentationSettings } from "@/editor-metadata/indentation";
+import { Editor, Extension, type JSONContent, type PMNode } from "@/tiptap";
 import { NodeSelection } from "@/tiptap/pm";
 import { ExtensionIndent, type ExtensionIndentOptions } from "../indent";
-import { computeIndentDropPreview, ExtensionDropcursor } from "./index";
+import {
+  computeIndentDropPreview,
+  createIndentDropCursorPlugin,
+  ExtensionDropcursor,
+  INDENT_DROP_CURSOR_KEY,
+} from "./index";
 
 const editors: Editor[] = [];
 
@@ -24,6 +30,40 @@ afterEach(() => {
 });
 
 describe("ExtensionDropcursor", () => {
+  it("preserves decorations for standalone plugin factory consumers", () => {
+    const settings = resolveHaloEditorIndentationSettings({
+      indentRange: 24,
+      minIndentLevel: 0,
+      maxIndentLevel: null,
+      defaultIndentLevel: 0,
+    });
+    const editor = new Editor({
+      extensions: [
+        Document,
+        Paragraph,
+        Text,
+        Extension.create({
+          name: "standaloneDropCursor",
+          addProseMirrorPlugins() {
+            return [createIndentDropCursorPlugin(() => settings)];
+          },
+        }),
+      ],
+      content: "<p>Target</p>",
+    });
+    editors.push(editor);
+
+    editor.view.dispatch(
+      editor.state.tr.setMeta(INDENT_DROP_CURSOR_KEY, {
+        type: "preview",
+        preview: { pos: 0, level: 0, ...settings },
+      })
+    );
+    expect(
+      editor.view.dom.querySelector(".halo-indent-dropcursor")
+    ).not.toBeNull();
+  });
+
   it("offers every indentation level up to the adjacent target", () => {
     const editor = createEditor();
     mockInternalDrag(editor);

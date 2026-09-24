@@ -1,3 +1,4 @@
+import { Decoration } from "@tiptap/core";
 import { Dropcursor, type DropcursorOptions } from "@tiptap/extensions";
 import {
   clampIndentLevel,
@@ -9,7 +10,7 @@ import {
   type HaloEditorIndentationSettings,
 } from "@/editor-metadata/indentation";
 import {
-  Decoration,
+  Decoration as PMDecoration,
   DecorationSet,
   dropPoint,
   NodeSelection,
@@ -53,11 +54,37 @@ export const INDENT_DROP_CURSOR_KEY = new PluginKey<IndentDropPreview | null>(
 );
 
 export const ExtensionDropcursor = Dropcursor.extend<DropcursorOptions>({
+  addDecorations() {
+    return {
+      create: ({ state }) => {
+        const preview = INDENT_DROP_CURSOR_KEY.getState(state);
+        if (!preview) {
+          return [];
+        }
+        return [
+          Decoration.Widget(
+            preview.pos,
+            () => createDropCursorElement(preview, this.options),
+            {
+              key: `halo-indent-dropcursor-${preview.level}-${
+                preview.listItemDrop?.insertPos ?? "root"
+              }`,
+              side: -1,
+            }
+          ),
+        ];
+      },
+      shouldUpdate: ({ tr }) =>
+        tr.docChanged || tr.getMeta(INDENT_DROP_CURSOR_KEY) !== undefined,
+    };
+  },
+
   addProseMirrorPlugins() {
     return [
-      createIndentDropCursorPlugin(
+      createIndentDropCursorStatePlugin(
         () => getHaloEditorIndentationSettings(this.editor),
-        this.options
+        this.options,
+        true
       ),
     ];
   },
@@ -70,6 +97,18 @@ export const ExtensionDropcursor = Dropcursor.extend<DropcursorOptions>({
 export function createIndentDropCursorPlugin(
   getIndentationSettings: () => HaloEditorIndentationSettings,
   options: Partial<DropcursorOptions> = {}
+) {
+  return createIndentDropCursorStatePlugin(
+    getIndentationSettings,
+    options,
+    false
+  );
+}
+
+function createIndentDropCursorStatePlugin(
+  getIndentationSettings: () => HaloEditorIndentationSettings,
+  options: Partial<DropcursorOptions>,
+  useDecorationsApi: boolean
 ) {
   return new Plugin<IndentDropPreview | null>({
     key: INDENT_DROP_CURSOR_KEY,
@@ -145,6 +184,28 @@ export function createIndentDropCursorPlugin(
       return tr.setMeta(DROP_INDENT_TRANSACTION_META, true);
     },
     props: {
+      // Standalone users of the exported plugin factory retain its original
+      // decoration behavior. Halo's extension uses addDecorations instead.
+      ...(!useDecorationsApi && {
+        decorations(state: EditorState) {
+          const preview = INDENT_DROP_CURSOR_KEY.getState(state);
+          if (!preview) {
+            return null;
+          }
+          return DecorationSet.create(state.doc, [
+            PMDecoration.widget(
+              preview.pos,
+              () => createDropCursorElement(preview, options),
+              {
+                key: `halo-indent-dropcursor-${preview.level}-${
+                  preview.listItemDrop?.insertPos ?? "root"
+                }`,
+                side: -1,
+              }
+            ),
+          ]);
+        },
+      }),
       handleDrop(view, event, slice, moved) {
         // Dragover events can be throttled while crossing deeply nested rows.
         // Resolve the final pointer position again at drop time so an older
@@ -165,24 +226,6 @@ export function createIndentDropCursorPlugin(
           moved,
           preview
         );
-      },
-      decorations(state) {
-        const preview = INDENT_DROP_CURSOR_KEY.getState(state);
-        if (!preview) {
-          return null;
-        }
-        return DecorationSet.create(state.doc, [
-          Decoration.widget(
-            preview.pos,
-            () => createDropCursorElement(preview, options),
-            {
-              key: `halo-indent-dropcursor-${preview.level}-${
-                preview.listItemDrop?.insertPos ?? "root"
-              }`,
-              side: -1,
-            }
-          ),
-        ]);
       },
       handleDOMEvents: {
         dragover(view, event) {
