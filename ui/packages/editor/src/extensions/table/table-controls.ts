@@ -1,10 +1,8 @@
-import { Extension, type Editor } from "@tiptap/core";
+import { Decoration, Extension, type Editor } from "@tiptap/core";
 import { i18n } from "@/locales";
 import {
   addColumnAfter,
   addRowAfter,
-  Decoration,
-  DecorationSet,
   Plugin,
   PluginKey,
   TableMap,
@@ -39,6 +37,188 @@ interface DragState {
 export const TableControls = Extension.create({
   name: "haloTableControls",
 
+  addDecorations() {
+    return {
+      create: ({ state }) => {
+        const table = findTable(state.selection);
+        if (!table) {
+          return [];
+        }
+
+        const decorations: Decoration[] = [];
+        const map = TableMap.get(table.node);
+        const columnAnchors = Array.from(
+          { length: map.width },
+          (_, index) => table.start + map.map[index]
+        );
+        const rowAnchors = Array.from(
+          { length: map.height },
+          (_, index) => table.start + map.map[index * map.width]
+        );
+
+        columnAnchors.forEach((pos, index) => {
+          const selected = isColumnSelected(index)(state.selection);
+          if (index === 0) {
+            decorations.push(
+              Decoration.Widget(
+                pos + 1,
+                () =>
+                  createControl({
+                    control: "add-column-before",
+                    index,
+                    label: i18n.global.t(
+                      "editor.menus.table.add_column_before"
+                    ),
+                    className: [
+                      "table-add-control",
+                      "table-add-column",
+                      "table-add-leading",
+                    ],
+                  }),
+                {
+                  key: `table-add-column-before-${table.pos}`,
+                  side: -1,
+                }
+              )
+            );
+          }
+          decorations.push(
+            Decoration.Widget(
+              pos + 1,
+              () =>
+                createControl({
+                  control: "column",
+                  index,
+                  label: i18n.global.t("editor.menus.table.select_column", {
+                    index: index + 1,
+                  }),
+                  className: [
+                    "grip-column",
+                    index === 0 ? "first" : "",
+                    index === columnAnchors.length - 1 ? "last" : "",
+                    selected ? "selected" : "",
+                  ],
+                  draggable: true,
+                }),
+              {
+                key: `table-column-${table.pos}-${index}-${selected}`,
+                side: -1,
+              }
+            ),
+            Decoration.Widget(
+              pos + 1,
+              () =>
+                createControl({
+                  control: "add-column",
+                  index,
+                  label: i18n.global.t("editor.menus.table.add_column_after"),
+                  className: ["table-add-control", "table-add-column"],
+                }),
+              { key: `table-add-column-${table.pos}-${index}`, side: 1 }
+            )
+          );
+        });
+
+        rowAnchors.forEach((pos, index) => {
+          const selected = isRowSelected(index)(state.selection);
+          if (index === 0) {
+            decorations.push(
+              Decoration.Widget(
+                pos + 1,
+                () =>
+                  createControl({
+                    control: "add-row-before",
+                    index,
+                    label: i18n.global.t("editor.menus.table.add_row_before"),
+                    className: [
+                      "table-add-control",
+                      "table-add-row",
+                      "table-add-leading",
+                    ],
+                  }),
+                {
+                  key: `table-add-row-before-${table.pos}`,
+                  side: -1,
+                }
+              )
+            );
+          }
+          decorations.push(
+            Decoration.Widget(
+              pos + 1,
+              () =>
+                createControl({
+                  control: "row",
+                  index,
+                  label: i18n.global.t("editor.menus.table.select_row", {
+                    index: index + 1,
+                  }),
+                  className: [
+                    "grip-row",
+                    index === 0 ? "first" : "",
+                    index === rowAnchors.length - 1 ? "last" : "",
+                    selected ? "selected" : "",
+                  ],
+                  draggable: true,
+                }),
+              {
+                key: `table-row-${table.pos}-${index}-${selected}`,
+                side: -1,
+              }
+            ),
+            Decoration.Widget(
+              pos + 1,
+              () =>
+                createControl({
+                  control: "add-row",
+                  index,
+                  label: i18n.global.t("editor.menus.table.add_row_after"),
+                  className: ["table-add-control", "table-add-row"],
+                }),
+              { key: `table-add-row-${table.pos}-${index}`, side: 1 }
+            ),
+            Decoration.Widget(
+              pos + 1,
+              () =>
+                createControl({
+                  control: "resize-row",
+                  index,
+                  label: i18n.global.t("editor.menus.table.resize_row", {
+                    index: index + 1,
+                  }),
+                  className: ["row-resize-handle"],
+                }),
+              { key: `table-resize-row-${table.pos}-${index}`, side: 1 }
+            )
+          );
+        });
+
+        if (columnAnchors[0] !== undefined) {
+          const selected = isTableSelected(state.selection);
+          decorations.push(
+            Decoration.Widget(
+              columnAnchors[0] + 1,
+              () =>
+                createControl({
+                  control: "table",
+                  index: 0,
+                  label: i18n.global.t("editor.menus.table.select_table"),
+                  className: ["grip-table", selected ? "selected" : ""],
+                }),
+              {
+                key: `table-grip-${table.pos}-${selected}`,
+                side: -1,
+              }
+            )
+          );
+        }
+
+        return decorations;
+      },
+      shouldUpdate: ({ tr }) => tr.docChanged || tr.selectionSet,
+    };
+  },
+
   addProseMirrorPlugins() {
     const editor = this.editor;
     let activeResizeCleanup: (() => void) | undefined;
@@ -52,187 +232,6 @@ export const TableControls = Extension.create({
       new Plugin({
         key: TABLE_CONTROLS_PLUGIN_KEY,
         props: {
-          decorations(state) {
-            const table = findTable(state.selection);
-            if (!table) {
-              return DecorationSet.empty;
-            }
-
-            const decorations: Decoration[] = [];
-            const map = TableMap.get(table.node);
-            const columnAnchors = Array.from(
-              { length: map.width },
-              (_, index) => table.start + map.map[index]
-            );
-            const rowAnchors = Array.from(
-              { length: map.height },
-              (_, index) => table.start + map.map[index * map.width]
-            );
-
-            columnAnchors.forEach((pos, index) => {
-              const selected = isColumnSelected(index)(state.selection);
-              if (index === 0) {
-                decorations.push(
-                  Decoration.widget(
-                    pos + 1,
-                    () =>
-                      createControl({
-                        control: "add-column-before",
-                        index,
-                        label: i18n.global.t(
-                          "editor.menus.table.add_column_before"
-                        ),
-                        className: [
-                          "table-add-control",
-                          "table-add-column",
-                          "table-add-leading",
-                        ],
-                      }),
-                    {
-                      key: `table-add-column-before-${table.pos}`,
-                      side: -1,
-                    }
-                  )
-                );
-              }
-              decorations.push(
-                Decoration.widget(
-                  pos + 1,
-                  () =>
-                    createControl({
-                      control: "column",
-                      index,
-                      label: i18n.global.t("editor.menus.table.select_column", {
-                        index: index + 1,
-                      }),
-                      className: [
-                        "grip-column",
-                        index === 0 ? "first" : "",
-                        index === columnAnchors.length - 1 ? "last" : "",
-                        selected ? "selected" : "",
-                      ],
-                      draggable: true,
-                    }),
-                  {
-                    key: `table-column-${table.pos}-${index}-${selected}`,
-                    side: -1,
-                  }
-                ),
-                Decoration.widget(
-                  pos + 1,
-                  () =>
-                    createControl({
-                      control: "add-column",
-                      index,
-                      label: i18n.global.t(
-                        "editor.menus.table.add_column_after"
-                      ),
-                      className: ["table-add-control", "table-add-column"],
-                    }),
-                  { key: `table-add-column-${table.pos}-${index}`, side: 1 }
-                )
-              );
-            });
-
-            rowAnchors.forEach((pos, index) => {
-              const selected = isRowSelected(index)(state.selection);
-              if (index === 0) {
-                decorations.push(
-                  Decoration.widget(
-                    pos + 1,
-                    () =>
-                      createControl({
-                        control: "add-row-before",
-                        index,
-                        label: i18n.global.t(
-                          "editor.menus.table.add_row_before"
-                        ),
-                        className: [
-                          "table-add-control",
-                          "table-add-row",
-                          "table-add-leading",
-                        ],
-                      }),
-                    {
-                      key: `table-add-row-before-${table.pos}`,
-                      side: -1,
-                    }
-                  )
-                );
-              }
-              decorations.push(
-                Decoration.widget(
-                  pos + 1,
-                  () =>
-                    createControl({
-                      control: "row",
-                      index,
-                      label: i18n.global.t("editor.menus.table.select_row", {
-                        index: index + 1,
-                      }),
-                      className: [
-                        "grip-row",
-                        index === 0 ? "first" : "",
-                        index === rowAnchors.length - 1 ? "last" : "",
-                        selected ? "selected" : "",
-                      ],
-                      draggable: true,
-                    }),
-                  {
-                    key: `table-row-${table.pos}-${index}-${selected}`,
-                    side: -1,
-                  }
-                ),
-                Decoration.widget(
-                  pos + 1,
-                  () =>
-                    createControl({
-                      control: "add-row",
-                      index,
-                      label: i18n.global.t("editor.menus.table.add_row_after"),
-                      className: ["table-add-control", "table-add-row"],
-                    }),
-                  { key: `table-add-row-${table.pos}-${index}`, side: 1 }
-                ),
-                Decoration.widget(
-                  pos + 1,
-                  () =>
-                    createControl({
-                      control: "resize-row",
-                      index,
-                      label: i18n.global.t("editor.menus.table.resize_row", {
-                        index: index + 1,
-                      }),
-                      className: ["row-resize-handle"],
-                    }),
-                  { key: `table-resize-row-${table.pos}-${index}`, side: 1 }
-                )
-              );
-            });
-
-            if (columnAnchors[0] !== undefined) {
-              const selected = isTableSelected(state.selection);
-              decorations.push(
-                Decoration.widget(
-                  columnAnchors[0] + 1,
-                  () =>
-                    createControl({
-                      control: "table",
-                      index: 0,
-                      label: i18n.global.t("editor.menus.table.select_table"),
-                      className: ["grip-table", selected ? "selected" : ""],
-                    }),
-                  {
-                    key: `table-grip-${table.pos}-${selected}`,
-                    side: -1,
-                  }
-                )
-              );
-            }
-
-            return DecorationSet.create(state.doc, decorations);
-          },
-
           handleDOMEvents: {
             mousedown(view, event) {
               const control = getControl(event.target);

@@ -1,0 +1,123 @@
+diff --git a/dist/index.cjs b/dist/index.cjs
+index 5bb89346860e3c334731755df48cfb72a6a9d3b7..e4c0080c32d0ae70e3441c8aacc6b3945c006781 100644
+--- a/dist/index.cjs
++++ b/dist/index.cjs
+@@ -4,9 +4,7 @@ Object.defineProperties(exports, {
+ });
+ let _tiptap_core = require("@tiptap/core");
+ let _floating_ui_dom = require("@floating-ui/dom");
+-let _tiptap_extension_collaboration = require("@tiptap/extension-collaboration");
+ let _tiptap_pm_state = require("@tiptap/pm/state");
+-let _tiptap_y_tiptap = require("@tiptap/y-tiptap");
+ let _tiptap_extension_node_range = require("@tiptap/extension-node-range");
+ //#region src/helpers/cloneElement.ts
+ function getCSSText(element, properties) {
+@@ -655,16 +653,8 @@ function createDroppedNodeRangeSelection(doc, anchorPos, nodeCount, depth) {
+ }
+ //#endregion
+ //#region src/drag-handle-plugin.ts
+-const getRelativePos = (state, absolutePos) => {
+-	const ystate = _tiptap_y_tiptap.ySyncPluginKey.getState(state);
+-	if (!ystate) return null;
+-	return (0, _tiptap_y_tiptap.absolutePositionToRelativePosition)(absolutePos, ystate.type, ystate.binding.mapping);
+-};
+-const getAbsolutePos = (state, relativePos) => {
+-	const ystate = _tiptap_y_tiptap.ySyncPluginKey.getState(state);
+-	if (!ystate) return -1;
+-	return (0, _tiptap_y_tiptap.relativePositionToAbsolutePosition)(ystate.doc, ystate.type, relativePos, ystate.binding.mapping) || 0;
+-};
++const getRelativePos = () => null;
++const getAbsolutePos = () => -1;
+ const getOuterDomNode = (view, domNode) => {
+ 	let tmpDomNode = domNode;
+ 	while (tmpDomNode === null || tmpDomNode === void 0 ? void 0 : tmpDomNode.parentNode) {
+@@ -691,7 +681,7 @@ const DragHandlePlugin = ({ pluginKey = dragHandlePluginDefaultKey, element, edi
+ 	function remapPendingRestore(tr, state) {
+ 		if (!pendingRestore) return;
+ 		pendingRestore = mapPendingRestoreAnchor(pendingRestore, tr, {
+-			isChangeOrigin: (0, _tiptap_extension_collaboration.isChangeOrigin)(tr),
++			isChangeOrigin: false,
+ 			getAbsolutePos: (relativePos) => getAbsolutePos(state, relativePos)
+ 		});
+ 	}
+@@ -812,15 +802,10 @@ const DragHandlePlugin = ({ pluginKey = dragHandlePluginDefaultKey, element, edi
+ 						return value;
+ 					}
+ 					if (tr.docChanged && currentNodePos !== -1 && element) {
+-						if ((0, _tiptap_extension_collaboration.isChangeOrigin)(tr)) {
+-							const newPos = getAbsolutePos(state, currentNodeRelPos);
+-							if (newPos !== currentNodePos) currentNodePos = newPos;
+-						} else {
+-							const newPos = tr.mapping.map(currentNodePos);
+-							if (newPos !== currentNodePos) {
+-								currentNodePos = newPos;
+-								currentNodeRelPos = getRelativePos(state, currentNodePos);
+-							}
++						const newPos = tr.mapping.map(currentNodePos);
++						if (newPos !== currentNodePos) {
++							currentNodePos = newPos;
++							currentNodeRelPos = getRelativePos(state, currentNodePos);
+ 						}
+ 					}
+ 					return value;
+diff --git a/dist/index.js b/dist/index.js
+index 48ce5bafcbf764d8bfe8dde7c0d8c679317e7e1a..94442ff74e8bc18d1c91f0d34712a7bc3edeb4c1 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -1,8 +1,6 @@
+ import { Extension, isFirefox } from "@tiptap/core";
+ import { computePosition } from "@floating-ui/dom";
+-import { isChangeOrigin } from "@tiptap/extension-collaboration";
+ import { NodeSelection, Plugin, PluginKey } from "@tiptap/pm/state";
+-import { absolutePositionToRelativePosition, relativePositionToAbsolutePosition, ySyncPluginKey } from "@tiptap/y-tiptap";
+ import { NodeRangeSelection, getSelectionRanges, isNodeRangeSelection } from "@tiptap/extension-node-range";
+ //#region src/helpers/cloneElement.ts
+ function getCSSText(element, properties) {
+@@ -651,16 +649,8 @@ function createDroppedNodeRangeSelection(doc, anchorPos, nodeCount, depth) {
+ }
+ //#endregion
+ //#region src/drag-handle-plugin.ts
+-const getRelativePos = (state, absolutePos) => {
+-	const ystate = ySyncPluginKey.getState(state);
+-	if (!ystate) return null;
+-	return absolutePositionToRelativePosition(absolutePos, ystate.type, ystate.binding.mapping);
+-};
+-const getAbsolutePos = (state, relativePos) => {
+-	const ystate = ySyncPluginKey.getState(state);
+-	if (!ystate) return -1;
+-	return relativePositionToAbsolutePosition(ystate.doc, ystate.type, relativePos, ystate.binding.mapping) || 0;
+-};
++const getRelativePos = () => null;
++const getAbsolutePos = () => -1;
+ const getOuterDomNode = (view, domNode) => {
+ 	let tmpDomNode = domNode;
+ 	while (tmpDomNode === null || tmpDomNode === void 0 ? void 0 : tmpDomNode.parentNode) {
+@@ -687,7 +677,7 @@ const DragHandlePlugin = ({ pluginKey = dragHandlePluginDefaultKey, element, edi
+ 	function remapPendingRestore(tr, state) {
+ 		if (!pendingRestore) return;
+ 		pendingRestore = mapPendingRestoreAnchor(pendingRestore, tr, {
+-			isChangeOrigin: isChangeOrigin(tr),
++			isChangeOrigin: false,
+ 			getAbsolutePos: (relativePos) => getAbsolutePos(state, relativePos)
+ 		});
+ 	}
+@@ -808,15 +798,10 @@ const DragHandlePlugin = ({ pluginKey = dragHandlePluginDefaultKey, element, edi
+ 						return value;
+ 					}
+ 					if (tr.docChanged && currentNodePos !== -1 && element) {
+-						if (isChangeOrigin(tr)) {
+-							const newPos = getAbsolutePos(state, currentNodeRelPos);
+-							if (newPos !== currentNodePos) currentNodePos = newPos;
+-						} else {
+-							const newPos = tr.mapping.map(currentNodePos);
+-							if (newPos !== currentNodePos) {
+-								currentNodePos = newPos;
+-								currentNodeRelPos = getRelativePos(state, currentNodePos);
+-							}
++						const newPos = tr.mapping.map(currentNodePos);
++						if (newPos !== currentNodePos) {
++							currentNodePos = newPos;
++							currentNodeRelPos = getRelativePos(state, currentNodePos);
+ 						}
+ 					}
+ 					return value;

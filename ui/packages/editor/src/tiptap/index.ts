@@ -1,6 +1,8 @@
 export * from "./core";
+export { Decoration as TiptapDecoration } from "./core";
 export { Editor, MarkView, type MarkType, type NodeType } from "./core";
 export * from "./pm";
+export { Decoration } from "./pm";
 export {
   Fragment,
   InputRule as PMInputRule,
