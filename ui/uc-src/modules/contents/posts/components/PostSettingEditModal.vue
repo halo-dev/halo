@@ -60,7 +60,6 @@ async function onSubmit(data: PostFormState) {
         autoGenerate: data.excerptAutoGenerate,
         raw: data.excerptRaw,
       },
-      pinned: data.pinned,
       publishTime: data.publishTime,
       slug: data.slug,
       tags: data.tags,
@@ -94,7 +93,6 @@ async function onSubmit(data: PostFormState) {
         tags: post.spec.tags,
         allowComment: post.spec.allowComment,
         visible: post.spec.visible,
-        pinned: post.spec.pinned,
         publishTime: post.spec.publishTime
           ? utils.date.toDatetimeLocal(post.spec.publishTime)
           : undefined,

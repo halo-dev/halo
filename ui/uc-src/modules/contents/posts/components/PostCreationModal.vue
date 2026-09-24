@@ -64,9 +64,9 @@ const { mutate, isLoading } = useMutation({
           raw: data.excerptRaw,
         },
         htmlMetas: [],
-        pinned: data.pinned,
+        pinned: false,
         priority: 0,
-        publish: props.publish,
+        publish: false,
         publishTime: data.publishTime,
         slug: data.slug,
         tags: data.tags,
@@ -142,7 +142,6 @@ async function onSubmit(data: PostFormState) {
         slug: props.post.spec.slug,
         allowComment: props.post.spec.allowComment,
         visible: props.post.spec.visible,
-        pinned: props.post.spec.pinned,
         excerptAutoGenerate: props.post.spec.excerpt.autoGenerate,
       }"
       @submit="onSubmit"
