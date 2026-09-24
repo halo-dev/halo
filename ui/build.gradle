@@ -39,40 +39,28 @@ tasks.named('assemble') {
 }
 
 tasks.register('doBuild', PnpmTask) {
-  dependsOn tasks.named('buildPackages')
+  dependsOn tasks.named('pnpmInstall')
   pnpmCommand = ['run', 'build']
   inputs.files(fileTree(layout.projectDirectory) {
-    include 'console-src/**', 'uc-src/**', 'src/**', 'public/**', '*.js', '*.json', '*.yaml', '*.html'
+    include 'console-src/**', 'uc-src/**', 'src/**', 'public/**', 'packages/**', '*.js', '*.json', '*.yaml', '*.html'
     exclude '**/node_modules/**', '**/build/**', '**/dist/**'
   })
   outputs.dir(layout.buildDirectory.dir('dist'))
 }
 
-tasks.register('buildPackages', PnpmTask) {
-  dependsOn tasks.named('pnpmInstall')
-  inputs.files(fileTree('packages') {
-    exclude '**/node_modules/**', '**/dist/**'
-  })
-  inputs.file('package.json')
-  pnpmCommand = ['run', 'build:packages']
-  outputs.files(fileTree('packages') {
-    include '*/dist/**'
-  })
-}
-
 tasks.register('test', PnpmTask) {
-  dependsOn tasks.named('buildPackages')
+  dependsOn tasks.named('pnpmInstall')
   pnpmCommand = ['run', 'test:unit']
   shouldRunAfter tasks.named('lint'), tasks.named('typecheck')
 }
 
 tasks.register('lint', PnpmTask) {
-  dependsOn tasks.named('buildPackages')
+  dependsOn tasks.named('pnpmInstall')
   pnpmCommand = ['run', 'lint']
 }
 
 tasks.register('typecheck', PnpmTask) {
-  dependsOn tasks.named('buildPackages')
+  dependsOn tasks.named('pnpmInstall')
   pnpmCommand = ['run', 'typecheck']
 }
 
@@ -81,6 +69,6 @@ tasks.named('check') {
 }
 
 tasks.register('dev', PnpmTask) {
-  dependsOn tasks.named('buildPackages')
+  dependsOn tasks.named('pnpmInstall')
   pnpmCommand = ['run', 'dev']
 }
