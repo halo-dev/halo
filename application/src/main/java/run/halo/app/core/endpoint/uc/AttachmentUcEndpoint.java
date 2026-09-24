@@ -148,18 +148,10 @@ public class AttachmentUcEndpoint implements CustomEndpoint {
     }
 
     private Mono<ServerResponse> uploadAttachment(ServerRequest request) {
-        var getConfigFromUser = systemSettingFetcher
-                .fetch(SystemSetting.User.GROUP, SystemSetting.User.class)
-                .mapNotNull(SystemSetting.User::getUcAttachmentPolicy)
-                .filter(StringUtils::isNotBlank)
-                .map(policyName -> SystemSetting.Attachment.UploadOptions.builder()
-                        .policyName(policyName)
-                        .build());
         var getConfig = systemSettingFetcher
                 .fetch(SystemSetting.Attachment.GROUP, SystemSetting.Attachment.class)
                 .mapNotNull(SystemSetting.Attachment::uc)
                 .filter(uo -> StringUtils.isNotBlank(uo.policyName()))
-                .switchIfEmpty(Mono.defer(() -> getConfigFromUser))
                 .switchIfEmpty(Mono.error(
                         () -> new UnsatisfiedAttributeValueException("problemDetail.attachment.settingsMissing")));
         return attachmentHandler.handleUpload(request, getConfig);

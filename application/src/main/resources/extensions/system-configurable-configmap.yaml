@@ -7,9 +7,7 @@ data:
     {
       "allowRegistration": false,
       "mustVerifyEmailOnRegistration": false,
-      "defaultRole": "guest",
-      "avatarPolicy": "default-policy",
-      "ucAttachmentPolicy": "default-policy"
+      "defaultRole": "guest"
     }
   attachment: |
     {

@@ -152,16 +152,6 @@ spec:
           multiple: true
           if: "$get(allowRegistration).value === true"
           help: 选择注册时需要用户同意的协议页面
-        - $formkit: attachmentPolicySelect
-          name: avatarPolicy
-          label: "头像存储位置"
-          value: "default-policy"
-          help: 指定用户上传头像的存储策略（已过时，请使用附件配置中的头像附件配置）
-        - $formkit: attachmentPolicySelect
-          name: ucAttachmentPolicy
-          label: "个人中心附件存储位置"
-          value: "default-policy"
-          help: 指定用户在个人中心上传的附件的存储位置（已过时，请使用附件配置中的个人中心附件配置）
     - group: attachment
       label: 附件配置
       formSchema:

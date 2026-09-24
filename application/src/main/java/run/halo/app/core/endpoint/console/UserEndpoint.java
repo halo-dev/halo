@@ -417,16 +417,11 @@ public class UserEndpoint implements CustomEndpoint {
     }
 
     private Mono<Attachment> uploadAvatar(AvatarUploadRequest uploadRequest) {
-        var fallbackSetting = environmentFetcher
-                .fetch(SystemSetting.User.GROUP, SystemSetting.User.class)
-                .mapNotNull(SystemSetting.User::getAvatarPolicy)
-                .filter(StringUtils::isNotBlank);
         var getAvatarPolicy = environmentFetcher
                 .fetch(SystemSetting.Attachment.GROUP, SystemSetting.Attachment.class)
                 .mapNotNull(SystemSetting.Attachment::avatar)
                 .mapNotNull(UploadOptions::policyName)
                 .filter(StringUtils::isNotBlank)
-                .switchIfEmpty(fallbackSetting)
                 .defaultIfEmpty(DEFAULT_USER_AVATAR_ATTACHMENT_POLICY_NAME);
         return getAvatarPolicy.flatMap(avatarPolicy -> {
             FilePart filePart = uploadRequest.getFile();
