@@ -16,6 +16,47 @@ const DEV_SERVER_PORT = 3000;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig(({ command, mode }) => ({
+  run: {
+    tasks: {
+      "app:dev": {
+        command: "vp dev . --host",
+        dependsOn: ["build:packages"],
+        cache: false,
+      },
+      "app:build": {
+        command: "vp build",
+        dependsOn: ["build:packages"],
+      },
+      "app:test:unit": {
+        command:
+          "vp test --run && vp run --parallel --filter @halo-dev/* test:unit",
+        dependsOn: ["build:packages"],
+        cache: false,
+      },
+      "app:test:unit:watch": {
+        command: "vp test --watch",
+        dependsOn: ["build:packages"],
+        cache: false,
+      },
+      "app:test:unit:ui": {
+        command: "vp test --watch --ui",
+        dependsOn: ["build:packages"],
+        cache: false,
+      },
+      "app:typecheck": {
+        command:
+          "vue-tsc --noEmit -p tsconfig.app.json --composite false && vp run --parallel --filter @halo-dev/* typecheck",
+        dependsOn: ["build:packages"],
+        cache: false,
+      },
+      "app:lint": {
+        command:
+          "eslint . --max-warnings=0 -f html -o build/lint-result/index.html",
+        dependsOn: ["build:packages"],
+        cache: false,
+      },
+    },
+  },
   plugins: [
     Vue(),
     VueJsx(),

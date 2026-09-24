@@ -6,19 +6,19 @@ install: ## Install console
 build-packages: install ## Build packages of console
 	pnpm build:packages
 
-build: build-packages ## Build console
+build: install ## Build console
 	pnpm build
 
-lint: build-packages ## Lint console
+lint: install ## Lint console
 	pnpm lint
 	pnpm typecheck
 
-test: build-packages ## Test console
+test: install ## Test console
 	pnpm test:unit
 
 check: lint test ## Check console
 
-dev: build-packages ## Run console with development environment
+dev: install ## Run console with development environment
 	pnpm dev
 
 api-client-gen: install ## Generate API client

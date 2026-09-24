@@ -80,7 +80,6 @@ Frontend checks (in `ui`):
 ```bash
 cd ui
 pnpm install
-pnpm build:packages
 pnpm lint
 pnpm typecheck
 pnpm test:unit
