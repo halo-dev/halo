@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,6 +26,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.content.PostService;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.SinglePage;
+import run.halo.app.core.user.service.RoleService;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.AnonymousUserConst;
@@ -60,6 +62,9 @@ class PreviewRouterFunctionTest {
 
     @Mock
     PostService postService;
+
+    @Mock
+    RoleService roleService;
 
     @Mock
     SinglePageConversionService singlePageConversionService;
@@ -119,6 +124,35 @@ class PreviewRouterFunctionTest {
     }
 
     @Test
+    @WithMockUser(username = "admin", authorities = "ROLE_role-template-view-posts")
+    void previewPostWithViewPermission() {
+        when(viewResolver.resolveViewName(any(), any())).thenReturn(Mono.just(new EmptyView()));
+
+        Post post = new Post();
+        post.setMetadata(new Metadata());
+        post.getMetadata().setName("post1");
+        post.setSpec(new Post.PostSpec());
+        post.getSpec().setHeadSnapshot("snapshot1");
+        when(client.fetch(Post.class, "post1")).thenReturn(Mono.just(post));
+
+        PostVo postVo = PostVo.from(post);
+        postVo.setContributors(
+                List.of(ContributorVo.builder().name("other-user").build()));
+        when(postPublicQueryService.convertToVo(post, "snapshot1")).thenReturn(Mono.just(postVo));
+        when(roleService.contains(Set.of("role-template-view-posts"), Set.of("role-template-view-posts")))
+                .thenReturn(Mono.just(true));
+        when(postViewNameResolver.resolveViewNameOrDefault(any(ServerRequest.class), eq(postVo)))
+                .thenReturn(Mono.just("postView"));
+
+        webTestClient
+                .get()
+                .uri("/preview/posts/post1")
+                .exchange()
+                .expectStatus()
+                .isOk();
+    }
+
+    @Test
     public void previewPostWhenUnAuthenticated() {
         webTestClient
                 .get()
@@ -163,6 +197,35 @@ class PreviewRouterFunctionTest {
 
         verify(viewResolver).resolveViewName(any(), any());
         verify(client).fetch(eq(SinglePage.class), eq("page1"));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", authorities = "ROLE_role-template-view-singlepages")
+    void previewSinglePageWithViewPermission() {
+        when(viewResolver.resolveViewName(any(), any())).thenReturn(Mono.just(new EmptyView()));
+
+        SinglePage singlePage = new SinglePage();
+        singlePage.setMetadata(new Metadata());
+        singlePage.getMetadata().setName("page1");
+        singlePage.setSpec(new SinglePage.SinglePageSpec());
+        singlePage.getSpec().setHeadSnapshot("snapshot1");
+        when(client.fetch(SinglePage.class, "page1")).thenReturn(Mono.just(singlePage));
+
+        SinglePageVo singlePageVo = SinglePageVo.from(singlePage);
+        singlePageVo.setContributors(
+                List.of(ContributorVo.builder().name("other-user").build()));
+        when(singlePageConversionService.convertToVo(singlePage, "snapshot1")).thenReturn(Mono.just(singlePageVo));
+        when(roleService.contains(Set.of("role-template-view-singlepages"), Set.of("role-template-view-singlepages")))
+                .thenReturn(Mono.just(true));
+        when(viewNameResolver.resolveViewNameOrDefault(any(ServerRequest.class), any(), eq("page")))
+                .thenReturn(Mono.just("pageView"));
+
+        webTestClient
+                .get()
+                .uri("/preview/singlepages/page1")
+                .exchange()
+                .expectStatus()
+                .isOk();
     }
 
     @Test
