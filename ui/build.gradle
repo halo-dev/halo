@@ -51,7 +51,7 @@ tasks.register('doBuild', PnpmTask) {
 tasks.register('test', PnpmTask) {
   dependsOn tasks.named('pnpmInstall')
   pnpmCommand = ['run', 'test:unit']
-  shouldRunAfter tasks.named('lint'), tasks.named('typecheck')
+  mustRunAfter tasks.named('lint'), tasks.named('typecheck')
 }
 
 tasks.register('lint', PnpmTask) {
@@ -62,6 +62,7 @@ tasks.register('lint', PnpmTask) {
 tasks.register('typecheck', PnpmTask) {
   dependsOn tasks.named('pnpmInstall')
   pnpmCommand = ['run', 'typecheck']
+  mustRunAfter tasks.named('lint')
 }
 
 tasks.named('check') {
