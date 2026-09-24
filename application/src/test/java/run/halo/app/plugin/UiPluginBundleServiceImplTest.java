@@ -62,6 +62,34 @@ class UiPluginBundleServiceImplTest {
     }
 
     @Test
+    void shouldInspectInactiveThemeResourcesUsingTheRuntimeManifestRules() throws Exception {
+        var theme = prepareActiveTheme("inactive", "1.0.0");
+        assertThat(service.getThemeUiResources(theme).block().kind()).isEqualTo("none");
+        writeThemeUiFile("inactive", "style.css", "body {}");
+        var styleOnly = service.getThemeUiResources(theme).block();
+        assertThat(styleOnly.kind()).isEqualTo("legacy");
+        assertThat(styleOnly.entry()).isNull();
+        assertThat(styleOnly.style()).isEqualTo("style.css");
+        writeThemeUiFile("inactive", "chunks/entry.js", "export default {};");
+        writeThemeUiFile("inactive", "ui-plugin.json", "{\"format\":\"esm\",\"entry\":\"./chunks/entry.js\"}");
+        var esm = service.getThemeUiResources(theme).block();
+        assertThat(esm.kind()).isEqualTo("esm");
+        assertThat(esm.entry()).isEqualTo("chunks/entry.js");
+        assertThat(esm.style()).isNull();
+        writeThemeUiFile("inactive", "ui-plugin.json", "{\"format\":\"esm\",\"entry\":\"../escape.js\"}");
+        assertThat(service.getThemeUiResources(theme).block().kind()).isEqualTo("invalid");
+    }
+
+    @Test
+    void shouldRejectThemeUiResourcesLinkedOutsideTheirDirectory() throws Exception {
+        var theme = prepareActiveTheme("linked", "1.0.0");
+        var outside = Files.writeString(tempDir.resolve("outside.js"), "export default {};");
+        writeThemeUiFile("linked", "ui-plugin.json", "{\"format\":\"esm\",\"entry\":\"./entry.js\"}");
+        Files.createSymbolicLink(tempDir.resolve("themes/linked/ui-plugin/dist/entry.js"), outside);
+        assertThat(service.getThemeUiResources(theme).block().kind()).isEqualTo("invalid");
+    }
+
+    @Test
     void shouldBuildVersionedLegacyDescriptorFromStartedPluginsAndActivatedTheme() throws Exception {
         var plugin = mockClasspathPlugin("legacy-plugin", "plugin/plugin-for-ui-assets");
         when(pluginManager.startedPlugins()).thenReturn(List.of(plugin));
