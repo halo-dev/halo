@@ -293,7 +293,10 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
                                 && Objects.equals(
                                         ownerIdentity(owner.getKind(), owner.getName()),
                                         ownerIdentity(User.KIND, username));
-                        boolean hasPermission = (!commentHidden) || (hasViewPermission || isCommentOwner);
+                        boolean hasPermission = (!commentHidden
+                                        && Boolean.TRUE.equals(comment.getSpec().getApproved()))
+                                || hasViewPermission
+                                || isCommentOwner;
                         if (ExtensionUtil.isDeleted(comment) || !hasPermission) {
                             return Mono.error(
                                     new UnsatisfiedAttributeValueException("problemDetail.comment.unavailable"));
@@ -309,7 +312,9 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
                     if (isAnonymous) {
                         builder.andQuery(visibleQuery);
                     } else if (!(hasViewPermission || (commentHidden && isCommentOwner))) {
-                        builder.andQuery(or(equal("spec.owner", ownerIdentity(User.KIND, username)), visibleQuery));
+                        builder.andQuery(or(
+                                equal("spec.owner", ownerIdentity(User.KIND, username)),
+                                isCommentOwner ? equal("spec.approved", BooleanUtils.TRUE) : visibleQuery));
                     }
                     // View all replies if the user is not an anonymous user, has view permission
                     // or is the comment owner.

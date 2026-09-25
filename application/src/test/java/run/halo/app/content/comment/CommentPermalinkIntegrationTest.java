@@ -140,6 +140,7 @@ class CommentPermalinkIntegrationTest {
         "unrelated,    true,  false, false, true,  404",
         "reply-owner,  true,  false, false, true,  200",
         "reply-owner,  true,  true,  true,  false, 404",
+        "thread-owner, true,  false, true,  true,  200",
         "thread-owner, true,  true,  false, true,  200",
         "thread-owner, true,  false, false, true,  404",
         "moderator,    false, true,  false, true,  200"
@@ -191,6 +192,150 @@ class CommentPermalinkIntegrationTest {
         reply = client.update(reply).block();
         comment = client.delete(comment).block();
         http.get().uri(REPLY_API + "permalink-reply").exchange().expectStatus().isNotFound();
+    }
+
+    @Test
+    void replyListRequiresVisibleParent() {
+        comment.getSpec().setApproved(false);
+        comment = client.update(comment).block();
+
+        http.get()
+                .uri("/apis/api.halo.run/v1alpha1/comments/permalink-comment/reply")
+                .exchange()
+                .expectStatus()
+                .is4xxClientError();
+    }
+
+    @Test
+    void privateReplyIsAbsentFromPublicCommentTree() {
+        var treePost = JsonUtils.deepCopy(post);
+        treePost.setMetadata(metadata("private-tree-post"));
+        save(treePost);
+        var treeComment = JsonUtils.deepCopy(comment);
+        treeComment.setMetadata(metadata("private-tree-comment"));
+        treeComment.getSpec().setSubjectRef(Ref.of(treePost));
+        treeComment.getSpec().getOwner().setName("privacy-thread-owner");
+        save(treeComment);
+        var privateReply = JsonUtils.deepCopy(reply);
+        privateReply.setMetadata(metadata("private-tree-reply"));
+        privateReply.getSpec().setCommentName("private-tree-comment");
+        privateReply.getSpec().setHidden(true);
+        save(privateReply);
+        var visible = JsonUtils.deepCopy(privateReply);
+        visible.setMetadata(metadata("visible-reply"));
+        visible.getSpec().setHidden(false);
+        visible.getSpec().setContent("<p>Visible reply</p>");
+        save(visible);
+        var pending = JsonUtils.deepCopy(visible);
+        pending.setMetadata(metadata("pending-reply"));
+        pending.getSpec().setApproved(false);
+        save(pending);
+
+        var listUrl = "/apis/api.halo.run/v1alpha1/comments/private-tree-comment/reply";
+
+        http.get()
+                .uri(listUrl + "?page=1&size=1")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.total")
+                .isEqualTo(1)
+                .jsonPath("$.items.length()")
+                .isEqualTo(1)
+                .jsonPath("$.items[0].metadata.name")
+                .isEqualTo("visible-reply");
+        http.get()
+                .uri(listUrl + "?page=2&size=1")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.items.length()")
+                .isEqualTo(0);
+        http.get()
+                .uri(listUrl + "/private-tree-reply")
+                .exchange()
+                .expectStatus()
+                .isNotFound();
+        http.get()
+                .uri("/apis/content.halo.run/v1alpha1/replies/private-tree-reply")
+                .exchange()
+                .expectStatus()
+                .isFound();
+        http.get()
+                .uri("/apis/api.console.halo.run/v1alpha1/replies?commentName=private-tree-comment")
+                .exchange()
+                .expectStatus()
+                .isFound();
+        http.get()
+                .uri(
+                        "/apis/api.halo.run/v1alpha1/comments?group=content.halo.run&version=v1alpha1&kind=Post&name=private-tree-post&withReplies=true")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.items[0].replies.total")
+                .isEqualTo(1)
+                .jsonPath("$.items[0].replies.items.length()")
+                .isEqualTo(1)
+                .jsonPath("$.items[0].replies.items[0].metadata.name")
+                .isEqualTo("visible-reply");
+
+        createUser("privacy-thread-owner");
+        http.get()
+                .uri(listUrl)
+                .headers(headers -> headers.setBasicAuth("privacy-thread-owner", "permalink-test"))
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.total")
+                .isEqualTo(2);
+        createUser("privacy-unrelated");
+        http.get()
+                .uri(listUrl)
+                .headers(headers -> headers.setBasicAuth("privacy-unrelated", "permalink-test"))
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.total")
+                .isEqualTo(1);
+        createUser("privacy-moderator");
+        save(RoleBinding.create("privacy-moderator", "role-template-view-comments"));
+        http.get()
+                .uri(listUrl)
+                .headers(headers -> headers.setBasicAuth("privacy-moderator", "permalink-test"))
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.total")
+                .isEqualTo(3);
+    }
+
+    @Test
+    void changingParentVisibilityImmediatelyRestrictsReplyList() {
+        var listUrl = "/apis/api.halo.run/v1alpha1/comments/permalink-comment/reply";
+        comment.getSpec().setHidden(true);
+        comment = client.update(comment).block();
+        http.get().uri(listUrl).exchange().expectStatus().is4xxClientError();
+
+        comment.getSpec().setHidden(false);
+        comment = client.update(comment).block();
+        http.get()
+                .uri(listUrl)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.total")
+                .isEqualTo(1);
+
+        comment.getSpec().setApproved(false);
+        comment = client.update(comment).block();
+        http.get().uri(listUrl).exchange().expectStatus().is4xxClientError();
     }
 
     @Test

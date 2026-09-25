@@ -76,7 +76,8 @@ public class ReplyServiceImpl extends AbstractCommentService implements ReplySer
                 .filter(reply -> isTrue(reply.getSpec().getApproved()))
                 .switchIfEmpty(Mono.error(requestRestrictedExceptionSupplier))
                 .doOnNext(approvedQuoteReply -> prepared.getSpec()
-                        .setHidden(approvedQuoteReply.getSpec().getHidden()))
+                        .setHidden(isTrue(prepared.getSpec().getHidden())
+                                || isTrue(approvedQuoteReply.getSpec().getHidden())))
                 .flatMap(approvedQuoteReply -> client.create(prepared));
     }
 
@@ -136,7 +137,9 @@ public class ReplyServiceImpl extends AbstractCommentService implements ReplySer
 
     private Mono<Reply> prepareReply(Comment comment, Reply reply) {
         reply.getSpec().setCommentName(comment.getMetadata().getName());
-        reply.getSpec().setHidden(comment.getSpec().getHidden());
+        reply.getSpec()
+                .setHidden(isTrue(reply.getSpec().getHidden())
+                        || isTrue(comment.getSpec().getHidden()));
         if (reply.getSpec().getTop() == null) {
             reply.getSpec().setTop(false);
         }
