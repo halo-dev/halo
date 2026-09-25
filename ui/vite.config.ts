@@ -112,12 +112,16 @@ export default defineConfig(({ command, mode }) => ({
     },
   },
   test: {
+    // Vitest v4 compatibility: preserve mock call history.
+    // Remove after tests no longer rely on calls from setup or earlier tests.
+    // https://viteplus.dev/guide/vitest-v5#remove-unneeded-compatibility-settings
+    // https://vitest.dev/guide/migration/#clearmocks-is-enabled-by-default
+    clearMocks: false,
     environment: "jsdom",
     include: ["**/*.spec.ts"],
     root: fileURLToPath(new URL("./", import.meta.url)),
     exclude: [...configDefaults.exclude, "./packages/**/*.ts"],
-    reporters: "html",
-    outputFile: "build/test-result/index.html",
+    reporters: [["html", { outputDir: "build/test-result" }]],
   },
   fmt: {
     sortTailwindcss: {},
