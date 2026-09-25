@@ -471,6 +471,25 @@ class SingleValueIndexTest {
         }
 
         @Test
+        void nullValueViewReflectsUpdates() {
+            var fake = createFake("fake");
+            fake.setStringValue(null);
+            var insert = index.prepareInsert(fake);
+            insert.prepare();
+            insert.commit();
+
+            var nullValues = index.isNull();
+            assertTrue(nullValues.contains("fake"));
+            fake.setStringValue("string");
+            var update = index.prepareUpdate(fake);
+            update.prepare();
+            update.commit();
+
+            assertFalse(nullValues.contains("fake"));
+            assertThrows(UnsupportedOperationException.class, () -> nullValues.clear());
+        }
+
+        @Test
         void shouldRollbackInsertCorrectly() {
             var fake = createFake("fake");
             fake.setStringValue("string");

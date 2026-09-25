@@ -72,9 +72,14 @@ public class QueryVisitor<E extends Extension> implements Visitor {
                     left.visit(this);
                     // fail fast if left result is empty
                     if (!result.isEmpty()) {
-                        var rightVisitor = new ConditionVisitor();
-                        right.visit(rightVisitor);
-                        result.retainAll(rightVisitor.getResult());
+                        if (right instanceof IsNullCondition(var indexName)) {
+                            // Probe the left-hand candidates without copying every null-key entry.
+                            result.retainAll(getValueIndexQuery(indexName).isNull());
+                        } else {
+                            var rightVisitor = new ConditionVisitor();
+                            right.visit(rightVisitor);
+                            result.retainAll(rightVisitor.getResult());
+                        }
                     }
                 }
                 case OrCondition(var left, var right) -> {
