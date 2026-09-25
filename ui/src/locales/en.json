@@ -340,7 +340,7 @@
   "core.comment.reply_modal.title": "Reply",
   "core.comment.reply_modal.fields.content.label": "Content",
   "core.comment.reply_modal.fields.private.label": "Private reply",
-  "core.comment.reply_modal.fields.private.help": "Private replies are not shown publicly. The signed-in original comment author can view them; anonymous recipients with email notifications enabled receive the reply content by email.",
+  "core.comment.reply_modal.fields.private.help": "Private replies are not shown publicly. Signed-in recipients (the original comment or quoted reply author) can view them when they can access the original comment; anonymous recipients with email notifications enabled receive the reply content by email.",
   "core.comment.reply_modal.operations.submit.toast_success": "Reply successfully",
   "core.comment.detail_modal.fields.owner": "Commentator",
   "core.comment.detail_modal.fields.creation_time": "Comment time",

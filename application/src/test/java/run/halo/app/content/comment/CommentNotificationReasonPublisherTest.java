@@ -518,6 +518,7 @@ class CommentNotificationReasonPublisherTest {
                     .thenReturn(Mono.just(new CommentSubject.SubjectDisplay("Post", "/post", "Post")));
             when(externalLinkProcessor.processLink("/post")).thenReturn("https://example.test/post");
             var reply = createReply("fake-reply");
+            reply.getSpec().setApproved(true);
 
             reply.getSpec().setQuoteReply("fake-quote-reply");
             var quoteReply = createReply("fake-quote-reply");
@@ -528,6 +529,7 @@ class CommentNotificationReasonPublisherTest {
 
             var comment = createComment();
             comment.getSpec().setContent("fake-comment-content");
+            comment.getSpec().setApproved(true);
 
             doReturn(false).when(spyNewReplyReasonPublisher).doNotEmitReason(any(), any(), any());
 
@@ -573,6 +575,68 @@ class CommentNotificationReasonPublisherTest {
                                         "replier", reply.getSpec().getOwner().getDisplayName(),
                                         "content", reply.getSpec().getContent(),
                                         "replyName", reply.getMetadata().getName()));
+                    }));
+        }
+
+        @ParameterizedTest
+        @CsvSource({
+            "false, false, true,  true, true",
+            "true,  false, true,  true, true",
+            "true,  true,  true,  true, false",
+            "true,  false, false, true, false",
+            "false, false, true,  false, false",
+            "false, true,  true,  true, true"
+        })
+        void privateReplyLinkRequiresRecipientAccessToParent(
+                boolean quoted,
+                boolean parentHidden,
+                boolean parentApproved,
+                boolean registeredRecipient,
+                boolean expectLink) {
+            var subject = mock(PostCommentSubject.class);
+            when(extensionGetter.getExtensions(CommentSubject.class)).thenReturn(Flux.just(subject));
+            when(subject.supports(any())).thenReturn(true);
+            when(subject.getSubjectDisplay(any()))
+                    .thenReturn(Mono.just(new CommentSubject.SubjectDisplay("Post", "/post", "Post")));
+            when(externalLinkProcessor.processLink("/post")).thenReturn("https://example.test/post");
+            when(commentContentConverter.convertRelativeLinks(anyString()))
+                    .thenAnswer(invocation -> invocation.getArgument(0));
+            when(notificationReasonEmitter.emit(any(), any())).thenReturn(Mono.empty());
+
+            var comment = createComment();
+            comment.getSpec().setContent("comment-content");
+            comment.getSpec().setApproved(parentApproved);
+            comment.getSpec().setHidden(parentHidden);
+            var recipient = comment.getSpec().getOwner();
+            if (registeredRecipient) {
+                recipient.setKind(User.KIND);
+                recipient.setName("recipient");
+            }
+
+            var reply = createReply("private-reply");
+            reply.getSpec().setApproved(true);
+            reply.getSpec().setHidden(true);
+            if (quoted) {
+                var quoteReply = createReply("quote");
+                quoteReply.getSpec().setOwner(recipient);
+                reply.getSpec().setQuoteReply("quote");
+                when(client.fetch(Reply.class, "quote")).thenReturn(Optional.of(quoteReply));
+                comment.getSpec().setOwner(createComment().getSpec().getOwner());
+            }
+
+            newReplyReasonPublisher.publishReasonBy(reply, comment);
+
+            verify(notificationReasonEmitter)
+                    .emit(eq(NotificationReasonConst.SOMEONE_REPLIED_TO_YOU), assertArg(consumer -> {
+                        var builder = ReasonPayload.builder();
+                        consumer.accept(builder);
+                        var attributes = builder.build().getAttributes();
+                        assertThat(attributes).containsEntry("content", "fake-reply-content");
+                        assertThat(attributes)
+                                .containsEntry(
+                                        "commentContent",
+                                        quoted && (parentHidden || !parentApproved) ? "" : "comment-content");
+                        assertThat(attributes.containsKey("replyUrl")).isEqualTo(expectLink);
                     }));
         }
 

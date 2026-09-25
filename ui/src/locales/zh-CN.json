@@ -346,7 +346,7 @@
   "core.comment.reply_modal.title": "回复",
   "core.comment.reply_modal.fields.content.label": "内容",
   "core.comment.reply_modal.fields.private.label": "私密回复",
-  "core.comment.reply_modal.fields.private.help": "勾选后，回复不会公开显示。登录的原评论作者可查看；匿名被回复者若开启了邮件通知，会通过邮件收到回复内容。",
+  "core.comment.reply_modal.fields.private.help": "勾选后，回复不会公开显示。登录且可访问原评论的被回复者（原评论作者或被引用回复作者）可查看；匿名被回复者若开启了邮件通知，会通过邮件收到回复内容。",
   "core.comment.reply_modal.operations.submit.toast_success": "回复成功",
   "core.comment.text.commented_on": "评论在",
   "core.comment.text.replied_below": "回复：",

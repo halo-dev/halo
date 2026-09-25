@@ -318,7 +318,7 @@
   "core.comment.reply_modal.title": "Respuesta",
   "core.comment.reply_modal.fields.content.label": "Contenido",
   "core.comment.reply_modal.fields.private.label": "Respuesta privada",
-  "core.comment.reply_modal.fields.private.help": "Las respuestas privadas no se muestran públicamente. El autor del comentario original puede verlas si ha iniciado sesión; los destinatarios anónimos con notificaciones por correo activadas reciben el contenido por correo.",
+  "core.comment.reply_modal.fields.private.help": "Las respuestas privadas no se muestran públicamente. El destinatario que haya iniciado sesión (autor del comentario original o de la respuesta citada) puede verlas si tiene acceso al comentario original; los destinatarios anónimos con notificaciones por correo activadas reciben el contenido por correo.",
   "core.comment.reply_modal.operations.submit.toast_success": "Respuesta enviada exitosamente",
   "core.comment.text.commented_on": "comentó en",
   "core.comment.text.replied_below": "respondió:",

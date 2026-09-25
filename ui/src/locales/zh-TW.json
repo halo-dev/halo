@@ -338,7 +338,7 @@
   "core.comment.reply_modal.title": "回覆",
   "core.comment.reply_modal.fields.content.label": "內容",
   "core.comment.reply_modal.fields.private.label": "私密回覆",
-  "core.comment.reply_modal.fields.private.help": "勾選後，回覆不會公開顯示。已登入的原評論作者可查看；匿名被回覆者若啟用了郵件通知，會透過郵件收到回覆內容。",
+  "core.comment.reply_modal.fields.private.help": "勾選後，回覆不會公開顯示。已登入且可存取原評論的被回覆者（原評論作者或被引用回覆作者）可查看；匿名被回覆者若啟用了郵件通知，會透過郵件收到回覆內容。",
   "core.comment.reply_modal.operations.submit.toast_success": "回覆成功",
   "core.comment.text.commented_on": "評論在",
   "core.comment.text.replied_below": "回覆：",
