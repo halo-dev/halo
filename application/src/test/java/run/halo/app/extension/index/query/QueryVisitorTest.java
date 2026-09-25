@@ -6,6 +6,8 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
+import java.util.AbstractSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
@@ -284,6 +286,40 @@ class QueryVisitorTest {
         var condition = Queries.isNull("metadata.optionalField");
         condition.visit(visitor);
         assertEquals(Set.of("is-null", "data"), visitor.getResult());
+    }
+
+    @Test
+    void shouldIntersectWithNullIndexWithoutEnumeratingIt() {
+        var ownerIndex = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
+        var ownerQuery = (ValueIndexQuery) ownerIndex;
+        when(indices.getIndex("spec.owner")).thenReturn(ownerIndex);
+        when(ownerIndex.getKeyType()).thenReturn(String.class);
+        when(ownerQuery.equal("viewer")).thenReturn(Set.of("kept", "removed"));
+
+        var deletionIndex = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
+        var deletionQuery = (ValueIndexQuery) deletionIndex;
+        var liveNames = Set.of("kept", "other-one", "other-two");
+        when(indices.getIndex("metadata.deletionTimestamp")).thenReturn(deletionIndex);
+        when(deletionQuery.isNull()).thenReturn(new AbstractSet<String>() {
+            @Override
+            public boolean contains(Object value) {
+                return liveNames.contains(value);
+            }
+
+            @Override
+            public Iterator<String> iterator() {
+                throw new AssertionError("The global null set must not be enumerated");
+            }
+
+            @Override
+            public int size() {
+                return liveNames.size();
+            }
+        });
+
+        Queries.and(Queries.equal("spec.owner", "viewer"), Queries.isNull("metadata.deletionTimestamp"))
+                .visit(visitor);
+        assertEquals(Set.of("kept"), visitor.getResult());
     }
 
     @Test

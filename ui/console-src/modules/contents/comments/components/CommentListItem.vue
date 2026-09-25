@@ -168,6 +168,22 @@ async function handleCancelApprove() {
   queryClient.invalidateQueries({ queryKey: ["core:comments"] });
 }
 
+async function handleToggleHidden() {
+  await coreApiClient.content.comment.patchComment({
+    name: props.comment.comment.metadata.name,
+    jsonPatchInner: [
+      {
+        op: "add",
+        path: "/spec/hidden",
+        value: !props.comment.comment.spec.hidden,
+      },
+    ],
+  });
+  Toast.success(t("core.common.toast.operation_success"));
+  queryClient.invalidateQueries({ queryKey: ["core:comments"] });
+  queryClient.invalidateQueries({ queryKey: ["core:comments:with-subject"] });
+}
+
 const {
   data: replies,
   isLoading,
@@ -255,15 +271,27 @@ const { data: operationItems } = useOperationItemExtensionPoint<ListedComment>(
     {
       priority: 20,
       component: markRaw(VDropdownItem),
+      label: t(
+        props.comment.comment.spec.hidden
+          ? "core.comment.operations.make_public.button"
+          : "core.comment.operations.make_private.button"
+      ),
+      permissions: ["system:comments:manage"],
+      hidden: !!props.comment.comment.metadata.deletionTimestamp,
+      action: handleToggleHidden,
+    },
+    {
+      priority: 30,
+      component: markRaw(VDropdownItem),
       label: t("core.comment.operations.approve_applies_in_batch.button"),
       action: handleApproveReplyInBatch,
     },
     {
-      priority: 30,
+      priority: 40,
       component: markRaw(VDropdownDivider),
     },
     {
-      priority: 40,
+      priority: 50,
       component: markRaw(VDropdownItem),
       props: {
         type: "danger",
@@ -273,7 +301,7 @@ const { data: operationItems } = useOperationItemExtensionPoint<ListedComment>(
       action: handleCancelApprove,
     },
     {
-      priority: 50,
+      priority: 60,
       component: markRaw(VDropdownItem),
       props: {
         type: "danger",

@@ -315,10 +315,20 @@ public class CommentNotificationReasonPublisher {
             var repliedOwner = quoteReplyOptional
                     .map(quoteReply -> quoteReply.getSpec().getOwner())
                     .orElseGet(() -> comment.getSpec().getOwner());
+            var parentPublic = Boolean.TRUE.equals(comment.getSpec().getApproved())
+                    && !Boolean.TRUE.equals(comment.getSpec().getHidden());
+            var isOriginalCommentOwner =
+                    repliedOwner.getKind().equals(comment.getSpec().getOwner().getKind())
+                            && repliedOwner
+                                    .getName()
+                                    .equals(comment.getSpec().getOwner().getName());
 
             var reasonAttributesBuilder = NewReplyReasonData.builder()
-                    .commentContent(commentContentConverter.convertRelativeLinks(
-                            comment.getSpec().getContent()))
+                    .commentContent(
+                            parentPublic || isOriginalCommentOwner
+                                    ? commentContentConverter.convertRelativeLinks(
+                                            comment.getSpec().getContent())
+                                    : "")
                     .isQuoteReply(isQuoteReply)
                     .quoteContent(quoteReplyContent)
                     .commentName(comment.getMetadata().getName())
@@ -333,10 +343,16 @@ public class CommentNotificationReasonPublisher {
                 var subjectUrl = externalLinkProcessor.processLink(subject.url());
                 reasonAttributesBuilder.commentSubjectTitle(subject.title());
                 reasonAttributesBuilder.commentSubjectUrl(subjectUrl);
-                reasonAttributesBuilder.replyUrl(CommentPermalinkService.getPermalink(
-                        subjectUrl,
-                        comment.getMetadata().getName(),
-                        reply.getMetadata().getName()));
+                var recipientCanOpen =
+                        User.KIND.equals(repliedOwner.getKind()) && (parentPublic || isOriginalCommentOwner);
+                var publicReply =
+                        parentPublic && !Boolean.TRUE.equals(reply.getSpec().getHidden());
+                if (Boolean.TRUE.equals(reply.getSpec().getApproved()) && (publicReply || recipientCanOpen)) {
+                    reasonAttributesBuilder.replyUrl(CommentPermalinkService.getPermalink(
+                            subjectUrl,
+                            comment.getMetadata().getName(),
+                            reply.getMetadata().getName()));
+                }
             });
 
             notificationReasonEmitter
