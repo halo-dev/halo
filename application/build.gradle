@@ -144,7 +144,7 @@ tasks.named('jacocoTestReport', JacocoReport) {
 tasks.register('downloadPluginPresets', Download) {
     def presetPlugins = [
         [
-            url       : 'https://github.com/halo-dev/plugin-comment-widget/releases/download/v3.1.2/plugin-comment-widget-3.1.2.jar',
+            url       : 'https://github.com/halo-dev/plugin-comment-widget/releases/download/v3.3.2/plugin-comment-widget-3.3.2.jar',
             filename  : 'plugin-comment-widget.jar',
             autoEnable: true,
         ],
@@ -164,17 +164,17 @@ tasks.register('downloadPluginPresets', Download) {
             autoEnable: true,
         ],
         [
-            url       : 'https://github.com/halo-sigs/plugin-shiki/releases/download/v1.3.2/plugin-shiki-1.3.2.jar',
+            url       : 'https://github.com/halo-sigs/plugin-shiki/releases/download/v1.5.1/plugin-shiki-1.5.1.jar',
             filename  : 'plugin-shiki.jar',
             autoEnable: true,
         ],
         [
-            url       : 'https://github.com/halo-sigs/plugin-editor-hyperlink-card/releases/download/v1.9.1/plugin-editor-hyperlink-card-1.9.1.jar',
+            url       : 'https://github.com/halo-sigs/plugin-editor-hyperlink-card/releases/download/v1.9.2/plugin-editor-hyperlink-card-1.9.2.jar',
             filename  : 'plugin-editor-hyperlink-card.jar',
             autoEnable: true,
         ],
         [
-            url       : 'https://github.com/halo-dev/plugin-ai-foundation/releases/download/v1.0.0/plugin-ai-foundation-1.0.0.jar',
+            url       : 'https://github.com/halo-dev/plugin-ai-foundation/releases/download/v1.1.0/plugin-ai-foundation-1.1.0.jar',
             filename  : 'plugin-ai-foundation.jar',
             autoEnable: true,
         ],
@@ -183,7 +183,7 @@ tasks.register('downloadPluginPresets', Download) {
         // Please see https://github.com/halo-dev/plugin-app-store/issues/55
         // https://www.halo.run/store/apps/app-VYJbF/releases/app-release-qafgml3o
         [
-            url       : 'https://www.halo.run/store/apps/app-VYJbF/releases/download/app-release-k0bgjukb/assets/app-release-k0bgjukb-aizf1wnc',
+            url       : 'https://www.halo.run/store/apps/app-VYJbF/releases/download/app-release-dtqssqka/assets/app-release-dtqssqka-sxbvffrr',
             filename  : 'appstore.jar',
             autoEnable: true,
         ],
