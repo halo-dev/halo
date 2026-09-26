@@ -91,16 +91,6 @@ spec:
             - label: "UUID"
               value: "UUID"
           help: 此选项仅在创建文章时生效，修改此选项不会影响已有文章
-        - $formkit: attachmentPolicySelect
-          name: attachmentPolicyName
-          label: "附件存储策略"
-          value: "default-policy"
-          help: 用于指定在文章编辑器中上传的默认附件存储策略（已过时，请使用附件配置中的管理端附件配置）
-        - $formkit: attachmentGroupSelect
-          name: attachmentGroupName
-          label: "附件存储组"
-          value: ""
-          help: 用于指定在文章编辑器中上传的默认附件存储分组（已过时，请使用附件配置中的管理端附件配置）
     - group: seo
       label: SEO 设置
       formSchema:

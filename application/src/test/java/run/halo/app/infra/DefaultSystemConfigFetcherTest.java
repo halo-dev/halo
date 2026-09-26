@@ -203,7 +203,9 @@ class DefaultSystemConfigFetcherTest {
         configMap.setData(Map.of("post", """
                 {
                   "postPageSize": 10,
-                  "archivePageSize": 20
+                  "archivePageSize": 20,
+                  "attachmentPolicyName": "old-policy",
+                  "attachmentGroupName": "old-group"
                 }"""));
         systemConfigFetcher.getConfigMapCache().set(configMap.getData());
 

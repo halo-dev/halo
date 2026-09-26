@@ -119,9 +119,6 @@ public class SystemSetting {
         Integer authorPageSize;
         Boolean review;
         String slugGenerationStrategy;
-
-        String attachmentPolicyName;
-        String attachmentGroupName;
     }
 
     @Data

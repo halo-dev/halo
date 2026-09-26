@@ -148,13 +148,16 @@ public class AttachmentUcEndpoint implements CustomEndpoint {
     }
 
     private Mono<ServerResponse> uploadAttachment(ServerRequest request) {
-        var getConfig = systemSettingFetcher
+        return attachmentHandler.handleUpload(request, getUcAttachmentConfig());
+    }
+
+    private Mono<SystemSetting.Attachment.UploadOptions> getUcAttachmentConfig() {
+        return systemSettingFetcher
                 .fetch(SystemSetting.Attachment.GROUP, SystemSetting.Attachment.class)
                 .mapNotNull(SystemSetting.Attachment::uc)
                 .filter(uo -> StringUtils.isNotBlank(uo.policyName()))
                 .switchIfEmpty(Mono.error(
                         () -> new UnsatisfiedAttributeValueException("problemDetail.attachment.settingsMissing")));
-        return attachmentHandler.handleUpload(request, getConfig);
     }
 
     private Mono<ServerResponse> listMyAttachments(ServerRequest request) {
@@ -190,12 +193,12 @@ public class AttachmentUcEndpoint implements CustomEndpoint {
     private Mono<ServerResponse> uploadFromUrlForPost(ServerRequest request) {
         var uploadFromUrlRequestMono = request.bodyToMono(UploadFromUrlRequest.class);
 
-        var uploadAttachment = getPostSettingMono()
-                .flatMap(postSetting -> uploadFromUrlRequestMono.flatMap(uploadFromUrlRequest -> {
+        var uploadAttachment = getUcAttachmentConfig()
+                .flatMap(uploadOptions -> uploadFromUrlRequestMono.flatMap(uploadFromUrlRequest -> {
                     var url = uploadFromUrlRequest.url();
                     var fileName = uploadFromUrlRequest.filename();
                     return attachmentService.uploadFromUrl(
-                            url, postSetting.getAttachmentPolicyName(), postSetting.getAttachmentGroupName(), fileName);
+                            url, uploadOptions.policyName(), uploadOptions.groupName(), fileName);
                 }));
 
         var waitForPermalink =
@@ -211,13 +214,12 @@ public class AttachmentUcEndpoint implements CustomEndpoint {
                 .map(PostAttachmentRequest::from)
                 .cache();
 
-        // get settings
-        var createdAttachment = getPostSettingMono()
-                .flatMap(postSetting -> postAttachmentRequestMono.flatMap(postAttachmentRequest -> getCurrentUser()
+        var createdAttachment = getUcAttachmentConfig()
+                .flatMap(uploadOptions -> postAttachmentRequestMono.flatMap(postAttachmentRequest -> getCurrentUser()
                         .flatMap(username -> attachmentService.upload(
                                 username,
-                                postSetting.getAttachmentPolicyName(),
-                                postSetting.getAttachmentGroupName(),
+                                uploadOptions.policyName(),
+                                uploadOptions.groupName(),
                                 postAttachmentRequest.file(),
                                 linkWith(postAttachmentRequest)))));
 
@@ -242,17 +244,6 @@ public class AttachmentUcEndpoint implements CustomEndpoint {
                 })
                 .thenReturn(attachment));
         return createdAttachment;
-    }
-
-    private Mono<SystemSetting.Post> getPostSettingMono() {
-        return systemSettingFetcher.fetchPost().handle((postSetting, sink) -> {
-            var attachmentPolicyName = postSetting.getAttachmentPolicyName();
-            if (StringUtils.isBlank(attachmentPolicyName)) {
-                sink.error(new UnsatisfiedAttributeValueException("problemDetail.attachment.policyMissing"));
-                return;
-            }
-            sink.next(postSetting);
-        });
     }
 
     private Consumer<Attachment> linkWith(PostAttachmentRequest request) {
