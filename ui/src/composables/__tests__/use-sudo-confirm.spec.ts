@@ -1,5 +1,5 @@
 import type { AxiosError } from "axios";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vite-plus/test";
 import { nextTick } from "vue";
 import {
   cancelSudoConfirm,
