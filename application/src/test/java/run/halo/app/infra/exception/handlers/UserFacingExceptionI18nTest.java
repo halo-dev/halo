@@ -49,7 +49,6 @@ class UserFacingExceptionI18nTest {
     @ParameterizedTest
     @ValueSource(
             strings = {
-                "problemDetail.attachment.policyMissing",
                 "problemDetail.attachment.settingsMissing",
                 "problemDetail.authentication.required",
                 "problemDetail.comment.content.empty",

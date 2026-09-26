@@ -106,6 +106,24 @@ class DefaultSystemConfigFetcherTest {
     }
 
     @Test
+    void testFetchUserWithRemovedAttachmentSettings() {
+        systemConfigFetcher.getConfigMapCache().set(Map.of("user", """
+                {
+                  "allowRegistration": true,
+                  "avatarPolicy": "old-avatar-policy",
+                  "ucAttachmentPolicy": "old-uc-policy"
+                }"""));
+        when(conversionService.canConvert(String.class, SystemSetting.User.class))
+                .thenReturn(false);
+
+        systemConfigFetcher
+                .fetch(SystemSetting.User.GROUP, SystemSetting.User.class)
+                .as(StepVerifier::create)
+                .assertNext(user -> assertThat(user.isAllowRegistration()).isTrue())
+                .verifyComplete();
+    }
+
+    @Test
     void testFetchWhenKeyDoesNotExist() {
         // Arrange
         systemConfigFetcher.getConfigMapCache().set(mockConfigMap.getData());
@@ -185,7 +203,9 @@ class DefaultSystemConfigFetcherTest {
         configMap.setData(Map.of("post", """
                 {
                   "postPageSize": 10,
-                  "archivePageSize": 20
+                  "archivePageSize": 20,
+                  "attachmentPolicyName": "old-policy",
+                  "attachmentGroupName": "old-group"
                 }"""));
         systemConfigFetcher.getConfigMapCache().set(configMap.getData());
 
