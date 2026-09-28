@@ -480,8 +480,6 @@ class UserEndpointTest {
             when(environmentFetcher.fetch(SystemSetting.Attachment.GROUP, SystemSetting.Attachment.class))
                     .thenReturn(Mono.fromSupplier(() ->
                             SystemSetting.Attachment.builder().avatar(null).build()));
-            when(environmentFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
-                    .thenReturn(Mono.empty());
 
             webClient
                     .post()
@@ -512,8 +510,6 @@ class UserEndpointTest {
             when(environmentFetcher.fetch(SystemSetting.Attachment.GROUP, SystemSetting.Attachment.class))
                     .thenReturn(Mono.fromSupplier(() ->
                             SystemSetting.Attachment.builder().avatar(null).build()));
-            when(environmentFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
-                    .thenReturn(Mono.empty());
 
             when(client.get(User.class, "fake-user")).thenReturn(Mono.just(currentUser));
             when(attachmentService.upload(eq("default-policy"), anyString(), anyString(), any(), any(MediaType.class)))
@@ -553,8 +549,6 @@ class UserEndpointTest {
             when(environmentFetcher.fetch(SystemSetting.Attachment.GROUP, SystemSetting.Attachment.class))
                     .thenReturn(Mono.fromSupplier(() ->
                             SystemSetting.Attachment.builder().avatar(null).build()));
-            when(environmentFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
-                    .thenReturn(Mono.empty());
 
             when(client.get(User.class, "fake-user")).thenReturn(Mono.just(currentUser));
             when(attachmentService.upload(
@@ -579,7 +573,7 @@ class UserEndpointTest {
         }
 
         @Test
-        void shouldUseFallbackSetting() {
+        void shouldUseAttachmentSetting() {
             var currentUser = createUser("fake-user");
 
             Attachment attachment = new Attachment();
@@ -594,14 +588,11 @@ class UserEndpointTest {
                     .filename("fake-filename.png");
 
             when(environmentFetcher.fetch(SystemSetting.Attachment.GROUP, SystemSetting.Attachment.class))
-                    .thenReturn(Mono.fromSupplier(() ->
-                            SystemSetting.Attachment.builder().avatar(null).build()));
-            when(environmentFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
-                    .thenReturn(Mono.fromSupplier(() -> {
-                        var us = new SystemSetting.User();
-                        us.setAvatarPolicy("fake-avatar-policy");
-                        return us;
-                    }));
+                    .thenReturn(Mono.fromSupplier(() -> SystemSetting.Attachment.builder()
+                            .avatar(SystemSetting.Attachment.UploadOptions.builder()
+                                    .policyName("fake-avatar-policy")
+                                    .build())
+                            .build()));
 
             when(client.get(User.class, "fake-user")).thenReturn(Mono.just(currentUser));
             when(attachmentService.upload(
