@@ -34,7 +34,7 @@ allowBuilds:
   esbuild: true
   vue-demi: true
 patchedDependencies:
-  "@tiptap/extension-drag-handle@3.29.0": patches/@tiptap__extension-drag-handle@3.29.0.patch
+  "@tiptap/extension-drag-handle@3.31.3": patches/@tiptap__extension-drag-handle@3.31.3.patch
 minimumReleaseAgeExclude:
   - "@vueuse/components@14.4.0"
   - "@vueuse/core@14.4.0"

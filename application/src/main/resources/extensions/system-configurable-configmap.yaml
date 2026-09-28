@@ -7,9 +7,7 @@ data:
     {
       "allowRegistration": false,
       "mustVerifyEmailOnRegistration": false,
-      "defaultRole": "guest",
-      "avatarPolicy": "default-policy",
-      "ucAttachmentPolicy": "default-policy"
+      "defaultRole": "guest"
     }
   attachment: |
     {
@@ -47,8 +45,7 @@ data:
       "categoryPageSize": 10,
       "tagPageSize": 10,
       "authorPageSize": 10,
-      "slugGenerationStrategy": "generateByTitle",
-      "attachmentPolicyName": "default-policy"
+      "slugGenerationStrategy": "generateByTitle"
     }
   comment: |
     {
