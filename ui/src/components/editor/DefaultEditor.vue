@@ -21,13 +21,10 @@ import {
 } from "@halo-dev/components";
 import {
   convertToMediaContents,
-  DecorationSet,
   Editor,
   Extension,
   ExtensionHeading,
   ExtensionsKit,
-  Plugin,
-  PluginKey,
   RichTextEditor,
   ToolbarItem,
   ToolboxItem,
@@ -122,6 +119,23 @@ const headingNodes = ref<HeadingNode[]>();
 const selectedHeadingNode = ref<HeadingNode>();
 const extraActiveId = ref("toc");
 
+function syncHeadingNodes(doc: Editor["state"]["doc"]) {
+  const headings: HeadingNode[] = [];
+  doc.descendants((node) => {
+    if (node.type.name === ExtensionHeading.name) {
+      headings.push({
+        level: node.attrs.level,
+        text: node.textContent,
+        id: node.attrs.id,
+      });
+    }
+  });
+  headingNodes.value = headings;
+  if (!selectedHeadingNode.value) {
+    selectedHeadingNode.value = headings[0];
+  }
+}
+
 const editor = shallowRef<VueEditor>();
 const editorTitleRef = ref();
 
@@ -201,32 +215,13 @@ const customExtensions = [
   }),
   Extension.create({
     name: "get-heading-id-extension",
-    addProseMirrorPlugins() {
-      return [
-        new Plugin({
-          key: new PluginKey("get-heading-id"),
-          props: {
-            decorations: (state) => {
-              const headings: HeadingNode[] = [];
-              const { doc } = state;
-              doc.descendants((node) => {
-                if (node.type.name === ExtensionHeading.name) {
-                  headings.push({
-                    level: node.attrs.level,
-                    text: node.textContent,
-                    id: node.attrs.id,
-                  });
-                }
-              });
-              headingNodes.value = headings;
-              if (!selectedHeadingNode.value) {
-                selectedHeadingNode.value = headings[0];
-              }
-              return DecorationSet.empty;
-            },
-          },
-        }),
-      ];
+    onCreate() {
+      syncHeadingNodes(this.editor.state.doc);
+    },
+    onTransaction({ transaction }) {
+      if (transaction.docChanged) {
+        syncHeadingNodes(transaction.doc);
+      }
     },
   }),
 ];

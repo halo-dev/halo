@@ -33,8 +33,6 @@ allowBuilds:
   core-js: true
   esbuild: true
   vue-demi: true
-patchedDependencies:
-  "@tiptap/extension-drag-handle@3.29.0": patches/@tiptap__extension-drag-handle@3.29.0.patch
 minimumReleaseAgeExclude:
   - "@vueuse/components@14.4.0"
   - "@vueuse/core@14.4.0"
@@ -52,3 +50,5 @@ minimumReleaseAgeExclude:
   - "@voidzero-dev/vite-plus-win32-arm64-msvc@0.2.9 || 0.3.0 || 0.3.1 || 0.3.2"
   - "@voidzero-dev/vite-plus-win32-x64-msvc@0.2.9 || 0.3.0 || 0.3.1 || 0.3.2"
   - vite-plus@0.2.9 || 0.3.0 || 0.3.1 || 0.3.2
+patchedDependencies:
+  "@tiptap/extension-drag-handle@3.31.3": patches/@tiptap__extension-drag-handle@3.31.3.patch
