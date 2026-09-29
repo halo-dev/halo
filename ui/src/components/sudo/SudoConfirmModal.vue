@@ -256,9 +256,3 @@ function onSendCode() {
     </template>
   </VModal>
 </template>
-
-<style>
-.sudo-confirm-modal.modal-wrapper {
-  z-index: 3000;
-}
-</style>
