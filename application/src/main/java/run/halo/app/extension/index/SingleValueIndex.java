@@ -140,7 +140,7 @@ class SingleValueIndex<E extends Extension, K extends Comparable<K>> implements 
     @Override
     public Set<String> isNull() {
         Assert.isTrue(spec.isNullable(), "Index " + getName() + " is not nullable");
-        return Collections.unmodifiableSet(nullKeyValues);
+        return new HashSet<>(nullKeyValues);
     }
 
     @Override

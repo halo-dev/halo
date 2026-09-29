@@ -428,6 +428,26 @@ class CommentPermalinkIntegrationTest {
                 .expectBody()
                 .jsonPath("$.items[0].replies.total")
                 .isEqualTo(2);
+
+        reply = client.delete(reply).block();
+        http.get()
+                .uri(listUrl)
+                .headers(headers -> headers.setBasicAuth("reply-owner", "permalink-test"))
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.total")
+                .isEqualTo(0);
+        http.get()
+                .uri(treeUrl)
+                .headers(headers -> headers.setBasicAuth("reply-owner", "permalink-test"))
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.items[0].replies.total")
+                .isEqualTo(0);
     }
 
     @Test
