@@ -4997,6 +4997,10 @@
         ],
         "type": "object",
         "properties": {
+          "impersonator": {
+            "type": "string",
+            "description": "name of the original administrator who switched to this user, or \u003ccode\u003enull\u003c/code\u003e if the current\n     session is not impersonated"
+          },
           "roles": {
             "type": "array",
             "description": "roles granted to the user",
