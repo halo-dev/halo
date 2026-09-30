@@ -56,6 +56,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.web.authentication.switchuser.SwitchUserGrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -555,7 +556,7 @@ public class UserEndpoint implements CustomEndpoint {
                         .flatMap(roleNames -> roleService
                                 .list(new HashSet<>(roleNames), true)
                                 .collectList()
-                                .map(roles -> new DetailedUser(user, roles))))
+                                .map(roles -> new DetailedUser(user, roles, null))))
                 .flatMap(detailedUser -> ServerResponse.ok().bodyValue(detailedUser));
     }
 
@@ -751,7 +752,16 @@ public class UserEndpoint implements CustomEndpoint {
                 .filter(Authentication::isAuthenticated)
                 .flatMap(auth -> userService.getUser(auth.getName()).flatMap(user -> {
                     var roleNames = authoritiesToRoles(auth.getAuthorities());
-                    return roleService.list(roleNames, true).collectList().map(roles -> new DetailedUser(user, roles));
+                    var impersonator = auth.getAuthorities().stream()
+                            .filter(SwitchUserGrantedAuthority.class::isInstance)
+                            .map(SwitchUserGrantedAuthority.class::cast)
+                            .findFirst()
+                            .map(switchUser -> switchUser.getSource().getName())
+                            .orElse(null);
+                    return roleService
+                            .list(roleNames, true)
+                            .collectList()
+                            .map(roles -> new DetailedUser(user, roles, impersonator));
                 }))
                 .flatMap(detailedUser -> ServerResponse.ok().bodyValue(detailedUser));
     }
@@ -761,11 +771,15 @@ public class UserEndpoint implements CustomEndpoint {
      *
      * @param user user extension
      * @param roles roles granted to the user
+     * @param impersonator name of the original administrator who switched to this user, or {@code null} if the current
+     *     session is not impersonated
      */
     record DetailedUser(
             @Schema(requiredMode = REQUIRED) User user,
 
-            @Schema(requiredMode = REQUIRED) List<Role> roles) {}
+            @Schema(requiredMode = REQUIRED) List<Role> roles,
+
+            String impersonator) {}
 
     Mono<ServerResponse> grantPermission(ServerRequest request) {
         var username = request.pathVariable("name");

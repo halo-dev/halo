@@ -8,6 +8,7 @@ import { defineStore } from "pinia";
 import { onMounted, reactive, ref } from "vue";
 import { RouterView, useRoute } from "vue-router";
 import IconLogo from "~icons/core/logo?width=5rem&height=2rem";
+import ImpersonationBanner from "@/components/impersonation/ImpersonationBanner.vue";
 import MenuLoading from "@/components/menu/MenuLoading.vue";
 import { RoutesMenu } from "@/components/menu/RoutesMenu";
 import { useRouteMenuGenerator } from "@/composables/use-route-menu-generator";
@@ -78,6 +79,7 @@ onMounted(() => {
     </aside>
 
     <main class="main-content">
+      <ImpersonationBanner />
       <slot v-if="$slots.default" />
       <RouterView v-else />
       <footer v-if="!route.meta.hideFooter" class="main-content__footer">

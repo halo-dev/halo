@@ -11,6 +11,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockAuthentication;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockUser;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.springSecurity;
 
@@ -36,6 +37,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.web.authentication.switchuser.SwitchUserGrantedAuthority;
+import org.springframework.security.web.server.authentication.SwitchUserWebFilter;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
@@ -264,7 +269,39 @@ class UserEndpointTest {
                     .expectHeader()
                     .contentType(MediaType.APPLICATION_JSON)
                     .expectBody(UserEndpoint.DetailedUser.class)
-                    .isEqualTo(new UserEndpoint.DetailedUser(user, List.of(role)));
+                    .isEqualTo(new UserEndpoint.DetailedUser(user, List.of(role), null));
+        }
+
+        @Test
+        void shouldGetCurrentUserDetailWithImpersonator() {
+            var metadata = new Metadata();
+            metadata.setName("fake-user");
+            var user = new User();
+            user.setMetadata(metadata);
+            when(userService.getUser("fake-user")).thenReturn(Mono.just(user));
+            Role role = new Role();
+            role.setMetadata(new Metadata());
+            role.getMetadata().setName("fake-super-role");
+            role.setRules(List.of());
+            when(roleService.list(anySet(), eq(true))).thenReturn(Flux.just(role));
+
+            var originalAuth = UsernamePasswordAuthenticationToken.authenticated(
+                    "admin", "password", AuthorityUtils.createAuthorityList("ROLE_super-role"));
+            var authorities = AuthorityUtils.createAuthorityList("ROLE_fake-super-role");
+            authorities.add(
+                    new SwitchUserGrantedAuthority(SwitchUserWebFilter.ROLE_PREVIOUS_ADMINISTRATOR, originalAuth));
+            var impersonatedAuth =
+                    UsernamePasswordAuthenticationToken.authenticated("fake-user", "password", authorities);
+
+            webClient
+                    .mutateWith(mockAuthentication(impersonatedAuth))
+                    .get()
+                    .uri("/users/-")
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectBody(UserEndpoint.DetailedUser.class)
+                    .isEqualTo(new UserEndpoint.DetailedUser(user, List.of(role), "admin"));
         }
     }
 
