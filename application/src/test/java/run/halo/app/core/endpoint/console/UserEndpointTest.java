@@ -33,8 +33,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.web.authentication.switchuser.SwitchUserGrantedAuthority;
@@ -102,10 +104,14 @@ class UserEndpointTest {
                                     .getBytes(StandardCharsets.UTF_8);
                             return response.writeWith(
                                     Mono.just(response.bufferFactory().wrap(body)));
+                        })
+                        .onErrorResume(AccessDeniedException.class, error -> {
+                            exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
+                            return exchange.getResponse().setComplete();
                         }))
                 .apply(springSecurity())
                 .build()
-                .mutateWith(mockUser("fake-user").password("fake-password").roles("fake-super-role"));
+                .mutateWith(mockUser("fake-user").password("fake-password").roles("super-role"));
     }
 
     @Test
@@ -251,9 +257,9 @@ class UserEndpointTest {
             when(userService.getUser("fake-user")).thenReturn(Mono.just(user));
             Role role = new Role();
             role.setMetadata(new Metadata());
-            role.getMetadata().setName("fake-super-role");
+            role.getMetadata().setName("super-role");
             role.setRules(List.of());
-            when(roleService.list(Set.of("fake-super-role"), true)).thenReturn(Flux.just(role));
+            when(roleService.list(Set.of("super-role"), true)).thenReturn(Flux.just(role));
             webClient
                     .get()
                     .uri("/users/-")
@@ -372,6 +378,7 @@ class UserEndpointTest {
             when(userService.updateWithRawPassword("fake-user", "new-password")).thenReturn(Mono.just(user));
             when(userService.confirmPassword("fake-user", "old-password")).thenReturn(Mono.just(true));
             webClient
+                    .mutateWith(mockUser("fake-user").roles("role-template-manage-users"))
                     .put()
                     .uri("/users/-/password")
                     .bodyValue(new UserEndpoint.ChangeOwnPasswordRequest("old-password", "new-password"))
@@ -472,10 +479,13 @@ class UserEndpointTest {
     }
 
     @Test
-    void createWhenNameDuplicate() {
+    void shouldCreateUserWithConfiguredDefaultRole() {
+        var setting = new SystemSetting.User();
+        setting.setDefaultRole("guest");
+        when(environmentFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
+                .thenReturn(Mono.just(setting));
         when(userService.createUser(any(User.class), anySet())).thenReturn(Mono.just(new User()));
-        var userRequest =
-                new UserEndpoint.CreateUserRequest("fake-user", "fake-email", "", "", "", "", "", Map.of(), Set.of());
+        var userRequest = new UserEndpoint.CreateUserRequest("fake-user", "fake-email", "", "", "", "", "", Map.of());
         webClient
                 .post()
                 .uri("/users")
@@ -483,11 +493,54 @@ class UserEndpointTest {
                 .exchange()
                 .expectStatus()
                 .isOk();
+        verify(userService).createUser(any(User.class), eq(Set.of("guest")));
+    }
+
+    @Test
+    void shouldIgnoreRequestedRolesWhenCreatingUser() {
+        var setting = new SystemSetting.User();
+        setting.setDefaultRole("guest");
+        when(environmentFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
+                .thenReturn(Mono.just(setting));
+        when(userService.createUser(any(User.class), eq(Set.of("guest")))).thenReturn(Mono.just(new User()));
+        webClient
+                .post()
+                .uri("/users")
+                .bodyValue(Map.of(
+                        "name",
+                        "new-user",
+                        "email",
+                        "user@example.com",
+                        "password",
+                        "password",
+                        "roles",
+                        List.of("super-role")))
+                .exchange()
+                .expectStatus()
+                .isOk();
+        verify(userService).createUser(any(User.class), eq(Set.of("guest")));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", " "})
+    void shouldRejectCreationWithoutDefaultRole(String role) {
+        var setting = new SystemSetting.User();
+        setting.setDefaultRole(role);
+        when(environmentFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
+                .thenReturn(Mono.just(setting));
+        webClient
+                .post()
+                .uri("/users")
+                .bodyValue(Map.of("name", "new-user", "email", "user@example.com", "password", "password"))
+                .exchange()
+                .expectStatus()
+                .isBadRequest();
+        verify(userService, never()).createUser(any(User.class), anySet());
     }
 
     @Test
     void shouldRejectCreateWhenEmailIsBlank() {
-        var userRequest = new UserEndpoint.CreateUserRequest("fake-user", " ", "", "", "", "", "", Map.of(), Set.of());
+        var userRequest = new UserEndpoint.CreateUserRequest("fake-user", " ", "", "", "", "", "", Map.of());
 
         webClient
                 .post()
@@ -501,6 +554,111 @@ class UserEndpointTest {
                 .isEqualTo("Email is required");
 
         verify(userService, never()).createUser(any(User.class), anySet());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"role-template-manage-users", "role-template-manage-permissions"})
+    void shouldRejectRoleAssignmentAndPasswordResetForNonSuperUser(String role) {
+        var delegated = webClient.mutateWith(mockUser("manager").roles(role));
+        delegated
+                .post()
+                .uri("/users/manager/permissions")
+                .bodyValue(Map.of("roles", List.of("super-role")))
+                .exchange()
+                .expectStatus()
+                .isForbidden();
+        delegated
+                .put()
+                .uri("/users/admin/password")
+                .bodyValue(Map.of("password", "new-password"))
+                .exchange()
+                .expectStatus()
+                .isForbidden();
+        verify(userService, never()).grantRoles(anyString(), anySet());
+        verify(userService, never()).updateWithRawPassword(anyString(), anyString());
+    }
+
+    @Test
+    void shouldUpdateOnlyProfileFieldsForDelegatedManager() {
+        var user = new User();
+        user.setMetadata(new Metadata());
+        user.getMetadata().setName("target");
+        user.getMetadata().setAnnotations(Map.of(User.EMAIL_TO_VERIFY, "pending@example.com"));
+        user.getSpec().setEmail("target@example.com");
+        user.getSpec().setPassword("original-hash");
+        user.getSpec().setEmailVerified(true);
+        user.getSpec().setTwoFactorAuthEnabled(true);
+        user.getSpec().setTotpEncryptedSecret("original-secret");
+        when(client.get(User.class, "target")).thenReturn(Mono.just(user));
+        when(client.update(user)).thenReturn(Mono.just(user));
+
+        webClient
+                .mutateWith(mockUser("manager").roles("role-template-manage-users"))
+                .put()
+                .uri("/users/target")
+                .bodyValue(Map.of(
+                        "displayName",
+                        "Updated",
+                        "email",
+                        "target@example.com",
+                        "bio",
+                        "Biography",
+                        "password",
+                        "attacker-password",
+                        "emailVerified",
+                        false,
+                        "twoFactorAuthEnabled",
+                        false,
+                        "totpEncryptedSecret",
+                        "attacker-secret",
+                        "roles",
+                        List.of("super-role"),
+                        "annotations",
+                        Map.of("custom", "value", User.EMAIL_TO_VERIFY, "attacker@example.com")))
+                .exchange()
+                .expectStatus()
+                .isOk();
+
+        assertEquals("Updated", user.getSpec().getDisplayName());
+        assertEquals("Biography", user.getSpec().getBio());
+        assertEquals("original-hash", user.getSpec().getPassword());
+        assertEquals(true, user.getSpec().isEmailVerified());
+        assertEquals(true, user.getSpec().getTwoFactorAuthEnabled());
+        assertEquals("original-secret", user.getSpec().getTotpEncryptedSecret());
+        assertEquals(
+                Map.of("custom", "value", User.EMAIL_TO_VERIFY, "pending@example.com"),
+                user.getMetadata().getAnnotations());
+        verify(userService, never()).grantRoles(anyString(), anySet());
+    }
+
+    @Test
+    void shouldAllowOnlySuperAdministratorToChangeEmail() {
+        var user = new User();
+        user.setMetadata(new Metadata());
+        user.getMetadata().setName("target");
+        user.getSpec().setEmail("original@example.com");
+        when(client.get(User.class, "target")).thenReturn(Mono.just(user));
+        var body = Map.of("displayName", "Target", "email", "updated@example.com");
+        webClient
+                .mutateWith(mockUser("manager").roles("role-template-manage-users"))
+                .put()
+                .uri("/users/target")
+                .bodyValue(body)
+                .exchange()
+                .expectStatus()
+                .isForbidden();
+        verify(client, never()).update(any());
+        assertEquals("original@example.com", user.getSpec().getEmail());
+
+        when(client.update(user)).thenReturn(Mono.just(user));
+        webClient
+                .put()
+                .uri("/users/target")
+                .bodyValue(body)
+                .exchange()
+                .expectStatus()
+                .isOk();
+        assertEquals("updated@example.com", user.getSpec().getEmail());
     }
 
     @Nested

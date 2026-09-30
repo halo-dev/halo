@@ -183,11 +183,14 @@ function handleSwitchUser() {
       <VDropdownItem @click="editingModal = true">
         {{ $t("core.user.operations.update_profile.title") }}
       </VDropdownItem>
-      <VDropdownItem @click="passwordChangeModal = true">
+      <VDropdownItem v-permission="['*']" @click="passwordChangeModal = true">
         {{ $t("core.user.operations.change_password.title") }}
       </VDropdownItem>
       <VDropdownItem
-        v-if="currentUser?.user.metadata.name !== user.user.metadata.name"
+        v-if="
+          currentUser?.user.metadata.name !== user.user.metadata.name &&
+          utils.permission.has(['*'])
+        "
         @click="grantPermissionModal = true"
       >
         {{ $t("core.user.operations.grant_permission.title") }}
@@ -226,7 +229,10 @@ function handleSwitchUser() {
         }}
       </VDropdownItem>
       <VDropdownItem
-        v-if="currentUser?.user.metadata.name !== user.user.metadata.name"
+        v-if="
+          currentUser?.user.metadata.name !== user.user.metadata.name &&
+          utils.permission.has(['*'])
+        "
         type="danger"
         @click="handleDelete"
       >

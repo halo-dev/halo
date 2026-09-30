@@ -52,6 +52,7 @@ import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.codec.multipart.Part;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
@@ -93,6 +94,7 @@ import run.halo.app.infra.exception.RateLimitExceededException;
 import run.halo.app.infra.exception.RestrictedNameException;
 import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.security.authorization.AuthorityUtils;
 
 @Component
 @RequiredArgsConstructor
@@ -142,6 +144,20 @@ public class UserEndpoint implements CustomEndpoint {
                                 .description("Update current user profile, but password.")
                                 .tag(tag)
                                 .requestBody(requestBodyBuilder().required(true).implementation(User.class))
+                                .response(responseBuilder().implementation(User.class)))
+                .PUT(
+                        "/users/{name}",
+                        this::updateUserProfile,
+                        builder -> builder.operationId("UpdateUserProfile")
+                                .description("Update user profile without changing credentials or roles.")
+                                .tag(tag)
+                                .parameter(parameterBuilder()
+                                        .in(ParameterIn.PATH)
+                                        .name("name")
+                                        .required(true))
+                                .requestBody(requestBodyBuilder()
+                                        .required(true)
+                                        .implementation(UpdateUserProfileRequest.class))
                                 .response(responseBuilder().implementation(User.class)))
                 .POST(
                         "/users/{name}/permissions",
@@ -461,11 +477,73 @@ public class UserEndpoint implements CustomEndpoint {
                     User newUser = CreateUserRequest.from(userRequest);
                     var encryptedPwd = userService.encryptPassword(userRequest.password());
                     newUser.getSpec().setPassword(encryptedPwd);
-                    return userService.createUser(newUser, userRequest.roles());
+                    return environmentFetcher
+                            .fetch(SystemSetting.User.GROUP, SystemSetting.User.class)
+                            .mapNotNull(SystemSetting.User::getDefaultRole)
+                            .filter(StringUtils::isNotBlank)
+                            .switchIfEmpty(Mono.error(() -> new UnsatisfiedAttributeValueException(
+                                    "problemDetail.user.signup.defaultRoleMissing")))
+                            .flatMap(defaultRole -> userService.createUser(newUser, Set.of(defaultRole)));
                 })
                 .flatMap(user -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(user));
+    }
+
+    private Mono<ServerResponse> updateUserProfile(ServerRequest request) {
+        var username = request.pathVariable("name");
+        return request.bodyToMono(UpdateUserProfileRequest.class)
+                .switchIfEmpty(Mono.error(() -> new ServerWebInputException("Request body is required.")))
+                .doOnNext(profile -> {
+                    if (StringUtils.isBlank(profile.displayName()) || StringUtils.isBlank(profile.email())) {
+                        throw new ServerWebInputException("Display name and email are required.");
+                    }
+                })
+                .flatMap(profile -> client.get(User.class, username).flatMap(user -> {
+                    var spec = user.getSpec();
+                    var authorization = Objects.equals(spec.getEmail(), profile.email())
+                            ? Mono.<Void>empty()
+                            : requireSuperAdministrator();
+                    return authorization.then(Mono.defer(() -> {
+                        spec.setDisplayName(profile.displayName());
+                        spec.setEmail(profile.email());
+                        spec.setAvatar(profile.avatar());
+                        spec.setPhone(profile.phone());
+                        spec.setBio(profile.bio());
+                        var oldAnnotations = MetadataUtil.nullSafeAnnotations(user);
+                        var annotations = new HashMap<>(defaultIfNull(profile.annotations(), Map.<String, String>of()));
+                        for (var key : List.of(
+                                User.EMAIL_TO_VERIFY,
+                                User.LAST_AVATAR_ATTACHMENT_NAME_ANNO,
+                                User.AVATAR_ATTACHMENT_NAME_ANNO)) {
+                            if (oldAnnotations.containsKey(key)) {
+                                annotations.put(key, oldAnnotations.get(key));
+                            } else {
+                                annotations.remove(key);
+                            }
+                        }
+                        user.getMetadata().setAnnotations(annotations);
+                        return client.update(user);
+                    }));
+                }))
+                .flatMap(user -> ServerResponse.ok().bodyValue(user));
+    }
+
+    record UpdateUserProfileRequest(
+            @Schema(requiredMode = REQUIRED) String displayName,
+            @Schema(requiredMode = REQUIRED) String email,
+            String avatar,
+            String phone,
+            String bio,
+            Map<String, String> annotations) {}
+
+    private static Mono<Void> requireSuperAdministrator() {
+        return ReactiveSecurityContextHolder.getContext()
+                .map(context -> AuthorityUtils.containsSuperRole(
+                        authoritiesToRoles(context.getAuthentication().getAuthorities())))
+                .filter(Boolean::booleanValue)
+                .switchIfEmpty(Mono.error(() -> new AccessDeniedException("Super administrator role is required.")))
+                .then();
     }
 
     private Mono<ServerResponse> getUserByName(ServerRequest request) {
@@ -493,7 +571,6 @@ public class UserEndpoint implements CustomEndpoint {
      * @param password raw password to set for the user
      * @param bio biography or profile text of the user
      * @param annotations metadata annotations to set on the user
-     * @param roles role {@code metadata.name} values to grant to the user after creation
      */
     record CreateUserRequest(
             @Schema(requiredMode = REQUIRED) String name,
@@ -510,9 +587,7 @@ public class UserEndpoint implements CustomEndpoint {
 
             String bio,
 
-            Map<String, String> annotations,
-
-            Set<String> roles) {
+            Map<String, String> annotations) {
 
         /**
          * Creates a new user from {@link CreateUserRequest}. Note: this method will not set password.
@@ -609,7 +684,8 @@ public class UserEndpoint implements CustomEndpoint {
                         .flatMap(changePasswordRequest -> {
                             var password = changePasswordRequest.password();
                             // encode password
-                            return userService.updateWithRawPassword(username, password);
+                            return requireSuperAdministrator()
+                                    .then(Mono.defer(() -> userService.updateWithRawPassword(username, password)));
                         }))
                 .flatMap(updatedUser -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
@@ -709,8 +785,8 @@ public class UserEndpoint implements CustomEndpoint {
         var username = request.pathVariable("name");
         return request.bodyToMono(GrantRequest.class)
                 .switchIfEmpty(Mono.error(() -> new ServerWebInputException("Request body is empty")))
-                .flatMap(grantRequest -> userService
-                        .grantRoles(username, grantRequest.roles())
+                .flatMap(grantRequest -> requireSuperAdministrator()
+                        .then(Mono.defer(() -> userService.grantRoles(username, grantRequest.roles())))
                         .then(ServerResponse.ok().build()));
     }
 
