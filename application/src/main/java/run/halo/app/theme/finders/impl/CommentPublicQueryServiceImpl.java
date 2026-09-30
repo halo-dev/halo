@@ -7,6 +7,7 @@ import static run.halo.app.extension.index.query.Queries.*;
 
 import com.google.common.hash.Hashing;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -181,6 +182,16 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
     }
 
     private Mono<? extends CommentVo> filterCommentSensitiveData(CommentVo commentVo) {
+        var status = commentVo.getStatus();
+        if (status != null) {
+            var publicStatus = new Comment.CommentStatus();
+            publicStatus.setVisibleReplyCount(status.getVisibleReplyCount());
+            publicStatus.setReplyCount(status.getVisibleReplyCount());
+            if (status.getReplyCount() != null && status.getReplyCount().equals(status.getVisibleReplyCount())) {
+                publicStatus.setLastReplyTime(status.getLastReplyTime());
+            }
+            commentVo.setStatus(publicStatus);
+        }
         var owner = commentVo.getOwner();
         commentVo.setOwner(OwnerInfo.builder()
                 .displayName(owner.getDisplayName())
@@ -293,7 +304,10 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
                                 && Objects.equals(
                                         ownerIdentity(owner.getKind(), owner.getName()),
                                         ownerIdentity(User.KIND, username));
-                        boolean hasPermission = (!commentHidden) || (hasViewPermission || isCommentOwner);
+                        boolean hasPermission = (!commentHidden
+                                        && Boolean.TRUE.equals(comment.getSpec().getApproved()))
+                                || hasViewPermission
+                                || isCommentOwner;
                         if (ExtensionUtil.isDeleted(comment) || !hasPermission) {
                             return Mono.error(
                                     new UnsatisfiedAttributeValueException("problemDetail.comment.unavailable"));
@@ -308,11 +322,50 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
                     var isAnonymous = AnonymousUserConst.isAnonymousUser(username);
                     if (isAnonymous) {
                         builder.andQuery(visibleQuery);
-                    } else if (!(hasViewPermission || (commentHidden && isCommentOwner))) {
-                        builder.andQuery(or(equal("spec.owner", ownerIdentity(User.KIND, username)), visibleQuery));
+                    } else if (!hasViewPermission && comment == null) {
+                        builder.andQuery(or(visibleQuery, equal("spec.owner", ownerIdentity(User.KIND, username))));
+                    } else if (!hasViewPermission) {
+                        var ownedReplies = ListOptions.builder()
+                                .andQuery(equal("spec.owner", ownerIdentity(User.KIND, username)))
+                                .build();
+                        var commentOwner = isCommentOwner;
+                        return client.listAllNames(Reply.class, ownedReplies, Sort.unsorted())
+                                .collectList()
+                                .flatMap(names -> {
+                                    if (names.isEmpty()) {
+                                        return Mono.just(names);
+                                    }
+                                    var deletedReplies = ListOptions.builder()
+                                            .andQuery(not(isNull("metadata.deletionTimestamp")))
+                                            .build();
+                                    return client.listAllNames(Reply.class, deletedReplies, Sort.unsorted())
+                                            .collectList()
+                                            .map(deleted -> {
+                                                names.removeAll(new HashSet<>(deleted));
+                                                return names;
+                                            });
+                                })
+                                .map(names -> {
+                                    var allowed =
+                                            or(visibleQuery, equal("spec.owner", ownerIdentity(User.KIND, username)));
+                                    if (commentOwner) {
+                                        allowed = or(
+                                                allowed,
+                                                and(
+                                                        equal("spec.approved", BooleanUtils.TRUE),
+                                                        isNull("spec.quoteReply")));
+                                    }
+                                    if (!names.isEmpty()) {
+                                        allowed = or(
+                                                allowed,
+                                                and(
+                                                        equal("spec.approved", BooleanUtils.TRUE),
+                                                        in("spec.quoteReply", names)));
+                                    }
+                                    builder.andQuery(allowed);
+                                    return builder;
+                                });
                     }
-                    // View all replies if the user is not an anonymous user, has view permission
-                    // or is the comment owner.
                     return Mono.just(builder);
                 });
     }
