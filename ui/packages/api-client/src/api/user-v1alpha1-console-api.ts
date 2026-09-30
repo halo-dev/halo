@@ -630,8 +630,8 @@ export const UserV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
         },
         /**
          * Update user profile without changing credentials or roles.
-         * @param {string} name
-         * @param {UpdateUserProfileRequest} updateUserProfileRequest
+         * @param {string} name 
+         * @param {UpdateUserProfileRequest} updateUserProfileRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -662,7 +662,7 @@ export const UserV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
 
-
+    
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -944,8 +944,8 @@ export const UserV1alpha1ConsoleApiFp = function(configuration?: Configuration) 
         },
         /**
          * Update user profile without changing credentials or roles.
-         * @param {string} name
-         * @param {UpdateUserProfileRequest} updateUserProfileRequest
+         * @param {string} name 
+         * @param {UpdateUserProfileRequest} updateUserProfileRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
