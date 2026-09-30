@@ -121,6 +121,39 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
         });
     }
 
+    @Override
+    public Mono<UiPluginResources> getThemeUiResources(Theme theme) {
+        return Mono.fromCallable(() -> {
+                    var candidate = themeCandidate(theme);
+                    if (providerResource(candidate, PROVIDER_MANIFEST) == null
+                            && providerResource(candidate, ThemeUiResources.JS_BUNDLE) == null
+                            && providerResource(candidate, ThemeUiResources.CSS_BUNDLE) == null) {
+                        return new UiPluginResources("none", null, null, null);
+                    }
+                    var provider = classify(candidate);
+                    return switch (provider.kind()) {
+                        case INVALID -> new UiPluginResources("invalid", null, null, provider.error());
+                        case ESM ->
+                            new UiPluginResources(
+                                    "esm",
+                                    provider.manifest().entry(),
+                                    provider.manifest().style(),
+                                    null);
+                        case LEGACY ->
+                            new UiPluginResources(
+                                    "legacy",
+                                    providerResource(candidate, ThemeUiResources.JS_BUNDLE) != null
+                                            ? ThemeUiResources.JS_BUNDLE
+                                            : null,
+                                    providerResource(candidate, ThemeUiResources.CSS_BUNDLE) != null
+                                            ? ThemeUiResources.CSS_BUNDLE
+                                            : null,
+                                    null);
+                    };
+                })
+                .subscribeOn(scheduler);
+    }
+
     private Mono<List<ClassifiedProvider>> discoverProviders() {
         return Mono.fromCallable(() -> pluginManager.startedPlugins().stream()
                         .sorted(Comparator.comparing(PluginWrapper::getPluginId))

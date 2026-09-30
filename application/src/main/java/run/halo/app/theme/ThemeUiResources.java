@@ -1,5 +1,6 @@
 package run.halo.app.theme;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import org.jspecify.annotations.Nullable;
@@ -47,6 +48,16 @@ public final class ThemeUiResources {
                 uiRoot.resolve(cleanedResourcePath).toAbsolutePath().normalize();
         FileUtils.checkDirectoryTraversal(uiRoot, resourcePathToCheck);
         if (!Files.isRegularFile(resourcePathToCheck) || !Files.isReadable(resourcePathToCheck)) {
+            return null;
+        }
+        try {
+            var realTheme = themeRoot.resolve(themeName).toRealPath();
+            var realUiRoot = uiRoot.toRealPath();
+            if (!realUiRoot.startsWith(realTheme)
+                    || !resourcePathToCheck.toRealPath().startsWith(realUiRoot)) {
+                return null;
+            }
+        } catch (IOException e) {
             return null;
         }
         return new FileSystemResource(resourcePathToCheck);
