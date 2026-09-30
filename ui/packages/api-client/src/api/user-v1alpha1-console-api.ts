@@ -34,6 +34,8 @@ import type { EmailVerifyRequest } from '../models';
 // @ts-ignore
 import type { GrantRequest } from '../models';
 // @ts-ignore
+import type { UpdateUserProfileRequest } from '../models';
+// @ts-ignore
 import type { User } from '../models';
 // @ts-ignore
 import type { UserEndpointListedUserList } from '../models';
@@ -627,6 +629,53 @@ export const UserV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             };
         },
         /**
+         * Update user profile without changing credentials or roles.
+         * @param {string} name
+         * @param {UpdateUserProfileRequest} updateUserProfileRequest
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateUserProfile: async (name: string, updateUserProfileRequest: UpdateUserProfileRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'name' is not null or undefined
+            assertParamExists('updateUserProfile', 'name', name)
+            // verify required parameter 'updateUserProfileRequest' is not null or undefined
+            assertParamExists('updateUserProfile', 'updateUserProfileRequest', updateUserProfileRequest)
+            const localVarPath = `/apis/api.console.halo.run/v1alpha1/users/{name}`
+                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(updateUserProfileRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * upload user avatar
          * @param {string} name User metadata.name
          * @param {File} file Avatar file.
@@ -894,6 +943,19 @@ export const UserV1alpha1ConsoleApiFp = function(configuration?: Configuration) 
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * Update user profile without changing credentials or roles.
+         * @param {string} name
+         * @param {UpdateUserProfileRequest} updateUserProfileRequest
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updateUserProfile(name: string, updateUserProfileRequest: UpdateUserProfileRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<User>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateUserProfile(name, updateUserProfileRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UserV1alpha1ConsoleApi.updateUserProfile']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * upload user avatar
          * @param {string} name User metadata.name
          * @param {File} file Avatar file.
@@ -1042,6 +1104,15 @@ export const UserV1alpha1ConsoleApiFactory = function (configuration?: Configura
          */
         updateCurrentUser(requestParameters: UserV1alpha1ConsoleApiUpdateCurrentUserRequest, options?: RawAxiosRequestConfig): AxiosPromise<User> {
             return localVarFp.updateCurrentUser(requestParameters.user, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Update user profile without changing credentials or roles.
+         * @param {UserV1alpha1ConsoleApiUpdateUserProfileRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateUserProfile(requestParameters: UserV1alpha1ConsoleApiUpdateUserProfileRequest, options?: RawAxiosRequestConfig): AxiosPromise<User> {
+            return localVarFp.updateUserProfile(requestParameters.name, requestParameters.updateUserProfileRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * upload user avatar
@@ -1207,6 +1278,15 @@ export interface UserV1alpha1ConsoleApiUpdateCurrentUserRequest {
 }
 
 /**
+ * Request parameters for updateUserProfile operation in UserV1alpha1ConsoleApi.
+ */
+export interface UserV1alpha1ConsoleApiUpdateUserProfileRequest {
+    readonly name: string
+
+    readonly updateUserProfileRequest: UpdateUserProfileRequest
+}
+
+/**
  * Request parameters for uploadUserAvatar operation in UserV1alpha1ConsoleApi.
  */
 export interface UserV1alpha1ConsoleApiUploadUserAvatarRequest {
@@ -1359,6 +1439,16 @@ export class UserV1alpha1ConsoleApi extends BaseAPI {
      */
     public updateCurrentUser(requestParameters: UserV1alpha1ConsoleApiUpdateCurrentUserRequest, options?: RawAxiosRequestConfig) {
         return UserV1alpha1ConsoleApiFp(this.configuration).updateCurrentUser(requestParameters.user, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Update user profile without changing credentials or roles.
+     * @param {UserV1alpha1ConsoleApiUpdateUserProfileRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public updateUserProfile(requestParameters: UserV1alpha1ConsoleApiUpdateUserProfileRequest, options?: RawAxiosRequestConfig) {
+        return UserV1alpha1ConsoleApiFp(this.configuration).updateUserProfile(requestParameters.name, requestParameters.updateUserProfileRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

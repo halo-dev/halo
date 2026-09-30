@@ -1,9 +1,5 @@
 <script lang="ts" setup>
-import {
-  consoleApiClient,
-  coreApiClient,
-  type User,
-} from "@halo-dev/api-client";
+import { consoleApiClient, type User } from "@halo-dev/api-client";
 import {
   IconArrowDown,
   VAvatar,
@@ -43,11 +39,11 @@ const { data: selectedUser } = useQuery({
       return null;
     }
 
-    const { data } = await coreApiClient.user.getUser({
+    const { data } = await consoleApiClient.user.getUserDetail({
       name: modelValue.value,
     });
 
-    return data;
+    return data.user;
   },
   cacheTime: 0,
 });

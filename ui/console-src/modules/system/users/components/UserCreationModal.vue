@@ -27,7 +27,6 @@ const formState = ref<CreateUserRequest>({
   email: "",
   name: "",
   password: "",
-  roles: [],
 });
 const isSubmitting = ref(false);
 
@@ -121,14 +120,6 @@ const handleCreateUser = async () => {
         :validation-messages="{
           matches: $t('core.formkit.validation.password'),
         }"
-      ></FormKit>
-      <!-- @vue-ignore -->
-      <FormKit
-        v-model="formState.roles"
-        :label="$t('core.user.grant_permission_modal.fields.role.label')"
-        type="roleSelect"
-        multiple
-        validation="required"
       ></FormKit>
       <FormKit
         v-model="formState.bio"

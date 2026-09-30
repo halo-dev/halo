@@ -5427,6 +5427,45 @@
         "tags": [
           "UserV1alpha1Console"
         ]
+      },
+      "put": {
+        "description": "Update user profile without changing credentials or roles.",
+        "operationId": "UpdateUserProfile",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserProfileRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "UserV1alpha1Console"
+        ]
       }
     },
     "/apis/api.console.halo.run/v1alpha1/users/{name}/avatar": {
@@ -17698,14 +17737,6 @@
           "phone": {
             "type": "string",
             "description": "phone number of the user"
-          },
-          "roles": {
-            "uniqueItems": true,
-            "type": "array",
-            "description": "role \u003ccode\u003emetadata.name\u003c/code\u003e values to grant to the user after creation",
-            "items": {
-              "type": "string"
-            }
           }
         },
         "description": "Payload for creating a user from the console."
@@ -24274,6 +24305,36 @@
           }
         },
         "description": "Browser descriptor for the currently enabled plugin and theme UI providers."
+      },
+      "UpdateUserProfileRequest": {
+        "required": [
+          "displayName",
+          "email"
+        ],
+        "type": "object",
+        "properties": {
+          "annotations": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "avatar": {
+            "type": "string"
+          },
+          "bio": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          }
+        }
       },
       "UpgradeFromUriRequest": {
         "required": [
