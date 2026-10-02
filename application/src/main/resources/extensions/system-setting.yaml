@@ -132,6 +132,8 @@ spec:
           value: "admin,administrator,root,system,superuser,guest,test,demo,user,backup,ftp,www,manager,support,service,api,超级管理员,管理员"
         - $formkit: roleSelect
           name: defaultRole
+          excludedNames:
+            - super-role
           label: "默认角色"
           validation: "required"
           if: "$get(allowRegistration).value === true"

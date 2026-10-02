@@ -37,6 +37,7 @@ import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.ValidationUtils;
 import run.halo.app.infra.exception.AgreementNotAcceptedException;
 import run.halo.app.security.authentication.oauth2.OAuth2RegistrationException.Error;
+import run.halo.app.security.authorization.AuthorityUtils;
 
 @Service
 @Slf4j
@@ -65,6 +66,7 @@ public class OAuth2RegistrationService {
                 .filter(SystemSetting.User::isAllowRegistration)
                 .switchIfEmpty(Mono.error(() -> new OAuth2RegistrationException(Error.REGISTRATION_CLOSED)))
                 .filter(setting -> StringUtils.hasText(setting.getDefaultRole()))
+                .filter(setting -> !AuthorityUtils.SUPER_ROLE_NAME.equals(setting.getDefaultRole()))
                 .switchIfEmpty(Mono.error(() -> new OAuth2RegistrationException(Error.DEFAULT_ROLE_MISSING)))
                 .filter(setting -> CollectionUtils.isEmpty(setting.getRequiredAgreementPages()) || agreedToTerms)
                 .switchIfEmpty(Mono.error(() -> new AgreementNotAcceptedException(

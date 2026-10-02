@@ -481,6 +481,7 @@ public class UserEndpoint implements CustomEndpoint {
                             .fetch(SystemSetting.User.GROUP, SystemSetting.User.class)
                             .mapNotNull(SystemSetting.User::getDefaultRole)
                             .filter(StringUtils::isNotBlank)
+                            .filter(role -> !AuthorityUtils.SUPER_ROLE_NAME.equals(role))
                             .switchIfEmpty(Mono.error(() -> new UnsatisfiedAttributeValueException(
                                     "problemDetail.user.signup.defaultRoleMissing")))
                             .flatMap(defaultRole -> userService.createUser(newUser, Set.of(defaultRole)));
