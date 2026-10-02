@@ -273,6 +273,7 @@ public class UserServiceImpl implements UserService {
                         "problemDetail.user.displayName.restricted",
                         new Object[] {signUpData.getDisplayName()})))
                 .filter(setting -> StringUtils.hasText(setting.getDefaultRole()))
+                .filter(setting -> !AuthorityUtils.SUPER_ROLE_NAME.equals(setting.getDefaultRole()))
                 .switchIfEmpty(Mono.error(
                         () -> new UnsatisfiedAttributeValueException("problemDetail.user.signup.defaultRoleMissing")))
                 .filter(setting -> {

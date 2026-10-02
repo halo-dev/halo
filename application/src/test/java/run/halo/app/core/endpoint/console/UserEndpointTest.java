@@ -522,8 +522,8 @@ class UserEndpointTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"", " "})
-    void shouldRejectCreationWithoutDefaultRole(String role) {
+    @ValueSource(strings = {"", " ", "super-role"})
+    void shouldRejectCreationWithInvalidDefaultRole(String role) {
         var setting = new SystemSetting.User();
         setting.setDefaultRole(role);
         when(environmentFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
