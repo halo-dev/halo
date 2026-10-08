@@ -34,6 +34,8 @@ import type { EmailVerifyRequest } from '../models';
 // @ts-ignore
 import type { GrantRequest } from '../models';
 // @ts-ignore
+import type { UpdateMyProfileRequest } from '../models';
+// @ts-ignore
 import type { UpdateUserProfileRequest } from '../models';
 // @ts-ignore
 import type { User } from '../models';
@@ -96,9 +98,10 @@ export const UserV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             };
         },
         /**
-         * Change own password of user.
+         * Change own password of user. Deprecated in favor of PUT /apis/uc.api.halo.run/v1alpha1/users/-/password.
          * @param {ChangeOwnPasswordRequest} changeOwnPasswordRequest 
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         changeOwnPassword: async (changeOwnPasswordRequest: ChangeOwnPasswordRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
@@ -182,7 +185,7 @@ export const UserV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             };
         },
         /**
-         * delete user avatar
+         * Delete a user\'s avatar by metadata.name. For the current user, prefer DELETE /apis/uc.api.halo.run/v1alpha1/users/-/avatar.
          * @param {string} name User metadata.name
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -305,8 +308,9 @@ export const UserV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             };
         },
         /**
-         * Get current user detail
+         * Get current user detail. Deprecated in favor of GET /apis/uc.api.halo.run/v1alpha1/users/-.
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         getCurrentUserDetail: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
@@ -342,7 +346,7 @@ export const UserV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             };
         },
         /**
-         * Get permissions of user
+         * Get permissions of a user by metadata.name. For the current user, prefer GET /apis/uc.api.halo.run/v1alpha1/users/-/permissions.
          * @param {string} name User metadata.name
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -546,6 +550,7 @@ export const UserV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
          * Send email verification code for user
          * @param {EmailVerifyRequest} emailVerifyRequest 
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         sendEmailVerificationCode: async (emailVerifyRequest: EmailVerifyRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
@@ -586,14 +591,15 @@ export const UserV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             };
         },
         /**
-         * Update current user profile, but password.
-         * @param {User} user 
+         * Update current user profile. Deprecated in favor of PUT /apis/uc.api.halo.run/v1alpha1/users/-.
+         * @param {UpdateMyProfileRequest} updateMyProfileRequest 
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
-        updateCurrentUser: async (user: User, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'user' is not null or undefined
-            assertParamExists('updateCurrentUser', 'user', user)
+        updateCurrentUser: async (updateMyProfileRequest: UpdateMyProfileRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'updateMyProfileRequest' is not null or undefined
+            assertParamExists('updateCurrentUser', 'updateMyProfileRequest', updateMyProfileRequest)
             const localVarPath = `/apis/api.console.halo.run/v1alpha1/users/-`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -621,7 +627,7 @@ export const UserV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(user, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(updateMyProfileRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -676,7 +682,7 @@ export const UserV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             };
         },
         /**
-         * upload user avatar
+         * Upload a user\'s avatar by metadata.name. For the current user, prefer POST /apis/uc.api.halo.run/v1alpha1/users/-/avatar.
          * @param {string} name User metadata.name
          * @param {File} file Avatar file.
          * @param {*} [options] Override http request option.
@@ -731,6 +737,7 @@ export const UserV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
          * Verify email for user by code.
          * @param {VerifyCodeRequest} verifyCodeRequest 
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         verifyEmail: async (verifyCodeRequest: VerifyCodeRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
@@ -793,9 +800,10 @@ export const UserV1alpha1ConsoleApiFp = function(configuration?: Configuration) 
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Change own password of user.
+         * Change own password of user. Deprecated in favor of PUT /apis/uc.api.halo.run/v1alpha1/users/-/password.
          * @param {ChangeOwnPasswordRequest} changeOwnPasswordRequest 
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         async changeOwnPassword(changeOwnPasswordRequest: ChangeOwnPasswordRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<User>> {
@@ -817,7 +825,7 @@ export const UserV1alpha1ConsoleApiFp = function(configuration?: Configuration) 
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * delete user avatar
+         * Delete a user\'s avatar by metadata.name. For the current user, prefer DELETE /apis/uc.api.halo.run/v1alpha1/users/-/avatar.
          * @param {string} name User metadata.name
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -853,8 +861,9 @@ export const UserV1alpha1ConsoleApiFp = function(configuration?: Configuration) 
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Get current user detail
+         * Get current user detail. Deprecated in favor of GET /apis/uc.api.halo.run/v1alpha1/users/-.
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         async getCurrentUserDetail(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DetailedUser>> {
@@ -864,7 +873,7 @@ export const UserV1alpha1ConsoleApiFp = function(configuration?: Configuration) 
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Get permissions of user
+         * Get permissions of a user by metadata.name. For the current user, prefer GET /apis/uc.api.halo.run/v1alpha1/users/-/permissions.
          * @param {string} name User metadata.name
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -922,6 +931,7 @@ export const UserV1alpha1ConsoleApiFp = function(configuration?: Configuration) 
          * Send email verification code for user
          * @param {EmailVerifyRequest} emailVerifyRequest 
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         async sendEmailVerificationCode(emailVerifyRequest: EmailVerifyRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
@@ -931,13 +941,14 @@ export const UserV1alpha1ConsoleApiFp = function(configuration?: Configuration) 
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Update current user profile, but password.
-         * @param {User} user 
+         * Update current user profile. Deprecated in favor of PUT /apis/uc.api.halo.run/v1alpha1/users/-.
+         * @param {UpdateMyProfileRequest} updateMyProfileRequest 
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
-        async updateCurrentUser(user: User, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<User>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updateCurrentUser(user, options);
+        async updateCurrentUser(updateMyProfileRequest: UpdateMyProfileRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<User>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateCurrentUser(updateMyProfileRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['UserV1alpha1ConsoleApi.updateCurrentUser']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -956,7 +967,7 @@ export const UserV1alpha1ConsoleApiFp = function(configuration?: Configuration) 
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * upload user avatar
+         * Upload a user\'s avatar by metadata.name. For the current user, prefer POST /apis/uc.api.halo.run/v1alpha1/users/-/avatar.
          * @param {string} name User metadata.name
          * @param {File} file Avatar file.
          * @param {*} [options] Override http request option.
@@ -972,6 +983,7 @@ export const UserV1alpha1ConsoleApiFp = function(configuration?: Configuration) 
          * Verify email for user by code.
          * @param {VerifyCodeRequest} verifyCodeRequest 
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         async verifyEmail(verifyCodeRequest: VerifyCodeRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
@@ -999,9 +1011,10 @@ export const UserV1alpha1ConsoleApiFactory = function (configuration?: Configura
             return localVarFp.changeAnyonePassword(requestParameters.name, requestParameters.changePasswordRequest, options).then((request) => request(axios, basePath));
         },
         /**
-         * Change own password of user.
+         * Change own password of user. Deprecated in favor of PUT /apis/uc.api.halo.run/v1alpha1/users/-/password.
          * @param {UserV1alpha1ConsoleApiChangeOwnPasswordRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         changeOwnPassword(requestParameters: UserV1alpha1ConsoleApiChangeOwnPasswordRequest, options?: RawAxiosRequestConfig): AxiosPromise<User> {
@@ -1017,7 +1030,7 @@ export const UserV1alpha1ConsoleApiFactory = function (configuration?: Configura
             return localVarFp.createUser(requestParameters.createUserRequest, options).then((request) => request(axios, basePath));
         },
         /**
-         * delete user avatar
+         * Delete a user\'s avatar by metadata.name. For the current user, prefer DELETE /apis/uc.api.halo.run/v1alpha1/users/-/avatar.
          * @param {UserV1alpha1ConsoleApiDeleteUserAvatarRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1044,15 +1057,16 @@ export const UserV1alpha1ConsoleApiFactory = function (configuration?: Configura
             return localVarFp.enableUser(requestParameters.username, options).then((request) => request(axios, basePath));
         },
         /**
-         * Get current user detail
+         * Get current user detail. Deprecated in favor of GET /apis/uc.api.halo.run/v1alpha1/users/-.
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         getCurrentUserDetail(options?: RawAxiosRequestConfig): AxiosPromise<DetailedUser> {
             return localVarFp.getCurrentUserDetail(options).then((request) => request(axios, basePath));
         },
         /**
-         * Get permissions of user
+         * Get permissions of a user by metadata.name. For the current user, prefer GET /apis/uc.api.halo.run/v1alpha1/users/-/permissions.
          * @param {UserV1alpha1ConsoleApiGetPermissionsRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1091,19 +1105,21 @@ export const UserV1alpha1ConsoleApiFactory = function (configuration?: Configura
          * Send email verification code for user
          * @param {UserV1alpha1ConsoleApiSendEmailVerificationCodeRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         sendEmailVerificationCode(requestParameters: UserV1alpha1ConsoleApiSendEmailVerificationCodeRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
             return localVarFp.sendEmailVerificationCode(requestParameters.emailVerifyRequest, options).then((request) => request(axios, basePath));
         },
         /**
-         * Update current user profile, but password.
+         * Update current user profile. Deprecated in favor of PUT /apis/uc.api.halo.run/v1alpha1/users/-.
          * @param {UserV1alpha1ConsoleApiUpdateCurrentUserRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         updateCurrentUser(requestParameters: UserV1alpha1ConsoleApiUpdateCurrentUserRequest, options?: RawAxiosRequestConfig): AxiosPromise<User> {
-            return localVarFp.updateCurrentUser(requestParameters.user, options).then((request) => request(axios, basePath));
+            return localVarFp.updateCurrentUser(requestParameters.updateMyProfileRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * Update user profile without changing credentials or roles.
@@ -1115,7 +1131,7 @@ export const UserV1alpha1ConsoleApiFactory = function (configuration?: Configura
             return localVarFp.updateUserProfile(requestParameters.name, requestParameters.updateUserProfileRequest, options).then((request) => request(axios, basePath));
         },
         /**
-         * upload user avatar
+         * Upload a user\'s avatar by metadata.name. For the current user, prefer POST /apis/uc.api.halo.run/v1alpha1/users/-/avatar.
          * @param {UserV1alpha1ConsoleApiUploadUserAvatarRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1127,6 +1143,7 @@ export const UserV1alpha1ConsoleApiFactory = function (configuration?: Configura
          * Verify email for user by code.
          * @param {UserV1alpha1ConsoleApiVerifyEmailRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         verifyEmail(requestParameters: UserV1alpha1ConsoleApiVerifyEmailRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
@@ -1274,7 +1291,7 @@ export interface UserV1alpha1ConsoleApiSendEmailVerificationCodeRequest {
  * Request parameters for updateCurrentUser operation in UserV1alpha1ConsoleApi.
  */
 export interface UserV1alpha1ConsoleApiUpdateCurrentUserRequest {
-    readonly user: User
+    readonly updateMyProfileRequest: UpdateMyProfileRequest
 }
 
 /**
@@ -1323,9 +1340,10 @@ export class UserV1alpha1ConsoleApi extends BaseAPI {
     }
 
     /**
-     * Change own password of user.
+     * Change own password of user. Deprecated in favor of PUT /apis/uc.api.halo.run/v1alpha1/users/-/password.
      * @param {UserV1alpha1ConsoleApiChangeOwnPasswordRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
+     * @deprecated
      * @throws {RequiredError}
      */
     public changeOwnPassword(requestParameters: UserV1alpha1ConsoleApiChangeOwnPasswordRequest, options?: RawAxiosRequestConfig) {
@@ -1343,7 +1361,7 @@ export class UserV1alpha1ConsoleApi extends BaseAPI {
     }
 
     /**
-     * delete user avatar
+     * Delete a user\'s avatar by metadata.name. For the current user, prefer DELETE /apis/uc.api.halo.run/v1alpha1/users/-/avatar.
      * @param {UserV1alpha1ConsoleApiDeleteUserAvatarRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -1373,8 +1391,9 @@ export class UserV1alpha1ConsoleApi extends BaseAPI {
     }
 
     /**
-     * Get current user detail
+     * Get current user detail. Deprecated in favor of GET /apis/uc.api.halo.run/v1alpha1/users/-.
      * @param {*} [options] Override http request option.
+     * @deprecated
      * @throws {RequiredError}
      */
     public getCurrentUserDetail(options?: RawAxiosRequestConfig) {
@@ -1382,7 +1401,7 @@ export class UserV1alpha1ConsoleApi extends BaseAPI {
     }
 
     /**
-     * Get permissions of user
+     * Get permissions of a user by metadata.name. For the current user, prefer GET /apis/uc.api.halo.run/v1alpha1/users/-/permissions.
      * @param {UserV1alpha1ConsoleApiGetPermissionsRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -1425,6 +1444,7 @@ export class UserV1alpha1ConsoleApi extends BaseAPI {
      * Send email verification code for user
      * @param {UserV1alpha1ConsoleApiSendEmailVerificationCodeRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
+     * @deprecated
      * @throws {RequiredError}
      */
     public sendEmailVerificationCode(requestParameters: UserV1alpha1ConsoleApiSendEmailVerificationCodeRequest, options?: RawAxiosRequestConfig) {
@@ -1432,13 +1452,14 @@ export class UserV1alpha1ConsoleApi extends BaseAPI {
     }
 
     /**
-     * Update current user profile, but password.
+     * Update current user profile. Deprecated in favor of PUT /apis/uc.api.halo.run/v1alpha1/users/-.
      * @param {UserV1alpha1ConsoleApiUpdateCurrentUserRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
+     * @deprecated
      * @throws {RequiredError}
      */
     public updateCurrentUser(requestParameters: UserV1alpha1ConsoleApiUpdateCurrentUserRequest, options?: RawAxiosRequestConfig) {
-        return UserV1alpha1ConsoleApiFp(this.configuration).updateCurrentUser(requestParameters.user, options).then((request) => request(this.axios, this.basePath));
+        return UserV1alpha1ConsoleApiFp(this.configuration).updateCurrentUser(requestParameters.updateMyProfileRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1452,7 +1473,7 @@ export class UserV1alpha1ConsoleApi extends BaseAPI {
     }
 
     /**
-     * upload user avatar
+     * Upload a user\'s avatar by metadata.name. For the current user, prefer POST /apis/uc.api.halo.run/v1alpha1/users/-/avatar.
      * @param {UserV1alpha1ConsoleApiUploadUserAvatarRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -1465,6 +1486,7 @@ export class UserV1alpha1ConsoleApi extends BaseAPI {
      * Verify email for user by code.
      * @param {UserV1alpha1ConsoleApiVerifyEmailRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
+     * @deprecated
      * @throws {RequiredError}
      */
     public verifyEmail(requestParameters: UserV1alpha1ConsoleApiVerifyEmailRequest, options?: RawAxiosRequestConfig) {

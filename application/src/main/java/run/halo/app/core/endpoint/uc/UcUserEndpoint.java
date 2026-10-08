@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
 import org.springframework.security.core.Authentication;
@@ -15,12 +16,14 @@ import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import org.springframework.web.reactive.function.server.RequestPredicates;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
+import run.halo.app.core.endpoint.console.UserEndpoint;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.core.user.service.UserService;
@@ -42,17 +45,74 @@ class UcUserEndpoint implements CustomEndpoint {
 
     private final UserService userService;
 
+    private final UserEndpoint userEndpoint;
+
     @Override
     public RouterFunction<ServerResponse> endpoint() {
         var tag = "UserV1alpha1Uc";
         return SpringdocRouteBuilder.route()
                 .GET(
                         "/users/-",
-                        this::getCurrentUser,
-                        builder -> builder.operationId("GetMyUser")
+                        userEndpoint::me,
+                        builder -> builder.operationId("GetMyUserDetail")
                                 .tag(tag)
-                                .description("Get current user profile without password hash.")
-                                .response(responseBuilder().implementation(UcUserVo.class)))
+                                .description("Get current user detail, including roles.")
+                                .response(responseBuilder().implementation(UserEndpoint.DetailedUser.class)))
+                .PUT(
+                        "/users/-",
+                        userEndpoint::updateProfile,
+                        builder -> builder.operationId("UpdateMyProfile")
+                                .tag(tag)
+                                .description("Update the current user's profile.")
+                                .requestBody(requestBodyBuilder()
+                                        .required(true)
+                                        .implementation(UserEndpoint.UpdateMyProfileRequest.class))
+                                .response(responseBuilder().implementation(User.class)))
+                .POST(
+                        "/users/-/avatar",
+                        RequestPredicates.contentType(MediaType.MULTIPART_FORM_DATA),
+                        userEndpoint::uploadMyAvatar,
+                        builder -> builder.operationId("UploadMyAvatar")
+                                .tag(tag)
+                                .description("Upload the current user's avatar.")
+                                .requestBody(requestBodyBuilder()
+                                        .required(true)
+                                        .implementation(UserEndpoint.IAvatarUploadRequest.class))
+                                .response(responseBuilder().implementation(User.class)))
+                .DELETE(
+                        "/users/-/avatar",
+                        userEndpoint::deleteMyAvatar,
+                        builder -> builder.operationId("DeleteMyAvatar")
+                                .tag(tag)
+                                .description("Delete the current user's avatar.")
+                                .response(responseBuilder().implementation(User.class)))
+                .POST(
+                        "/users/-/send-email-verification-code",
+                        userEndpoint::sendEmailVerificationCode,
+                        builder -> builder.operationId("SendMyEmailVerificationCode")
+                                .tag(tag)
+                                .description("Send an email verification code to the current user.")
+                                .requestBody(requestBodyBuilder()
+                                        .required(true)
+                                        .implementation(UserEndpoint.EmailVerifyRequest.class))
+                                .response(responseBuilder().implementation(Void.class)))
+                .POST(
+                        "/users/-/verify-email",
+                        userEndpoint::verifyEmail,
+                        builder -> builder.operationId("VerifyMyEmail")
+                                .tag(tag)
+                                .description("Verify the current user's email address.")
+                                .requestBody(requestBodyBuilder()
+                                        .required(true)
+                                        .implementation(UserEndpoint.VerifyCodeRequest.class))
+                                .response(responseBuilder().implementation(Void.class)))
+                .GET(
+                        "/users/-/permissions",
+                        userEndpoint::getMyPermissions,
+                        builder -> builder.operationId("GetMyPermissions")
+                                .tag(tag)
+                                .description("Get permissions of the current user.")
+                                .response(responseBuilder().implementation(UserEndpoint.UserPermission.class)))
                 .PUT(
                         "/users/-/password",
                         this::changeMyPassword,
@@ -64,14 +124,6 @@ class UcUserEndpoint implements CustomEndpoint {
                                         .implementation(ChangeMyPasswordRequest.class))
                                 .response(responseBuilder().implementation(UcUserVo.class)))
                 .build();
-    }
-
-    private Mono<ServerResponse> getCurrentUser(ServerRequest request) {
-        return authenticated()
-                .map(Authentication::getName)
-                .flatMap(userService::getUser)
-                .map(this::toUserVo)
-                .flatMap(userVo -> ServerResponse.ok().bodyValue(userVo));
     }
 
     private Mono<ServerResponse> changeMyPassword(ServerRequest request) {

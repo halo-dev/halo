@@ -1,6 +1,6 @@
 import {
   axiosInstance,
-  consoleApiClient,
+  ucApiClient,
   type DetailedUser,
 } from "@halo-dev/api-client";
 import { defineStore } from "pinia";
@@ -118,7 +118,7 @@ export const stores = {
      * @throws Will throw an error if the API request fails.
      */
     async function fetchCurrentUser() {
-      const { data } = await consoleApiClient.user.getCurrentUserDetail();
+      const { data } = await ucApiClient.user.currentUser.getMyUserDetail();
       currentUser.value = data;
       isAnonymous.value = data.user.metadata.name === "anonymousUser";
     }

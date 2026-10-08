@@ -934,14 +934,93 @@
     },
     "/apis/uc.api.halo.run/v1alpha1/users/-": {
       "get": {
-        "description": "Get current user profile without password hash.",
-        "operationId": "GetMyUser",
+        "description": "Get current user detail, including roles.",
+        "operationId": "GetMyUserDetail",
         "responses": {
           "default": {
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/UcUserVo"
+                  "$ref": "#/components/schemas/DetailedUser"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "UserV1alpha1Uc"
+        ]
+      },
+      "put": {
+        "description": "Update the current user\u0027s profile.",
+        "operationId": "UpdateMyProfile",
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMyProfileRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "UserV1alpha1Uc"
+        ]
+      }
+    },
+    "/apis/uc.api.halo.run/v1alpha1/users/-/avatar": {
+      "delete": {
+        "description": "Delete the current user\u0027s avatar.",
+        "operationId": "DeleteMyAvatar",
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "UserV1alpha1Uc"
+        ]
+      },
+      "post": {
+        "description": "Upload the current user\u0027s avatar.",
+        "operationId": "UploadMyAvatar",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/IAvatarUploadRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
                 }
               }
             },
@@ -976,6 +1055,77 @@
                 }
               }
             },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "UserV1alpha1Uc"
+        ]
+      }
+    },
+    "/apis/uc.api.halo.run/v1alpha1/users/-/permissions": {
+      "get": {
+        "description": "Get permissions of the current user.",
+        "operationId": "GetMyPermissions",
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserPermission"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "UserV1alpha1Uc"
+        ]
+      }
+    },
+    "/apis/uc.api.halo.run/v1alpha1/users/-/send-email-verification-code": {
+      "post": {
+        "description": "Send an email verification code to the current user.",
+        "operationId": "SendMyEmailVerificationCode",
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailVerifyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "content": {},
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "UserV1alpha1Uc"
+        ]
+      }
+    },
+    "/apis/uc.api.halo.run/v1alpha1/users/-/verify-email": {
+      "post": {
+        "description": "Verify the current user\u0027s email address.",
+        "operationId": "VerifyMyEmail",
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyCodeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "content": {},
             "description": "default response"
           }
         },
@@ -2094,6 +2244,34 @@
           }
         }
       },
+      "DetailedUser": {
+        "required": [
+          "roles",
+          "user"
+        ],
+        "type": "object",
+        "properties": {
+          "impersonator": {
+            "type": "string",
+            "description": "name of the original administrator who switched to this user, or \u003ccode\u003enull\u003c/code\u003e if the current\n     session is not impersonated"
+          },
+          "passwordSet": {
+            "type": "boolean",
+            "description": "whether the user has a password set; \u003ccode\u003enull\u003c/code\u003e when the response is not the current user\u0027s\n     own detail"
+          },
+          "roles": {
+            "type": "array",
+            "description": "roles granted to the user",
+            "items": {
+              "$ref": "#/components/schemas/Role"
+            }
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          }
+        },
+        "description": "User detail response with resolved roles."
+      },
       "Device": {
         "required": [
           "apiVersion",
@@ -2181,6 +2359,21 @@
         },
         "description": "Parsed browser and operating system details for display."
       },
+      "EmailVerifyRequest": {
+        "required": [
+          "email"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "email address to verify",
+            "minLength": 1
+          }
+        },
+        "description": "Payload for sending an email verification code."
+      },
       "Excerpt": {
         "required": [
           "autoGenerate"
@@ -2212,6 +2405,20 @@
           }
         },
         "description": "GroupKind contains group and kind data only."
+      },
+      "IAvatarUploadRequest": {
+        "required": [
+          "file"
+        ],
+        "type": "object",
+        "properties": {
+          "file": {
+            "type": "string",
+            "description": "Avatar file.",
+            "format": "binary"
+          }
+        },
+        "description": "Multipart payload for uploading a user avatar."
       },
       "JsonPatch": {
         "minItems": 1,
@@ -2695,6 +2902,47 @@
         },
         "description": "Personal access token extension used for non-interactive API authentication on behalf of a Halo user."
       },
+      "PolicyRule": {
+        "type": "object",
+        "properties": {
+          "apiGroups": {
+            "type": "array",
+            "description": "APIGroups is the name of the APIGroup that contains the resources. If multiple API groups are specified, any\n action requested against one of the enumerated resources in any API group will be allowed.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "nonResourceURLs": {
+            "type": "array",
+            "description": "NonResourceURLs is a set of partial urls that a user should have access to. *s are allowed, but only as the\n full, final step in the path If an action is not a resource API request, then the URL is split on \u0027/\u0027 and is\n checked against the NonResourceURLs to look for a match. Since non-resource URLs are not namespaced, this\n field is only applicable for ClusterRoles referenced from a ClusterRoleBinding. Rules can either apply to API\n resources (such as \"pods\" or \"secrets\") or non-resource URL paths (such as \"/api\"), but not both.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "resourceNames": {
+            "type": "array",
+            "description": "ResourceNames is an optional white list of names that the rule applies to. An empty set means that everything\n is allowed.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "resources": {
+            "type": "array",
+            "description": "Resources is a list of resources this rule applies to. \u0027*\u0027 represents all resources in the specified\n apiGroups. \u0027*\u0026#47;foo\u0027 represents the subresource \u0027foo\u0027 for all resources in the specified apiGroups.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "verbs": {
+            "type": "array",
+            "description": "Verbs allowed by this rule, such as get, list, create, update, patch, or delete.",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "description": "PolicyRule holds information that describes a policy rule, but does not contain information about whom the rule\n applies to or which namespace the rule applies to."
+      },
       "Post": {
         "required": [
           "apiVersion",
@@ -3096,6 +3344,34 @@
           }
         }
       },
+      "Role": {
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "rules"
+        ],
+        "type": "object",
+        "properties": {
+          "apiVersion": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata"
+          },
+          "rules": {
+            "type": "array",
+            "description": "Policy rules granted by this role.",
+            "items": {
+              "$ref": "#/components/schemas/PolicyRule"
+            }
+          }
+        },
+        "description": "Role extension that defines RBAC policy rules for users and other subjects."
+      },
       "SnapShotSpec": {
         "required": [
           "owner",
@@ -3426,6 +3702,23 @@
         },
         "description": "Masked current user profile. The password hash is never exposed."
       },
+      "UpdateMyProfileRequest": {
+        "required": [
+          "displayName"
+        ],
+        "type": "object",
+        "properties": {
+          "bio": {
+            "type": "string",
+            "description": "biography or profile text"
+          },
+          "displayName": {
+            "type": "string",
+            "description": "display name shown in the console and theme"
+          }
+        },
+        "description": "Payload for updating the current user\u0027s editable profile fields."
+      },
       "UploadForm": {
         "type": "object",
         "properties": {
@@ -3444,6 +3737,33 @@
           }
         },
         "description": "Upload form from console. The file and url are mutually exclusive. If both are provided, the file will be used."
+      },
+      "User": {
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec"
+        ],
+        "type": "object",
+        "properties": {
+          "apiVersion": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata"
+          },
+          "spec": {
+            "$ref": "#/components/schemas/UserSpec"
+          },
+          "status": {
+            "$ref": "#/components/schemas/UserStatus"
+          }
+        },
+        "description": "User extension that stores profile, authentication, and account state for a Halo user."
       },
       "UserConnection": {
         "required": [
@@ -3518,6 +3838,126 @@
           }
         },
         "description": "User device entry with session state."
+      },
+      "UserPermission": {
+        "required": [
+          "permissions",
+          "roles",
+          "uiPermissions"
+        ],
+        "type": "object",
+        "properties": {
+          "permissions": {
+            "type": "array",
+            "description": "Role templates or permissions resolved from granted roles.",
+            "items": {
+              "$ref": "#/components/schemas/Role"
+            }
+          },
+          "roles": {
+            "type": "array",
+            "description": "Roles granted to the user.",
+            "items": {
+              "$ref": "#/components/schemas/Role"
+            }
+          },
+          "uiPermissions": {
+            "type": "array",
+            "description": "Resolved UI permission identifiers.",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "description": "Resolved role and permission information for a user."
+      },
+      "UserSpec": {
+        "required": [
+          "displayName"
+        ],
+        "type": "object",
+        "properties": {
+          "avatar": {
+            "type": "string",
+            "description": "Avatar URL or attachment URI for the user."
+          },
+          "bio": {
+            "type": "string",
+            "description": "User biography shown on profile surfaces."
+          },
+          "disabled": {
+            "type": "boolean",
+            "description": "Whether the user account is disabled."
+          },
+          "displayName": {
+            "type": "string",
+            "description": "Display name shown for the user."
+          },
+          "email": {
+            "type": "string",
+            "description": "Email address used for sign-in and notifications."
+          },
+          "emailVerified": {
+            "type": "boolean",
+            "description": "Whether the email address has been verified."
+          },
+          "loginHistoryLimit": {
+            "type": "integer",
+            "description": "Maximum number of login history entries retained for this user.",
+            "format": "int32"
+          },
+          "password": {
+            "type": "string",
+            "description": "Password hash or encoded password value."
+          },
+          "phone": {
+            "type": "string",
+            "description": "Phone number associated with the user."
+          },
+          "registeredAt": {
+            "type": "string",
+            "description": "Time when the user registered.",
+            "format": "date-time"
+          },
+          "totpEncryptedSecret": {
+            "type": "string",
+            "description": "Encrypted TOTP secret used for two-factor authentication."
+          },
+          "twoFactorAuthEnabled": {
+            "type": "boolean",
+            "description": "Whether two-factor authentication is enabled for this user."
+          }
+        },
+        "description": "Desired user profile and authentication settings."
+      },
+      "UserStatus": {
+        "type": "object",
+        "properties": {
+          "permalink": {
+            "type": "string",
+            "description": "Public permalink of the user\u0027s profile or author page."
+          }
+        },
+        "description": "Observed user state derived by the application."
+      },
+      "VerifyCodeRequest": {
+        "required": [
+          "code",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "minLength": 1,
+            "type": "string",
+            "description": "email verification code"
+          },
+          "password": {
+            "type": "string",
+            "description": "current password of the authenticated user"
+          }
+        },
+        "description": "Payload for verifying an email address by code."
       }
     },
     "securitySchemes": {

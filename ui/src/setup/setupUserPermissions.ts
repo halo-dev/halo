@@ -1,13 +1,11 @@
-import { consoleApiClient } from "@halo-dev/api-client";
+import { ucApiClient } from "@halo-dev/api-client";
 import { utils } from "@halo-dev/ui-shared";
 import type { App, DirectiveBinding } from "vue";
 import { useRoleStore } from "@/stores/role";
 
 export async function setupUserPermissions(app: App) {
   const { data: currentPermissions } =
-    await consoleApiClient.user.getPermissions({
-      name: "-",
-    });
+    await ucApiClient.user.currentUser.getMyPermissions();
   const roleStore = useRoleStore();
   roleStore.$patch({
     permissions: currentPermissions,

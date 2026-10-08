@@ -122,7 +122,10 @@ public class UserEndpoint implements CustomEndpoint {
                         "/users/-",
                         this::me,
                         builder -> builder.operationId("GetCurrentUserDetail")
-                                .description("Get current user detail")
+                                .description("""
+                                        Get current user detail.
+                                        Deprecated in favor of GET /apis/uc.api.halo.run/v1alpha1/users/-.""")
+                                .deprecated(true)
                                 .tag(tag)
                                 .response(responseBuilder().implementation(DetailedUser.class)))
                 .GET(
@@ -141,9 +144,14 @@ public class UserEndpoint implements CustomEndpoint {
                         "/users/-",
                         this::updateProfile,
                         builder -> builder.operationId("UpdateCurrentUser")
-                                .description("Update current user profile, but password.")
+                                .description("""
+                                        Update current user profile.
+                                        Deprecated in favor of PUT /apis/uc.api.halo.run/v1alpha1/users/-.""")
+                                .deprecated(true)
                                 .tag(tag)
-                                .requestBody(requestBodyBuilder().required(true).implementation(User.class))
+                                .requestBody(requestBodyBuilder()
+                                        .required(true)
+                                        .implementation(UpdateMyProfileRequest.class))
                                 .response(responseBuilder().implementation(User.class)))
                 .PUT(
                         "/users/{name}",
@@ -185,7 +193,9 @@ public class UserEndpoint implements CustomEndpoint {
                         "/users/{name}/permissions",
                         this::getUserPermission,
                         builder -> builder.operationId("GetPermissions")
-                                .description("Get permissions of user")
+                                .description("""
+                                        Get permissions of a user by metadata.name.
+                                        For the current user, prefer GET /apis/uc.api.halo.run/v1alpha1/users/-/permissions.""")
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .in(ParameterIn.PATH)
@@ -197,7 +207,10 @@ public class UserEndpoint implements CustomEndpoint {
                         "/users/-/password",
                         this::changeOwnPassword,
                         builder -> builder.operationId("ChangeOwnPassword")
-                                .description("Change own password of user.")
+                                .description("""
+                                        Change own password of user.
+                                        Deprecated in favor of PUT /apis/uc.api.halo.run/v1alpha1/users/-/password.""")
+                                .deprecated(true)
                                 .tag(tag)
                                 .requestBody(requestBodyBuilder()
                                         .required(true)
@@ -231,7 +244,9 @@ public class UserEndpoint implements CustomEndpoint {
                         contentType(MediaType.MULTIPART_FORM_DATA),
                         this::uploadUserAvatar,
                         builder -> builder.operationId("UploadUserAvatar")
-                                .description("upload user avatar")
+                                .description("""
+                                        Upload a user's avatar by metadata.name.
+                                        For the current user, prefer POST /apis/uc.api.halo.run/v1alpha1/users/-/avatar.""")
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .in(ParameterIn.PATH)
@@ -249,7 +264,9 @@ public class UserEndpoint implements CustomEndpoint {
                         this::deleteUserAvatar,
                         builder -> builder.tag(tag)
                                 .operationId("DeleteUserAvatar")
-                                .description("delete user avatar")
+                                .description("""
+                                        Delete a user's avatar by metadata.name.
+                                        For the current user, prefer DELETE /apis/uc.api.halo.run/v1alpha1/users/-/avatar.""")
                                 .parameter(parameterBuilder()
                                         .in(ParameterIn.PATH)
                                         .name("name")
@@ -261,6 +278,7 @@ public class UserEndpoint implements CustomEndpoint {
                         "users/-/send-email-verification-code",
                         this::sendEmailVerificationCode,
                         builder -> builder.tag(tag)
+                                .deprecated(true)
                                 .operationId("SendEmailVerificationCode")
                                 .requestBody(requestBodyBuilder()
                                         .implementation(EmailVerifyRequest.class)
@@ -272,6 +290,7 @@ public class UserEndpoint implements CustomEndpoint {
                         "users/-/verify-email",
                         this::verifyEmail,
                         builder -> builder.tag(tag)
+                                .deprecated(true)
                                 .operationId("VerifyEmail")
                                 .description("Verify email for user by code.")
                                 .requestBody(
@@ -281,7 +300,7 @@ public class UserEndpoint implements CustomEndpoint {
                 .build();
     }
 
-    private Mono<ServerResponse> verifyEmail(ServerRequest request) {
+    public Mono<ServerResponse> verifyEmail(ServerRequest request) {
         return request.bodyToMono(VerifyCodeRequest.class)
                 .switchIfEmpty(Mono.error(() -> new ServerWebInputException("Request body is required.")))
                 .flatMap(this::doVerifyCode)
@@ -331,7 +350,7 @@ public class UserEndpoint implements CustomEndpoint {
 
             @Schema(requiredMode = REQUIRED, minLength = 1) String code) {}
 
-    private Mono<ServerResponse> sendEmailVerificationCode(ServerRequest request) {
+    public Mono<ServerResponse> sendEmailVerificationCode(ServerRequest request) {
         var emailMono = request.bodyToMono(EmailVerifyRequest.class)
                 .switchIfEmpty(Mono.error(() -> new ServerWebInputException("Request body is required.")))
                 .doOnNext(emailReq -> {
@@ -367,9 +386,18 @@ public class UserEndpoint implements CustomEndpoint {
         return RateLimiterOperator.of(rateLimiter);
     }
 
-    private Mono<ServerResponse> deleteUserAvatar(ServerRequest request) {
+    public Mono<ServerResponse> deleteMyAvatar(ServerRequest request) {
+        return deleteAvatarFor(getAuthenticatedUserName());
+    }
+
+    Mono<ServerResponse> deleteUserAvatar(ServerRequest request) {
         final var nameInPath = request.pathVariable("name");
-        return getUserOrSelf(nameInPath)
+        return deleteAvatarFor(
+                getUserOrSelf(nameInPath).map(user -> user.getMetadata().getName()));
+    }
+
+    private Mono<ServerResponse> deleteAvatarFor(Mono<String> username) {
+        return username.flatMap(name -> client.get(User.class, name))
                 .flatMap(user -> {
                     MetadataUtil.nullSafeAnnotations(user).remove(User.AVATAR_ATTACHMENT_NAME_ANNO);
                     user.getSpec().setAvatar(null);
@@ -385,13 +413,20 @@ public class UserEndpoint implements CustomEndpoint {
         return getAuthenticatedUserName().flatMap(currentUserName -> client.get(User.class, currentUserName));
     }
 
-    private Mono<ServerResponse> uploadUserAvatar(ServerRequest request) {
+    public Mono<ServerResponse> uploadMyAvatar(ServerRequest request) {
+        return uploadAvatarFor(request, getAuthenticatedUserName().flatMap(name -> client.get(User.class, name)));
+    }
+
+    Mono<ServerResponse> uploadUserAvatar(ServerRequest request) {
         final var username = request.pathVariable("name");
+        return uploadAvatarFor(request, getUserOrSelf(username));
+    }
+
+    private Mono<ServerResponse> uploadAvatarFor(ServerRequest request, Mono<User> userMono) {
         return request.body(BodyExtractors.toMultipartData())
                 .map(AvatarUploadRequest::new)
                 .flatMap(this::uploadAvatar)
-                .flatMap(attachment -> getUserOrSelf(username)
-                        .flatMap(user -> {
+                .flatMap(attachment -> userMono.flatMap(user -> {
                             MetadataUtil.nullSafeAnnotations(user)
                                     .put(
                                             User.AVATAR_ATTACHMENT_NAME_ANNO,
@@ -614,53 +649,43 @@ public class UserEndpoint implements CustomEndpoint {
         }
     }
 
-    private Mono<ServerResponse> updateProfile(ServerRequest request) {
+    /**
+     * Payload for updating the current user's editable profile fields.
+     *
+     * @param displayName display name shown in the console and theme
+     * @param bio biography or profile text
+     */
+    public record UpdateMyProfileRequest(
+            @Schema(requiredMode = REQUIRED) String displayName, String bio) {}
+
+    public Mono<ServerResponse> updateProfile(ServerRequest request) {
         return getAuthenticatedUserName()
                 .flatMap(currentUserName -> client.get(User.class, currentUserName))
-                .flatMap(currentUser -> request.bodyToMono(User.class)
-                        .filter(user -> user.getMetadata() != null
-                                && Objects.equals(
-                                        user.getMetadata().getName(),
-                                        currentUser.getMetadata().getName()))
-                        .switchIfEmpty(Mono.error(() -> new ServerWebInputException("Username didn't match.")))
-                        .flatMap(user -> {
-                            var newDisplayName = user.getSpec().getDisplayName();
-                            var oldDisplayName = currentUser.getSpec().getDisplayName();
-                            return Mono.just(user)
-                                    .filterWhen(u -> {
-                                        if (Objects.equals(oldDisplayName, newDisplayName)) {
-                                            return Mono.just(true);
-                                        }
-                                        return environmentFetcher
-                                                .fetch(SystemSetting.User.GROUP, SystemSetting.User.class)
-                                                .map(setting -> isDisplayNameAllowed(setting, newDisplayName))
-                                                .defaultIfEmpty(false);
-                                    })
-                                    .switchIfEmpty(Mono.defer(() -> Mono.error(new RestrictedNameException(
-                                            "The display name is restricted.",
-                                            "problemDetail.user.displayName.restricted",
-                                            new Object[] {newDisplayName}))));
-                        })
-                        .map(user -> {
-                            Map<String, String> oldAnnotations = MetadataUtil.nullSafeAnnotations(currentUser);
-                            Map<String, String> newAnnotations =
-                                    user.getMetadata().getAnnotations();
-                            if (!CollectionUtils.isEmpty(newAnnotations)) {
-                                newAnnotations.put(
-                                        User.LAST_AVATAR_ATTACHMENT_NAME_ANNO,
-                                        oldAnnotations.get(User.LAST_AVATAR_ATTACHMENT_NAME_ANNO));
-                                newAnnotations.put(
-                                        User.AVATAR_ATTACHMENT_NAME_ANNO,
-                                        oldAnnotations.get(User.AVATAR_ATTACHMENT_NAME_ANNO));
-                                newAnnotations.put(User.EMAIL_TO_VERIFY, oldAnnotations.get(User.EMAIL_TO_VERIFY));
-                                currentUser.getMetadata().setAnnotations(newAnnotations);
+                .flatMap(currentUser -> request.bodyToMono(UpdateMyProfileRequest.class)
+                        .switchIfEmpty(Mono.error(() -> new ServerWebInputException("Request body is required.")))
+                        .doOnNext(profile -> {
+                            if (StringUtils.isBlank(profile.displayName())) {
+                                throw new ServerWebInputException("Display name is required.");
                             }
-                            var spec = currentUser.getSpec();
-                            var newSpec = user.getSpec();
-                            spec.setBio(newSpec.getBio());
-                            spec.setDisplayName(newSpec.getDisplayName());
-                            spec.setTwoFactorAuthEnabled(newSpec.getTwoFactorAuthEnabled());
-                            spec.setPhone(newSpec.getPhone());
+                        })
+                        .filterWhen(profile -> {
+                            var newDisplayName = profile.displayName();
+                            var oldDisplayName = currentUser.getSpec().getDisplayName();
+                            if (Objects.equals(oldDisplayName, newDisplayName)) {
+                                return Mono.just(true);
+                            }
+                            return Mono.defer(() -> environmentFetcher.fetch(
+                                            SystemSetting.User.GROUP, SystemSetting.User.class))
+                                    .map(setting -> isDisplayNameAllowed(setting, newDisplayName))
+                                    .defaultIfEmpty(false);
+                        })
+                        .switchIfEmpty(Mono.defer(() -> Mono.error(new RestrictedNameException(
+                                "The display name is restricted.",
+                                "problemDetail.user.displayName.restricted",
+                                new Object[] {currentUser.getSpec().getDisplayName()}))))
+                        .map(profile -> {
+                            currentUser.getSpec().setDisplayName(profile.displayName());
+                            currentUser.getSpec().setBio(profile.bio());
                             return currentUser;
                         }))
                 .flatMap(client::update)
@@ -746,7 +771,7 @@ public class UserEndpoint implements CustomEndpoint {
     record ChangePasswordRequest(
             @Schema(requiredMode = REQUIRED, minLength = 5) String password) {}
 
-    Mono<ServerResponse> me(ServerRequest request) {
+    public Mono<ServerResponse> me(ServerRequest request) {
         return ReactiveSecurityContextHolder.getContext()
                 .map(SecurityContext::getAuthentication)
                 .filter(Authentication::isAuthenticated)
@@ -763,6 +788,7 @@ public class UserEndpoint implements CustomEndpoint {
                             .collectList()
                             .map(roles -> new DetailedUser(user, roles, impersonator));
                 }))
+                .map(this::redactCurrentUserSecrets)
                 .flatMap(detailedUser -> ServerResponse.ok().bodyValue(detailedUser));
     }
 
@@ -773,13 +799,31 @@ public class UserEndpoint implements CustomEndpoint {
      * @param roles roles granted to the user
      * @param impersonator name of the original administrator who switched to this user, or {@code null} if the current
      *     session is not impersonated
+     * @param passwordSet whether the user has a password set; {@code null} when the response is not the current user's
+     *     own detail
      */
-    record DetailedUser(
+    public record DetailedUser(
             @Schema(requiredMode = REQUIRED) User user,
 
             @Schema(requiredMode = REQUIRED) List<Role> roles,
 
-            String impersonator) {}
+            String impersonator,
+
+            Boolean passwordSet) {
+
+        public DetailedUser(User user, List<Role> roles, String impersonator) {
+            this(user, roles, impersonator, null);
+        }
+    }
+
+    private DetailedUser redactCurrentUserSecrets(DetailedUser detailedUser) {
+        var user = detailedUser.user();
+        var passwordSet =
+                org.springframework.util.StringUtils.hasText(user.getSpec().getPassword());
+        user.getSpec().setPassword(null);
+        user.getSpec().setTotpEncryptedSecret(null);
+        return new DetailedUser(user, detailedUser.roles(), detailedUser.impersonator(), passwordSet);
+    }
 
     Mono<ServerResponse> grantPermission(ServerRequest request) {
         var username = request.pathVariable("name");
@@ -797,18 +841,28 @@ public class UserEndpoint implements CustomEndpoint {
      */
     record GrantRequest(@Schema(requiredMode = REQUIRED) Set<String> roles) {}
 
-    private Mono<ServerResponse> getUserPermission(ServerRequest request) {
+    public Mono<ServerResponse> getMyPermissions(ServerRequest request) {
+        return getPermissionsFor(getAuthenticatedUserName()
+                .flatMap(username -> ReactiveSecurityContextHolder.getContext()
+                        .map(SecurityContext::getAuthentication)
+                        .map(auth -> authoritiesToRoles(auth.getAuthorities()))));
+    }
+
+    Mono<ServerResponse> getUserPermission(ServerRequest request) {
         var username = request.pathVariable("name");
-        return Mono.defer(() -> {
-                    if (SELF_USER.equals(username)) {
-                        return ReactiveSecurityContextHolder.getContext()
-                                .map(SecurityContext::getAuthentication)
-                                .map(auth -> authoritiesToRoles(auth.getAuthorities()));
-                    }
-                    return roleService
-                            .getRolesByUsername(username)
-                            .collect(Collectors.toCollection(LinkedHashSet::new));
-                })
+        var roleNames = Mono.defer(() -> {
+            if (SELF_USER.equals(username)) {
+                return ReactiveSecurityContextHolder.getContext()
+                        .map(SecurityContext::getAuthentication)
+                        .map(auth -> authoritiesToRoles(auth.getAuthorities()));
+            }
+            return roleService.getRolesByUsername(username).collect(Collectors.toCollection(LinkedHashSet::new));
+        });
+        return getPermissionsFor(roleNames);
+    }
+
+    private Mono<ServerResponse> getPermissionsFor(Mono<Set<String>> roleNamesMono) {
+        return roleNamesMono
                 .flatMap(roleNames -> {
                     var up = new UserPermission();
                     var setRoles = roleService
