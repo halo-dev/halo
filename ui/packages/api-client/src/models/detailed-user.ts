@@ -29,6 +29,10 @@ export interface DetailedUser {
      */
     'impersonator'?: string;
     /**
+     * whether the user has a password set; <code>null</code> when the response is not the current user\'s      own detail
+     */
+    'passwordSet'?: boolean;
+    /**
      * roles granted to the user
      */
     'roles': Array<Role>;

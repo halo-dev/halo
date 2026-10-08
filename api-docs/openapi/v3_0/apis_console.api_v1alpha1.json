@@ -3135,7 +3135,8 @@
     },
     "/apis/api.console.halo.run/v1alpha1/users/-": {
       "get": {
-        "description": "Get current user detail",
+        "deprecated": true,
+        "description": "Get current user detail.\nDeprecated in favor of GET /apis/uc.api.halo.run/v1alpha1/users/-.",
         "operationId": "GetCurrentUserDetail",
         "responses": {
           "default": {
@@ -3154,13 +3155,14 @@
         ]
       },
       "put": {
-        "description": "Update current user profile, but password.",
+        "deprecated": true,
+        "description": "Update current user profile.\nDeprecated in favor of PUT /apis/uc.api.halo.run/v1alpha1/users/-.",
         "operationId": "UpdateCurrentUser",
         "requestBody": {
           "content": {
             "*/*": {
               "schema": {
-                "$ref": "#/components/schemas/User"
+                "$ref": "#/components/schemas/UpdateMyProfileRequest"
               }
             }
           },
@@ -3185,7 +3187,8 @@
     },
     "/apis/api.console.halo.run/v1alpha1/users/-/password": {
       "put": {
-        "description": "Change own password of user.",
+        "deprecated": true,
+        "description": "Change own password of user.\nDeprecated in favor of PUT /apis/uc.api.halo.run/v1alpha1/users/-/password.",
         "operationId": "ChangeOwnPassword",
         "requestBody": {
           "content": {
@@ -3216,6 +3219,7 @@
     },
     "/apis/api.console.halo.run/v1alpha1/users/-/send-email-verification-code": {
       "post": {
+        "deprecated": true,
         "description": "Send email verification code for user",
         "operationId": "SendEmailVerificationCode",
         "requestBody": {
@@ -3241,6 +3245,7 @@
     },
     "/apis/api.console.halo.run/v1alpha1/users/-/verify-email": {
       "post": {
+        "deprecated": true,
         "description": "Verify email for user by code.",
         "operationId": "VerifyEmail",
         "requestBody": {
@@ -3337,7 +3342,7 @@
     },
     "/apis/api.console.halo.run/v1alpha1/users/{name}/avatar": {
       "delete": {
-        "description": "delete user avatar",
+        "description": "Delete a user\u0027s avatar by metadata.name.\nFor the current user, prefer DELETE /apis/uc.api.halo.run/v1alpha1/users/-/avatar.",
         "operationId": "DeleteUserAvatar",
         "parameters": [
           {
@@ -3367,7 +3372,7 @@
         ]
       },
       "post": {
-        "description": "upload user avatar",
+        "description": "Upload a user\u0027s avatar by metadata.name.\nFor the current user, prefer POST /apis/uc.api.halo.run/v1alpha1/users/-/avatar.",
         "operationId": "UploadUserAvatar",
         "parameters": [
           {
@@ -3451,7 +3456,7 @@
     },
     "/apis/api.console.halo.run/v1alpha1/users/{name}/permissions": {
       "get": {
-        "description": "Get permissions of user",
+        "description": "Get permissions of a user by metadata.name.\nFor the current user, prefer GET /apis/uc.api.halo.run/v1alpha1/users/-/permissions.",
         "operationId": "GetPermissions",
         "parameters": [
           {
@@ -5031,6 +5036,10 @@
           "impersonator": {
             "type": "string",
             "description": "name of the original administrator who switched to this user, or \u003ccode\u003enull\u003c/code\u003e if the current\n     session is not impersonated"
+          },
+          "passwordSet": {
+            "type": "boolean",
+            "description": "whether the user has a password set; \u003ccode\u003enull\u003c/code\u003e when the response is not the current user\u0027s\n     own detail"
           },
           "roles": {
             "type": "array",
@@ -7681,6 +7690,23 @@
           }
         },
         "description": "Browser descriptor for the currently enabled plugin and theme UI providers."
+      },
+      "UpdateMyProfileRequest": {
+        "required": [
+          "displayName"
+        ],
+        "type": "object",
+        "properties": {
+          "bio": {
+            "type": "string",
+            "description": "biography or profile text"
+          },
+          "displayName": {
+            "type": "string",
+            "description": "display name shown in the console and theme"
+          }
+        },
+        "description": "Payload for updating the current user\u0027s editable profile fields."
       },
       "UpdateUserProfileRequest": {
         "required": [

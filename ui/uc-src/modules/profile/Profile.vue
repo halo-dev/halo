@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { ucApiClient } from "@halo-dev/api-client";
 import {
   VButton,
   VDropdown,
@@ -32,17 +31,7 @@ const { currentUser } = storeToRefs(stores.currentUser());
 const { fetchCurrentUser } = stores.currentUser();
 fetchCurrentUser();
 
-const hasPassword = ref(false);
-
-async function fetchHasPassword() {
-  try {
-    const { data } = await ucApiClient.user.currentUser.getMyUser();
-    hasPassword.value = data.passwordSet;
-  } catch (error) {
-    console.error("Failed to get current user password status", error);
-  }
-}
-fetchHasPassword();
+const hasPassword = computed(() => currentUser.value?.passwordSet === true);
 
 const changePasswordLabel = computed(() =>
   hasPassword.value

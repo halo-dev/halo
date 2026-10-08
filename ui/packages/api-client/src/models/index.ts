@@ -239,6 +239,7 @@ export * from './uc-upload-from-url-request';
 export * from './uc-user-vo';
 export * from './ui-plugin-provider';
 export * from './ui-plugin-provider-descriptor';
+export * from './update-my-profile-request';
 export * from './update-user-profile-request';
 export * from './upgrade-from-uri-request';
 export * from './upload-from-url-request';

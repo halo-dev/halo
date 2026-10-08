@@ -1,6 +1,7 @@
 package run.halo.app.core.endpoint.uc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -20,7 +21,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
+import run.halo.app.core.endpoint.console.UserEndpoint;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.user.service.UserService;
 import run.halo.app.extension.Metadata;
@@ -37,6 +41,9 @@ class UcUserEndpointTest {
     @Mock
     UserService userService;
 
+    @Mock
+    UserEndpoint userEndpoint;
+
     @BeforeEach
     void setUp() {
         webClient = WebTestClient.bindToRouterFunction(endpoint.endpoint())
@@ -52,22 +59,9 @@ class UcUserEndpointTest {
     }
 
     @Test
-    void shouldNotGetCurrentUserWhenUnauthenticated() {
-        webClient
-                .mutate()
-                .apply(mockAuthentication(new AnonymousAuthenticationToken(
-                        "key", "anonymousUser", createAuthorityList("ROLE_ANONYMOUS"))))
-                .build()
-                .get()
-                .uri("/users/-")
-                .exchange()
-                .expectStatus()
-                .isForbidden();
-    }
-
-    @Test
-    void shouldGetCurrentUserWhenPasswordSet() {
-        when(userService.getUser("faker")).thenReturn(Mono.just(createUser(true)));
+    void shouldDelegateCurrentUserDetailToUserEndpoint() {
+        when(userEndpoint.me(any(ServerRequest.class)))
+                .thenReturn(ServerResponse.ok().build());
         webClient
                 .mutate()
                 .apply(mockUser("faker"))
@@ -76,35 +70,10 @@ class UcUserEndpointTest {
                 .uri("/users/-")
                 .exchange()
                 .expectStatus()
-                .isOk()
-                .expectBody()
-                .jsonPath("$.name")
-                .isEqualTo("faker")
-                .jsonPath("$.displayName")
-                .isEqualTo("Faker")
-                .jsonPath("$.avatar")
-                .isEqualTo("https://example.com/avatar.png")
-                .jsonPath("$.passwordSet")
-                .isEqualTo(true)
-                .jsonPath("$.password")
-                .doesNotExist();
-    }
+                .isOk();
 
-    @Test
-    void shouldGetCurrentUserWhenPasswordNotSet() {
-        when(userService.getUser("faker")).thenReturn(Mono.just(createUser(false)));
-        webClient
-                .mutate()
-                .apply(mockUser("faker"))
-                .build()
-                .get()
-                .uri("/users/-")
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody()
-                .jsonPath("$.passwordSet")
-                .isEqualTo(false);
+        verify(userEndpoint, times(1)).me(any(ServerRequest.class));
+        verify(userService, never()).getUser(anyString());
     }
 
     @Test

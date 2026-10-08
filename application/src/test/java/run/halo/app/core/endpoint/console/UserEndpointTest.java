@@ -1,6 +1,7 @@
 package run.halo.app.core.endpoint.console;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -254,6 +255,8 @@ class UserEndpointTest {
             metadata.setName("fake-user");
             var user = new User();
             user.setMetadata(metadata);
+            user.getSpec().setPassword("fake-encoded-password");
+            user.getSpec().setTotpEncryptedSecret("encrypted-secret");
             when(userService.getUser("fake-user")).thenReturn(Mono.just(user));
             Role role = new Role();
             role.setMetadata(new Metadata());
@@ -269,7 +272,10 @@ class UserEndpointTest {
                     .expectHeader()
                     .contentType(MediaType.APPLICATION_JSON)
                     .expectBody(UserEndpoint.DetailedUser.class)
-                    .isEqualTo(new UserEndpoint.DetailedUser(user, List.of(role), null));
+                    .isEqualTo(new UserEndpoint.DetailedUser(user, List.of(role), null, true));
+
+            assertNull(user.getSpec().getPassword());
+            assertNull(user.getSpec().getTotpEncryptedSecret());
         }
 
         @Test
@@ -301,7 +307,7 @@ class UserEndpointTest {
                     .expectStatus()
                     .isOk()
                     .expectBody(UserEndpoint.DetailedUser.class)
-                    .isEqualTo(new UserEndpoint.DetailedUser(user, List.of(role), "admin"));
+                    .isEqualTo(new UserEndpoint.DetailedUser(user, List.of(role), "admin", false));
         }
     }
 
@@ -313,15 +319,16 @@ class UserEndpointTest {
         void shouldUpdateProfileCorrectly() {
             var currentUser = createUser("fake-user");
             var updatedUser = createUser("fake-user");
-            var requestUser = createUser("fake-user");
 
             when(client.get(User.class, "fake-user")).thenReturn(Mono.just(currentUser));
             when(client.update(currentUser)).thenReturn(Mono.just(updatedUser));
+            when(environmentFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
+                    .thenReturn(Mono.just(new SystemSetting.User()));
 
             webClient
                     .put()
                     .uri("/users/-")
-                    .bodyValue(requestUser)
+                    .bodyValue(Map.of("displayName", "Updated", "bio", "Updated bio"))
                     .exchange()
                     .expectStatus()
                     .isOk()
@@ -333,47 +340,63 @@ class UserEndpointTest {
         }
 
         @Test
-        void shouldPreserveTwoFactorStateWhenUpdatingProfile() {
+        void shouldPreserveSensitiveFieldsWhenUpdatingProfile() {
             var currentUser = createUser("fake-user");
+            currentUser.getSpec().setPhone("123");
             currentUser.getSpec().setTwoFactorAuthEnabled(true);
             currentUser.getSpec().setTotpEncryptedSecret("configured-secret");
-            var requestUser = createUser("fake-user");
-            requestUser.getSpec().setTwoFactorAuthEnabled(false);
-            requestUser.getSpec().setTotpEncryptedSecret("attacker-secret");
-
             when(client.get(User.class, "fake-user")).thenReturn(Mono.just(currentUser));
             when(client.update(currentUser)).thenReturn(Mono.just(currentUser));
+            when(environmentFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
+                    .thenReturn(Mono.just(new SystemSetting.User()));
 
             webClient
                     .put()
                     .uri("/users/-")
-                    .bodyValue(requestUser)
+                    .bodyValue(Map.of(
+                            "metadata",
+                            Map.of("name", "another-user"),
+                            "spec",
+                            Map.of(
+                                    "email", "attacker@example.com",
+                                    "password", "attacker-password",
+                                    "phone", "456",
+                                    "twoFactorAuthEnabled", false,
+                                    "totpEncryptedSecret", "attacker-secret"),
+                            "displayName",
+                            "Updated",
+                            "bio",
+                            "Updated bio"))
                     .exchange()
                     .expectStatus()
                     .isOk();
 
+            assertEquals("Updated", currentUser.getSpec().getDisplayName());
+            assertEquals("Updated bio", currentUser.getSpec().getBio());
+            assertEquals("hi@halo.run", currentUser.getSpec().getEmail());
+            assertEquals("fake-password", currentUser.getSpec().getPassword());
+            assertEquals("123", currentUser.getSpec().getPhone());
             assertEquals(true, currentUser.getSpec().getTwoFactorAuthEnabled());
             assertEquals("configured-secret", currentUser.getSpec().getTotpEncryptedSecret());
-            verify(client).update(currentUser);
         }
 
-        @Test
-        void shouldGetErrorIfUsernameMismatch() {
+        @ParameterizedTest
+        @ValueSource(strings = {"{}", "{\"displayName\": null}", "{\"displayName\": \" \"}"})
+        void shouldRejectBlankDisplayName(String body) {
             var currentUser = createUser("fake-user");
-            var requestUser = createUser("another-fake-user");
-
             when(client.get(User.class, "fake-user")).thenReturn(Mono.just(currentUser));
 
             webClient
                     .put()
                     .uri("/users/-")
-                    .bodyValue(requestUser)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(body)
                     .exchange()
                     .expectStatus()
                     .isBadRequest();
 
-            verify(client).get(User.class, "fake-user");
-            verify(client, never()).update(currentUser);
+            assertEquals("Faker", currentUser.getSpec().getDisplayName());
+            verify(client, never()).update(any(User.class));
         }
 
         User createUser(String name) {
