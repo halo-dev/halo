@@ -32,6 +32,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -379,9 +381,11 @@ class OAuth2RegistrationServiceTest {
         verifyNoMutation();
     }
 
-    @Test
-    void shouldRejectMissingDefaultRoleBeforeMutation() {
-        setting.setDefaultRole("  ");
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"  ", "super-role"})
+    void shouldRejectInvalidDefaultRoleBeforeMutation(String role) {
+        setting.setDefaultRole(role);
 
         StepVerifier.create(service.register(token(Map.of("sub", "alice")), false))
                 .expectErrorSatisfies(error -> assertThat(error)

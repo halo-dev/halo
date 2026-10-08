@@ -28,6 +28,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -454,10 +457,13 @@ class UserServiceImplTest {
                     .verifyComplete();
         }
 
-        @Test
-        void signUpWhenRegistrationDefaultRoleNotConfigured() {
+        @ParameterizedTest
+        @NullAndEmptySource
+        @ValueSource(strings = {" ", "super-role"})
+        void signUpWhenRegistrationDefaultRoleIsInvalid(String role) {
             SystemSetting.User userSetting = new SystemSetting.User();
             userSetting.setAllowRegistration(true);
+            userSetting.setDefaultRole(role);
             when(environmentFetcher.fetch(eq(SystemSetting.User.GROUP), eq(SystemSetting.User.class)))
                     .thenReturn(Mono.just(userSetting));
 
@@ -473,6 +479,8 @@ class UserServiceImplTest {
                                 ((ServerWebInputException) e).getReason());
                     })
                     .verify();
+
+            verify(client, never()).create(any(User.class));
         }
 
         @Test
