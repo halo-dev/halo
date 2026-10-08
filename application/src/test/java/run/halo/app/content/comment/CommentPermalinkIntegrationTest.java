@@ -1,7 +1,10 @@
 package run.halo.app.content.comment;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.clearInvocations;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -9,6 +12,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,6 +25,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Flux;
 import run.halo.app.content.permalinks.PostPermalinkPolicy;
 import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.User;
@@ -28,6 +33,7 @@ import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.Reply;
 import run.halo.app.extension.*;
+import run.halo.app.extension.index.IndexEngine;
 import run.halo.app.extension.store.ReactiveExtensionStoreClient;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.utils.JsonUtils;
@@ -47,8 +53,11 @@ class CommentPermalinkIntegrationTest {
     private static final String REPLY_URL = COMMENT_URL + "&reply=permalink-reply";
     private static final String REPLY_API = "/apis/api.halo.run/v1alpha1/comments/permalink-comment/reply/";
 
-    @Autowired
+    @MockitoSpyBean
     ReactiveExtensionClient client;
+
+    @Autowired
+    IndexEngine indexEngine;
 
     @Autowired
     ReactiveExtensionStoreClient storeClient;
@@ -448,6 +457,51 @@ class CommentPermalinkIntegrationTest {
                 .expectBody()
                 .jsonPath("$.items[0].replies.total")
                 .isEqualTo(0);
+    }
+
+    @Test
+    void garbageCollectedSourceDoesNotGrantAccessToPrivateReplies() {
+        var quoted = JsonUtils.deepCopy(reply);
+        quoted.setMetadata(metadata("private-quoted-reply"));
+        quoted.getSpec().getOwner().setName("responder");
+        quoted.getSpec().setQuoteReply("permalink-reply");
+        quoted.getSpec().setHidden(true);
+        save(quoted);
+        createUser("reply-owner");
+        var source = client.delete(reply).block();
+        var storeName = ExtensionStoreUtil.buildStoreName(schemeManager.get(Reply.class), "permalink-reply");
+        var collected = new AtomicBoolean();
+
+        doAnswer(invocation -> {
+                    @SuppressWarnings("unchecked")
+                    var result = (Flux<String>) invocation.callRealMethod();
+                    return result.collectList().flatMapMany(names -> {
+                        if (!collected.compareAndSet(false, true)) {
+                            return Flux.fromIterable(names);
+                        }
+                        // Finish GC after the owned-reply query has captured its result.
+                        return storeClient
+                                .delete(storeName, source.getMetadata().getVersion())
+                                .doOnNext(ignored -> indexEngine.delete(List.of(source)))
+                                .thenMany(Flux.fromIterable(names));
+                    });
+                })
+                .when(client)
+                .listAllNames(eq(Reply.class), any(), any());
+
+        http.get()
+                .uri("/apis/api.halo.run/v1alpha1/comments/permalink-comment/reply")
+                .headers(headers -> headers.setBasicAuth("reply-owner", "permalink-test"))
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.total")
+                .isEqualTo(0)
+                .jsonPath("$.items.length()")
+                .isEqualTo(0);
+        assertThat(collected).isTrue();
+        assertThat(client.fetch(Reply.class, "permalink-reply").block()).isNull();
     }
 
     @Test

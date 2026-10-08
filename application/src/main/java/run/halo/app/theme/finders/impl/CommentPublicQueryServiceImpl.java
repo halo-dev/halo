@@ -7,7 +7,6 @@ import static run.halo.app.extension.index.query.Queries.*;
 
 import com.google.common.hash.Hashing;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -327,24 +326,11 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
                     } else if (!hasViewPermission) {
                         var ownedReplies = ListOptions.builder()
                                 .andQuery(equal("spec.owner", ownerIdentity(User.KIND, username)))
+                                .andQuery(isNull("metadata.deletionTimestamp"))
                                 .build();
                         var commentOwner = isCommentOwner;
                         return client.listAllNames(Reply.class, ownedReplies, Sort.unsorted())
                                 .collectList()
-                                .flatMap(names -> {
-                                    if (names.isEmpty()) {
-                                        return Mono.just(names);
-                                    }
-                                    var deletedReplies = ListOptions.builder()
-                                            .andQuery(not(isNull("metadata.deletionTimestamp")))
-                                            .build();
-                                    return client.listAllNames(Reply.class, deletedReplies, Sort.unsorted())
-                                            .collectList()
-                                            .map(deleted -> {
-                                                names.removeAll(new HashSet<>(deleted));
-                                                return names;
-                                            });
-                                })
                                 .map(names -> {
                                     var allowed =
                                             or(visibleQuery, equal("spec.owner", ownerIdentity(User.KIND, username)));
