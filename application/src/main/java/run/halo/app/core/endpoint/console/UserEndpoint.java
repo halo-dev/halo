@@ -659,7 +659,6 @@ public class UserEndpoint implements CustomEndpoint {
                             var newSpec = user.getSpec();
                             spec.setBio(newSpec.getBio());
                             spec.setDisplayName(newSpec.getDisplayName());
-                            spec.setTwoFactorAuthEnabled(newSpec.getTwoFactorAuthEnabled());
                             spec.setPhone(newSpec.getPhone());
                             return currentUser;
                         }))

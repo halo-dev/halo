@@ -333,6 +333,31 @@ class UserEndpointTest {
         }
 
         @Test
+        void shouldPreserveTwoFactorStateWhenUpdatingProfile() {
+            var currentUser = createUser("fake-user");
+            currentUser.getSpec().setTwoFactorAuthEnabled(true);
+            currentUser.getSpec().setTotpEncryptedSecret("configured-secret");
+            var requestUser = createUser("fake-user");
+            requestUser.getSpec().setTwoFactorAuthEnabled(false);
+            requestUser.getSpec().setTotpEncryptedSecret("attacker-secret");
+
+            when(client.get(User.class, "fake-user")).thenReturn(Mono.just(currentUser));
+            when(client.update(currentUser)).thenReturn(Mono.just(currentUser));
+
+            webClient
+                    .put()
+                    .uri("/users/-")
+                    .bodyValue(requestUser)
+                    .exchange()
+                    .expectStatus()
+                    .isOk();
+
+            assertEquals(true, currentUser.getSpec().getTwoFactorAuthEnabled());
+            assertEquals("configured-secret", currentUser.getSpec().getTotpEncryptedSecret());
+            verify(client).update(currentUser);
+        }
+
+        @Test
         void shouldGetErrorIfUsernameMismatch() {
             var currentUser = createUser("fake-user");
             var requestUser = createUser("another-fake-user");
