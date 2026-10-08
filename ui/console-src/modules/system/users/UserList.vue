@@ -296,7 +296,11 @@ function onCreationModalClose() {
                 <VButton @click="handleEnableOrDisableInBatch('enable')">
                   {{ $t("core.common.buttons.enable") }}
                 </VButton>
-                <VButton type="danger" @click="handleDeleteInBatch">
+                <VButton
+                  v-permission="['*']"
+                  type="danger"
+                  @click="handleDeleteInBatch"
+                >
                   {{ $t("core.common.buttons.delete") }}
                 </VButton>
               </VSpace>

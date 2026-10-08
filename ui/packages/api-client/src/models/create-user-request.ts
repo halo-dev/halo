@@ -50,9 +50,5 @@ export interface CreateUserRequest {
      * phone number of the user
      */
     'phone'?: string;
-    /**
-     * role <code>metadata.name</code> values to grant to the user after creation
-     */
-    'roles'?: Array<string>;
 }
 

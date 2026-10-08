@@ -172,67 +172,73 @@ function onSendCode() {
     ref="modal"
     class="sudo-confirm-modal"
     :width="500"
+    mount-to-body
     :title="$t('core.sudo.modal.title')"
     @close="onClose"
   >
-    <VAlert
-      :title="$t('core.common.text.tip')"
-      :description="$t('core.sudo.modal.alert', { minutes: SUDO_TTL_MINUTES })"
-      type="warning"
-      :closable="false"
-    />
-    <VAlert
-      v-if="!methods.length"
-      :title="$t('core.common.text.tip')"
-      :description="$t('core.sudo.modal.no_method')"
-      type="warning"
-      :closable="false"
-    />
-    <FormKit
-      v-else
-      id="sudo-confirm-form"
-      type="form"
-      name="sudo-confirm-form"
-      :actions="false"
-      @submit="onSubmit"
-    >
-      <FormKit
-        v-if="methods.length > 1"
-        v-model="selectedMethod"
-        type="radio"
-        name="method"
-        :label="$t('core.sudo.fields.method.label')"
-        :options="methodOptions"
-        validation="required"
-      />
-      <FormKit
-        v-model="code"
-        type="text"
-        inputmode="numeric"
-        name="code"
-        :label="$t('core.sudo.fields.code.label')"
-        :help="
-          currentMethod?.canSendCode
-            ? $t('core.sudo.fields.code.help_email', {
-                target: currentMethod.maskedTarget || '',
-              })
-            : $t('core.sudo.fields.code.help_totp')
+    <div>
+      <VAlert
+        :title="$t('core.common.text.tip')"
+        :description="
+          $t('core.sudo.modal.alert', { minutes: SUDO_TTL_MINUTES })
         "
-        validation="required"
-      >
-        <template #suffix>
-          <VButton
-            v-show="currentMethod?.canSendCode"
-            :loading="isSending"
-            :disabled="isActive"
-            class="rounded-none border-y-0 border-l border-r-0 tabular-nums"
-            @click="onSendCode"
+        type="warning"
+        :closable="false"
+      />
+      <VAlert
+        v-if="!methods.length"
+        :title="$t('core.common.text.tip')"
+        :description="$t('core.sudo.modal.no_method')"
+        type="warning"
+        :closable="false"
+      />
+      <div v-else class="mt-4">
+        <FormKit
+          id="sudo-confirm-form"
+          type="form"
+          name="sudo-confirm-form"
+          :actions="false"
+          @submit="onSubmit"
+        >
+          <FormKit
+            v-if="methods.length > 1"
+            v-model="selectedMethod"
+            type="radio"
+            name="method"
+            :label="$t('core.sudo.fields.method.label')"
+            :options="methodOptions"
+            validation="required"
+          />
+          <FormKit
+            v-model="code"
+            type="text"
+            inputmode="numeric"
+            name="code"
+            :label="$t('core.sudo.fields.code.label')"
+            :help="
+              currentMethod?.canSendCode
+                ? $t('core.sudo.fields.code.help_email', {
+                    target: currentMethod.maskedTarget || '',
+                  })
+                : $t('core.sudo.fields.code.help_totp')
+            "
+            validation="required"
           >
-            {{ sendButtonText }}
-          </VButton>
-        </template>
-      </FormKit>
-    </FormKit>
+            <template #suffix>
+              <VButton
+                v-show="currentMethod?.canSendCode"
+                :loading="isSending"
+                :disabled="isActive"
+                class="rounded-none border-y-0 border-l border-r-0 tabular-nums"
+                @click="onSendCode"
+              >
+                {{ sendButtonText }}
+              </VButton>
+            </template>
+          </FormKit>
+        </FormKit>
+      </div>
+    </div>
     <template #footer>
       <VSpace>
         <VButton
@@ -250,9 +256,3 @@ function onSendCode() {
     </template>
   </VModal>
 </template>
-
-<style>
-.sudo-confirm-modal.modal-wrapper {
-  z-index: 3000;
-}
-</style>

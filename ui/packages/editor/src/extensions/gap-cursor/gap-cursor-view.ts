@@ -1,10 +1,5 @@
-import type { EditorState } from "@/tiptap";
-import {
-  Decoration,
-  DecorationSet,
-  GapCursor,
-  type EditorView,
-} from "@/tiptap/pm";
+import { Decoration } from "@/tiptap/core";
+import { GapCursor, type EditorState, type EditorView } from "@/tiptap/pm";
 import {
   getEditorNodeElement,
   getGapCursorTarget,
@@ -69,16 +64,16 @@ function handleGapCursorMouseDownFrom(
 
 export function drawGapCursor(state: EditorState) {
   if (!(state.selection instanceof GapCursor)) {
-    return null;
+    return [];
   }
 
   const side = getGapCursorSelectionSide(state.selection);
   if (!side) {
-    return null;
+    return [];
   }
 
-  return DecorationSet.create(state.doc, [
-    Decoration.widget(
+  return [
+    Decoration.Widget(
       state.selection.head,
       () => {
         const cursor = document.createElement("div");
@@ -90,7 +85,7 @@ export function drawGapCursor(state: EditorState) {
         side: side === "before" ? -1 : 1,
       }
     ),
-  ]);
+  ];
 }
 
 export class GapCursorPositioner {

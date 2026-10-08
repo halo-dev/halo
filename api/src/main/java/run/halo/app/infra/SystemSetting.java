@@ -104,14 +104,6 @@ public class SystemSetting {
         boolean mustVerifyEmailOnRegistration;
         String defaultRole;
 
-        /** @deprecated since 2.22.0, use {@link Attachment} instead. */
-        @Deprecated(since = "2.22.0")
-        String avatarPolicy;
-
-        /** @deprecated since 2.22.0, use {@link Attachment} instead. */
-        @Deprecated(since = "2.22.0")
-        String ucAttachmentPolicy;
-
         String protectedUsernames;
 
         List<String> requiredAgreementPages;
@@ -127,9 +119,6 @@ public class SystemSetting {
         Integer authorPageSize;
         Boolean review;
         String slugGenerationStrategy;
-
-        String attachmentPolicyName;
-        String attachmentGroupName;
     }
 
     @Data

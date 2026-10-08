@@ -24,7 +24,19 @@ import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError
 // @ts-ignore
 import type { ChangeMyPasswordRequest } from '../models';
 // @ts-ignore
+import type { DetailedUser } from '../models';
+// @ts-ignore
+import type { EmailVerifyRequest } from '../models';
+// @ts-ignore
 import type { UcUserVo } from '../models';
+// @ts-ignore
+import type { UpdateMyProfileRequest } from '../models';
+// @ts-ignore
+import type { User } from '../models';
+// @ts-ignore
+import type { UserPermission } from '../models';
+// @ts-ignore
+import type { VerifyCodeRequest } from '../models';
 /**
  * UserV1alpha1UcApi - axios parameter creator
  */
@@ -74,11 +86,85 @@ export const UserV1alpha1UcApiAxiosParamCreator = function (configuration?: Conf
             };
         },
         /**
-         * Get current user profile without password hash.
+         * Delete the current user\'s avatar.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getMyUser: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        deleteMyAvatar: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/apis/uc.api.halo.run/v1alpha1/users/-/avatar`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Get permissions of the current user.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getMyPermissions: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/apis/uc.api.halo.run/v1alpha1/users/-/permissions`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Get current user detail, including roles.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getMyUserDetail: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/uc.api.halo.run/v1alpha1/users/-`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -110,6 +196,183 @@ export const UserV1alpha1UcApiAxiosParamCreator = function (configuration?: Conf
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * Send an email verification code to the current user.
+         * @param {EmailVerifyRequest} emailVerifyRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        sendMyEmailVerificationCode: async (emailVerifyRequest: EmailVerifyRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'emailVerifyRequest' is not null or undefined
+            assertParamExists('sendMyEmailVerificationCode', 'emailVerifyRequest', emailVerifyRequest)
+            const localVarPath = `/apis/uc.api.halo.run/v1alpha1/users/-/send-email-verification-code`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(emailVerifyRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Update the current user\'s profile.
+         * @param {UpdateMyProfileRequest} updateMyProfileRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateMyProfile: async (updateMyProfileRequest: UpdateMyProfileRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'updateMyProfileRequest' is not null or undefined
+            assertParamExists('updateMyProfile', 'updateMyProfileRequest', updateMyProfileRequest)
+            const localVarPath = `/apis/uc.api.halo.run/v1alpha1/users/-`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(updateMyProfileRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Upload the current user\'s avatar.
+         * @param {File} file Avatar file.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        uploadMyAvatar: async (file: File, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'file' is not null or undefined
+            assertParamExists('uploadMyAvatar', 'file', file)
+            const localVarPath = `/apis/uc.api.halo.run/v1alpha1/users/-/avatar`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+            const localVarFormParams = new ((configuration && configuration.formDataCtor) || FormData)();
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+            if (file !== undefined) { 
+                localVarFormParams.append('file', file as any);
+            }
+    
+    
+            localVarHeaderParameter['Content-Type'] = 'multipart/form-data';
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = localVarFormParams;
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Verify the current user\'s email address.
+         * @param {VerifyCodeRequest} verifyCodeRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        verifyMyEmail: async (verifyCodeRequest: VerifyCodeRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'verifyCodeRequest' is not null or undefined
+            assertParamExists('verifyMyEmail', 'verifyCodeRequest', verifyCodeRequest)
+            const localVarPath = `/apis/uc.api.halo.run/v1alpha1/users/-/verify-email`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(verifyCodeRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -132,14 +395,84 @@ export const UserV1alpha1UcApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Get current user profile without password hash.
+         * Delete the current user\'s avatar.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getMyUser(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UcUserVo>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getMyUser(options);
+        async deleteMyAvatar(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<User>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteMyAvatar(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['UserV1alpha1UcApi.getMyUser']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['UserV1alpha1UcApi.deleteMyAvatar']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Get permissions of the current user.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getMyPermissions(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserPermission>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getMyPermissions(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UserV1alpha1UcApi.getMyPermissions']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Get current user detail, including roles.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getMyUserDetail(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DetailedUser>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getMyUserDetail(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UserV1alpha1UcApi.getMyUserDetail']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Send an email verification code to the current user.
+         * @param {EmailVerifyRequest} emailVerifyRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async sendMyEmailVerificationCode(emailVerifyRequest: EmailVerifyRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.sendMyEmailVerificationCode(emailVerifyRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UserV1alpha1UcApi.sendMyEmailVerificationCode']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Update the current user\'s profile.
+         * @param {UpdateMyProfileRequest} updateMyProfileRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updateMyProfile(updateMyProfileRequest: UpdateMyProfileRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<User>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateMyProfile(updateMyProfileRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UserV1alpha1UcApi.updateMyProfile']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Upload the current user\'s avatar.
+         * @param {File} file Avatar file.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async uploadMyAvatar(file: File, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<User>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.uploadMyAvatar(file, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UserV1alpha1UcApi.uploadMyAvatar']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Verify the current user\'s email address.
+         * @param {VerifyCodeRequest} verifyCodeRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async verifyMyEmail(verifyCodeRequest: VerifyCodeRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.verifyMyEmail(verifyCodeRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UserV1alpha1UcApi.verifyMyEmail']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -161,12 +494,64 @@ export const UserV1alpha1UcApiFactory = function (configuration?: Configuration,
             return localVarFp.changeMyPassword(requestParameters.changeMyPasswordRequest, options).then((request) => request(axios, basePath));
         },
         /**
-         * Get current user profile without password hash.
+         * Delete the current user\'s avatar.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getMyUser(options?: RawAxiosRequestConfig): AxiosPromise<UcUserVo> {
-            return localVarFp.getMyUser(options).then((request) => request(axios, basePath));
+        deleteMyAvatar(options?: RawAxiosRequestConfig): AxiosPromise<User> {
+            return localVarFp.deleteMyAvatar(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Get permissions of the current user.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getMyPermissions(options?: RawAxiosRequestConfig): AxiosPromise<UserPermission> {
+            return localVarFp.getMyPermissions(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Get current user detail, including roles.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getMyUserDetail(options?: RawAxiosRequestConfig): AxiosPromise<DetailedUser> {
+            return localVarFp.getMyUserDetail(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Send an email verification code to the current user.
+         * @param {UserV1alpha1UcApiSendMyEmailVerificationCodeRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        sendMyEmailVerificationCode(requestParameters: UserV1alpha1UcApiSendMyEmailVerificationCodeRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.sendMyEmailVerificationCode(requestParameters.emailVerifyRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Update the current user\'s profile.
+         * @param {UserV1alpha1UcApiUpdateMyProfileRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateMyProfile(requestParameters: UserV1alpha1UcApiUpdateMyProfileRequest, options?: RawAxiosRequestConfig): AxiosPromise<User> {
+            return localVarFp.updateMyProfile(requestParameters.updateMyProfileRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Upload the current user\'s avatar.
+         * @param {UserV1alpha1UcApiUploadMyAvatarRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        uploadMyAvatar(requestParameters: UserV1alpha1UcApiUploadMyAvatarRequest, options?: RawAxiosRequestConfig): AxiosPromise<User> {
+            return localVarFp.uploadMyAvatar(requestParameters.file, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Verify the current user\'s email address.
+         * @param {UserV1alpha1UcApiVerifyMyEmailRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        verifyMyEmail(requestParameters: UserV1alpha1UcApiVerifyMyEmailRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.verifyMyEmail(requestParameters.verifyCodeRequest, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -176,6 +561,37 @@ export const UserV1alpha1UcApiFactory = function (configuration?: Configuration,
  */
 export interface UserV1alpha1UcApiChangeMyPasswordRequest {
     readonly changeMyPasswordRequest: ChangeMyPasswordRequest
+}
+
+/**
+ * Request parameters for sendMyEmailVerificationCode operation in UserV1alpha1UcApi.
+ */
+export interface UserV1alpha1UcApiSendMyEmailVerificationCodeRequest {
+    readonly emailVerifyRequest: EmailVerifyRequest
+}
+
+/**
+ * Request parameters for updateMyProfile operation in UserV1alpha1UcApi.
+ */
+export interface UserV1alpha1UcApiUpdateMyProfileRequest {
+    readonly updateMyProfileRequest: UpdateMyProfileRequest
+}
+
+/**
+ * Request parameters for uploadMyAvatar operation in UserV1alpha1UcApi.
+ */
+export interface UserV1alpha1UcApiUploadMyAvatarRequest {
+    /**
+     * Avatar file.
+     */
+    readonly file: File
+}
+
+/**
+ * Request parameters for verifyMyEmail operation in UserV1alpha1UcApi.
+ */
+export interface UserV1alpha1UcApiVerifyMyEmailRequest {
+    readonly verifyCodeRequest: VerifyCodeRequest
 }
 
 /**
@@ -193,12 +609,70 @@ export class UserV1alpha1UcApi extends BaseAPI {
     }
 
     /**
-     * Get current user profile without password hash.
+     * Delete the current user\'s avatar.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    public getMyUser(options?: RawAxiosRequestConfig) {
-        return UserV1alpha1UcApiFp(this.configuration).getMyUser(options).then((request) => request(this.axios, this.basePath));
+    public deleteMyAvatar(options?: RawAxiosRequestConfig) {
+        return UserV1alpha1UcApiFp(this.configuration).deleteMyAvatar(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Get permissions of the current user.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getMyPermissions(options?: RawAxiosRequestConfig) {
+        return UserV1alpha1UcApiFp(this.configuration).getMyPermissions(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Get current user detail, including roles.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getMyUserDetail(options?: RawAxiosRequestConfig) {
+        return UserV1alpha1UcApiFp(this.configuration).getMyUserDetail(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Send an email verification code to the current user.
+     * @param {UserV1alpha1UcApiSendMyEmailVerificationCodeRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public sendMyEmailVerificationCode(requestParameters: UserV1alpha1UcApiSendMyEmailVerificationCodeRequest, options?: RawAxiosRequestConfig) {
+        return UserV1alpha1UcApiFp(this.configuration).sendMyEmailVerificationCode(requestParameters.emailVerifyRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Update the current user\'s profile.
+     * @param {UserV1alpha1UcApiUpdateMyProfileRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public updateMyProfile(requestParameters: UserV1alpha1UcApiUpdateMyProfileRequest, options?: RawAxiosRequestConfig) {
+        return UserV1alpha1UcApiFp(this.configuration).updateMyProfile(requestParameters.updateMyProfileRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Upload the current user\'s avatar.
+     * @param {UserV1alpha1UcApiUploadMyAvatarRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public uploadMyAvatar(requestParameters: UserV1alpha1UcApiUploadMyAvatarRequest, options?: RawAxiosRequestConfig) {
+        return UserV1alpha1UcApiFp(this.configuration).uploadMyAvatar(requestParameters.file, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Verify the current user\'s email address.
+     * @param {UserV1alpha1UcApiVerifyMyEmailRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public verifyMyEmail(requestParameters: UserV1alpha1UcApiVerifyMyEmailRequest, options?: RawAxiosRequestConfig) {
+        return UserV1alpha1UcApiFp(this.configuration).verifyMyEmail(requestParameters.verifyCodeRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

@@ -27,7 +27,7 @@ metadata:
     storage.halo.run/policy-owner: default-policy
     halo.run/do-not-overwrite: "true"
 data:
-  default: '{"location":""}'
+  default: '{"location":"","maxFileSize":"200MB","allowedFileTypes":["IMAGE","VIDEO","AUDIO"]}'
 ---
 apiVersion: v1alpha1
 kind: Setting

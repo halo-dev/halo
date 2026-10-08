@@ -52,6 +52,13 @@ export const ExtensionGapCursor = Extension.create({
     return [createGapCursorPlugin()];
   },
 
+  addDecorations() {
+    return {
+      create: ({ state }) => drawGapCursor(state),
+      shouldUpdate: ({ tr }) => tr.docChanged || tr.selectionSet,
+    };
+  },
+
   extendNodeSchema(extension) {
     const context = {
       name: extension.name,
@@ -89,7 +96,6 @@ function createGapCursorPlugin() {
     key: new PluginKey("halo-gap-cursor"),
     view: (view) => new GapCursorPositioner(view),
     props: {
-      decorations: drawGapCursor,
       createSelectionBetween(_view, $anchor, $head) {
         if ($anchor.pos !== $head.pos) {
           return null;

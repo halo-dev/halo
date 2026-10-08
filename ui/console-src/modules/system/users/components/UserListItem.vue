@@ -15,7 +15,7 @@ import {
 import { stores, utils } from "@halo-dev/ui-shared";
 import { useQueryClient } from "@tanstack/vue-query";
 import { storeToRefs } from "pinia";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { rbacAnnotations } from "@/constants/annotations";
 import { useUserEnableDisable } from "../composables/use-user";
@@ -88,6 +88,14 @@ function onEditingModalClose() {
 }
 
 const { handleEnableOrDisableUser } = useUserEnableDisable();
+
+const isSuperRole = computed(() => utils.permission.has(["*"]));
+
+function handleSwitchUser() {
+  window.location.href = `/login/impersonate?username=${encodeURIComponent(
+    props.user.user.metadata.name
+  )}`;
+}
 </script>
 
 <template>
@@ -175,14 +183,26 @@ const { handleEnableOrDisableUser } = useUserEnableDisable();
       <VDropdownItem @click="editingModal = true">
         {{ $t("core.user.operations.update_profile.title") }}
       </VDropdownItem>
-      <VDropdownItem @click="passwordChangeModal = true">
+      <VDropdownItem v-permission="['*']" @click="passwordChangeModal = true">
         {{ $t("core.user.operations.change_password.title") }}
       </VDropdownItem>
       <VDropdownItem
-        v-if="currentUser?.user.metadata.name !== user.user.metadata.name"
+        v-if="
+          currentUser?.user.metadata.name !== user.user.metadata.name &&
+          utils.permission.has(['*'])
+        "
         @click="grantPermissionModal = true"
       >
         {{ $t("core.user.operations.grant_permission.title") }}
+      </VDropdownItem>
+      <VDropdownItem
+        v-if="
+          isSuperRole &&
+          currentUser?.user.metadata.name !== user.user.metadata.name
+        "
+        @click="handleSwitchUser"
+      >
+        {{ $t("core.user.operations.switch_user.title") }}
       </VDropdownItem>
       <VDropdownDivider
         v-if="currentUser?.user.metadata.name !== user.user.metadata.name"
@@ -209,7 +229,10 @@ const { handleEnableOrDisableUser } = useUserEnableDisable();
         }}
       </VDropdownItem>
       <VDropdownItem
-        v-if="currentUser?.user.metadata.name !== user.user.metadata.name"
+        v-if="
+          currentUser?.user.metadata.name !== user.user.metadata.name &&
+          utils.permission.has(['*'])
+        "
         type="danger"
         @click="handleDelete"
       >

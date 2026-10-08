@@ -37,7 +37,7 @@
   },
   "dependencies": {
     "@halo-dev/api-client": "workspace:*",
-    "@tiptap/core": "^3.29.0",
+    "@tiptap/core": "^3.31.3",
     "mitt": "^3.0.1"
   },
   "devDependencies": {

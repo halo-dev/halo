@@ -58,7 +58,15 @@ rules:
   - apiGroups: ["uc.api.halo.run"]
     resources: ["users"]
     resourceNames: ["-"]
-    verbs: ["get"]
+    verbs: ["get", "update"]
+  - apiGroups: ["uc.api.halo.run"]
+    resources: ["users/avatar"]
+    resourceNames: ["-"]
+    verbs: ["create", "delete"]
+  - apiGroups: ["uc.api.halo.run"]
+    resources: ["users/send-email-verification-code", "users/verify-email"]
+    resourceNames: ["-"]
+    verbs: ["create"]
   - apiGroups: ["api.console.halo.run"]
     resources: ["users/avatar"]
     resourceNames: ["-"]
@@ -80,6 +88,10 @@ rules:
     resources: ["users/permissions"]
     resourceNames: ["-"]
     verbs: ["list", "get"]
+  - apiGroups: ["uc.api.halo.run"]
+    resources: ["users/permissions"]
+    resourceNames: ["-"]
+    verbs: ["get"]
 ---
 apiVersion: v1alpha1
 kind: "Role"

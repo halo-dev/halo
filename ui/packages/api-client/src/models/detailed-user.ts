@@ -25,6 +25,14 @@ import type { User } from './user';
  */
 export interface DetailedUser {
     /**
+     * name of the original administrator who switched to this user, or <code>null</code> if the current      session is not impersonated
+     */
+    'impersonator'?: string;
+    /**
+     * whether the user has a password set; <code>null</code> when the response is not the current user\'s      own detail
+     */
+    'passwordSet'?: boolean;
+    /**
      * roles granted to the user
      */
     'roles': Array<Role>;

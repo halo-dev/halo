@@ -5268,7 +5268,8 @@
     },
     "/apis/api.console.halo.run/v1alpha1/users/-": {
       "get": {
-        "description": "Get current user detail",
+        "deprecated": true,
+        "description": "Get current user detail.\nDeprecated in favor of GET /apis/uc.api.halo.run/v1alpha1/users/-.",
         "operationId": "GetCurrentUserDetail",
         "responses": {
           "default": {
@@ -5287,13 +5288,14 @@
         ]
       },
       "put": {
-        "description": "Update current user profile, but password.",
+        "deprecated": true,
+        "description": "Update current user profile.\nDeprecated in favor of PUT /apis/uc.api.halo.run/v1alpha1/users/-.",
         "operationId": "UpdateCurrentUser",
         "requestBody": {
           "content": {
             "*/*": {
               "schema": {
-                "$ref": "#/components/schemas/User"
+                "$ref": "#/components/schemas/UpdateMyProfileRequest"
               }
             }
           },
@@ -5318,7 +5320,8 @@
     },
     "/apis/api.console.halo.run/v1alpha1/users/-/password": {
       "put": {
-        "description": "Change own password of user.",
+        "deprecated": true,
+        "description": "Change own password of user.\nDeprecated in favor of PUT /apis/uc.api.halo.run/v1alpha1/users/-/password.",
         "operationId": "ChangeOwnPassword",
         "requestBody": {
           "content": {
@@ -5349,6 +5352,7 @@
     },
     "/apis/api.console.halo.run/v1alpha1/users/-/send-email-verification-code": {
       "post": {
+        "deprecated": true,
         "description": "Send email verification code for user",
         "operationId": "SendEmailVerificationCode",
         "requestBody": {
@@ -5374,6 +5378,7 @@
     },
     "/apis/api.console.halo.run/v1alpha1/users/-/verify-email": {
       "post": {
+        "deprecated": true,
         "description": "Verify email for user by code.",
         "operationId": "VerifyEmail",
         "requestBody": {
@@ -5427,11 +5432,50 @@
         "tags": [
           "UserV1alpha1Console"
         ]
+      },
+      "put": {
+        "description": "Update user profile without changing credentials or roles.",
+        "operationId": "UpdateUserProfile",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserProfileRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "UserV1alpha1Console"
+        ]
       }
     },
     "/apis/api.console.halo.run/v1alpha1/users/{name}/avatar": {
       "delete": {
-        "description": "delete user avatar",
+        "description": "Delete a user\u0027s avatar by metadata.name.\nFor the current user, prefer DELETE /apis/uc.api.halo.run/v1alpha1/users/-/avatar.",
         "operationId": "DeleteUserAvatar",
         "parameters": [
           {
@@ -5461,7 +5505,7 @@
         ]
       },
       "post": {
-        "description": "upload user avatar",
+        "description": "Upload a user\u0027s avatar by metadata.name.\nFor the current user, prefer POST /apis/uc.api.halo.run/v1alpha1/users/-/avatar.",
         "operationId": "UploadUserAvatar",
         "parameters": [
           {
@@ -5545,7 +5589,7 @@
     },
     "/apis/api.console.halo.run/v1alpha1/users/{name}/permissions": {
       "get": {
-        "description": "Get permissions of user",
+        "description": "Get permissions of a user by metadata.name.\nFor the current user, prefer GET /apis/uc.api.halo.run/v1alpha1/users/-/permissions.",
         "operationId": "GetPermissions",
         "parameters": [
           {
@@ -15035,14 +15079,93 @@
     },
     "/apis/uc.api.halo.run/v1alpha1/users/-": {
       "get": {
-        "description": "Get current user profile without password hash.",
-        "operationId": "GetMyUser",
+        "description": "Get current user detail, including roles.",
+        "operationId": "GetMyUserDetail",
         "responses": {
           "default": {
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/UcUserVo"
+                  "$ref": "#/components/schemas/DetailedUser"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "UserV1alpha1Uc"
+        ]
+      },
+      "put": {
+        "description": "Update the current user\u0027s profile.",
+        "operationId": "UpdateMyProfile",
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMyProfileRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "UserV1alpha1Uc"
+        ]
+      }
+    },
+    "/apis/uc.api.halo.run/v1alpha1/users/-/avatar": {
+      "delete": {
+        "description": "Delete the current user\u0027s avatar.",
+        "operationId": "DeleteMyAvatar",
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "UserV1alpha1Uc"
+        ]
+      },
+      "post": {
+        "description": "Upload the current user\u0027s avatar.",
+        "operationId": "UploadMyAvatar",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/IAvatarUploadRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
                 }
               }
             },
@@ -15077,6 +15200,77 @@
                 }
               }
             },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "UserV1alpha1Uc"
+        ]
+      }
+    },
+    "/apis/uc.api.halo.run/v1alpha1/users/-/permissions": {
+      "get": {
+        "description": "Get permissions of the current user.",
+        "operationId": "GetMyPermissions",
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserPermission"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "UserV1alpha1Uc"
+        ]
+      }
+    },
+    "/apis/uc.api.halo.run/v1alpha1/users/-/send-email-verification-code": {
+      "post": {
+        "description": "Send an email verification code to the current user.",
+        "operationId": "SendMyEmailVerificationCode",
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailVerifyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "content": {},
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "UserV1alpha1Uc"
+        ]
+      }
+    },
+    "/apis/uc.api.halo.run/v1alpha1/users/-/verify-email": {
+      "post": {
+        "description": "Verify the current user\u0027s email address.",
+        "operationId": "VerifyMyEmail",
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyCodeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "content": {},
             "description": "default response"
           }
         },
@@ -17698,14 +17892,6 @@
           "phone": {
             "type": "string",
             "description": "phone number of the user"
-          },
-          "roles": {
-            "uniqueItems": true,
-            "type": "array",
-            "description": "role \u003ccode\u003emetadata.name\u003c/code\u003e values to grant to the user after creation",
-            "items": {
-              "type": "string"
-            }
           }
         },
         "description": "Payload for creating a user from the console."
@@ -17788,6 +17974,14 @@
         ],
         "type": "object",
         "properties": {
+          "impersonator": {
+            "type": "string",
+            "description": "name of the original administrator who switched to this user, or \u003ccode\u003enull\u003c/code\u003e if the current\n     session is not impersonated"
+          },
+          "passwordSet": {
+            "type": "boolean",
+            "description": "whether the user has a password set; \u003ccode\u003enull\u003c/code\u003e when the response is not the current user\u0027s\n     own detail"
+          },
           "roles": {
             "type": "array",
             "description": "roles granted to the user",
@@ -24274,6 +24468,53 @@
           }
         },
         "description": "Browser descriptor for the currently enabled plugin and theme UI providers."
+      },
+      "UpdateMyProfileRequest": {
+        "required": [
+          "displayName"
+        ],
+        "type": "object",
+        "properties": {
+          "bio": {
+            "type": "string",
+            "description": "biography or profile text"
+          },
+          "displayName": {
+            "type": "string",
+            "description": "display name shown in the console and theme"
+          }
+        },
+        "description": "Payload for updating the current user\u0027s editable profile fields."
+      },
+      "UpdateUserProfileRequest": {
+        "required": [
+          "displayName",
+          "email"
+        ],
+        "type": "object",
+        "properties": {
+          "annotations": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "avatar": {
+            "type": "string"
+          },
+          "bio": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          }
+        }
       },
       "UpgradeFromUriRequest": {
         "required": [

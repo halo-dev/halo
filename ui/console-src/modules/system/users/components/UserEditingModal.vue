@@ -1,7 +1,8 @@
 <script lang="ts" setup>
 import type { User } from "@halo-dev/api-client";
-import { coreApiClient } from "@halo-dev/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
+import { utils } from "@halo-dev/ui-shared";
 import { useQueryClient } from "@tanstack/vue-query";
 import { cloneDeep } from "es-toolkit";
 import { nextTick, ref } from "vue";
@@ -52,9 +53,16 @@ const handleUpdateUser = async () => {
         formState.value.spec.displayName.trim();
     }
 
-    await coreApiClient.user.updateUser({
+    await consoleApiClient.user.updateUserProfile({
       name: formState.value.metadata.name,
-      user: formState.value,
+      updateUserProfileRequest: {
+        displayName: formState.value.spec.displayName,
+        email: formState.value.spec.email || "",
+        avatar: formState.value.spec.avatar,
+        phone: formState.value.spec.phone,
+        bio: formState.value.spec.bio,
+        annotations: formState.value.metadata.annotations,
+      },
     });
 
     modal.value?.close();
@@ -112,6 +120,7 @@ const handleUpdateUser = async () => {
             ></FormKit>
             <FormKit
               v-model="formState.spec.email"
+              :disabled="!utils.permission.has(['*'])"
               :label="$t('core.user.editing_modal.fields.email.label')"
               type="email"
               name="email"
