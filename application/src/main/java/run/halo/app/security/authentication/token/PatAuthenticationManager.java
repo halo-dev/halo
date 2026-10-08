@@ -19,6 +19,7 @@ import org.springframework.security.oauth2.server.resource.authentication.Bearer
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
+import run.halo.app.core.extension.User;
 import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.security.PersonalAccessToken;
@@ -73,8 +74,10 @@ public class PatAuthenticationManager implements ReactiveAuthenticationManager {
         }
         return client.fetch(PersonalAccessToken.class, patName)
                 .switchIfEmpty(Mono.error(() -> new DisabledException("Personal access token has been deleted.")))
-                .flatMap(pat ->
-                        patChecks(pat, jwtId).and(updateLastUsed(patName)).thenReturn(pat))
+                .flatMap(pat -> patChecks(pat, jwtId)
+                        .then(checkUser(pat.getSpec().getUsername()))
+                        .then(updateLastUsed(patName))
+                        .thenReturn(pat))
                 .map(pat -> {
                     // Make sure the authorities modifiable
                     var authorities = new ArrayList<>(jat.getAuthorities());
@@ -88,6 +91,17 @@ public class PatAuthenticationManager implements ReactiveAuthenticationManager {
                                 .forEach(authorities::add);
                     }
                     return new JwtAuthenticationToken(jat.getToken(), authorities, jat.getName());
+                });
+    }
+
+    private Mono<Void> checkUser(String username) {
+        return client.fetch(User.class, username)
+                .switchIfEmpty(Mono.error(() -> new InvalidBearerTokenException("User does not exist.")))
+                .flatMap(user -> {
+                    if (Boolean.TRUE.equals(user.getSpec().getDisabled())) {
+                        return Mono.error(new DisabledException("User is disabled"));
+                    }
+                    return Mono.empty();
                 });
     }
 
