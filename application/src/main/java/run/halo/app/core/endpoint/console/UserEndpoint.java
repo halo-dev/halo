@@ -663,6 +663,11 @@ public class UserEndpoint implements CustomEndpoint {
                 .flatMap(currentUserName -> client.get(User.class, currentUserName))
                 .flatMap(currentUser -> request.bodyToMono(UpdateMyProfileRequest.class)
                         .switchIfEmpty(Mono.error(() -> new ServerWebInputException("Request body is required.")))
+                        .doOnNext(profile -> {
+                            if (StringUtils.isBlank(profile.displayName())) {
+                                throw new ServerWebInputException("Display name is required.");
+                            }
+                        })
                         .filterWhen(profile -> {
                             var newDisplayName = profile.displayName();
                             var oldDisplayName = currentUser.getSpec().getDisplayName();

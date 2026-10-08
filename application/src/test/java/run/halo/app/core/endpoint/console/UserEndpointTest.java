@@ -380,6 +380,25 @@ class UserEndpointTest {
             assertEquals("configured-secret", currentUser.getSpec().getTotpEncryptedSecret());
         }
 
+        @ParameterizedTest
+        @ValueSource(strings = {"{}", "{\"displayName\": null}", "{\"displayName\": \" \"}"})
+        void shouldRejectBlankDisplayName(String body) {
+            var currentUser = createUser("fake-user");
+            when(client.get(User.class, "fake-user")).thenReturn(Mono.just(currentUser));
+
+            webClient
+                    .put()
+                    .uri("/users/-")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(body)
+                    .exchange()
+                    .expectStatus()
+                    .isBadRequest();
+
+            assertEquals("Faker", currentUser.getSpec().getDisplayName());
+            verify(client, never()).update(any(User.class));
+        }
+
         User createUser(String name) {
             var spec = new User.UserSpec();
             spec.setEmail("hi@halo.run");
