@@ -7,6 +7,7 @@ import com.nimbusds.jwt.JWTClaimNames;
 import java.time.Clock;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import org.apache.commons.lang3.Strings;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -17,8 +18,11 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.server.resource.InvalidBearerTokenException;
 import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthenticationToken;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
+import run.halo.app.core.extension.User;
+import run.halo.app.core.user.service.RoleService;
 import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.security.PersonalAccessToken;
@@ -33,11 +37,15 @@ public class PatAuthenticationManager implements ReactiveAuthenticationManager {
 
     private final ReactiveExtensionClient client;
 
+    private final RoleService roleService;
+
     private Clock clock;
 
-    public PatAuthenticationManager(ReactiveExtensionClient client, ReactiveAuthenticationManager delegate) {
+    public PatAuthenticationManager(
+            ReactiveExtensionClient client, ReactiveAuthenticationManager delegate, RoleService roleService) {
         this.client = client;
         this.delegate = delegate;
+        this.roleService = roleService;
         this.clock = Clock.systemDefaultZone();
     }
 
@@ -73,8 +81,11 @@ public class PatAuthenticationManager implements ReactiveAuthenticationManager {
         }
         return client.fetch(PersonalAccessToken.class, patName)
                 .switchIfEmpty(Mono.error(() -> new DisabledException("Personal access token has been deleted.")))
-                .flatMap(pat ->
-                        patChecks(pat, jwtId).and(updateLastUsed(patName)).thenReturn(pat))
+                .flatMap(pat -> patChecks(pat, jwtId)
+                        .then(checkUser(
+                                pat.getSpec().getUsername(), pat.getSpec().getRoles()))
+                        .then(updateLastUsed(patName))
+                        .thenReturn(pat))
                 .map(pat -> {
                     // Make sure the authorities modifiable
                     var authorities = new ArrayList<>(jat.getAuthorities());
@@ -88,6 +99,28 @@ public class PatAuthenticationManager implements ReactiveAuthenticationManager {
                                 .forEach(authorities::add);
                     }
                     return new JwtAuthenticationToken(jat.getToken(), authorities, jat.getName());
+                });
+    }
+
+    private Mono<Void> checkUser(String username, List<String> patRoles) {
+        return client.fetch(User.class, username)
+                .switchIfEmpty(Mono.error(() -> new InvalidBearerTokenException("User does not exist.")))
+                .flatMap(user -> {
+                    if (Boolean.TRUE.equals(user.getSpec().getDisabled())) {
+                        return Mono.error(new DisabledException("User is disabled"));
+                    }
+                    if (CollectionUtils.isEmpty(patRoles)) {
+                        return Mono.empty();
+                    }
+                    return roleService
+                            .getRolesByUsername(username)
+                            .concatWithValues(AUTHENTICATED_ROLE_NAME, ANONYMOUS_ROLE_NAME)
+                            .collectList()
+                            .flatMap(roles -> roleService.contains(roles, patRoles))
+                            .filter(Boolean::booleanValue)
+                            .switchIfEmpty(Mono.error(() -> new InvalidBearerTokenException(
+                                    "Personal access token roles exceed the user's current roles.")))
+                            .then();
                 });
     }
 
