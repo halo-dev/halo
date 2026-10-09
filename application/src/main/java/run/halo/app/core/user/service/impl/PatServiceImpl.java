@@ -1,7 +1,9 @@
 package run.halo.app.core.user.service.impl;
 
-import com.nimbusds.jose.jwk.JWKSet;
-import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
+import static java.nio.charset.StandardCharsets.UTF_8;
+
+import com.google.common.hash.Hashing;
+import java.security.SecureRandom;
 import java.time.Clock;
 import java.util.*;
 import org.springframework.security.authentication.AuthenticationTrustResolver;
@@ -10,24 +12,19 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
-import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
-import org.springframework.security.oauth2.jwt.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.AlternativeJdkIdGenerator;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.IdGenerator;
-import org.springframework.web.filter.reactive.ServerWebExchangeContextFilter;
-import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import run.halo.app.core.user.service.PatService;
 import run.halo.app.core.user.service.RoleService;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.security.PersonalAccessToken;
-import run.halo.app.security.authentication.CryptoService;
 import run.halo.app.security.authorization.AuthorityUtils;
 
 /**
@@ -46,31 +43,19 @@ class PatServiceImpl implements PatService {
 
     private final AuthenticationTrustResolver authTrustResolver = new AuthenticationTrustResolverImpl();
 
-    private final JwtEncoder jwtEncoder;
-
-    private final ExternalUrlSupplier externalUrl;
-
     private final ReactiveUserDetailsService userDetailsService;
 
-    private final String keyId;
+    private final SecureRandom secureRandom = new SecureRandom();
 
     private Clock clock;
 
     public PatServiceImpl(
-            RoleService roleService,
-            ReactiveExtensionClient client,
-            ExternalUrlSupplier externalUrl,
-            CryptoService cryptoService,
-            ReactiveUserDetailsService userDetailsService) {
+            RoleService roleService, ReactiveExtensionClient client, ReactiveUserDetailsService userDetailsService) {
         this.roleService = roleService;
         this.client = client;
-        this.externalUrl = externalUrl;
         this.userDetailsService = userDetailsService;
         this.clock = Clock.systemUTC();
         idGenerator = new AlternativeJdkIdGenerator();
-        var jwk = cryptoService.getJwk();
-        this.jwtEncoder = new NimbusJwtEncoder(new ImmutableJWKSet<>(new JWKSet(jwk)));
-        this.keyId = jwk.getKeyID();
     }
 
     /**
@@ -198,29 +183,44 @@ class PatServiceImpl implements PatService {
 
     @Override
     public Mono<String> generateToken(PersonalAccessToken pat) {
-        return Mono.deferContextual(contextView -> {
-                    var externalUrl = ServerWebExchangeContextFilter.getExchange(contextView)
-                            .map(exchange -> this.externalUrl.getURL(exchange.getRequest()))
-                            .orElse(null);
-                    if (externalUrl == null) {
-                        return Mono.error(new ServerWebInputException("Server web exchange is " + "required"));
-                    }
-                    var claimsBuilder = JwtClaimsSet.builder()
-                            .issuer(externalUrl.toString())
-                            .id(pat.getSpec().getTokenId())
-                            .subject(pat.getSpec().getUsername())
-                            .issuedAt(clock.instant())
-                            .claim("pat_name", pat.getMetadata().getName());
-                    var expiresAt = pat.getSpec().getExpiresAt();
-                    if (expiresAt != null) {
-                        claimsBuilder.expiresAt(expiresAt);
-                    }
-                    var headerBuilder = JwsHeader.with(SignatureAlgorithm.RS256).keyId(this.keyId);
-                    var jwt =
-                            jwtEncoder.encode(JwtEncoderParameters.from(headerBuilder.build(), claimsBuilder.build()));
-                    return Mono.just(jwt);
-                })
-                .map(jwt -> PersonalAccessToken.PAT_TOKEN_PREFIX + jwt.getTokenValue());
+        // SecureRandom may block on some platforms (e.g. when seeded from /dev/random), so offload
+        // secret generation to the boundedElastic scheduler to keep the event loop non-blocking.
+        return Mono.fromCallable(this::generateSecret)
+                .subscribeOn(Schedulers.boundedElastic())
+                .flatMap(secret -> {
+                    // Only the hash of the secret is persisted; the plain secret is returned once.
+                    pat.getSpec().setTokenId(hashSecret(secret));
+                    return client.update(pat)
+                            .thenReturn(buildToken(pat.getMetadata().getName(), secret));
+                });
+    }
+
+    private String generateSecret() {
+        var bytes = new byte[24];
+        secureRandom.nextBytes(bytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+    }
+
+    /**
+     * Hash the token secret for storage and comparison.
+     *
+     * @param secret the plain token secret
+     * @return the SHA-256 hash of the secret, hex encoded
+     */
+    static String hashSecret(String secret) {
+        return Hashing.sha256().hashString(secret, UTF_8).toString();
+    }
+
+    /**
+     * Build the opaque token string for the given PAT name and secret.
+     *
+     * @param patName metadata.name of the PAT
+     * @param secret the plain token secret
+     * @return the token in the form of {@code pat_<base64url(patName:secret)>}
+     */
+    static String buildToken(String patName, String secret) {
+        var encoded = Base64.getUrlEncoder().withoutPadding().encodeToString((patName + ':' + secret).getBytes(UTF_8));
+        return PersonalAccessToken.PAT_TOKEN_PREFIX + encoded;
     }
 
     private Mono<Boolean> hasSufficientRoles(

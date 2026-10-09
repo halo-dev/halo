@@ -1,11 +1,16 @@
 package run.halo.app.security.authentication.pat;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,7 +88,31 @@ class PatAuthenticationIntegrationTest {
                 .getResponseBody();
         assertThat(pat).isNotNull();
         token = pat.getMetadata().getAnnotations().get("security.halo.run/access-token");
-        assertThat(token).isNotBlank();
+        assertThat(token).matches("^pat_[A-Za-z0-9\\-_]+$");
+    }
+
+    private void issueLegacyJwtPat() {
+        var legacyPat = new PersonalAccessToken();
+        legacyPat.setMetadata(new Metadata());
+        legacyPat.getMetadata().setName("legacy-pat");
+        legacyPat.getSpec().setName("Legacy PAT");
+        legacyPat.getSpec().setUsername(USERNAME);
+        legacyPat.getSpec().setTokenId(UUID.randomUUID().toString());
+        legacyPat.getSpec().setRoles(List.of("authenticated"));
+        pat = client.create(legacyPat).block();
+
+        var encoder = new NimbusJwtEncoder(new ImmutableJWKSet<>(new JWKSet(cryptoService.getJwk())));
+        var jwt = encoder.encode(JwtEncoderParameters.from(
+                        JwsHeader.with(SignatureAlgorithm.RS256)
+                                .keyId(cryptoService.getJwk().getKeyID())
+                                .build(),
+                        JwtClaimsSet.builder()
+                                .subject(USERNAME)
+                                .id(legacyPat.getSpec().getTokenId())
+                                .claim("pat_name", "legacy-pat")
+                                .build()))
+                .getTokenValue();
+        token = "pat_" + jwt;
     }
 
     @Test
@@ -177,7 +206,46 @@ class PatAuthenticationIntegrationTest {
         getCurrentUser().expectStatus().isOk();
     }
 
+    @Test
+    void shouldAuthenticateWithLegacyJwtPat() {
+        issueLegacyJwtPat();
+
+        getCurrentUser().expectStatus().isOk();
+    }
+
+    @Test
+    void shouldRejectTamperedToken() {
+        var mid = token.length() / 2;
+        var replacement = token.charAt(mid) == 'a' ? 'b' : 'a';
+        var tampered = token.substring(0, mid) + replacement + token.substring(mid + 1);
+
+        getWithToken(tampered).expectStatus().isUnauthorized();
+    }
+
+    @Test
+    void shouldRejectExpiredPat() {
+        var storedPat = client.get(PersonalAccessToken.class, pat.getMetadata().getName())
+                .block();
+        storedPat.getSpec().setExpiresAt(Instant.now().minus(Duration.ofMinutes(1)));
+        client.update(storedPat).block();
+
+        getCurrentUser().expectStatus().isUnauthorized();
+    }
+
+    @Test
+    void shouldRejectMalformedToken() {
+        getWithToken("pat_not-base64!!!").expectStatus().isUnauthorized();
+
+        var noSeparator =
+                "pat_" + Base64.getUrlEncoder().withoutPadding().encodeToString("noseparator".getBytes(UTF_8));
+        getWithToken(noSeparator).expectStatus().isUnauthorized();
+    }
+
     private WebTestClient.ResponseSpec getCurrentUser() {
+        return getWithToken(token);
+    }
+
+    private WebTestClient.ResponseSpec getWithToken(String token) {
         return webClient
                 .get()
                 .uri("/apis/api.console.halo.run/v1alpha1/users/-")
