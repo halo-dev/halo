@@ -170,6 +170,58 @@ describe("automatic table column resizing", () => {
     expect(table.style.width).toBe("300px");
   });
 
+  it.each(["columns", "cells"])(
+    "measures only the outer table using %s when switching nested tables to fixed layout",
+    (measurement) => {
+      editor = createTableEditor(
+        `<table data-table-layout="auto"><tr><td colspan="2" colwidth="200,200"><p>Outer</p><table data-table-layout="fixed"><tr><td colwidth="60"><p>Nested</p></td></tr></table></td><td colwidth="200"><p>End</p></td></tr><tr><td colwidth="200"><p>A</p></td><td colwidth="200"><p>B</p></td><td colwidth="200"><p>C</p></td></tr></table>`
+      );
+      editor.commands.setTextSelection(getCellPositions(editor)[0] + 2);
+      const table = editor.view.dom.querySelector("table")!;
+      const nestedBefore = editor.state.doc
+        .firstChild!.firstChild!.firstChild!.child(1)
+        .toJSON();
+      table.querySelectorAll("col").forEach((col) => {
+        vi.spyOn(col, "getBoundingClientRect").mockReturnValue({
+          width: 60,
+        } as DOMRect);
+      });
+      table.querySelectorAll(":scope > colgroup > col").forEach((col) => {
+        vi.mocked(col.getBoundingClientRect).mockReturnValue({
+          width: measurement === "columns" ? 100 : 0,
+        } as DOMRect);
+      });
+      Array.from(table.rows[0].cells).forEach((cell, index) => {
+        vi.spyOn(cell, "getBoundingClientRect").mockReturnValue({
+          width: index === 0 ? 200 : 100,
+        } as DOMRect);
+      });
+      vi.spyOn(
+        table.querySelector("table")!.querySelector("td")!,
+        "getBoundingClientRect"
+      ).mockReturnValue({ width: 60 } as DOMRect);
+
+      expect(editor.commands.setTableLayout("fixed")).toBe(true);
+      const outer = editor.state.doc.firstChild!;
+      expect(outer.attrs.layoutMode).toBe("fixed");
+      expect(outer.firstChild!.firstChild!.attrs.colwidth).toEqual([100, 100]);
+      expect(outer.firstChild!.lastChild!.attrs.colwidth).toEqual([100]);
+      outer.lastChild!.forEach((cell) =>
+        expect(cell.attrs.colwidth).toEqual([100])
+      );
+      expect(outer.firstChild!.firstChild!.child(1).toJSON()).toEqual(
+        nestedBefore
+      );
+      expect(table.style.width).toBe("300px");
+      expect(editor.commands.undo()).toBe(true);
+      expect(editor.state.doc.firstChild!.attrs.layoutMode).toBe("auto");
+      expect(editor.commands.redo()).toBe(true);
+      expect(
+        editor.state.doc.firstChild!.firstChild!.firstChild!.child(1).toJSON()
+      ).toEqual(nestedBefore);
+    }
+  );
+
   it("keeps fixed layout column resizing independent of adjacent columns", () => {
     startDrag();
     window.dispatchEvent(new Event("blur"));
