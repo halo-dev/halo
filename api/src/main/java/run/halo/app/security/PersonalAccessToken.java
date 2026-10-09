@@ -64,7 +64,10 @@ public class PersonalAccessToken extends AbstractExtension {
         /** Last time the token was used successfully. */
         private Instant lastUsed;
 
-        /** Stable token identifier stored separately from the secret token value. */
+        /**
+         * Stable token identifier stored separately from the secret token value. For legacy tokens issued as JWTs, this
+         * is the JWT ID (jti). For opaque tokens, this is the SHA-256 hash (hex encoded) of the token secret.
+         */
         @Schema(requiredMode = REQUIRED)
         private String tokenId;
     }
