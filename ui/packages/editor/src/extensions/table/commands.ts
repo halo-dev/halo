@@ -125,7 +125,10 @@ export function setTableLayoutCommand(
 
     if (normalized === "auto") {
       clearColumnWidths(table.node, table.start, tr);
-    } else if (!hasColumnWidths(table.node)) {
+    } else if (
+      table.node.attrs.layoutMode === "auto" ||
+      !hasColumnWidths(table.node)
+    ) {
       materializeColumnWidths(table.node, table.start, table.pos, tr, view);
     }
 
@@ -451,43 +454,6 @@ export function moveAxisToCommand(
         : undefined
     );
   };
-}
-
-export function tableLayoutTransitionPluginAppendTransaction(
-  transactions: readonly Transaction[],
-  oldState: EditorState,
-  newState: EditorState
-) {
-  if (!transactions.some((transaction) => transaction.docChanged)) {
-    return null;
-  }
-
-  const tr = newState.tr;
-  let changed = false;
-
-  newState.doc.descendants((node, pos) => {
-    if (
-      node.type.spec.tableRole !== "table" ||
-      node.attrs.layoutMode !== "auto" ||
-      !hasColumnWidths(node)
-    ) {
-      return;
-    }
-
-    const oldNode =
-      pos <= oldState.doc.content.size ? oldState.doc.nodeAt(pos) : null;
-    if (oldNode?.type === node.type && hasColumnWidths(oldNode)) {
-      return;
-    }
-
-    tr.setNodeMarkup(pos, undefined, {
-      ...node.attrs,
-      layoutMode: "fixed",
-    });
-    changed = true;
-  });
-
-  return changed ? tr : null;
 }
 
 function getSelectedCells(state: EditorState) {

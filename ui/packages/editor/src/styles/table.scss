@@ -16,10 +16,6 @@
     min-width: 100%;
     table-layout: auto;
 
-    > colgroup > col {
-      width: auto !important;
-    }
-
     tr > :last-child > .table-add-column:not(.table-add-leading) {
       right: 0;
     }

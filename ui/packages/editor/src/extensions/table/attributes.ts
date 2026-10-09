@@ -142,10 +142,13 @@ export function parseColumnWidths(element: HTMLElement): number[] | null {
     table.querySelectorAll<HTMLTableColElement>("colgroup > col")
   ).slice(columnIndex, columnIndex + colspan);
   const widths = columns.map((column) => {
-    return Number.parseInt(
-      column.getAttribute("width") || column.style.width,
-      10
-    );
+    const width = column.getAttribute("width") || column.style.width;
+    // Automatic tables keep their weights on the cells. A new column has no
+    // weight yet; its rendered percentage must not be imported as pixels.
+    if (parseTableLayoutMode(table) === "auto" && width.endsWith("%")) {
+      return Number.NaN;
+    }
+    return Number.parseInt(width, 10);
   });
 
   return widths.length === colspan &&
