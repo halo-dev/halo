@@ -622,6 +622,13 @@ class UserEndpointTest {
                 .exchange()
                 .expectStatus()
                 .isForbidden();
+        delegated
+                .put()
+                .uri("/users/manager/password")
+                .bodyValue(Map.of("password", "new-password"))
+                .exchange()
+                .expectStatus()
+                .isForbidden();
         verify(userService, never()).grantRoles(anyString(), anySet());
         verify(userService, never()).updateWithRawPassword(anyString(), anyString());
     }
