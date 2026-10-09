@@ -11724,7 +11724,7 @@
           },
           "tokenId": {
             "type": "string",
-            "description": "Stable token identifier stored separately from the secret token value."
+            "description": "Stable token identifier stored separately from the secret token value. For legacy tokens issued as JWTs, this\n is the JWT ID (jti). For opaque tokens, this is the SHA-256 hash (hex encoded) of the token secret."
           },
           "username": {
             "type": "string",

@@ -51,7 +51,7 @@ export interface PatSpec {
      */
     'scopes'?: Array<string>;
     /**
-     * Stable token identifier stored separately from the secret token value.
+     * Stable token identifier stored separately from the secret token value. For legacy tokens issued as JWTs, this  is the JWT ID (jti). For opaque tokens, this is the SHA-256 hash (hex encoded) of the token secret.
      */
     'tokenId': string;
     /**
