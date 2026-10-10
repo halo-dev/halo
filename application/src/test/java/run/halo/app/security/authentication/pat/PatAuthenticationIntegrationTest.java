@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
+import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
 import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
@@ -26,6 +27,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.User;
+import run.halo.app.extension.Extension;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.security.PersonalAccessToken;
@@ -45,11 +47,31 @@ class PatAuthenticationIntegrationTest {
     @Autowired
     CryptoService cryptoService;
 
+    @Autowired
+    DatabaseClient databaseClient;
+
     private static final String USERNAME = "pat-user";
 
     private PersonalAccessToken pat;
 
     private String token;
+
+    private <E extends Extension> E createWithDump(E extension) {
+        try {
+            return client.create(extension).block();
+        } catch (RuntimeException e) {
+            var names = databaseClient
+                    .sql("SELECT name FROM extensions ORDER BY name")
+                    .map((row, meta) -> row.get(0, String.class))
+                    .all()
+                    .collectList()
+                    .block();
+            System.err.println("=== EXTENSIONS DUMP on create failure of "
+                    + extension.getMetadata().getName() + " ===");
+            names.forEach(n -> System.err.println("  " + n));
+            throw e;
+        }
+    }
 
     @BeforeEach
     void setUp() {
@@ -60,13 +82,13 @@ class PatAuthenticationIntegrationTest {
         user.getSpec().setDisplayName("PAT user");
         user.getSpec().setEmail("pat-user@example.com");
         user.getSpec().setEmailVerified(true);
-        client.create(user).block();
+        createWithDump(user);
 
         var role = new Role();
         role.setMetadata(new Metadata());
         role.getMetadata().setName("pat-role");
         role.setRules(List.of());
-        client.create(role).block();
+        createWithDump(role);
 
         issuePat("authenticated", List.of("authenticated"));
     }
@@ -99,7 +121,7 @@ class PatAuthenticationIntegrationTest {
         legacyPat.getSpec().setUsername(USERNAME);
         legacyPat.getSpec().setTokenId(UUID.randomUUID().toString());
         legacyPat.getSpec().setRoles(List.of("authenticated"));
-        pat = client.create(legacyPat).block();
+        pat = createWithDump(legacyPat);
 
         var encoder = new NimbusJwtEncoder(new ImmutableJWKSet<>(new JWKSet(cryptoService.getJwk())));
         var jwt = encoder.encode(JwtEncoderParameters.from(
@@ -155,7 +177,7 @@ class PatAuthenticationIntegrationTest {
 
     @Test
     void shouldRejectPatAfterUserLosesRequiredRole() {
-        var binding = client.create(RoleBinding.create(USERNAME, "pat-role")).block();
+        var binding = createWithDump(RoleBinding.create(USERNAME, "pat-role"));
         issuePat("pat-role", List.of("pat-role"));
         getCurrentUser().expectStatus().isOk();
 
@@ -167,7 +189,7 @@ class PatAuthenticationIntegrationTest {
 
     @Test
     void shouldRejectSuperRolePatAfterUserIsDemoted() {
-        var binding = client.create(RoleBinding.create(USERNAME, "super-role")).block();
+        var binding = createWithDump(RoleBinding.create(USERNAME, "super-role"));
         issuePat("super-role", List.of("super-role"));
         getCurrentUser().expectStatus().isOk();
 
@@ -179,7 +201,7 @@ class PatAuthenticationIntegrationTest {
 
     @Test
     void shouldAllowPatWithSubsetOfCurrentUserRoles() {
-        client.create(RoleBinding.create(USERNAME, "super-role")).block();
+        createWithDump(RoleBinding.create(USERNAME, "super-role"));
         issuePat("super-role", List.of("pat-role"));
 
         getCurrentUser().expectStatus().isOk();
@@ -192,8 +214,8 @@ class PatAuthenticationIntegrationTest {
         role.getMetadata().setName("pat-parent-role");
         role.getMetadata().setAnnotations(Map.of(Role.ROLE_DEPENDENCIES_ANNO, "[\"pat-role\"]"));
         role.setRules(List.of());
-        client.create(role).block();
-        client.create(RoleBinding.create(USERNAME, "pat-parent-role")).block();
+        createWithDump(role);
+        createWithDump(RoleBinding.create(USERNAME, "pat-parent-role"));
         issuePat("pat-parent-role", List.of("pat-role"));
 
         getCurrentUser().expectStatus().isOk();
