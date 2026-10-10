@@ -33,6 +33,17 @@ jobs:
         uses: ./.github/actions/setup-env
       - name: Check Halo
         run: ./gradlew clean check --configuration-cache --configuration-cache-problems=warn
+      - name: Upload test reports
+        if: failure()
+        uses: actions/upload-artifact@v6
+        with:
+          name: test-reports
+          path: |
+            api/build/reports/tests/
+            api/build/test-results/
+            application/build/reports/tests/
+            application/build/test-results/
+          retention-days: 7
       - name: Upload coverage reports to Codecov
         if: github.repository == 'halo-dev/halo'
         uses: codecov/codecov-action@v6
