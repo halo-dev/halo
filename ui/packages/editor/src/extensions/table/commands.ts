@@ -125,7 +125,10 @@ export function setTableLayoutCommand(
 
     if (normalized === "auto") {
       clearColumnWidths(table.node, table.start, tr);
-    } else if (!hasColumnWidths(table.node)) {
+    } else if (
+      table.node.attrs.layoutMode === "auto" ||
+      !hasColumnWidths(table.node)
+    ) {
       materializeColumnWidths(table.node, table.start, table.pos, tr, view);
     }
 
@@ -453,43 +456,6 @@ export function moveAxisToCommand(
   };
 }
 
-export function tableLayoutTransitionPluginAppendTransaction(
-  transactions: readonly Transaction[],
-  oldState: EditorState,
-  newState: EditorState
-) {
-  if (!transactions.some((transaction) => transaction.docChanged)) {
-    return null;
-  }
-
-  const tr = newState.tr;
-  let changed = false;
-
-  newState.doc.descendants((node, pos) => {
-    if (
-      node.type.spec.tableRole !== "table" ||
-      node.attrs.layoutMode !== "auto" ||
-      !hasColumnWidths(node)
-    ) {
-      return;
-    }
-
-    const oldNode =
-      pos <= oldState.doc.content.size ? oldState.doc.nodeAt(pos) : null;
-    if (oldNode?.type === node.type && hasColumnWidths(oldNode)) {
-      return;
-    }
-
-    tr.setNodeMarkup(pos, undefined, {
-      ...node.attrs,
-      layoutMode: "fixed",
-    });
-    changed = true;
-  });
-
-  return changed ? tr : null;
-}
-
 function getSelectedCells(state: EditorState) {
   const table = findTable(state.selection);
   if (!table) {
@@ -563,19 +529,19 @@ function materializeColumnWidths(
   tr: Transaction,
   view?: EditorView
 ) {
-  const tableDom = view?.nodeDOM(tablePos) as HTMLElement | null;
+  const tableWrapper = view?.nodeDOM(tablePos) as HTMLElement | null;
+  const tableDom = tableWrapper?.querySelector("table");
   const map = TableMap.get(table);
-  const renderedColumns =
-    tableDom?.querySelectorAll<HTMLElement>("colgroup > col");
+  const renderedColumns = tableDom?.querySelectorAll<HTMLElement>(
+    ":scope > colgroup > col"
+  );
   const measuredColumnWidths = renderedColumns
     ? Array.from(
         renderedColumns,
         (column) => column.getBoundingClientRect().width
       )
     : [];
-  const cells = tableDom?.querySelectorAll<HTMLElement>(
-    "tr:first-child > th, tr:first-child > td"
-  );
+  const cells = tableDom?.rows[0]?.cells;
   const measuredCellWidths = cells
     ? Array.from(cells).flatMap((cell) => {
         const colspan = Math.max(1, Number(cell.getAttribute("colspan")) || 1);
@@ -608,6 +574,7 @@ function materializeColumnWidths(
       ...node.attrs,
       colwidth: widths.slice(rect.left, rect.right),
     });
+    return false;
   });
 }
 
