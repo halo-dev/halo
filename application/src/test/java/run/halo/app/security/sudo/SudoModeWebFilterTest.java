@@ -151,7 +151,6 @@ class SudoModeWebFilterTest {
     @CsvSource({
         "PUT,/apis/uc.api.halo.run/v1alpha1/users/-/password",
         "PUT,/apis/api.console.halo.run/v1alpha1/users/-/password",
-        "PUT,/apis/api.console.halo.run/v1alpha1/users/bob/password",
         "POST,/apis/uc.api.security.halo.run/v1alpha1/personalaccesstokens",
         "DELETE,/apis/uc.api.security.halo.run/v1alpha1/personalaccesstokens/pat-1",
         "PUT,/apis/uc.api.security.halo.run/v1alpha1/personalaccesstokens/pat-1/actions/revocation",
@@ -166,6 +165,22 @@ class SudoModeWebFilterTest {
                 .expectError(SudoRequiredException.class)
                 .verify();
         verify(chain, never()).filter(exchange);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "PUT,/apis/api.console.halo.run/v1alpha1/users/alice/password",
+        "PUT,/apis/api.console.halo.run/v1alpha1/users/bob/password"
+    })
+    void shouldNotMatchConsolePasswordResetPaths(HttpMethod method, String path) {
+        var exchange = exchange(method, path);
+        when(sudoService.requireSudo(eq(exchange), eq("alice")))
+                .thenReturn(Mono.error(new SudoRequiredException(List.of("totp"))));
+        StepVerifier.create(filter.filter(exchange, chain)
+                        .contextWrite(ReactiveSecurityContextHolder.withAuthentication(sessionAuth())))
+                .verifyComplete();
+        verify(sudoService, never()).requireSudo(any(), any());
+        verify(chain).filter(exchange);
     }
 
     @Test

@@ -122,8 +122,7 @@ class SudoModeWebFilter implements WebFilter {
                 pathMatchers(
                         HttpMethod.PUT,
                         "/apis/uc.api.halo.run/v1alpha1/users/-/password",
-                        "/apis/api.console.halo.run/v1alpha1/users/-/password",
-                        "/apis/api.console.halo.run/v1alpha1/users/*/password"),
+                        "/apis/api.console.halo.run/v1alpha1/users/-/password"),
                 pathMatchers(HttpMethod.POST, "/apis/uc.api.security.halo.run/v1alpha1/personalaccesstokens"),
                 pathMatchers(HttpMethod.DELETE, "/apis/uc.api.security.halo.run/v1alpha1/personalaccesstokens/*"),
                 pathMatchers(
