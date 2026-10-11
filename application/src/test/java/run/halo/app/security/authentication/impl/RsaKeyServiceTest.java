@@ -25,6 +25,7 @@ import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -139,6 +140,63 @@ class RsaKeyServiceTest {
         shouldGenerateKeyPair();
         shouldDecryptMessageCorrectly();
         shouldReuseKeyPairOnRestart();
+    }
+
+    @Test
+    void shouldPreserveMatchingNonCrtPrivateKey() throws Exception {
+        var nonCrtKey = replacePrivateKeyWithNonCrtEncoding();
+        var publicKeyBytes = Files.readAllBytes(tempDir.resolve("pat_id_rsa.pub"));
+
+        service = new RsaKeyService(tempDir);
+        service.afterPropertiesSet();
+
+        assertArrayEquals(nonCrtKey.getEncoded(), Files.readAllBytes(tempDir.resolve("pat_id_rsa")));
+        assertArrayEquals(publicKeyBytes, Files.readAllBytes(tempDir.resolve("pat_id_rsa.pub")));
+        shouldDecryptMessageCorrectly();
+        shouldReuseKeyPairOnRestart();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"missing", "invalid", "mismatched"})
+    void shouldRejectNonCrtPrivateKeyWithoutMatchingPublicKey(String state) throws Exception {
+        var nonCrtKey = replacePrivateKeyWithNonCrtEncoding();
+        var publicKeyPath = tempDir.resolve("pat_id_rsa.pub");
+        var publicKeyBytes = Files.readAllBytes(publicKeyPath);
+        switch (state) {
+            case "missing" -> Files.delete(publicKeyPath);
+            case "invalid" -> {
+                publicKeyBytes = new byte[] {1, 2, 3};
+                Files.write(publicKeyPath, publicKeyBytes);
+            }
+            case "mismatched" -> {
+                var generator = KeyPairGenerator.getInstance(RsaKeyService.ALGORITHM);
+                generator.initialize(2048);
+                var mismatchedPublicKey =
+                        generator.generateKeyPair().getPublic().getEncoded();
+                Files.write(publicKeyPath, mismatchedPublicKey);
+                publicKeyBytes = mismatchedPublicKey;
+            }
+            default -> throw new AssertionError(state);
+        }
+        var restarted = new RsaKeyService(tempDir);
+
+        assertThrows(IllegalStateException.class, restarted::afterPropertiesSet);
+        assertArrayEquals(nonCrtKey.getEncoded(), Files.readAllBytes(tempDir.resolve("pat_id_rsa")));
+        if (Files.exists(publicKeyPath)) {
+            assertArrayEquals(publicKeyBytes, Files.readAllBytes(publicKeyPath));
+        }
+    }
+
+    private java.security.PrivateKey replacePrivateKeyWithNonCrtEncoding()
+            throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+        var privateKeyPath = tempDir.resolve("pat_id_rsa");
+        var keyFactory = KeyFactory.getInstance(RsaKeyService.ALGORITHM);
+        var crtKey = (RSAPrivateCrtKey)
+                keyFactory.generatePrivate(new PKCS8EncodedKeySpec(Files.readAllBytes(privateKeyPath)));
+        var nonCrtKey =
+                keyFactory.generatePrivate(new RSAPrivateKeySpec(crtKey.getModulus(), crtKey.getPrivateExponent()));
+        Files.write(privateKeyPath, nonCrtKey.getEncoded());
+        return nonCrtKey;
     }
 
     @Test

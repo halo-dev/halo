@@ -18,10 +18,12 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.security.*;
 import java.security.interfaces.RSAPrivateCrtKey;
+import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.RSAPublicKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
 import java.util.Set;
 import javax.crypto.BadPaddingException;
@@ -81,11 +83,10 @@ public class RsaKeyService implements CryptoService, InitializingBean {
                                 + "JWTs signed with the previous key.",
                         privKeyPath);
             }
-            RSAPrivateCrtKey existingPrivateKey = null;
+            PrivateKey existingPrivateKey = null;
             if (privKeyBytes != null) {
                 try {
-                    existingPrivateKey =
-                            (RSAPrivateCrtKey) keyFactory.generatePrivate(new PKCS8EncodedKeySpec(privKeyBytes));
+                    existingPrivateKey = keyFactory.generatePrivate(new PKCS8EncodedKeySpec(privKeyBytes));
                 } catch (InvalidKeySpecException e) {
                     log.warn(
                             "Invalid RSA private key at {}. Generating a new key pair will invalidate "
@@ -93,14 +94,23 @@ public class RsaKeyService implements CryptoService, InitializingBean {
                             privKeyPath);
                 }
             }
-            if (existingPrivateKey != null) {
+            if (existingPrivateKey instanceof RSAPrivateCrtKey privateKey) {
                 var pubKey = keyFactory.generatePublic(
-                        new RSAPublicKeySpec(existingPrivateKey.getModulus(), existingPrivateKey.getPublicExponent()));
+                        new RSAPublicKeySpec(privateKey.getModulus(), privateKey.getPublicExponent()));
                 if (!Arrays.equals(pubKey.getEncoded(), pubKeyBytes)) {
                     log.warn("Restoring RSA public key at {} from the existing private key.", pubKeyPath);
                     writeKeyFileAtomically(pubKeyPath, pubKey.getEncoded());
                 }
-                return new KeyPair(pubKey, existingPrivateKey);
+                return new KeyPair(pubKey, privateKey);
+            }
+            if (existingPrivateKey instanceof RSAPrivateKey privateKey) {
+                var pubKey = readMatchingPublicKey(keyFactory, privateKey, pubKeyBytes);
+                if (pubKey == null) {
+                    throw new IllegalStateException("Cannot derive the public key for the non-CRT RSA private key at "
+                            + privKeyPath + ". Restore its matching public key; "
+                            + "the private key was preserved.");
+                }
+                return new KeyPair(pubKey, privateKey);
             }
 
             log.info("Generating RSA keys for PAT.");
@@ -116,6 +126,24 @@ public class RsaKeyService implements CryptoService, InitializingBean {
         } catch (JOSEException | IOException | InvalidKeySpecException | NoSuchAlgorithmException e) {
             throw new RuntimeException("Failed to generate or read RSA key pair", e);
         }
+    }
+
+    private static PublicKey readMatchingPublicKey(
+            KeyFactory keyFactory, RSAPrivateKey privateKey, byte[] pubKeyBytes) {
+        if (pubKeyBytes == null) {
+            return null;
+        }
+        PublicKey pubKey;
+        try {
+            pubKey = keyFactory.generatePublic(new X509EncodedKeySpec(pubKeyBytes));
+        } catch (InvalidKeySpecException e) {
+            return null;
+        }
+        if (!(pubKey instanceof RSAPublicKey publicKey)
+                || !privateKey.getModulus().equals(publicKey.getModulus())) {
+            return null;
+        }
+        return pubKey;
     }
 
     private static byte[] readKeyFileIfPresent(Path path) throws IOException {
