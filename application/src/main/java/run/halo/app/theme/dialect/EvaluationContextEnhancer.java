@@ -43,10 +43,18 @@ public class EvaluationContextEnhancer extends AbstractTemplateBoundariesProcess
      *
      * <p>Thymeleaf already denies references to JDK and Spring core packages, but its denylist does not cover libraries
      * on the runtime classpath that can compile and run arbitrary code. H2, the embedded database, is one of them:
-     * {@code CREATE ALIAS ... AS $$ ... $$} compiles Java at runtime, so a template that can instantiate
-     * {@code org.h2.Driver} can execute commands.
+     * {@code CREATE ALIAS ... AS $$ ... $$} compiles Java at runtime.
+     *
+     * <p>Blocking {@code org.h2} alone is not enough. {@code io.r2dbc:r2dbc-h2} is also on the runtime classpath, and a
+     * template can reach H2 without naming {@code org.h2} at all, through
+     * {@code T(io.r2dbc.spi.ConnectionFactories).get("r2dbc:h2:mem:///...")} or
+     * {@code T(io.r2dbc.h2.H2ConnectionFactory)}. The returned connection's reactive methods are unwrapped
+     * synchronously by {@link ReactiveMethodExecutor}, so the SQL runs during rendering.
+     *
+     * <p>{@code io.r2dbc.spi} is the shared R2DBC API rather than H2 itself, but every driver on the classpath is
+     * reachable through it, so it is blocked together with the H2-specific packages.
      */
-    private static final Set<String> BLOCKED_TYPE_PACKAGES = Set.of("org.h2");
+    private static final Set<String> BLOCKED_TYPE_PACKAGES = Set.of("org.h2", "io.r2dbc.h2", "io.r2dbc.spi");
 
     public EvaluationContextEnhancer() {
         super(TemplateMode.HTML, PRECEDENCE);

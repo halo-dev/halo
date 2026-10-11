@@ -6,6 +6,8 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationContext;
@@ -39,25 +41,25 @@ class EvaluationContextEnhancerTest {
         templateEngine.addTemplateResolver(new StringTemplateResolver());
     }
 
-    @Test
-    void shouldRejectH2TypeReference() {
-        var context = new Context();
-        context.setVariable(
-                ThymeleafEvaluationContext.THYMELEAF_EVALUATION_CONTEXT_CONTEXT_VARIABLE_NAME,
-                new ThymeleafEvaluationContext(applicationContext, null));
-
-        assertThatThrownBy(() -> templateEngine.process("<p th:text=\"${T(org.h2.Driver)}\"></p>", context))
-                .hasMessageContaining("org.h2.Driver");
+    @ParameterizedTest
+    @ValueSource(strings = {"org.h2.Driver", "io.r2dbc.h2.H2ConnectionFactory", "io.r2dbc.spi.ConnectionFactories"})
+    void shouldRejectTypesThatReachH2(String typeName) {
+        assertThatThrownBy(
+                        () -> templateEngine.process("<p th:text=\"${T(" + typeName + ")}\"></p>", evaluationContext()))
+                .hasMessageContaining(typeName);
     }
 
     @Test
     void shouldAllowOrdinaryTypeReference() {
+        templateEngine.process("<p th:text=\"${T(java.lang.Math).abs(-1)}\"></p>", evaluationContext());
+    }
+
+    private Context evaluationContext() {
         var context = new Context();
         context.setVariable(
                 ThymeleafEvaluationContext.THYMELEAF_EVALUATION_CONTEXT_CONTEXT_VARIABLE_NAME,
                 new ThymeleafEvaluationContext(applicationContext, null));
-
-        templateEngine.process("<p th:text=\"${T(java.lang.Math).abs(-1)}\"></p>", context);
+        return context;
     }
 
     /**
