@@ -42,16 +42,32 @@ class EvaluationContextEnhancerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"org.h2.Driver", "io.r2dbc.h2.H2ConnectionFactory", "io.r2dbc.spi.ConnectionFactories"})
-    void shouldRejectTypesThatReachH2(String typeName) {
+    @ValueSource(
+            strings = {
+                "org.h2.Driver",
+                "io.r2dbc.h2.H2ConnectionFactory",
+                "io.r2dbc.spi.ConnectionFactories",
+                "org.springframework.boot.r2dbc.ConnectionFactoryBuilder",
+                "java.lang.Runtime",
+                "java.util.concurrent.atomic.AtomicInteger"
+            })
+    void shouldRejectTypeReferencesOutsideTheAllowlist(String typeName) {
         assertThatThrownBy(
                         () -> templateEngine.process("<p th:text=\"${T(" + typeName + ")}\"></p>", evaluationContext()))
                 .hasMessageContaining(typeName);
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"java.lang.Math", "java.lang.String", "java.util.HashMap", "java.util.Date"})
+    void shouldAllowListedTypeReferences(String typeName) {
+        templateEngine.process("<p th:text=\"${T(" + typeName + ")}\"></p>", evaluationContext());
+    }
+
     @Test
-    void shouldAllowOrdinaryTypeReference() {
-        templateEngine.process("<p th:text=\"${T(java.lang.Math).abs(-1)}\"></p>", evaluationContext());
+    void shouldRejectBeanReferences() {
+        assertThatThrownBy(
+                        () -> templateEngine.process("<p th:text=\"${@connectionFactory}\"></p>", evaluationContext()))
+                .hasMessageContaining("connectionFactory");
     }
 
     private Context evaluationContext() {

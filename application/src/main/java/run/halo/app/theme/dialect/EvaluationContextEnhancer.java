@@ -39,22 +39,44 @@ public class EvaluationContextEnhancer extends AbstractTemplateBoundariesProcess
     private static final JsonPropertyAccessor JSON_PROPERTY_ACCESSOR = new JsonPropertyAccessor();
 
     /**
-     * Packages whose types must not be referenced from theme templates.
+     * The only types a theme template may reference through {@code T(...)} or {@code new}.
      *
-     * <p>Thymeleaf already denies references to JDK and Spring core packages, but its denylist does not cover libraries
-     * on the runtime classpath that can compile and run arbitrary code. H2, the embedded database, is one of them:
-     * {@code CREATE ALIAS ... AS $$ ... $$} compiles Java at runtime.
+     * <p>A denylist does not hold here. Thymeleaf already rejects JDK and Spring core packages, but every other type on
+     * the runtime classpath stays reachable, and several of them can run arbitrary code: H2 compiles Java from
+     * {@code CREATE ALIAS ... AS $$ ... $$}, and that entry point is exposed through {@code org.h2}, through
+     * {@code io.r2dbc.h2}, through {@code io.r2dbc.spi.ConnectionFactories}, and again through
+     * {@code org.springframework.boot.r2dbc.ConnectionFactoryBuilder}. Each package blocked so far revealed the next
+     * one.
      *
-     * <p>Blocking {@code org.h2} alone is not enough. {@code io.r2dbc:r2dbc-h2} is also on the runtime classpath, and a
-     * template can reach H2 without naming {@code org.h2} at all, through
-     * {@code T(io.r2dbc.spi.ConnectionFactories).get("r2dbc:h2:mem:///...")} or
-     * {@code T(io.r2dbc.h2.H2ConnectionFactory)}. The returned connection's reactive methods are unwrapped
-     * synchronously by {@link ReactiveMethodExecutor}, so the SQL runs during rendering.
-     *
-     * <p>{@code io.r2dbc.spi} is the shared R2DBC API rather than H2 itself, but every driver on the classpath is
-     * reachable through it, so it is blocked together with the H2-specific packages.
+     * <p>Themes do not reference types directly. They call methods on the objects Halo puts into the template context,
+     * so an allowlist of the JDK value types Thymeleaf itself permits covers legitimate templates.
      */
-    private static final Set<String> BLOCKED_TYPE_PACKAGES = Set.of("org.h2", "io.r2dbc.h2", "io.r2dbc.spi");
+    private static final Set<String> ALLOWED_TYPE_NAMES = Set.of(
+            "java.lang.Boolean",
+            "java.lang.Byte",
+            "java.lang.Character",
+            "java.lang.Double",
+            "java.lang.Enum",
+            "java.lang.Float",
+            "java.lang.Integer",
+            "java.lang.Long",
+            "java.lang.Math",
+            "java.lang.Number",
+            "java.lang.Short",
+            "java.lang.String",
+            "java.math.BigDecimal",
+            "java.math.BigInteger",
+            "java.math.RoundingMode",
+            "java.util.ArrayList",
+            "java.util.LinkedList",
+            "java.util.HashMap",
+            "java.util.LinkedHashMap",
+            "java.util.HashSet",
+            "java.util.LinkedHashSet",
+            "java.util.Locale",
+            "java.util.Optional",
+            "java.util.Date",
+            "java.util.Calendar");
 
     public EvaluationContextEnhancer() {
         super(TemplateMode.HTML, PRECEDENCE);
@@ -71,7 +93,11 @@ public class EvaluationContextEnhancer extends AbstractTemplateBoundariesProcess
             evaluationContext.addPropertyAccessor(JSON_PROPERTY_ACCESSOR);
             ReactiveReflectivePropertyAccessor.wrap(evaluationContext);
             ReactiveMethodResolver.wrap(evaluationContext, context);
-            blockDangerousTypes(evaluationContext);
+            restrictTypeReferences(evaluationContext);
+            // Thymeleaf installs a BeanFactoryResolver, which lets a template reach any bean with
+            // @beanName. The connection factory and database client beans expose H2 that way without
+            // any type reference, so bean resolution is removed entirely.
+            evaluationContext.setBeanResolver(null);
         }
     }
 
@@ -81,40 +107,28 @@ public class EvaluationContextEnhancer extends AbstractTemplateBoundariesProcess
         // nothing to do
     }
 
-    /**
-     * Wraps the context's type locator so theme templates cannot reference types that Thymeleaf's own denylist leaves
-     * open but that can execute arbitrary code.
-     */
-    private static void blockDangerousTypes(ThymeleafEvaluationContext evaluationContext) {
+    /** Wraps the context's type locator so theme templates can only reference types in {@link #ALLOWED_TYPE_NAMES}. */
+    private static void restrictTypeReferences(ThymeleafEvaluationContext evaluationContext) {
         var current = evaluationContext.getTypeLocator();
-        if (current instanceof RestrictedTypeLocator) {
+        if (current instanceof AllowedTypeLocator) {
             return;
         }
-        evaluationContext.setTypeLocator(new RestrictedTypeLocator(current));
+        evaluationContext.setTypeLocator(new AllowedTypeLocator(current));
     }
 
     /**
-     * A {@link TypeLocator} that rejects type references under {@link #BLOCKED_TYPE_PACKAGES} before delegating to the
-     * locator Thymeleaf installed.
+     * A {@link TypeLocator} that resolves a type only when {@link #ALLOWED_TYPE_NAMES} contains it, and delegates the
+     * actual lookup to the locator Thymeleaf installed.
      */
-    private record RestrictedTypeLocator(TypeLocator delegate) implements TypeLocator {
+    private record AllowedTypeLocator(TypeLocator delegate) implements TypeLocator {
 
         @Override
         public Class<?> findType(String typeName) throws EvaluationException {
-            if (isBlocked(typeName)) {
+            if (!ALLOWED_TYPE_NAMES.contains(typeName)) {
                 throw new EvaluationException(
                         "Access is forbidden for type '" + typeName + "' in this expression context.");
             }
             return delegate.findType(typeName);
-        }
-
-        private static boolean isBlocked(String typeName) {
-            for (var blocked : BLOCKED_TYPE_PACKAGES) {
-                if (typeName.equals(blocked) || typeName.startsWith(blocked + ".")) {
-                    return true;
-                }
-            }
-            return false;
         }
     }
 
