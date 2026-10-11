@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 import org.springframework.core.convert.TypeDescriptor;
@@ -37,6 +38,16 @@ public class EvaluationContextEnhancer extends AbstractTemplateBoundariesProcess
 
     private static final JsonPropertyAccessor JSON_PROPERTY_ACCESSOR = new JsonPropertyAccessor();
 
+    /**
+     * Packages whose types must not be referenced from theme templates.
+     *
+     * <p>Thymeleaf already denies references to JDK and Spring core packages, but its denylist does not cover libraries
+     * on the runtime classpath that can compile and run arbitrary code. H2, the embedded database, is one of them:
+     * {@code CREATE ALIAS ... AS $$ ... $$} compiles Java at runtime, so a template that can instantiate
+     * {@code org.h2.Driver} can execute commands.
+     */
+    private static final Set<String> BLOCKED_TYPE_PACKAGES = Set.of("org.h2");
+
     public EvaluationContextEnhancer() {
         super(TemplateMode.HTML, PRECEDENCE);
     }
@@ -52,6 +63,7 @@ public class EvaluationContextEnhancer extends AbstractTemplateBoundariesProcess
             evaluationContext.addPropertyAccessor(JSON_PROPERTY_ACCESSOR);
             ReactiveReflectivePropertyAccessor.wrap(evaluationContext);
             ReactiveMethodResolver.wrap(evaluationContext, context);
+            blockDangerousTypes(evaluationContext);
         }
     }
 
@@ -59,6 +71,43 @@ public class EvaluationContextEnhancer extends AbstractTemplateBoundariesProcess
     public void doProcessTemplateEnd(
             ITemplateContext context, ITemplateEnd templateEnd, ITemplateBoundariesStructureHandler structureHandler) {
         // nothing to do
+    }
+
+    /**
+     * Wraps the context's type locator so theme templates cannot reference types that Thymeleaf's own denylist leaves
+     * open but that can execute arbitrary code.
+     */
+    private static void blockDangerousTypes(ThymeleafEvaluationContext evaluationContext) {
+        var current = evaluationContext.getTypeLocator();
+        if (current instanceof RestrictedTypeLocator) {
+            return;
+        }
+        evaluationContext.setTypeLocator(new RestrictedTypeLocator(current));
+    }
+
+    /**
+     * A {@link TypeLocator} that rejects type references under {@link #BLOCKED_TYPE_PACKAGES} before delegating to the
+     * locator Thymeleaf installed.
+     */
+    private record RestrictedTypeLocator(TypeLocator delegate) implements TypeLocator {
+
+        @Override
+        public Class<?> findType(String typeName) throws EvaluationException {
+            if (isBlocked(typeName)) {
+                throw new EvaluationException(
+                        "Access is forbidden for type '" + typeName + "' in this expression context.");
+            }
+            return delegate.findType(typeName);
+        }
+
+        private static boolean isBlocked(String typeName) {
+            for (var blocked : BLOCKED_TYPE_PACKAGES) {
+                if (typeName.equals(blocked) || typeName.startsWith(blocked + ".")) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
     /**
