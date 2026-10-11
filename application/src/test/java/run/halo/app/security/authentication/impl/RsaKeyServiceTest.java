@@ -14,6 +14,7 @@ import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.KeyUse;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,6 +27,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.RSAPrivateKeySpec;
+import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -154,6 +156,24 @@ class RsaKeyServiceTest {
         assertArrayEquals(publicKeyBytes, Files.readAllBytes(tempDir.resolve("pat_id_rsa.pub")));
         shouldDecryptMessageCorrectly();
         shouldReuseKeyPairOnRestart();
+    }
+
+    @Test
+    void shouldRejectNonCrtPrivateKeyWithSameModulusAndWrongExponent() throws Exception {
+        var privateKeyBytes = Files.readAllBytes(tempDir.resolve("pat_id_rsa"));
+        var nonCrtKey = replacePrivateKeyWithNonCrtEncoding();
+        var publicKeyPath = tempDir.resolve("pat_id_rsa.pub");
+        var keyFactory = KeyFactory.getInstance(RsaKeyService.ALGORITHM);
+        var privateKey = (RSAPrivateCrtKey) keyFactory.generatePrivate(new PKCS8EncodedKeySpec(privateKeyBytes));
+        var wrongPublicKey = keyFactory
+                .generatePublic(new RSAPublicKeySpec(privateKey.getModulus(), BigInteger.valueOf(7)))
+                .getEncoded();
+        Files.write(publicKeyPath, wrongPublicKey);
+        var restarted = new RsaKeyService(tempDir);
+
+        assertThrows(IllegalStateException.class, restarted::afterPropertiesSet);
+        assertArrayEquals(nonCrtKey.getEncoded(), Files.readAllBytes(tempDir.resolve("pat_id_rsa")));
+        assertArrayEquals(wrongPublicKey, Files.readAllBytes(publicKeyPath));
     }
 
     @ParameterizedTest

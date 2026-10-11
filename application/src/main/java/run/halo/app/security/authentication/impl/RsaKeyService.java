@@ -140,10 +140,25 @@ public class RsaKeyService implements CryptoService, InitializingBean {
             return null;
         }
         if (!(pubKey instanceof RSAPublicKey publicKey)
-                || !privateKey.getModulus().equals(publicKey.getModulus())) {
+                || !privateKey.getModulus().equals(publicKey.getModulus())
+                || !verifyPublicKeyMatches(privateKey, pubKey)) {
             return null;
         }
         return pubKey;
+    }
+
+    private static boolean verifyPublicKeyMatches(PrivateKey privateKey, PublicKey publicKey) {
+        try {
+            var signature = Signature.getInstance("SHA256withRSA");
+            signature.initSign(privateKey);
+            signature.update(ALGORITHM.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            var signed = signature.sign();
+            signature.initVerify(publicKey);
+            signature.update(ALGORITHM.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            return signature.verify(signed);
+        } catch (GeneralSecurityException e) {
+            return false;
+        }
     }
 
     private static byte[] readKeyFileIfPresent(Path path) throws IOException {
