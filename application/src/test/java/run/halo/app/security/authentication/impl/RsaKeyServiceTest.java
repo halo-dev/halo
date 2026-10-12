@@ -95,18 +95,7 @@ class RsaKeyServiceTest {
         var privateKeyBytes = Files.readAllBytes(tempDir.resolve("pat_id_rsa"));
         var publicKeyPath = tempDir.resolve("pat_id_rsa.pub");
         var publicKeyBytes = Files.readAllBytes(publicKeyPath);
-        switch (state) {
-            case "missing" -> Files.delete(publicKeyPath);
-            case "empty" -> Files.write(publicKeyPath, new byte[0]);
-            case "invalid" -> Files.write(publicKeyPath, new byte[] {1, 2, 3});
-            case "mismatched" -> {
-                var generator = KeyPairGenerator.getInstance(RsaKeyService.ALGORITHM);
-                generator.initialize(2048);
-                Files.write(
-                        publicKeyPath, generator.generateKeyPair().getPublic().getEncoded());
-            }
-            default -> throw new AssertionError(state);
-        }
+        corruptKeyFile(publicKeyPath, state);
 
         var restarted = new RsaKeyService(tempDir);
         restarted.afterPropertiesSet();
@@ -123,13 +112,7 @@ class RsaKeyServiceTest {
     @CsvSource({"missing,true", "missing,false", "empty,true", "empty,false", "invalid,true", "invalid,false"})
     void shouldRegenerateKeyPairWhenPrivateKeyCannotBeRecovered(String state, boolean publicKeyExists)
             throws Exception {
-        var privateKeyPath = tempDir.resolve("pat_id_rsa");
-        switch (state) {
-            case "missing" -> Files.delete(privateKeyPath);
-            case "empty" -> Files.write(privateKeyPath, new byte[0]);
-            case "invalid" -> Files.write(privateKeyPath, new byte[] {1, 2, 3});
-            default -> throw new AssertionError(state);
-        }
+        corruptKeyFile(tempDir.resolve("pat_id_rsa"), state);
         if (!publicKeyExists) {
             Files.delete(tempDir.resolve("pat_id_rsa.pub"));
         }
@@ -159,51 +142,53 @@ class RsaKeyServiceTest {
     }
 
     @Test
-    void shouldRejectNonCrtPrivateKeyWithSameModulusAndWrongExponent() throws Exception {
+    void shouldRegenerateKeyPairWhenNonCrtPublicKeyHasWrongExponent() throws Exception {
         var privateKeyBytes = Files.readAllBytes(tempDir.resolve("pat_id_rsa"));
-        var nonCrtKey = replacePrivateKeyWithNonCrtEncoding();
-        var publicKeyPath = tempDir.resolve("pat_id_rsa.pub");
+        replacePrivateKeyWithNonCrtEncoding();
         var keyFactory = KeyFactory.getInstance(RsaKeyService.ALGORITHM);
         var privateKey = (RSAPrivateCrtKey) keyFactory.generatePrivate(new PKCS8EncodedKeySpec(privateKeyBytes));
         var wrongPublicKey = keyFactory
                 .generatePublic(new RSAPublicKeySpec(privateKey.getModulus(), BigInteger.valueOf(7)))
                 .getEncoded();
-        Files.write(publicKeyPath, wrongPublicKey);
-        var restarted = new RsaKeyService(tempDir);
+        Files.write(tempDir.resolve("pat_id_rsa.pub"), wrongPublicKey);
+        var previousKeyId = service.getKeyId();
 
-        assertThrows(IllegalStateException.class, restarted::afterPropertiesSet);
-        assertArrayEquals(nonCrtKey.getEncoded(), Files.readAllBytes(tempDir.resolve("pat_id_rsa")));
-        assertArrayEquals(wrongPublicKey, Files.readAllBytes(publicKeyPath));
+        service = new RsaKeyService(tempDir);
+        service.afterPropertiesSet();
+
+        assertNotEquals(previousKeyId, service.getKeyId());
+        shouldGenerateKeyPair();
+        shouldDecryptMessageCorrectly();
+        shouldReuseKeyPairOnRestart();
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"missing", "invalid", "mismatched"})
-    void shouldRejectNonCrtPrivateKeyWithoutMatchingPublicKey(String state) throws Exception {
-        var nonCrtKey = replacePrivateKeyWithNonCrtEncoding();
-        var publicKeyPath = tempDir.resolve("pat_id_rsa.pub");
-        var publicKeyBytes = Files.readAllBytes(publicKeyPath);
+    void shouldRegenerateKeyPairWhenNonCrtPrivateKeyLacksMatchingPublicKey(String state) throws Exception {
+        replacePrivateKeyWithNonCrtEncoding();
+        corruptKeyFile(tempDir.resolve("pat_id_rsa.pub"), state);
+        var previousKeyId = service.getKeyId();
+
+        service = new RsaKeyService(tempDir);
+        service.afterPropertiesSet();
+
+        assertNotEquals(previousKeyId, service.getKeyId());
+        shouldGenerateKeyPair();
+        shouldDecryptMessageCorrectly();
+        shouldReuseKeyPairOnRestart();
+    }
+
+    private static void corruptKeyFile(Path path, String state) throws Exception {
         switch (state) {
-            case "missing" -> Files.delete(publicKeyPath);
-            case "invalid" -> {
-                publicKeyBytes = new byte[] {1, 2, 3};
-                Files.write(publicKeyPath, publicKeyBytes);
-            }
+            case "missing" -> Files.delete(path);
+            case "empty" -> Files.write(path, new byte[0]);
+            case "invalid" -> Files.write(path, new byte[] {1, 2, 3});
             case "mismatched" -> {
                 var generator = KeyPairGenerator.getInstance(RsaKeyService.ALGORITHM);
                 generator.initialize(2048);
-                var mismatchedPublicKey =
-                        generator.generateKeyPair().getPublic().getEncoded();
-                Files.write(publicKeyPath, mismatchedPublicKey);
-                publicKeyBytes = mismatchedPublicKey;
+                Files.write(path, generator.generateKeyPair().getPublic().getEncoded());
             }
             default -> throw new AssertionError(state);
-        }
-        var restarted = new RsaKeyService(tempDir);
-
-        assertThrows(IllegalStateException.class, restarted::afterPropertiesSet);
-        assertArrayEquals(nonCrtKey.getEncoded(), Files.readAllBytes(tempDir.resolve("pat_id_rsa")));
-        if (Files.exists(publicKeyPath)) {
-            assertArrayEquals(publicKeyBytes, Files.readAllBytes(publicKeyPath));
         }
     }
 

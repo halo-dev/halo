@@ -12,6 +12,7 @@ import com.nimbusds.jose.jwk.KeyUse;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -44,6 +45,9 @@ public class RsaKeyService implements CryptoService, InitializingBean {
     public static final String TRANSFORMATION = "RSA/ECB/PKCS1Padding";
 
     public static final String ALGORITHM = "RSA";
+
+    private static final String REGENERATION_WARNING =
+            "Generating a new key pair will invalidate JWTs signed with the previous key.";
 
     private final Path keysRoot;
 
@@ -78,20 +82,14 @@ public class RsaKeyService implements CryptoService, InitializingBean {
             var privKeyBytes = readKeyFileIfPresent(privKeyPath);
             var pubKeyBytes = readKeyFileIfPresent(pubKeyPath);
             if (privKeyBytes == null && pubKeyBytes != null) {
-                log.warn(
-                        "RSA private key is missing at {}. Generating a new key pair will invalidate "
-                                + "JWTs signed with the previous key.",
-                        privKeyPath);
+                log.warn("RSA private key is missing at {}. " + REGENERATION_WARNING, privKeyPath);
             }
             PrivateKey existingPrivateKey = null;
             if (privKeyBytes != null) {
                 try {
                     existingPrivateKey = keyFactory.generatePrivate(new PKCS8EncodedKeySpec(privKeyBytes));
                 } catch (InvalidKeySpecException e) {
-                    log.warn(
-                            "Invalid RSA private key at {}. Generating a new key pair will invalidate "
-                                    + "JWTs signed with the previous key.",
-                            privKeyPath);
+                    log.warn("Invalid RSA private key at {}. " + REGENERATION_WARNING, privKeyPath);
                 }
             }
             if (existingPrivateKey instanceof RSAPrivateCrtKey privateKey) {
@@ -105,12 +103,13 @@ public class RsaKeyService implements CryptoService, InitializingBean {
             }
             if (existingPrivateKey instanceof RSAPrivateKey privateKey) {
                 var pubKey = readMatchingPublicKey(keyFactory, privateKey, pubKeyBytes);
-                if (pubKey == null) {
-                    throw new IllegalStateException("Cannot derive the public key for the non-CRT RSA private key at "
-                            + privKeyPath + ". Restore its matching public key; "
-                            + "the private key was preserved.");
+                if (pubKey != null) {
+                    return new KeyPair(pubKey, privateKey);
                 }
-                return new KeyPair(pubKey, privateKey);
+                log.warn(
+                        "Cannot derive or verify the public key for the non-CRT RSA private key at {}. "
+                                + REGENERATION_WARNING,
+                        privKeyPath);
             }
 
             log.info("Generating RSA keys for PAT.");
@@ -149,12 +148,13 @@ public class RsaKeyService implements CryptoService, InitializingBean {
 
     private static boolean verifyPublicKeyMatches(PrivateKey privateKey, PublicKey publicKey) {
         try {
+            var payload = ALGORITHM.getBytes(StandardCharsets.UTF_8);
             var signature = Signature.getInstance("SHA256withRSA");
             signature.initSign(privateKey);
-            signature.update(ALGORITHM.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            signature.update(payload);
             var signed = signature.sign();
             signature.initVerify(publicKey);
-            signature.update(ALGORITHM.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            signature.update(payload);
             return signature.verify(signed);
         } catch (GeneralSecurityException e) {
             return false;
