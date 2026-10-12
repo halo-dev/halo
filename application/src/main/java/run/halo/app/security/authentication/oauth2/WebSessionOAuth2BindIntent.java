@@ -21,7 +21,10 @@ public class WebSessionOAuth2BindIntent implements OAuth2BindIntent {
         return exchange.getSession()
                 .doOnNext(session -> {
                     session.getAttributes().put(IDENTITY_ATTRIBUTE_KEY, oauth2Identity);
-                    session.getAttributes().put(CREATED_AT_ATTRIBUTE_KEY, clock.instant());
+                    // Store epoch millis instead of Instant: session serialization (e.g. Redis with
+                    // default Jackson typing) may not round-trip Instant into the same type.
+                    session.getAttributes()
+                            .put(CREATED_AT_ATTRIBUTE_KEY, clock.instant().toEpochMilli());
                 })
                 .then();
     }
@@ -32,8 +35,10 @@ public class WebSessionOAuth2BindIntent implements OAuth2BindIntent {
             var identity = session.getAttributes().remove(IDENTITY_ATTRIBUTE_KEY);
             var createdAt = session.getAttributes().remove(CREATED_AT_ATTRIBUTE_KEY);
             if (identity instanceof String value
-                    && createdAt instanceof Instant instant
-                    && !instant.plus(MAX_AGE).isBefore(clock.instant())) {
+                    && createdAt instanceof Number epochMilli
+                    && !Instant.ofEpochMilli(epochMilli.longValue())
+                            .plus(MAX_AGE)
+                            .isBefore(clock.instant())) {
                 return Mono.just(value);
             }
             return Mono.empty();
