@@ -59,6 +59,7 @@ const creationTime = computed(() => {
 
 const editorContent = ref("");
 const editorCharacterCount = ref(0);
+const hidden = ref(false);
 
 function onCommentEditorUpdate(value: {
   content: string;
@@ -92,6 +93,7 @@ async function handleApprove() {
         raw: editorContent.value,
         content: editorContent.value,
         allowNotification: true,
+        hidden: hidden.value,
         quoteReply: props.reply.reply.metadata.name,
       },
     });
@@ -214,7 +216,10 @@ const replyEditingModalVisible = ref(false);
         <VDescriptionItem
           :label="$t('core.comment.reply_detail_modal.fields.content')"
         >
-          <div v-if="reply.reply.spec.hidden" class="mb-2">
+          <div
+            v-if="reply.reply.spec.hidden || comment.comment.spec.hidden"
+            class="mb-2"
+          >
             <VTag>
               {{ $t("core.comment.list.fields.private") }}
             </VTag>
@@ -250,6 +255,13 @@ const replyEditingModalVisible = ref(false);
           :label="$t('core.comment.detail_modal.fields.new_reply')"
         >
           <CommentEditor @update="onCommentEditorUpdate" />
+          <FormKit
+            v-model="hidden"
+            type="checkbox"
+            :label="$t('core.comment.reply_modal.fields.private.label')"
+            :help="$t('core.comment.reply_modal.fields.private.help')"
+            outer-class="mt-3"
+          />
         </VDescriptionItem>
       </VDescription>
     </div>

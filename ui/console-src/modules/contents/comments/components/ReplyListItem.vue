@@ -110,6 +110,24 @@ async function handleCancelApprove() {
   });
 }
 
+async function handleToggleHidden() {
+  await coreApiClient.content.reply.patchReply({
+    name: props.reply.reply.metadata.name,
+    jsonPatchInner: [
+      {
+        op: "add",
+        path: "/spec/hidden",
+        value: !props.reply.reply.spec.hidden,
+      },
+    ],
+  });
+  Toast.success(t("core.common.toast.operation_success"));
+  queryClient.invalidateQueries({
+    queryKey: ["core:comment-replies", props.comment.comment.metadata.name],
+  });
+  queryClient.invalidateQueries({ queryKey: ["core:comments"] });
+}
+
 // Show hovered reply
 const hoveredReply = inject<Ref<ListedReply | undefined>>("hoveredReply");
 
@@ -178,6 +196,18 @@ const { data: operationItems } = useOperationItemExtensionPoint<ListedReply>(
     },
     {
       priority: 20,
+      component: markRaw(VDropdownItem),
+      label: t(
+        props.reply.reply.spec.hidden
+          ? "core.comment.operations.make_public.button"
+          : "core.comment.operations.make_private.button"
+      ),
+      permissions: ["system:comments:manage"],
+      hidden: !!props.reply.reply.metadata.deletionTimestamp,
+      action: handleToggleHidden,
+    },
+    {
+      priority: 25,
       component: markRaw(VDropdownDivider),
     },
     {
@@ -239,7 +269,9 @@ const { data: contentProvider } = useContentProviderExtensionPoint();
                 :owner="reply?.owner"
                 @click="detailModalVisible = true"
               />
-              <VTag v-if="comment.comment.spec.hidden">
+              <VTag
+                v-if="reply.reply.spec.hidden || comment.comment.spec.hidden"
+              >
                 {{ $t("core.comment.list.fields.private") }}
               </VTag>
               <span class="whitespace-nowrap text-sm text-gray-900">
