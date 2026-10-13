@@ -19,7 +19,7 @@ import { computed, inject, markRaw, ref, toRefs, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
 import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
 import { useCommentLastReadTimeMutate } from "../composables/use-comment-last-readtime-mutate";
-import { useContentProviderExtensionPoint } from "../composables/use-content-provider-extension-point";
+import CollapsibleCommentContent from "./CollapsibleCommentContent.vue";
 import CommentEditingModal from "./CommentEditingModal.vue";
 import OwnerButton from "./OwnerButton.vue";
 import ReplyCreationModal from "./ReplyCreationModal.vue";
@@ -232,8 +232,6 @@ const { data: operationItems } = useOperationItemExtensionPoint<ListedReply>(
     },
   ])
 );
-
-const { data: contentProvider } = useContentProviderExtensionPoint();
 </script>
 
 <template>
@@ -288,8 +286,7 @@ const { data: contentProvider } = useContentProviderExtensionPoint();
               >
                 <IconReplyLine />
                 <span>{{ quoteReply.owner.displayName }}</span> </a
-              ><br v-if="quoteReply" /><component
-                :is="contentProvider?.component"
+              ><br v-if="quoteReply" /><CollapsibleCommentContent
                 :content="reply?.reply.spec.content"
               />
             </div>

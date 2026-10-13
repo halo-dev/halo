@@ -300,6 +300,8 @@
   "core.comment.reply_empty.message": "You can try refreshing or creating a new reply.",
   "core.comment.reply_empty.new": "New Reply",
   "core.comment.text.commented_on": "commented on",
+  "core.comment.text.collapse_content": "Show less",
+  "core.comment.text.expand_content": "Show more",
   "core.comment.text.replied_below": "replied:",
   "core.comment.operations.delete_comment.title": "Delete comment",
   "core.comment.operations.delete_comment.description": "All replies under the comments will be deleted at the same time, and this operation cannot be undone.",
