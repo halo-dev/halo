@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, useId } from "vue";
 import { useContentProviderExtensionPoint } from "../composables/use-content-provider-extension-point";
 
 defineProps<{
@@ -14,6 +14,7 @@ const { data: contentProvider } = useContentProviderExtensionPoint();
 const expanded = ref(false);
 const collapsible = ref(false);
 const contentRef = ref<HTMLElement>();
+const contentId = `collapsible-comment-content-${useId()}`;
 
 const collapsed = computed(() => collapsible.value && !expanded.value);
 
@@ -56,16 +57,22 @@ onBeforeUnmount(() => {
 <template>
   <div class="max-w-3xl">
     <div
+      :id="contentId"
       ref="contentRef"
       :class="{ 'cursor-pointer overflow-hidden': collapsed }"
       :style="collapsedStyle"
       @click="handleContentClick"
     >
-      <component :is="contentProvider?.component" :content="content" />
+      <div :inert="collapsed">
+        <component :is="contentProvider?.component" :content="content" />
+      </div>
     </div>
-    <span
+    <button
       v-if="collapsible"
+      type="button"
       class="cursor-pointer select-none text-xs text-gray-700 hover:text-gray-900"
+      :aria-expanded="expanded"
+      :aria-controls="contentId"
       @click="expanded = !expanded"
     >
       {{
@@ -73,6 +80,6 @@ onBeforeUnmount(() => {
           ? $t("core.comment.text.collapse_content")
           : $t("core.comment.text.expand_content")
       }}
-    </span>
+    </button>
   </div>
 </template>
