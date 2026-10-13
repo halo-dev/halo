@@ -2,7 +2,12 @@
 
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 import type { Editor } from "@/tiptap";
-import { closeHistory, columnResizingPluginKey, TableMap } from "@/tiptap/pm";
+import {
+  closeHistory,
+  columnResizingPluginKey,
+  TableMap,
+  type Transaction,
+} from "@/tiptap/pm";
 import {
   createTableEditor,
   getCellPositions,
@@ -53,6 +58,22 @@ describe("automatic table column resizing", () => {
     window.dispatchEvent(new MouseEvent("mouseup", { clientX }));
   }
 
+  function repeatDrag(widths: number[]) {
+    const table = editor!.view.dom.querySelector("table")!;
+    table.querySelectorAll(":scope > colgroup > col").forEach((col, index) => {
+      vi.mocked(col.getBoundingClientRect).mockReturnValue({
+        width: widths[index],
+      } as DOMRect);
+    });
+    table.querySelector("td")!.dispatchEvent(
+      new MouseEvent("mousedown", {
+        bubbles: true,
+        cancelable: true,
+        clientX: 200,
+      })
+    );
+  }
+
   it("keeps the table full width during dragging and compensates the adjacent column", () => {
     const table = startDrag();
     move(250);
@@ -94,6 +115,55 @@ describe("automatic table column resizing", () => {
     const row = getTableNode(editor!).node.firstChild!;
     expect(row.child(0).attrs.colwidth).toEqual([375]);
     expect(row.child(1).attrs.colwidth).toEqual([25]);
+  });
+
+  it("only updates the affected cells when resizing an initialized table again", () => {
+    startDrag(Array(20).fill(200));
+    finish(250);
+    const before = getTableNode(editor!).node;
+    const transactions: Transaction[] = [];
+    editor!.on("transaction", ({ transaction }) => {
+      if (transaction.docChanged) {
+        transactions.push(transaction);
+      }
+    });
+
+    repeatDrag([250, 150, ...Array(18).fill(200)]);
+    finish(225);
+
+    expect(transactions).toHaveLength(1);
+    expect(transactions[0].steps).toHaveLength(4);
+    const after = getTableNode(editor!).node;
+    after.forEach((row, _offset, rowIndex) => {
+      expect(row.child(0).attrs.colwidth).toEqual([275]);
+      expect(row.child(1).attrs.colwidth).toEqual([125]);
+      for (let column = 2; column < row.childCount; column++) {
+        expect(row.child(column)).toBe(before.child(rowIndex).child(column));
+      }
+    });
+    expect(editor!.commands.undo()).toBe(true);
+    expect(getTableNode(editor!).node.eq(before)).toBe(true);
+    expect(editor!.commands.redo()).toBe(true);
+    expect(getTableNode(editor!).node.eq(after)).toBe(true);
+  });
+
+  it("does not change the document or add undo history when already at the minimum", () => {
+    startDrag();
+    finish(1000);
+    const before = editor!.state.doc;
+
+    repeatDrag([375, 25, 200]);
+    move(250);
+    finish(250);
+
+    expect(editor!.state.doc).toBe(before);
+    expect(columnResizingPluginKey.getState(editor!.state)!.dragging).toBe(
+      false
+    );
+    expect(editor!.commands.undo()).toBe(true);
+    expect(
+      getTableNode(editor!).node.firstChild!.firstChild!.attrs.colwidth
+    ).toBeNull();
   });
 
   it("does not resize the outer edge of an automatic table", () => {
@@ -274,6 +344,47 @@ describe("automatic table column resizing", () => {
     expect(columnResizingPluginKey.getState(editor.state)!.dragging).toBe(
       false
     );
+  });
+
+  it("updates each spanning cell once and preserves unaffected cells", () => {
+    editor = createTableEditor(
+      `<table><tr><th colspan="2" rowspan="2" colwidth="200,200"><p>Merged</p></th><td colwidth="200"><p>A</p></td><td colwidth="200"><p>B</p></td></tr><tr><td colwidth="200"><p>C</p></td><td colwidth="200"><p>D</p></td></tr></table>`
+    );
+    const before = getTableNode(editor).node;
+    const table = editor.view.dom.querySelector("table")!;
+    table.querySelectorAll("col").forEach((col) => {
+      vi.spyOn(col, "getBoundingClientRect").mockReturnValue({
+        width: 200,
+      } as DOMRect);
+    });
+    editor.view.dispatch(
+      editor.state.tr.setMeta(columnResizingPluginKey, {
+        setHandle: getCellPositions(editor)[0],
+      })
+    );
+    const transactions: Transaction[] = [];
+    editor.on("transaction", ({ transaction }) => {
+      if (transaction.docChanged) {
+        transactions.push(transaction);
+      }
+    });
+    table.querySelector("th")!.dispatchEvent(
+      new MouseEvent("mousedown", {
+        bubbles: true,
+        cancelable: true,
+        clientX: 200,
+      })
+    );
+    finish(250);
+
+    expect(transactions).toHaveLength(1);
+    expect(transactions[0].steps).toHaveLength(3);
+    const after = getTableNode(editor).node;
+    expect(after.firstChild!.firstChild!.attrs.colwidth).toEqual([200, 250]);
+    expect(after.firstChild!.child(1).attrs.colwidth).toEqual([150]);
+    expect(after.lastChild!.firstChild!.attrs.colwidth).toEqual([150]);
+    expect(after.firstChild!.lastChild).toBe(before.firstChild!.lastChild);
+    expect(after.lastChild!.lastChild).toBe(before.lastChild!.lastChild);
   });
 
   it("gives inserted columns a proportional share and preserves it after reload", () => {

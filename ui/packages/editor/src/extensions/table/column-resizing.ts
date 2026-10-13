@@ -121,6 +121,14 @@ export function autoColumnResizing(cellMinWidth: number) {
               Math.max(1, Math.round(width))
             );
             const tr = closeHistory(view.state.tr);
+            // A spanning cell occurs more than once in the map. Its first
+            // occurrence identifies its left column without repeated lookups.
+            const cellColumns = new Map<number, number>();
+            map.map.forEach((pos, index) => {
+              if (!cellColumns.has(pos)) {
+                cellColumns.set(pos, index % map.width);
+              }
+            });
             table.descendants((node, pos) => {
               if (
                 node.type.spec.tableRole !== "cell" &&
@@ -128,10 +136,19 @@ export function autoColumnResizing(cellMinWidth: number) {
               ) {
                 return;
               }
-              const rect = map.findCell(pos);
+              const left = cellColumns.get(pos)!;
+              const colwidth = result.slice(left, left + node.attrs.colspan);
+              if (
+                node.attrs.colwidth?.length === colwidth.length &&
+                colwidth.every(
+                  (width, index) => width === node.attrs.colwidth[index]
+                )
+              ) {
+                return false;
+              }
               tr.setNodeMarkup(start + pos, undefined, {
                 ...node.attrs,
-                colwidth: result.slice(rect.left, rect.right),
+                colwidth,
               });
               return false;
             });
