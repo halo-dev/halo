@@ -33,8 +33,8 @@ import { computed, markRaw, provide, ref, toRefs, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
 import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
 import { useCommentLastReadTimeMutate } from "../composables/use-comment-last-readtime-mutate";
-import { useContentProviderExtensionPoint } from "../composables/use-content-provider-extension-point";
 import { useSubjectRef } from "../composables/use-subject-ref";
+import CollapsibleCommentContent from "./CollapsibleCommentContent.vue";
 import CommentDetailModal from "./CommentDetailModal.vue";
 import CommentEditingModal from "./CommentEditingModal.vue";
 import OwnerButton from "./OwnerButton.vue";
@@ -311,8 +311,6 @@ const { data: operationItems } = useOperationItemExtensionPoint<ListedComment>(
     },
   ])
 );
-
-const { data: contentProvider } = useContentProviderExtensionPoint();
 </script>
 
 <template>
@@ -369,8 +367,7 @@ const { data: contentProvider } = useContentProviderExtensionPoint();
                 <IconExternalLinkLine class="h-3.5 w-3.5" />
               </a>
             </div>
-            <component
-              :is="contentProvider?.component"
+            <CollapsibleCommentContent
               :content="comment?.comment?.spec.content"
             />
             <div class="flex items-center gap-3 text-xs">
