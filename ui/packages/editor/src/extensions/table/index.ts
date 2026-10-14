@@ -391,7 +391,7 @@ export const ExtensionTable = TiptapTable.extend<ExtensionTableOptions>({
       "colgroup",
       ...getColumnPercentages(autoWidths).map((width): DOMOutputSpec => [
         "col",
-        { style: `width: ${width}` },
+        { style: `width: ${width}; min-width: ${cellMinWidth}px` },
       ]),
     ];
     const layoutStyle =

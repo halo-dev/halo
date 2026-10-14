@@ -55,6 +55,46 @@ describe("ExtensionTable model and HTML contract", () => {
     expect(editor.getHTML()).not.toContain("<colgroup>");
   });
 
+  it.each([
+    { options: {}, minimum: 25 },
+    { options: { cellMinWidth: 40 }, minimum: 40 },
+  ])(
+    "preserves the $minimum px column minimum in serialized automatic tables",
+    ({ options, minimum }) => {
+      editor = createTableEditor(
+        '<table data-table-layout="auto"><tr><td colwidth="100"><p>A</p></td><td colwidth="400"><p>B</p></td></tr></table>',
+        options
+      );
+      const before = getTableNode(editor).node;
+
+      for (let roundtrip = 0; roundtrip < 2; roundtrip++) {
+        const saved = document.createElement("div");
+        saved.innerHTML = editor.getHTML();
+        const columns = saved.querySelectorAll("col");
+        expect(Array.from(columns, (col) => col.style.width)).toEqual([
+          "20%",
+          "80%",
+        ]);
+        expect(Array.from(columns, (col) => col.style.minWidth)).toEqual([
+          `${minimum}px`,
+          `${minimum}px`,
+        ]);
+        expect(
+          Array.from(
+            editor.view.dom.querySelectorAll("col"),
+            (col) => col.style.minWidth
+          )
+        ).toEqual(Array.from(columns, (col) => col.style.minWidth));
+        expect(saved.querySelector("table")!.style.width).toBe("100%");
+        expect(
+          saved.querySelector(".halo-table-wrapper")!.getAttribute("style")
+        ).toContain("overflow-x: auto");
+        editor.commands.setContent(editor.getHTML());
+        expect(getTableNode(editor).node.eq(before)).toBe(true);
+      }
+    }
+  );
+
   it("normalizes legacy wrappers, colgroup widths, row height, and cell formatting", () => {
     editor = createTableEditor(`
       <div class="table-wrapper">
