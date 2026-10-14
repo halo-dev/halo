@@ -1,5 +1,5 @@
 diff --git a/dist/index.cjs b/dist/index.cjs
-index 5bb89346860e3c334731755df48cfb72a6a9d3b7..e4c0080c32d0ae70e3441c8aacc6b3945c006781 100644
+index 68918b0008d27d2548b002ce98cb4b43e9ae87cd..fa42f7b3a89cbf28f55e841a37b1a6508ed57f8c 100644
 --- a/dist/index.cjs
 +++ b/dist/index.cjs
 @@ -4,9 +4,7 @@ Object.defineProperties(exports, {
@@ -12,7 +12,7 @@ index 5bb89346860e3c334731755df48cfb72a6a9d3b7..e4c0080c32d0ae70e3441c8aacc6b394
  let _tiptap_extension_node_range = require("@tiptap/extension-node-range");
  //#region src/helpers/cloneElement.ts
  function getCSSText(element, properties) {
-@@ -655,16 +653,8 @@ function createDroppedNodeRangeSelection(doc, anchorPos, nodeCount, depth) {
+@@ -655,17 +653,8 @@ function createDroppedNodeRangeSelection(doc, anchorPos, nodeCount, depth) {
  }
  //#endregion
  //#region src/drag-handle-plugin.ts
@@ -24,6 +24,7 @@ index 5bb89346860e3c334731755df48cfb72a6a9d3b7..e4c0080c32d0ae70e3441c8aacc6b394
 -const getAbsolutePos = (state, relativePos) => {
 -	const ystate = _tiptap_y_tiptap.ySyncPluginKey.getState(state);
 -	if (!ystate) return -1;
+-	if (relativePos === null) return 0;
 -	return (0, _tiptap_y_tiptap.relativePositionToAbsolutePosition)(ystate.doc, ystate.type, relativePos, ystate.binding.mapping) || 0;
 -};
 +const getRelativePos = () => null;
@@ -31,7 +32,7 @@ index 5bb89346860e3c334731755df48cfb72a6a9d3b7..e4c0080c32d0ae70e3441c8aacc6b394
  const getOuterDomNode = (view, domNode) => {
  	let tmpDomNode = domNode;
  	while (tmpDomNode === null || tmpDomNode === void 0 ? void 0 : tmpDomNode.parentNode) {
-@@ -691,7 +681,7 @@ const DragHandlePlugin = ({ pluginKey = dragHandlePluginDefaultKey, element, edi
+@@ -692,7 +681,7 @@ const DragHandlePlugin = ({ pluginKey = dragHandlePluginDefaultKey, element, edi
  	function remapPendingRestore(tr, state) {
  		if (!pendingRestore) return;
  		pendingRestore = mapPendingRestoreAnchor(pendingRestore, tr, {
@@ -40,7 +41,7 @@ index 5bb89346860e3c334731755df48cfb72a6a9d3b7..e4c0080c32d0ae70e3441c8aacc6b394
  			getAbsolutePos: (relativePos) => getAbsolutePos(state, relativePos)
  		});
  	}
-@@ -812,15 +802,10 @@ const DragHandlePlugin = ({ pluginKey = dragHandlePluginDefaultKey, element, edi
+@@ -813,15 +802,10 @@ const DragHandlePlugin = ({ pluginKey = dragHandlePluginDefaultKey, element, edi
  						return value;
  					}
  					if (tr.docChanged && currentNodePos !== -1 && element) {
@@ -61,7 +62,7 @@ index 5bb89346860e3c334731755df48cfb72a6a9d3b7..e4c0080c32d0ae70e3441c8aacc6b394
  					}
  					return value;
 diff --git a/dist/index.js b/dist/index.js
-index 48ce5bafcbf764d8bfe8dde7c0d8c679317e7e1a..94442ff74e8bc18d1c91f0d34712a7bc3edeb4c1 100644
+index 260b9cce27da1eeab3772c703300a52d29dde06c..db8f7ca2934b596058c465d93dfc4f547c99919f 100644
 --- a/dist/index.js
 +++ b/dist/index.js
 @@ -1,8 +1,6 @@
@@ -73,7 +74,7 @@ index 48ce5bafcbf764d8bfe8dde7c0d8c679317e7e1a..94442ff74e8bc18d1c91f0d34712a7bc
  import { NodeRangeSelection, getSelectionRanges, isNodeRangeSelection } from "@tiptap/extension-node-range";
  //#region src/helpers/cloneElement.ts
  function getCSSText(element, properties) {
-@@ -651,16 +649,8 @@ function createDroppedNodeRangeSelection(doc, anchorPos, nodeCount, depth) {
+@@ -651,17 +649,8 @@ function createDroppedNodeRangeSelection(doc, anchorPos, nodeCount, depth) {
  }
  //#endregion
  //#region src/drag-handle-plugin.ts
@@ -85,6 +86,7 @@ index 48ce5bafcbf764d8bfe8dde7c0d8c679317e7e1a..94442ff74e8bc18d1c91f0d34712a7bc
 -const getAbsolutePos = (state, relativePos) => {
 -	const ystate = ySyncPluginKey.getState(state);
 -	if (!ystate) return -1;
+-	if (relativePos === null) return 0;
 -	return relativePositionToAbsolutePosition(ystate.doc, ystate.type, relativePos, ystate.binding.mapping) || 0;
 -};
 +const getRelativePos = () => null;
@@ -92,7 +94,7 @@ index 48ce5bafcbf764d8bfe8dde7c0d8c679317e7e1a..94442ff74e8bc18d1c91f0d34712a7bc
  const getOuterDomNode = (view, domNode) => {
  	let tmpDomNode = domNode;
  	while (tmpDomNode === null || tmpDomNode === void 0 ? void 0 : tmpDomNode.parentNode) {
-@@ -687,7 +677,7 @@ const DragHandlePlugin = ({ pluginKey = dragHandlePluginDefaultKey, element, edi
+@@ -688,7 +677,7 @@ const DragHandlePlugin = ({ pluginKey = dragHandlePluginDefaultKey, element, edi
  	function remapPendingRestore(tr, state) {
  		if (!pendingRestore) return;
  		pendingRestore = mapPendingRestoreAnchor(pendingRestore, tr, {
@@ -101,7 +103,7 @@ index 48ce5bafcbf764d8bfe8dde7c0d8c679317e7e1a..94442ff74e8bc18d1c91f0d34712a7bc
  			getAbsolutePos: (relativePos) => getAbsolutePos(state, relativePos)
  		});
  	}
-@@ -808,15 +798,10 @@ const DragHandlePlugin = ({ pluginKey = dragHandlePluginDefaultKey, element, edi
+@@ -809,15 +798,10 @@ const DragHandlePlugin = ({ pluginKey = dragHandlePluginDefaultKey, element, edi
  						return value;
  					}
  					if (tr.docChanged && currentNodePos !== -1 && element) {

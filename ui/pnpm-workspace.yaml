@@ -12,9 +12,6 @@ overrides:
   axios: ^1.16.1
   vite-plus: "catalog:"
   "@lezer/javascript": 1.5.4
-  prosemirror-model: 1.25.1
-  prosemirror-transform: 1.10.4
-  prosemirror-view: 1.40.0
   vite@*: "catalog:"
   vitest@*: "catalog:"
 peerDependencyRules:
@@ -34,7 +31,7 @@ allowBuilds:
   esbuild: true
   vue-demi: true
 patchedDependencies:
-  "@tiptap/extension-drag-handle@3.31.3": patches/@tiptap__extension-drag-handle@3.31.3.patch
+  "@tiptap/extension-drag-handle@3.32.0": patches/@tiptap__extension-drag-handle@3.32.0.patch
 minimumReleaseAgeExclude:
   - "@vueuse/components@14.4.0"
   - "@vueuse/core@14.4.0"
@@ -60,3 +57,41 @@ minimumReleaseAgeExclude:
   - "@voidzero-dev/vite-plus-win32-x64-msvc@0.2.9 || 0.3.0 || 0.3.1 || 0.3.2 ||
     1.0.0-rc.1"
   - vite-plus@0.2.9 || 0.3.0 || 0.3.1 || 0.3.2 || 1.0.0-rc.1
+  - "@tiptap/core@3.32.0"
+  - "@tiptap/extension-audio@3.32.0"
+  - "@tiptap/extension-blockquote@3.32.0"
+  - "@tiptap/extension-bold@3.32.0"
+  - "@tiptap/extension-bubble-menu@3.32.0"
+  - "@tiptap/extension-code-block@3.32.0"
+  - "@tiptap/extension-code@3.32.0"
+  - "@tiptap/extension-collaboration@3.32.0"
+  - "@tiptap/extension-color@3.32.0"
+  - "@tiptap/extension-details@3.32.0"
+  - "@tiptap/extension-document@3.32.0"
+  - "@tiptap/extension-drag-handle-vue-3@3.32.0"
+  - "@tiptap/extension-drag-handle@3.32.0"
+  - "@tiptap/extension-find-and-replace@3.32.0"
+  - "@tiptap/extension-floating-menu@3.32.0"
+  - "@tiptap/extension-hard-break@3.32.0"
+  - "@tiptap/extension-heading@3.32.0"
+  - "@tiptap/extension-highlight@3.32.0"
+  - "@tiptap/extension-horizontal-rule@3.32.0"
+  - "@tiptap/extension-image@3.32.0"
+  - "@tiptap/extension-italic@3.32.0"
+  - "@tiptap/extension-link@3.32.0"
+  - "@tiptap/extension-list@3.32.0"
+  - "@tiptap/extension-node-range@3.32.0"
+  - "@tiptap/extension-paragraph@3.32.0"
+  - "@tiptap/extension-strike@3.32.0"
+  - "@tiptap/extension-subscript@3.32.0"
+  - "@tiptap/extension-superscript@3.32.0"
+  - "@tiptap/extension-table@3.32.0"
+  - "@tiptap/extension-text-align@3.32.0"
+  - "@tiptap/extension-text-style@3.32.0"
+  - "@tiptap/extension-text@3.32.0"
+  - "@tiptap/extension-underline@3.32.0"
+  - "@tiptap/extensions@3.32.0"
+  - "@tiptap/pm@3.32.0"
+  - "@tiptap/suggestion@3.32.0"
+  - "@tiptap/vue-3@3.32.0"
+  - "@tiptap/y-tiptap@3.0.10"

@@ -729,8 +729,18 @@ describe("ExtensionIndent", () => {
     const columnsDOM = editor.view.nodeDOM(0) as HTMLElement;
     expect(columnsDOM.style.marginLeft).toBe("24px");
     expect(columnsDOM.style.maxWidth).toBe("calc(100% - 24px)");
-    expect(editor.getHTML()).toContain(
-      "max-width: calc(100% - 24px)!important"
+    expect(editor.getHTML()).toContain("max-width: calc(100% - 24px)");
+
+    // jsdom drops !important on calc() when ProseMirror assigns style.cssText.
+    const columns = editor.state.doc.firstChild!;
+    expect(columns.type.spec.toDOM?.(columns)).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          style: expect.stringContaining(
+            "max-width: calc(100% - 24px)!important"
+          ),
+        }),
+      ])
     );
   });
 
