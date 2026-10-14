@@ -1,6 +1,84 @@
 import type { Editor } from "@/tiptap";
-import { DOMSerializer } from "@/tiptap/pm";
+import {
+  __clipCells as clipTableCells,
+  __insertCells as insertTableCells,
+  __pastedCells as getPastedTableCells,
+  CellSelection,
+  DOMSerializer,
+  Fragment,
+  isInTable,
+  selectedRect,
+  TableMap,
+  type EditorView,
+  type Node as ProseMirrorNode,
+  type Slice,
+} from "@/tiptap/pm";
 import { findTable } from "@/utils/table";
+
+export function handlePastedTableCells(view: EditorView, slice: Slice) {
+  if (!isInTable(view.state)) {
+    return false;
+  }
+  let cells = getPastedTableCells(slice);
+  if (!cells) {
+    return false;
+  }
+  const rect = selectedRect(view.state);
+  if (view.state.selection instanceof CellSelection) {
+    cells = clipTableCells(
+      cells,
+      rect.right - rect.left,
+      rect.bottom - rect.top
+    );
+  }
+
+  // colwidth is a pixel width in fixed tables but a table-local weight in
+  // automatic tables. Keep destination widths when replacing its cells.
+  const widths: number[] = [];
+  rect.table.firstChild!.forEach((cell) => {
+    for (let index = 0; index < cell.attrs.colspan; index++) {
+      widths.push(cell.attrs.colwidth?.[index] ?? 0);
+    }
+  });
+  const table = rect.table.type.create(
+    null,
+    cells.rows.map((row) => rect.table.firstChild!.type.create(null, row))
+  );
+  const map = TableMap.get(table);
+  const columns = new Map<number, number>();
+  map.map.forEach((pos, index) => {
+    if (!columns.has(pos)) {
+      columns.set(pos, index % map.width);
+    }
+  });
+  const rows: Fragment[] = [];
+  table.forEach((row, rowOffset) => {
+    const rowCells: ProseMirrorNode[] = [];
+    row.forEach((cell, cellOffset) => {
+      const column = rect.left + columns.get(rowOffset + cellOffset + 1)!;
+      const colwidth = Array.from(
+        { length: cell.attrs.colspan },
+        (_, index) => widths[column + index] ?? 0
+      );
+      rowCells.push(
+        cell.type.create(
+          {
+            ...cell.attrs,
+            colwidth: colwidth.some((width) => width > 0) ? colwidth : null,
+          },
+          cell.content,
+          cell.marks
+        )
+      );
+    });
+    rows.push(Fragment.from(rowCells));
+  });
+  insertTableCells(view.state, view.dispatch, rect.tableStart, rect, {
+    ...cells,
+    rows,
+  });
+  return true;
+}
 
 export async function writeTableToClipboard(editor: Editor) {
   const table = findTable(editor.state.selection);

@@ -21,7 +21,6 @@ import {
 } from "@/tiptap";
 import {
   Fragment,
-  handlePaste as handleTablePaste,
   Plugin,
   PluginKey,
   Slice,
@@ -42,6 +41,7 @@ import {
   type CellVerticalAlign,
   type TableLayoutMode,
 } from "./attributes";
+import { handlePastedTableCells } from "./clipboard";
 import { autoColumnResizing } from "./column-resizing";
 import { getColumnPercentages, getTableColumnWidths } from "./column-widths";
 import {
@@ -353,7 +353,9 @@ export const ExtensionTable = TiptapTable.extend<ExtensionTableOptions>({
       new Plugin({
         key: TABLE_LAYOUT_PLUGIN_KEY,
         props: {
-          handlePaste: handleTabSeparatedPaste,
+          handlePaste: (view, event, slice) =>
+            handleTabSeparatedPaste(view, event) ||
+            handlePastedTableCells(view, slice),
         },
       }),
       autoColumnResizing(this.options.cellMinWidth ?? 25),
@@ -556,7 +558,7 @@ function handleTabSeparatedPaste(view: EditorView, event: ClipboardEvent) {
   );
   const slice = new Slice(Fragment.from(rows), 0, 0);
 
-  if (handleTablePaste(view, event, slice)) {
+  if (handlePastedTableCells(view, slice)) {
     event.preventDefault();
     return true;
   }
