@@ -63,4 +63,18 @@ describe("table attributes", () => {
       "width: 100%; table-layout: auto;"
     );
   });
+
+  it("does not import a nested table's colgroup into the outer table", () => {
+    const container = document.createElement("div");
+    container.innerHTML = `<table data-table-layout="auto"><tr><td><p>Outer</p><table data-table-layout="auto"><colgroup><col style="width: 20%"><col style="width: 80%"></colgroup><tr><td><p>A</p></td><td><p>B</p></td></tr></table></td></tr></table>`;
+    expect(parseColumnWidths(container.querySelector("td")!)).toBeNull();
+  });
+
+  it("does not combine percentage weights with pixel widths", () => {
+    const container = document.createElement("div");
+    container.innerHTML = `<table data-table-layout="auto"><colgroup><col style="width: 20%"><col width="200"></colgroup><tr><td><p>A</p></td><td><p>B</p></td></tr></table>`;
+    const cells = container.querySelectorAll("td");
+    expect(parseColumnWidths(cells[0])).toBeNull();
+    expect(parseColumnWidths(cells[1])).toEqual([200]);
+  });
 });

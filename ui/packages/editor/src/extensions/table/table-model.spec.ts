@@ -55,6 +55,46 @@ describe("ExtensionTable model and HTML contract", () => {
     expect(editor.getHTML()).not.toContain("<colgroup>");
   });
 
+  it.each([
+    { options: {}, minimum: 25 },
+    { options: { cellMinWidth: 40 }, minimum: 40 },
+  ])(
+    "preserves the $minimum px column minimum in serialized automatic tables",
+    ({ options, minimum }) => {
+      editor = createTableEditor(
+        '<table data-table-layout="auto"><tr><td colwidth="100"><p>A</p></td><td colwidth="400"><p>B</p></td></tr></table>',
+        options
+      );
+      const before = getTableNode(editor).node;
+
+      for (let roundtrip = 0; roundtrip < 2; roundtrip++) {
+        const saved = document.createElement("div");
+        saved.innerHTML = editor.getHTML();
+        const columns = saved.querySelectorAll("col");
+        expect(Array.from(columns, (col) => col.style.width)).toEqual([
+          "20%",
+          "80%",
+        ]);
+        expect(Array.from(columns, (col) => col.style.minWidth)).toEqual([
+          `${minimum}px`,
+          `${minimum}px`,
+        ]);
+        expect(
+          Array.from(
+            editor.view.dom.querySelectorAll("col"),
+            (col) => col.style.minWidth
+          )
+        ).toEqual(Array.from(columns, (col) => col.style.minWidth));
+        expect(saved.querySelector("table")!.style.width).toBe("100%");
+        expect(
+          saved.querySelector(".halo-table-wrapper")!.getAttribute("style")
+        ).toContain("overflow-x: auto");
+        editor.commands.setContent(editor.getHTML());
+        expect(getTableNode(editor).node.eq(before)).toBe(true);
+      }
+    }
+  );
+
   it("normalizes legacy wrappers, colgroup widths, row height, and cell formatting", () => {
     editor = createTableEditor(`
       <div class="table-wrapper">
@@ -82,6 +122,79 @@ describe("ExtensionTable model and HTML contract", () => {
     expect(html.match(/halo-table-wrapper/g)).toHaveLength(1);
     expect(html).toContain('data-row-height="66"');
     expect(html).toContain('data-vertical-align="middle"');
+  });
+
+  it.each([
+    { source: "load", attribute: "style", widths: [20, 80] },
+    { source: "paste", attribute: "width", widths: [20, 80] },
+    { source: "load", attribute: "width", widths: [0.5, 99.5] },
+    { source: "paste", attribute: "style", widths: [0.5, 99.5] },
+  ])(
+    "preserves percentage-only colgroups from $source using $attribute: $widths",
+    ({ source, attribute, widths }) => {
+      const columns = widths
+        .map((width) =>
+          attribute === "style"
+            ? `<col style="width: ${width}%">`
+            : `<col width="${width}%">`
+        )
+        .join("");
+      const html = `<div data-table-layout="auto"><table><colgroup>${columns}</colgroup><tr><th><p>A</p></th><th><p>B</p></th></tr><tr><td><p>C</p></td><td><p>D</p></td></tr></table></div>`;
+      editor = createTableEditor(source === "load" ? html : "<p></p>");
+      if (source === "paste") {
+        expect(
+          editor.view.pasteHTML(html, new Event("paste") as ClipboardEvent)
+        ).toBe(true);
+      }
+
+      for (let roundtrip = 0; roundtrip < 2; roundtrip++) {
+        const { node } = getTableNode(editor);
+        expect(node.attrs.layoutMode).toBe("auto");
+        node.forEach((row) => {
+          row.forEach((cell) => {
+            expect(cell.attrs.colwidth).toHaveLength(1);
+            expect(Number.isInteger(cell.attrs.colwidth[0])).toBe(true);
+            expect(cell.attrs.colwidth[0]).toBeGreaterThan(0);
+          });
+        });
+        const table = editor.view.dom.querySelector("table")!;
+        expect(table.style.width).toBe("100%");
+        expect(
+          Array.from(table.querySelectorAll("col"), (col) =>
+            Number.parseFloat(col.style.width)
+          )
+        ).toEqual(widths);
+        const saved = document.createElement("div");
+        saved.innerHTML = editor.getHTML();
+        expect(
+          Array.from(saved.querySelectorAll("col"), (col) =>
+            Number.parseFloat(col.style.width)
+          )
+        ).toEqual(widths);
+        editor.commands.setContent(editor.getHTML());
+      }
+    }
+  );
+
+  it("imports merged percentage columns without using nested cell weights", () => {
+    editor = createTableEditor(
+      `<table data-table-layout="auto"><colgroup><col style="width: 20%"><col style="width: 30%"><col style="width: 50%"></colgroup><tr><td colspan="2"><p>Merged</p><table data-table-layout="fixed"><tr><td colwidth="60"><p>Nested</p></td></tr></table></td><td><p>End</p></td></tr></table>`
+    );
+    const before = getTableNode(editor).node;
+    expect(before.firstChild!.firstChild!.attrs.colwidth).toHaveLength(2);
+    const outer = editor.view.dom.querySelector("table")!;
+    expect(
+      Array.from(
+        outer.querySelectorAll<HTMLTableColElement>(":scope > colgroup > col"),
+        (col) => Number.parseFloat(col.style.width)
+      )
+    ).toEqual([20, 30, 50]);
+    expect(
+      before.firstChild!.firstChild!.child(1).firstChild!.firstChild!.attrs
+        .colwidth
+    ).toEqual([60]);
+    editor.commands.setContent(editor.getHTML());
+    expect(getTableNode(editor).node.eq(before)).toBe(true);
   });
 
   it("removes unsafe pasted markup while preserving table content", () => {
