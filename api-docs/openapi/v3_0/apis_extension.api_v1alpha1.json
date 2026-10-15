@@ -11058,6 +11058,7 @@
         "type": "object",
         "properties": {
           "children": {
+            "uniqueItems": true,
             "type": "array",
             "description": "Legacy child MenuItem names. Menu hierarchy is now sourced from MenuItem.spec.menuName and MenuItem.spec.parent.",
             "deprecated": true,
@@ -11197,6 +11198,7 @@
             "description": "Display name shown for the menu."
           },
           "menuItems": {
+            "uniqueItems": true,
             "type": "array",
             "description": "Legacy ordered root MenuItem names. Menu hierarchy is now sourced from MenuItem.spec.menuName and MenuItem.spec.parent.",
             "deprecated": true,
