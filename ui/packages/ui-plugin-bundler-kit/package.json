@@ -12,6 +12,9 @@
     "url": "https://github.com/halo-dev/halo.git",
     "directory": "ui/packages/ui-plugin-bundler-kit"
   },
+  "files": [
+    "dist"
+  ],
   "type": "module",
   "exports": {
     "./rsbuild": "./dist/rsbuild.mjs",
