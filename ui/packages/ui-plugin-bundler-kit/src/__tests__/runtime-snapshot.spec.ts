@@ -20,7 +20,7 @@ const currentSnapshot = HALO_HOST_RUNTIME_SNAPSHOTS.find(
 if (!currentSnapshot) {
   throw new Error(`Missing Halo ${packageJson.version} host runtime snapshot.`);
 }
-const selectionSnapshots = ["2.26.0", "2.27.0"].map((haloVersion) => ({
+const selectionSnapshots = ["2.27.0", "2.28.0"].map((haloVersion) => ({
   ...currentSnapshot,
   haloVersion,
 }));
@@ -68,25 +68,25 @@ describe("Halo host runtime snapshot", () => {
   it("reuses the latest eligible sparse snapshot", () => {
     const selected = selectHaloHostRuntimeSnapshot("3.2.9", selectionSnapshots);
 
-    expect(selected.snapshot.haloVersion).toBe("2.27.0");
+    expect(selected.snapshot.haloVersion).toBe("2.28.0");
     expect(selected.reusedOlderSnapshot).toBe(true);
   });
 
   it("distinguishes same-core prereleases from newer prereleases", () => {
     expect(
-      selectHaloHostRuntimeSnapshot("2.27.0-beta.1", selectionSnapshots)
+      selectHaloHostRuntimeSnapshot("2.28.0-beta.1", selectionSnapshots)
         .reusedOlderSnapshot
     ).toBe(false);
     expect(
-      selectHaloHostRuntimeSnapshot("2.28.0-beta.1", selectionSnapshots)
+      selectHaloHostRuntimeSnapshot("2.29.0-beta.1", selectionSnapshots)
         .reusedOlderSnapshot
     ).toBe(true);
   });
 
   it("fails with a diagnostic when no snapshot is eligible", () => {
     expect(() =>
-      selectHaloHostRuntimeSnapshot("2.25.9", selectionSnapshots)
-    ).toThrow("No ESM host runtime snapshot is available for Halo 2.25.9");
+      selectHaloHostRuntimeSnapshot("2.26.9", selectionSnapshots)
+    ).toThrow("No ESM host runtime snapshot is available for Halo 2.26.9");
   });
 
   it("rejects missing and extra shared roots", () => {

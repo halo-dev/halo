@@ -2,7 +2,7 @@
   "openapi": "3.0.1",
   "info": {
     "title": "Halo",
-    "version": "2.27.0-SNAPSHOT"
+    "version": "2.28.0-SNAPSHOT"
   },
   "servers": [
     {
@@ -19723,6 +19723,7 @@
         "type": "object",
         "properties": {
           "children": {
+            "uniqueItems": true,
             "type": "array",
             "description": "Legacy child MenuItem names. Menu hierarchy is now sourced from MenuItem.spec.menuName and MenuItem.spec.parent.",
             "deprecated": true,
@@ -19912,6 +19913,7 @@
             "description": "Display name shown for the menu."
           },
           "menuItems": {
+            "uniqueItems": true,
             "type": "array",
             "description": "Legacy ordered root MenuItem names. Menu hierarchy is now sourced from MenuItem.spec.menuName and MenuItem.spec.parent.",
             "deprecated": true,
@@ -23113,7 +23115,6 @@
             "format": "email"
           },
           "externalUrl": {
-            "pattern": "",
             "type": "string"
           },
           "language": {
