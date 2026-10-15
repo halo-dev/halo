@@ -1,6 +1,6 @@
 plugins {
     id 'java-library'
-    id 'halo.publish'
+    alias(libs.plugins.vanniktech.maven.publish)
     id 'jacoco'
     alias(libs.plugins.lombok)
     alias(libs.plugins.versions)
@@ -23,8 +23,6 @@ java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
     }
-    withJavadocJar()
-    withSourcesJar()
 }
 
 jar {
@@ -117,13 +115,10 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
-publishing {
-    publications.named('mavenJava', MavenPublication) {
-        from components.java
-        pom {
-            name = 'API library'
-            description = "$project.description"
-        }
+mavenPublishing {
+    pom {
+        name = 'API library'
+        description = project.description
     }
 }
 
@@ -137,10 +132,6 @@ tasks.named('jacocoTestReport') {
         xml.required = true
         html.required = false
     }
-}
-
-tasks.named('uploadBundle') {
-    mustRunAfter project(':platform:application').tasks.named('uploadBundle')
 }
 
 spotless {

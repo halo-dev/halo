@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.spotless)
+    alias(libs.plugins.vanniktech.maven.publish) apply false
 }
 
 repositories {
@@ -49,5 +50,35 @@ spotless {
             exclude excludePatterns
         }
         flexmark()
+    }
+}
+
+subprojects {
+    plugins.withId('com.vanniktech.maven.publish') {
+        extensions.configure('mavenPublishing') { ext ->
+            ext.publishToMavenCentral(true)
+            ext.signAllPublications()
+            ext.pom {
+                url = 'https://github.com/halo-dev/halo'
+                licenses {
+                    license {
+                        name = 'The GNU General Public License v3.0'
+                        url = 'https://www.gnu.org/licenses/gpl-3.0.en.html'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'johnniang'
+                        name = 'JohnNiang'
+                        email = 'johnniang@foxmail.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:https://github.com/halo-dev/halo.git'
+                    developerConnection = 'scm:git:ssh://git@github.com:halo-dev/halo.git'
+                    url = 'https://github.com/halo-dev/halo'
+                }
+            }
+        }
     }
 }
