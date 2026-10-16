@@ -635,7 +635,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ListedPostVo"
+                  "$ref": "#/components/schemas/ListedPostVoList"
                 }
               }
             },
@@ -2220,7 +2220,7 @@
             }
           }
         },
-        "description": "A value object for {@link Post Post}."
+        "description": "A value object for a post."
       },
       "ListedPostVoList": {
         "required": [

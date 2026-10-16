@@ -22,6 +22,7 @@ import run.halo.app.extension.MetadataOperator;
 @SuperBuilder
 @ToString
 @EqualsAndHashCode
+@Schema(description = "A value object for a post.")
 public class ListedPostVo implements ExtensionVoOperator {
 
     @Schema(requiredMode = REQUIRED)
