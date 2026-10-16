@@ -36,7 +36,7 @@ import type { StatsVo } from './stats-vo';
 import type { TagVo } from './tag-vo';
 
 /**
- * A value object for {@link Post Post}.
+ * A value object for a post.
  */
 export interface ListedPostVo {
     'categories'?: Array<CategoryVo>;
