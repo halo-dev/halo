@@ -19199,7 +19199,7 @@
             }
           }
         },
-        "description": "A chunk of items."
+        "description": "A value object for a post."
       },
       "ListedPostVoList": {
         "required": [

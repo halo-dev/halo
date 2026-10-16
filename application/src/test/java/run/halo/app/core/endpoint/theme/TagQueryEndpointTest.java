@@ -51,13 +51,16 @@ class TagQueryEndpointTest {
         var operation = ((Builder) route.getAttributes().get(OPERATION_ATTRIBUTE)).build();
         var responseType =
                 operation.getOperation().responses()[0].content()[0].schema().implementation();
-        Schema<?> schema =
-                ModelConverters.getInstance().resolveAsResolvedSchema(new AnnotatedType(responseType)).schema;
+        var resolvedSchema = ModelConverters.getInstance().resolveAsResolvedSchema(new AnnotatedType(responseType));
+        Schema<?> schema = resolvedSchema.schema;
 
         assertThat(schema.getProperties()).containsKeys("page", "size", "total", "items");
         assertThat(schema.getProperties().get("items").getType()).isEqualTo("array");
+        assertThat(schema.getProperties().get("items").getDescription()).isEqualTo("A chunk of items.");
         assertThat(schema.getProperties().get("items").getItems().get$ref())
                 .isEqualTo("#/components/schemas/ListedPostVo");
+        assertThat(resolvedSchema.referencedSchemas.get("ListedPostVo").getDescription())
+                .isEqualTo("A value object for a post.");
     }
 
     @Test
