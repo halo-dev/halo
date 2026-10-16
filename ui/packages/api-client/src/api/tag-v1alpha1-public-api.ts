@@ -22,7 +22,7 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import type { ListedPostVo } from '../models';
+import type { ListedPostVoList } from '../models';
 // @ts-ignore
 import type { TagVo } from '../models';
 // @ts-ignore
@@ -221,7 +221,7 @@ export const TagV1alpha1PublicApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async queryPostsByTagName(name: string, page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListedPostVo>> {
+        async queryPostsByTagName(name: string, page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListedPostVoList>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.queryPostsByTagName(name, page, size, labelSelector, fieldSelector, sort, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['TagV1alpha1PublicApi.queryPostsByTagName']?.[localVarOperationServerIndex]?.url;
@@ -270,7 +270,7 @@ export const TagV1alpha1PublicApiFactory = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        queryPostsByTagName(requestParameters: TagV1alpha1PublicApiQueryPostsByTagNameRequest, options?: RawAxiosRequestConfig): AxiosPromise<ListedPostVo> {
+        queryPostsByTagName(requestParameters: TagV1alpha1PublicApiQueryPostsByTagNameRequest, options?: RawAxiosRequestConfig): AxiosPromise<ListedPostVoList> {
             return localVarFp.queryPostsByTagName(requestParameters.name, requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
         },
         /**
