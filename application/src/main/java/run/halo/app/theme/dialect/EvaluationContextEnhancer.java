@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 import org.springframework.core.convert.TypeDescriptor;
@@ -37,6 +38,46 @@ public class EvaluationContextEnhancer extends AbstractTemplateBoundariesProcess
 
     private static final JsonPropertyAccessor JSON_PROPERTY_ACCESSOR = new JsonPropertyAccessor();
 
+    /**
+     * The only types a theme template may reference through {@code T(...)} or {@code new}.
+     *
+     * <p>A denylist does not hold here. Thymeleaf already rejects JDK and Spring core packages, but every other type on
+     * the runtime classpath stays reachable, and several of them can run arbitrary code: H2 compiles Java from
+     * {@code CREATE ALIAS ... AS $$ ... $$}, and that entry point is exposed through {@code org.h2}, through
+     * {@code io.r2dbc.h2}, through {@code io.r2dbc.spi.ConnectionFactories}, and again through
+     * {@code org.springframework.boot.r2dbc.ConnectionFactoryBuilder}. Each package blocked so far revealed the next
+     * one.
+     *
+     * <p>Themes do not reference types directly. They call methods on the objects Halo puts into the template context,
+     * so an allowlist of the JDK value types Thymeleaf itself permits covers legitimate templates.
+     */
+    private static final Set<String> ALLOWED_TYPE_NAMES = Set.of(
+            "java.lang.Boolean",
+            "java.lang.Byte",
+            "java.lang.Character",
+            "java.lang.Double",
+            "java.lang.Enum",
+            "java.lang.Float",
+            "java.lang.Integer",
+            "java.lang.Long",
+            "java.lang.Math",
+            "java.lang.Number",
+            "java.lang.Short",
+            "java.lang.String",
+            "java.math.BigDecimal",
+            "java.math.BigInteger",
+            "java.math.RoundingMode",
+            "java.util.ArrayList",
+            "java.util.LinkedList",
+            "java.util.HashMap",
+            "java.util.LinkedHashMap",
+            "java.util.HashSet",
+            "java.util.LinkedHashSet",
+            "java.util.Locale",
+            "java.util.Optional",
+            "java.util.Date",
+            "java.util.Calendar");
+
     public EvaluationContextEnhancer() {
         super(TemplateMode.HTML, PRECEDENCE);
     }
@@ -52,6 +93,11 @@ public class EvaluationContextEnhancer extends AbstractTemplateBoundariesProcess
             evaluationContext.addPropertyAccessor(JSON_PROPERTY_ACCESSOR);
             ReactiveReflectivePropertyAccessor.wrap(evaluationContext);
             ReactiveMethodResolver.wrap(evaluationContext, context);
+            restrictTypeReferences(evaluationContext);
+            // Thymeleaf installs a BeanFactoryResolver, which lets a template reach any bean with
+            // @beanName. The connection factory and database client beans expose H2 that way without
+            // any type reference, so bean resolution is removed entirely.
+            evaluationContext.setBeanResolver(null);
         }
     }
 
@@ -59,6 +105,31 @@ public class EvaluationContextEnhancer extends AbstractTemplateBoundariesProcess
     public void doProcessTemplateEnd(
             ITemplateContext context, ITemplateEnd templateEnd, ITemplateBoundariesStructureHandler structureHandler) {
         // nothing to do
+    }
+
+    /** Wraps the context's type locator so theme templates can only reference types in {@link #ALLOWED_TYPE_NAMES}. */
+    private static void restrictTypeReferences(ThymeleafEvaluationContext evaluationContext) {
+        var current = evaluationContext.getTypeLocator();
+        if (current instanceof AllowedTypeLocator) {
+            return;
+        }
+        evaluationContext.setTypeLocator(new AllowedTypeLocator(current));
+    }
+
+    /**
+     * A {@link TypeLocator} that resolves a type only when {@link #ALLOWED_TYPE_NAMES} contains it, and delegates the
+     * actual lookup to the locator Thymeleaf installed.
+     */
+    private record AllowedTypeLocator(TypeLocator delegate) implements TypeLocator {
+
+        @Override
+        public Class<?> findType(String typeName) throws EvaluationException {
+            if (!ALLOWED_TYPE_NAMES.contains(typeName)) {
+                throw new EvaluationException(
+                        "Access is forbidden for type '" + typeName + "' in this expression context.");
+            }
+            return delegate.findType(typeName);
+        }
     }
 
     /**
