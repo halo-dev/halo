@@ -32,6 +32,7 @@ const onlyIcon = computed(() => {
         show: 0,
       },
     }"
+    type="button"
     :class="[
       { 'bg-gray-200 !text-black': isActive },
       { 'size-8': onlyIcon },
