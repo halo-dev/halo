@@ -174,7 +174,7 @@ const { handleChangeStatusInBatch, handleUninstallInBatch } =
             class="relative flex flex-col flex-wrap items-start gap-4 sm:flex-row sm:items-center"
           >
             <div
-              v-permission="['system:posts:manage']"
+              v-permission="['system:plugins:manage']"
               class="hidden items-center sm:flex"
             >
               <input
