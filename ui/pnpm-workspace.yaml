@@ -45,6 +45,7 @@ catalog:
   vitest: 5.0.5
 overrides:
   axios: ^1.16.1
+  markdown-it: ^14.3.3
   vite-plus: "catalog:"
   "@lezer/javascript": 1.5.4
   vite@*: "catalog:"
