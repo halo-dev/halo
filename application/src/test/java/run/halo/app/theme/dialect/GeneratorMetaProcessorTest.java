@@ -35,7 +35,7 @@ class GeneratorMetaProcessorTest {
 
     @BeforeEach
     void setUp() throws FileNotFoundException, URISyntaxException {
-        when(initializationStateGetter.userInitialized()).thenReturn(Mono.just(true));
+        when(initializationStateGetter.setupRequired()).thenReturn(Mono.just(false));
         var themeContext = ThemeContext.builder()
                 .name("default")
                 .path(Path.of(ResourceUtils.getURL("classpath:themes/default").toURI()))

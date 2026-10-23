@@ -56,7 +56,9 @@ import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.infra.ThemeRootGetter;
+import run.halo.app.infra.exception.DuplicateNameException;
 import run.halo.app.infra.exception.ThemeInstallationException;
+import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.utils.JsonUtils;
 
 @ExtendWith(MockitoExtension.class)
@@ -73,6 +75,9 @@ class ThemeServiceImplTest {
 
     @Mock
     SystemConfigFetcher systemConfigFetcher;
+
+    @Mock
+    HaloProperties haloProperties;
 
     @InjectMocks
     ThemeServiceImpl themeService;
@@ -209,6 +214,63 @@ class ThemeServiceImplTest {
             var defaultThemeZipPath = prepareTheme("invalid-missing-manifest");
             StepVerifier.create(themeService.install(content(defaultThemeZipPath)))
                     .verifyError(ThemeInstallationException.class);
+        }
+    }
+
+    @Nested
+    class InstallPresetThemeTest {
+
+        @Test
+        void shouldRecoverThemeDirectoryLeftByInterruptedSetup() throws IOException {
+            when(haloProperties.getTheme()).thenReturn(new HaloProperties().getTheme());
+            when(systemVersionSupplier.get()).thenReturn(Version.parse("2.28.0"));
+            when(client.create(isA(Theme.class))).thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
+
+            // Simulate a theme directory left behind by an interrupted setup.
+            var leftoverThemeDir = themeRoot.get().resolve("theme-earth");
+            Files.createDirectories(leftoverThemeDir);
+            Files.writeString(leftoverThemeDir.resolve("leftover.txt"), "leftover");
+
+            StepVerifier.create(themeService.installPresetTheme()).verifyComplete();
+
+            // The Theme extension must be created even if the directory already exists.
+            verify(client).create(isA(Theme.class));
+            assertThat(leftoverThemeDir.resolve("theme.yaml")).exists();
+        }
+
+        @Test
+        void shouldFailWhenPresetThemeArchiveHasNoManifest() throws IOException {
+            var corruptThemeArchive = tmpDir.resolve("corrupt-theme.zip");
+            Files.writeString(corruptThemeArchive, "not a zip file");
+            var themeProperties = new HaloProperties().getTheme();
+            themeProperties
+                    .getInitializer()
+                    .setLocation(corruptThemeArchive.toUri().toString());
+            when(haloProperties.getTheme()).thenReturn(themeProperties);
+
+            StepVerifier.create(themeService.installPresetTheme()).verifyError(ThemeInstallationException.class);
+        }
+
+        @Test
+        void shouldFailWhenPresetThemeCannotBeCopied() throws IOException {
+            // A leftover file at the theme root path forces an IOException while copying the
+            // preset theme, which must fail the setup instead of being silently ignored.
+            var blockedThemeRoot = tmpDir.resolve("blocked-themes");
+            Files.writeString(blockedThemeRoot, "not a directory");
+            when(themeRoot.get()).thenReturn(blockedThemeRoot);
+            when(haloProperties.getTheme()).thenReturn(new HaloProperties().getTheme());
+
+            StepVerifier.create(themeService.installPresetTheme()).verifyError(ServerWebInputException.class);
+        }
+
+        @Test
+        void shouldIgnoreExistingPresetThemeExtension() throws IOException {
+            when(haloProperties.getTheme()).thenReturn(new HaloProperties().getTheme());
+            when(client.create(isA(Theme.class))).thenReturn(Mono.error(new DuplicateNameException("Duplicate name")));
+
+            StepVerifier.create(themeService.installPresetTheme()).verifyComplete();
+
+            verify(client).create(isA(Theme.class));
         }
     }
 

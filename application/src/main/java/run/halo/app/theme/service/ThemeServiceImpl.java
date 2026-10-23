@@ -47,6 +47,7 @@ import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.infra.ThemeRootGetter;
+import run.halo.app.infra.exception.DuplicateNameException;
 import run.halo.app.infra.exception.ThemeAlreadyExistsException;
 import run.halo.app.infra.exception.ThemeUpgradeException;
 import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
@@ -103,8 +104,9 @@ public class ThemeServiceImpl implements ThemeService {
                                             DefaultDataBufferFactory.sharedInstance,
                                             StreamUtils.BUFFER_SIZE);
                                     // We don't want to run on the bounded elastic scheduler again, so pass null
-                                    // here.
-                                    return doInstall(content, null);
+                                    // here. The override flag heals the theme directory left behind by an
+                                    // interrupted setup.
+                                    return doInstall(content, null, true);
                                 }),
                         FileUtils::deleteRecursivelyAndSilently)
                 .subscribeOn(scheduler)
@@ -112,10 +114,11 @@ public class ThemeServiceImpl implements ThemeService {
                     log.warn("Failed to initialize theme from {}", location, e);
                     return Mono.empty();
                 })
-                .onErrorResume(ThemeAlreadyExistsException.class, e -> {
-                    log.warn("Failed to initialize theme from {}, because it already exists", location);
-                    return Mono.empty();
-                })
+                .onErrorResume(
+                        t -> t instanceof ThemeAlreadyExistsException || t instanceof DuplicateNameException, e -> {
+                            log.warn("Failed to initialize theme from {}, because it already exists", location);
+                            return Mono.empty();
+                        })
                 .then();
     }
 
@@ -177,8 +180,12 @@ public class ThemeServiceImpl implements ThemeService {
     }
 
     private Mono<Theme> doInstall(Publisher<DataBuffer> content, @Nullable Scheduler scheduler) {
+        return doInstall(content, scheduler, false);
+    }
+
+    private Mono<Theme> doInstall(Publisher<DataBuffer> content, @Nullable Scheduler scheduler, boolean override) {
         var themeRoot = this.themeRoot.get();
-        return unzipThemeTo(content, themeRoot, scheduler).flatMap(theme -> persistent(theme, false));
+        return unzipThemeTo(content, themeRoot, override, scheduler).flatMap(theme -> persistent(theme, false));
     }
 
     /**
