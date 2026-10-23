@@ -174,7 +174,7 @@ tasks.register('downloadPluginPresets', Download) {
             autoEnable: true,
         ],
         [
-            url       : 'https://github.com/halo-dev/plugin-ai-foundation/releases/download/v1.1.0/plugin-ai-foundation-1.1.0.jar',
+            url       : 'https://github.com/halo-dev/plugin-ai-foundation/releases/download/v1.1.1/plugin-ai-foundation-1.1.1.jar',
             filename  : 'plugin-ai-foundation.jar',
             autoEnable: true,
         ],
