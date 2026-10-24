@@ -104,8 +104,7 @@ class OAuth2EmailCompletionFlowIntegrationTest {
                 .when(systemConfigFetcher)
                 .fetch(SystemSetting.User.GROUP, SystemSetting.User.class);
         when(loginHandlerEnhancer.onLoginSuccess(any(), any())).thenReturn(Mono.empty());
-        when(initializationStateGetter.userInitialized()).thenReturn(Mono.just(true));
-        when(initializationStateGetter.dataInitialized()).thenReturn(Mono.just(true));
+        when(initializationStateGetter.setupRequired()).thenReturn(Mono.just(false));
         when(rateLimiterRegistry.rateLimiter(anyString(), eq("verify-email")))
                 .thenAnswer(invocation -> RateLimiter.ofDefaults(invocation.getArgument(0)));
         givenAuthorities("ROLE_authenticated");

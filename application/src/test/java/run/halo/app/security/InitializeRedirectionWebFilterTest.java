@@ -49,7 +49,7 @@ class InitializeRedirectionWebFilterTest {
 
     @Test
     void shouldRedirectWhenSystemNotInitialized() {
-        when(initializationStateGetter.userInitialized()).thenReturn(Mono.just(false));
+        when(initializationStateGetter.setupRequired()).thenReturn(Mono.just(true));
 
         WebFilterChain chain = mock(WebFilterChain.class);
         var paths = new String[] {"/", "/console/test", "/uc/test", "/login", "/signup"};
@@ -72,7 +72,7 @@ class InitializeRedirectionWebFilterTest {
 
     @Test
     void shouldNotRedirectWhenSystemInitialized() {
-        lenient().when(initializationStateGetter.userInitialized()).thenReturn(Mono.just(true));
+        lenient().when(initializationStateGetter.setupRequired()).thenReturn(Mono.just(false));
 
         WebFilterChain chain = mock(WebFilterChain.class);
 
