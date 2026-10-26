@@ -243,7 +243,7 @@
       }
     },
     "axios": {
-      "version": "1.16.1",
+      "version": "1.20.0",
       "exports": [
         "Axios",
         "AxiosError",

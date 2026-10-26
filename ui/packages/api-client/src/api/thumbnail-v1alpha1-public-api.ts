@@ -18,7 +18,7 @@ import type { AxiosPromise, AxiosInstance, RawAxiosRequestConfig } from 'axios';
 import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
-import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
+import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction, replaceWithSerializableTypeIfNeeded } from '../common';
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 /**
@@ -71,8 +71,8 @@ export const ThumbnailV1alpha1PublicApiAxiosParamCreator = function (configurati
                 localVarQueryParameter['width'] = width;
             }
 
+            localVarHeaderParameter['Accept'] = '*/*';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -165,13 +165,13 @@ export const GetThumbnailByUriSizeEnum = {
     S: 'S',
     M: 'M',
     L: 'L',
-    Xl: 'XL'
+    Xl: 'XL',
 } as const;
 export type GetThumbnailByUriSizeEnum = typeof GetThumbnailByUriSizeEnum[keyof typeof GetThumbnailByUriSizeEnum];
 export const GetThumbnailByUriWidthEnum = {
     NUMBER_400: 400,
     NUMBER_800: 800,
     NUMBER_1200: 1200,
-    NUMBER_1600: 1600
+    NUMBER_1600: 1600,
 } as const;
 export type GetThumbnailByUriWidthEnum = typeof GetThumbnailByUriWidthEnum[keyof typeof GetThumbnailByUriWidthEnum];

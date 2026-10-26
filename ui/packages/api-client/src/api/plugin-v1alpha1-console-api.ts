@@ -18,7 +18,7 @@ import type { AxiosPromise, AxiosInstance, RawAxiosRequestConfig } from 'axios';
 import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
-import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
+import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction, replaceWithSerializableTypeIfNeeded } from '../common';
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
@@ -53,7 +53,7 @@ export const PluginV1alpha1ConsoleApiAxiosParamCreator = function (configuration
             // verify required parameter 'pluginRunningStateRequest' is not null or undefined
             assertParamExists('changePluginRunningState', 'pluginRunningStateRequest', pluginRunningStateRequest)
             const localVarPath = `/apis/api.console.halo.run/v1alpha1/plugins/{name}/plugin-state`
-                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+                .replace('{name}', encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -73,9 +73,8 @@ export const PluginV1alpha1ConsoleApiAxiosParamCreator = function (configuration
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
-
-    
             localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = '*/*';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
@@ -113,8 +112,8 @@ export const PluginV1alpha1ConsoleApiAxiosParamCreator = function (configuration
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            localVarHeaderParameter['Accept'] = '*/*';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -150,8 +149,8 @@ export const PluginV1alpha1ConsoleApiAxiosParamCreator = function (configuration
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            localVarHeaderParameter['Accept'] = '*/*';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -171,7 +170,7 @@ export const PluginV1alpha1ConsoleApiAxiosParamCreator = function (configuration
             // verify required parameter 'name' is not null or undefined
             assertParamExists('fetchPluginJsonConfig', 'name', name)
             const localVarPath = `/apis/api.console.halo.run/v1alpha1/plugins/{name}/json-config`
-                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+                .replace('{name}', encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -191,8 +190,8 @@ export const PluginV1alpha1ConsoleApiAxiosParamCreator = function (configuration
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            localVarHeaderParameter['Accept'] = '*/*';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -212,7 +211,7 @@ export const PluginV1alpha1ConsoleApiAxiosParamCreator = function (configuration
             // verify required parameter 'name' is not null or undefined
             assertParamExists('fetchPluginSetting', 'name', name)
             const localVarPath = `/apis/api.console.halo.run/v1alpha1/plugins/{name}/setting`
-                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+                .replace('{name}', encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -232,8 +231,8 @@ export const PluginV1alpha1ConsoleApiAxiosParamCreator = function (configuration
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            localVarHeaderParameter['Accept'] = '*/*';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -277,18 +276,17 @@ export const PluginV1alpha1ConsoleApiAxiosParamCreator = function (configuration
             if (file !== undefined) { 
                 localVarFormParams.append('file', file as any);
             }
-    
+
             if (presetName !== undefined) { 
                 localVarFormParams.append('presetName', presetName as any);
             }
-    
+
             if (source !== undefined) { 
                 localVarFormParams.append('source', source as any);
             }
-    
-    
             localVarHeaderParameter['Content-Type'] = 'multipart/form-data';
-    
+            localVarHeaderParameter['Accept'] = '*/*';
+
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -328,9 +326,8 @@ export const PluginV1alpha1ConsoleApiAxiosParamCreator = function (configuration
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
-
-    
             localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = '*/*';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
@@ -403,8 +400,8 @@ export const PluginV1alpha1ConsoleApiAxiosParamCreator = function (configuration
                 localVarQueryParameter['enabled'] = enabled;
             }
 
+            localVarHeaderParameter['Accept'] = '*/*';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -424,7 +421,7 @@ export const PluginV1alpha1ConsoleApiAxiosParamCreator = function (configuration
             // verify required parameter 'name' is not null or undefined
             assertParamExists('reloadPlugin', 'name', name)
             const localVarPath = `/apis/api.console.halo.run/v1alpha1/plugins/{name}/reload`
-                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+                .replace('{name}', encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -444,8 +441,8 @@ export const PluginV1alpha1ConsoleApiAxiosParamCreator = function (configuration
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            localVarHeaderParameter['Accept'] = '*/*';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -465,7 +462,7 @@ export const PluginV1alpha1ConsoleApiAxiosParamCreator = function (configuration
             // verify required parameter 'name' is not null or undefined
             assertParamExists('resetPluginConfig', 'name', name)
             const localVarPath = `/apis/api.console.halo.run/v1alpha1/plugins/{name}/reset-config`
-                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+                .replace('{name}', encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -485,8 +482,8 @@ export const PluginV1alpha1ConsoleApiAxiosParamCreator = function (configuration
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            localVarHeaderParameter['Accept'] = '*/*';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -509,7 +506,7 @@ export const PluginV1alpha1ConsoleApiAxiosParamCreator = function (configuration
             // verify required parameter 'body' is not null or undefined
             assertParamExists('updatePluginJsonConfig', 'body', body)
             const localVarPath = `/apis/api.console.halo.run/v1alpha1/plugins/{name}/json-config`
-                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+                .replace('{name}', encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -529,8 +526,6 @@ export const PluginV1alpha1ConsoleApiAxiosParamCreator = function (configuration
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
-
-    
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -556,7 +551,7 @@ export const PluginV1alpha1ConsoleApiAxiosParamCreator = function (configuration
             // verify required parameter 'name' is not null or undefined
             assertParamExists('upgradePlugin', 'name', name)
             const localVarPath = `/apis/api.console.halo.run/v1alpha1/plugins/{name}/upgrade`
-                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+                .replace('{name}', encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -581,18 +576,17 @@ export const PluginV1alpha1ConsoleApiAxiosParamCreator = function (configuration
             if (file !== undefined) { 
                 localVarFormParams.append('file', file as any);
             }
-    
+
             if (presetName !== undefined) { 
                 localVarFormParams.append('presetName', presetName as any);
             }
-    
+
             if (source !== undefined) { 
                 localVarFormParams.append('source', source as any);
             }
-    
-    
             localVarHeaderParameter['Content-Type'] = 'multipart/form-data';
-    
+            localVarHeaderParameter['Accept'] = '*/*';
+
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -616,7 +610,7 @@ export const PluginV1alpha1ConsoleApiAxiosParamCreator = function (configuration
             // verify required parameter 'upgradeFromUriRequest' is not null or undefined
             assertParamExists('upgradePluginFromUri', 'upgradeFromUriRequest', upgradeFromUriRequest)
             const localVarPath = `/apis/api.console.halo.run/v1alpha1/plugins/{name}/upgrade-from-uri`
-                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+                .replace('{name}', encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -636,9 +630,8 @@ export const PluginV1alpha1ConsoleApiAxiosParamCreator = function (configuration
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
-
-    
             localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = '*/*';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
@@ -1258,12 +1251,12 @@ export class PluginV1alpha1ConsoleApi extends BaseAPI {
 export const InstallPluginSourceEnum = {
     File: 'FILE',
     Preset: 'PRESET',
-    Url: 'URL'
+    Url: 'URL',
 } as const;
 export type InstallPluginSourceEnum = typeof InstallPluginSourceEnum[keyof typeof InstallPluginSourceEnum];
 export const UpgradePluginSourceEnum = {
     File: 'FILE',
     Preset: 'PRESET',
-    Url: 'URL'
+    Url: 'URL',
 } as const;
 export type UpgradePluginSourceEnum = typeof UpgradePluginSourceEnum[keyof typeof UpgradePluginSourceEnum];

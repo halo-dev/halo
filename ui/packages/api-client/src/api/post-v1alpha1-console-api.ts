@@ -18,7 +18,7 @@ import type { AxiosPromise, AxiosInstance, RawAxiosRequestConfig } from 'axios';
 import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
-import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
+import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction, replaceWithSerializableTypeIfNeeded } from '../common';
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
@@ -53,7 +53,7 @@ export const PostV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             // verify required parameter 'snapshotName' is not null or undefined
             assertParamExists('deletePostContent', 'snapshotName', snapshotName)
             const localVarPath = `/apis/api.console.halo.run/v1alpha1/posts/{name}/content`
-                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+                .replace('{name}', encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -77,8 +77,8 @@ export const PostV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
                 localVarQueryParameter['snapshotName'] = snapshotName;
             }
 
+            localVarHeaderParameter['Accept'] = '*/*';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -117,9 +117,8 @@ export const PostV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
-
-    
             localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = '*/*';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
@@ -144,7 +143,7 @@ export const PostV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             // verify required parameter 'snapshotName' is not null or undefined
             assertParamExists('fetchPostContent', 'snapshotName', snapshotName)
             const localVarPath = `/apis/api.console.halo.run/v1alpha1/posts/{name}/content`
-                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+                .replace('{name}', encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -168,8 +167,8 @@ export const PostV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
                 localVarQueryParameter['snapshotName'] = snapshotName;
             }
 
+            localVarHeaderParameter['Accept'] = '*/*';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -189,7 +188,7 @@ export const PostV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             // verify required parameter 'name' is not null or undefined
             assertParamExists('fetchPostHeadContent', 'name', name)
             const localVarPath = `/apis/api.console.halo.run/v1alpha1/posts/{name}/head-content`
-                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+                .replace('{name}', encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -209,8 +208,8 @@ export const PostV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            localVarHeaderParameter['Accept'] = '*/*';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -230,7 +229,7 @@ export const PostV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             // verify required parameter 'name' is not null or undefined
             assertParamExists('fetchPostReleaseContent', 'name', name)
             const localVarPath = `/apis/api.console.halo.run/v1alpha1/posts/{name}/release-content`
-                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+                .replace('{name}', encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -250,8 +249,8 @@ export const PostV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            localVarHeaderParameter['Accept'] = '*/*';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -271,7 +270,7 @@ export const PostV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             // verify required parameter 'name' is not null or undefined
             assertParamExists('listPostSnapshots', 'name', name)
             const localVarPath = `/apis/api.console.halo.run/v1alpha1/posts/{name}/snapshot`
-                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+                .replace('{name}', encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -291,8 +290,8 @@ export const PostV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            localVarHeaderParameter['Accept'] = '*/*';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -368,8 +367,8 @@ export const PostV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
                 localVarQueryParameter['categoryWithChildren'] = categoryWithChildren;
             }
 
+            localVarHeaderParameter['Accept'] = '*/*';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -391,7 +390,7 @@ export const PostV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             // verify required parameter 'name' is not null or undefined
             assertParamExists('publishPost', 'name', name)
             const localVarPath = `/apis/api.console.halo.run/v1alpha1/posts/{name}/publish`
-                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+                .replace('{name}', encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -419,8 +418,8 @@ export const PostV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
                 localVarQueryParameter['async'] = async;
             }
 
+            localVarHeaderParameter['Accept'] = '*/*';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -440,7 +439,7 @@ export const PostV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             // verify required parameter 'name' is not null or undefined
             assertParamExists('recyclePost', 'name', name)
             const localVarPath = `/apis/api.console.halo.run/v1alpha1/posts/{name}/recycle`
-                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+                .replace('{name}', encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -460,8 +459,8 @@ export const PostV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            localVarHeaderParameter['Accept'] = '*/*';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -484,7 +483,7 @@ export const PostV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             // verify required parameter 'revertSnapshotForPostParam' is not null or undefined
             assertParamExists('revertToSpecifiedSnapshotForPost', 'revertSnapshotForPostParam', revertSnapshotForPostParam)
             const localVarPath = `/apis/api.console.halo.run/v1alpha1/posts/{name}/revert-content`
-                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+                .replace('{name}', encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -504,9 +503,8 @@ export const PostV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
-
-    
             localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = '*/*';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
@@ -528,7 +526,7 @@ export const PostV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             // verify required parameter 'name' is not null or undefined
             assertParamExists('unpublishPost', 'name', name)
             const localVarPath = `/apis/api.console.halo.run/v1alpha1/posts/{name}/unpublish`
-                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+                .replace('{name}', encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -548,8 +546,8 @@ export const PostV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            localVarHeaderParameter['Accept'] = '*/*';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -572,7 +570,7 @@ export const PostV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             // verify required parameter 'postRequest' is not null or undefined
             assertParamExists('updateDraftPost', 'postRequest', postRequest)
             const localVarPath = `/apis/api.console.halo.run/v1alpha1/posts/{name}`
-                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+                .replace('{name}', encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -592,9 +590,8 @@ export const PostV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
-
-    
             localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = '*/*';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
@@ -619,7 +616,7 @@ export const PostV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             // verify required parameter 'content' is not null or undefined
             assertParamExists('updatePostContent', 'content', content)
             const localVarPath = `/apis/api.console.halo.run/v1alpha1/posts/{name}/content`
-                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+                .replace('{name}', encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -639,9 +636,8 @@ export const PostV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
-
-    
             localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = '*/*';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
@@ -1288,6 +1284,6 @@ export const ListPostsPublishPhaseEnum = {
     Draft: 'DRAFT',
     PendingApproval: 'PENDING_APPROVAL',
     Published: 'PUBLISHED',
-    Failed: 'FAILED'
+    Failed: 'FAILED',
 } as const;
 export type ListPostsPublishPhaseEnum = typeof ListPostsPublishPhaseEnum[keyof typeof ListPostsPublishPhaseEnum];

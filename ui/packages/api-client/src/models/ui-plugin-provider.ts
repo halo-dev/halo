@@ -42,13 +42,13 @@ export interface UiPluginProvider {
 export const UiPluginProviderKindEnum = {
     Legacy: 'legacy',
     Esm: 'esm',
-    Invalid: 'invalid'
+    Invalid: 'invalid',
 } as const;
 
 export type UiPluginProviderKindEnum = typeof UiPluginProviderKindEnum[keyof typeof UiPluginProviderKindEnum];
 export const UiPluginProviderTypeEnum = {
     Plugin: 'plugin',
-    Theme: 'theme'
+    Theme: 'theme',
 } as const;
 
 export type UiPluginProviderTypeEnum = typeof UiPluginProviderTypeEnum[keyof typeof UiPluginProviderTypeEnum];

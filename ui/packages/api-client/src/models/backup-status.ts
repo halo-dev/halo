@@ -52,7 +52,7 @@ export const BackupStatusPhaseEnum = {
     Pending: 'PENDING',
     Running: 'RUNNING',
     Succeeded: 'SUCCEEDED',
-    Failed: 'FAILED'
+    Failed: 'FAILED',
 } as const;
 
 export type BackupStatusPhaseEnum = typeof BackupStatusPhaseEnum[keyof typeof BackupStatusPhaseEnum];

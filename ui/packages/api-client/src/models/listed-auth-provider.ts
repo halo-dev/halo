@@ -37,7 +37,7 @@ export interface ListedAuthProvider {
 
 export const ListedAuthProviderAuthTypeEnum = {
     Form: 'FORM',
-    Oauth2: 'OAUTH2'
+    Oauth2: 'OAUTH2',
 } as const;
 
 export type ListedAuthProviderAuthTypeEnum = typeof ListedAuthProviderAuthTypeEnum[keyof typeof ListedAuthProviderAuthTypeEnum];

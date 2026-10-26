@@ -18,7 +18,7 @@ import type { AxiosPromise, AxiosInstance, RawAxiosRequestConfig } from 'axios';
 import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
-import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
+import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction, replaceWithSerializableTypeIfNeeded } from '../common';
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 /**
@@ -36,7 +36,7 @@ export const UserPreferenceV1alpha1UcApiAxiosParamCreator = function (configurat
             // verify required parameter 'group' is not null or undefined
             assertParamExists('getMyPreference', 'group', group)
             const localVarPath = `/apis/uc.api.halo.run/v1alpha1/user-preferences/{group}`
-                .replace(`{${"group"}}`, encodeURIComponent(String(group)));
+                .replace('{group}', encodeURIComponent(String(group)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -56,8 +56,8 @@ export const UserPreferenceV1alpha1UcApiAxiosParamCreator = function (configurat
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            localVarHeaderParameter['Accept'] = '*/*';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -80,7 +80,7 @@ export const UserPreferenceV1alpha1UcApiAxiosParamCreator = function (configurat
             // verify required parameter 'body' is not null or undefined
             assertParamExists('updateMyPreference', 'body', body)
             const localVarPath = `/apis/uc.api.halo.run/v1alpha1/user-preferences/{group}`
-                .replace(`{${"group"}}`, encodeURIComponent(String(group)));
+                .replace('{group}', encodeURIComponent(String(group)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -100,8 +100,6 @@ export const UserPreferenceV1alpha1UcApiAxiosParamCreator = function (configurat
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
-
-    
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);

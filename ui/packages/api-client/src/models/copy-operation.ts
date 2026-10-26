@@ -27,7 +27,7 @@ export interface CopyOperation {
 }
 
 export const CopyOperationOpEnum = {
-    Copy: 'copy'
+    Copy: 'copy',
 } as const;
 
 export type CopyOperationOpEnum = typeof CopyOperationOpEnum[keyof typeof CopyOperationOpEnum];

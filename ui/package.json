@@ -63,7 +63,7 @@
     "@vueuse/integrations": "^14.4.0",
     "@vueuse/router": "^14.4.0",
     "@vueuse/shared": "^14.4.0",
-    "axios": "^1.16.1",
+    "axios": "^1.20.0",
     "codemirror": "^6.0.2",
     "colorjs.io": "^0.4.3",
     "core-js": "^3.50.0",
