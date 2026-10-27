@@ -91,7 +91,7 @@ export interface SinglePageSpec {
 export const SinglePageSpecVisibleEnum = {
     Public: 'PUBLIC',
     Internal: 'INTERNAL',
-    Private: 'PRIVATE'
+    Private: 'PRIVATE',
 } as const;
 
 export type SinglePageSpecVisibleEnum = typeof SinglePageSpecVisibleEnum[keyof typeof SinglePageSpecVisibleEnum];

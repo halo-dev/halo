@@ -18,7 +18,7 @@ import type { AxiosPromise, AxiosInstance, RawAxiosRequestConfig } from 'axios';
 import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
-import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
+import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction, replaceWithSerializableTypeIfNeeded } from '../common';
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
@@ -41,8 +41,8 @@ export const MigrationV1alpha1ConsoleApiAxiosParamCreator = function (configurat
             // verify required parameter 'filename' is not null or undefined
             assertParamExists('downloadBackups', 'filename', filename)
             const localVarPath = `/apis/console.api.migration.halo.run/v1alpha1/backups/{name}/files/{filename}`
-                .replace(`{${"name"}}`, encodeURIComponent(String(name)))
-                .replace(`{${"filename"}}`, encodeURIComponent(String(filename)));
+                .replace('{name}', encodeURIComponent(String(name)))
+                .replace('{filename}', encodeURIComponent(String(filename)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -63,7 +63,6 @@ export const MigrationV1alpha1ConsoleApiAxiosParamCreator = function (configurat
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -99,8 +98,8 @@ export const MigrationV1alpha1ConsoleApiAxiosParamCreator = function (configurat
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            localVarHeaderParameter['Accept'] = '*/*';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -145,22 +144,21 @@ export const MigrationV1alpha1ConsoleApiAxiosParamCreator = function (configurat
             if (backupName !== undefined) { 
                 localVarFormParams.append('backupName', backupName as any);
             }
-    
+
             if (downloadUrl !== undefined) { 
                 localVarFormParams.append('downloadUrl', downloadUrl as any);
             }
-    
+
             if (file !== undefined) { 
                 localVarFormParams.append('file', file as any);
             }
-    
+
             if (filename !== undefined) { 
                 localVarFormParams.append('filename', filename as any);
             }
-    
-    
             localVarHeaderParameter['Content-Type'] = 'multipart/form-data';
-    
+            localVarHeaderParameter['Accept'] = '*/*';
+
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};

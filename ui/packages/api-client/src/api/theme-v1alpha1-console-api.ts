@@ -18,7 +18,7 @@ import type { AxiosPromise, AxiosInstance, RawAxiosRequestConfig } from 'axios';
 import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
-import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
+import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction, replaceWithSerializableTypeIfNeeded } from '../common';
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
@@ -48,7 +48,7 @@ export const ThemeV1alpha1ConsoleApiAxiosParamCreator = function (configuration?
             // verify required parameter 'name' is not null or undefined
             assertParamExists('activateTheme', 'name', name)
             const localVarPath = `/apis/api.console.halo.run/v1alpha1/themes/{name}/activation`
-                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+                .replace('{name}', encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -68,8 +68,8 @@ export const ThemeV1alpha1ConsoleApiAxiosParamCreator = function (configuration?
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            localVarHeaderParameter['Accept'] = '*/*';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -105,8 +105,8 @@ export const ThemeV1alpha1ConsoleApiAxiosParamCreator = function (configuration?
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            localVarHeaderParameter['Accept'] = '*/*';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -126,7 +126,7 @@ export const ThemeV1alpha1ConsoleApiAxiosParamCreator = function (configuration?
             // verify required parameter 'name' is not null or undefined
             assertParamExists('fetchThemeJsonConfig', 'name', name)
             const localVarPath = `/apis/api.console.halo.run/v1alpha1/themes/{name}/json-config`
-                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+                .replace('{name}', encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -146,8 +146,8 @@ export const ThemeV1alpha1ConsoleApiAxiosParamCreator = function (configuration?
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            localVarHeaderParameter['Accept'] = '*/*';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -167,7 +167,7 @@ export const ThemeV1alpha1ConsoleApiAxiosParamCreator = function (configuration?
             // verify required parameter 'name' is not null or undefined
             assertParamExists('fetchThemeSetting', 'name', name)
             const localVarPath = `/apis/api.console.halo.run/v1alpha1/themes/{name}/setting`
-                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+                .replace('{name}', encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -187,8 +187,8 @@ export const ThemeV1alpha1ConsoleApiAxiosParamCreator = function (configuration?
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            localVarHeaderParameter['Accept'] = '*/*';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -224,8 +224,8 @@ export const ThemeV1alpha1ConsoleApiAxiosParamCreator = function (configuration?
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            localVarHeaderParameter['Accept'] = '*/*';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -264,9 +264,8 @@ export const ThemeV1alpha1ConsoleApiAxiosParamCreator = function (configuration?
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
-
-    
             localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = '*/*';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
@@ -288,7 +287,7 @@ export const ThemeV1alpha1ConsoleApiAxiosParamCreator = function (configuration?
             // verify required parameter 'name' is not null or undefined
             assertParamExists('invalidateCache', 'name', name)
             const localVarPath = `/apis/api.console.halo.run/v1alpha1/themes/{name}/invalidate-cache`
-                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+                .replace('{name}', encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -309,7 +308,6 @@ export const ThemeV1alpha1ConsoleApiAxiosParamCreator = function (configuration?
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -370,8 +368,8 @@ export const ThemeV1alpha1ConsoleApiAxiosParamCreator = function (configuration?
                 localVarQueryParameter['uninstalled'] = uninstalled;
             }
 
+            localVarHeaderParameter['Accept'] = '*/*';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -391,7 +389,7 @@ export const ThemeV1alpha1ConsoleApiAxiosParamCreator = function (configuration?
             // verify required parameter 'name' is not null or undefined
             assertParamExists('reload', 'name', name)
             const localVarPath = `/apis/api.console.halo.run/v1alpha1/themes/{name}/reload`
-                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+                .replace('{name}', encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -411,8 +409,8 @@ export const ThemeV1alpha1ConsoleApiAxiosParamCreator = function (configuration?
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            localVarHeaderParameter['Accept'] = '*/*';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -432,7 +430,7 @@ export const ThemeV1alpha1ConsoleApiAxiosParamCreator = function (configuration?
             // verify required parameter 'name' is not null or undefined
             assertParamExists('resetThemeConfig', 'name', name)
             const localVarPath = `/apis/api.console.halo.run/v1alpha1/themes/{name}/reset-config`
-                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+                .replace('{name}', encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -452,8 +450,8 @@ export const ThemeV1alpha1ConsoleApiAxiosParamCreator = function (configuration?
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            localVarHeaderParameter['Accept'] = '*/*';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -476,7 +474,7 @@ export const ThemeV1alpha1ConsoleApiAxiosParamCreator = function (configuration?
             // verify required parameter 'body' is not null or undefined
             assertParamExists('updateThemeJsonConfig', 'body', body)
             const localVarPath = `/apis/api.console.halo.run/v1alpha1/themes/{name}/json-config`
-                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+                .replace('{name}', encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -496,8 +494,6 @@ export const ThemeV1alpha1ConsoleApiAxiosParamCreator = function (configuration?
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
-
-    
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -523,7 +519,7 @@ export const ThemeV1alpha1ConsoleApiAxiosParamCreator = function (configuration?
             // verify required parameter 'file' is not null or undefined
             assertParamExists('upgradeTheme', 'file', file)
             const localVarPath = `/apis/api.console.halo.run/v1alpha1/themes/{name}/upgrade`
-                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+                .replace('{name}', encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -548,10 +544,9 @@ export const ThemeV1alpha1ConsoleApiAxiosParamCreator = function (configuration?
             if (file !== undefined) { 
                 localVarFormParams.append('file', file as any);
             }
-    
-    
             localVarHeaderParameter['Content-Type'] = 'multipart/form-data';
-    
+            localVarHeaderParameter['Accept'] = '*/*';
+
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -575,7 +570,7 @@ export const ThemeV1alpha1ConsoleApiAxiosParamCreator = function (configuration?
             // verify required parameter 'upgradeFromUriRequest' is not null or undefined
             assertParamExists('upgradeThemeFromUri', 'upgradeFromUriRequest', upgradeFromUriRequest)
             const localVarPath = `/apis/api.console.halo.run/v1alpha1/themes/{name}/upgrade-from-uri`
-                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+                .replace('{name}', encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -595,9 +590,8 @@ export const ThemeV1alpha1ConsoleApiAxiosParamCreator = function (configuration?
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
-
-    
             localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = '*/*';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};

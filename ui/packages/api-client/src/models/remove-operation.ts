@@ -23,7 +23,7 @@ export interface RemoveOperation {
 }
 
 export const RemoveOperationOpEnum = {
-    Remove: 'remove'
+    Remove: 'remove',
 } as const;
 
 export type RemoveOperationOpEnum = typeof RemoveOperationOpEnum[keyof typeof RemoveOperationOpEnum];

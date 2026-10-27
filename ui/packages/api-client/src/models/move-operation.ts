@@ -27,7 +27,7 @@ export interface MoveOperation {
 }
 
 export const MoveOperationOpEnum = {
-    Move: 'move'
+    Move: 'move',
 } as const;
 
 export type MoveOperationOpEnum = typeof MoveOperationOpEnum[keyof typeof MoveOperationOpEnum];
