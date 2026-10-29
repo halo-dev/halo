@@ -92,6 +92,7 @@ function handleClickLayer() {
 
 // body scroll
 const modalBody = ref(null);
+const modalViewport = ref(null);
 const reactiveParams = reactive<UseOverlayScrollbarsParams>({
   options: {
     scrollbars: {
@@ -106,7 +107,16 @@ watch(
   () => internalVisible.value,
   (value) => {
     if (value) {
-      if (modalBody.value) initialize({ target: modalBody.value });
+      if (modalBody.value && modalViewport.value) {
+        initialize({
+          target: modalBody.value,
+          // Keep Vue's slot nodes inside their original parent during updates.
+          elements: {
+            viewport: modalViewport.value,
+            content: modalViewport.value,
+          },
+        });
+      }
       nextTick(() => {
         modelWrapper.value?.focus();
       });
@@ -174,7 +184,9 @@ watch(
             </slot>
           </div>
           <div ref="modalBody" :class="bodyClass" class="modal-body">
-            <slot />
+            <div ref="modalViewport">
+              <slot />
+            </div>
           </div>
           <div v-if="$slots.footer" class="modal-footer">
             <slot name="footer" />
