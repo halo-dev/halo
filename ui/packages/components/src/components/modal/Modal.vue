@@ -1,7 +1,15 @@
 <script lang="ts" setup>
 import type { UseOverlayScrollbarsParams } from "overlayscrollbars-vue";
 import { useOverlayScrollbars } from "overlayscrollbars-vue";
-import { computed, nextTick, onMounted, reactive, ref, watch } from "vue";
+import {
+  computed,
+  nextTick,
+  onMounted,
+  reactive,
+  ref,
+  useTemplateRef,
+  watch,
+} from "vue";
 import { IconClose } from "../../icons/icons";
 
 const props = withDefaults(
@@ -36,7 +44,7 @@ const emit = defineEmits<{
 
 const internalVisible = ref<boolean | undefined>(false);
 const rootVisible = ref(false);
-const modelWrapper = ref<HTMLElement>();
+const modelWrapper = useTemplateRef<HTMLElement>("modelWrapper");
 
 watch(
   () => props.visible,
@@ -91,8 +99,8 @@ function handleClickLayer() {
 }
 
 // body scroll
-const modalBody = ref(null);
-const modalViewport = ref(null);
+const modalBody = useTemplateRef<HTMLElement>("modalBody");
+const modalViewport = useTemplateRef<HTMLElement>("modalViewport");
 const reactiveParams = reactive<UseOverlayScrollbarsParams>({
   options: {
     scrollbars: {
