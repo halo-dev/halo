@@ -63,6 +63,7 @@ import run.halo.app.core.extension.Plugin;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.SystemVersionSupplier;
+import run.halo.app.infra.exception.DuplicateNameException;
 import run.halo.app.infra.exception.PluginAlreadyExistsException;
 import run.halo.app.infra.utils.FileUtils;
 
@@ -364,6 +365,41 @@ class PluginServiceImplTest {
             verify(client).create(captor.capture());
             verify(client, never()).update(isA(Plugin.class));
             assertFalse(captor.getValue().getSpec().getEnabled());
+        }
+
+        @Test
+        void shouldEnablePresetPluginInstalledBefore() {
+            var existingPlugin = new Plugin();
+            existingPlugin.setMetadata(new Metadata());
+            existingPlugin.getMetadata().setName("fake-plugin");
+            existingPlugin.setSpec(new Plugin.PluginSpec());
+            when(client.fetch(Plugin.class, "fake-plugin")).thenReturn(Mono.just(existingPlugin));
+            when(client.get(Plugin.class, "fake-plugin")).thenReturn(Mono.just(existingPlugin));
+            when(client.update(isA(Plugin.class)))
+                    .thenAnswer(invocation -> Mono.just(invocation.getArgument(0, Plugin.class)));
+
+            pluginService.installPresetPlugins().as(StepVerifier::create).verifyComplete();
+
+            var captor = ArgumentCaptor.forClass(Plugin.class);
+            verify(client).update(captor.capture());
+            assertTrue(captor.getValue().getSpec().getEnabled());
+        }
+
+        @Test
+        void shouldRecoverWhenPresetPluginIsCreatedConcurrently() {
+            var existingPlugin = new Plugin();
+            existingPlugin.setMetadata(new Metadata());
+            existingPlugin.getMetadata().setName("fake-plugin");
+            existingPlugin.setSpec(new Plugin.PluginSpec());
+            when(client.fetch(Plugin.class, "fake-plugin")).thenReturn(Mono.empty());
+            when(client.create(isA(Plugin.class))).thenReturn(Mono.error(new DuplicateNameException("Duplicate name")));
+            when(client.get(Plugin.class, "fake-plugin")).thenReturn(Mono.just(existingPlugin));
+            when(client.update(isA(Plugin.class)))
+                    .thenAnswer(invocation -> Mono.just(invocation.getArgument(0, Plugin.class)));
+
+            pluginService.installPresetPlugins().as(StepVerifier::create).verifyComplete();
+
+            verify(client).update(isA(Plugin.class));
         }
     }
 
