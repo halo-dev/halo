@@ -32,7 +32,7 @@ const handleChange = () => {
         '!bg-primary': modelValue,
         'switch-disabled': disabled || loading,
       }"
-      aria-checked="false"
+      :aria-checked="modelValue"
       class="switch-inner"
       role="switch"
       type="button"
