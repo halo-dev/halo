@@ -26,8 +26,10 @@ import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.core.extension.notification.Reason;
 import run.halo.app.core.extension.notification.Subscription;
 import run.halo.app.event.post.CommentCreatedEvent;
+import run.halo.app.event.post.ReplyApprovedEvent;
 import run.halo.app.event.post.ReplyCreatedEvent;
 import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.Ref;
 import run.halo.app.infra.ExternalLinkProcessor;
@@ -71,6 +73,27 @@ public class CommentNotificationReasonPublisher {
     @EventListener(ReplyCreatedEvent.class)
     public void onNewReply(ReplyCreatedEvent event) {
         Reply reply = event.getReply();
+        // Notify only if the reply is approved. Replies waiting for review will be notified by
+        // {@link #onReplyApproved(ReplyApprovedEvent)} after they get approved.
+        if (!Boolean.TRUE.equals(reply.getSpec().getApproved())) {
+            return;
+        }
+        publishNewReplyReason(reply);
+    }
+
+    /** On reply approved. */
+    @Async
+    @EventListener(ReplyApprovedEvent.class)
+    public void onReplyApproved(ReplyApprovedEvent event) {
+        var replyName = event.getReply().getMetadata().getName();
+        // The reply may have been unapproved or deleted before this async listener runs.
+        client.fetch(Reply.class, replyName)
+                .filter(reply -> !ExtensionUtil.isDeleted(reply))
+                .filter(reply -> Boolean.TRUE.equals(reply.getSpec().getApproved()))
+                .ifPresent(this::publishNewReplyReason);
+    }
+
+    private void publishNewReplyReason(Reply reply) {
         var commentName = reply.getSpec().getCommentName();
         client.fetch(Comment.class, commentName)
                 .ifPresent(comment -> newReplyReasonPublisher.publishReasonBy(reply, comment));

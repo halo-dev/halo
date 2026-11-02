@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Nested;
@@ -24,6 +25,7 @@ import run.halo.app.core.extension.content.Reply;
 import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.core.extension.notification.Reason;
 import run.halo.app.event.post.CommentCreatedEvent;
+import run.halo.app.event.post.ReplyApprovedEvent;
 import run.halo.app.event.post.ReplyCreatedEvent;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.GroupVersionKind;
@@ -85,6 +87,7 @@ class CommentNotificationReasonPublisherTest {
         var spec = mock(Reply.ReplySpec.class);
         when(reply.getSpec()).thenReturn(spec);
         when(spec.getCommentName()).thenReturn("fake-comment");
+        when(spec.getApproved()).thenReturn(true);
 
         var spyReasonPublisher = spy(reasonPublisher);
         var comment = mock(Comment.class);
@@ -97,6 +100,80 @@ class CommentNotificationReasonPublisherTest {
         verify(newReplyReasonPublisher).publishReasonBy(eq(reply), eq(comment));
         verify(spec).getCommentName();
         verify(client).fetch(eq(Comment.class), eq("fake-comment"));
+    }
+
+    @Test
+    void shouldNotPublishReasonForUnapprovedReply() {
+        var reply = mock(Reply.class);
+        var spec = mock(Reply.ReplySpec.class);
+        when(reply.getSpec()).thenReturn(spec);
+        when(spec.getApproved()).thenReturn(false);
+
+        reasonPublisher.onNewReply(new ReplyCreatedEvent(this, reply));
+
+        verify(newReplyReasonPublisher, never()).publishReasonBy(any(), any());
+        verify(client, never()).fetch(eq(Comment.class), anyString());
+    }
+
+    @Test
+    void shouldPublishReasonWhenReplyApproved() {
+        var reply = createReplyForApproval(true);
+
+        var comment = mock(Comment.class);
+        when(client.fetch(eq(Reply.class), eq("fake-reply"))).thenReturn(Optional.of(reply));
+        when(client.fetch(eq(Comment.class), eq("fake-comment"))).thenReturn(Optional.of(comment));
+
+        reasonPublisher.onReplyApproved(new ReplyApprovedEvent(this, reply));
+
+        verify(newReplyReasonPublisher).publishReasonBy(eq(reply), eq(comment));
+    }
+
+    @Test
+    void shouldNotPublishReasonWhenReplyWasUnapprovedAgain() {
+        var eventReply = createReplyForApproval(true);
+        var currentReply = createReplyForApproval(false);
+        when(client.fetch(eq(Reply.class), eq("fake-reply"))).thenReturn(Optional.of(currentReply));
+
+        reasonPublisher.onReplyApproved(new ReplyApprovedEvent(this, eventReply));
+
+        verify(newReplyReasonPublisher, never()).publishReasonBy(any(), any());
+        verify(client, never()).fetch(eq(Comment.class), anyString());
+    }
+
+    @Test
+    void shouldNotPublishReasonWhenApprovedReplyWasDeleted() {
+        var eventReply = createReplyForApproval(true);
+        var currentReply = createReplyForApproval(true);
+        currentReply.getMetadata().setDeletionTimestamp(Instant.now());
+        when(client.fetch(eq(Reply.class), eq("fake-reply"))).thenReturn(Optional.of(currentReply));
+
+        reasonPublisher.onReplyApproved(new ReplyApprovedEvent(this, eventReply));
+
+        verify(newReplyReasonPublisher, never()).publishReasonBy(any(), any());
+        verify(client, never()).fetch(eq(Comment.class), anyString());
+    }
+
+    @Test
+    void shouldNotPublishReasonWhenApprovedReplyWasGone() {
+        var eventReply = createReplyForApproval(true);
+        when(client.fetch(eq(Reply.class), eq("fake-reply"))).thenReturn(Optional.empty());
+
+        reasonPublisher.onReplyApproved(new ReplyApprovedEvent(this, eventReply));
+
+        verify(newReplyReasonPublisher, never()).publishReasonBy(any(), any());
+        verify(client, never()).fetch(eq(Comment.class), anyString());
+    }
+
+    private static Reply createReplyForApproval(boolean approved) {
+        var reply = new Reply();
+        var metadata = new Metadata();
+        metadata.setName("fake-reply");
+        reply.setMetadata(metadata);
+        var spec = new Reply.ReplySpec();
+        spec.setCommentName("fake-comment");
+        spec.setApproved(approved);
+        reply.setSpec(spec);
+        return reply;
     }
 
     @Test
