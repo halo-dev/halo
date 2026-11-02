@@ -24,6 +24,7 @@ import run.halo.app.core.extension.content.Reply;
 import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.core.extension.notification.Reason;
 import run.halo.app.event.post.CommentCreatedEvent;
+import run.halo.app.event.post.ReplyApprovedEvent;
 import run.halo.app.event.post.ReplyCreatedEvent;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.GroupVersionKind;
@@ -85,6 +86,7 @@ class CommentNotificationReasonPublisherTest {
         var spec = mock(Reply.ReplySpec.class);
         when(reply.getSpec()).thenReturn(spec);
         when(spec.getCommentName()).thenReturn("fake-comment");
+        when(spec.getApproved()).thenReturn(true);
 
         var spyReasonPublisher = spy(reasonPublisher);
         var comment = mock(Comment.class);
@@ -97,6 +99,34 @@ class CommentNotificationReasonPublisherTest {
         verify(newReplyReasonPublisher).publishReasonBy(eq(reply), eq(comment));
         verify(spec).getCommentName();
         verify(client).fetch(eq(Comment.class), eq("fake-comment"));
+    }
+
+    @Test
+    void shouldNotPublishReasonForUnapprovedReply() {
+        var reply = mock(Reply.class);
+        var spec = mock(Reply.ReplySpec.class);
+        when(reply.getSpec()).thenReturn(spec);
+        when(spec.getApproved()).thenReturn(false);
+
+        reasonPublisher.onNewReply(new ReplyCreatedEvent(this, reply));
+
+        verify(newReplyReasonPublisher, never()).publishReasonBy(any(), any());
+        verify(client, never()).fetch(eq(Comment.class), anyString());
+    }
+
+    @Test
+    void shouldPublishReasonWhenReplyApproved() {
+        var reply = mock(Reply.class);
+        var spec = mock(Reply.ReplySpec.class);
+        when(reply.getSpec()).thenReturn(spec);
+        when(spec.getCommentName()).thenReturn("fake-comment");
+
+        var comment = mock(Comment.class);
+        when(client.fetch(eq(Comment.class), eq("fake-comment"))).thenReturn(Optional.of(comment));
+
+        reasonPublisher.onReplyApproved(new ReplyApprovedEvent(this, reply));
+
+        verify(newReplyReasonPublisher).publishReasonBy(eq(reply), eq(comment));
     }
 
     @Test
