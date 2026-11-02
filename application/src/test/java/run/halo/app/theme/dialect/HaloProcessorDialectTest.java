@@ -138,7 +138,7 @@ class HaloProcessorDialectTest {
                 <meta charset="UTF-8" />
                 <title>Index</title>
               <meta name="global-head-test" content="test" />
-            <link rel="icon" href="favicon.ico" />
+            <link rel="icon" href="favicon.ico"/>
             </head>
               <body>
                 <p>index</p>
@@ -232,7 +232,7 @@ class HaloProcessorDialectTest {
                 <title>Seo Test</title>
               <meta name="robots" content="noindex"/>\
             <meta name="global-head-test" content="test" />
-            <link rel="icon" href="favicon.ico" />
+            <link rel="icon" href="favicon.ico"/>
             </head>
               <body>
                 seo setting test.
@@ -262,15 +262,40 @@ class HaloProcessorDialectTest {
                 <meta charset="UTF-8" />
                 <title>Seo Test</title>
               <meta name="global-head-test" content="test" />
-            <meta name="keywords" content="K1, K2, K3" />
-            <meta name="description" content="This is a description." />
-            <link rel="icon" href="favicon.ico" />
+            <meta name="keywords" content="K1, K2, K3"/>
+            <meta name="description" content="This is a description."/>
+            <link rel="icon" href="favicon.ico"/>
             </head>
               <body>
                 seo setting test.
               </body>
             </html>
             """);
+    }
+
+
+    @Test
+    void faviconAndIndexSeoShouldEscapeAttributeValues() {
+        Context context = getContext();
+        context.setVariable(ModelConst.TEMPLATE_ID, DefaultTemplateEnum.INDEX.getValue());
+        Seo seo = new Seo();
+        seo.setKeywords("K1\"/><script>alert(1)</script>");
+        seo.setDescription("desc\"/><img src=x onerror=alert(1)>");
+        when(fetcher.fetch(eq(Seo.GROUP), eq(Seo.class))).thenReturn(Mono.just(seo));
+        SystemSetting.Basic basic = new SystemSetting.Basic();
+        basic.setFavicon("https://example.com/a.ico\"/><script>alert(1)</script>");
+        when(fetcher.fetch(eq(SystemSetting.Basic.GROUP), eq(SystemSetting.Basic.class)))
+                .thenReturn(Mono.just(basic));
+
+        String result = templateEngine.process("seo", context);
+        // Values must stay inside attributes; raw markup must not break out.
+        assertThat(result).doesNotContain("<script>");
+        assertThat(result).doesNotContain("<img");
+        assertThat(result).contains("&quot;");
+        assertThat(result).contains("&lt;script&gt;");
+        assertThat(result).contains("content=\"K1&quot;/&gt;&lt;script&gt;alert(1)&lt;/script&gt;\"");
+        assertThat(result).contains("content=\"desc&quot;/&gt;&lt;img src=x onerror=alert(1)&gt;\"");
+        assertThat(result).contains("href=\"https://example.com/a.ico&quot;/&gt;&lt;script&gt;alert(1)&lt;/script&gt;\"");
     }
 
     @Nested
