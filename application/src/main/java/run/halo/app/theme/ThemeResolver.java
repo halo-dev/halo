@@ -107,10 +107,7 @@ public class ThemeResolver {
                 .cast(ThemeContext.class);
     }
 
-
-    /**
-     * Resolve a theme directory under the themes root and reject path traversal.
-     */
+    /** Resolve a theme directory under the themes root and reject path traversal. */
     Path resolveThemePath(String themeName) {
         var themeRootPath = themeRoot.get();
         var path = themeRootPath.resolve(themeName).normalize();
