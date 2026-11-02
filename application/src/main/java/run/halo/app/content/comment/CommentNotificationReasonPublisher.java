@@ -29,6 +29,7 @@ import run.halo.app.event.post.CommentCreatedEvent;
 import run.halo.app.event.post.ReplyApprovedEvent;
 import run.halo.app.event.post.ReplyCreatedEvent;
 import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.Ref;
 import run.halo.app.infra.ExternalLinkProcessor;
@@ -84,7 +85,12 @@ public class CommentNotificationReasonPublisher {
     @Async
     @EventListener(ReplyApprovedEvent.class)
     public void onReplyApproved(ReplyApprovedEvent event) {
-        publishNewReplyReason(event.getReply());
+        var replyName = event.getReply().getMetadata().getName();
+        // The reply may have been unapproved or deleted before this async listener runs.
+        client.fetch(Reply.class, replyName)
+                .filter(reply -> !ExtensionUtil.isDeleted(reply))
+                .filter(reply -> Boolean.TRUE.equals(reply.getSpec().getApproved()))
+                .ifPresent(this::publishNewReplyReason);
     }
 
     private void publishNewReplyReason(Reply reply) {

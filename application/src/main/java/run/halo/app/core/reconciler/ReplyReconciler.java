@@ -34,8 +34,8 @@ public class ReplyReconciler implements Reconciler<Reconciler.Request> {
 
     /**
      * Annotation recording the notification state of a reply. A missing value means the reply was created before this
-     * annotation was introduced: approved replies are treated as already notified to avoid notifying historical replies
-     * on upgrade, while unapproved replies are marked as pending so they will be notified once approved.
+     * annotation was introduced. Such replies were already notified on creation by the previous behavior, regardless of
+     * their approval state, so they are treated as already notified and will never be notified again.
      */
     static final String NOTIFICATION_ANNO = "content.halo.run/reply-notification";
 
@@ -55,26 +55,13 @@ public class ReplyReconciler implements Reconciler<Reconciler.Request> {
                 return;
             }
             var isNew = addFinalizers(reply.getMetadata(), Set.of(FINALIZER_NAME));
-            var annotations = MetadataUtil.nullSafeAnnotations(reply);
-            var notificationStatus = annotations.get(NOTIFICATION_ANNO);
-            var notifyApproved = false;
             if (isNew) {
                 replyNotificationSubscriptionHelper.subscribeNewReplyReasonForReply(reply);
-                if (Boolean.TRUE.equals(reply.getSpec().getApproved())) {
-                    annotations.put(NOTIFICATION_ANNO, NOTIFICATION_SENT);
-                } else {
-                    annotations.put(NOTIFICATION_ANNO, NOTIFICATION_PENDING);
-                }
+            }
+            var notifyApproved = updateNotificationState(reply, isNew);
+            if (isNew) {
                 client.update(reply);
                 eventPublisher.publishEvent(new ReplyCreatedEvent(this, reply));
-            } else if (NOTIFICATION_PENDING.equals(notificationStatus)
-                    && Boolean.TRUE.equals(reply.getSpec().getApproved())) {
-                annotations.put(NOTIFICATION_ANNO, NOTIFICATION_SENT);
-                notifyApproved = true;
-            } else if (notificationStatus == null
-                    && !Boolean.TRUE.equals(reply.getSpec().getApproved())) {
-                // initialize the state for replies created before the annotation was introduced
-                annotations.put(NOTIFICATION_ANNO, NOTIFICATION_PENDING);
             }
 
             if (reply.getSpec().getCreationTime() == null) {
@@ -97,6 +84,22 @@ public class ReplyReconciler implements Reconciler<Reconciler.Request> {
             eventPublisher.publishEvent(new ReplyChangedEvent(this, reply));
         });
         return new Result(false, null);
+    }
+
+    private boolean updateNotificationState(Reply reply, boolean isNew) {
+        var annotations = MetadataUtil.nullSafeAnnotations(reply);
+        if (isNew) {
+            var approved = Boolean.TRUE.equals(reply.getSpec().getApproved());
+            annotations.put(NOTIFICATION_ANNO, approved ? NOTIFICATION_SENT : NOTIFICATION_PENDING);
+            return false;
+        }
+        var notificationStatus = annotations.get(NOTIFICATION_ANNO);
+        if (!NOTIFICATION_PENDING.equals(notificationStatus)
+                || !Boolean.TRUE.equals(reply.getSpec().getApproved())) {
+            return false;
+        }
+        annotations.put(NOTIFICATION_ANNO, NOTIFICATION_SENT);
+        return true;
     }
 
     private void cleanUpResourcesAndRemoveFinalizer(String replyName) {

@@ -84,6 +84,7 @@ class ReplyReconcilerTest {
 
         assertThat(reply.getMetadata().getAnnotations())
                 .containsEntry(ReplyReconciler.NOTIFICATION_ANNO, ReplyReconciler.NOTIFICATION_SENT);
+        verify(client).update(reply);
         verify(eventPublisher).publishEvent(isA(ReplyApprovedEvent.class));
         verify(replyNotificationSubscriptionHelper, never()).subscribeNewReplyReasonForReply(any());
     }
@@ -126,23 +127,38 @@ class ReplyReconcilerTest {
     }
 
     @Test
-    void shouldNotifyLegacyPendingReplyAfterItGetsApproved() {
+    void shouldNotInitializeLegacyReplyAsPending() {
         var reply = createReply(false, null);
         reply.getMetadata().setFinalizers(new HashSet<>(Set.of(ReplyReconciler.FINALIZER_NAME)));
         when(client.fetch(eq(Reply.class), eq("fake-reply"))).thenReturn(Optional.of(reply));
 
         replyReconciler.reconcile(new Reconciler.Request("fake-reply"));
 
-        assertThat(reply.getMetadata().getAnnotations())
-                .containsEntry(ReplyReconciler.NOTIFICATION_ANNO, ReplyReconciler.NOTIFICATION_PENDING);
+        assertThat(reply.getMetadata().getAnnotations()).doesNotContainKey(ReplyReconciler.NOTIFICATION_ANNO);
         verify(eventPublisher, never()).publishEvent(isA(ReplyApprovedEvent.class));
+    }
 
-        reply.getSpec().setApproved(true);
+    @Test
+    void shouldNotNotifyLegacyReplyAfterUnapprovalAndReapproval() {
+        var legacyApproved = createReply(true, null);
+        legacyApproved.getMetadata().setFinalizers(new HashSet<>(Set.of(ReplyReconciler.FINALIZER_NAME)));
+        when(client.fetch(eq(Reply.class), eq("fake-reply"))).thenReturn(Optional.of(legacyApproved));
         replyReconciler.reconcile(new Reconciler.Request("fake-reply"));
 
-        assertThat(reply.getMetadata().getAnnotations())
-                .containsEntry(ReplyReconciler.NOTIFICATION_ANNO, ReplyReconciler.NOTIFICATION_SENT);
-        verify(eventPublisher).publishEvent(isA(ReplyApprovedEvent.class));
+        var unapproved = createReply(false, null);
+        unapproved.getMetadata().setFinalizers(new HashSet<>(Set.of(ReplyReconciler.FINALIZER_NAME)));
+        when(client.fetch(eq(Reply.class), eq("fake-reply"))).thenReturn(Optional.of(unapproved));
+        replyReconciler.reconcile(new Reconciler.Request("fake-reply"));
+
+        var reapproved = createReply(true, null);
+        reapproved.getMetadata().setFinalizers(new HashSet<>(Set.of(ReplyReconciler.FINALIZER_NAME)));
+        when(client.fetch(eq(Reply.class), eq("fake-reply"))).thenReturn(Optional.of(reapproved));
+        replyReconciler.reconcile(new Reconciler.Request("fake-reply"));
+
+        assertThat(legacyApproved.getMetadata().getAnnotations()).doesNotContainKey(ReplyReconciler.NOTIFICATION_ANNO);
+        assertThat(unapproved.getMetadata().getAnnotations()).doesNotContainKey(ReplyReconciler.NOTIFICATION_ANNO);
+        assertThat(reapproved.getMetadata().getAnnotations()).doesNotContainKey(ReplyReconciler.NOTIFICATION_ANNO);
+        verify(eventPublisher, never()).publishEvent(isA(ReplyApprovedEvent.class));
     }
 
     private Reply createReply(boolean approved, String notificationStatus) {
