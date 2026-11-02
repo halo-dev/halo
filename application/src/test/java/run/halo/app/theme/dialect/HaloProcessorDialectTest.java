@@ -273,7 +273,6 @@ class HaloProcessorDialectTest {
             """);
     }
 
-
     @Test
     void faviconAndIndexSeoShouldEscapeAttributeValues() {
         Context context = getContext();
@@ -295,7 +294,8 @@ class HaloProcessorDialectTest {
         assertThat(result).contains("&lt;script&gt;");
         assertThat(result).contains("content=\"K1&quot;/&gt;&lt;script&gt;alert(1)&lt;/script&gt;\"");
         assertThat(result).contains("content=\"desc&quot;/&gt;&lt;img src=x onerror=alert(1)&gt;\"");
-        assertThat(result).contains("href=\"https://example.com/a.ico&quot;/&gt;&lt;script&gt;alert(1)&lt;/script&gt;\"");
+        assertThat(result)
+                .contains("href=\"https://example.com/a.ico&quot;/&gt;&lt;script&gt;alert(1)&lt;/script&gt;\"");
     }
 
     @Nested
