@@ -33,9 +33,9 @@ public class ReplyReconciler implements Reconciler<Reconciler.Request> {
     protected static final String FINALIZER_NAME = "reply-protection";
 
     /**
-     * Annotation recording the notification state of a reply. A missing value means the reply was created before this
-     * annotation was introduced. Such replies were already notified on creation by the previous behavior, regardless of
-     * their approval state, so they are treated as already notified and will never be notified again.
+     * Annotation recording the notification state of a reply. A missing value is treated as already notified: replies
+     * created before this annotation was introduced were notified on creation by the previous behavior, regardless of
+     * their approval state.
      */
     static final String NOTIFICATION_ANNO = "content.halo.run/reply-notification";
 

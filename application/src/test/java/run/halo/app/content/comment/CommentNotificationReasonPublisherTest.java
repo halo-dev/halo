@@ -153,6 +153,17 @@ class CommentNotificationReasonPublisherTest {
         verify(client, never()).fetch(eq(Comment.class), anyString());
     }
 
+    @Test
+    void shouldNotPublishReasonWhenApprovedReplyWasGone() {
+        var eventReply = createReplyForApproval(true);
+        when(client.fetch(eq(Reply.class), eq("fake-reply"))).thenReturn(Optional.empty());
+
+        reasonPublisher.onReplyApproved(new ReplyApprovedEvent(this, eventReply));
+
+        verify(newReplyReasonPublisher, never()).publishReasonBy(any(), any());
+        verify(client, never()).fetch(eq(Comment.class), anyString());
+    }
+
     private static Reply createReplyForApproval(boolean approved) {
         var reply = new Reply();
         var metadata = new Metadata();

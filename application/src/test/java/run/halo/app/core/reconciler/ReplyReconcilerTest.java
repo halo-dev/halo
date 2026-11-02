@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -79,13 +80,23 @@ class ReplyReconcilerTest {
         var reply = createReply(true, ReplyReconciler.NOTIFICATION_PENDING);
         reply.getMetadata().setFinalizers(new HashSet<>(Set.of(ReplyReconciler.FINALIZER_NAME)));
         when(client.fetch(eq(Reply.class), eq("fake-reply"))).thenReturn(Optional.of(reply));
+        var markerAtUpdate = new AtomicReference<String>();
+        doAnswer(invocation -> {
+                    Reply updated = invocation.getArgument(0);
+                    markerAtUpdate.set(updated.getMetadata().getAnnotations().get(ReplyReconciler.NOTIFICATION_ANNO));
+                    return null;
+                })
+                .when(client)
+                .update(reply);
 
         replyReconciler.reconcile(new Reconciler.Request("fake-reply"));
 
         assertThat(reply.getMetadata().getAnnotations())
                 .containsEntry(ReplyReconciler.NOTIFICATION_ANNO, ReplyReconciler.NOTIFICATION_SENT);
-        verify(client).update(reply);
-        verify(eventPublisher).publishEvent(isA(ReplyApprovedEvent.class));
+        assertThat(markerAtUpdate).hasValue(ReplyReconciler.NOTIFICATION_SENT);
+        var inOrder = inOrder(client, eventPublisher);
+        inOrder.verify(client).update(reply);
+        inOrder.verify(eventPublisher).publishEvent(isA(ReplyApprovedEvent.class));
         verify(replyNotificationSubscriptionHelper, never()).subscribeNewReplyReasonForReply(any());
     }
 
