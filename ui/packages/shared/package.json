@@ -50,7 +50,7 @@
   },
   "inlinedDependencies": {
     "@formkit/core": "2.1.2",
-    "dayjs": "1.11.21",
+    "dayjs": "1.11.23",
     "mitt": "3.0.1",
     "uuid": "13.0.0"
   }
