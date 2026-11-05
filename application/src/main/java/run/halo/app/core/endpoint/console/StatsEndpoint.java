@@ -7,13 +7,12 @@ import static run.halo.app.extension.index.query.Queries.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
-import run.halo.app.core.extension.Counter;
+import run.halo.app.core.counter.CounterService;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
@@ -30,9 +29,11 @@ import run.halo.app.extension.ReactiveExtensionClient;
 public class StatsEndpoint implements CustomEndpoint {
 
     private final ReactiveExtensionClient client;
+    private final CounterService counterService;
 
-    public StatsEndpoint(ReactiveExtensionClient client) {
+    public StatsEndpoint(ReactiveExtensionClient client, CounterService counterService) {
         this.client = client;
+        this.counterService = counterService;
     }
 
     @Override
@@ -51,25 +52,13 @@ public class StatsEndpoint implements CustomEndpoint {
 
     Mono<ServerResponse> getStats(ServerRequest request) {
         var stats = DashboardStats.emptyStats();
-        Mono<Void> setFromCounters = client.listAll(
-                        Counter.class, ListOptions.builder().build(), Sort.unsorted())
-                .doOnNext(counter -> {
-                    var visit = counter.getVisit();
-                    if (visit != null) {
-                        stats.setVisits(stats.getVisits() + visit);
-                    }
-                    var totalComment = counter.getTotalComment();
-                    if (totalComment != null) {
-                        stats.setComments(stats.getComments() + totalComment);
-                    }
-                    var approvedComment = counter.getApprovedComment();
-                    if (approvedComment != null) {
-                        stats.setApprovedComments(stats.getApprovedComments() + approvedComment);
-                    }
-                    var upvote = counter.getUpvote();
-                    if (upvote != null) {
-                        stats.setUpvotes(stats.getUpvotes() + upvote);
-                    }
+        Mono<Void> setFromCounters = counterService
+                .getStats()
+                .doOnNext(counterStats -> {
+                    stats.setVisits(counterStats.visits());
+                    stats.setComments(counterStats.comments());
+                    stats.setApprovedComments(counterStats.approvedComments());
+                    stats.setUpvotes(counterStats.upvotes());
                 })
                 .then();
 
