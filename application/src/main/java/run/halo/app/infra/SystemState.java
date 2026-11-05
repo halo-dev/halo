@@ -15,6 +15,7 @@ import reactor.util.retry.Retry;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.infra.exception.DuplicateNameException;
 import run.halo.app.infra.utils.JsonParseException;
 import run.halo.app.infra.utils.JsonUtils;
 
@@ -31,6 +32,13 @@ public class SystemState {
     static final String GROUP = "states";
 
     private Boolean isSetup;
+
+    /**
+     * The username of the super administrator created during system setup.
+     *
+     * <p>It is used to resume an interrupted setup without creating another administrator.
+     */
+    private String setupUsername;
 
     /**
      * Deserialize from {@link ConfigMap}.
@@ -92,7 +100,9 @@ public class SystemState {
                             return client.update(configMap);
                         }))
                 .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
-                        .filter(OptimisticLockingFailureException.class::isInstance))
+                        .filter(t -> t instanceof OptimisticLockingFailureException
+                                // The config map may be created concurrently by another setup request.
+                                || t instanceof DuplicateNameException))
                 .then();
     }
 

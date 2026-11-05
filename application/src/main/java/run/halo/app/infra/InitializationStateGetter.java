@@ -11,16 +11,12 @@ import reactor.core.publisher.Mono;
 public interface InitializationStateGetter {
 
     /**
-     * Check if system user is initialized.
+     * Check if system setup is required.
      *
-     * @return <code>true</code> if system user is initialized, <code>false</code> otherwise.
-     */
-    Mono<Boolean> userInitialized();
-
-    /**
-     * Check if system basic data is initialized.
+     * <p>System setup is required if the system has never been set up, or if a previous setup was interrupted before it
+     * was completed.
      *
-     * @return <code>true</code> if system basic data is initialized, <code>false</code> otherwise.
+     * @return <code>true</code> if system setup is required, <code>false</code> otherwise.
      */
-    Mono<Boolean> dataInitialized();
+    Mono<Boolean> setupRequired();
 }
