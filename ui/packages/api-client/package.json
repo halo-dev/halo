@@ -45,7 +45,7 @@
     "prepublishOnly": "vp run build"
   },
   "dependencies": {
-    "qs": "^6.15.3"
+    "qs": "^6.16.1"
   },
   "devDependencies": {
     "@openapitools/openapi-generator-cli": "^2.40.1",

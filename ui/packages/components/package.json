@@ -61,7 +61,7 @@
     "eslint-plugin-storybook": "10.5.7",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "storybook": "^10.5.7",
+    "storybook": "^10.6.2",
     "vite": "catalog:",
     "vite-plus": "catalog:"
   },
