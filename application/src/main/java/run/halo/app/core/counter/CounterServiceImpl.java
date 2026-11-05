@@ -65,8 +65,9 @@ public class CounterServiceImpl implements CounterService {
 
     @Override
     public Mono<CounterStats> getStats() {
+        // Do not cancel the shared load when a subscriber is cancelled.
         return Mono.defer(() -> Mono.fromFuture(
-                statsCache.get(STATS_CACHE_KEY, (key, executor) -> loadStats().toFuture())));
+                statsCache.get(STATS_CACHE_KEY, (key, executor) -> loadStats().toFuture()), true));
     }
 
     private Mono<CounterStats> loadStats() {

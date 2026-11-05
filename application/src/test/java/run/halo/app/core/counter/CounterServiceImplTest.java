@@ -17,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Sort;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Sinks;
 import reactor.test.StepVerifier;
 import run.halo.app.core.extension.Counter;
 import run.halo.app.extension.ListOptions;
@@ -65,6 +66,30 @@ class CounterServiceImplTest {
         ticker.advance(Duration.ofSeconds(11));
         counterService.getStats().block();
         verify(client, times(2)).listAll(eq(Counter.class), any(ListOptions.class), eq(Sort.unsorted()));
+    }
+
+    @Test
+    void shouldNotCancelSharedStatsLoadWhenSubscriberCancels() {
+        Sinks.Many<Counter> counterSink = Sinks.many().unicast().onBackpressureBuffer();
+        when(client.listAll(eq(Counter.class), any(ListOptions.class), eq(Sort.unsorted())))
+                .thenReturn(counterSink.asFlux());
+
+        var subscription = counterService.getStats().subscribe();
+        subscription.dispose();
+
+        assertThat(counterSink.tryEmitNext(counter(1, 2, 3, 4))).isEqualTo(Sinks.EmitResult.OK);
+        assertThat(counterSink.tryEmitComplete()).isEqualTo(Sinks.EmitResult.OK);
+
+        StepVerifier.create(counterService.getStats())
+                .assertNext(stats -> {
+                    assertThat(stats.visits()).isEqualTo(1);
+                    assertThat(stats.comments()).isEqualTo(2);
+                    assertThat(stats.approvedComments()).isEqualTo(3);
+                    assertThat(stats.upvotes()).isEqualTo(4);
+                })
+                .verifyComplete();
+
+        verify(client, times(1)).listAll(eq(Counter.class), any(ListOptions.class), eq(Sort.unsorted()));
     }
 
     static Counter counter(Integer visit, Integer totalComment, Integer approvedComment, Integer upvote) {
