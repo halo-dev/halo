@@ -3,7 +3,6 @@ package run.halo.app.theme.finders.impl;
 import static run.halo.app.extension.index.query.Queries.*;
 
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Sort;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Counter;
 import run.halo.app.core.extension.content.Category;
@@ -31,7 +30,7 @@ public class SiteStatsFinderImpl implements SiteStatsFinder {
 
     @Override
     public Mono<SiteStatsVo> getStats() {
-        return client.listAll(Counter.class, new ListOptions(), Sort.unsorted())
+        return client.list(Counter.class, null, null)
                 .reduce(SiteStatsVo.empty(), (stats, counter) -> {
                     stats.setVisit(stats.getVisit() + counter.getVisit());
                     stats.setComment(stats.getComment() + counter.getApprovedComment());
