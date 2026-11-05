@@ -1,5 +1,6 @@
 package run.halo.app.core.reconciler;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -7,6 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.assertArg;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -52,6 +55,7 @@ import org.pf4j.PluginState;
 import org.pf4j.PluginWrapper;
 import org.pf4j.RuntimeMode;
 import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.data.domain.Sort;
 import reactor.core.scheduler.Schedulers;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.core.extension.ReverseProxy;
@@ -292,6 +296,39 @@ class PluginReconcilerTest {
             assertEquals(PluginReconciler.ConditionReason.REQUEST_TO_UNLOAD, condition.getReason());
             verify(pluginManager).unloadPlugin(name);
             verify(pluginManager, never()).loadPlugin(any(Path.class));
+        }
+
+        @Test
+        void shouldRemoveUnloadRequestLabelsFromDependentsAfterUnloading() {
+            var fakePlugin = createPlugin(name, plugin -> {
+                var spec = plugin.getSpec();
+                spec.setVersion("1.2.3");
+                spec.setEnabled(true);
+                plugin.getMetadata().setLabels(new HashMap<>(Map.of(REQUEST_TO_UNLOAD_LABEL, "parent-plugin")));
+            });
+
+            when(client.fetch(Plugin.class, name)).thenReturn(Optional.of(fakePlugin));
+            when(pluginManager.getPluginsRoots()).thenReturn(List.of(tempPath));
+            var pluginWrapper = mockPluginWrapper(PluginState.RESOLVED);
+            when(pluginManager.getPlugin(name)).thenReturn(pluginWrapper);
+            when(pluginManager.getResolvedPlugins()).thenReturn(List.of(pluginWrapper));
+
+            var dependent = createPlugin(
+                    "dependent-plugin",
+                    plugin -> plugin.getMetadata().setLabels(new HashMap<>(Map.of(REQUEST_TO_UNLOAD_LABEL, name))));
+            when(client.listAll(
+                            eq(Plugin.class),
+                            assertArg(options -> assertThat(
+                                            options.getLabelSelector().toString())
+                                    .isEqualTo("metadata.labels['plugin.halo.run/request-to-unload'] = 'fake-plugin'")),
+                            eq(Sort.unsorted())))
+                    .thenReturn(List.of(dependent));
+
+            var result = reconciler.reconcile(new Request(name));
+
+            assertFalse(result.reEnqueue());
+            assertFalse(dependent.getMetadata().getLabels().containsKey(REQUEST_TO_UNLOAD_LABEL));
+            verify(client).update(dependent);
         }
 
         @Test
