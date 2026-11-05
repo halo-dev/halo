@@ -259,7 +259,7 @@ class ThemeServiceImplTest {
             return Mono.just(argument);
         });
 
-        when(client.list(eq(AnnotationSetting.class), any(), eq(null))).thenReturn(Flux.empty());
+        when(client.listAll(eq(AnnotationSetting.class), any(), any())).thenReturn(Flux.empty());
 
         themeService
                 .reloadTheme("fake-theme")
@@ -323,7 +323,7 @@ class ThemeServiceImplTest {
             return Mono.just(argument);
         });
 
-        when(client.list(eq(AnnotationSetting.class), any(), eq(null))).thenReturn(Flux.empty());
+        when(client.listAll(eq(AnnotationSetting.class), any(), any())).thenReturn(Flux.empty());
 
         themeService
                 .reloadTheme("fake-theme")

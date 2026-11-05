@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.fn.builders.operation.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.codec.multipart.Part;
@@ -38,7 +39,9 @@ import run.halo.app.core.extension.Theme;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.core.user.service.SettingConfigService;
 import run.halo.app.extension.ConfigMap;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
+import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.IListRequest;
 import run.halo.app.infra.ReactiveUrlDataBufferFetcher;
@@ -414,7 +417,8 @@ public class ThemeEndpoint implements CustomEndpoint {
                     if (query.getUninstalled()) {
                         return listUninstalled(query);
                     }
-                    return client.list(Theme.class, null, null, query.getPage(), query.getSize());
+                    return client.listBy(
+                            Theme.class, new ListOptions(), PageRequestImpl.of(query.getPage(), query.getSize()));
                 })
                 .flatMap(extensions -> ServerResponse.ok().bodyValue(extensions));
     }
@@ -484,8 +488,7 @@ public class ThemeEndpoint implements CustomEndpoint {
     }
 
     private Mono<List<Theme>> filterUnInstalledThemes(List<Theme> allThemes) {
-        return client.list(Theme.class, null, null)
-                .map(theme -> theme.getMetadata().getName())
+        return client.listAllNames(Theme.class, new ListOptions(), Sort.unsorted())
                 .collectList()
                 .map(installed -> allThemes.stream()
                         .filter(theme -> !installed.contains(theme.getMetadata().getName()))
