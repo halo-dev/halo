@@ -26,6 +26,7 @@ import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.ResourceUtils;
@@ -40,7 +41,7 @@ import run.halo.app.core.extension.AnnotationSetting;
 import run.halo.app.core.extension.Setting;
 import run.halo.app.core.extension.Theme;
 import run.halo.app.extension.ConfigMap;
-import run.halo.app.extension.MetadataUtil;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Unstructured;
 import run.halo.app.infra.SystemConfigFetcher;
@@ -296,13 +297,12 @@ public class ThemeServiceImpl implements ThemeService {
     }
 
     private Mono<Void> waitForAnnotationSettingsDeleted(String themeName) {
-        return client.list(
-                        AnnotationSetting.class,
-                        annotationSetting -> {
-                            Map<String, String> labels = MetadataUtil.nullSafeLabels(annotationSetting);
-                            return StringUtils.equals(themeName, labels.get(Theme.THEME_NAME_LABEL));
-                        },
-                        null)
+        var listOptions = ListOptions.builder()
+                .labelSelector()
+                .eq(Theme.THEME_NAME_LABEL, themeName)
+                .end()
+                .build();
+        return client.listAll(AnnotationSetting.class, listOptions, Sort.unsorted())
                 .flatMap(annotationSetting -> client.delete(annotationSetting)
                         .flatMap(deleted -> client.fetch(
                                         AnnotationSetting.class,

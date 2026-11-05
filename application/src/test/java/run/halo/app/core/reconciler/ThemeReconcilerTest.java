@@ -137,7 +137,7 @@ class ThemeReconcilerTest {
         verify(extensionClient, times(1)).fetch(eq(Theme.class), eq(metadata.getName()));
         verify(extensionClient, times(2)).fetch(eq(Setting.class), eq(themeSpec.getSettingName()));
 
-        verify(extensionClient, times(2)).list(eq(AnnotationSetting.class), any(), any());
+        verify(extensionClient, times(2)).listAll(eq(AnnotationSetting.class), any(), any());
 
         assertThat(Files.exists(testWorkDir)).isTrue();
         assertThat(Files.exists(defaultThemePath)).isFalse();
@@ -174,7 +174,7 @@ class ThemeReconcilerTest {
                     return Optional.empty();
                 });
 
-        when(extensionClient.list(eq(AnnotationSetting.class), any(), eq(null)))
+        when(extensionClient.listAll(eq(AnnotationSetting.class), any(), any()))
                 .thenAnswer((Answer<List<AnnotationSetting>>) invocation -> {
                     retryFlags[1]++;
                     // retry 2 times
@@ -189,7 +189,7 @@ class ThemeReconcilerTest {
         String settingName = theme.getSpec().getSettingName();
         verify(extensionClient, times(1)).fetch(eq(Theme.class), eq(metadata.getName()));
         verify(extensionClient, times(3)).fetch(eq(Setting.class), eq(settingName));
-        verify(extensionClient, times(3)).list(eq(AnnotationSetting.class), any(), eq(null));
+        verify(extensionClient, times(3)).listAll(eq(AnnotationSetting.class), any(), any());
         verify(templateEngineManager).clearCache(eq(metadata.getName()));
     }
 

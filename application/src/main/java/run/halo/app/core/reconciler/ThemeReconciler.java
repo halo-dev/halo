@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.retry.RetryException;
 import org.springframework.core.retry.RetryPolicy;
 import org.springframework.core.retry.RetryTemplate;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.FileSystemUtils;
@@ -34,7 +35,7 @@ import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.Extension;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.GroupVersionKind;
-import run.halo.app.extension.MetadataUtil;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.Unstructured;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
@@ -270,13 +271,12 @@ class ThemeReconciler implements Reconciler<Request> {
     }
 
     private List<AnnotationSetting> listAnnotationSettingsByThemeName(String themeName) {
-        return client.list(
-                AnnotationSetting.class,
-                annotationSetting -> {
-                    Map<String, String> labels = MetadataUtil.nullSafeLabels(annotationSetting);
-                    return themeName.equals(labels.get(Theme.THEME_NAME_LABEL));
-                },
-                null);
+        var listOptions = ListOptions.builder()
+                .labelSelector()
+                .eq(Theme.THEME_NAME_LABEL, themeName)
+                .end()
+                .build();
+        return client.listAll(AnnotationSetting.class, listOptions, Sort.unsorted());
     }
 
     private void deleteThemeFiles(Theme theme) {
