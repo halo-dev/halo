@@ -9,6 +9,7 @@ import static run.halo.app.extension.index.query.Queries.lessThan;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -39,14 +40,24 @@ public class TransientEmailSubscriptionCleanupTask {
     // Retained across scheduled runs so permanently protected records cannot starve the tail.
     private volatile String nameCursor;
 
+    private final AtomicBoolean running = new AtomicBoolean();
+
     private final ReactiveExtensionClient client;
     private final TransientEmailNotificationCoordinator coordinator;
 
     /** The cron can be set to {@code -} to disable cleanup. Publication must use the same Halo instance. */
     @Scheduled(cron = "${halo.notification.transient-email-cleanup-cron:0 30 3 * * ?}")
-    public void cleanUp() {
-        var deleted = cleanUpSubscriptions().block();
-        log.info("Deleted {} unused transient email subscription(s)", deleted);
+    public Mono<Void> cleanUp() {
+        return Mono.defer(() -> {
+            // Reactive cron triggers can overlap; only one scan may advance the shared cursor.
+            if (!running.compareAndSet(false, true)) {
+                return Mono.empty();
+            }
+            return cleanUpSubscriptions()
+                    .doOnNext(deleted -> log.info("Deleted {} unused transient email subscription(s)", deleted))
+                    .then()
+                    .doFinally(signal -> running.set(false));
+        });
     }
 
     Mono<Long> cleanUpSubscriptions() {

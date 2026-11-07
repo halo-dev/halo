@@ -71,7 +71,7 @@ import tools.jackson.databind.json.JsonMapper;
         })
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DirtiesContext
-class TransientEmailSubscriptionEndToEndTest {
+class TransientEmailSubscriptionEndToEndIntegrationTest {
     private static final String PASSWORD = "E2ePass2026x!";
     private static final String USER_API = "/apis/api.console.halo.run/v1alpha1/users/-";
 
@@ -231,7 +231,7 @@ class TransientEmailSubscriptionEndToEndTest {
                 .name(subscriber.getName())
                 .build());
         var permanent = notificationCenter.subscribe(subscriber, reason).block();
-        cleanup.cleanUp();
+        cleanup.cleanUp().block(Duration.ofSeconds(30));
         assertThat(client.get(Subscription.class, permanent.getMetadata().getName())
                         .block()
                         .getMetadata()
@@ -271,7 +271,7 @@ class TransientEmailSubscriptionEndToEndTest {
                     200);
             until(() -> pendingReasons("email-verification", email) == 1);
             var oldName = subscriptions("email-verification", email).getFirst();
-            cleanup.cleanUp();
+            cleanup.cleanUp().block(Duration.ofSeconds(30));
             assertThat(subscriptions("email-verification", email)).containsExactly(oldName);
             status(
                     new Browser("e2e-delayed-b", PASSWORD)
@@ -280,7 +280,7 @@ class TransientEmailSubscriptionEndToEndTest {
             until(() -> pendingReasons("email-verification", email) == 2);
             var newName = subscriptions("email-verification", email).getFirst();
             assertThat(newName).isNotEqualTo(oldName);
-            cleanup.cleanUp();
+            cleanup.cleanUp().block(Duration.ofSeconds(30));
             assertThat(subscriptions("email-verification", email)).containsExactly(newName);
         } finally {
             controllers.start();
@@ -294,7 +294,7 @@ class TransientEmailSubscriptionEndToEndTest {
         until(() -> pendingReasons(reasonType, email) == 0);
         var names = subscriptions(reasonType, email);
         assertThat(names).isNotEmpty();
-        cleanup.cleanUp();
+        cleanup.cleanUp().block(Duration.ofSeconds(30));
         until(() -> names.stream()
                 .allMatch(name ->
                         client.fetch(Subscription.class, name).blockOptional().isEmpty()));

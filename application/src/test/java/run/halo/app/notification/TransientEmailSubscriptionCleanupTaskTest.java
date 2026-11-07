@@ -45,6 +45,50 @@ class TransientEmailSubscriptionCleanupTaskTest {
         when(client.fetch(Subscription.class, "old")).thenAnswer(ignored -> Mono.just(subscription));
     }
 
+    @Test
+    void scheduledPublisherDefersAndRepeatsCleanupOnEachSubscription() {
+        when(client.listTopNames(eq(Subscription.class), any(), any(), anyInt()))
+                .thenReturn(Flux.empty());
+
+        var cleanup = task.cleanUp();
+        verifyNoInteractions(client);
+
+        StepVerifier.create(cleanup).verifyComplete();
+        StepVerifier.create(cleanup).verifyComplete();
+        verify(client, times(2)).listTopNames(eq(Subscription.class), any(), any(), anyInt());
+    }
+
+    @Test
+    void skipsOverlappingTriggersAndResumesAfterCancellation() {
+        when(client.listTopNames(eq(Subscription.class), any(), any(), anyInt()))
+                .thenReturn(Flux.never(), Flux.empty());
+        var cleanup = task.cleanUp();
+        var active = cleanup.subscribe();
+        try {
+            StepVerifier.create(cleanup).verifyComplete();
+            verify(client).listTopNames(eq(Subscription.class), any(), any(), anyInt());
+        } finally {
+            active.dispose();
+        }
+
+        StepVerifier.create(cleanup).verifyComplete();
+        verify(client, times(2)).listTopNames(eq(Subscription.class), any(), any(), anyInt());
+    }
+
+    @Test
+    void resumesScheduledCleanupAfterFailure() {
+        var failure = new IllegalStateException("list failed");
+        when(client.listTopNames(eq(Subscription.class), any(), any(), anyInt()))
+                .thenReturn(Flux.error(failure), Flux.empty());
+        var cleanup = task.cleanUp();
+
+        StepVerifier.create(cleanup)
+                .expectErrorSatisfies(error -> assertThat(error).isSameAs(failure))
+                .verify();
+        StepVerifier.create(cleanup).verifyComplete();
+        verify(client, times(2)).listTopNames(eq(Subscription.class), any(), any(), anyInt());
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {"email-verification", "login-email-code", "sudo-email-code", "reset-password-by-email"})
     void preservesSubscriptionAcrossDelayedConsumptionAndReasonRetries(String reasonType) {

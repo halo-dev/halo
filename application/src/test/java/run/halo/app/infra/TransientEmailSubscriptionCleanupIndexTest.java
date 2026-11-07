@@ -109,12 +109,12 @@ class TransientEmailSubscriptionCleanupIndexTest {
                     }));
             var task = new TransientEmailSubscriptionCleanupTask(client, new TransientEmailNotificationCoordinator());
 
-            task.cleanUp();
+            task.cleanUp().block(Duration.ofSeconds(30));
             assertThat(deleted).containsExactly("unused");
 
             active.getMetadata().setDeletionTimestamp(Instant.now());
             engine.update(List.of(active));
-            task.cleanUp();
+            task.cleanUp().block(Duration.ofSeconds(30));
             assertThat(deleted).containsExactly("unused", "pending");
             // Both matching and unrelated subjects must avoid global Reason index queries.
             verify(reasonIndices, never()).getIndex("metadata.deletionTimestamp");
