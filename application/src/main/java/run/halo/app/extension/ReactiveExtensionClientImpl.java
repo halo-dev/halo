@@ -34,6 +34,8 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
 
     public static final int GENERATE_NAME_RANDOM_LENGTH = 8;
 
+    private static final int LIST_ALL_BATCH_SIZE = 1000;
+
     private final ReactiveExtensionStoreClient client;
 
     private final ExtensionConverter converter;
@@ -133,8 +135,10 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
                         }
                     }
                     long startTimeMs = System.currentTimeMillis();
-                    return client.listByNames(storeNames)
-                            .map(extensionStore -> converter.convertFrom(type, extensionStore))
+                    return Flux.fromIterable(storeNames)
+                            .buffer(LIST_ALL_BATCH_SIZE)
+                            .concatMap(batch -> client.listByNames(batch)
+                                    .map(extensionStore -> converter.convertFrom(type, extensionStore)))
                             .doOnComplete(() -> log.debug(
                                     "Successfully retrieved all by names from db for {} in {}ms",
                                     scheme.groupVersionKind(),
