@@ -11,7 +11,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -50,8 +49,8 @@ class TransientEmailSubscriptionCleanupTaskTest {
     @ValueSource(strings = {"email-verification", "login-email-code", "sudo-email-code", "reset-password-by-email"})
     void preservesSubscriptionAcrossDelayedConsumptionAndReasonRetries(String reasonType) {
         subscription.getSpec().getReason().setReasonType(reasonType);
-        when(client.listTopNames(eq(Reason.class), any(), any(), eq(1)))
-                .thenReturn(Flux.just("delayed-reason"), Flux.just("retrying-reason"), Flux.empty());
+        when(client.listAll(eq(Reason.class), any(), any()))
+                .thenReturn(Flux.just(pendingReason(reasonType)), Flux.just(pendingReason(reasonType)), Flux.empty());
         when(client.delete(subscription)).thenReturn(Mono.just(subscription));
 
         task.cleanUpSubscription("old", CUTOFF).as(StepVerifier::create).verifyComplete();
@@ -78,7 +77,7 @@ class TransientEmailSubscriptionCleanupTaskTest {
 
         task.cleanUpSubscription("old", CUTOFF).as(StepVerifier::create).verifyComplete();
 
-        verify(client, never()).listTopNames(any(), any(), any(), anyInt());
+        verify(client, never()).listAll(any(), any(), any());
         verify(client, never()).delete(any());
         publishing.tryEmitEmpty();
     }
@@ -87,7 +86,7 @@ class TransientEmailSubscriptionCleanupTaskTest {
     @ValueSource(strings = {"email-verification", "login-email-code", "sudo-email-code", "reset-password-by-email"})
     void waitsForExactOldInstanceDeletionBeforePublishingNewSubscription(String reasonType) {
         subscription.getSpec().getReason().setReasonType(reasonType);
-        when(client.listTopNames(eq(Reason.class), any(), any(), eq(1))).thenReturn(Flux.empty());
+        when(client.listAll(eq(Reason.class), any(), any())).thenReturn(Flux.empty());
         var deletion = Sinks.<Subscription>one();
         when(client.delete(subscription)).thenReturn(deletion.asMono());
         var cleanup = task.cleanUpSubscription("old", CUTOFF).subscribe();
@@ -121,7 +120,7 @@ class TransientEmailSubscriptionCleanupTaskTest {
         verify(client, never()).delete(any());
 
         when(client.fetch(Subscription.class, "old")).thenReturn(Mono.just(subscription));
-        when(client.listTopNames(eq(Reason.class), any(), any(), eq(1))).thenReturn(Flux.empty());
+        when(client.listAll(eq(Reason.class), any(), any())).thenReturn(Flux.empty());
         when(client.delete(subscription)).thenReturn(Mono.error(new OptimisticLockingFailureException("changed")));
         task.cleanUpSubscription("old", CUTOFF).as(StepVerifier::create).verifyComplete();
         verify(client, times(1)).delete(subscription);
@@ -129,7 +128,7 @@ class TransientEmailSubscriptionCleanupTaskTest {
 
     @Test
     void failsClosedWhenPendingReasonLookupFails() {
-        when(client.listTopNames(eq(Reason.class), any(), any(), eq(1)))
+        when(client.listAll(eq(Reason.class), any(), any()))
                 .thenReturn(Flux.error(new IllegalStateException("index unavailable")));
         task.cleanUpSubscription("old", CUTOFF).as(StepVerifier::create).verifyComplete();
         verify(client, never()).delete(any());
@@ -140,7 +139,7 @@ class TransientEmailSubscriptionCleanupTaskTest {
         var changed = subscription("old");
         changed.getSpec().getReason().setReasonType("login-email-code");
         when(client.fetch(Subscription.class, "old")).thenReturn(Mono.just(subscription), Mono.just(changed));
-        when(client.listTopNames(eq(Reason.class), any(), any(), eq(1))).thenReturn(Flux.empty());
+        when(client.listAll(eq(Reason.class), any(), any())).thenReturn(Flux.empty());
         when(client.delete(any(Subscription.class))).thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
 
         task.cleanUpSubscription("old", CUTOFF).as(StepVerifier::create).verifyComplete();
@@ -185,7 +184,7 @@ class TransientEmailSubscriptionCleanupTaskTest {
                     ReflectionTestUtils.getField(sender, "requestQueue");
             assertThat(queue).isNotNull();
             var item = queue.peek().getEntry();
-            when(client.listTopNames(eq(Reason.class), any(), any(), eq(1))).thenReturn(Flux.empty());
+            when(client.listAll(eq(Reason.class), any(), any())).thenReturn(Flux.empty());
             when(client.delete(subscription)).thenReturn(Mono.just(subscription));
             task.cleanUpSubscription("old", CUTOFF).block();
             when(client.fetch(Subscription.class, "old")).thenReturn(Mono.empty());
@@ -222,27 +221,17 @@ class TransientEmailSubscriptionCleanupTaskTest {
             change.accept(subscription);
             task.cleanUpSubscription("old", CUTOFF).as(StepVerifier::create).verifyComplete();
         }
-        verify(client, never()).listTopNames(any(), any(), any(), anyInt());
+        verify(client, never()).listAll(any(), any(), any());
         verify(client, never()).delete(any());
     }
 
-    @Test
-    void snapshotsNamesAndContinuesPastProtectedRecordsWithoutOffsetPagination() {
-        var names = IntStream.range(0, 205).mapToObj(i -> "subscription-" + i).toList();
-        when(client.listAllNames(eq(Subscription.class), any(), any())).thenReturn(Flux.fromIterable(names));
-        when(client.fetch(eq(Subscription.class), anyString()))
-                .thenAnswer(invocation -> Mono.just(subscription(invocation.getArgument(1))));
-        when(client.listTopNames(eq(Reason.class), any(), any(), eq(1))).thenReturn(Flux.just("pending"), Flux.empty());
-        when(client.delete(any(Subscription.class))).thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
-
-        StepVerifier.withVirtualTime(task::cleanUpSubscriptions)
-                .thenAwait(Duration.ofSeconds(5))
-                .expectNext(204L)
-                .verifyComplete();
-
-        verify(client, times(1)).listAllNames(eq(Subscription.class), any(), any());
-        verify(client, times(204)).delete(any(Subscription.class));
-        verify(client, never()).listBy(any(), any(), any());
+    private static Reason pendingReason(String reasonType) {
+        var reason = new Reason();
+        reason.setMetadata(new Metadata());
+        var spec = new Reason.Spec();
+        spec.setReasonType(reasonType);
+        reason.setSpec(spec);
+        return reason;
     }
 
     static Subscription subscription(String name) {

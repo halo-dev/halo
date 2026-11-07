@@ -1,6 +1,7 @@
 package run.halo.app.notification;
 
 import static run.halo.app.extension.index.query.Queries.equal;
+import static run.halo.app.extension.index.query.Queries.greaterThan;
 import static run.halo.app.extension.index.query.Queries.in;
 import static run.halo.app.extension.index.query.Queries.isNull;
 import static run.halo.app.extension.index.query.Queries.lessThan;
@@ -33,32 +34,54 @@ public class TransientEmailSubscriptionCleanupTask {
     private static final Set<String> REASON_TYPES =
             Set.of("email-verification", "login-email-code", "sudo-email-code", "reset-password-by-email");
 
+    private static final int BATCH_SIZE = 1000;
+
+    // Retained across scheduled runs so permanently protected records cannot starve the tail.
+    private volatile String nameCursor;
+
     private final ReactiveExtensionClient client;
     private final TransientEmailNotificationCoordinator coordinator;
 
     /** The cron can be set to {@code -} to disable cleanup. Publication must use the same Halo instance. */
     @Scheduled(cron = "${halo.notification.transient-email-cleanup-cron:0 30 3 * * ?}")
     public void cleanUp() {
-        var deleted = cleanUpSubscriptions().block(Duration.ofMinutes(10));
+        var deleted = cleanUpSubscriptions().block();
         log.info("Deleted {} unused transient email subscription(s)", deleted);
     }
 
     Mono<Long> cleanUpSubscriptions() {
         return Mono.defer(() -> {
             var cutoff = Instant.now();
-            var options = ListOptions.builder()
-                    .andQuery(in("spec.reason.reasonType", REASON_TYPES))
-                    .andQuery(isNull("metadata.deletionTimestamp"))
-                    .andQuery(lessThan("metadata.creationTimestamp", cutoff))
-                    .build();
-            // Snapshot names before deleting: offset pagination over a shrinking result would skip records.
-            return client.listAllNames(
-                            Subscription.class, options, Sort.by("metadata.creationTimestamp", "metadata.name"))
-                    .collectList()
-                    .flatMapMany(Flux::fromIterable)
-                    .concatMap(name -> cleanUpSubscription(name, cutoff).delaySubscription(Duration.ofMillis(10)), 1)
+            return Flux.defer(() -> cleanUpBatch(cutoff))
+                    .repeat(() -> nameCursor != null)
+                    .take(Duration.ofMinutes(10))
                     .count();
         });
+    }
+
+    private Flux<Subscription> cleanUpBatch(Instant cutoff) {
+        var builder = ListOptions.builder()
+                .andQuery(in("spec.reason.reasonType", REASON_TYPES))
+                .andQuery(isNull("metadata.deletionTimestamp"))
+                .andQuery(lessThan("metadata.creationTimestamp", cutoff));
+        if (nameCursor != null) {
+            builder.andQuery(greaterThan("metadata.name", nameCursor));
+        }
+        // Snapshot each batch before deleting; keyset pagination also advances past protected records.
+        return client.listTopNames(Subscription.class, builder.build(), Sort.by("metadata.name"), BATCH_SIZE)
+                .collectList()
+                .flatMapMany(names -> {
+                    if (names.isEmpty()) {
+                        nameCursor = null;
+                        return Flux.empty();
+                    }
+                    return Flux.fromIterable(names)
+                            .concatMap(
+                                    name -> cleanUpSubscription(name, cutoff)
+                                            .delaySubscription(Duration.ofMillis(10))
+                                            .doOnSuccess(ignored -> nameCursor = name),
+                                    1);
+                });
     }
 
     Mono<Subscription> cleanUpSubscription(String name, Instant cutoff) {
@@ -89,15 +112,20 @@ public class TransientEmailSubscriptionCleanupTask {
     }
 
     private Mono<Boolean> hasPendingReason(Subscription subscription) {
+        // Only retrieve this subject's Reasons. Combining global type/deletion indexes would
+        // copy their entire matching sets for every candidate, even with a top-N limit.
         var options = ListOptions.builder()
-                .andQuery(isNull("metadata.deletionTimestamp"))
-                .andQuery(equal(
-                        "spec.reasonType", subscription.getSpec().getReason().getReasonType()))
                 .andQuery(equal(
                         "spec.subject",
                         subscription.getSpec().getReason().getSubject().toString()))
                 .build();
-        return client.listTopNames(Reason.class, options, Sort.unsorted(), 1).hasElements();
+        return client.listAll(Reason.class, options, Sort.unsorted())
+                .any(reason -> reason.getMetadata().getDeletionTimestamp() == null
+                        && subscription
+                                .getSpec()
+                                .getReason()
+                                .getReasonType()
+                                .equals(reason.getSpec().getReasonType()));
     }
 
     private boolean isCandidate(Subscription subscription, Instant cutoff) {
