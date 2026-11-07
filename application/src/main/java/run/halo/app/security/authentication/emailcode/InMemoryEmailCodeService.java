@@ -19,6 +19,7 @@ import run.halo.app.core.user.service.UserService;
 import run.halo.app.extension.GroupVersion;
 import run.halo.app.notification.NotificationCenter;
 import run.halo.app.notification.NotificationReasonEmitter;
+import run.halo.app.notification.TransientEmailNotificationCoordinator;
 import run.halo.app.notification.UserIdentity;
 
 /**
@@ -53,12 +54,17 @@ public class InMemoryEmailCodeService implements EmailCodeService {
     private final UserService userService;
     private final NotificationReasonEmitter reasonEmitter;
     private final NotificationCenter notificationCenter;
+    private final TransientEmailNotificationCoordinator notificationCoordinator;
 
     public InMemoryEmailCodeService(
-            UserService userService, NotificationReasonEmitter reasonEmitter, NotificationCenter notificationCenter) {
+            UserService userService,
+            NotificationReasonEmitter reasonEmitter,
+            NotificationCenter notificationCenter,
+            TransientEmailNotificationCoordinator notificationCoordinator) {
         this.userService = userService;
         this.reasonEmitter = reasonEmitter;
         this.notificationCenter = notificationCenter;
+        this.notificationCoordinator = notificationCoordinator;
     }
 
     void setClock(Clock clock) {
@@ -98,6 +104,13 @@ public class InMemoryEmailCodeService implements EmailCodeService {
     }
 
     Mono<Void> sendLoginCodeNotification(String username, String email) {
+        return notificationCoordinator.publish(
+                LOGIN_EMAIL_CODE_REASON_TYPE,
+                UserIdentity.anonymousWithEmail(email).name(),
+                () -> publishLoginCodeNotification(username, email));
+    }
+
+    private Mono<Void> publishLoginCodeNotification(String username, String email) {
         var key = email.toLowerCase();
         return Mono.fromCallable(() -> {
                     var code = RandomStringUtils.secure().nextNumeric(CODE_LENGTH);

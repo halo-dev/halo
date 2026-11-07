@@ -11,6 +11,7 @@ import run.halo.app.core.extension.notification.Subscription;
 import run.halo.app.extension.GroupVersion;
 import run.halo.app.notification.NotificationCenter;
 import run.halo.app.notification.NotificationReasonEmitter;
+import run.halo.app.notification.TransientEmailNotificationCoordinator;
 import run.halo.app.notification.UserIdentity;
 
 /**
@@ -30,14 +31,17 @@ class EmailSudoVerificationProvider implements SudoVerificationProvider {
     private final InMemorySudoCodeStore codeStore;
     private final NotificationReasonEmitter reasonEmitter;
     private final NotificationCenter notificationCenter;
+    private final TransientEmailNotificationCoordinator notificationCoordinator;
 
     EmailSudoVerificationProvider(
             InMemorySudoCodeStore codeStore,
             NotificationReasonEmitter reasonEmitter,
-            NotificationCenter notificationCenter) {
+            NotificationCenter notificationCenter,
+            TransientEmailNotificationCoordinator notificationCoordinator) {
         this.codeStore = codeStore;
         this.reasonEmitter = reasonEmitter;
         this.notificationCenter = notificationCenter;
+        this.notificationCoordinator = notificationCoordinator;
     }
 
     @Override
@@ -65,7 +69,10 @@ class EmailSudoVerificationProvider implements SudoVerificationProvider {
     public Mono<Void> sendCode(User user) {
         var username = user.getMetadata().getName();
         var email = user.getSpec().getEmail();
-        return codeStore.generate(storeKey(username)).flatMap(code -> sendNotification(username, email, code));
+        return notificationCoordinator.publish(
+                SUDO_EMAIL_CODE_REASON_TYPE,
+                UserIdentity.anonymousWithEmail(email).name(),
+                () -> codeStore.generate(storeKey(username)).flatMap(code -> sendNotification(username, email, code)));
     }
 
     @Override
