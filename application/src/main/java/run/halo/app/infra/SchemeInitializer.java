@@ -557,7 +557,17 @@ class SchemeInitializer implements SmartLifecycle {
 
         // notification.halo.run
         schemeManager.register(ReasonType.class);
-        schemeManager.register(Reason.class);
+        schemeManager.register(Reason.class, indexSpecs -> {
+            indexSpecs.add(IndexSpecs.<Reason, String>single("spec.reasonType", String.class)
+                    .indexFunc(reason -> Optional.ofNullable(reason.getSpec())
+                            .map(Reason.Spec::getReasonType)
+                            .orElse(null)));
+            indexSpecs.add(IndexSpecs.<Reason, String>single("spec.subject", String.class)
+                    .indexFunc(reason -> Optional.ofNullable(reason.getSpec())
+                            .map(Reason.Spec::getSubject)
+                            .map(subject -> subject.getKind() + "#" + subject.getApiVersion() + "/" + subject.getName())
+                            .orElse(null)));
+        });
         schemeManager.register(NotificationTemplate.class, indexSpecs -> {
             indexSpecs.add(
                     IndexSpecs.<NotificationTemplate, String>single("spec.reasonSelector.reasonType", String.class)

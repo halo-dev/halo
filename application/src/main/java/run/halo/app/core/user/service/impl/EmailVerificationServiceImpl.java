@@ -27,6 +27,7 @@ import run.halo.app.infra.exception.EmailVerificationFailed;
 import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.notification.NotificationCenter;
 import run.halo.app.notification.NotificationReasonEmitter;
+import run.halo.app.notification.TransientEmailNotificationCoordinator;
 import run.halo.app.notification.UserIdentity;
 
 /**
@@ -47,6 +48,7 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
     private final ReactiveExtensionClient client;
     private final NotificationReasonEmitter reasonEmitter;
     private final NotificationCenter notificationCenter;
+    private final TransientEmailNotificationCoordinator notificationCoordinator;
 
     @Override
     public Mono<Void> sendVerificationCode(String username, String email) {
@@ -138,6 +140,13 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
     }
 
     Mono<Void> sendVerificationNotification(String username, String email) {
+        return notificationCoordinator.publish(
+                EMAIL_VERIFICATION_REASON_TYPE,
+                UserIdentity.anonymousWithEmail(email).name(),
+                () -> publishVerificationNotification(username, email));
+    }
+
+    private Mono<Void> publishVerificationNotification(String username, String email) {
         var code = emailVerificationManager.generateCode(username, email);
         if (log.isDebugEnabled()) {
             log.debug("Generated verification code for user '{}' and email '{}': {}", username, email, code);
