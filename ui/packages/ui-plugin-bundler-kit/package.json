@@ -34,7 +34,7 @@
     "@halo-dev/api-client": "workspace:*",
     "es-module-lexer": "^2.3.1",
     "exsolve": "^1.1.1",
-    "js-yaml": "^4.1.1",
+    "js-yaml": "^4.3.2",
     "pkg-types": "^2.3.1",
     "semver": "^7.8.5"
   },
