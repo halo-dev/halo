@@ -42,7 +42,7 @@
   },
   "devDependencies": {
     "dayjs": "^1.11.21",
-    "uuid": "^13.0.0"
+    "uuid": "^13.0.2"
   },
   "peerDependencies": {
     "vue": "^3.5.x",
@@ -52,6 +52,6 @@
     "@formkit/core": "2.1.2",
     "dayjs": "1.11.21",
     "mitt": "3.0.1",
-    "uuid": "13.0.0"
+    "uuid": "13.0.2"
   }
 }
