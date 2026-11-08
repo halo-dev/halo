@@ -13,6 +13,7 @@ import {
   VCard,
   VEmpty,
   VEntityContainer,
+  VFilterDropdown,
   VLoading,
   VPageHeader,
   VPagination,
@@ -334,14 +335,12 @@ watch(selectedPageNames, (newValue) => {
                 v-if="hasFilters"
                 @click="handleClearFilters"
               />
-              <FilterDropdown
+              <VFilterDropdown
                 v-model="selectedPublishStatus"
                 :label="$t('core.common.filters.labels.status')"
-                :items="[
-                  {
-                    label: t('core.common.filters.item_labels.all'),
-                    value: undefined,
-                  },
+                show-clear-option
+                :clear-label="t('core.common.filters.item_labels.all')"
+                :options="[
                   {
                     label: t('core.page.filters.status.items.published'),
                     value: 'true',
@@ -352,14 +351,12 @@ watch(selectedPageNames, (newValue) => {
                   },
                 ]"
               />
-              <FilterDropdown
+              <VFilterDropdown
                 v-model="selectedVisible"
                 :label="$t('core.page.filters.visible.label')"
-                :items="[
-                  {
-                    label: t('core.common.filters.item_labels.all'),
-                    value: undefined,
-                  },
+                show-clear-option
+                :clear-label="t('core.common.filters.item_labels.all')"
+                :options="[
                   {
                     label: t('core.page.filters.visible.items.public'),
                     value: 'PUBLIC',
@@ -376,13 +373,12 @@ watch(selectedPageNames, (newValue) => {
                   :label="$t('core.page.filters.author.label')"
                 />
               </HasPermission>
-              <FilterDropdown
+              <VFilterDropdown
                 v-model="selectedSort"
                 :label="$t('core.common.filters.labels.sort')"
-                :items="[
-                  {
-                    label: t('core.common.filters.item_labels.default'),
-                  },
+                show-clear-option
+                :clear-label="t('core.common.filters.item_labels.default')"
+                :options="[
                   {
                     label: t('core.page.filters.sort.items.publish_time_desc'),
                     value: 'publishTime,desc',

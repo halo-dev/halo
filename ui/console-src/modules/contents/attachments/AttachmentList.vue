@@ -17,6 +17,7 @@ import {
   VDropdownItem,
   VEmpty,
   VEntityContainer,
+  VFilterDropdown,
   VLoading,
   VPageHeader,
   VPagination,
@@ -332,28 +333,26 @@ watch(
                     v-if="hasFilters"
                     @click="handleClearFilters"
                   />
-                  <FilterDropdown
+                  <VFilterDropdown
                     v-model="selectedPolicy"
                     :label="$t('core.attachment.filters.storage_policy.label')"
-                    :items="[
-                      {
-                        label: t('core.common.filters.item_labels.all'),
-                      },
-                      ...(policies?.map((policy) => {
+                    show-clear-option
+                    :clear-label="t('core.common.filters.item_labels.all')"
+                    :options="
+                      policies?.map((policy) => {
                         return {
                           label: policy.spec.displayName,
                           value: policy.metadata.name,
                         };
-                      }) || []),
-                    ]"
+                      }) || []
+                    "
                   />
-                  <FilterDropdown
+                  <VFilterDropdown
                     v-model="selectedAccepts"
                     :label="$t('core.attachment.filters.accept.label')"
-                    :items="[
-                      {
-                        label: t('core.common.filters.item_labels.all'),
-                      },
+                    show-clear-option
+                    :clear-label="t('core.common.filters.item_labels.all')"
+                    :options="[
                       {
                         label: t('core.attachment.filters.accept.items.image'),
                         value: 'image/*',
@@ -378,13 +377,12 @@ watch(
                       :label="$t('core.attachment.filters.owner.label')"
                     />
                   </HasPermission>
-                  <FilterDropdown
+                  <VFilterDropdown
                     v-model="selectedSort"
                     :label="$t('core.common.filters.labels.sort')"
-                    :items="[
-                      {
-                        label: t('core.common.filters.item_labels.default'),
-                      },
+                    show-clear-option
+                    :clear-label="t('core.common.filters.item_labels.default')"
+                    :options="[
                       {
                         label: t(
                           'core.attachment.filters.sort.items.create_time_desc'

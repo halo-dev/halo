@@ -10,6 +10,7 @@ import {
   VCard,
   VEmpty,
   VEntityContainer,
+  VFilterDropdown,
   VLoading,
   VPageHeader,
   VPagination,
@@ -243,13 +244,12 @@ const handleApproveInBatch = async () => {
                 v-if="hasFilters"
                 @click="handleClearFilters"
               />
-              <FilterDropdown
+              <VFilterDropdown
                 v-model="selectedApprovedStatus"
                 :label="$t('core.common.filters.labels.status')"
-                :items="[
-                  {
-                    label: t('core.common.filters.item_labels.all'),
-                  },
+                show-clear-option
+                :clear-label="t('core.common.filters.item_labels.all')"
+                :options="[
                   {
                     label: t('core.comment.filters.status.items.approved'),
                     value: 'true',
@@ -268,13 +268,12 @@ const handleApproveInBatch = async () => {
                   :label="$t('core.comment.filters.owner.label')"
                 />
               </HasPermission>
-              <FilterDropdown
+              <VFilterDropdown
                 v-model="selectedSort"
                 :label="$t('core.common.filters.labels.sort')"
-                :items="[
-                  {
-                    label: t('core.common.filters.item_labels.default'),
-                  },
+                show-clear-option
+                :clear-label="t('core.common.filters.item_labels.default')"
+                :options="[
                   {
                     label: t(
                       'core.comment.filters.sort.items.last_reply_time_desc'

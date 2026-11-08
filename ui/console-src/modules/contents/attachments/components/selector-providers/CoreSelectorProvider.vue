@@ -14,6 +14,7 @@ import {
   VButton,
   VEmpty,
   VEntityContainer,
+  VFilterDropdown,
   VLoading,
   VPagination,
   VSpace,
@@ -217,13 +218,12 @@ function handleToggleUploadView() {
         <VSpace spacing="lg">
           <FilterCleanButton v-if="hasFilters" @click="handleClearFilters" />
 
-          <FilterDropdown
+          <VFilterDropdown
             v-model="selectedSort"
             :label="$t('core.common.filters.labels.sort')"
-            :items="[
-              {
-                label: t('core.common.filters.item_labels.default'),
-              },
+            show-clear-option
+            :clear-label="t('core.common.filters.item_labels.default')"
+            :options="[
               {
                 label: t('core.attachment.filters.sort.items.create_time_desc'),
                 value: 'metadata.creationTimestamp,desc',

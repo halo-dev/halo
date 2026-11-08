@@ -13,6 +13,7 @@ import {
   VCard,
   VEmpty,
   VEntityContainer,
+  VFilterDropdown,
   VLoading,
   VPageHeader,
   VPagination,
@@ -449,14 +450,12 @@ watch(
                 v-if="hasFilters"
                 @click="handleClearFilters"
               />
-              <FilterDropdown
+              <VFilterDropdown
                 v-model="selectedPublishStatus"
                 :label="$t('core.common.filters.labels.status')"
-                :items="[
-                  {
-                    label: t('core.common.filters.item_labels.all'),
-                    value: undefined,
-                  },
+                show-clear-option
+                :clear-label="t('core.common.filters.item_labels.all')"
+                :options="[
                   {
                     label: t('core.post.filters.status.items.published'),
                     value: `${postLabels.PUBLISHED}=true`,
@@ -471,14 +470,12 @@ watch(
                   },
                 ]"
               />
-              <FilterDropdown
+              <VFilterDropdown
                 v-model="selectedVisible"
                 :label="$t('core.post.filters.visible.label')"
-                :items="[
-                  {
-                    label: t('core.common.filters.item_labels.all'),
-                    value: undefined,
-                  },
+                show-clear-option
+                :clear-label="t('core.common.filters.item_labels.all')"
+                :options="[
                   {
                     label: t('core.post.filters.visible.items.public'),
                     value: 'PUBLIC',
@@ -503,13 +500,12 @@ watch(
                   :label="$t('core.post.filters.author.label')"
                 />
               </HasPermission>
-              <FilterDropdown
+              <VFilterDropdown
                 v-model="selectedSort"
                 :label="$t('core.common.filters.labels.sort')"
-                :items="[
-                  {
-                    label: t('core.common.filters.item_labels.default'),
-                  },
+                show-clear-option
+                :clear-label="t('core.common.filters.item_labels.default')"
+                :options="[
                   {
                     label: t('core.post.filters.sort.items.publish_time_desc'),
                     value: 'spec.publishTime,desc',

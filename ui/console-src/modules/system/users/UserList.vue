@@ -13,6 +13,7 @@ import {
   VCard,
   VEmpty,
   VEntityContainer,
+  VFilterDropdown,
   VLoading,
   VPageHeader,
   VPagination,
@@ -310,14 +311,13 @@ function onCreationModalClose() {
                 v-if="hasFilters"
                 @click="handleClearFilters"
               />
-              <FilterDropdown
+              <VFilterDropdown
                 v-model="selectedRoleValue"
                 :label="$t('core.user.filters.role.label')"
-                :items="[
-                  {
-                    label: t('core.common.filters.item_labels.all'),
-                  },
-                  ...(roles?.map((role) => {
+                show-clear-option
+                :clear-label="t('core.common.filters.item_labels.all')"
+                :options="
+                  roles?.map((role) => {
                     return {
                       label:
                         role.metadata.annotations?.[
@@ -325,16 +325,15 @@ function onCreationModalClose() {
                         ] || role.metadata.name,
                       value: role.metadata.name,
                     };
-                  }) || []),
-                ]"
+                  }) || []
+                "
               />
-              <FilterDropdown
+              <VFilterDropdown
                 v-model="selectedSortValue"
                 :label="$t('core.common.filters.labels.sort')"
-                :items="[
-                  {
-                    label: t('core.common.filters.item_labels.default'),
-                  },
+                show-clear-option
+                :clear-label="t('core.common.filters.item_labels.default')"
+                :options="[
                   {
                     label: t('core.user.filters.sort.items.create_time_desc'),
                     value: 'metadata.creationTimestamp,desc',

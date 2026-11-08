@@ -17,6 +17,7 @@ import {
   VDropdownItem,
   VEmpty,
   VEntityContainer,
+  VFilterDropdown,
   VLoading,
   VPageHeader,
   VSpace,
@@ -226,13 +227,12 @@ const { handleChangeStatusInBatch, handleUninstallInBatch } =
                 v-if="hasFilters"
                 @click="handleClearFilters"
               />
-              <FilterDropdown
+              <VFilterDropdown
                 v-model="selectedEnabledValue"
                 :label="$t('core.common.filters.labels.status')"
-                :items="[
-                  {
-                    label: t('core.common.filters.item_labels.all'),
-                  },
+                show-clear-option
+                :clear-label="t('core.common.filters.item_labels.all')"
+                :options="[
                   {
                     label: t('core.plugin.filters.status.items.active'),
                     value: 'true',
@@ -243,13 +243,12 @@ const { handleChangeStatusInBatch, handleUninstallInBatch } =
                   },
                 ]"
               />
-              <FilterDropdown
+              <VFilterDropdown
                 v-model="selectedSortValue"
                 :label="$t('core.common.filters.labels.sort')"
-                :items="[
-                  {
-                    label: t('core.common.filters.item_labels.default'),
-                  },
+                show-clear-option
+                :clear-label="t('core.common.filters.item_labels.default')"
+                :options="[
                   {
                     label: t('core.plugin.filters.sort.items.create_time_desc'),
                     value: 'creationTimestamp,desc',

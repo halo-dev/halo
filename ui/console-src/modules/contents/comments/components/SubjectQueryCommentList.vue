@@ -4,6 +4,7 @@ import {
   VButton,
   VEmpty,
   VEntityContainer,
+  VFilterDropdown,
   VLoading,
   VPagination,
   VSpace,
@@ -74,13 +75,12 @@ function handleClearFilters() {
       <SearchInput v-model="keyword" />
       <VSpace spacing="lg" class="flex-wrap">
         <FilterCleanButton v-if="hasFilters" @click="handleClearFilters" />
-        <FilterDropdown
+        <VFilterDropdown
           v-model="selectedApprovedStatus"
           :label="$t('core.common.filters.labels.status')"
-          :items="[
-            {
-              label: $t('core.common.filters.item_labels.all'),
-            },
+          show-clear-option
+          :clear-label="$t('core.common.filters.item_labels.all')"
+          :options="[
             {
               label: $t('core.comment.filters.status.items.approved'),
               value: 'true',
@@ -97,13 +97,12 @@ function handleClearFilters() {
             :label="$t('core.comment.filters.owner.label')"
           />
         </HasPermission>
-        <FilterDropdown
+        <VFilterDropdown
           v-model="selectedSort"
           :label="$t('core.common.filters.labels.sort')"
-          :items="[
-            {
-              label: $t('core.common.filters.item_labels.default'),
-            },
+          show-clear-option
+          :clear-label="$t('core.common.filters.item_labels.default')"
+          :options="[
             {
               label: $t('core.comment.filters.sort.items.last_reply_time_desc'),
               value: 'status.lastReplyTime,desc',

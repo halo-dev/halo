@@ -8,6 +8,7 @@ import {
   VCard,
   VEmpty,
   VEntityContainer,
+  VFilterDropdown,
   VLoading,
   VPageHeader,
   VPagination,
@@ -130,14 +131,12 @@ const {
                 v-if="hasFilters"
                 @click="handleClearFilters"
               />
-              <FilterDropdown
+              <VFilterDropdown
                 v-model="selectedPublishPhase"
                 :label="$t('core.common.filters.labels.status')"
-                :items="[
-                  {
-                    label: $t('core.common.filters.item_labels.all'),
-                    value: undefined,
-                  },
+                show-clear-option
+                :clear-label="$t('core.common.filters.item_labels.all')"
+                :options="[
                   {
                     label: $t('core.post.filters.status.items.published'),
                     value: 'PUBLISHED',
