@@ -9,13 +9,15 @@ import {
   VCard,
   VEmpty,
   VEntityContainer,
+  VFilterDropdown,
+  VFilterDropdownGroup,
   VLoading,
   VPageHeader,
   VPagination,
   VSpace,
 } from "@halo-dev/components";
 import { useRouteQuery } from "@vueuse/router";
-import { computed, onMounted, ref, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import TagEditingModal from "./components/TagEditingModal.vue";
 import TagListItem from "./components/TagListItem.vue";
@@ -37,14 +39,6 @@ const size = useRouteQuery<number>("size", 20, {
   transform: Number,
 });
 const selectedSort = useRouteQuery<string | undefined>("sort");
-
-const hasFilters = computed(() => {
-  return !!selectedSort.value;
-});
-
-const handleClearFilters = () => {
-  selectedSort.value = undefined;
-};
 
 const {
   tags,
@@ -201,47 +195,46 @@ watch(selectedTagNames, (newVal) => {
               <SearchInput v-else v-model="keyword" />
             </div>
             <VSpace spacing="lg" class="flex-wrap">
-              <FilterCleanButton
-                v-if="hasFilters"
-                @click="handleClearFilters"
-              />
-              <FilterDropdown
-                v-model="selectedSort"
-                :label="$t('core.common.filters.labels.sort')"
-                :items="[
-                  {
-                    label: t('core.common.filters.item_labels.default'),
-                  },
-                  {
-                    label: t(
-                      'core.post.tag.filters.sort.items.create_time_desc'
-                    ),
-                    value: 'metadata.creationTimestamp,desc',
-                  },
-                  {
-                    label: t(
-                      'core.post.tag.filters.sort.items.create_time_asc'
-                    ),
-                    value: 'metadata.creationTimestamp,asc',
-                  },
-                  {
-                    label: t(
-                      'core.post.tag.filters.sort.items.display_name_desc'
-                    ),
-                    value: 'spec.displayName,desc',
-                  },
-                  {
-                    label: t(
-                      'core.post.tag.filters.sort.items.display_name_asc'
-                    ),
-                    value: 'spec.displayName,asc',
-                  },
-                  {
-                    label: t('core.post.tag.filters.sort.items.post_desc'),
-                    value: 'status.postCount,desc',
-                  },
-                ]"
-              />
+              <VFilterDropdownGroup
+                :clear-label="$t('core.common.buttons.reset')"
+              >
+                <VFilterDropdown
+                  v-model="selectedSort"
+                  :label="$t('core.common.filters.labels.sort')"
+                  show-clear-option
+                  :clear-label="t('core.common.filters.item_labels.default')"
+                  :options="[
+                    {
+                      label: t(
+                        'core.post.tag.filters.sort.items.create_time_desc'
+                      ),
+                      value: 'metadata.creationTimestamp,desc',
+                    },
+                    {
+                      label: t(
+                        'core.post.tag.filters.sort.items.create_time_asc'
+                      ),
+                      value: 'metadata.creationTimestamp,asc',
+                    },
+                    {
+                      label: t(
+                        'core.post.tag.filters.sort.items.display_name_desc'
+                      ),
+                      value: 'spec.displayName,desc',
+                    },
+                    {
+                      label: t(
+                        'core.post.tag.filters.sort.items.display_name_asc'
+                      ),
+                      value: 'spec.displayName,asc',
+                    },
+                    {
+                      label: t('core.post.tag.filters.sort.items.post_desc'),
+                      value: 'status.postCount,desc',
+                    },
+                  ]"
+                />
+              </VFilterDropdownGroup>
               <div class="flex flex-row gap-2">
                 <button
                   v-tooltip="$t('core.common.buttons.refresh')"

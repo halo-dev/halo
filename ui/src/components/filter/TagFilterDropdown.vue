@@ -1,19 +1,14 @@
 <script lang="ts" setup>
-import PostTag from "@console/modules/contents/posts/tags/components/PostTag.vue";
 import { useAllPostTagsQuery } from "@console/modules/contents/posts/tags/composables/use-post-tag";
-import type { Tag } from "@halo-dev/api-client";
 import {
-  IconArrowDown,
-  VDropdown,
-  VEntity,
-  VEntityContainer,
-  VEntityField,
+  VFilterDropdown,
+  type FilterDropdownOption,
+  type FilterDropdownValue,
 } from "@halo-dev/components";
-import Fuse from "fuse.js";
-import { computed, ref, watch } from "vue";
-import { setFocus } from "@/formkit/utils/focus";
+import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     label: string;
     modelValue?: string;
@@ -27,116 +22,75 @@ const emit = defineEmits<{
   (event: "update:modelValue", value?: string): void;
 }>();
 
+const { t } = useI18n();
 const { data: tags } = useAllPostTagsQuery();
 
-const dropdown = ref();
+const tagMap = computed(() => {
+  return new Map(tags.value?.map((tag) => [tag.metadata.name, tag]));
+});
 
-const handleSelect = (tag: Tag) => {
-  if (tag.metadata.name === props.modelValue) {
-    emit("update:modelValue", undefined);
-  } else {
-    emit("update:modelValue", tag.metadata.name);
+const options = computed<FilterDropdownOption[]>(() => {
+  return (
+    tags.value?.map((tag) => ({
+      label: tag.spec.displayName,
+      value: tag.metadata.name,
+      description: tag.status?.permalink,
+      keywords: [tag.metadata.name],
+    })) || []
+  );
+});
+
+function getTag(option: FilterDropdownOption) {
+  if (option.value === undefined) {
+    return undefined;
   }
 
-  dropdown.value.hide();
-};
-
-function onDropdownShow() {
-  setTimeout(() => {
-    setFocus("tagFilterDropdownInput");
-  }, 200);
+  return tagMap.value.get(String(option.value));
 }
 
-// search
-const keyword = ref("");
+function getPostCount(option: FilterDropdownOption) {
+  return t("core.common.fields.post_count", {
+    count: getTag(option)?.status?.postCount || 0,
+  });
+}
 
-let fuse: Fuse<Tag> | undefined = undefined;
-
-watch(
-  () => tags.value,
-  () => {
-    fuse = new Fuse(tags.value || [], {
-      keys: ["spec.displayName", "metadata.name", "spec.email"],
-      useExtendedSearch: true,
-      threshold: 0.2,
-    });
-  },
-  {
-    immediate: true,
-  }
-);
-
-const searchResults = computed(() => {
-  if (!fuse || !keyword.value) {
-    return tags.value;
-  }
-
-  return fuse?.search(keyword.value).map((item) => item.item);
-});
-
-const selectedTag = computed(() => {
-  return tags.value?.find((tag) => tag.metadata.name === props.modelValue);
-});
+function handleUpdate(value?: FilterDropdownValue) {
+  emit("update:modelValue", typeof value === "string" ? value : undefined);
+}
 </script>
 
 <template>
-  <VDropdown
-    ref="dropdown"
-    popper-class="[&_.v-popper\_\_inner]:!p-0"
-    @show="onDropdownShow"
+  <VFilterDropdown
+    :model-value="modelValue"
+    :label="label"
+    :options="options"
+    searchable
+    :search-placeholder="$t('core.common.placeholder.search')"
+    :empty-text="$t('core.components.global_search.no_results')"
+    panel-width="22rem"
+    @update:model-value="handleUpdate"
   >
-    <div
-      class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
-      :class="{ 'font-semibold text-gray-700': modelValue !== undefined }"
-    >
-      <span v-if="!selectedTag" class="mr-0.5">
-        {{ label }}
-      </span>
-      <span v-else class="mr-0.5">
-        {{ label }}：{{ selectedTag.spec.displayName }}
-      </span>
-      <span>
-        <IconArrowDown />
-      </span>
-    </div>
-    <template #popper>
-      <div class="h-96 w-80">
-        <div class="border-b border-b-gray-100 bg-white p-4">
-          <FormKit
-            id="tagFilterDropdownInput"
-            v-model="keyword"
-            :placeholder="$t('core.common.placeholder.search')"
-            type="text"
-          ></FormKit>
-        </div>
-        <div>
-          <VEntityContainer>
-            <VEntity
-              v-for="tag in searchResults"
-              :key="tag.metadata.name"
-              :is-selected="modelValue === tag.metadata.name"
-              @click="handleSelect(tag)"
-            >
-              <template #start>
-                <VEntityField :description="tag.status?.permalink">
-                  <template #title>
-                    <PostTag :tag="tag" />
-                  </template>
-                </VEntityField>
-              </template>
-              <template #end>
-                <VEntityField
-                  :description="
-                    $t('core.common.fields.post_count', {
-                      count: tag.status?.postCount || 0,
-                    })
-                  "
-                />
-              </template>
-            </VEntity>
-          </VEntityContainer>
-        </div>
+    <template #option="{ option, selected }">
+      <span
+        class="h-2.5 w-2.5 shrink-0 rounded-full"
+        :style="{
+          backgroundColor: getTag(option)?.spec.color || '#d9d9d9',
+        }"
+      />
+      <div class="flex min-w-0 flex-1 flex-col">
+        <span
+          class="truncate text-sm"
+          :class="selected ? 'font-medium text-gray-900' : 'text-gray-700'"
+        >
+          {{ option.label }}
+        </span>
+        <span v-if="option.description" class="truncate text-xs text-gray-500">
+          {{ option.description }}
+        </span>
       </div>
+      <span class="shrink-0 text-xs text-gray-500">
+        {{ getPostCount(option) }}
+      </span>
     </template>
-  </VDropdown>
+  </VFilterDropdown>
 </template>
