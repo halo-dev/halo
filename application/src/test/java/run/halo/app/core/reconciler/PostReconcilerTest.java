@@ -403,6 +403,7 @@ class PostReconcilerTest {
     @Test
     void subscribeNewCommentNotificationTest() {
         Post post = TestPost.postV1();
+        post.getSpec().setOwner("fake-user");
 
         postReconciler.subscribeNewCommentNotification(post);
 
@@ -413,8 +414,18 @@ class PostReconcilerTest {
                         assertArg(argReason -> {
                             var interestReason = new Subscription.InterestReason();
                             interestReason.setReasonType(NotificationReasonConst.NEW_COMMENT_ON_POST);
-                            interestReason.setExpression("props.postOwner == 'null'");
+                            interestReason.setExpression("props.postOwner == 'fake-user'");
                             assertThat(argReason).isEqualTo(interestReason);
                         }));
+    }
+
+    @Test
+    void shouldNotSubscribeNewCommentNotificationWhenOwnerIsBlank() {
+        Post post = TestPost.postV1();
+        post.getSpec().setOwner("");
+
+        postReconciler.subscribeNewCommentNotification(post);
+
+        verifyNoInteractions(notificationCenter);
     }
 }

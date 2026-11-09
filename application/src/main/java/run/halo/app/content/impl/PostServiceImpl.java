@@ -175,7 +175,7 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
         return Mono.defer(() -> {
                     var post = postRequest.post();
 
-                    if (post.getSpec().getOwner() != null) {
+                    if (StringUtils.isNotBlank(post.getSpec().getOwner())) {
                         return Mono.just(post);
                     }
 
