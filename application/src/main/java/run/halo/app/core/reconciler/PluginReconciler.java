@@ -33,7 +33,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +41,7 @@ import org.pf4j.PluginState;
 import org.pf4j.PluginWrapper;
 import org.pf4j.RuntimeMode;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -56,6 +56,7 @@ import run.halo.app.core.extension.Setting;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ExtensionUtil;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.Unstructured;
@@ -984,13 +985,12 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
 
     private void cancelUnloadRequest(String pluginName) {
         // remove label REQUEST_TO_UNLOAD_LABEL
-        // TODO Use index mechanism
-        Predicate<Plugin> filter = aplugin -> {
-            var labels = aplugin.getMetadata().getLabels();
-            return labels != null && pluginName.equals(labels.get(REQUEST_TO_UNLOAD_LABEL));
-        };
-
-        client.list(Plugin.class, filter, null).forEach(aplugin -> {
+        var listOptions = ListOptions.builder()
+                .labelSelector()
+                .eq(REQUEST_TO_UNLOAD_LABEL, pluginName)
+                .end()
+                .build();
+        client.listAll(Plugin.class, listOptions, Sort.unsorted()).forEach(aplugin -> {
             var labels = aplugin.getMetadata().getLabels();
             if (labels != null && labels.remove(REQUEST_TO_UNLOAD_LABEL) != null) {
                 client.update(aplugin);
