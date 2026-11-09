@@ -42,6 +42,7 @@ import {
   clearLocalNotificationState,
   locallyDeletedNotificationNames,
   locallyReadNotificationNames,
+  locallyRemovedUnreadNames,
   updateCachedNotificationReadState,
 } from "./local-notification-state";
 
@@ -99,14 +100,29 @@ const notifications = computed(() => {
   const items =
     notificationPages.value?.pages.flatMap((page) => page.items) ?? [];
   const seen = new Set<string>();
+  const isUnreadTab = activeTab.value === "unread";
 
-  return items.filter((item) => {
-    if (seen.has(item.metadata.name)) {
-      return false;
+  // Local reads win over the cached pages: a refetch that was already in
+  // flight when a notification was read may still return it as unread.
+  return items.reduce<Notification[]>((result, item) => {
+    const name = item.metadata.name;
+    if (seen.has(name)) {
+      return result;
     }
-    seen.add(item.metadata.name);
-    return true;
-  });
+    seen.add(name);
+
+    if (isUnreadTab && locallyRemovedUnreadNames.has(name)) {
+      return result;
+    }
+
+    if (item.spec?.unread && locallyReadNotificationNames.has(name)) {
+      result.push({ ...item, spec: { ...item.spec, unread: false } });
+      return result;
+    }
+
+    result.push(item);
+    return result;
+  }, []);
 });
 
 const markingAsReadCount = useIsMutating({
@@ -130,6 +146,33 @@ function needsPageRepair(tab: string) {
     activeTab.value === tab &&
     locallyReadNotificationNames.size > 0
   );
+}
+
+// A marker may only be dropped once the server confirms the read, i.e. the
+// refetched pages no longer return that notification as unread. Dropping it
+// earlier would let a stale refetch render the notification as unread again.
+function confirmLocallyRead() {
+  if (activeTab.value !== "unread") {
+    return;
+  }
+
+  const stillUnread = new Set<string>();
+  for (const page of notificationPages.value?.pages ?? []) {
+    for (const item of page.items) {
+      if (item.spec?.unread) {
+        stillUnread.add(item.metadata.name);
+      }
+    }
+  }
+
+  for (const name of [...locallyReadNotificationNames]) {
+    if (stillUnread.has(name)) {
+      continue;
+    }
+
+    locallyReadNotificationNames.delete(name);
+    locallyRemovedUnreadNames.delete(name);
+  }
 }
 
 async function repairLoadedPages(tab: string) {
@@ -156,8 +199,11 @@ async function repairLoadedPages(tab: string) {
       return false;
     }
 
-    locallyReadNotificationNames.clear();
-    return true;
+    confirmLocallyRead();
+
+    if (locallyReadNotificationNames.size === 0) {
+      return true;
+    }
   }
 
   return false;

@@ -10,11 +10,19 @@ import { reactive } from "vue";
  */
 export const locallyReadNotificationNames = reactive(new Set<string>());
 
+/**
+ * Notifications read through the explicit "mark as read" action during this
+ * visit. They are hidden from the unread list until a refetch confirms that
+ * the server no longer returns them as unread.
+ */
+export const locallyRemovedUnreadNames = reactive(new Set<string>());
+
 /** Notifications deleted during this visit, independent of virtual row lifetime. */
 export const locallyDeletedNotificationNames = reactive(new Set<string>());
 
 export function clearLocalNotificationState() {
   locallyReadNotificationNames.clear();
+  locallyRemovedUnreadNames.clear();
   locallyDeletedNotificationNames.clear();
 }
 

@@ -10,6 +10,7 @@ import { useI18n } from "vue-i18n";
 import {
   locallyDeletedNotificationNames,
   locallyReadNotificationNames,
+  locallyRemovedUnreadNames,
   updateCachedNotificationReadState,
 } from "../local-notification-state";
 
@@ -33,25 +34,22 @@ const { currentUser } = stores.currentUser();
 
 const { mutate: handleMarkAsRead } = useMutation({
   mutationKey: ["notification-mark-as-read"],
-  mutationFn: async ({ refetch }: { refetch: boolean }) => {
+  mutationFn: async (_variables: { removeFromUnread: boolean }) => {
     const { data } =
       await ucApiClient.notification.notification.markNotificationAsRead({
         name: props.notification.metadata.name,
         username: currentUser?.user.metadata.name as string,
       });
 
-    if (refetch) {
-      await queryClient.invalidateQueries({ queryKey: ["user-notifications"] });
-    }
-
     return data;
   },
-  onSuccess(_data, { refetch }) {
-    // The explicit path already invalidated the query, which refreshed the
-    // loaded pages; marking it dirty again would refetch them a second time.
-    if (!refetch) {
-      locallyReadNotificationNames.add(props.notification.metadata.name);
+  onSuccess(_data, { removeFromUnread }) {
+    locallyReadNotificationNames.add(props.notification.metadata.name);
+
+    if (removeFromUnread) {
+      locallyRemovedUnreadNames.add(props.notification.metadata.name);
     }
+
     updateCachedNotificationReadState(
       queryClient,
       props.notification.metadata.name
@@ -85,7 +83,7 @@ watch(
   () => props.isSelected,
   (value) => {
     if (value && props.notification.spec?.unread) {
-      handleMarkAsRead({ refetch: false });
+      handleMarkAsRead({ removeFromUnread: false });
     }
   },
   {
@@ -165,7 +163,7 @@ const content = computed(() => {
         <span
           v-if="notification.spec?.unread"
           class="text-sm text-gray-600 hover:text-gray-900"
-          @click.stop="handleMarkAsRead({ refetch: true })"
+          @click.stop="handleMarkAsRead({ removeFromUnread: true })"
         >
           {{ $t("core.uc_notification.operations.mark_as_read.button") }}
         </span>
