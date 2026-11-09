@@ -654,12 +654,16 @@ function onListKeydown(event: KeyboardEvent) {
   }
 }
 
+let lastAutoLoadSignature = "";
+let loadMoreRequested = false;
 let searchTimer: ReturnType<typeof setTimeout> | undefined;
 
 watch(keyword, (value) => {
   if (!props.remoteSearch) {
     return;
   }
+
+  lastAutoLoadSignature = "";
 
   if (searchTimer) {
     clearTimeout(searchTimer);
@@ -677,9 +681,6 @@ watch(navigableRows, (rows) => {
 
   activeKey.value = normalizedKeyword.value ? rows[0]?.key : undefined;
 });
-
-let lastAutoLoadSignature = "";
-let loadMoreRequested = false;
 
 function emitLoadMore() {
   if (!props.hasMore || props.loading || loadMoreRequested) {
@@ -713,7 +714,7 @@ function maybeAutoLoadMore() {
     return;
   }
 
-  const signature = `${keyword.value}|${optionCount.value}`;
+  const signature = `${keyword.value}|${optionCount.value}|${visibleRows.value.length}`;
 
   if (lastAutoLoadSignature === signature) {
     return;
@@ -797,7 +798,13 @@ watch(
 
 watch(
   () =>
-    [props.options, optionCount.value, props.loading, isOpen.value] as const,
+    [
+      props.options,
+      optionCount.value,
+      visibleRows.value.length,
+      props.loading,
+      isOpen.value,
+    ] as const,
   async () => {
     if (!isOpen.value) {
       return;

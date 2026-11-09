@@ -31,6 +31,7 @@ function mountDropdown(
     showClearOption?: boolean;
     clearLabel?: string;
     panelWidth?: string;
+    searchDelay?: number;
     variant?: FilterDropdownVariant;
   } = {},
   options: { attachTo?: HTMLElement } = {}
@@ -547,6 +548,86 @@ describe("FilterDropdown", () => {
     await flushPromises();
 
     expect(wrapper.emitted("load-more")).toHaveLength(2);
+  });
+
+  it("resets the autoload signature when the search keyword changes", async () => {
+    const page = Array.from({ length: 8 }, (_, index) => ({
+      label: `User ${index + 1}`,
+      value: `user-${index + 1}`,
+    }));
+
+    const wrapper = mountDropdown({
+      searchable: true,
+      remoteSearch: true,
+      hasMore: true,
+      options: page,
+      searchDelay: 10000,
+    });
+
+    wrapper.findComponent(VDropdownStub).vm.$emit("show");
+    await nextTick();
+    wrapper.findComponent(VDropdownStub).vm.$emit("apply-show");
+    await flushPromises();
+
+    expect(wrapper.emitted("load-more")).toHaveLength(1);
+
+    await wrapper.get("input").setValue("zzz");
+    await wrapper.setProps({
+      options: [{ label: "Only", value: "only" }],
+      hasMore: false,
+    });
+    await flushPromises();
+
+    await wrapper.get("input").setValue("");
+    await wrapper.setProps({ options: page, hasMore: true });
+    await flushPromises();
+
+    expect(wrapper.emitted("load-more")).toHaveLength(2);
+
+    wrapper.unmount();
+  });
+
+  it("emits load-more after collapsing a tree branch", async () => {
+    const children = (count: number, prefix: string) =>
+      Array.from({ length: count }, (_, index) => ({
+        label: `${prefix} ${index + 1}`,
+        value: `${prefix.toLowerCase()}-${index + 1}`,
+      }));
+
+    const wrapper = mountDropdown({
+      hasMore: true,
+      options: [
+        { label: "Frontend", children: children(6, "FE") },
+        { label: "Backend", children: children(2, "BE") },
+      ],
+    });
+
+    const list = wrapper.get('[role="tree"]');
+
+    Object.defineProperty(list.element, "clientHeight", {
+      configurable: true,
+      get: () => 100,
+    });
+    Object.defineProperty(list.element, "scrollHeight", {
+      configurable: true,
+      get: () => wrapper.findAll("[data-option-id]").length * 20,
+    });
+
+    wrapper.findComponent(VDropdownStub).vm.$emit("show");
+    await nextTick();
+    wrapper.findComponent(VDropdownStub).vm.$emit("apply-show");
+    await flushPromises();
+
+    expect(wrapper.emitted("load-more")).toBeUndefined();
+
+    const frontendRow = wrapper
+      .findAll("[data-option-id]")
+      .find((row) => row.text().includes("Frontend"));
+    await frontendRow!.trigger("click");
+    await flushPromises();
+
+    expect(wrapper.findAll("[data-option-id]")).toHaveLength(4);
+    expect(wrapper.emitted("load-more")).toHaveLength(1);
   });
 
   it("emits load-more when scrolled near the bottom", async () => {
