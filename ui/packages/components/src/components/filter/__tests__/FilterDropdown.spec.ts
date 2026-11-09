@@ -216,6 +216,34 @@ describe("FilterDropdown", () => {
     expect(wrapper.findAll("[data-option-id]")).toHaveLength(2);
   });
 
+  it("does not persist collapse state toggled while searching", async () => {
+    const wrapper = mountDropdown({
+      searchable: true,
+      options: [
+        {
+          label: "Frontend",
+          children: [{ label: "Vue", value: "vue" }],
+        },
+        {
+          label: "Backend",
+          children: [{ label: "Java", value: "java" }],
+        },
+      ],
+    });
+    const input = wrapper.get("input");
+
+    await input.setValue("Backend");
+
+    const backendRow = wrapper
+      .findAll("[data-option-id]")
+      .find((row) => row.text().includes("Backend"));
+    await backendRow!.trigger("click");
+
+    await input.setValue("");
+
+    expect(wrapper.findAll("[data-option-id]")).toHaveLength(4);
+  });
+
   it("supports keyboard navigation", async () => {
     const wrapper = mountDropdown({ searchable: true });
     const input = wrapper.get("input");

@@ -459,7 +459,9 @@ function hide() {
 }
 
 function toggleRow(row: OptionRow) {
-  if (!row.hasChildren) {
+  // Search always expands matching rows, so persisting a toggle here would
+  // write a filtered row key that maps to an unrelated option afterwards.
+  if (!row.hasChildren || normalizedKeyword.value) {
     return;
   }
 
