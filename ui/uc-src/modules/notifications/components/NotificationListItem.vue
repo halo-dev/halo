@@ -5,8 +5,13 @@ import { Dialog, Toast, VStatusDot } from "@halo-dev/components";
 import { stores, utils } from "@halo-dev/ui-shared";
 import { useMutation, useQueryClient } from "@tanstack/vue-query";
 import sanitize from "sanitize-html";
-import { computed, ref, watch } from "vue";
+import { computed, watch } from "vue";
 import { useI18n } from "vue-i18n";
+import {
+  locallyDeletedNotificationNames,
+  locallyReadNotificationNames,
+  updateCachedNotificationReadState,
+} from "../local-notification-state";
 
 const queryClient = useQueryClient();
 const { t } = useI18n();
@@ -26,8 +31,6 @@ const props = withDefaults(
 
 const { currentUser } = stores.currentUser();
 
-const isRead = ref();
-
 const { mutate: handleMarkAsRead } = useMutation({
   mutationKey: ["notification-mark-as-read"],
   mutationFn: async ({ refetch }: { refetch: boolean }) => {
@@ -43,8 +46,16 @@ const { mutate: handleMarkAsRead } = useMutation({
 
     return data;
   },
-  onSuccess() {
-    isRead.value = true;
+  onSuccess(_data, { refetch }) {
+    // The explicit path already invalidated the query, which refreshed the
+    // loaded pages; marking it dirty again would refetch them a second time.
+    if (!refetch) {
+      locallyReadNotificationNames.add(props.notification.metadata.name);
+    }
+    updateCachedNotificationReadState(
+      queryClient,
+      props.notification.metadata.name
+    );
   },
 });
 
@@ -60,6 +71,8 @@ function handleDelete() {
         name: props.notification.metadata.name,
         username: currentUser?.user.metadata.name as string,
       });
+
+      locallyDeletedNotificationNames.add(props.notification.metadata.name);
 
       await queryClient.invalidateQueries({ queryKey: ["user-notifications"] });
 
@@ -125,7 +138,7 @@ const content = computed(() => {
       <div class="flex min-w-0 flex-1 items-center justify-between">
         <div
           class="truncate text-sm"
-          :class="{ 'font-semibold': notification.spec?.unread && !isRead }"
+          :class="{ 'font-semibold': notification.spec?.unread }"
         >
           {{ notification.spec?.title }}
         </div>
@@ -150,7 +163,7 @@ const content = computed(() => {
       <!-- Action buttons: hidden in batch select mode -->
       <div v-if="!isSelectMode" class="hidden space-x-2 group-hover:block">
         <span
-          v-if="notification.spec?.unread && !isRead"
+          v-if="notification.spec?.unread"
           class="text-sm text-gray-600 hover:text-gray-900"
           @click.stop="handleMarkAsRead({ refetch: true })"
         >

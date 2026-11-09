@@ -19,17 +19,31 @@ import {
   VTabbar,
 } from "@halo-dev/components";
 import { stores } from "@halo-dev/ui-shared";
-import { useQuery, useQueryClient } from "@tanstack/vue-query";
+import {
+  useInfiniteQuery,
+  useIsMutating,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/vue-query";
+import { useVirtualizer } from "@tanstack/vue-virtual";
 import { useRouteQuery } from "@vueuse/router";
 import { chunk } from "es-toolkit";
+import type { OverlayScrollbars } from "overlayscrollbars";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
-import { computed, ref, watch } from "vue";
+import { computed, onUnmounted, ref, shallowRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import RiCheckDoubleLine from "~icons/ri/check-double-line";
 import RiCheckboxMultipleFill from "~icons/ri/checkbox-multiple-fill";
 import RiCheckboxMultipleLine from "~icons/ri/checkbox-multiple-line";
 import NotificationContent from "./components/NotificationContent.vue";
 import NotificationListItem from "./components/NotificationListItem.vue";
+import {
+  clearLocalNotificationState,
+  locallyDeletedNotificationNames,
+  locallyReadNotificationNames,
+  updateCachedNotificationReadState,
+} from "./local-notification-state";
 
 const queryClient = useQueryClient();
 const { t } = useI18n();
@@ -37,62 +51,374 @@ const { currentUser } = stores.currentUser();
 
 const activeTab = useRouteQuery("tab", "unread");
 
+const PAGE_SIZE = 50;
+
+// Markers can outlive an unmount when a mutation settles late; start each
+// visit with a clean slate and repair only from what happens in this visit.
+clearLocalNotificationState();
+
 const {
-  data: notifications,
+  data: notificationPages,
   isLoading,
+  isError,
   refetch,
   isFetching,
-} = useQuery({
+  fetchNextPage,
+  hasNextPage,
+  isFetchingNextPage,
+} = useInfiniteQuery({
   queryKey: ["user-notifications", activeTab],
-  queryFn: async () => {
-    return await paginate<
-      NotificationV1alpha1UcApiListUserNotificationsRequest,
-      Notification
-    >(
-      (params) =>
-        ucApiClient.notification.notification.listUserNotifications(params),
-      {
+  queryFn: async ({ pageParam = 1, queryKey }) => {
+    // Read the tab from the query key: a refetch of an old key may still be
+    // running after the route query has already switched to the other tab.
+    const tab = queryKey[1];
+    const { data } =
+      await ucApiClient.notification.notification.listUserNotifications({
         username: currentUser?.user.metadata.name as string,
-        fieldSelector: [`spec.unread=${activeTab.value === "unread"}`],
-        size: 1000,
-      }
-    );
+        fieldSelector: [`spec.unread=${tab === "unread"}`],
+        page: pageParam,
+        size: PAGE_SIZE,
+      });
+
+    return data;
+  },
+  getNextPageParam: (lastPage) => {
+    return lastPage.hasNext ? lastPage.page + 1 : undefined;
   },
   cacheTime: 0,
   refetchInterval(data) {
-    const hasDeletingNotifications = data?.some(
-      (item) => item.metadata.deletionTimestamp !== undefined
+    const hasDeletingNotifications = data?.pages.some((page) =>
+      page.items.some((item) => item.metadata.deletionTimestamp !== undefined)
     );
 
     return hasDeletingNotifications ? 1000 : false;
   },
 });
 
+const notifications = computed(() => {
+  const items =
+    notificationPages.value?.pages.flatMap((page) => page.items) ?? [];
+  const seen = new Set<string>();
+
+  return items.filter((item) => {
+    if (seen.has(item.metadata.name)) {
+      return false;
+    }
+    seen.add(item.metadata.name);
+    return true;
+  });
+});
+
+const markingAsReadCount = useIsMutating({
+  mutationKey: ["notification-mark-as-read"],
+});
+
+// ---- Infinite scroll ----
+const scrollViewport = shallowRef<HTMLElement | null>(null);
+
+function handleScrollbarsInitialized(instance: OverlayScrollbars) {
+  scrollViewport.value = instance.elements().viewport;
+}
+
+// Marked-as-read notifications shrink the server-side unread set without
+// refreshing the loaded pages, so loading the next page by offset could skip
+// an item. The signal lives outside the query cache because a late page
+// response can overwrite the cached read state.
+function needsPageRepair(tab: string) {
+  return (
+    tab === "unread" &&
+    activeTab.value === tab &&
+    locallyReadNotificationNames.size > 0
+  );
+}
+
+async function repairLoadedPages(tab: string) {
+  for (let attempt = 0; attempt < 3; attempt++) {
+    if (!needsPageRepair(tab)) {
+      return true;
+    }
+
+    const readCount = locallyReadNotificationNames.size;
+    await refetch({ cancelRefetch: false });
+
+    if (activeTab.value !== tab || isError.value) {
+      return false;
+    }
+
+    if (locallyReadNotificationNames.size !== readCount) {
+      continue;
+    }
+
+    // A read whose response has not arrived yet will also shift the
+    // server-side offsets; keep the marker and let the mutation watcher
+    // schedule another repair.
+    if (markingAsReadCount.value > 0) {
+      return false;
+    }
+
+    locallyReadNotificationNames.clear();
+    return true;
+  }
+
+  return false;
+}
+
+async function waitForMarkAsReadMutations() {
+  if (markingAsReadCount.value === 0) {
+    return;
+  }
+
+  await new Promise<void>((resolve) => {
+    const stop = watch(markingAsReadCount, (count) => {
+      if (count === 0) {
+        stop();
+        clearTimeout(timer);
+        resolve();
+      }
+    });
+    // Never block infinite scrolling on a hung request; the dirty marker
+    // still triggers another repair when the request finally settles.
+    const timer = setTimeout(() => {
+      stop();
+      resolve();
+    }, 10_000);
+  });
+}
+
+let isLoadingMore = false;
+
+async function loadMore() {
+  if (
+    isLoadingMore ||
+    isFetchingNextPage.value ||
+    isFetching.value ||
+    markingAsReadCount.value > 0
+  ) {
+    return;
+  }
+
+  const tab = activeTab.value;
+
+  // Repairing is independent of pagination: a read can leave a gap on the
+  // last loaded page, where there is no next page left to fetch.
+  if (!hasNextPage?.value && !needsPageRepair(tab)) {
+    return;
+  }
+
+  isLoadingMore = true;
+
+  try {
+    if (!(await repairLoadedPages(tab))) {
+      return;
+    }
+
+    if (activeTab.value !== tab) {
+      return;
+    }
+
+    // Repairing may have consumed the last page.
+    if (!hasNextPage?.value) {
+      return;
+    }
+
+    if (isFetching.value || markingAsReadCount.value > 0) {
+      return;
+    }
+
+    await fetchNextPage({ cancelRefetch: false });
+    if (activeTab.value !== tab) {
+      return;
+    }
+
+    // A notification read while the page was loading may have shifted the
+    // server-side offsets or overwritten its cached read state.
+    await waitForMarkAsReadMutations();
+    await repairLoadedPages(tab);
+  } catch {
+    // The query state keeps the error; the footer offers a retry.
+  } finally {
+    isLoadingMore = false;
+  }
+}
+
+const virtualizerOptions = computed(() => ({
+  count: notifications.value.length,
+  getScrollElement: () => scrollViewport.value,
+  estimateSize: () => 108,
+  getItemKey: (index: number) =>
+    notifications.value[index]?.metadata.name ?? index,
+  overscan: 5,
+}));
+
+const virtualizer = useVirtualizer(virtualizerOptions);
+
+const virtualItems = computed(() => virtualizer.value.getVirtualItems());
+const virtualListSize = computed(() => virtualizer.value.getTotalSize());
+
+const virtualRows = computed(() => {
+  return virtualItems.value.map((virtualItem) => ({
+    index: virtualItem.index,
+    start: virtualItem.start,
+    notification: notifications.value[virtualItem.index],
+  }));
+});
+
+function measureRow(element: unknown) {
+  virtualizer.value.measureElement(element instanceof Element ? element : null);
+}
+
+watch(
+  [
+    () => virtualItems.value[virtualItems.value.length - 1]?.index,
+    isFetching,
+    markingAsReadCount,
+  ],
+  ([lastIndex, fetching, markingAsRead]) => {
+    if (
+      !fetching &&
+      markingAsRead === 0 &&
+      !isError.value &&
+      lastIndex !== undefined &&
+      lastIndex >= notifications.value.length - 1
+    ) {
+      loadMore();
+    }
+  },
+  { flush: "post" }
+);
+
 const selectedNotificationName = useRouteQuery<string | undefined>("name");
 
-const selectedNotification = computed(() => {
-  return notifications.value?.find(
+// Keep the opened notification visible when a refetch drops it from the list,
+// e.g. after it was marked as read and the unread pages were refreshed.
+const selectedNotificationSnapshot = shallowRef<Notification>();
+
+watch(selectedNotificationName, (name) => {
+  if (selectedNotificationSnapshot.value?.metadata.name !== name) {
+    selectedNotificationSnapshot.value = undefined;
+  }
+});
+
+const loadedSelectedNotification = computed(() => {
+  return notifications.value.find(
     (item) => item.metadata.name === selectedNotificationName.value
   );
 });
+
+// Deep links can point to a notification outside the loaded pages.
+const { data: fetchedSelectedNotification } = useQuery({
+  queryKey: ["user-notification", selectedNotificationName],
+  queryFn: async ({ queryKey }) => {
+    const name = queryKey[1];
+    const { data } =
+      await ucApiClient.notification.notification.listUserNotifications({
+        username: currentUser?.user.metadata.name as string,
+        fieldSelector: [`metadata.name=${name}`],
+        page: 1,
+        size: 1,
+      });
+
+    return data.items[0];
+  },
+  enabled: computed(
+    () =>
+      !!currentUser?.user.metadata.name &&
+      !!selectedNotificationName.value &&
+      !loadedSelectedNotification.value &&
+      selectedNotificationSnapshot.value?.metadata.name !==
+        selectedNotificationName.value
+  ),
+  cacheTime: 0,
+});
+
+// A deep-linked notification has no row to trigger the passive mark-as-read.
+const { mutate: markFetchedNotificationAsRead } = useMutation({
+  mutationKey: ["notification-mark-as-read"],
+  mutationFn: async (notification: Notification) => {
+    const { data } =
+      await ucApiClient.notification.notification.markNotificationAsRead({
+        name: notification.metadata.name,
+        username: currentUser?.user.metadata.name as string,
+      });
+
+    return data;
+  },
+  onSuccess(_data, notification) {
+    locallyReadNotificationNames.add(notification.metadata.name);
+    updateCachedNotificationReadState(queryClient, notification.metadata.name);
+  },
+});
+
+watch(
+  fetchedSelectedNotification,
+  (notification) => {
+    if (notification?.spec?.unread) {
+      markFetchedNotificationAsRead(notification);
+    }
+  },
+  { immediate: true }
+);
+
+const selectedNotification = computed(() => {
+  if (loadedSelectedNotification.value) {
+    return loadedSelectedNotification.value;
+  }
+
+  if (fetchedSelectedNotification.value) {
+    return fetchedSelectedNotification.value;
+  }
+
+  if (
+    selectedNotificationSnapshot.value?.metadata.name ===
+    selectedNotificationName.value
+  ) {
+    return selectedNotificationSnapshot.value;
+  }
+
+  return undefined;
+});
+
+function clearSelectedNotification() {
+  selectedNotificationSnapshot.value = undefined;
+  selectedNotificationName.value = undefined;
+}
+
+watch(
+  () => locallyDeletedNotificationNames.size,
+  () => {
+    if (
+      selectedNotificationName.value &&
+      locallyDeletedNotificationNames.has(selectedNotificationName.value)
+    ) {
+      clearSelectedNotification();
+    }
+  }
+);
 
 // ---- Batch selection state ----
 const isSelectMode = ref(false);
 const selectedNames = ref<Set<string>>(new Set<string>());
 const lastSelectedIndex = ref<number>(-1);
+const selectAllActive = ref(false);
+const isSelectingAll = ref(false);
+let selectAllRequestId = 0;
 
 const isAllSelected = computed(
-  () =>
-    !!notifications.value?.length &&
-    selectedNames.value.size === notifications.value.length
+  () => selectAllActive.value && selectedNames.value.size > 0
 );
 
-// Exit select mode and clear selections when switching tabs.
+// Exit select mode and clear selections when switching tabs. The read/deleted
+// markers outlive the tab switch: a page fetched before the switch can still
+// resolve afterwards, and its repair marker must survive.
 watch(activeTab, () => {
   isSelectMode.value = false;
   selectedNames.value.clear();
   lastSelectedIndex.value = -1;
+  selectAllActive.value = false;
+  selectAllRequestId++;
 });
+
+onUnmounted(clearLocalNotificationState);
 
 // Auto-exit select mode when the list becomes empty (e.g. after deleting all).
 watch(notifications, (newVal) => {
@@ -100,6 +426,7 @@ watch(notifications, (newVal) => {
     isSelectMode.value = false;
     selectedNames.value.clear();
     lastSelectedIndex.value = -1;
+    selectAllActive.value = false;
   }
 });
 
@@ -108,6 +435,8 @@ function toggleSelectMode() {
   if (!isSelectMode.value) {
     selectedNames.value.clear();
     lastSelectedIndex.value = -1;
+    selectAllActive.value = false;
+    selectAllRequestId++;
   }
 }
 
@@ -126,11 +455,20 @@ function handleItemClick(
   event: MouseEvent
 ) {
   if (!isSelectMode.value) {
+    // A soft-deleted notification can stay in the list until the next
+    // refetch; reopening it would revive a snapshot the delete watcher can
+    // no longer clear.
+    if (locallyDeletedNotificationNames.has(notification.metadata.name)) {
+      return;
+    }
+
+    selectedNotificationSnapshot.value = notification;
     selectedNotificationName.value = notification.metadata.name;
     return;
   }
 
   const name = notification.metadata.name;
+  selectAllActive.value = false;
 
   if (event.shiftKey && lastSelectedIndex.value !== -1) {
     const start = Math.min(lastSelectedIndex.value, index);
@@ -157,13 +495,41 @@ function handleItemClick(
   }
 }
 
-function handleSelectAll() {
+async function handleSelectAll() {
   if (isAllSelected.value) {
     selectedNames.value.clear();
-  } else {
-    notifications.value?.forEach((n) =>
-      selectedNames.value.add(n.metadata.name)
+    selectAllActive.value = false;
+    selectAllRequestId++;
+    return;
+  }
+
+  if (!currentUser || isSelectingAll.value) {
+    return;
+  }
+
+  const tab = activeTab.value;
+  const requestId = ++selectAllRequestId;
+  isSelectingAll.value = true;
+
+  try {
+    const names = await listAllNotificationNames(
+      currentUser.user.metadata.name
     );
+
+    if (
+      requestId !== selectAllRequestId ||
+      !isSelectMode.value ||
+      activeTab.value !== tab
+    ) {
+      return;
+    }
+
+    selectedNames.value = new Set(names);
+    selectAllActive.value = true;
+  } catch {
+    Toast.error(t("core.common.toast.operation_failed"));
+  } finally {
+    isSelectingAll.value = false;
   }
 }
 
@@ -185,6 +551,7 @@ function handleDeleteSelected() {
 
       const namesToDelete = Array.from(selectedNames.value);
       const notificationChunks = chunk(namesToDelete, 5);
+      selectAllRequestId++;
 
       for (const chunkItem of notificationChunks) {
         await Promise.all(
@@ -199,12 +566,42 @@ function handleDeleteSelected() {
 
       selectedNames.value.clear();
       lastSelectedIndex.value = -1;
+      selectAllActive.value = false;
+
+      if (
+        selectedNotificationName.value &&
+        namesToDelete.includes(selectedNotificationName.value)
+      ) {
+        clearSelectedNotification();
+      }
+
       await queryClient.invalidateQueries({ queryKey: ["user-notifications"] });
       Toast.success(t("core.common.toast.delete_success"));
     },
   });
 }
 // ---- End batch selection ----
+
+/**
+ * List all notification names of the current tab for batch operations.
+ * The list itself is paginated, but batch operations still apply to every notification.
+ */
+async function listAllNotificationNames(username: string) {
+  const notifications = await paginate<
+    NotificationV1alpha1UcApiListUserNotificationsRequest,
+    Notification
+  >(
+    (params) =>
+      ucApiClient.notification.notification.listUserNotifications(params),
+    {
+      username,
+      fieldSelector: [`spec.unread=${activeTab.value === "unread"}`],
+      size: 1000,
+    }
+  );
+
+  return notifications.map((notification) => notification.metadata.name);
+}
 
 function handleDeleteNotifications() {
   Dialog.warning({
@@ -214,7 +611,7 @@ function handleDeleteNotifications() {
     cancelText: t("core.common.buttons.cancel"),
     confirmType: "danger",
     onConfirm: async () => {
-      if (!notifications.value || notifications.value.length === 0) {
+      if (!notifications.value.length) {
         return;
       }
 
@@ -222,17 +619,27 @@ function handleDeleteNotifications() {
         throw new Error("Current user is not found");
       }
 
-      const notificationChunks = chunk(notifications.value, 5);
+      const names = await listAllNotificationNames(
+        currentUser.user.metadata.name
+      );
+      const notificationChunks = chunk(names, 5);
 
       for (const chunkItem of notificationChunks) {
         await Promise.all(
-          chunkItem.map((notification) =>
+          chunkItem.map((name) =>
             ucApiClient.notification.notification.deleteSpecifiedNotification({
               username: currentUser.user.metadata.name,
-              name: notification.metadata.name,
+              name,
             })
           )
         );
+      }
+
+      if (
+        selectedNotificationName.value &&
+        names.includes(selectedNotificationName.value)
+      ) {
+        clearSelectedNotification();
       }
 
       await queryClient.invalidateQueries({ queryKey: ["user-notifications"] });
@@ -251,7 +658,7 @@ function handleMarkAllAsRead() {
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
-      if (!notifications.value || notifications.value.length === 0) {
+      if (!notifications.value.length) {
         return;
       }
 
@@ -259,8 +666,8 @@ function handleMarkAllAsRead() {
         throw new Error("Current user is not found");
       }
 
-      const names = notifications.value?.map(
-        (notification) => notification.metadata.name
+      const names = await listAllNotificationNames(
+        currentUser.user.metadata.name
       );
 
       await ucApiClient.notification.notification.markNotificationsAsRead({
@@ -356,6 +763,7 @@ function handleMarkAllAsRead() {
                     $t('core.uc_notification.operations.select_all.tooltip')
                   "
                   class="flex size-7 cursor-pointer items-center justify-center rounded-full hover:bg-gray-200 disabled:pointer-events-none disabled:opacity-70"
+                  :disabled="isSelectingAll"
                   @click="handleSelectAll"
                 >
                   <RiCheckboxMultipleFill
@@ -397,6 +805,7 @@ function handleMarkAllAsRead() {
             :options="{ scrollbars: { autoHide: 'scroll' } }"
             class="h-full w-full flex-1"
             defer
+            @os-initialized="handleScrollbarsInitialized"
           >
             <VLoading v-if="isLoading" />
             <Transition v-else-if="!notifications?.length" appear name="fade">
@@ -415,26 +824,55 @@ function handleMarkAllAsRead() {
               </VEmpty>
             </Transition>
             <Transition v-else appear name="fade">
-              <ul
-                class="box-border h-full w-full divide-y divide-gray-100"
-                role="list"
-              >
-                <li
-                  v-for="(notification, index) in notifications"
-                  :key="notification.metadata.name"
-                  @click="handleItemClick(notification, index, $event)"
+              <div>
+                <ul
+                  class="relative w-full"
+                  role="list"
+                  :style="{ height: `${virtualListSize}px` }"
                 >
-                  <NotificationListItem
-                    :notification="notification"
-                    :is-selected="
-                      !isSelectMode &&
-                      selectedNotificationName === notification.metadata.name
+                  <li
+                    v-for="row in virtualRows"
+                    :key="row.notification.metadata.name"
+                    :ref="measureRow"
+                    :data-index="row.index"
+                    class="absolute left-0 top-0 w-full"
+                    :class="{
+                      'border-t border-gray-100': row.index > 0,
+                    }"
+                    :style="{ transform: `translateY(${row.start}px)` }"
+                    @click="
+                      handleItemClick(row.notification, row.index, $event)
                     "
-                    :is-select-mode="isSelectMode"
-                    :is-checked="selectedNames.has(notification.metadata.name)"
-                  />
-                </li>
-              </ul>
+                  >
+                    <NotificationListItem
+                      :notification="row.notification"
+                      :is-selected="
+                        !isSelectMode &&
+                        selectedNotificationName ===
+                          row.notification.metadata.name
+                      "
+                      :is-select-mode="isSelectMode"
+                      :is-checked="
+                        selectedNames.has(row.notification.metadata.name)
+                      "
+                    />
+                  </li>
+                </ul>
+                <div
+                  v-if="hasNextPage"
+                  class="flex items-center justify-center py-2"
+                >
+                  <VLoading v-if="isFetchingNextPage" class="!py-0" />
+                  <button
+                    v-else-if="isError"
+                    type="button"
+                    class="text-sm text-gray-600 hover:text-gray-900"
+                    @click="loadMore"
+                  >
+                    {{ $t("core.common.buttons.retry") }}
+                  </button>
+                </div>
+              </div>
             </Transition>
           </OverlayScrollbarsComponent>
         </div>
