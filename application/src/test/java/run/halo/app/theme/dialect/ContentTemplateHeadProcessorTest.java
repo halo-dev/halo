@@ -47,6 +47,14 @@ class ContentTemplateHeadProcessorTest {
         }
 
         @Test
+        void shouldKeepExcerptUnescapedBecauseSinkEscapesIt() {
+            var result =
+                    ContentTemplateHeadProcessor.excerptToMetaDescriptionIfAbsent(null, "\"><script>alert(1)</script>");
+            assertThat(result).hasSize(1);
+            assertThat(result.get(0)).containsEntry("content", "\"><script>alert(1)</script>");
+        }
+
+        @Test
         void toMetaWhenWhenDescriptionExistsAndEmpty() {
             List<Map<String, String>> htmlMetas = new ArrayList<>();
             htmlMetas.add(createMetaMap("keywords", "test"));
