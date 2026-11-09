@@ -61,19 +61,19 @@ function mountGroup(initial: { author?: string; status?: string } = {}) {
 }
 
 describe("FilterDropdownGroup", () => {
-  it("uses md spacing by default and supports custom spacing", () => {
+  it("uses sm spacing by default and supports custom spacing", () => {
     const wrapper = mount(VFilterDropdownGroup);
 
-    expect(wrapper.get(".space-wrapper").attributes("style")).toContain(
-      "gap: 16px"
+    expect(wrapper.get(".filter-dropdown-group").attributes("style")).toContain(
+      "gap: 4px"
     );
 
     const spaced = mount(VFilterDropdownGroup, {
       props: { spacing: "lg" },
     });
 
-    expect(spaced.get(".space-wrapper").attributes("style")).toContain(
-      "gap: 20px"
+    expect(spaced.get(".filter-dropdown-group").attributes("style")).toContain(
+      "gap: 12px"
     );
   });
 

@@ -1,8 +1,15 @@
 <script lang="ts" setup>
 import { computed, provide, shallowReactive } from "vue";
 import { IconClose } from "../../icons/icons";
-import { VSpace, type SpaceSpacing } from "../space";
 import { filterDropdownGroupKey, type FilterDropdownGroupEntry } from "./group";
+import type { FilterDropdownGroupSpacing } from "./types";
+
+const spacingSize: Record<FilterDropdownGroupSpacing, number> = {
+  xs: 2,
+  sm: 4,
+  md: 8,
+  lg: 12,
+};
 
 const props = withDefaults(
   defineProps<{
@@ -17,16 +24,19 @@ const props = withDefaults(
      */
     hasExternalFilters?: boolean;
     /**
-     * Spacing between the filters.
+     * Spacing between the filters. The scale is smaller than `VSpace` because
+     * filter triggers already have horizontal padding.
      */
-    spacing?: SpaceSpacing;
+    spacing?: FilterDropdownGroupSpacing;
   }>(),
   {
     clearLabel: "Reset filters",
     hasExternalFilters: false,
-    spacing: "md",
+    spacing: "sm",
   }
 );
+
+const gap = computed(() => spacingSize[props.spacing]);
 
 const emit = defineEmits<{
   /**
@@ -71,7 +81,10 @@ defineExpose({
 </script>
 
 <template>
-  <VSpace :spacing="spacing" class="flex-wrap">
+  <div
+    class="filter-dropdown-group inline-flex flex-wrap items-center"
+    :style="{ gap: `${gap}px` }"
+  >
     <slot name="clear" :clear="clearAll" :has-filters="hasFilters">
       <button
         v-if="hasFilters"
@@ -84,5 +97,5 @@ defineExpose({
       </button>
     </slot>
     <slot />
-  </VSpace>
+  </div>
 </template>

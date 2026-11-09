@@ -23,6 +23,7 @@ import type {
   FilterDropdownItem,
   FilterDropdownOption,
   FilterDropdownValue,
+  FilterDropdownVariant,
 } from "./types";
 
 const props = withDefaults(
@@ -100,6 +101,10 @@ const props = withDefaults(
      * sized by its content, between 12rem and 20rem.
      */
     panelWidth?: string;
+    /**
+     * Style of the trigger button.
+     */
+    variant?: FilterDropdownVariant;
   }>(),
   {
     modelValue: undefined,
@@ -118,6 +123,7 @@ const props = withDefaults(
     selectedLabel: undefined,
     placement: "bottom-start",
     panelWidth: undefined,
+    variant: "default",
   }
 );
 
@@ -179,6 +185,30 @@ const isOpen = ref(false);
 const keyword = ref("");
 const activeKey = ref<string>();
 const collapsedKeys = ref(new Set<string>());
+
+const triggerClasses = computed(() => {
+  const isSelected = props.modelValue !== undefined;
+  const highlighted = isSelected || isOpen.value;
+
+  return [
+    "inline-flex h-8 cursor-pointer select-none items-center whitespace-nowrap rounded-md text-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-60",
+    highlighted ? "text-gray-900" : "text-gray-700",
+    isSelected ? "font-semibold" : "",
+    props.variant === "outline"
+      ? [
+          "border bg-white px-3",
+          isOpen.value
+            ? "border-primary"
+            : "border-gray-300 hover:border-gray-400 hover:text-gray-900",
+        ]
+      : [
+          "px-2 active:bg-gray-200",
+          isOpen.value
+            ? "bg-gray-100"
+            : "hover:bg-gray-100 hover:text-gray-900",
+        ],
+  ];
+});
 
 const showSearch = computed(() => props.searchable || props.remoteSearch);
 const normalizedKeyword = computed(() => keyword.value.trim().toLowerCase());
@@ -746,8 +776,7 @@ defineExpose({
   >
     <button
       type="button"
-      class="inline-flex cursor-pointer select-none items-center whitespace-nowrap rounded text-sm text-gray-700 transition-colors hover:text-black focus:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-60"
-      :class="{ 'font-semibold text-gray-900': modelValue !== undefined }"
+      :class="triggerClasses"
       :disabled="disabled"
       :aria-haspopup="hasTree ? 'tree' : 'listbox'"
       :aria-expanded="isOpen"

@@ -1,7 +1,11 @@
 import { flushPromises, mount } from "@vue/test-utils";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 import { defineComponent, h } from "vue";
-import { VFilterDropdown, type FilterDropdownOption } from "..";
+import {
+  VFilterDropdown,
+  type FilterDropdownOption,
+  type FilterDropdownVariant,
+} from "..";
 
 const VDropdownStub = defineComponent({
   name: "VDropdown",
@@ -27,6 +31,7 @@ function mountDropdown(
     showClearOption?: boolean;
     clearLabel?: string;
     panelWidth?: string;
+    variant?: FilterDropdownVariant;
   } = {}
 ) {
   return mount(VFilterDropdown, {
@@ -86,6 +91,33 @@ describe("FilterDropdown", () => {
 
     expect(panel.attributes("style")).toContain("width: 20rem");
     expect(panel.classes()).toContain("max-w-[calc(100vw-2rem)]");
+  });
+
+  it("applies the default trigger variant", () => {
+    const wrapper = mountDropdown();
+    const button = wrapper.get("button");
+
+    expect(button.classes()).toContain("hover:bg-gray-100");
+    expect(button.classes()).not.toContain("border-gray-300");
+  });
+
+  it("applies the outline trigger variant", () => {
+    const wrapper = mountDropdown({ variant: "outline" });
+    const button = wrapper.get("button");
+
+    expect(button.classes()).toContain("border");
+    expect(button.classes()).toContain("bg-white");
+    expect(button.classes()).toContain("border-gray-300");
+  });
+
+  it("highlights the trigger while the panel is open", async () => {
+    const wrapper = mountDropdown();
+
+    wrapper.getComponent({ name: "VDropdown" }).vm.$emit("show");
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.get("button").classes()).toContain("bg-gray-100");
+    expect(wrapper.get("button").classes()).toContain("text-gray-900");
   });
 
   it("emits undefined when selecting the clear option", async () => {

@@ -67,6 +67,12 @@ const authors: FilterDropdownOption[] = [
 
 export const Default: Story = {};
 
+export const Outline: Story = {
+  args: {
+    variant: "outline",
+  },
+};
+
 export const WithClearOption: Story = {
   args: {
     showClearOption: true,

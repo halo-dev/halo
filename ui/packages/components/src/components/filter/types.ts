@@ -2,6 +2,15 @@ import type { Component } from "vue";
 
 export type FilterDropdownValue = string | number | boolean;
 
+export type FilterDropdownVariant = "default" | "outline";
+
+/**
+ * Spacing between the filters in a `VFilterDropdownGroup`. The values are
+ * smaller than `VSpace` because filter triggers already have horizontal
+ * padding.
+ */
+export type FilterDropdownGroupSpacing = "xs" | "sm" | "md" | "lg";
+
 export interface FilterDropdownOption {
   /**
    * The text displayed in the option row and in the trigger.
