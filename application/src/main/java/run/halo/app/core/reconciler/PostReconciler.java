@@ -268,13 +268,20 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
     }
 
     void subscribeNewCommentNotification(Post post) {
+        var owner = post.getSpec().getOwner();
+        if (StringUtils.isBlank(owner)) {
+            log.debug(
+                    "Skip subscribing new comment notification for post [{}] because the owner is blank",
+                    post.getMetadata().getName());
+            return;
+        }
+
         var subscriber = new Subscription.Subscriber();
-        subscriber.setName(post.getSpec().getOwner());
+        subscriber.setName(owner);
 
         var interestReason = new Subscription.InterestReason();
         interestReason.setReasonType(NotificationReasonConst.NEW_COMMENT_ON_POST);
-        interestReason.setExpression(
-                "props.postOwner == '%s'".formatted(post.getSpec().getOwner()));
+        interestReason.setExpression("props.postOwner == '%s'".formatted(owner));
         notificationCenter.subscribe(subscriber, interestReason).block(BLOCKING_TIMEOUT);
     }
 

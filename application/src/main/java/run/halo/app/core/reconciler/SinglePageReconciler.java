@@ -106,13 +106,20 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
     }
 
     void subscribeNewCommentNotification(SinglePage page) {
+        var owner = page.getSpec().getOwner();
+        if (StringUtils.isBlank(owner)) {
+            log.debug(
+                    "Skip subscribing new comment notification for single page [{}] because the owner is blank",
+                    page.getMetadata().getName());
+            return;
+        }
+
         var subscriber = new Subscription.Subscriber();
-        subscriber.setName(page.getSpec().getOwner());
+        subscriber.setName(owner);
 
         var interestReason = new Subscription.InterestReason();
         interestReason.setReasonType(NotificationReasonConst.NEW_COMMENT_ON_PAGE);
-        interestReason.setExpression(
-                "props.pageOwner == '%s'".formatted(page.getSpec().getOwner()));
+        interestReason.setExpression("props.pageOwner == '%s'".formatted(owner));
         notificationCenter.subscribe(subscriber, interestReason).block(BLOCKING_TIMEOUT);
     }
 
