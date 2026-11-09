@@ -8,6 +8,7 @@ import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Base64;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
 import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
@@ -204,6 +206,61 @@ class PatAuthenticationIntegrationTest {
         issuePat("authenticated", List.of());
 
         getCurrentUser().expectStatus().isOk();
+    }
+
+    @Test
+    void shouldListOnlyCurrentUsersPatsOrderedByCreationTimeDescending() {
+        var secondPat = new PersonalAccessToken();
+        secondPat.getSpec().setName("Second PAT");
+        secondPat.getSpec().setRoles(List.of("authenticated"));
+        var secondCreated = webClient
+                .post()
+                .uri("/apis/uc.api.security.halo.run/v1alpha1/personalaccesstokens")
+                .headers(headers -> headers.setBearerAuth(createJwt(USERNAME, "authenticated")))
+                .bodyValue(secondPat)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(PersonalAccessToken.class)
+                .returnResult()
+                .getResponseBody();
+        assertThat(secondCreated).isNotNull();
+
+        var otherPat = new PersonalAccessToken();
+        otherPat.setMetadata(new Metadata());
+        otherPat.getMetadata().setName("other-user-pat");
+        otherPat.getSpec().setName("Other user PAT");
+        otherPat.getSpec().setUsername("other-pat-user");
+        otherPat.getSpec().setTokenId(UUID.randomUUID().toString());
+        otherPat.getSpec().setRoles(List.of("authenticated"));
+        client.create(otherPat).block();
+
+        var pats = webClient
+                .get()
+                .uri("/apis/uc.api.security.halo.run/v1alpha1/personalaccesstokens")
+                .headers(headers -> headers.setBearerAuth(createJwt(USERNAME, "authenticated")))
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(new ParameterizedTypeReference<List<PersonalAccessToken>>() {})
+                .returnResult()
+                .getResponseBody();
+
+        assertThat(pats).isNotNull();
+        assertThat(pats)
+                .allSatisfy(pat -> assertThat(pat.getSpec().getUsername()).isEqualTo(USERNAME));
+        assertThat(pats)
+                .extracting(pat -> pat.getMetadata().getName())
+                .doesNotContain("other-user-pat")
+                .contains(
+                        pat.getMetadata().getName(), secondCreated.getMetadata().getName());
+
+        var expectedOrder = Comparator.comparing(
+                        (PersonalAccessToken token) -> token.getMetadata().getCreationTimestamp(),
+                        Comparator.<Instant>nullsLast(Comparator.naturalOrder()))
+                .reversed()
+                .thenComparing(token -> token.getMetadata().getName());
+        assertThat(pats).isSortedAccordingTo(expectedOrder);
     }
 
     @Test
