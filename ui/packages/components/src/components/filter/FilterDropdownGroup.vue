@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { computed, provide, shallowReactive } from "vue";
-import { IconDeleteBin } from "../../icons/icons";
+import { IconClose } from "../../icons/icons";
+import { VSpace, type SpaceSpacing } from "../space";
 import { filterDropdownGroupKey, type FilterDropdownGroupEntry } from "./group";
 
 const props = withDefaults(
@@ -15,10 +16,15 @@ const props = withDefaults(
      * same clear button.
      */
     hasExternalFilters?: boolean;
+    /**
+     * Spacing between the filters.
+     */
+    spacing?: SpaceSpacing;
   }>(),
   {
     clearLabel: "Reset filters",
     hasExternalFilters: false,
+    spacing: "md",
   }
 );
 
@@ -35,10 +41,6 @@ defineSlots<{
   default?: () => unknown;
   clear?: (props: { clear: () => void; hasFilters: boolean }) => unknown;
 }>();
-
-defineOptions({
-  inheritAttrs: false,
-});
 
 const entries = shallowReactive(new Map<symbol, FilterDropdownGroupEntry>());
 
@@ -69,18 +71,18 @@ defineExpose({
 </script>
 
 <template>
-  <slot name="clear" :clear="clearAll" :has-filters="hasFilters">
-    <button
-      v-if="hasFilters"
-      type="button"
-      class="group inline-flex cursor-pointer items-center justify-center rounded-full bg-primary p-1 opacity-80 ring-1 ring-primary transition-all duration-300 hover:opacity-100 hover:shadow-sm hover:ring-opacity-50"
-      :aria-label="clearLabel"
-      @click="clearAll"
-    >
-      <IconDeleteBin
-        class="h-4 w-4 text-gray-200 transition-all group-hover:text-white"
-      />
-    </button>
-  </slot>
-  <slot />
+  <VSpace :spacing="spacing" class="flex-wrap">
+    <slot name="clear" :clear="clearAll" :has-filters="hasFilters">
+      <button
+        v-if="hasFilters"
+        type="button"
+        class="inline-flex h-7 w-7 cursor-pointer items-center justify-center rounded text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        :aria-label="clearLabel"
+        @click="clearAll"
+      >
+        <IconClose class="h-4 w-4" aria-hidden="true" />
+      </button>
+    </slot>
+    <slot />
+  </VSpace>
 </template>

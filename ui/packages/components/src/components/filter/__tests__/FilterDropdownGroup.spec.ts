@@ -61,6 +61,22 @@ function mountGroup(initial: { author?: string; status?: string } = {}) {
 }
 
 describe("FilterDropdownGroup", () => {
+  it("uses md spacing by default and supports custom spacing", () => {
+    const wrapper = mount(VFilterDropdownGroup);
+
+    expect(wrapper.get(".space-wrapper").attributes("style")).toContain(
+      "gap: 16px"
+    );
+
+    const spaced = mount(VFilterDropdownGroup, {
+      props: { spacing: "lg" },
+    });
+
+    expect(spaced.get(".space-wrapper").attributes("style")).toContain(
+      "gap: 20px"
+    );
+  });
+
   it("does not render the clear button when no dropdown has a value", () => {
     const { wrapper } = mountGroup();
 
