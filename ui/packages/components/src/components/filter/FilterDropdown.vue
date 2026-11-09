@@ -698,6 +698,8 @@ function countOptions(items: FilterDropdownItem[]): number {
   }, 0);
 }
 
+const optionCount = computed(() => countOptions(props.options));
+
 function maybeAutoLoadMore() {
   if (!props.hasMore || props.loading) {
     return;
@@ -709,7 +711,7 @@ function maybeAutoLoadMore() {
     return;
   }
 
-  const signature = `${keyword.value}|${countOptions(props.options)}`;
+  const signature = `${keyword.value}|${optionCount.value}`;
 
   if (lastAutoLoadSignature === signature) {
     return;
@@ -785,14 +787,15 @@ function onHide() {
 }
 
 watch(
-  () => [props.options, props.loading] as const,
+  () => [props.options, optionCount.value, props.loading] as const,
   () => {
     loadMoreRequested = false;
   }
 );
 
 watch(
-  () => [props.options, props.loading, isOpen.value] as const,
+  () =>
+    [props.options, optionCount.value, props.loading, isOpen.value] as const,
   async () => {
     if (!isOpen.value) {
       return;

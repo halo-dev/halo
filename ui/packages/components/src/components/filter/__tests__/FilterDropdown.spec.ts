@@ -1,6 +1,6 @@
 import { flushPromises, mount } from "@vue/test-utils";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
-import { defineComponent, h, nextTick } from "vue";
+import { defineComponent, h, nextTick, reactive } from "vue";
 import {
   VFilterDropdown,
   type FilterDropdownOption,
@@ -492,6 +492,30 @@ describe("FilterDropdown", () => {
         },
       ],
     });
+    await flushPromises();
+
+    expect(wrapper.emitted("load-more")).toHaveLength(2);
+  });
+
+  it("emits load-more when options are appended in place", async () => {
+    const options = reactive<FilterDropdownOption[]>([
+      {
+        label: "Frontend",
+        children: [{ label: "Vue", value: "vue" }],
+      },
+    ]);
+
+    const wrapper = mountDropdown({ hasMore: true, options });
+
+    wrapper.findComponent(VDropdownStub).vm.$emit("show");
+    await nextTick();
+    wrapper.findComponent(VDropdownStub).vm.$emit("apply-show");
+    await flushPromises();
+
+    expect(wrapper.emitted("load-more")).toHaveLength(1);
+
+    options[0].children?.push({ label: "React", value: "react" });
+    await nextTick();
     await flushPromises();
 
     expect(wrapper.emitted("load-more")).toHaveLength(2);
