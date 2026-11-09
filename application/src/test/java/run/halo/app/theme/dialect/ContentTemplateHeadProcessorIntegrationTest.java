@@ -26,6 +26,7 @@ import org.thymeleaf.templateresource.StringTemplateResource;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Post;
+import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.extension.Metadata;
 import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
@@ -34,6 +35,7 @@ import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.SinglePageFinder;
 import run.halo.app.theme.finders.vo.PostVo;
+import run.halo.app.theme.finders.vo.SinglePageVo;
 import run.halo.app.theme.router.ModelConst;
 
 /**
@@ -157,6 +159,171 @@ class ContentTemplateHeadProcessorIntegrationTest {
              <body>this is body</body>
             </html>""").outputSettings(outputSettings).html();
         assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void shouldDropHtmlMetaWithInvalidAttributeName() {
+        Context context = getContext();
+        context.setVariable("name", "fake-post");
+        context.setVariable(ModelConst.TEMPLATE_ID, DefaultTemplateEnum.POST.getValue());
+
+        List<Map<String, String>> htmlMetas = new ArrayList<>();
+        Map<String, String> maliciousMeta = new HashMap<>();
+        maliciousMeta.put("x\"><script>alert(1)</script><meta name=\"", "injected");
+        htmlMetas.add(maliciousMeta);
+        htmlMetas.add(mutableMetaMap("keywords", "postK1"));
+        Post.PostSpec postSpec = new Post.PostSpec();
+        postSpec.setHtmlMetas(htmlMetas);
+        Metadata metadata = new Metadata();
+        metadata.setName("fake-post");
+        PostVo postVo = PostVo.builder().spec(postSpec).metadata(metadata).build();
+        when(postFinder.getByName(eq("fake-post"))).thenReturn(Mono.just(postVo));
+
+        String result = templateEngine.process("post", context);
+
+        var document = Jsoup.parse(result);
+        assertThat(document.select("script")).isEmpty();
+        assertThat(result).doesNotContain("alert(1)");
+        assertThat(document.select("meta[name=keywords]")).singleElement();
+    }
+
+    @Test
+    void shouldEscapeHtmlMetaAttributeValues() {
+        Context context = getContext();
+        context.setVariable("name", "fake-post");
+        context.setVariable(ModelConst.TEMPLATE_ID, DefaultTemplateEnum.POST.getValue());
+
+        List<Map<String, String>> htmlMetas = new ArrayList<>();
+        htmlMetas.add(mutableMetaMap("description", "\"><script>alert(1)</script>"));
+        htmlMetas.add(mutableMetaMap("keywords", "a & b"));
+        Post.PostSpec postSpec = new Post.PostSpec();
+        postSpec.setHtmlMetas(htmlMetas);
+        Metadata metadata = new Metadata();
+        metadata.setName("fake-post");
+        PostVo postVo = PostVo.builder().spec(postSpec).metadata(metadata).build();
+        when(postFinder.getByName(eq("fake-post"))).thenReturn(Mono.just(postVo));
+
+        String result = templateEngine.process("post", context);
+
+        var document = Jsoup.parse(result);
+        assertThat(document.select("script")).isEmpty();
+        assertThat(document.select("meta[name=description]"))
+                .singleElement()
+                .satisfies(meta -> assertThat(meta.attr("content")).isEqualTo("\"><script>alert(1)</script>"));
+        assertThat(document.select("meta[name=keywords]"))
+                .singleElement()
+                .satisfies(meta -> assertThat(meta.attr("content")).isEqualTo("a & b"));
+        assertThat(result).contains("content=\"&quot;&gt;&lt;script&gt;alert(1)&lt;/script&gt;\"");
+        assertThat(result).contains("content=\"a &amp; b\"");
+    }
+
+    @Test
+    void shouldEscapeExcerptInDescriptionMeta() {
+        Context context = getContext();
+        context.setVariable("name", "fake-post");
+        context.setVariable(ModelConst.TEMPLATE_ID, DefaultTemplateEnum.POST.getValue());
+
+        Post.PostStatus status = new Post.PostStatus();
+        status.setExcerpt("\"><script>alert(1)</script>");
+        Metadata metadata = new Metadata();
+        metadata.setName("fake-post");
+        PostVo postVo = PostVo.builder()
+                .spec(new Post.PostSpec())
+                .status(status)
+                .metadata(metadata)
+                .build();
+        when(postFinder.getByName(eq("fake-post"))).thenReturn(Mono.just(postVo));
+
+        String result = templateEngine.process("post", context);
+
+        var document = Jsoup.parse(result);
+        assertThat(document.select("script")).isEmpty();
+        assertThat(document.select("meta[name=description]"))
+                .singleElement()
+                .satisfies(meta -> assertThat(meta.attr("content")).isEqualTo("\"><script>alert(1)</script>"));
+    }
+
+    @Test
+    void shouldEscapeHtmlMetaAttributeValuesForSinglePage() {
+        Context context = getContext();
+        context.setVariable("name", "fake-page");
+        context.setVariable(ModelConst.TEMPLATE_ID, DefaultTemplateEnum.SINGLE_PAGE.getValue());
+
+        List<Map<String, String>> htmlMetas = new ArrayList<>();
+        htmlMetas.add(mutableMetaMap("description", "\"><script>alert(1)</script>"));
+        SinglePage.SinglePageSpec spec = new SinglePage.SinglePageSpec();
+        spec.setHtmlMetas(htmlMetas);
+        Metadata metadata = new Metadata();
+        metadata.setName("fake-page");
+        SinglePageVo pageVo =
+                SinglePageVo.builder().spec(spec).metadata(metadata).build();
+        when(singlePageFinder.getByName(eq("fake-page"))).thenReturn(Mono.just(pageVo));
+
+        String result = templateEngine.process("post", context);
+
+        var document = Jsoup.parse(result);
+        assertThat(document.select("script")).isEmpty();
+        assertThat(document.select("meta[name=description]"))
+                .singleElement()
+                .satisfies(meta -> assertThat(meta.attr("content")).isEqualTo("\"><script>alert(1)</script>"));
+    }
+
+    @Test
+    void shouldKeepValidHtmlMetaAttributeNames() {
+        Context context = getContext();
+        context.setVariable("name", "fake-post");
+        context.setVariable(ModelConst.TEMPLATE_ID, DefaultTemplateEnum.POST.getValue());
+
+        List<Map<String, String>> htmlMetas = new ArrayList<>();
+        Map<String, String> meta = new LinkedHashMap<>();
+        meta.put("property", "og:title");
+        meta.put("content", "Hello");
+        meta.put("data-test", "value");
+        meta.put("media", "(prefers-color-scheme: dark)");
+        htmlMetas.add(meta);
+        Post.PostSpec postSpec = new Post.PostSpec();
+        postSpec.setHtmlMetas(htmlMetas);
+        Metadata metadata = new Metadata();
+        metadata.setName("fake-post");
+        PostVo postVo = PostVo.builder().spec(postSpec).metadata(metadata).build();
+        when(postFinder.getByName(eq("fake-post"))).thenReturn(Mono.just(postVo));
+
+        String result = templateEngine.process("post", context);
+
+        var document = Jsoup.parse(result);
+        assertThat(document.select("meta[property=og:title]")).singleElement().satisfies(ogMeta -> {
+            assertThat(ogMeta.attr("content")).isEqualTo("Hello");
+            assertThat(ogMeta.attr("data-test")).isEqualTo("value");
+            assertThat(ogMeta.attr("media")).isEqualTo("(prefers-color-scheme: dark)");
+        });
+    }
+
+    @Test
+    void shouldIgnoreNullMetaAndNullAttributeValue() {
+        Context context = getContext();
+        context.setVariable("name", "fake-post");
+        context.setVariable(ModelConst.TEMPLATE_ID, DefaultTemplateEnum.POST.getValue());
+
+        List<Map<String, String>> htmlMetas = new ArrayList<>();
+        htmlMetas.add(null);
+        Map<String, String> metaWithNullValue = new HashMap<>();
+        metaWithNullValue.put("name", "robots");
+        metaWithNullValue.put("content", null);
+        htmlMetas.add(metaWithNullValue);
+        Post.PostSpec postSpec = new Post.PostSpec();
+        postSpec.setHtmlMetas(htmlMetas);
+        Metadata metadata = new Metadata();
+        metadata.setName("fake-post");
+        PostVo postVo = PostVo.builder().spec(postSpec).metadata(metadata).build();
+        when(postFinder.getByName(eq("fake-post"))).thenReturn(Mono.just(postVo));
+
+        String result = templateEngine.process("post", context);
+
+        var document = Jsoup.parse(result);
+        assertThat(document.select("script")).isEmpty();
+        assertThat(document.select("meta[name=robots]"))
+                .singleElement()
+                .satisfies(meta -> assertThat(meta.attr("content")).isEmpty());
     }
 
     @Test
