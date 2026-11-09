@@ -821,11 +821,11 @@ defineExpose({
               v-else
               :id="row.id"
               :data-option-id="row.id"
-              class="relative flex min-h-8 w-full cursor-pointer select-none items-center gap-2 rounded-md py-1.5 pr-2 text-left transition-colors"
+              class="group relative flex min-h-8 w-full cursor-pointer select-none items-center gap-2 rounded py-1.5 pr-2 text-left transition-colors"
               :class="[
                 row.option.disabled
-                  ? 'cursor-not-allowed opacity-50'
-                  : 'cursor-pointer',
+                  ? 'cursor-not-allowed opacity-70'
+                  : 'cursor-pointer hover:bg-gray-100',
                 isRowSelected(row)
                   ? 'bg-gray-100'
                   : activeKey === row.key
@@ -864,8 +864,8 @@ defineExpose({
                     class="truncate text-sm"
                     :class="
                       isRowSelected(row)
-                        ? 'font-medium text-gray-900'
-                        : 'text-gray-700'
+                        ? 'text-gray-900'
+                        : 'text-gray-700 group-hover:text-gray-900'
                     "
                   >
                     {{ row.option.label }}
