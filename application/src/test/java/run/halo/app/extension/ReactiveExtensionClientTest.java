@@ -3,6 +3,7 @@ package run.halo.app.extension;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.reverseOrder;
 import static java.util.Comparator.comparing;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
@@ -15,16 +16,19 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.ReactiveTransactionManager;
 import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.Exceptions;
@@ -186,6 +190,32 @@ class ReactiveExtensionClientTest {
                 null,
                 reverseOrder(comparing(fake -> fake.getMetadata().getName())));
         StepVerifier.create(fakes).expectNext(fake2).expectNext(fake1).verifyComplete();
+    }
+
+    @Test
+    void shouldListAllInBatches() {
+        var names = IntStream.rangeClosed(1, 2500).mapToObj(i -> "fake-" + i).toList();
+        when(indexEngine.retrieveAll(eq(FakeExtension.class), any(ListOptions.class), any(Sort.class)))
+                .thenReturn(names);
+        when(storeClient.listByNames(anyList())).thenAnswer(invocation -> {
+            List<String> batch = invocation.getArgument(0);
+            return Flux.fromIterable(batch).map(this::createExtensionStore);
+        });
+        when(converter.convertFrom(eq(FakeExtension.class), any(ExtensionStore.class)))
+                .thenAnswer(invocation -> {
+                    var store = invocation.getArgument(1, ExtensionStore.class);
+                    return createFakeExtension(store.getName(), 1L);
+                });
+
+        StepVerifier.create(client.listAll(FakeExtension.class, new ListOptions(), Sort.unsorted()))
+                .expectNextCount(2500)
+                .verifyComplete();
+
+        var captor = ArgumentCaptor.forClass(List.class);
+        verify(storeClient, times(3)).listByNames(captor.capture());
+        assertEquals(
+                List.of(1000, 1000, 500),
+                captor.getAllValues().stream().map(List::size).toList());
     }
 
     @Test
