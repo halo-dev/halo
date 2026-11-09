@@ -71,6 +71,7 @@ function handleUpdate(value?: FilterDropdownValue) {
     :options="options"
     searchable
     :search-placeholder="$t('core.common.placeholder.search')"
+    panel-width="22rem"
     @update:model-value="handleUpdate"
   >
     <template #option="{ option, selected }">

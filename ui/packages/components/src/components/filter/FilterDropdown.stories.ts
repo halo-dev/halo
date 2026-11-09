@@ -152,6 +152,7 @@ export const CustomOption: Story = {
     title: "Filter by author",
     searchable: true,
     options: authors,
+    panelWidth: "18rem",
   },
   render: (args) => ({
     components: { VFilterDropdown, VAvatar },
@@ -163,8 +164,8 @@ export const CustomOption: Story = {
       <div class="flex h-80 items-start p-4">
         <VFilterDropdown v-bind="args" v-model="value">
           <template #option="{ option }">
-            <VAvatar size="md" :alt="option.label" :src="'https://api.dicebear.com/9.x/bottts/svg?seed=' + option.value" />
-            <div class="flex min-w-0 flex-1 items-baseline gap-2">
+            <VAvatar size="md" aria-hidden="true" :alt="option.label" :src="'https://api.dicebear.com/9.x/bottts/svg?seed=' + option.value" />
+            <div class="flex min-w-0 flex-1 flex-col">
               <span class="truncate text-sm text-gray-700">{{ option.label }}</span>
               <span class="truncate text-xs text-gray-500">{{ option.description }}</span>
             </div>

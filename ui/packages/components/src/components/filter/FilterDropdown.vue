@@ -95,6 +95,11 @@ const props = withDefaults(
      * Placement of the panel.
      */
     placement?: VDropdownPlacement;
+    /**
+     * Width of the panel, for example "20rem". By default the panel width is
+     * sized by its content, between 12rem and 20rem.
+     */
+    panelWidth?: string;
   }>(),
   {
     modelValue: undefined,
@@ -112,6 +117,7 @@ const props = withDefaults(
     clearLabel: "All",
     selectedLabel: undefined,
     placement: "bottom-start",
+    panelWidth: undefined,
   }
 );
 
@@ -767,7 +773,13 @@ defineExpose({
     </button>
     <template #popper>
       <div
-        class="flex w-max min-w-48 max-w-[min(20rem,calc(100vw-2rem))] flex-col"
+        class="flex flex-col"
+        :class="
+          panelWidth
+            ? 'max-w-[calc(100vw-2rem)]'
+            : 'w-max min-w-48 max-w-[min(20rem,calc(100vw-2rem))]'
+        "
+        :style="panelWidth ? { width: panelWidth } : undefined"
       >
         <div
           v-if="title"
@@ -859,7 +871,7 @@ defineExpose({
                   v-if="row.option.icon"
                   class="h-4 w-4 shrink-0 text-gray-500"
                 />
-                <div class="flex min-w-0 flex-1 items-baseline gap-2">
+                <div class="flex min-w-0 flex-1 flex-col">
                   <span
                     class="truncate text-sm"
                     :class="

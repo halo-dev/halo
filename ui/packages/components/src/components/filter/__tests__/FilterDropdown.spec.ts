@@ -26,6 +26,7 @@ function mountDropdown(
     loading?: boolean;
     showClearOption?: boolean;
     clearLabel?: string;
+    panelWidth?: string;
   } = {}
 ) {
   return mount(VFilterDropdown, {
@@ -77,6 +78,14 @@ describe("FilterDropdown", () => {
     expect(
       wrapper.findAll('[role="option"]')[0].attributes("aria-selected")
     ).toBe("true");
+  });
+
+  it("applies a custom panel width", () => {
+    const wrapper = mountDropdown({ panelWidth: "20rem" });
+    const panel = wrapper.get<HTMLElement>('div[style*="width"]');
+
+    expect(panel.attributes("style")).toContain("width: 20rem");
+    expect(panel.classes()).toContain("max-w-[calc(100vw-2rem)]");
   });
 
   it("emits undefined when selecting the clear option", async () => {

@@ -117,6 +117,7 @@ function handleUpdate(value?: FilterDropdownValue) {
     remote-search
     :loading="isFetching"
     :search-placeholder="$t('core.common.placeholder.search')"
+    panel-width="18rem"
     @update:model-value="handleUpdate"
     @search="keyword = $event"
   >
@@ -125,8 +126,9 @@ function handleUpdate(value?: FilterDropdownValue) {
         size="md"
         :alt="option.label"
         :src="getUser(option)?.spec.avatar"
+        aria-hidden="true"
       />
-      <div class="flex min-w-0 flex-1 items-baseline gap-2">
+      <div class="flex min-w-0 flex-1 flex-col">
         <span
           class="truncate text-sm"
           :class="selected ? 'font-medium text-gray-900' : 'text-gray-700'"
