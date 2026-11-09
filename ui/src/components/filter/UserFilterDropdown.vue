@@ -102,6 +102,16 @@ function getUser(option: FilterDropdownOption) {
   return userMap.value.get(String(option.value));
 }
 
+function showUsername(option: FilterDropdownOption) {
+  if (!option.description) {
+    return false;
+  }
+
+  return (
+    option.description.toLowerCase() !== (option.label || "").toLowerCase()
+  );
+}
+
 function handleUpdate(value?: FilterDropdownValue) {
   emit("update:modelValue", typeof value === "string" ? value : undefined);
 }
@@ -123,19 +133,23 @@ function handleUpdate(value?: FilterDropdownValue) {
   >
     <template #option="{ option, selected }">
       <VAvatar
-        size="md"
+        size="sm"
+        circle
         :alt="option.label"
         :src="getUser(option)?.spec.avatar"
         aria-hidden="true"
       />
       <div class="flex min-w-0 flex-1 flex-col">
         <span
-          class="truncate text-sm"
+          class="truncate text-sm group-hover:text-gray-900"
           :class="selected ? 'font-medium text-gray-900' : 'text-gray-700'"
         >
           {{ option.label }}
         </span>
-        <span class="truncate text-xs text-gray-500">
+        <span
+          v-if="showUsername(option)"
+          class="truncate text-xs text-gray-500"
+        >
           {{ option.description }}
         </span>
       </div>
