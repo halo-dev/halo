@@ -71,6 +71,38 @@ export class AttachmentUtils {
   }
 
   /**
+   * Falls back to the original image URL when the thumbnail endpoint rejects it.
+   *
+   * @param event - The error event from the `<img>` element
+   * @param originalUrl - The original image URL used as the fallback
+   *
+   * @remarks
+   * The thumbnail endpoint only redirects external URIs that are registered as
+   * attachments, so unregistered custom links return 404. Falling back keeps the
+   * original image visible instead of showing a broken image.
+   *
+   * @example
+   * ```vue
+   * <img
+   *   :src="utils.attachment.getThumbnailUrl(url, 'S')"
+   *   @error="utils.attachment.handleThumbnailError($event, url)"
+   * />
+   * ```
+   */
+  handleThumbnailError(event: Event, originalUrl: string) {
+    const target = event.target as HTMLImageElement | null;
+
+    // Skip if the element already points at the original URL. This both avoids
+    // retry loops when the original image also fails and allows a reused element
+    // to fall back again after its `src` changes to another image.
+    if (!target || target.getAttribute("src") === originalUrl) {
+      return;
+    }
+
+    target.src = originalUrl;
+  }
+
+  /**
    * Extracts the URL from an attachment-like object
    *
    * @param attachment - The attachment object (can be a string URL, Attachment object, or AttachmentSimple)

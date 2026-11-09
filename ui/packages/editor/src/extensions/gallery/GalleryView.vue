@@ -313,6 +313,7 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
             :alt="image.alt ?? ''"
             :loading="image.aspectRatio > 0 ? 'lazy' : 'eager'"
             class="pointer-events-none block size-full object-cover"
+            @error="utils.attachment.handleThumbnailError($event, image.src)"
             @load="handleImageLoad($event, groupIndex * groupSize + imgIndex)"
           />
           <div

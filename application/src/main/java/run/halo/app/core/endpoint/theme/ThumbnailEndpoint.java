@@ -4,6 +4,7 @@ import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import java.net.URI;
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -21,6 +22,7 @@ import run.halo.app.core.attachment.ThumbnailSize;
 import run.halo.app.core.attachment.thumbnail.ThumbnailService;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.extension.GroupVersion;
+import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.infra.utils.HaloUtils;
 
 /**
@@ -45,6 +47,9 @@ public class ThumbnailEndpoint implements CustomEndpoint {
                             .description("Get thumbnail by URI")
                             .tag(tag)
                             .response(responseBuilder().implementation(Resource.class))
+                            .response(responseBuilder()
+                                    .responseCode("404")
+                                    .description("Thumbnail not found or the URI is not allowed to be redirected to"))
                             .parameter(parameterBuilder()
                                     .in(ParameterIn.QUERY)
                                     .name("uri")
@@ -74,8 +79,16 @@ public class ThumbnailEndpoint implements CustomEndpoint {
     }
 
     private Mono<ServerResponse> getThumbnailByUri(ServerRequest request) {
-        var uri = request.queryParam("uri").filter(StringUtils::isNotBlank).map(HaloUtils::safeToUri);
-        if (uri.isEmpty()) {
+        URI uri;
+        try {
+            uri = request.queryParam("uri")
+                    .filter(StringUtils::isNotBlank)
+                    .map(HaloUtils::safeToUriFromDecoded)
+                    .orElse(null);
+        } catch (IllegalArgumentException e) {
+            return Mono.error(new ServerWebInputException("Required parameter 'uri' is invalid", null, e));
+        }
+        if (uri == null) {
             return Mono.error(new ServerWebInputException("Required parameter 'uri' is missing or invalid"));
         }
         var size = request.queryParam("size")
@@ -89,11 +102,11 @@ public class ThumbnailEndpoint implements CustomEndpoint {
                     new ServerWebInputException("Required parameter 'size' or 'width' is missing or invalid"));
         }
         return thumbnailService
-                .get(uri.get(), size.get())
-                .defaultIfEmpty(uri.get())
+                .getSafeRedirectUri(uri, size.get())
                 .flatMap(thumbnailLink -> ServerResponse.status(HttpStatus.FOUND)
                         .location(thumbnailLink)
-                        .build());
+                        .build())
+                .switchIfEmpty(Mono.error(() -> new NotFoundException("Thumbnail not found")));
     }
 
     @Override
