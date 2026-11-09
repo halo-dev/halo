@@ -213,6 +213,18 @@ class HaloProcessorDialectTest {
     }
 
     @Test
+    void shouldEscapeSeoMetaDescription() {
+        var context = getContext();
+        context.setVariable(Constant.META_DESCRIPTION_VARIABLE_NAME, "\"><script>alert(1)</script>");
+        when(fetcher.fetch(Seo.GROUP, Seo.class)).thenReturn(Mono.empty());
+        when(fetcher.fetch(SystemSetting.Basic.GROUP, SystemSetting.Basic.class))
+                .thenReturn(Mono.empty());
+        var result = templateEngine.process("seo", context);
+        assertThat(result).doesNotContain("<script>");
+        assertThat(result).contains("content=\"&quot;&gt;&lt;script&gt;alert(1)&lt;/script&gt;\"");
+    }
+
+    @Test
     void blockSeo() {
         final Context context = getContext();
         Seo seo = new Seo();
