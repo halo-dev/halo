@@ -82,6 +82,21 @@ public class PostIntegrationTests {
     }
 
     @Test
+    void draftPostWithBlankOwner() {
+        PostRequest postRequest = postDraftRequest();
+        postRequest.post().getSpec().setOwner("");
+
+        webTestClient
+                .post()
+                .uri("/apis/api.console.halo.run/v1alpha1/posts")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(postRequest)
+                .exchange()
+                .expectBody(Post.class)
+                .value(post -> assertThat(post.getSpec().getOwner()).isEqualTo("fake-user"));
+    }
+
+    @Test
     void draftPostAsPublish() {
         PostRequest postRequest = postDraftRequest();
         postRequest.post().getSpec().setPublish(true);
