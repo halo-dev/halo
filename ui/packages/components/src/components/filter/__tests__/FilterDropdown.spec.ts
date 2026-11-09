@@ -383,6 +383,40 @@ describe("FilterDropdown", () => {
     expect(wrapper.emitted("load-more")).toHaveLength(1);
   });
 
+  it("emits load-more again when nested options grow without filling the panel", async () => {
+    const wrapper = mountDropdown({
+      hasMore: true,
+      options: [
+        {
+          label: "Recent",
+          options: [{ label: "Alice", value: "alice" }],
+        },
+      ],
+    });
+
+    wrapper.findComponent(VDropdownStub).vm.$emit("show");
+    await nextTick();
+    wrapper.findComponent(VDropdownStub).vm.$emit("apply-show");
+    await flushPromises();
+
+    expect(wrapper.emitted("load-more")).toHaveLength(1);
+
+    await wrapper.setProps({
+      options: [
+        {
+          label: "Recent",
+          options: [
+            { label: "Alice", value: "alice" },
+            { label: "Bob", value: "bob" },
+          ],
+        },
+      ],
+    });
+    await flushPromises();
+
+    expect(wrapper.emitted("load-more")).toHaveLength(2);
+  });
+
   it("emits load-more when scrolled near the bottom", async () => {
     const wrapper = mountDropdown({ hasMore: true });
     const list = wrapper.get('[role="listbox"]');

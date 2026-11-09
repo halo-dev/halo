@@ -686,6 +686,16 @@ function emitLoadMore() {
   emit("load-more");
 }
 
+function countOptions(items: FilterDropdownItem[]): number {
+  return items.reduce((total, item) => {
+    if (isGroup(item)) {
+      return total + countOptions(item.options);
+    }
+
+    return total + 1 + (item.children ? countOptions(item.children) : 0);
+  }, 0);
+}
+
 function maybeAutoLoadMore() {
   if (!props.hasMore || props.loading) {
     return;
@@ -697,7 +707,7 @@ function maybeAutoLoadMore() {
     return;
   }
 
-  const signature = `${keyword.value}|${props.options.length}`;
+  const signature = `${keyword.value}|${countOptions(props.options)}`;
 
   if (lastAutoLoadSignature === signature) {
     return;
