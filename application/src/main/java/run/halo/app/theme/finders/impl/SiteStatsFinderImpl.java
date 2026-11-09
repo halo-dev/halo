@@ -4,7 +4,7 @@ import static run.halo.app.extension.index.query.Queries.*;
 
 import lombok.AllArgsConstructor;
 import reactor.core.publisher.Mono;
-import run.halo.app.core.extension.Counter;
+import run.halo.app.core.counter.CounterService;
 import run.halo.app.core.extension.content.Category;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ListOptions;
@@ -27,15 +27,18 @@ import run.halo.app.theme.finders.vo.SiteStatsVo;
 @Finder("siteStatsFinder")
 public class SiteStatsFinderImpl implements SiteStatsFinder {
     private final ReactiveExtensionClient client;
+    private final CounterService counterService;
 
     @Override
     public Mono<SiteStatsVo> getStats() {
-        return client.list(Counter.class, null, null)
-                .reduce(SiteStatsVo.empty(), (stats, counter) -> {
-                    stats.setVisit(stats.getVisit() + counter.getVisit());
-                    stats.setComment(stats.getComment() + counter.getApprovedComment());
-                    stats.setUpvote(stats.getUpvote() + counter.getUpvote());
-                    return stats;
+        return counterService
+                .getStats()
+                .map(counterStats -> {
+                    var siteStats = SiteStatsVo.empty();
+                    siteStats.setVisit((int) counterStats.visits());
+                    siteStats.setComment((int) counterStats.approvedComments());
+                    siteStats.setUpvote((int) counterStats.upvotes());
+                    return siteStats;
                 })
                 .flatMap(siteStatsVo ->
                         postCount().doOnNext(siteStatsVo::setPost).thenReturn(siteStatsVo))
