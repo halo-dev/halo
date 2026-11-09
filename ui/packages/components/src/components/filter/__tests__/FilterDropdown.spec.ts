@@ -329,6 +329,86 @@ describe("FilterDropdown", () => {
     expect(document.activeElement).toBe(trigger.element);
   });
 
+  it("stops the Escape keyup that dismissed the panel", async () => {
+    const onKeyup = vi.fn();
+    document.body.addEventListener("keyup", onKeyup);
+
+    try {
+      const wrapper = mountDropdown(
+        { searchable: true },
+        { attachTo: document.body }
+      );
+
+      wrapper.findComponent(VDropdownStub).vm.$emit("apply-show");
+      await nextTick();
+
+      await wrapper.get("input").trigger("keydown", { key: "Escape" });
+      await nextTick();
+
+      wrapper
+        .get("button")
+        .element.dispatchEvent(
+          new KeyboardEvent("keyup", { key: "Escape", bubbles: true })
+        );
+
+      expect(onKeyup).not.toHaveBeenCalled();
+    } finally {
+      document.body.removeEventListener("keyup", onKeyup);
+    }
+  });
+
+  it("lets Escape keyup bubble when the panel was not dismissed by Escape", async () => {
+    const onKeyup = vi.fn();
+    document.body.addEventListener("keyup", onKeyup);
+
+    try {
+      const wrapper = mountDropdown(
+        { searchable: true },
+        { attachTo: document.body }
+      );
+
+      wrapper
+        .get("button")
+        .element.dispatchEvent(
+          new KeyboardEvent("keyup", { key: "Escape", bubbles: true })
+        );
+
+      expect(onKeyup).toHaveBeenCalledTimes(1);
+    } finally {
+      document.body.removeEventListener("keyup", onKeyup);
+    }
+  });
+
+  it("lets Escape keyup bubble after a dismissed panel that never received a keyup", async () => {
+    const onKeyup = vi.fn();
+    document.body.addEventListener("keyup", onKeyup);
+
+    try {
+      const wrapper = mountDropdown(
+        { searchable: true },
+        { attachTo: document.body }
+      );
+
+      wrapper.findComponent(VDropdownStub).vm.$emit("apply-show");
+      await nextTick();
+
+      await wrapper.get("input").trigger("keydown", { key: "Escape" });
+      await nextTick();
+
+      await wrapper.get("button").trigger("keydown", { key: "Escape" });
+
+      wrapper
+        .get("button")
+        .element.dispatchEvent(
+          new KeyboardEvent("keyup", { key: "Escape", bubbles: true })
+        );
+
+      expect(onKeyup).toHaveBeenCalledTimes(1);
+    } finally {
+      document.body.removeEventListener("keyup", onKeyup);
+    }
+  });
+
   it("restores focus to the trigger after selecting an option", async () => {
     const wrapper = mountDropdown(
       { searchable: true },

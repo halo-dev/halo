@@ -582,6 +582,7 @@ function onSearchKeydown(event: KeyboardEvent) {
       break;
     case "Escape":
       event.preventDefault();
+      suppressEscapeKeyup = true;
       hideAndRestoreFocus();
       break;
     case "Tab":
@@ -642,6 +643,7 @@ function onListKeydown(event: KeyboardEvent) {
       break;
     case "Escape":
       event.preventDefault();
+      suppressEscapeKeyup = true;
       hideAndRestoreFocus();
       break;
     case "Tab":
@@ -750,9 +752,29 @@ async function onApplyShow() {
   maybeAutoLoadMore();
 }
 
+let suppressEscapeKeyup = false;
+
 function hideAndRestoreFocus() {
   hide();
   nextTick(() => triggerRef.value?.focus());
+}
+
+function onTriggerKeydown(event: KeyboardEvent) {
+  if (event.key === "Escape") {
+    suppressEscapeKeyup = false;
+  }
+}
+
+function onTriggerKeyup(event: KeyboardEvent) {
+  if (!suppressEscapeKeyup) {
+    return;
+  }
+
+  suppressEscapeKeyup = false;
+
+  if (event.key === "Escape") {
+    event.stopPropagation();
+  }
 }
 
 function onHide() {
@@ -823,6 +845,8 @@ defineExpose({
       :aria-expanded="isOpen"
       :aria-controls="listboxId"
       @keydown.down.prevent="show"
+      @keydown="onTriggerKeydown"
+      @keyup="onTriggerKeyup"
     >
       <slot
         name="trigger"
