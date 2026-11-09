@@ -14,6 +14,7 @@ import {
   VEmpty,
   VEntityContainer,
   VFilterDropdown,
+  VFilterDropdownGroup,
   VLoading,
   VPageHeader,
   VPagination,
@@ -22,7 +23,7 @@ import {
 import { useQuery } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
 import type { Ref } from "vue";
-import { computed, provide, ref, watch } from "vue";
+import { provide, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
 import { singlePageLabels } from "@/constants/labels";
@@ -59,22 +60,6 @@ watch(
     page.value = 1;
   }
 );
-
-const hasFilters = computed(() => {
-  return (
-    selectedContributor.value ||
-    selectedVisible.value ||
-    selectedPublishStatus.value !== undefined ||
-    selectedSort.value
-  );
-});
-
-function handleClearFilters() {
-  selectedContributor.value = undefined;
-  selectedVisible.value = undefined;
-  selectedPublishStatus.value = undefined;
-  selectedSort.value = undefined;
-}
 
 const page = useRouteQuery<number>("page", 1, {
   transform: Number,
@@ -331,72 +316,72 @@ watch(selectedPageNames, (newValue) => {
               </VSpace>
             </div>
             <VSpace spacing="lg" class="flex-wrap">
-              <FilterCleanButton
-                v-if="hasFilters"
-                @click="handleClearFilters"
-              />
-              <VFilterDropdown
-                v-model="selectedPublishStatus"
-                :label="$t('core.common.filters.labels.status')"
-                show-clear-option
-                :clear-label="t('core.common.filters.item_labels.all')"
-                :options="[
-                  {
-                    label: t('core.page.filters.status.items.published'),
-                    value: 'true',
-                  },
-                  {
-                    label: t('core.page.filters.status.items.draft'),
-                    value: 'false',
-                  },
-                ]"
-              />
-              <VFilterDropdown
-                v-model="selectedVisible"
-                :label="$t('core.page.filters.visible.label')"
-                show-clear-option
-                :clear-label="t('core.common.filters.item_labels.all')"
-                :options="[
-                  {
-                    label: t('core.page.filters.visible.items.public'),
-                    value: 'PUBLIC',
-                  },
-                  {
-                    label: t('core.page.filters.visible.items.private'),
-                    value: 'PRIVATE',
-                  },
-                ]"
-              />
-              <HasPermission :permissions="['system:users:view']">
-                <UserFilterDropdown
-                  v-model="selectedContributor"
-                  :label="$t('core.page.filters.author.label')"
+              <VFilterDropdownGroup>
+                <VFilterDropdown
+                  v-model="selectedPublishStatus"
+                  :label="$t('core.common.filters.labels.status')"
+                  show-clear-option
+                  :clear-label="t('core.common.filters.item_labels.all')"
+                  :options="[
+                    {
+                      label: t('core.page.filters.status.items.published'),
+                      value: 'true',
+                    },
+                    {
+                      label: t('core.page.filters.status.items.draft'),
+                      value: 'false',
+                    },
+                  ]"
                 />
-              </HasPermission>
-              <VFilterDropdown
-                v-model="selectedSort"
-                :label="$t('core.common.filters.labels.sort')"
-                show-clear-option
-                :clear-label="t('core.common.filters.item_labels.default')"
-                :options="[
-                  {
-                    label: t('core.page.filters.sort.items.publish_time_desc'),
-                    value: 'publishTime,desc',
-                  },
-                  {
-                    label: t('core.page.filters.sort.items.publish_time_asc'),
-                    value: 'publishTime,asc',
-                  },
-                  {
-                    label: t('core.page.filters.sort.items.create_time_desc'),
-                    value: 'creationTimestamp,desc',
-                  },
-                  {
-                    label: t('core.page.filters.sort.items.create_time_asc'),
-                    value: 'creationTimestamp,asc',
-                  },
-                ]"
-              />
+                <VFilterDropdown
+                  v-model="selectedVisible"
+                  :label="$t('core.page.filters.visible.label')"
+                  show-clear-option
+                  :clear-label="t('core.common.filters.item_labels.all')"
+                  :options="[
+                    {
+                      label: t('core.page.filters.visible.items.public'),
+                      value: 'PUBLIC',
+                    },
+                    {
+                      label: t('core.page.filters.visible.items.private'),
+                      value: 'PRIVATE',
+                    },
+                  ]"
+                />
+                <HasPermission :permissions="['system:users:view']">
+                  <UserFilterDropdown
+                    v-model="selectedContributor"
+                    :label="$t('core.page.filters.author.label')"
+                  />
+                </HasPermission>
+                <VFilterDropdown
+                  v-model="selectedSort"
+                  :label="$t('core.common.filters.labels.sort')"
+                  show-clear-option
+                  :clear-label="t('core.common.filters.item_labels.default')"
+                  :options="[
+                    {
+                      label: t(
+                        'core.page.filters.sort.items.publish_time_desc'
+                      ),
+                      value: 'publishTime,desc',
+                    },
+                    {
+                      label: t('core.page.filters.sort.items.publish_time_asc'),
+                      value: 'publishTime,asc',
+                    },
+                    {
+                      label: t('core.page.filters.sort.items.create_time_desc'),
+                      value: 'creationTimestamp,desc',
+                    },
+                    {
+                      label: t('core.page.filters.sort.items.create_time_asc'),
+                      value: 'creationTimestamp,asc',
+                    },
+                  ]"
+                />
+              </VFilterDropdownGroup>
               <div class="flex flex-row gap-2">
                 <button
                   v-tooltip="$t('core.common.buttons.refresh')"

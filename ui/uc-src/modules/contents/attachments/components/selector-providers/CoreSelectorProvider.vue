@@ -15,6 +15,7 @@ import {
   VEmpty,
   VEntityContainer,
   VFilterDropdown,
+  VFilterDropdownGroup,
   VLoading,
   VPagination,
   VSpace,
@@ -57,14 +58,6 @@ const page = ref(1);
 const size = ref(60);
 const keyword = ref("");
 const selectedSort = ref();
-
-const hasFilters = computed(() => {
-  return selectedSort.value;
-});
-
-function handleClearFilters() {
-  selectedSort.value = undefined;
-}
 
 const {
   data,
@@ -253,48 +246,48 @@ function onUploaded(response: UppyUploadSuccessResponse) {
       </div>
       <div class="mt-4 flex sm:mt-0">
         <VSpace spacing="lg">
-          <FilterCleanButton v-if="hasFilters" @click="handleClearFilters" />
-
-          <VFilterDropdown
-            v-model="selectedSort"
-            :label="$t('core.common.filters.labels.sort')"
-            show-clear-option
-            :clear-label="t('core.common.filters.item_labels.default')"
-            :options="[
-              {
-                label: t(
-                  'core.uc_attachment.filters.sort.items.create_time_desc'
-                ),
-                value: 'metadata.creationTimestamp,desc',
-              },
-              {
-                label: t(
-                  'core.uc_attachment.filters.sort.items.create_time_asc'
-                ),
-                value: 'metadata.creationTimestamp,asc',
-              },
-              {
-                label: t(
-                  'core.uc_attachment.filters.sort.items.display_name_desc'
-                ),
-                value: 'spec.displayName,desc',
-              },
-              {
-                label: t(
-                  'core.uc_attachment.filters.sort.items.display_name_asc'
-                ),
-                value: 'spec.displayName,asc',
-              },
-              {
-                label: t('core.uc_attachment.filters.sort.items.size_desc'),
-                value: 'spec.size,desc',
-              },
-              {
-                label: t('core.uc_attachment.filters.sort.items.size_asc'),
-                value: 'spec.size,asc',
-              },
-            ]"
-          />
+          <VFilterDropdownGroup>
+            <VFilterDropdown
+              v-model="selectedSort"
+              :label="$t('core.common.filters.labels.sort')"
+              show-clear-option
+              :clear-label="t('core.common.filters.item_labels.default')"
+              :options="[
+                {
+                  label: t(
+                    'core.uc_attachment.filters.sort.items.create_time_desc'
+                  ),
+                  value: 'metadata.creationTimestamp,desc',
+                },
+                {
+                  label: t(
+                    'core.uc_attachment.filters.sort.items.create_time_asc'
+                  ),
+                  value: 'metadata.creationTimestamp,asc',
+                },
+                {
+                  label: t(
+                    'core.uc_attachment.filters.sort.items.display_name_desc'
+                  ),
+                  value: 'spec.displayName,desc',
+                },
+                {
+                  label: t(
+                    'core.uc_attachment.filters.sort.items.display_name_asc'
+                  ),
+                  value: 'spec.displayName,asc',
+                },
+                {
+                  label: t('core.uc_attachment.filters.sort.items.size_desc'),
+                  value: 'spec.size,desc',
+                },
+                {
+                  label: t('core.uc_attachment.filters.sort.items.size_asc'),
+                  value: 'spec.size,asc',
+                },
+              ]"
+            />
+          </VFilterDropdownGroup>
 
           <div class="flex flex-row gap-2">
             <div

@@ -11,6 +11,7 @@ import {
   VEmpty,
   VEntityContainer,
   VFilterDropdown,
+  VFilterDropdownGroup,
   VLoading,
   VPageHeader,
   VPagination,
@@ -18,7 +19,7 @@ import {
 } from "@halo-dev/components";
 import { useRouteQuery } from "@vueuse/router";
 import { chunk } from "es-toolkit";
-import { computed, ref, watch } from "vue";
+import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
 import CommentListItem from "./components/CommentListItem.vue";
@@ -45,20 +46,6 @@ watch(
     page.value = 1;
   }
 );
-
-const hasFilters = computed(() => {
-  return (
-    selectedApprovedStatus.value !== undefined ||
-    selectedSort.value ||
-    selectedUser.value
-  );
-});
-
-function handleClearFilters() {
-  selectedApprovedStatus.value = undefined;
-  selectedSort.value = undefined;
-  selectedUser.value = undefined;
-}
 
 const page = useRouteQuery<number>("page", 1, {
   transform: Number,
@@ -240,74 +227,76 @@ const handleApproveInBatch = async () => {
               </VSpace>
             </div>
             <VSpace spacing="lg" class="flex-wrap">
-              <FilterCleanButton
-                v-if="hasFilters"
-                @click="handleClearFilters"
-              />
-              <VFilterDropdown
-                v-model="selectedApprovedStatus"
-                :label="$t('core.common.filters.labels.status')"
-                show-clear-option
-                :clear-label="t('core.common.filters.item_labels.all')"
-                :options="[
-                  {
-                    label: t('core.comment.filters.status.items.approved'),
-                    value: 'true',
-                  },
-                  {
-                    label: t(
-                      'core.comment.filters.status.items.pending_review'
-                    ),
-                    value: 'false',
-                  },
-                ]"
-              />
-              <HasPermission :permissions="['system:users:view']">
-                <UserFilterDropdown
-                  v-model="selectedUser"
-                  :label="$t('core.comment.filters.owner.label')"
+              <VFilterDropdownGroup>
+                <VFilterDropdown
+                  v-model="selectedApprovedStatus"
+                  :label="$t('core.common.filters.labels.status')"
+                  show-clear-option
+                  :clear-label="t('core.common.filters.item_labels.all')"
+                  :options="[
+                    {
+                      label: t('core.comment.filters.status.items.approved'),
+                      value: 'true',
+                    },
+                    {
+                      label: t(
+                        'core.comment.filters.status.items.pending_review'
+                      ),
+                      value: 'false',
+                    },
+                  ]"
                 />
-              </HasPermission>
-              <VFilterDropdown
-                v-model="selectedSort"
-                :label="$t('core.common.filters.labels.sort')"
-                show-clear-option
-                :clear-label="t('core.common.filters.item_labels.default')"
-                :options="[
-                  {
-                    label: t(
-                      'core.comment.filters.sort.items.last_reply_time_desc'
-                    ),
-                    value: 'status.lastReplyTime,desc',
-                  },
-                  {
-                    label: t(
-                      'core.comment.filters.sort.items.last_reply_time_asc'
-                    ),
-                    value: 'status.lastReplyTime,asc',
-                  },
-                  {
-                    label: t(
-                      'core.comment.filters.sort.items.reply_count_desc'
-                    ),
-                    value: 'status.replyCount,desc',
-                  },
-                  {
-                    label: t('core.comment.filters.sort.items.reply_count_asc'),
-                    value: 'status.replyCount,asc',
-                  },
-                  {
-                    label: t(
-                      'core.comment.filters.sort.items.create_time_desc'
-                    ),
-                    value: 'metadata.creationTimestamp,desc',
-                  },
-                  {
-                    label: t('core.comment.filters.sort.items.create_time_asc'),
-                    value: 'metadata.creationTimestamp,asc',
-                  },
-                ]"
-              />
+                <HasPermission :permissions="['system:users:view']">
+                  <UserFilterDropdown
+                    v-model="selectedUser"
+                    :label="$t('core.comment.filters.owner.label')"
+                  />
+                </HasPermission>
+                <VFilterDropdown
+                  v-model="selectedSort"
+                  :label="$t('core.common.filters.labels.sort')"
+                  show-clear-option
+                  :clear-label="t('core.common.filters.item_labels.default')"
+                  :options="[
+                    {
+                      label: t(
+                        'core.comment.filters.sort.items.last_reply_time_desc'
+                      ),
+                      value: 'status.lastReplyTime,desc',
+                    },
+                    {
+                      label: t(
+                        'core.comment.filters.sort.items.last_reply_time_asc'
+                      ),
+                      value: 'status.lastReplyTime,asc',
+                    },
+                    {
+                      label: t(
+                        'core.comment.filters.sort.items.reply_count_desc'
+                      ),
+                      value: 'status.replyCount,desc',
+                    },
+                    {
+                      label: t(
+                        'core.comment.filters.sort.items.reply_count_asc'
+                      ),
+                      value: 'status.replyCount,asc',
+                    },
+                    {
+                      label: t(
+                        'core.comment.filters.sort.items.create_time_desc'
+                      ),
+                      value: 'metadata.creationTimestamp,desc',
+                    },
+                    {
+                      label: t(
+                        'core.comment.filters.sort.items.create_time_asc'
+                      ),
+                      value: 'metadata.creationTimestamp,asc',
+                    },
+                  ]"
+                />
+              </VFilterDropdownGroup>
               <div class="flex flex-row gap-2">
                 <button
                   v-tooltip="$t('core.common.buttons.refresh')"

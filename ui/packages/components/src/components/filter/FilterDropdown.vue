@@ -1,5 +1,14 @@
 <script lang="ts" setup>
-import { computed, nextTick, onBeforeUnmount, ref, useId, watch } from "vue";
+import {
+  computed,
+  inject,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  useId,
+  watch,
+} from "vue";
 import {
   IconArrowDown,
   IconArrowRight,
@@ -8,6 +17,7 @@ import {
 } from "../../icons/icons";
 import { VDropdown, type VDropdownPlacement } from "../dropdown";
 import { VLoading } from "../loading";
+import { filterDropdownGroupKey } from "./group";
 import type {
   FilterDropdownGroup,
   FilterDropdownItem,
@@ -151,6 +161,9 @@ type Row = OptionRow | GroupRow;
 
 const uid = useId();
 const listboxId = `${uid}-listbox`;
+
+const group = inject(filterDropdownGroupKey);
+const groupEntryId = Symbol("filter-dropdown");
 
 const dropdown = ref<{ show: () => void; hide: () => void }>();
 const searchInputRef = ref<HTMLInputElement>();
@@ -419,17 +432,22 @@ function toggleRow(row: OptionRow) {
   activeKey.value = row.key;
 }
 
+function clearSelection() {
+  if (props.modelValue === undefined) {
+    return;
+  }
+
+  emit("update:modelValue", undefined);
+  emit("select", undefined);
+}
+
 function selectRow(row: OptionRow) {
   if (row.option.disabled) {
     return;
   }
 
   if (row.isClear) {
-    if (props.modelValue !== undefined) {
-      emit("update:modelValue", undefined);
-      emit("select", undefined);
-    }
-
+    clearSelection();
     keyword.value = "";
     hide();
     return;
@@ -441,8 +459,7 @@ function selectRow(row: OptionRow) {
   }
 
   if (row.option.value === props.modelValue) {
-    emit("update:modelValue", undefined);
-    emit("select", undefined);
+    clearSelection();
   } else {
     emit("update:modelValue", row.option.value);
     emit("select", row.option);
@@ -690,7 +707,16 @@ watch(
   }
 );
 
+onMounted(() => {
+  group?.register(groupEntryId, {
+    isActive: () => props.modelValue !== undefined,
+    clear: clearSelection,
+  });
+});
+
 onBeforeUnmount(() => {
+  group?.unregister(groupEntryId);
+
   if (searchTimer) {
     clearTimeout(searchTimer);
   }

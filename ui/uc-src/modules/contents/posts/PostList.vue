@@ -9,6 +9,7 @@ import {
   VEmpty,
   VEntityContainer,
   VFilterDropdown,
+  VFilterDropdownGroup,
   VLoading,
   VPageHeader,
   VPagination,
@@ -16,7 +17,7 @@ import {
 } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
-import { computed, watch } from "vue";
+import { watch } from "vue";
 import { postLabels } from "@/constants/labels";
 import PostListItem from "./components/PostListItem.vue";
 
@@ -31,14 +32,6 @@ const keyword = useRouteQuery<string>("keyword", "");
 const selectedPublishPhase = useRouteQuery<
   "DRAFT" | "PENDING_APPROVAL" | "PUBLISHED" | "FAILED" | undefined
 >("status");
-
-function handleClearFilters() {
-  selectedPublishPhase.value = undefined;
-}
-
-const hasFilters = computed(() => {
-  return selectedPublishPhase.value !== undefined;
-});
 
 watch(
   () => [selectedPublishPhase.value, keyword.value],
@@ -127,26 +120,24 @@ const {
             <SearchInput v-model="keyword" />
 
             <VSpace spacing="lg" class="flex-wrap">
-              <FilterCleanButton
-                v-if="hasFilters"
-                @click="handleClearFilters"
-              />
-              <VFilterDropdown
-                v-model="selectedPublishPhase"
-                :label="$t('core.common.filters.labels.status')"
-                show-clear-option
-                :clear-label="$t('core.common.filters.item_labels.all')"
-                :options="[
-                  {
-                    label: $t('core.post.filters.status.items.published'),
-                    value: 'PUBLISHED',
-                  },
-                  {
-                    label: $t('core.post.filters.status.items.draft'),
-                    value: 'DRAFT',
-                  },
-                ]"
-              />
+              <VFilterDropdownGroup>
+                <VFilterDropdown
+                  v-model="selectedPublishPhase"
+                  :label="$t('core.common.filters.labels.status')"
+                  show-clear-option
+                  :clear-label="$t('core.common.filters.item_labels.all')"
+                  :options="[
+                    {
+                      label: $t('core.post.filters.status.items.published'),
+                      value: 'PUBLISHED',
+                    },
+                    {
+                      label: $t('core.post.filters.status.items.draft'),
+                      value: 'DRAFT',
+                    },
+                  ]"
+                />
+              </VFilterDropdownGroup>
               <button
                 v-tooltip="$t('core.common.buttons.refresh')"
                 type="button"
