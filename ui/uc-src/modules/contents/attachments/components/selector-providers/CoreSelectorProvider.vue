@@ -246,7 +246,7 @@ function onUploaded(response: UppyUploadSuccessResponse) {
       </div>
       <div class="mt-4 flex sm:mt-0">
         <VSpace spacing="lg">
-          <VFilterDropdownGroup>
+          <VFilterDropdownGroup :clear-label="$t('core.common.buttons.reset')">
             <VFilterDropdown
               v-model="selectedSort"
               :label="$t('core.common.filters.labels.sort')"

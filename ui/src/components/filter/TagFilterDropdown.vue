@@ -35,6 +35,7 @@ const options = computed<FilterDropdownOption[]>(() => {
       label: tag.spec.displayName,
       value: tag.metadata.name,
       description: tag.status?.permalink,
+      keywords: [tag.metadata.name],
     })) || []
   );
 });
@@ -65,6 +66,7 @@ function handleUpdate(value?: FilterDropdownValue) {
     :options="options"
     searchable
     :search-placeholder="$t('core.common.placeholder.search')"
+    :empty-text="$t('core.components.global_search.no_results')"
     panel-width="22rem"
     @update:model-value="handleUpdate"
   >

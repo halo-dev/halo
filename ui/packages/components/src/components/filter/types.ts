@@ -26,6 +26,10 @@ export interface FilterDropdownOption {
    */
   description?: string;
   /**
+   * Additional terms matched by the local search, such as a resource name.
+   */
+  keywords?: string[];
+  /**
    * Optional leading icon component.
    */
   icon?: Component;

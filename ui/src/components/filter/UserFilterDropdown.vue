@@ -127,6 +127,7 @@ function handleUpdate(value?: FilterDropdownValue) {
     remote-search
     :loading="isFetching"
     :search-placeholder="$t('core.common.placeholder.search')"
+    :empty-text="$t('core.components.global_search.no_results')"
     panel-width="18rem"
     @update:model-value="handleUpdate"
     @search="keyword = $event"

@@ -1,6 +1,6 @@
 import { flushPromises, mount } from "@vue/test-utils";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
-import { defineComponent, h } from "vue";
+import { defineComponent, h, nextTick } from "vue";
 import {
   VFilterDropdown,
   type FilterDropdownOption,
@@ -32,7 +32,8 @@ function mountDropdown(
     clearLabel?: string;
     panelWidth?: string;
     variant?: FilterDropdownVariant;
-  } = {}
+  } = {},
+  options: { attachTo?: HTMLElement } = {}
 ) {
   return mount(VFilterDropdown, {
     props: {
@@ -43,6 +44,7 @@ function mountDropdown(
       ],
       ...props,
     },
+    ...(options.attachTo ? { attachTo: options.attachTo } : {}),
     global: {
       stubs: {
         VDropdown: VDropdownStub,
@@ -154,6 +156,22 @@ describe("FilterDropdown", () => {
     expect(options[0].text()).toContain("Bob");
   });
 
+  it("matches option keywords in local search", async () => {
+    const wrapper = mountDropdown({
+      searchable: true,
+      options: [
+        { label: "Apple", value: "apple", keywords: ["tag-4fxvldaw"] },
+        { label: "Banana", value: "banana" },
+      ],
+    });
+
+    await wrapper.get("input").setValue("tag-4fxvldaw");
+
+    const options = wrapper.findAll('[role="option"]');
+    expect(options).toHaveLength(1);
+    expect(options[0].text()).toContain("Apple");
+  });
+
   it("does not filter options locally in remote search mode", async () => {
     const wrapper = mountDropdown({ remoteSearch: true });
 
@@ -208,6 +226,142 @@ describe("FilterDropdown", () => {
     expect(wrapper.emitted("update:modelValue")?.[0]).toEqual(["alice"]);
   });
 
+  it("expands and collapses tree nodes from the search input", async () => {
+    const wrapper = mountDropdown({
+      searchable: true,
+      options: [
+        {
+          label: "Frontend",
+          children: [{ label: "Vue", value: "vue" }],
+        },
+      ],
+    });
+    const input = wrapper.get("input");
+
+    await input.trigger("keydown", { key: "ArrowDown" });
+    expect(wrapper.findAll("[data-option-id]")).toHaveLength(2);
+
+    await input.trigger("keydown", { key: "ArrowLeft" });
+    expect(wrapper.findAll("[data-option-id]")).toHaveLength(1);
+
+    await input.trigger("keydown", { key: "ArrowRight" });
+    expect(wrapper.findAll("[data-option-id]")).toHaveLength(2);
+  });
+
+  it("keeps horizontal arrows for text editing while searching a tree", async () => {
+    const wrapper = mountDropdown({
+      searchable: true,
+      options: [
+        {
+          label: "Frontend",
+          children: [{ label: "Vue", value: "vue" }],
+        },
+      ],
+    });
+    const input = wrapper.get("input");
+
+    await input.setValue("Frontend");
+
+    const left = new KeyboardEvent("keydown", {
+      key: "ArrowLeft",
+      bubbles: true,
+      cancelable: true,
+    });
+    input.element.dispatchEvent(left);
+
+    expect(left.defaultPrevented).toBe(false);
+    expect(wrapper.findAll("[data-option-id]")).toHaveLength(2);
+
+    const right = new KeyboardEvent("keydown", {
+      key: "ArrowRight",
+      bubbles: true,
+      cancelable: true,
+    });
+    input.element.dispatchEvent(right);
+
+    expect(right.defaultPrevented).toBe(false);
+    expect(wrapper.findAll("[data-option-id]")).toHaveLength(2);
+  });
+
+  it("exposes the popup type on the search input", () => {
+    const searchable = mountDropdown({ searchable: true });
+    expect(searchable.get("input").attributes("aria-haspopup")).toBe("listbox");
+
+    const tree = mountDropdown({
+      searchable: true,
+      options: [
+        {
+          label: "Frontend",
+          children: [{ label: "Vue", value: "vue" }],
+        },
+      ],
+    });
+    expect(tree.get("input").attributes("aria-haspopup")).toBe("tree");
+  });
+
+  it("focuses the search input after the popper is applied", async () => {
+    const wrapper = mountDropdown(
+      { searchable: true },
+      { attachTo: document.body }
+    );
+
+    wrapper.findComponent(VDropdownStub).vm.$emit("apply-show");
+    await nextTick();
+
+    expect(document.activeElement).toBe(wrapper.get("input").element);
+  });
+
+  it("restores focus to the trigger when closed with Escape", async () => {
+    const wrapper = mountDropdown(
+      { searchable: true },
+      { attachTo: document.body }
+    );
+    const input = wrapper.get("input");
+    const trigger = wrapper.get("button");
+
+    wrapper.findComponent(VDropdownStub).vm.$emit("apply-show");
+    await nextTick();
+    expect(document.activeElement).toBe(input.element);
+
+    await input.trigger("keydown", { key: "Escape" });
+    await nextTick();
+
+    expect(document.activeElement).toBe(trigger.element);
+  });
+
+  it("restores focus to the trigger after selecting an option", async () => {
+    const wrapper = mountDropdown(
+      { searchable: true },
+      { attachTo: document.body }
+    );
+    const trigger = wrapper.get("button");
+
+    wrapper.findComponent(VDropdownStub).vm.$emit("apply-show");
+    await nextTick();
+
+    await wrapper.findAll('[role="option"]')[0].trigger("click");
+    await nextTick();
+
+    expect(document.activeElement).toBe(trigger.element);
+  });
+
+  it("restores focus to the trigger when closed with Tab", async () => {
+    const wrapper = mountDropdown(
+      { searchable: true },
+      { attachTo: document.body }
+    );
+    const input = wrapper.get("input");
+    const trigger = wrapper.get("button");
+
+    wrapper.findComponent(VDropdownStub).vm.$emit("apply-show");
+    await nextTick();
+
+    await input.trigger("keydown", { key: "Tab" });
+    await nextTick();
+
+    expect(document.activeElement).toBe(trigger.element);
+  });
+
   it("debounces remote search", async () => {
     vi.useFakeTimers();
 
@@ -223,7 +377,7 @@ describe("FilterDropdown", () => {
   it("emits load-more when opening a short list with more pages", async () => {
     const wrapper = mountDropdown({ hasMore: true });
 
-    wrapper.findComponent(VDropdownStub).vm.$emit("show");
+    wrapper.findComponent(VDropdownStub).vm.$emit("apply-show");
     await flushPromises();
 
     expect(wrapper.emitted("load-more")).toHaveLength(1);

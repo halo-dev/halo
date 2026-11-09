@@ -178,6 +178,7 @@ const group = inject(filterDropdownGroupKey);
 const groupEntryId = Symbol("filter-dropdown");
 
 const dropdown = ref<{ show: () => void; hide: () => void }>();
+const triggerRef = ref<HTMLButtonElement>();
 const searchInputRef = ref<HTMLInputElement>();
 const listRef = ref<HTMLElement>();
 
@@ -229,13 +230,19 @@ function matchesKeyword(text: string | undefined, word: string) {
   return !!text && text.toLowerCase().includes(word);
 }
 
+function matchesOption(option: FilterDropdownOption, word: string) {
+  return (
+    matchesKeyword(option.label, word) ||
+    matchesKeyword(option.description, word) ||
+    option.keywords?.some((keyword) => matchesKeyword(keyword, word))
+  );
+}
+
 function filterOption(
   option: FilterDropdownOption,
   word: string
 ): FilterDropdownOption | undefined {
-  const matchesSelf =
-    matchesKeyword(option.label, word) ||
-    matchesKeyword(option.description, word);
+  const matchesSelf = matchesOption(option, word);
 
   if (!option.children?.length) {
     return matchesSelf ? option : undefined;
@@ -485,7 +492,7 @@ function selectRow(row: OptionRow) {
   if (row.isClear) {
     clearSelection();
     keyword.value = "";
-    hide();
+    hideAndRestoreFocus();
     return;
   }
 
@@ -502,7 +509,7 @@ function selectRow(row: OptionRow) {
   }
 
   keyword.value = "";
-  hide();
+  hideAndRestoreFocus();
 }
 
 function moveActive(delta: number) {
@@ -544,6 +551,8 @@ function onSearchKeydown(event: KeyboardEvent) {
     return;
   }
 
+  const row = activeRow.value;
+
   switch (event.key) {
     case "ArrowDown":
       event.preventDefault();
@@ -553,18 +562,30 @@ function onSearchKeydown(event: KeyboardEvent) {
       event.preventDefault();
       moveActive(-1);
       break;
-    case "Enter":
-      if (activeRow.value) {
+    case "ArrowRight":
+      if (!normalizedKeyword.value && row?.hasChildren && !row.expanded) {
         event.preventDefault();
-        selectRow(activeRow.value);
+        toggleRow(row);
+      }
+      break;
+    case "ArrowLeft":
+      if (!normalizedKeyword.value && row?.hasChildren && row.expanded) {
+        event.preventDefault();
+        toggleRow(row);
+      }
+      break;
+    case "Enter":
+      if (row) {
+        event.preventDefault();
+        selectRow(row);
       }
       break;
     case "Escape":
       event.preventDefault();
-      hide();
+      hideAndRestoreFocus();
       break;
     case "Tab":
-      hide();
+      hideAndRestoreFocus();
       break;
   }
 }
@@ -621,10 +642,10 @@ function onListKeydown(event: KeyboardEvent) {
       break;
     case "Escape":
       event.preventDefault();
-      hide();
+      hideAndRestoreFocus();
       break;
     case "Tab":
-      hide();
+      hideAndRestoreFocus();
       break;
   }
 }
@@ -700,7 +721,9 @@ async function onShow() {
   isOpen.value = true;
   lastAutoLoadSignature = "";
   loadMoreRequested = false;
+}
 
+async function onApplyShow() {
   await nextTick();
 
   if (showSearch.value) {
@@ -715,6 +738,11 @@ async function onShow() {
   await nextTick();
   scrollActiveIntoView();
   maybeAutoLoadMore();
+}
+
+function hideAndRestoreFocus() {
+  hide();
+  nextTick(() => triggerRef.value?.focus());
 }
 
 function onHide() {
@@ -770,11 +798,14 @@ defineExpose({
     :disabled="disabled"
     :placement="placement"
     :distance="4"
+    :no-auto-focus="true"
     popper-class="[&_.v-popper\_\_inner]:!overflow-hidden [&_.v-popper\_\_inner]:!p-0"
     @show="onShow"
+    @apply-show="onApplyShow"
     @hide="onHide"
   >
     <button
+      ref="triggerRef"
       type="button"
       :class="triggerClasses"
       :disabled="disabled"
@@ -833,6 +864,7 @@ defineExpose({
               role="combobox"
               aria-autocomplete="list"
               aria-expanded="true"
+              :aria-haspopup="hasTree ? 'tree' : 'listbox'"
               :aria-controls="listboxId"
               :aria-activedescendant="activeOptionId"
               @keydown="onSearchKeydown"

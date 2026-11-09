@@ -213,6 +213,7 @@ function handleToggleUploadView() {
       <div class="mt-4 flex sm:mt-0">
         <VSpace spacing="lg">
           <VFilterDropdownGroup
+            :clear-label="$t('core.common.buttons.reset')"
             :has-external-filters="!!selectedPolicy || !!selectedGroup"
             @clear="handleClearExternalFilters"
           >

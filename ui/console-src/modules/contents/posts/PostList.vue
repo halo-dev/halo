@@ -427,7 +427,11 @@ watch(
               </VSpace>
             </div>
             <VSpace spacing="lg" class="flex-wrap">
-              <VFilterDropdownGroup>
+              <VFilterDropdownGroup
+                :clear-label="$t('core.common.buttons.reset')"
+                :has-external-filters="!!selectedContributor"
+                @clear="selectedContributor = undefined"
+              >
                 <VFilterDropdown
                   v-model="selectedPublishStatus"
                   :label="$t('core.common.filters.labels.status')"

@@ -215,7 +215,9 @@ const { handleChangeStatusInBatch, handleUninstallInBatch } =
               </VSpace>
             </div>
             <VSpace spacing="lg" class="flex-wrap">
-              <VFilterDropdownGroup>
+              <VFilterDropdownGroup
+                :clear-label="$t('core.common.buttons.reset')"
+              >
                 <VFilterDropdown
                   v-model="selectedEnabledValue"
                   :label="$t('core.common.filters.labels.status')"

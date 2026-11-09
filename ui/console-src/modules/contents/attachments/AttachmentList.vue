@@ -314,7 +314,11 @@ watch(
                   </VSpace>
                 </div>
                 <VSpace spacing="lg" class="flex-wrap">
-                  <VFilterDropdownGroup>
+                  <VFilterDropdownGroup
+                    :clear-label="$t('core.common.buttons.reset')"
+                    :has-external-filters="!!selectedUser"
+                    @clear="selectedUser = undefined"
+                  >
                     <VFilterDropdown
                       v-model="selectedPolicy"
                       :label="

@@ -120,7 +120,9 @@ const {
             <SearchInput v-model="keyword" />
 
             <VSpace spacing="lg" class="flex-wrap">
-              <VFilterDropdownGroup>
+              <VFilterDropdownGroup
+                :clear-label="$t('core.common.buttons.reset')"
+              >
                 <VFilterDropdown
                   v-model="selectedPublishPhase"
                   :label="$t('core.common.filters.labels.status')"

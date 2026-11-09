@@ -37,6 +37,7 @@ function toOption(node: CategoryTreeNode): FilterDropdownOption {
     label: node.category.spec.displayName,
     value: node.category.metadata.name,
     description: node.category.status?.permalink,
+    keywords: [node.category.metadata.name],
     children: node.children.length ? node.children.map(toOption) : undefined,
   };
 }
@@ -71,6 +72,7 @@ function handleUpdate(value?: FilterDropdownValue) {
     :options="options"
     searchable
     :search-placeholder="$t('core.common.placeholder.search')"
+    :empty-text="$t('core.components.global_search.no_results')"
     panel-width="22rem"
     @update:model-value="handleUpdate"
   >
