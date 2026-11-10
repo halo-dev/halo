@@ -56,7 +56,7 @@ class SinglePageServiceImplTest {
     @Test
     void shouldAssembleListedSinglePagesWithBatchQueries() {
         var page1 = singlePage("page-1", "user-1");
-        page1.getStatusOrDefault().setContributors(List.of("user-2", "user-1"));
+        page1.getStatusOrDefault().setContributors(List.of("user-2", "user-1", "user-2"));
         var page2 = singlePage("page-2", " ");
 
         var pageRequest = PageRequestImpl.of(1, 20);
@@ -81,7 +81,7 @@ class SinglePageServiceImplTest {
         assertThat(listedPage1.getPage()).isSameAs(page1);
         assertThat(listedPage1.getContributors())
                 .extracting(Contributor::getName)
-                .containsExactly("user-2", "user-1");
+                .containsExactly("user-2", "user-1", "user-2");
         assertThat(listedPage1.getOwner().getName()).isEqualTo("user-1");
         assertThat(listedPage1.getStats().getVisit()).isEqualTo(7);
         assertThat(listedPage1.getStats().getTotalComment()).isEqualTo(3);

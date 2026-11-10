@@ -64,7 +64,7 @@ class PostServiceImplTest {
     @Test
     void shouldAssembleListedPostsWithBatchQueries() {
         var post1 = post("post-1", "user-1", List.of("tag-b", "tag-a"), List.of("category-b", "category-a"));
-        post1.getStatusOrDefault().setContributors(List.of("user-2", "user-1"));
+        post1.getStatusOrDefault().setContributors(List.of("user-2", "user-1", "user-2"));
         var post2 = post("post-2", "missing-user", List.of("tag-a"), List.of("category-a"));
 
         var pageRequest = PageRequestImpl.of(1, 20);
@@ -76,7 +76,8 @@ class PostServiceImplTest {
         when(counterService.getByNames(anyCollection()))
                 .thenReturn(Flux.just(counter("posts.content.halo.run/post-1", 10, 1, 2, 1)));
         when(client.listAll(eq(Tag.class), any(ListOptions.class), eq(Sort.by("metadata.creationTimestamp"))))
-                .thenReturn(Flux.just(tag("tag-b"), tag("tag-a")));
+                // The creation timestamp order deliberately differs from the post spec order.
+                .thenReturn(Flux.just(tag("tag-a"), tag("tag-b")));
         when(client.listAll(eq(Category.class), any(ListOptions.class), eq(Sort.unsorted())))
                 .thenReturn(Flux.just(category("category-a"), category("category-b")));
         when(userService.getUsersOrGhosts(anyList())).thenAnswer(invocation -> {
@@ -93,13 +94,13 @@ class PostServiceImplTest {
         assertThat(listedPost1.getPost()).isSameAs(post1);
         assertThat(listedPost1.getTags())
                 .extracting(tag -> tag.getMetadata().getName())
-                .containsExactly("tag-b", "tag-a");
+                .containsExactly("tag-a", "tag-b");
         assertThat(listedPost1.getCategories())
                 .extracting(category -> category.getMetadata().getName())
                 .containsExactly("category-b", "category-a");
         assertThat(listedPost1.getContributors())
                 .extracting(Contributor::getName)
-                .containsExactly("user-2", "user-1");
+                .containsExactly("user-2", "user-1", "user-2");
         assertThat(listedPost1.getOwner().getName()).isEqualTo("user-1");
         assertThat(listedPost1.getOwner().getDisplayName()).isEqualTo("User One");
         assertThat(listedPost1.getStats().getVisit()).isEqualTo(10);
