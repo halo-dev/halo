@@ -1,15 +1,9 @@
 <script lang="ts" setup>
 import type { Notification } from "@halo-dev/api-client";
-import { ucApiClient } from "@halo-dev/api-client";
-import { Dialog, Toast, VStatusDot } from "@halo-dev/components";
-import { stores, utils } from "@halo-dev/ui-shared";
-import { useMutation, useQueryClient } from "@tanstack/vue-query";
+import { VStatusDot } from "@halo-dev/components";
+import { utils } from "@halo-dev/ui-shared";
 import sanitize from "sanitize-html";
 import { computed } from "vue";
-import { useI18n } from "vue-i18n";
-
-const queryClient = useQueryClient();
-const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
@@ -24,40 +18,10 @@ const props = withDefaults(
   }
 );
 
-const { currentUser } = stores.currentUser();
-
-const { mutate: handleMarkAsRead } = useMutation({
-  mutationKey: ["notification-mark-as-read"],
-  mutationFn: async () => {
-    await ucApiClient.notification.notification.markNotificationAsRead({
-      name: props.notification.metadata.name,
-      username: currentUser?.user.metadata.name as string,
-    });
-  },
-  async onSuccess() {
-    await queryClient.invalidateQueries({ queryKey: ["user-notifications"] });
-  },
-});
-
-function handleDelete() {
-  Dialog.warning({
-    title: t("core.uc_notification.operations.delete.title"),
-    description: t("core.uc_notification.operations.delete.description"),
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
-    confirmType: "danger",
-    async onConfirm() {
-      await ucApiClient.notification.notification.deleteSpecifiedNotification({
-        name: props.notification.metadata.name,
-        username: currentUser?.user.metadata.name as string,
-      });
-
-      await queryClient.invalidateQueries({ queryKey: ["user-notifications"] });
-
-      Toast.success(t("core.common.toast.delete_success"));
-    },
-  });
-}
+const emit = defineEmits<{
+  read: [notification: Notification];
+  delete: [notification: Notification];
+}>();
 
 const content = computed(() => {
   // Clean html tags
@@ -131,13 +95,13 @@ const content = computed(() => {
         <span
           v-if="notification.spec?.unread"
           class="text-sm text-gray-600 hover:text-gray-900"
-          @click.stop="handleMarkAsRead()"
+          @click.stop="emit('read', notification)"
         >
           {{ $t("core.uc_notification.operations.mark_as_read.button") }}
         </span>
         <span
           class="text-sm text-red-600 hover:text-red-700"
-          @click.stop="handleDelete"
+          @click.stop="emit('delete', notification)"
         >
           {{ $t("core.common.buttons.delete") }}
         </span>

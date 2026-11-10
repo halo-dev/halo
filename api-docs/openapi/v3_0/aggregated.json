@@ -6945,6 +6945,40 @@
       }
     },
     "/apis/api.notification.halo.run/v1alpha1/userspaces/{username}/notifications": {
+      "delete": {
+        "description": "Delete all notifications matching the given field selector.",
+        "operationId": "DeleteAllNotifications",
+        "parameters": [
+          {
+            "description": "User metadata.name",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Field selector for filtering. e.g.: spec.unread\u003dtrue",
+            "in": "query",
+            "name": "fieldSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Notifications deleted successfully."
+          }
+        },
+        "tags": [
+          "NotificationV1alpha1Uc"
+        ]
+      },
       "get": {
         "description": "List notifications for the authenticated user.",
         "operationId": "ListUserNotifications",
@@ -7027,6 +7061,41 @@
         ]
       }
     },
+    "/apis/api.notification.halo.run/v1alpha1/userspaces/{username}/notifications/-/mark-all-as-read": {
+      "put": {
+        "description": "Mark all notifications as read.",
+        "operationId": "MarkAllNotificationsAsRead",
+        "parameters": [
+          {
+            "description": "User metadata.name",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "NotificationV1alpha1Uc"
+        ]
+      }
+    },
     "/apis/api.notification.halo.run/v1alpha1/userspaces/{username}/notifications/-/mark-specified-as-read": {
       "put": {
         "description": "Mark the specified notifications as read.",
@@ -7076,6 +7145,45 @@
       "delete": {
         "description": "Delete the specified notification.",
         "operationId": "DeleteSpecifiedNotification",
+        "parameters": [
+          {
+            "description": "User metadata.name",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Notification metadata.name",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Notification"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "NotificationV1alpha1Uc"
+        ]
+      },
+      "get": {
+        "description": "Get the specified notification.",
+        "operationId": "GetSpecifiedNotification",
         "parameters": [
           {
             "description": "User metadata.name",
