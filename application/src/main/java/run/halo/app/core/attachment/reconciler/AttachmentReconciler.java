@@ -43,9 +43,18 @@ class AttachmentReconciler implements Reconciler<Request> {
                 .map(attachment -> {
                     if (ExtensionUtil.isDeleted(attachment)) {
                         if (removeFinalizers(attachment.getMetadata(), Set.of(Constant.FINALIZER_NAME))) {
+                            try {
+                                // Publish before cleaning up so the thumbnail cache stops trusting the permalink even
+                                // if the cleanup fails or is slow. A failing listener must not block the cleanup.
+                                this.eventPublisher.publishEvent(new AttachmentChangedEvent(this, attachment));
+                            } catch (RuntimeException e) {
+                                log.warn(
+                                        "Failed to publish attachment changed event for {}",
+                                        attachment.getMetadata().getName(),
+                                        e);
+                            }
                             cleanUpResources(attachment);
                             client.update(attachment);
-                            this.eventPublisher.publishEvent(new AttachmentChangedEvent(this, attachment));
                         }
                         return null;
                     }

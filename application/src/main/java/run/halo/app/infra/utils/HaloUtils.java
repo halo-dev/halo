@@ -116,4 +116,31 @@ public class HaloUtils {
         }
         return uriBuilder.build(false).encode().toUri();
     }
+
+    /**
+     * Safely convert an already URL-decoded string to URI without decoding it again. This method preserves the
+     * percent-encoded parts of the input, so a stored URI like {@code https://example.com/a%2Fb.png} keeps matching
+     * itself. Unicode hosts are still normalized to ASCII (punycode), and the input is encoded as a fallback if it
+     * cannot be parsed as an URI.
+     *
+     * @param uri the URL-decoded uri string
+     * @return the uri
+     */
+    public static URI safeToUriFromDecoded(String uri) {
+        var normalizedUri = normalizeHttpHost(uri);
+        try {
+            return URI.create(normalizedUri);
+        } catch (IllegalArgumentException e) {
+            return safeToUri(normalizedUri);
+        }
+    }
+
+    private static String normalizeHttpHost(String uri) {
+        if (!StringUtils.startsWithIgnoreCase(uri, "http://") && !StringUtils.startsWithIgnoreCase(uri, "https://")) {
+            // Only absolute http(s) URLs have an authority that may need IDN normalization.
+            return uri;
+        }
+        var normalizedUri = ExternalUrlUtils.toAscii(uri);
+        return normalizedUri != null ? normalizedUri : uri;
+    }
 }

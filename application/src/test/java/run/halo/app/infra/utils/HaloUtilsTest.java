@@ -37,4 +37,37 @@ class HaloUtilsTest {
     void shouldConvertUriSafely(String uri, String expected) {
         assertEquals(expected, HaloUtils.safeToUri(uri).toString());
     }
+
+    @ParameterizedTest
+    @CsvSource({
+        "https://example.com/a%2Fb.png, https://example.com/a%2Fb.png",
+        "https://example.com/a%7Eb.png, https://example.com/a%7Eb.png",
+        "https://example.com/a%41b.png, https://example.com/a%41b.png",
+        "https://example.com/a%3Fb.png, https://example.com/a%3Fb.png",
+        "https://example.com/a%23b.png, https://example.com/a%23b.png",
+        "/upload/a%5Cb.png, /upload/a%5Cb.png",
+        "https://example.com/中文, https://example.com/%E4%B8%AD%E6%96%87",
+        "http://中文.com/path/to/中文, http://xn--fiq228c.com/path/to/%E4%B8%AD%E6%96%87",
+        "http://example.com/normal-path, http://example.com/normal-path",
+        "/upload/%E4%B8%AD%E6%96%87%20%E6%96%87%E4%BB%B6.png, /upload/%E4%B8%AD%E6%96%87%20%E6%96%87%E4%BB%B6.png",
+        "/upload/emoji-%F0%9F%98%80.png, /upload/emoji-%F0%9F%98%80.png",
+        "/upload/a%23b%3Fc%26d%3De%2Bf.png, /upload/a%23b%3Fc%26d%3De%2Bf.png",
+        "/upload/100%25.png, /upload/100%25.png",
+        "/upload/space%20name.png, /upload/space%20name.png",
+        "/upload/colon%3Aname.png, /upload/colon%3Aname.png",
+        "/upload/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.png, /upload/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.png"
+    })
+    void shouldPreserveEncodedPartsWhenConvertingDecodedUri(String uri, String expected) {
+        assertEquals(expected, HaloUtils.safeToUriFromDecoded(uri).toASCIIString());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "http://example.com/path with spaces, http://example.com/path%20with%20spaces",
+        "/upload/first%20last photo.png, /upload/first%20last%20photo.png",
+        "/a{b}.png, /a%7Bb%7D.png"
+    })
+    void shouldEncodeDecodedUriWhenItCannotBeParsedAsIs(String uri, String expected) {
+        assertEquals(expected, HaloUtils.safeToUriFromDecoded(uri).toASCIIString());
+    }
 }
