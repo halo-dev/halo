@@ -113,6 +113,11 @@ const {
   queryFn: async ({ pageParam = 0, queryKey }) => {
     const start = pageParam as number;
     const tab = queryKey[1] as string;
+    // Sample before the request: a removal registered while the request is in
+    // flight may not be reflected in the response, and under-subtracting would
+    // skip the notification at the page boundary. Over-subtracting only
+    // overlaps pages, which are deduplicated.
+    const removalsAtFetch = removalState(tab).count;
     const { data } =
       await ucApiClient.notification.notification.listUserNotifications({
         username: currentUser?.user.metadata.name as string,
@@ -126,7 +131,7 @@ const {
       tab,
       total: data.total,
       nextOffset: start + data.items.length,
-      removalsAtFetch: removalState(tab).count,
+      removalsAtFetch,
     };
 
     return page;
