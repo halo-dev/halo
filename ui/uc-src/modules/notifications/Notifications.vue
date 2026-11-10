@@ -152,12 +152,17 @@ const { data: selectedNotificationById } = useQuery({
         size: 1,
         fieldSelector: [`metadata.name=${queryKey[1]}`],
       });
-    return data.items.find((item) => item.metadata.name === queryKey[1]);
+    return (
+      data.items.find((item) => item.metadata.name === queryKey[1]) ?? null
+    );
   },
 });
 
 const selectedNotification = computed(
-  () => selectedNotificationFromList.value ?? selectedNotificationById.value
+  () =>
+    selectedNotificationFromList.value ??
+    selectedNotificationById.value ??
+    undefined
 );
 
 function updateCachedNotificationReadState(name: string) {
@@ -194,6 +199,15 @@ const { mutate: markSelectedAsRead } = useMutation({
   onSuccess(_, notification) {
     markingReadNames.delete(notification.metadata.name);
     updateCachedNotificationReadState(notification.metadata.name);
+    // Keep the detail pane populated when the notification drops out of the
+    // unread pages, and prevent marking it as read again.
+    queryClient.setQueryData(
+      ["user-notification", notification.metadata.name],
+      {
+        ...notification,
+        spec: { ...notification.spec, unread: false },
+      }
+    );
     if (activeTab.value === "unread") {
       locallyReadNames.add(notification.metadata.name);
     }
@@ -307,7 +321,18 @@ async function repairLoadedPages(tab: string) {
     }
 
     const pendingNames = [...locallyReadNames];
-    const result = await refetchPages({ cancelRefetch: false });
+    const result = await refetchPages({
+      cancelRefetch: false,
+      // Only the first page that contains a locally read notification and the
+      // pages after it need to be realigned. Notifications that are not loaded
+      // are outside the loaded prefix and do not shift it.
+      refetchPage: (_page, index, allPages) =>
+        allPages
+          .slice(0, index + 1)
+          .some((page) =>
+            page.items.some((item) => locallyReadNames.has(item.metadata.name))
+          ),
+    });
 
     if (activeTab.value !== tab) {
       return false;
