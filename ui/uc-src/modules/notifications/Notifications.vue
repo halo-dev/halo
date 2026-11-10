@@ -150,9 +150,9 @@ const { data: selectedNotificationById } = useQuery({
         username: currentUser?.user.metadata.name as string,
         page: 1,
         size: 1,
-        fieldSelector: [`metadata.name==${queryKey[1]}`],
+        fieldSelector: [`metadata.name=${queryKey[1]}`],
       });
-    return data.items[0];
+    return data.items.find((item) => item.metadata.name === queryKey[1]);
   },
 });
 
@@ -164,7 +164,7 @@ function updateCachedNotificationReadState(name: string) {
   queryClient.setQueriesData<InfiniteData<NotificationList>>(
     { queryKey: ["user-notifications"] },
     (data) => {
-      if (!data) {
+      if (!data || !Array.isArray(data.pages)) {
         return data;
       }
 
@@ -271,7 +271,10 @@ const loadMoreFailed = ref(false);
  * unread set shrinks and later pages shift by one. Refetch the loaded pages so
  * the next page starts at the right offset.
  */
-function confirmLocallyRead(pages?: NotificationList[]) {
+function confirmLocallyRead(
+  pages: NotificationList[] | undefined,
+  names: string[]
+) {
   if (!pages) {
     return;
   }
@@ -285,11 +288,55 @@ function confirmLocallyRead(pages?: NotificationList[]) {
     }
   }
 
-  for (const name of [...locallyReadNames]) {
+  for (const name of names) {
     if (!stillUnread.has(name)) {
       locallyReadNames.delete(name);
     }
   }
+}
+
+/**
+ * Refetch the loaded pages until the server reflects the notifications that
+ * were marked as read without refetching the list. Returns false when the
+ * repair could not be completed, in which case the caller should stop for now.
+ */
+async function repairLoadedPages(tab: string) {
+  for (let attempt = 0; attempt < 3; attempt++) {
+    if (locallyReadNames.size === 0) {
+      return true;
+    }
+
+    const pendingNames = [...locallyReadNames];
+    const result = await refetchPages({ cancelRefetch: false });
+
+    if (activeTab.value !== tab) {
+      return false;
+    }
+
+    if (result.isError) {
+      loadMoreFailed.value = true;
+      return false;
+    }
+
+    if (result.isFetching) {
+      // Another fetch superseded the repair; the watcher retries later.
+      return false;
+    }
+
+    confirmLocallyRead(result.data?.pages, pendingNames);
+
+    if (pendingNames.every((name) => !locallyReadNames.has(name))) {
+      if (locallyReadNames.size === 0) {
+        return true;
+      }
+      // Notifications marked as read while the repair was running need
+      // another round.
+      continue;
+    }
+  }
+
+  loadMoreFailed.value = true;
+  return false;
 }
 
 async function loadNextPage() {
@@ -303,20 +350,16 @@ async function loadNextPage() {
     const tab = activeTab.value;
 
     if (tab === "unread" && locallyReadNames.size > 0) {
-      const result = await refetchPages({ cancelRefetch: false });
-      if (activeTab.value !== tab) {
-        return;
-      }
-      confirmLocallyRead(result.data?.pages);
-      if (locallyReadNames.size > 0) {
-        // The server has not reflected the read state yet. Stop here instead
-        // of retrying in a tight loop; scrolling retries later.
-        loadMoreFailed.value = true;
+      if (!(await repairLoadedPages(tab))) {
         return;
       }
     }
 
-    const result = await fetchNextPage();
+    if (isFetching.value || markingAsReadCount.value > 0) {
+      return;
+    }
+
+    const result = await fetchNextPage({ cancelRefetch: false });
     if (result.isError) {
       loadMoreFailed.value = true;
     }
@@ -396,14 +439,19 @@ function scheduleDeletionPolling() {
       return;
     }
 
-    // Only refetch the pages that still contain a deleting notification
-    // instead of every loaded page.
+    // Refetch the first page that still contains a deleting notification and
+    // every page after it, so the page boundaries stay aligned after the item
+    // is removed from the server-side list.
     await refetchPages({
       cancelRefetch: false,
-      refetchPage: (page) =>
-        page.items.some(
-          (item) => item.metadata.deletionTimestamp !== undefined
-        ),
+      refetchPage: (_page, index, allPages) =>
+        allPages
+          .slice(0, index + 1)
+          .some((page) =>
+            page.items.some(
+              (item) => item.metadata.deletionTimestamp !== undefined
+            )
+          ),
     });
 
     scheduleDeletionPolling();
