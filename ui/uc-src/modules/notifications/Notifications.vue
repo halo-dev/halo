@@ -19,17 +19,21 @@ import {
   VTabbar,
 } from "@halo-dev/components";
 import { stores } from "@halo-dev/ui-shared";
-import { useQuery, useQueryClient } from "@tanstack/vue-query";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/vue-query";
+import { useVirtualizer } from "@tanstack/vue-virtual";
 import { useRouteQuery } from "@vueuse/router";
 import { chunk } from "es-toolkit";
+import type { OverlayScrollbars } from "overlayscrollbars";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
-import { computed, ref, watch } from "vue";
+import { computed, ref, watch, type ComponentPublicInstance } from "vue";
 import { useI18n } from "vue-i18n";
 import RiCheckDoubleLine from "~icons/ri/check-double-line";
 import RiCheckboxMultipleFill from "~icons/ri/checkbox-multiple-fill";
 import RiCheckboxMultipleLine from "~icons/ri/checkbox-multiple-line";
 import NotificationContent from "./components/NotificationContent.vue";
 import NotificationListItem from "./components/NotificationListItem.vue";
+
+const PAGE_SIZE = 50;
 
 const queryClient = useQueryClient();
 const { t } = useI18n();
@@ -38,43 +42,111 @@ const { currentUser } = stores.currentUser();
 const activeTab = useRouteQuery("tab", "unread");
 
 const {
-  data: notifications,
+  data: notificationPages,
   isLoading,
   refetch,
   isFetching,
-} = useQuery({
+  fetchNextPage,
+  hasNextPage,
+  isFetchingNextPage,
+} = useInfiniteQuery({
   queryKey: ["user-notifications", activeTab],
-  queryFn: async () => {
-    return await paginate<
-      NotificationV1alpha1UcApiListUserNotificationsRequest,
-      Notification
-    >(
-      (params) =>
-        ucApiClient.notification.notification.listUserNotifications(params),
-      {
+  queryFn: async ({ pageParam = 1 }) => {
+    const { data } =
+      await ucApiClient.notification.notification.listUserNotifications({
         username: currentUser?.user.metadata.name as string,
+        page: pageParam,
+        size: PAGE_SIZE,
         fieldSelector: [`spec.unread=${activeTab.value === "unread"}`],
-        size: 1000,
-      }
-    );
+      });
+    return data;
   },
+  getNextPageParam: (lastPage) =>
+    lastPage.hasNext ? lastPage.page + 1 : undefined,
   cacheTime: 0,
   refetchInterval(data) {
-    const hasDeletingNotifications = data?.some(
-      (item) => item.metadata.deletionTimestamp !== undefined
+    const hasDeletingNotifications = data?.pages.some((page) =>
+      page.items.some((item) => item.metadata.deletionTimestamp !== undefined)
     );
 
     return hasDeletingNotifications ? 1000 : false;
   },
 });
 
+const notifications = computed(() => {
+  const items =
+    notificationPages.value?.pages.flatMap((page) => page.items) ?? [];
+  // Offset pagination can return the same notification on two pages when new
+  // notifications arrive between page requests, so drop the duplicates.
+  const seen = new Set<string>();
+  return items.filter((item) => {
+    if (seen.has(item.metadata.name)) {
+      return false;
+    }
+    seen.add(item.metadata.name);
+    return true;
+  });
+});
+
 const selectedNotificationName = useRouteQuery<string | undefined>("name");
 
 const selectedNotification = computed(() => {
-  return notifications.value?.find(
+  return notifications.value.find(
     (item) => item.metadata.name === selectedNotificationName.value
   );
 });
+
+// ---- Virtual scrolling ----
+const scrollElement = ref<HTMLElement | null>(null);
+
+function handleScrollbarsInitialized(instance: OverlayScrollbars) {
+  scrollElement.value = instance.elements().viewport;
+}
+
+const virtualizerOptions = computed(() => ({
+  count: notifications.value.length,
+  getScrollElement: () => scrollElement.value,
+  getItemKey: (index: number) =>
+    notifications.value[index]?.metadata.name ?? index,
+  estimateSize: () => 88,
+  overscan: 5,
+}));
+
+const virtualizer = useVirtualizer(virtualizerOptions);
+
+const virtualRows = computed(() => {
+  return virtualizer.value.getVirtualItems().map((virtualItem) => ({
+    ...virtualItem,
+    notification: notifications.value[virtualItem.index],
+  }));
+});
+
+const totalSize = computed(() => virtualizer.value.getTotalSize());
+
+function measureElement(el: Element | ComponentPublicInstance | null) {
+  if (el instanceof Element) {
+    virtualizer.value.measureElement(el);
+  }
+}
+
+const lastVirtualIndex = computed(
+  () => virtualRows.value[virtualRows.value.length - 1]?.index
+);
+
+watch(lastVirtualIndex, (index) => {
+  if (index === undefined) {
+    return;
+  }
+
+  if (
+    index >= notifications.value.length - 1 &&
+    hasNextPage?.value === true &&
+    !isFetchingNextPage.value
+  ) {
+    fetchNextPage();
+  }
+});
+// ---- End virtual scrolling ----
 
 // ---- Batch selection state ----
 const isSelectMode = ref(false);
@@ -83,7 +155,7 @@ const lastSelectedIndex = ref<number>(-1);
 
 const isAllSelected = computed(
   () =>
-    !!notifications.value?.length &&
+    !!notifications.value.length &&
     selectedNames.value.size === notifications.value.length
 );
 
@@ -92,11 +164,12 @@ watch(activeTab, () => {
   isSelectMode.value = false;
   selectedNames.value.clear();
   lastSelectedIndex.value = -1;
+  scrollElement.value?.scrollTo({ top: 0 });
 });
 
 // Auto-exit select mode when the list becomes empty (e.g. after deleting all).
 watch(notifications, (newVal) => {
-  if (isSelectMode.value && newVal !== undefined && newVal.length === 0) {
+  if (isSelectMode.value && newVal.length === 0) {
     isSelectMode.value = false;
     selectedNames.value.clear();
     lastSelectedIndex.value = -1;
@@ -136,7 +209,7 @@ function handleItemClick(
     const start = Math.min(lastSelectedIndex.value, index);
     const end = Math.max(lastSelectedIndex.value, index);
     // Shift+click always selects the range (deselection uses Ctrl+click).
-    notifications.value?.slice(start, end + 1).forEach((n) => {
+    notifications.value.slice(start, end + 1).forEach((n) => {
       selectedNames.value.add(n.metadata.name);
     });
     lastSelectedIndex.value = index;
@@ -161,7 +234,7 @@ function handleSelectAll() {
   if (isAllSelected.value) {
     selectedNames.value.clear();
   } else {
-    notifications.value?.forEach((n) =>
+    notifications.value.forEach((n) =>
       selectedNames.value.add(n.metadata.name)
     );
   }
@@ -206,6 +279,26 @@ function handleDeleteSelected() {
 }
 // ---- End batch selection ----
 
+/**
+ * Fetch all notifications of the current tab. Used by batch operations
+ * ("delete all" / "mark all as read") so they are not limited to the pages
+ * that have been scrolled into view.
+ */
+async function listAllNotifications() {
+  return await paginate<
+    NotificationV1alpha1UcApiListUserNotificationsRequest,
+    Notification
+  >(
+    (params) =>
+      ucApiClient.notification.notification.listUserNotifications(params),
+    {
+      username: currentUser?.user.metadata.name as string,
+      fieldSelector: [`spec.unread=${activeTab.value === "unread"}`],
+      size: 1000,
+    }
+  );
+}
+
 function handleDeleteNotifications() {
   Dialog.warning({
     title: t("core.uc_notification.operations.delete_all.title"),
@@ -214,15 +307,17 @@ function handleDeleteNotifications() {
     cancelText: t("core.common.buttons.cancel"),
     confirmType: "danger",
     onConfirm: async () => {
-      if (!notifications.value || notifications.value.length === 0) {
-        return;
-      }
-
       if (!currentUser) {
         throw new Error("Current user is not found");
       }
 
-      const notificationChunks = chunk(notifications.value, 5);
+      const allNotifications = await listAllNotifications();
+
+      if (allNotifications.length === 0) {
+        return;
+      }
+
+      const notificationChunks = chunk(allNotifications, 5);
 
       for (const chunkItem of notificationChunks) {
         await Promise.all(
@@ -251,15 +346,17 @@ function handleMarkAllAsRead() {
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
-      if (!notifications.value || notifications.value.length === 0) {
-        return;
-      }
-
       if (!currentUser) {
         throw new Error("Current user is not found");
       }
 
-      const names = notifications.value?.map(
+      const allNotifications = await listAllNotifications();
+
+      if (allNotifications.length === 0) {
+        return;
+      }
+
+      const names = allNotifications.map(
         (notification) => notification.metadata.name
       );
 
@@ -313,7 +410,7 @@ function handleMarkAllAsRead() {
                     $t('core.uc_notification.operations.select_mode.tooltip')
                   "
                   class="flex size-7 cursor-pointer items-center justify-center rounded-full hover:bg-gray-200 disabled:pointer-events-none disabled:opacity-70"
-                  :disabled="!notifications?.length"
+                  :disabled="!notifications.length"
                   @click="toggleSelectMode"
                 >
                   <RiCheckboxMultipleLine
@@ -328,7 +425,7 @@ function handleMarkAllAsRead() {
                     )
                   "
                   class="flex size-7 cursor-pointer items-center justify-center rounded-full hover:bg-gray-200 disabled:pointer-events-none disabled:opacity-70"
-                  :disabled="!notifications?.length"
+                  :disabled="!notifications.length"
                   @click="handleMarkAllAsRead"
                 >
                   <RiCheckDoubleLine
@@ -340,7 +437,7 @@ function handleMarkAllAsRead() {
                     $t('core.uc_notification.operations.delete_all.tooltip')
                   "
                   class="group flex size-7 cursor-pointer items-center justify-center rounded-full hover:bg-gray-200 disabled:pointer-events-none disabled:opacity-70"
-                  :disabled="!notifications?.length"
+                  :disabled="!notifications.length"
                   @click="handleDeleteNotifications"
                 >
                   <IconDeleteBin
@@ -397,9 +494,10 @@ function handleMarkAllAsRead() {
             :options="{ scrollbars: { autoHide: 'scroll' } }"
             class="h-full w-full flex-1"
             defer
+            @os-initialized="handleScrollbarsInitialized"
           >
             <VLoading v-if="isLoading" />
-            <Transition v-else-if="!notifications?.length" appear name="fade">
+            <Transition v-else-if="!notifications.length" appear name="fade">
               <VEmpty
                 :title="`${
                   activeTab === 'unread'
@@ -416,26 +514,36 @@ function handleMarkAllAsRead() {
             </Transition>
             <Transition v-else appear name="fade">
               <ul
-                class="box-border h-full w-full divide-y divide-gray-100"
+                class="relative box-border w-full"
                 role="list"
+                :style="{ height: `${totalSize}px` }"
               >
                 <li
-                  v-for="(notification, index) in notifications"
-                  :key="notification.metadata.name"
-                  @click="handleItemClick(notification, index, $event)"
+                  v-for="row in virtualRows"
+                  :key="row.notification.metadata.name"
+                  :ref="measureElement"
+                  :data-index="row.index"
+                  class="absolute left-0 top-0 w-full"
+                  :class="{ 'border-t border-gray-100': row.index > 0 }"
+                  :style="{ transform: `translateY(${row.start}px)` }"
+                  @click="handleItemClick(row.notification, row.index, $event)"
                 >
                   <NotificationListItem
-                    :notification="notification"
+                    :notification="row.notification"
                     :is-selected="
                       !isSelectMode &&
-                      selectedNotificationName === notification.metadata.name
+                      selectedNotificationName ===
+                        row.notification.metadata.name
                     "
                     :is-select-mode="isSelectMode"
-                    :is-checked="selectedNames.has(notification.metadata.name)"
+                    :is-checked="
+                      selectedNames.has(row.notification.metadata.name)
+                    "
                   />
                 </li>
               </ul>
             </Transition>
+            <VLoading v-if="isFetchingNextPage" />
           </OverlayScrollbarsComponent>
         </div>
         <div
