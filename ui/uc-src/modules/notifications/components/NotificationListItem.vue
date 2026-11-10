@@ -5,7 +5,7 @@ import { Dialog, Toast, VStatusDot } from "@halo-dev/components";
 import { stores, utils } from "@halo-dev/ui-shared";
 import { useMutation, useQueryClient } from "@tanstack/vue-query";
 import sanitize from "sanitize-html";
-import { computed, ref, watch } from "vue";
+import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 
 const queryClient = useQueryClient();
@@ -26,25 +26,16 @@ const props = withDefaults(
 
 const { currentUser } = stores.currentUser();
 
-const isRead = ref();
-
 const { mutate: handleMarkAsRead } = useMutation({
   mutationKey: ["notification-mark-as-read"],
-  mutationFn: async ({ refetch }: { refetch: boolean }) => {
-    const { data } =
-      await ucApiClient.notification.notification.markNotificationAsRead({
-        name: props.notification.metadata.name,
-        username: currentUser?.user.metadata.name as string,
-      });
-
-    if (refetch) {
-      await queryClient.invalidateQueries({ queryKey: ["user-notifications"] });
-    }
-
-    return data;
+  mutationFn: async () => {
+    await ucApiClient.notification.notification.markNotificationAsRead({
+      name: props.notification.metadata.name,
+      username: currentUser?.user.metadata.name as string,
+    });
   },
-  onSuccess() {
-    isRead.value = true;
+  async onSuccess() {
+    await queryClient.invalidateQueries({ queryKey: ["user-notifications"] });
   },
 });
 
@@ -67,18 +58,6 @@ function handleDelete() {
     },
   });
 }
-
-watch(
-  () => props.isSelected,
-  (value) => {
-    if (value && props.notification.spec?.unread) {
-      handleMarkAsRead({ refetch: false });
-    }
-  },
-  {
-    immediate: true,
-  }
-);
 
 const content = computed(() => {
   // Clean html tags
@@ -125,7 +104,7 @@ const content = computed(() => {
       <div class="flex min-w-0 flex-1 items-center justify-between">
         <div
           class="truncate text-sm"
-          :class="{ 'font-semibold': notification.spec?.unread && !isRead }"
+          :class="{ 'font-semibold': notification.spec?.unread }"
         >
           {{ notification.spec?.title }}
         </div>
@@ -150,9 +129,9 @@ const content = computed(() => {
       <!-- Action buttons: hidden in batch select mode -->
       <div v-if="!isSelectMode" class="hidden space-x-2 group-hover:block">
         <span
-          v-if="notification.spec?.unread && !isRead"
+          v-if="notification.spec?.unread"
           class="text-sm text-gray-600 hover:text-gray-900"
-          @click.stop="handleMarkAsRead({ refetch: true })"
+          @click.stop="handleMarkAsRead()"
         >
           {{ $t("core.uc_notification.operations.mark_as_read.button") }}
         </span>

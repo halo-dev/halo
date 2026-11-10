@@ -3,6 +3,7 @@ import {
   paginate,
   ucApiClient,
   type Notification,
+  type NotificationList,
   type NotificationV1alpha1UcApiListUserNotificationsRequest,
 } from "@halo-dev/api-client";
 import {
@@ -19,13 +20,28 @@ import {
   VTabbar,
 } from "@halo-dev/components";
 import { stores } from "@halo-dev/ui-shared";
-import { useInfiniteQuery, useQueryClient } from "@tanstack/vue-query";
+import {
+  useInfiniteQuery,
+  useIsMutating,
+  useMutation,
+  useQuery,
+  useQueryClient,
+  type InfiniteData,
+  type RefetchOptions,
+} from "@tanstack/vue-query";
 import { useVirtualizer } from "@tanstack/vue-virtual";
 import { useRouteQuery } from "@vueuse/router";
 import { chunk } from "es-toolkit";
 import type { OverlayScrollbars } from "overlayscrollbars";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
-import { computed, ref, watch, type ComponentPublicInstance } from "vue";
+import {
+  computed,
+  onUnmounted,
+  reactive,
+  ref,
+  watch,
+  type ComponentPublicInstance,
+} from "vue";
 import { useI18n } from "vue-i18n";
 import RiCheckDoubleLine from "~icons/ri/check-double-line";
 import RiCheckboxMultipleFill from "~icons/ri/checkbox-multiple-fill";
@@ -34,6 +50,7 @@ import NotificationContent from "./components/NotificationContent.vue";
 import NotificationListItem from "./components/NotificationListItem.vue";
 
 const PAGE_SIZE = 50;
+const DELETION_POLL_INTERVAL = 1000;
 
 const queryClient = useQueryClient();
 const { t } = useI18n();
@@ -51,27 +68,41 @@ const {
   isFetchingNextPage,
 } = useInfiniteQuery({
   queryKey: ["user-notifications", activeTab],
-  queryFn: async ({ pageParam = 1 }) => {
+  queryFn: async ({ pageParam = 1, queryKey }) => {
     const { data } =
       await ucApiClient.notification.notification.listUserNotifications({
         username: currentUser?.user.metadata.name as string,
         page: pageParam,
         size: PAGE_SIZE,
-        fieldSelector: [`spec.unread=${activeTab.value === "unread"}`],
+        fieldSelector: [`spec.unread=${queryKey[1] === "unread"}`],
       });
     return data;
   },
   getNextPageParam: (lastPage) =>
     lastPage.hasNext ? lastPage.page + 1 : undefined,
   cacheTime: 0,
-  refetchInterval(data) {
-    const hasDeletingNotifications = data?.pages.some((page) =>
-      page.items.some((item) => item.metadata.deletionTimestamp !== undefined)
-    );
-
-    return hasDeletingNotifications ? 1000 : false;
-  },
 });
+
+// The `refetch` exposed by useInfiniteQuery supports `refetchPage` at runtime
+// (InfiniteQueryObserver.refetch), but v4 does not include it in the option
+// type.
+type RefetchOptionsWithPages = RefetchOptions & {
+  refetchPage?: (
+    page: NotificationList,
+    index: number,
+    allPages: NotificationList[]
+  ) => boolean;
+};
+
+function refetchPages(options: RefetchOptionsWithPages) {
+  return refetch(options);
+}
+
+// Notifications marked as read without refetching the list. Offset pagination
+// shifts after they are removed from the unread set, so the loaded pages are
+// repaired before the next page is fetched.
+const locallyReadNames = reactive(new Set<string>());
+const markingReadNames = reactive(new Set<string>());
 
 const notifications = computed(() => {
   const items =
@@ -79,22 +110,116 @@ const notifications = computed(() => {
   // Offset pagination can return the same notification on two pages when new
   // notifications arrive between page requests, so drop the duplicates.
   const seen = new Set<string>();
-  return items.filter((item) => {
-    if (seen.has(item.metadata.name)) {
-      return false;
-    }
-    seen.add(item.metadata.name);
-    return true;
-  });
+  return items
+    .filter((item) => {
+      if (seen.has(item.metadata.name)) {
+        return false;
+      }
+      seen.add(item.metadata.name);
+      return true;
+    })
+    .map((item) =>
+      // Keep the read state stable when an in-flight page fetch overwrites the
+      // optimistic cache update.
+      locallyReadNames.has(item.metadata.name) && item.spec?.unread
+        ? { ...item, spec: { ...item.spec, unread: false } }
+        : item
+    );
 });
 
 const selectedNotificationName = useRouteQuery<string | undefined>("name");
 
-const selectedNotification = computed(() => {
+const selectedNotificationFromList = computed(() => {
   return notifications.value.find(
     (item) => item.metadata.name === selectedNotificationName.value
   );
 });
+
+// The selected notification may not be loaded yet (deep link) or may drop out
+// of the loaded unread pages after it is marked as read, so fall back to
+// fetching it by name.
+const { data: selectedNotificationById } = useQuery({
+  queryKey: ["user-notification", selectedNotificationName],
+  enabled: computed(
+    () =>
+      !!selectedNotificationName.value && !selectedNotificationFromList.value
+  ),
+  queryFn: async ({ queryKey }) => {
+    const { data } =
+      await ucApiClient.notification.notification.listUserNotifications({
+        username: currentUser?.user.metadata.name as string,
+        page: 1,
+        size: 1,
+        fieldSelector: [`metadata.name==${queryKey[1]}`],
+      });
+    return data.items[0];
+  },
+});
+
+const selectedNotification = computed(
+  () => selectedNotificationFromList.value ?? selectedNotificationById.value
+);
+
+function updateCachedNotificationReadState(name: string) {
+  queryClient.setQueriesData<InfiniteData<NotificationList>>(
+    { queryKey: ["user-notifications"] },
+    (data) => {
+      if (!data) {
+        return data;
+      }
+
+      return {
+        ...data,
+        pages: data.pages.map((page) => ({
+          ...page,
+          items: page.items.map((item) =>
+            item.metadata.name === name && item.spec?.unread
+              ? { ...item, spec: { ...item.spec, unread: false } }
+              : item
+          ),
+        })),
+      };
+    }
+  );
+}
+
+const { mutate: markSelectedAsRead } = useMutation({
+  mutationKey: ["notification-mark-as-read"],
+  mutationFn: async (notification: Notification) => {
+    await ucApiClient.notification.notification.markNotificationAsRead({
+      name: notification.metadata.name,
+      username: currentUser?.user.metadata.name as string,
+    });
+  },
+  onSuccess(_, notification) {
+    markingReadNames.delete(notification.metadata.name);
+    updateCachedNotificationReadState(notification.metadata.name);
+    if (activeTab.value === "unread") {
+      locallyReadNames.add(notification.metadata.name);
+    }
+  },
+  onError(_, notification) {
+    markingReadNames.delete(notification.metadata.name);
+  },
+});
+
+// Mark the selected notification as read here instead of inside the list item
+// so it also works for notifications that are loaded but not rendered by the
+// virtualizer, or not loaded at all (deep link).
+watch(
+  selectedNotification,
+  (notification) => {
+    if (
+      notification?.spec?.unread &&
+      !locallyReadNames.has(notification.metadata.name) &&
+      !markingReadNames.has(notification.metadata.name)
+    ) {
+      markingReadNames.add(notification.metadata.name);
+      markSelectedAsRead(notification);
+    }
+  },
+  { immediate: true }
+);
 
 // ---- Virtual scrolling ----
 const scrollElement = ref<HTMLElement | null>(null);
@@ -114,38 +239,190 @@ const virtualizerOptions = computed(() => ({
 
 const virtualizer = useVirtualizer(virtualizerOptions);
 
-const virtualRows = computed(() => {
-  return virtualizer.value.getVirtualItems().map((virtualItem) => ({
-    ...virtualItem,
-    notification: notifications.value[virtualItem.index],
-  }));
-});
+const virtualRows = computed(() =>
+  virtualizer.value.getVirtualItems().flatMap((virtualItem) => {
+    const notification = notifications.value[virtualItem.index];
+    return notification ? [{ ...virtualItem, notification }] : [];
+  })
+);
 
 const totalSize = computed(() => virtualizer.value.getTotalSize());
 
 function measureElement(el: Element | ComponentPublicInstance | null) {
-  if (el instanceof Element) {
-    virtualizer.value.measureElement(el);
-  }
+  virtualizer.value.measureElement(el instanceof Element ? el : null);
 }
 
-const lastVirtualIndex = computed(
-  () => virtualRows.value[virtualRows.value.length - 1]?.index
-);
+// Level-triggered: keep loading while the last rendered row is the last loaded
+// notification, so a failed or all-duplicate page does not stall pagination.
+const shouldLoadMore = computed(() => {
+  const lastRow = virtualRows.value[virtualRows.value.length - 1];
+  return !!lastRow && lastRow.index >= notifications.value.length - 1;
+});
 
-watch(lastVirtualIndex, (index) => {
-  if (index === undefined) {
+const markingAsReadCount = useIsMutating({
+  mutationKey: ["notification-mark-as-read"],
+});
+
+const isLoadingMore = ref(false);
+const loadMoreFailed = ref(false);
+
+/**
+ * After a notification is marked as read without refetching, the server-side
+ * unread set shrinks and later pages shift by one. Refetch the loaded pages so
+ * the next page starts at the right offset.
+ */
+function confirmLocallyRead(pages?: NotificationList[]) {
+  if (!pages) {
     return;
   }
 
-  if (
-    index >= notifications.value.length - 1 &&
-    hasNextPage?.value === true &&
-    !isFetchingNextPage.value
-  ) {
-    fetchNextPage();
+  const stillUnread = new Set<string>();
+  for (const page of pages) {
+    for (const item of page.items) {
+      if (item.spec?.unread) {
+        stillUnread.add(item.metadata.name);
+      }
+    }
+  }
+
+  for (const name of [...locallyReadNames]) {
+    if (!stillUnread.has(name)) {
+      locallyReadNames.delete(name);
+    }
+  }
+}
+
+async function loadNextPage() {
+  if (isLoadingMore.value || isFetching.value) {
+    return;
+  }
+
+  isLoadingMore.value = true;
+
+  try {
+    const tab = activeTab.value;
+
+    if (tab === "unread" && locallyReadNames.size > 0) {
+      const result = await refetchPages({ cancelRefetch: false });
+      if (activeTab.value !== tab) {
+        return;
+      }
+      confirmLocallyRead(result.data?.pages);
+      if (locallyReadNames.size > 0) {
+        // The server has not reflected the read state yet. Stop here instead
+        // of retrying in a tight loop; scrolling retries later.
+        loadMoreFailed.value = true;
+        return;
+      }
+    }
+
+    const result = await fetchNextPage();
+    if (result.isError) {
+      loadMoreFailed.value = true;
+    }
+  } finally {
+    isLoadingMore.value = false;
+  }
+}
+
+watch(
+  [
+    shouldLoadMore,
+    () => hasNextPage?.value,
+    isFetching,
+    isFetchingNextPage,
+    markingAsReadCount,
+    () => notifications.value.length,
+    isLoadingMore,
+    loadMoreFailed,
+  ],
+  () => {
+    if (
+      !shouldLoadMore.value ||
+      hasNextPage?.value !== true ||
+      isFetching.value ||
+      isFetchingNextPage.value ||
+      markingAsReadCount.value > 0 ||
+      isLoadingMore.value ||
+      loadMoreFailed.value
+    ) {
+      return;
+    }
+
+    void loadNextPage();
+  },
+  { immediate: true }
+);
+
+// Allow retrying by scrolling away from the end and back.
+watch(shouldLoadMore, (value) => {
+  if (!value) {
+    loadMoreFailed.value = false;
   }
 });
+
+function retryLoadMore() {
+  loadMoreFailed.value = false;
+}
+
+// ---- Deletion polling ----
+const hasDeletingNotifications = computed(
+  () =>
+    notificationPages.value?.pages.some((page) =>
+      page.items.some((item) => item.metadata.deletionTimestamp !== undefined)
+    ) ?? false
+);
+
+let deletionPollTimer: ReturnType<typeof setTimeout> | undefined;
+
+function stopDeletionPolling() {
+  if (deletionPollTimer !== undefined) {
+    clearTimeout(deletionPollTimer);
+    deletionPollTimer = undefined;
+  }
+}
+
+function scheduleDeletionPolling() {
+  stopDeletionPolling();
+
+  if (!hasDeletingNotifications.value) {
+    return;
+  }
+
+  deletionPollTimer = setTimeout(async () => {
+    deletionPollTimer = undefined;
+
+    if (!hasDeletingNotifications.value) {
+      return;
+    }
+
+    // Only refetch the pages that still contain a deleting notification
+    // instead of every loaded page.
+    await refetchPages({
+      cancelRefetch: false,
+      refetchPage: (page) =>
+        page.items.some(
+          (item) => item.metadata.deletionTimestamp !== undefined
+        ),
+    });
+
+    scheduleDeletionPolling();
+  }, DELETION_POLL_INTERVAL);
+}
+
+watch(
+  hasDeletingNotifications,
+  (hasDeleting) => {
+    if (hasDeleting) {
+      scheduleDeletionPolling();
+    } else {
+      stopDeletionPolling();
+    }
+  },
+  { immediate: true }
+);
+
+onUnmounted(stopDeletionPolling);
 // ---- End virtual scrolling ----
 
 // ---- Batch selection state ----
@@ -164,6 +441,8 @@ watch(activeTab, () => {
   isSelectMode.value = false;
   selectedNames.value.clear();
   lastSelectedIndex.value = -1;
+  locallyReadNames.clear();
+  loadMoreFailed.value = false;
   scrollElement.value?.scrollTo({ top: 0 });
 });
 
@@ -544,6 +823,11 @@ function handleMarkAllAsRead() {
               </ul>
             </Transition>
             <VLoading v-if="isFetchingNextPage" />
+            <div v-if="loadMoreFailed" class="flex justify-center p-4">
+              <VButton size="sm" @click="retryLoadMore">
+                {{ $t("core.common.buttons.retry") }}
+              </VButton>
+            </div>
           </OverlayScrollbarsComponent>
         </div>
         <div
