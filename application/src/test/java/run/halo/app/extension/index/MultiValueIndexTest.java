@@ -294,6 +294,21 @@ class MultiValueIndexTest {
             }
 
             @Test
+            void shouldReturnModifiableSnapshots() {
+                var equalResult = index.equal("string1");
+                equalResult.clear();
+                assertEquals(Set.of("fake1"), index.equal("string1"));
+
+                var allResult = index.all();
+                allResult.clear();
+                assertEquals(Set.of("fake1", "fake2", "fake3", "fakenull"), index.all());
+
+                var nullResult = index.isNull();
+                nullResult.clear();
+                assertEquals(Set.of("fakenull"), index.isNull());
+            }
+
+            @Test
             void inQuery() {
                 var result = index.in(Set.of("string1", "string3"));
                 assertEquals(Set.of("fake1", "fake3"), result);
@@ -636,6 +651,21 @@ class MultiValueIndexTest {
             void allQuery() {
                 var result = index.all();
                 assertEquals(Set.of("fake1", "fake2", "fake3", "fakenull"), result);
+            }
+
+            @Test
+            void shouldReturnModifiableSnapshots() {
+                var equalResult = index.equal("string1");
+                equalResult.clear();
+                assertEquals(Set.of("fake1"), index.equal("string1"));
+
+                var allResult = index.all();
+                allResult.clear();
+                assertEquals(Set.of("fake1", "fake2", "fake3", "fakenull"), index.all());
+
+                var nullResult = index.isNull();
+                nullResult.clear();
+                assertEquals(Set.of("fakenull"), index.isNull());
             }
 
             @Test

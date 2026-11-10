@@ -6,6 +6,9 @@ import java.util.Set;
 /**
  * Value index query interface.
  *
+ * <p>Implementations must return a new mutable {@link Set} owned by the caller. Callers may modify the returned set, so
+ * implementations must never expose a set that is backed by the index itself.
+ *
  * @param <K> the type of the key
  */
 public interface ValueIndexQuery<K extends Comparable<K>> {

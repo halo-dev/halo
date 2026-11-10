@@ -141,6 +141,17 @@ class LabelIndexTest {
         }
 
         @Test
+        void shouldReturnModifiableSnapshots() {
+            var equalResult = index.equal("k1", "v1");
+            equalResult.clear();
+            assertEquals(Set.of("f1"), index.equal("k1", "v1"));
+
+            var existsResult = index.exists("k1");
+            existsResult.clear();
+            assertEquals(Set.of("f1", "f2", "f3"), index.exists("k1"));
+        }
+
+        @Test
         void inAndNotInQuery() {
             var inResult = index.in("k1", List.of("v1", "v3", "non-existent"));
             assertEquals(Set.of("f1", "f3"), inResult);

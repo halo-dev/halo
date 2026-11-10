@@ -284,6 +284,17 @@ class SingleValueIndexTest {
             }
 
             @Test
+            void shouldReturnModifiableSnapshots() {
+                var equalResult = index.equal("string1");
+                equalResult.clear();
+                assertEquals(Set.of("fake1"), index.equal("string1"));
+
+                var allResult = index.all();
+                allResult.clear();
+                assertEquals(Set.of("fake1", "fake2", "fake3"), index.all());
+            }
+
+            @Test
             void betweenQuery() {
                 var result = index.between("string1", true, "string3", false);
                 assertEquals(Set.of("fake1", "fake2"), result);
@@ -601,6 +612,17 @@ class SingleValueIndexTest {
             void allQuery() {
                 var result = index.all();
                 assertEquals(Set.of("fake1", "fake2", "fake3"), result);
+            }
+
+            @Test
+            void shouldReturnModifiableSnapshots() {
+                var equalResult = index.equal("string1");
+                equalResult.clear();
+                assertEquals(Set.of("fake1"), index.equal("string1"));
+
+                var allResult = index.all();
+                allResult.clear();
+                assertEquals(Set.of("fake1", "fake2", "fake3"), index.all());
             }
 
             @Test
