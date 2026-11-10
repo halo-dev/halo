@@ -411,6 +411,48 @@ class QueryVisitorTest {
     }
 
     @Test
+    void shouldVisitAndConditionWhenRightResultIsSmaller() {
+        var index = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
+        var query = (ValueIndexQuery) index;
+        when(indices.getIndex("metadata.name")).thenReturn(index);
+        when(query.equal("name1")).thenReturn(mutableSet("name1", "name2", "data"));
+        when(query.equal("name2")).thenReturn(mutableSet("data"));
+        when(index.getKeyType()).thenReturn(String.class);
+        var condition = Queries.equal("metadata.name", "name1").and(Queries.equal("metadata.name", "name2"));
+        condition.visit(visitor);
+        assertEquals(Set.of("data"), visitor.getResult());
+    }
+
+    @Test
+    void shouldVisitOrConditionWhenRightResultIsLarger() {
+        var index = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
+        var query = (ValueIndexQuery) index;
+        when(indices.getIndex("metadata.name")).thenReturn(index);
+        when(query.equal("name1")).thenReturn(mutableSet("name1"));
+        when(query.equal("name2")).thenReturn(mutableSet("name2", "data"));
+        when(index.getKeyType()).thenReturn(String.class);
+        var condition = Queries.equal("metadata.name", "name1").or(Queries.equal("metadata.name", "name2"));
+        condition.visit(visitor);
+        assertEquals(Set.of("name1", "name2", "data"), visitor.getResult());
+    }
+
+    @Test
+    void shouldVisitNestedAndOrCondition() {
+        var index = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
+        var query = (ValueIndexQuery) index;
+        when(indices.getIndex("metadata.name")).thenReturn(index);
+        when(query.equal("name1")).thenReturn(mutableSet("a", "b", "c"));
+        when(query.equal("name2")).thenReturn(mutableSet("b", "c"));
+        when(query.equal("name3")).thenReturn(mutableSet("d"));
+        when(index.getKeyType()).thenReturn(String.class);
+        var condition = Queries.equal("metadata.name", "name1")
+                .and(Queries.equal("metadata.name", "name2"))
+                .or(Queries.equal("metadata.name", "name3"));
+        condition.visit(visitor);
+        assertEquals(Set.of("b", "c", "d"), visitor.getResult());
+    }
+
+    @Test
     void shouldVisiteNotCondition() {
         var index = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
         var query = (ValueIndexQuery) index;

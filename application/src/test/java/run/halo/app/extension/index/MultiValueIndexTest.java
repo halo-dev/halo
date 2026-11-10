@@ -306,6 +306,14 @@ class MultiValueIndexTest {
                 var nullResult = index.isNull();
                 nullResult.clear();
                 assertEquals(Set.of("fakenull"), index.isNull());
+
+                var notEqualResult = index.notEqual("string1");
+                notEqualResult.clear();
+                assertEquals(Set.of("fake2", "fake3"), index.notEqual("string1"));
+
+                var notInResult = index.notIn(Set.of("string1"));
+                notInResult.clear();
+                assertEquals(Set.of("fake2", "fake3"), index.notIn(Set.of("string1")));
             }
 
             @Test
@@ -666,6 +674,14 @@ class MultiValueIndexTest {
                 var nullResult = index.isNull();
                 nullResult.clear();
                 assertEquals(Set.of("fakenull"), index.isNull());
+
+                var notEqualResult = index.notEqual("string1");
+                notEqualResult.clear();
+                assertEquals(Set.of("fake2", "fake3"), index.notEqual("string1"));
+
+                var notInResult = index.notIn(Set.of("string1"));
+                notInResult.clear();
+                assertEquals(Set.of("fake2", "fake3"), index.notIn(Set.of("string1")));
             }
 
             @Test

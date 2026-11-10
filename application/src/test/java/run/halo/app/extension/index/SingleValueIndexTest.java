@@ -292,6 +292,14 @@ class SingleValueIndexTest {
                 var allResult = index.all();
                 allResult.clear();
                 assertEquals(Set.of("fake1", "fake2", "fake3"), index.all());
+
+                var notEqualResult = index.notEqual("string1");
+                notEqualResult.clear();
+                assertEquals(Set.of("fake2", "fake3"), index.notEqual("string1"));
+
+                var notInResult = index.notIn(List.of("string1"));
+                notInResult.clear();
+                assertEquals(Set.of("fake2", "fake3"), index.notIn(List.of("string1")));
             }
 
             @Test
@@ -623,6 +631,14 @@ class SingleValueIndexTest {
                 var allResult = index.all();
                 allResult.clear();
                 assertEquals(Set.of("fake1", "fake2", "fake3"), index.all());
+
+                var notEqualResult = index.notEqual("string1");
+                notEqualResult.clear();
+                assertEquals(Set.of("fake2", "fake3"), index.notEqual("string1"));
+
+                var notInResult = index.notIn(List.of("string1"));
+                notInResult.clear();
+                assertEquals(Set.of("fake2", "fake3"), index.notIn(List.of("string1")));
             }
 
             @Test

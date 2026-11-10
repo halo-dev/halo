@@ -64,63 +64,8 @@ public class QueryVisitor<E extends Extension> implements Visitor {
                     // delegate to AndCondition for backward compatibility
                     new AndCondition(left, right).visit(this);
                 case EmptyCondition ignored -> setResult(allQuery("metadata.name", false));
-                case AndCondition(var left, var right) -> {
-                    if (left instanceof EmptyCondition) {
-                        right.visit(this);
-                        return;
-                    }
-                    if (right instanceof EmptyCondition) {
-                        left.visit(this);
-                        return;
-                    }
-                    left.visit(this);
-                    // fail fast if left result is empty
-                    if (result.isEmpty()) {
-                        return;
-                    }
-                    var rightVisitor = new ConditionVisitor();
-                    right.visit(rightVisitor);
-                    var rightResult = rightVisitor.getResult();
-                    if (rightResult.isEmpty()) {
-                        setResult(rightResult);
-                        return;
-                    }
-                    // Retain on the smaller set to avoid copying the larger one.
-                    if (result.size() <= rightResult.size()) {
-                        result.retainAll(rightResult);
-                    } else {
-                        rightResult.retainAll(result);
-                        setResult(rightResult);
-                    }
-                }
-                case OrCondition(var left, var right) -> {
-                    if (left instanceof EmptyCondition) {
-                        left.visit(this);
-                        return;
-                    }
-                    if (right instanceof EmptyCondition) {
-                        right.visit(this);
-                        return;
-                    }
-                    left.visit(this);
-                    var rightVisitor = new ConditionVisitor();
-                    right.visit(rightVisitor);
-                    var rightResult = rightVisitor.getResult();
-                    if (result.isEmpty()) {
-                        setResult(rightResult);
-                        return;
-                    }
-                    if (rightResult.isEmpty()) {
-                        return;
-                    }
-                    // Add into the larger set to reduce resizing and copying.
-                    if (result.size() >= rightResult.size()) {
-                        result.addAll(rightResult);
-                    } else {
-                        rightResult.addAll(result);
-                        setResult(rightResult);
-                    }
-                }
+                case AndCondition(var left, var right) -> visitAnd(left, right);
+                case OrCondition(var left, var right) -> visitOr(left, right);
                 case NotCondition(var condition) -> {
                     if (condition instanceof EmptyCondition) {
                         return;
@@ -160,23 +105,82 @@ public class QueryVisitor<E extends Extension> implements Visitor {
                 case LabelExistsCondition(var labelKey) -> setResult(labelExistsQuery(labelKey));
                 case LabelNotExistsCondition(var labelKey) -> {
                     // To get all extensions that do not have the label, we get all extensions
-                    var result = allQuery("metadata.name", false);
-                    result.removeAll(labelExistsQuery(labelKey));
-                    setResult(result);
+                    var allResult = allQuery("metadata.name", false);
+                    allResult.removeAll(labelExistsQuery(labelKey));
+                    setResult(allResult);
                 }
                 case LabelEqualsCondition(var labelKey, var labelValue) ->
                     setResult(labelEqualsQuery(labelKey, labelValue, false));
                 case LabelNotEqualsCondition(var labelKey, var labelValue) -> {
                     // Only for backward compatibility
-                    var result = allQuery("metadata.name", false);
-                    result.removeAll(labelEqualsQuery(labelKey, labelValue, false));
-                    setResult(result);
+                    var allResult = allQuery("metadata.name", false);
+                    allResult.removeAll(labelEqualsQuery(labelKey, labelValue, false));
+                    setResult(allResult);
                 }
                 case LabelInCondition(var labelKey, var labelValues) ->
                     setResult(labelInQuery(labelKey, labelValues, false));
                 case LabelNotInCondition(var labelKey, var labelValues) ->
                     setResult(labelInQuery(labelKey, labelValues, true));
                 default -> {}
+            }
+        }
+
+        private void visitAnd(Condition left, Condition right) {
+            if (left instanceof EmptyCondition) {
+                right.visit(this);
+                return;
+            }
+            if (right instanceof EmptyCondition) {
+                left.visit(this);
+                return;
+            }
+            left.visit(this);
+            // fail fast if left result is empty
+            if (result.isEmpty()) {
+                return;
+            }
+            var rightVisitor = new ConditionVisitor();
+            right.visit(rightVisitor);
+            var rightResult = rightVisitor.getResult();
+            if (rightResult.isEmpty()) {
+                setResult(rightResult);
+                return;
+            }
+            // Retain on the smaller set to avoid copying the larger one.
+            if (result.size() <= rightResult.size()) {
+                result.retainAll(rightResult);
+            } else {
+                rightResult.retainAll(result);
+                setResult(rightResult);
+            }
+        }
+
+        private void visitOr(Condition left, Condition right) {
+            if (left instanceof EmptyCondition) {
+                left.visit(this);
+                return;
+            }
+            if (right instanceof EmptyCondition) {
+                right.visit(this);
+                return;
+            }
+            left.visit(this);
+            var rightVisitor = new ConditionVisitor();
+            right.visit(rightVisitor);
+            var rightResult = rightVisitor.getResult();
+            if (result.isEmpty()) {
+                setResult(rightResult);
+                return;
+            }
+            if (rightResult.isEmpty()) {
+                return;
+            }
+            // Add into the larger set to reduce resizing and copying.
+            if (result.size() >= rightResult.size()) {
+                result.addAll(rightResult);
+            } else {
+                rightResult.addAll(result);
+                setResult(rightResult);
             }
         }
 
