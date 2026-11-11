@@ -108,4 +108,36 @@ class ExtensionUpdateHandlerTest {
                         Objects.equals("my-fake", extension.getMetadata().getName())));
         verify(client, times(0)).fetch(same(FakeExtension.class), anyString());
     }
+
+    @Test
+    void shouldReturnErrorWhenKindDoesNotMatchScheme() {
+        shouldRejectMismatchedIdentity("fake.halo.run/v1alpha1", "Other", "my-fake");
+    }
+
+    @Test
+    void shouldReturnErrorWhenApiVersionDoesNotMatchScheme() {
+        shouldRejectMismatchedIdentity("other.halo.run/v1alpha1", "Fake", "my-fake");
+    }
+
+    @Test
+    void shouldReturnErrorWhenNameDoesNotMatchPath() {
+        shouldRejectMismatchedIdentity("fake.halo.run/v1alpha1", "Fake", "other-fake");
+    }
+
+    private void shouldRejectMismatchedIdentity(String apiVersion, String kind, String bodyName) {
+        var unstructured = new Unstructured();
+        var metadata = new Metadata();
+        metadata.setName(bodyName);
+        unstructured.setMetadata(metadata);
+        unstructured.setApiVersion(apiVersion);
+        unstructured.setKind(kind);
+
+        var serverRequest =
+                MockServerRequest.builder().pathVariable("name", "my-fake").body(Mono.just(unstructured));
+        var scheme = Scheme.buildFromType(FakeExtension.class);
+        var updateHandler = new ExtensionUpdateHandler(scheme, client);
+
+        StepVerifier.create(updateHandler.handle(serverRequest)).verifyError(ServerWebInputException.class);
+        verify(client, never()).update(any());
+    }
 }

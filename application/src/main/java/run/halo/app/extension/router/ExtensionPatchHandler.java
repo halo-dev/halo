@@ -59,6 +59,7 @@ public class ExtensionPatchHandler implements PatchHandler {
                                 var appliedJsonNode = (ObjectNode) jsonPatch.apply(jsonExtension.getInternal());
                                 var patchedExtension =
                                         new JsonExtension(jsonExtension.getObjectMapper(), appliedJsonNode);
+                                ExtensionIdentity.requireUnchanged(scheme, name, patchedExtension);
                                 // update the patched extension
                                 return client.update(patchedExtension);
                             } catch (JsonPatchException e) {
