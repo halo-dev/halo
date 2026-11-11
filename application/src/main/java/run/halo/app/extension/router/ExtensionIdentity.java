@@ -4,6 +4,7 @@ import java.util.Objects;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ServerWebInputException;
 import run.halo.app.extension.Extension;
+import run.halo.app.extension.JsonExtension;
 import run.halo.app.extension.Scheme;
 
 /**
@@ -28,14 +29,24 @@ final class ExtensionIdentity {
         if (extension == null) {
             return false;
         }
-        var metadata = extension.getMetadata();
-        if (metadata == null || !StringUtils.hasText(metadata.getName()) || !Objects.equals(name, metadata.getName())) {
-            return false;
-        }
         try {
-            return Objects.equals(scheme.groupVersionKind(), extension.groupVersionKind());
+            // JsonExtension getters coerce JSON scalars to strings. Identity fields must be strings.
+            if (extension instanceof JsonExtension json) {
+                var node = json.getInternal();
+                if (!node.path("apiVersion").isTextual()
+                        || !node.path("kind").isTextual()
+                        || !node.path("metadata").path("name").isTextual()) {
+                    return false;
+                }
+            }
+            var metadata = extension.getMetadata();
+            return metadata != null
+                    && StringUtils.hasText(metadata.getName())
+                    && Objects.equals(name, metadata.getName())
+                    && Objects.equals(scheme.groupVersionKind().kind(), extension.getKind())
+                    && Objects.equals(scheme.groupVersionKind().groupVersion().toString(), extension.getApiVersion());
         } catch (RuntimeException e) {
-            // Missing or invalid apiVersion/kind should be treated as an identity change.
+            // Malformed identity or metadata must be rejected before reaching the client.
             return false;
         }
     }
