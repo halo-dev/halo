@@ -13,6 +13,8 @@ import run.halo.app.extension.Scheme;
  * <p>Authorization for these endpoints is derived from the URL path, so a request that changes {@code apiVersion},
  * {@code kind}, or {@code metadata.name} would otherwise be applied to a different extension than the one the caller
  * was authorized to modify.
+ *
+ * <p>Creation has no name in the request path, so only the group, version, and kind are compared there.
  */
 final class ExtensionIdentity {
 
@@ -25,7 +27,33 @@ final class ExtensionIdentity {
         }
     }
 
+    static void requireGroupVersionKind(Scheme scheme, Extension extension) {
+        if (!matchesGroupVersionKind(scheme, extension)) {
+            throw new ServerWebInputException("apiVersion and kind must match " + scheme.groupVersionKind());
+        }
+    }
+
     static boolean matches(Scheme scheme, String name, Extension extension) {
+        if (!matchesGroupVersionKind(scheme, extension)) {
+            return false;
+        }
+        try {
+            // JsonExtension getters coerce JSON scalars to strings. Identity fields must be strings.
+            if (extension instanceof JsonExtension json
+                    && !json.getInternal().path("metadata").path("name").isTextual()) {
+                return false;
+            }
+            var metadata = extension.getMetadata();
+            return metadata != null
+                    && StringUtils.hasText(metadata.getName())
+                    && Objects.equals(name, metadata.getName());
+        } catch (RuntimeException e) {
+            // Malformed identity or metadata must be rejected before reaching the client.
+            return false;
+        }
+    }
+
+    static boolean matchesGroupVersionKind(Scheme scheme, Extension extension) {
         if (extension == null) {
             return false;
         }
@@ -33,20 +61,14 @@ final class ExtensionIdentity {
             // JsonExtension getters coerce JSON scalars to strings. Identity fields must be strings.
             if (extension instanceof JsonExtension json) {
                 var node = json.getInternal();
-                if (!node.path("apiVersion").isTextual()
-                        || !node.path("kind").isTextual()
-                        || !node.path("metadata").path("name").isTextual()) {
+                if (!node.path("apiVersion").isTextual() || !node.path("kind").isTextual()) {
                     return false;
                 }
             }
-            var metadata = extension.getMetadata();
-            return metadata != null
-                    && StringUtils.hasText(metadata.getName())
-                    && Objects.equals(name, metadata.getName())
-                    && Objects.equals(scheme.groupVersionKind().kind(), extension.getKind())
+            return Objects.equals(scheme.groupVersionKind().kind(), extension.getKind())
                     && Objects.equals(scheme.groupVersionKind().groupVersion().toString(), extension.getApiVersion());
         } catch (RuntimeException e) {
-            // Malformed identity or metadata must be rejected before reaching the client.
+            // Malformed identity must be rejected before reaching the client.
             return false;
         }
     }

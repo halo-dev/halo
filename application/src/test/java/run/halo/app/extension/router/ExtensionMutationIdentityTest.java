@@ -79,6 +79,50 @@ class ExtensionMutationIdentityTest {
         return documents.stream();
     }
 
+    static Stream<String> invalidGroupVersionKinds() throws IOException {
+        List<String> documents = new ArrayList<>();
+        for (String field : List.of("apiVersion", "kind")) {
+            var missing = (ObjectNode) MAPPER.readTree(VALID);
+            missing.remove(field);
+            documents.add(missing.toString());
+            for (String value : List.of("null", "[]", "{}", "123", "true", "\"\"", "\" \"")) {
+                var invalid = (ObjectNode) MAPPER.readTree(VALID);
+                invalid.set(field, MAPPER.readTree(value));
+                documents.add(invalid.toString());
+            }
+        }
+        for (String version : List.of("fake.halo.run/v1alpha1/", "other.halo.run/v1alpha1", "fake.halo.run/v2")) {
+            var invalid = (ObjectNode) MAPPER.readTree(VALID);
+            invalid.put("apiVersion", version);
+            documents.add(invalid.toString());
+        }
+        var otherKind = (ObjectNode) MAPPER.readTree(VALID);
+        otherKind.put("kind", "Other");
+        documents.add(otherKind.toString());
+        return documents.stream();
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidGroupVersionKinds")
+    void shouldRejectCreateWithMismatchedGroupVersionKind(String json) throws IOException {
+        var extension = MAPPER.readValue(json, Unstructured.class);
+        var request = MockServerRequest.builder().body(Mono.just(extension));
+        StepVerifier.create(new ExtensionCreateHandler(SCHEME, client).handle(request))
+                .verifyError(ServerWebInputException.class);
+        verify(client, never()).create(any());
+    }
+
+    @Test
+    void shouldAllowCreateWithMatchingGroupVersionKind() throws IOException {
+        var extension = MAPPER.readValue(VALID, Unstructured.class);
+        when(client.create(any(Unstructured.class))).thenReturn(Mono.just(extension));
+        var request = MockServerRequest.builder().body(Mono.just(extension));
+        StepVerifier.create(new ExtensionCreateHandler(SCHEME, client).handle(request))
+                .assertNext(response -> assertEquals(HttpStatus.CREATED, response.statusCode()))
+                .verifyComplete();
+        verify(client).create(extension);
+    }
+
     @ParameterizedTest
     @MethodSource("invalidDocuments")
     void shouldRejectInvalidPutIdentityBeforeUpdating(String json) throws IOException {
@@ -110,7 +154,8 @@ class ExtensionMutationIdentityTest {
                 "[{\"op\":\"remove\",\"path\":\"/apiVersion\"}]",
                 "[{\"op\":\"remove\",\"path\":\"/metadata/name\"}]",
                 "[{\"op\":\"copy\",\"from\":\"/status/state\",\"path\":\"/metadata/name\"}]",
-                "[{\"op\":\"move\",\"from\":\"/metadata/name\",\"path\":\"/status/state\"}]"
+                "[{\"op\":\"move\",\"from\":\"/metadata/name\",\"path\":\"/status/state\"}]",
+                "[{\"op\":\"add\",\"path\":\"/kind\",\"value\":\"Other\"}]"
             })
     void shouldRejectIndirectOrRemovedIdentity(String patch) throws IOException {
         assertRejectedPatch(patch);
