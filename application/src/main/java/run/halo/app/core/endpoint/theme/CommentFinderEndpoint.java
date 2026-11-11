@@ -339,7 +339,16 @@ public class CommentFinderEndpoint implements CustomEndpoint {
                 arraySchema = @Schema(name = "sort"),
                 schema = @Schema(implementation = String.class, example = "creationTimestamp,desc"))
         public Sort getSort() {
-            return SortResolver.defaultInstance.resolve(exchange);
+            var sort = SortResolver.defaultInstance.resolve(exchange);
+            var orders = sort.stream()
+                    .map(order -> {
+                        if ("creationTimestamp".equals(order.getProperty())) {
+                            return order.withProperty("metadata.creationTimestamp");
+                        }
+                        return order;
+                    })
+                    .toList();
+            return Sort.by(orders);
         }
 
         Ref toRef() {
