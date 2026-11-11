@@ -37,6 +37,51 @@ import type { ReasonTypeNotifierMatrix } from '../models';
 export const NotificationV1alpha1UcApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
+         * Delete all notifications matching the given field selector.
+         * @param {string} username User metadata.name
+         * @param {Array<string>} [fieldSelector] Field selector for filtering. e.g.: spec.unread&#x3D;true
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteAllNotifications: async (username: string, fieldSelector?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'username' is not null or undefined
+            assertParamExists('deleteAllNotifications', 'username', username)
+            const localVarPath = `/apis/api.notification.halo.run/v1alpha1/userspaces/{username}/notifications`
+                .replace('{username}', encodeURIComponent(String(username)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (fieldSelector) {
+                localVarQueryParameter['fieldSelector'] = fieldSelector;
+            }
+
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Delete the specified notification.
          * @param {string} username User metadata.name
          * @param {string} name Notification metadata.name
@@ -59,6 +104,51 @@ export const NotificationV1alpha1UcApiAxiosParamCreator = function (configuratio
             }
 
             const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = '*/*';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Get the specified notification.
+         * @param {string} username User metadata.name
+         * @param {string} name Notification metadata.name
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getSpecifiedNotification: async (username: string, name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'username' is not null or undefined
+            assertParamExists('getSpecifiedNotification', 'username', username)
+            // verify required parameter 'name' is not null or undefined
+            assertParamExists('getSpecifiedNotification', 'name', name)
+            const localVarPath = `/apis/api.notification.halo.run/v1alpha1/userspaces/{username}/notifications/{name}`
+                .replace('{username}', encodeURIComponent(String(username)))
+                .replace('{name}', encodeURIComponent(String(name)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
@@ -176,6 +266,47 @@ export const NotificationV1alpha1UcApiAxiosParamCreator = function (configuratio
             if (sort) {
                 localVarQueryParameter['sort'] = sort;
             }
+
+            localVarHeaderParameter['Accept'] = '*/*';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Mark all notifications as read.
+         * @param {string} username User metadata.name
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        markAllNotificationsAsRead: async (username: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'username' is not null or undefined
+            assertParamExists('markAllNotificationsAsRead', 'username', username)
+            const localVarPath = `/apis/api.notification.halo.run/v1alpha1/userspaces/{username}/notifications/-/mark-all-as-read`
+                .replace('{username}', encodeURIComponent(String(username)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
             localVarHeaderParameter['Accept'] = '*/*';
 
@@ -333,6 +464,19 @@ export const NotificationV1alpha1UcApiFp = function(configuration?: Configuratio
     const localVarAxiosParamCreator = NotificationV1alpha1UcApiAxiosParamCreator(configuration)
     return {
         /**
+         * Delete all notifications matching the given field selector.
+         * @param {string} username User metadata.name
+         * @param {Array<string>} [fieldSelector] Field selector for filtering. e.g.: spec.unread&#x3D;true
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteAllNotifications(username: string, fieldSelector?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteAllNotifications(username, fieldSelector, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['NotificationV1alpha1UcApi.deleteAllNotifications']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Delete the specified notification.
          * @param {string} username User metadata.name
          * @param {string} name Notification metadata.name
@@ -343,6 +487,19 @@ export const NotificationV1alpha1UcApiFp = function(configuration?: Configuratio
             const localVarAxiosArgs = await localVarAxiosParamCreator.deleteSpecifiedNotification(username, name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['NotificationV1alpha1UcApi.deleteSpecifiedNotification']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Get the specified notification.
+         * @param {string} username User metadata.name
+         * @param {string} name Notification metadata.name
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getSpecifiedNotification(username: string, name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Notification>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getSpecifiedNotification(username, name, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['NotificationV1alpha1UcApi.getSpecifiedNotification']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -372,6 +529,18 @@ export const NotificationV1alpha1UcApiFp = function(configuration?: Configuratio
             const localVarAxiosArgs = await localVarAxiosParamCreator.listUserNotifications(username, page, size, labelSelector, fieldSelector, sort, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['NotificationV1alpha1UcApi.listUserNotifications']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Mark all notifications as read.
+         * @param {string} username User metadata.name
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async markAllNotificationsAsRead(username: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<string>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.markAllNotificationsAsRead(username, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['NotificationV1alpha1UcApi.markAllNotificationsAsRead']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -423,6 +592,15 @@ export const NotificationV1alpha1UcApiFactory = function (configuration?: Config
     const localVarFp = NotificationV1alpha1UcApiFp(configuration)
     return {
         /**
+         * Delete all notifications matching the given field selector.
+         * @param {NotificationV1alpha1UcApiDeleteAllNotificationsRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteAllNotifications(requestParameters: NotificationV1alpha1UcApiDeleteAllNotificationsRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.deleteAllNotifications(requestParameters.username, requestParameters.fieldSelector, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Delete the specified notification.
          * @param {NotificationV1alpha1UcApiDeleteSpecifiedNotificationRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -430,6 +608,15 @@ export const NotificationV1alpha1UcApiFactory = function (configuration?: Config
          */
         deleteSpecifiedNotification(requestParameters: NotificationV1alpha1UcApiDeleteSpecifiedNotificationRequest, options?: RawAxiosRequestConfig): AxiosPromise<Notification> {
             return localVarFp.deleteSpecifiedNotification(requestParameters.username, requestParameters.name, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Get the specified notification.
+         * @param {NotificationV1alpha1UcApiGetSpecifiedNotificationRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getSpecifiedNotification(requestParameters: NotificationV1alpha1UcApiGetSpecifiedNotificationRequest, options?: RawAxiosRequestConfig): AxiosPromise<Notification> {
+            return localVarFp.getSpecifiedNotification(requestParameters.username, requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
          * List notification preferences for the authenticated user.
@@ -448,6 +635,15 @@ export const NotificationV1alpha1UcApiFactory = function (configuration?: Config
          */
         listUserNotifications(requestParameters: NotificationV1alpha1UcApiListUserNotificationsRequest, options?: RawAxiosRequestConfig): AxiosPromise<NotificationList> {
             return localVarFp.listUserNotifications(requestParameters.username, requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Mark all notifications as read.
+         * @param {NotificationV1alpha1UcApiMarkAllNotificationsAsReadRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        markAllNotificationsAsRead(requestParameters: NotificationV1alpha1UcApiMarkAllNotificationsAsReadRequest, options?: RawAxiosRequestConfig): AxiosPromise<Array<string>> {
+            return localVarFp.markAllNotificationsAsRead(requestParameters.username, options).then((request) => request(axios, basePath));
         },
         /**
          * Mark the specified notification as read.
@@ -480,9 +676,39 @@ export const NotificationV1alpha1UcApiFactory = function (configuration?: Config
 };
 
 /**
+ * Request parameters for deleteAllNotifications operation in NotificationV1alpha1UcApi.
+ */
+export interface NotificationV1alpha1UcApiDeleteAllNotificationsRequest {
+    /**
+     * User metadata.name
+     */
+    readonly username: string
+
+    /**
+     * Field selector for filtering. e.g.: spec.unread&#x3D;true
+     */
+    readonly fieldSelector?: Array<string>
+}
+
+/**
  * Request parameters for deleteSpecifiedNotification operation in NotificationV1alpha1UcApi.
  */
 export interface NotificationV1alpha1UcApiDeleteSpecifiedNotificationRequest {
+    /**
+     * User metadata.name
+     */
+    readonly username: string
+
+    /**
+     * Notification metadata.name
+     */
+    readonly name: string
+}
+
+/**
+ * Request parameters for getSpecifiedNotification operation in NotificationV1alpha1UcApi.
+ */
+export interface NotificationV1alpha1UcApiGetSpecifiedNotificationRequest {
     /**
      * User metadata.name
      */
@@ -540,6 +766,16 @@ export interface NotificationV1alpha1UcApiListUserNotificationsRequest {
 }
 
 /**
+ * Request parameters for markAllNotificationsAsRead operation in NotificationV1alpha1UcApi.
+ */
+export interface NotificationV1alpha1UcApiMarkAllNotificationsAsReadRequest {
+    /**
+     * User metadata.name
+     */
+    readonly username: string
+}
+
+/**
  * Request parameters for markNotificationAsRead operation in NotificationV1alpha1UcApi.
  */
 export interface NotificationV1alpha1UcApiMarkNotificationAsReadRequest {
@@ -583,6 +819,16 @@ export interface NotificationV1alpha1UcApiSaveUserNotificationPreferencesRequest
  */
 export class NotificationV1alpha1UcApi extends BaseAPI {
     /**
+     * Delete all notifications matching the given field selector.
+     * @param {NotificationV1alpha1UcApiDeleteAllNotificationsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public deleteAllNotifications(requestParameters: NotificationV1alpha1UcApiDeleteAllNotificationsRequest, options?: RawAxiosRequestConfig) {
+        return NotificationV1alpha1UcApiFp(this.configuration).deleteAllNotifications(requestParameters.username, requestParameters.fieldSelector, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * Delete the specified notification.
      * @param {NotificationV1alpha1UcApiDeleteSpecifiedNotificationRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -590,6 +836,16 @@ export class NotificationV1alpha1UcApi extends BaseAPI {
      */
     public deleteSpecifiedNotification(requestParameters: NotificationV1alpha1UcApiDeleteSpecifiedNotificationRequest, options?: RawAxiosRequestConfig) {
         return NotificationV1alpha1UcApiFp(this.configuration).deleteSpecifiedNotification(requestParameters.username, requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Get the specified notification.
+     * @param {NotificationV1alpha1UcApiGetSpecifiedNotificationRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getSpecifiedNotification(requestParameters: NotificationV1alpha1UcApiGetSpecifiedNotificationRequest, options?: RawAxiosRequestConfig) {
+        return NotificationV1alpha1UcApiFp(this.configuration).getSpecifiedNotification(requestParameters.username, requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -610,6 +866,16 @@ export class NotificationV1alpha1UcApi extends BaseAPI {
      */
     public listUserNotifications(requestParameters: NotificationV1alpha1UcApiListUserNotificationsRequest, options?: RawAxiosRequestConfig) {
         return NotificationV1alpha1UcApiFp(this.configuration).listUserNotifications(requestParameters.username, requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Mark all notifications as read.
+     * @param {NotificationV1alpha1UcApiMarkAllNotificationsAsReadRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public markAllNotificationsAsRead(requestParameters: NotificationV1alpha1UcApiMarkAllNotificationsAsReadRequest, options?: RawAxiosRequestConfig) {
+        return NotificationV1alpha1UcApiFp(this.configuration).markAllNotificationsAsRead(requestParameters.username, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
