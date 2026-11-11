@@ -56,9 +56,11 @@ public class ExtensionPatchHandler implements PatchHandler {
                         .flatMap(jsonExtension -> {
                             try {
                                 // apply the patch
-                                var appliedJsonNode = (ObjectNode) jsonPatch.apply(jsonExtension.getInternal());
-                                var patchedExtension =
-                                        new JsonExtension(jsonExtension.getObjectMapper(), appliedJsonNode);
+                                var appliedJsonNode = jsonPatch.apply(jsonExtension.getInternal());
+                                if (!(appliedJsonNode instanceof ObjectNode objectNode)) {
+                                    throw new ServerWebInputException("Patched extension must be an object.");
+                                }
+                                var patchedExtension = new JsonExtension(jsonExtension.getObjectMapper(), objectNode);
                                 ExtensionIdentity.requireUnchanged(scheme, name, patchedExtension);
                                 // update the patched extension
                                 return client.update(patchedExtension);
