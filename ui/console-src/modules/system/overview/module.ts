@@ -15,7 +15,7 @@ export default definePlugin({
         searchable: true,
         permissions: ["system:actuator:manage"],
         menu: {
-          name: "core.sidebar.menu.items.overview",
+          name: /* @x18n-key */ "core.sidebar.menu.items.overview",
           group: "system",
           icon: markRaw(IconTerminalBoxLine),
           priority: 3,

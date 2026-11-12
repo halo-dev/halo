@@ -293,7 +293,7 @@ export const ExtensionGallery = Node.create<
         return {
           priority: 96,
           icon: markRaw(MingcutePhotoAlbumLine),
-          title: "editor.extensions.commands_menu.gallery",
+          title: /* @x18n-key */ "editor.extensions.commands_menu.gallery",
           keywords: ["gallery", "hualang", "tupian", "images"],
           command: ({ editor, range }: { editor: Editor; range: Range }) => {
             editor

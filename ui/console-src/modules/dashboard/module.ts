@@ -29,7 +29,7 @@ export default definePlugin({
             title: "core.dashboard.title",
             searchable: true,
             menu: {
-              name: "core.sidebar.menu.items.dashboard",
+              name: /* @x18n-key */ "core.sidebar.menu.items.dashboard",
               group: "dashboard",
               icon: markRaw(IconDashboard),
               priority: 0,

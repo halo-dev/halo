@@ -112,7 +112,9 @@ function createRoutesProvider(
         sourceId: "routes",
         title: context.t(route.meta?.title as string),
         icon: { component: markRaw(IconLink) },
-        group: context.t("core.components.global_search.groups.console"),
+        group: context.t(
+          /* @x18n-key */ "core.components.global_search.groups.console"
+        ),
         route,
       }));
     },
@@ -137,7 +139,9 @@ function createPluginsProvider(
         sourceId: "plugins",
         title: plugin.spec.displayName as string,
         icon: { src: plugin.status?.logo as string },
-        group: context.t("core.components.global_search.groups.plugin"),
+        group: context.t(
+          /* @x18n-key */ "core.components.global_search.groups.plugin"
+        ),
         route: {
           name: "PluginDetail",
           params: { name: plugin.metadata.name },
@@ -166,7 +170,9 @@ function createCategoriesProvider(
         sourceId: "categories",
         title: category.spec.displayName,
         icon: { component: markRaw(IconBookRead) },
-        group: context.t("core.components.global_search.groups.category"),
+        group: context.t(
+          /* @x18n-key */ "core.components.global_search.groups.category"
+        ),
         route: {
           name: "Categories",
           query: { name: category.metadata.name },
@@ -198,7 +204,9 @@ function createSettingsProvider(
         sourceId: "settings",
         title: form.label as string,
         icon: { component: markRaw(IconSettings) },
-        group: context.t("core.components.global_search.groups.setting"),
+        group: context.t(
+          /* @x18n-key */ "core.components.global_search.groups.setting"
+        ),
         route: {
           name: "SystemSetting",
           params: { group: form.group },
@@ -228,7 +236,9 @@ function createThemeSettingsProvider(
           " / "
         ),
         icon: { component: markRaw(IconPalette) },
-        group: context.t("core.components.global_search.groups.theme_setting"),
+        group: context.t(
+          /* @x18n-key */ "core.components.global_search.groups.theme_setting"
+        ),
         route: {
           name: "ThemeSetting",
           params: { group: form.group },
@@ -260,7 +270,9 @@ function createPostsProvider(
       return data.items.map(({ post }) =>
         mapContentToResult(post, keyword, {
           sourceId: "posts",
-          group: context.t("core.components.global_search.groups.post"),
+          group: context.t(
+            /* @x18n-key */ "core.components.global_search.groups.post"
+          ),
           icon: { component: markRaw(IconBookRead) },
           routeName: "PostEditor",
         })
@@ -293,7 +305,9 @@ function createSinglePagesProvider(
       return data.items.map(({ page }) =>
         mapContentToResult(page, keyword, {
           sourceId: "single-pages",
-          group: context.t("core.components.global_search.groups.page"),
+          group: context.t(
+            /* @x18n-key */ "core.components.global_search.groups.page"
+          ),
           icon: { component: markRaw(IconPages) },
           routeName: "SinglePageEditor",
         })
@@ -327,7 +341,9 @@ function createAttachmentsProvider(
         title: attachment.spec.displayName as string,
         context: attachment.spec.mediaType,
         icon: { component: markRaw(IconFolder) },
-        group: context.t("core.components.global_search.groups.attachment"),
+        group: context.t(
+          /* @x18n-key */ "core.components.global_search.groups.attachment"
+        ),
         route: {
           name: "Attachments",
           query: { name: attachment.metadata.name },
@@ -362,7 +378,9 @@ function createUsersProvider(
         title: user.spec.displayName,
         context: user.metadata.name,
         icon: { component: markRaw(IconUserSettings) },
-        group: context.t("core.components.global_search.groups.user"),
+        group: context.t(
+          /* @x18n-key */ "core.components.global_search.groups.user"
+        ),
         route: {
           name: "UserDetail",
           params: { name: user.metadata.name },
@@ -396,7 +414,9 @@ function createTagsProvider(
         title: tag.spec.displayName,
         context: tag.spec.slug,
         icon: { component: markRaw(IconBookRead) },
-        group: context.t("core.components.global_search.groups.tag"),
+        group: context.t(
+          /* @x18n-key */ "core.components.global_search.groups.tag"
+        ),
         route: {
           name: "Tags",
           query: { name: tag.metadata.name },
