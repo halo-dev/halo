@@ -26,7 +26,7 @@ Run from the repo root:
 
 - Follow existing component and composable patterns; match surrounding code rather than introducing new stylistic islands.
 - Never hand-edit `ui/packages/api-client/src/` — it is generated; regenerate it instead.
-- Keep dependency versions in `ui/package.json`; never hard-code versions.
+- Keep application dependency versions in `ui/package.json`. For dependencies shared by workspace packages, define versions in the catalog in `ui/pnpm-workspace.yaml` and reference them with `catalog:`; never duplicate version declarations across packages.
 - Payload or UX changes usually ship together with the backend change that defines the contract.
 
 ## Boundaries

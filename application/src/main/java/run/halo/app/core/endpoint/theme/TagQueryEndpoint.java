@@ -72,7 +72,8 @@ public class TagQueryEndpoint implements CustomEndpoint {
                                     .name("name")
                                     .description("Tag metadata.name")
                                     .required(true))
-                            .response(responseBuilder().implementation(ListedPostVo.class));
+                            .response(responseBuilder()
+                                    .implementation(ListResult.generateGenericClass(ListedPostVo.class)));
                     PostPublicQuery.buildParameters(builder);
                 })
                 .build();

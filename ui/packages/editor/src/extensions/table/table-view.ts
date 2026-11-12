@@ -1,6 +1,7 @@
 import { TableView as TiptapTableView } from "@tiptap/extension-table";
 import type { EditorView, Node as ProseMirrorNode } from "@/tiptap/pm";
 import { normalizeTableLayoutMode, type TableLayoutMode } from "./attributes";
+import { applyAutoColumnWidths, getTableColumnWidths } from "./column-widths";
 
 export class HaloTableView extends TiptapTableView {
   declare dom: HTMLDivElement;
@@ -89,13 +90,12 @@ export class HaloTableView extends TiptapTableView {
     this.table.style.tableLayout = layoutMode;
 
     if (layoutMode === "auto") {
-      this.table.style.width = "100%";
-      this.table.style.minWidth = "100%";
-      Array.from(this.colgroup.children).forEach((column) => {
-        const element = column as HTMLTableColElement;
-        element.style.removeProperty("width");
-        element.style.setProperty("min-width", `${this.cellMinWidth}px`);
-      });
+      applyAutoColumnWidths(
+        this.table,
+        this.colgroup,
+        getTableColumnWidths(node),
+        this.cellMinWidth
+      );
       return;
     }
 

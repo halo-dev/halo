@@ -1,6 +1,6 @@
 {
   "name": "@halo-dev/api-client",
-  "version": "2.27.0",
+  "version": "2.28.0",
   "description": "API Client for Halo 2",
   "homepage": "https://github.com/halo-dev/halo/tree/main/ui/packages/api-client#readme",
   "bugs": {
@@ -45,7 +45,7 @@
     "prepublishOnly": "vp run build"
   },
   "dependencies": {
-    "qs": "^6.15.3"
+    "qs": "^6.16.1"
   },
   "devDependencies": {
     "@openapitools/openapi-generator-cli": "^2.40.1",
@@ -70,7 +70,7 @@
     "hasown": "2.0.4",
     "math-intrinsics": "1.1.0",
     "object-inspect": "1.13.4",
-    "qs": "6.15.3",
+    "qs": "6.16.1",
     "side-channel": "1.1.1",
     "side-channel-list": "1.0.1",
     "side-channel-map": "1.0.1",

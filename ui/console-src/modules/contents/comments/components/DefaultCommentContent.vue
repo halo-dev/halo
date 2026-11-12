@@ -27,4 +27,9 @@ defineProps<{
 .comment-content :deep(ol) {
   list-style: decimal !important;
 }
+
+.comment-content :deep(img) {
+  max-width: 50%;
+  height: auto;
+}
 </style>

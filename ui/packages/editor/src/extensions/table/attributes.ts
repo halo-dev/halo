@@ -139,14 +139,29 @@ export function parseColumnWidths(element: HTMLElement): number[] | null {
     Number.parseInt(element.getAttribute("colspan") ?? "1", 10)
   );
   const columns = Array.from(
-    table.querySelectorAll<HTMLTableColElement>("colgroup > col")
-  ).slice(columnIndex, columnIndex + colspan);
-  const widths = columns.map((column) => {
-    return Number.parseInt(
-      column.getAttribute("width") || column.style.width,
-      10
-    );
-  });
+    table.querySelectorAll<HTMLTableColElement>(":scope > colgroup > col"),
+    (column) => (column.getAttribute("width") || column.style.width).trim()
+  );
+  const isAuto = parseTableLayoutMode(table) === "auto";
+  // Auto layout takes its weights from the first row. Keep missing weights
+  // for newly inserted columns instead of mixing percentages into that scale.
+  const importPercentages =
+    isAuto &&
+    !Array.from(table.rows[0]?.cells ?? []).some((cell) =>
+      cell.getAttribute("colwidth")
+    ) &&
+    columns.every((width) => width.endsWith("%"));
+  const widths = columns
+    .slice(columnIndex, columnIndex + colspan)
+    .map((width) => {
+      if (isAuto && width.endsWith("%")) {
+        // colwidth stores integers; retain two decimal places of percentages.
+        return importPercentages
+          ? Math.round(Number.parseFloat(width) * 100)
+          : Number.NaN;
+      }
+      return Number.parseInt(width, 10);
+    });
 
   return widths.length === colspan &&
     widths.every((width) => Number.isFinite(width) && width > 0)

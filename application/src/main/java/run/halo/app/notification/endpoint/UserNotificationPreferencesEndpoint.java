@@ -4,6 +4,8 @@ import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
+import static org.springframework.data.domain.Sort.Order.asc;
+import static org.springframework.data.domain.Sort.Order.desc;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -20,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 import org.apache.commons.lang3.StringUtils;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RequestPredicates;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -31,7 +34,6 @@ import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.core.extension.notification.NotifierDescriptor;
 import run.halo.app.core.extension.notification.ReasonType;
-import run.halo.app.extension.Comparators;
 import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.GroupVersion;
 import run.halo.app.extension.ListOptions;
@@ -139,7 +141,10 @@ public class UserNotificationPreferencesEndpoint implements CustomEndpoint {
         return client.listAll(ReasonType.class, listOptions, ExtensionUtil.defaultSort())
                 .map(ReasonTypeInfo::from)
                 .collectList()
-                .flatMap(reasonTypes -> client.list(NotifierDescriptor.class, null, Comparators.defaultComparator())
+                .flatMap(reasonTypes -> client.listAll(
+                                NotifierDescriptor.class,
+                                new ListOptions(),
+                                Sort.by(desc("metadata.creationTimestamp"), asc("metadata.name")))
                         .map(notifier -> new NotifierInfo(
                                 notifier.getMetadata().getName(),
                                 notifier.getSpec().getDisplayName(),

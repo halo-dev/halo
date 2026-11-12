@@ -1,9 +1,8 @@
 <script lang="ts" setup>
-import { useElementSize, useThrottleFn } from "@vueuse/core";
-import type { ComputedRef } from "vue";
-import { computed, onMounted, onUnmounted, ref, watch } from "vue";
+import { useElementSize, useEventListener } from "@vueuse/core";
+import { computed, nextTick, shallowRef, useTemplateRef, watch } from "vue";
 import { IconArrowLeft, IconArrowRight } from "../../icons/icons";
-import type { TabsArrowShow, TabsDirection, TabsType } from "./types";
+import type { TabsDirection, TabsType } from "./types";
 
 const props = withDefaults(
   defineProps<{
@@ -34,188 +33,211 @@ const classes = computed(() => {
 });
 
 const handleChange = (id: number | string, index: number) => {
-  handleClickTabItem(index);
+  if (id === props.activeId) {
+    void scrollTabIntoView(index, getScrollBehavior());
+  }
   emit("update:activeId", id);
   emit("change", id);
 };
 
-const tabbarItemsRef = ref<HTMLElement | undefined>();
-const tabItemRefs = ref<HTMLElement[] | undefined>();
-const itemWidthArr = ref<number[]>([]);
-const indicatorRef = ref<HTMLElement | undefined>();
-const arrowFlag = ref(false);
+const tabbarItemsRef = useTemplateRef<HTMLElement>("tabbarItemsRef");
+const tabbarTrackRef = useTemplateRef<HTMLElement>("tabbarTrackRef");
+const leftArrowRef = useTemplateRef<HTMLButtonElement>("leftArrowRef");
+const rightArrowRef = useTemplateRef<HTMLButtonElement>("rightArrowRef");
+const scrollLeft = shallowRef(0);
 const { width: tabbarWidth } = useElementSize(tabbarItemsRef);
+const { width: tabbarContentWidth } = useElementSize(tabbarTrackRef);
 
-const arrowShow: ComputedRef<TabsArrowShow> = computed(() => {
-  const show: TabsArrowShow = { left: false, right: false };
-  if (!tabbarItemsRef.value) return show;
-  void arrowFlag.value;
-  void tabbarWidth.value;
-  const { scrollWidth, scrollLeft, clientWidth } = tabbarItemsRef.value;
-  if (scrollWidth > clientWidth) {
-    if (scrollLeft < scrollWidth - clientWidth) {
-      show.right = true;
-    }
-    if (scrollLeft > 20) {
-      show.left = true;
-    }
-  }
-  return show;
+const maxScrollLeft = computed(() => {
+  if (props.direction !== "row") return 0;
+  return Math.max(0, tabbarContentWidth.value - tabbarWidth.value);
+});
+const canScrollLeft = computed(() => {
+  return maxScrollLeft.value > 0 && scrollLeft.value > 1;
+});
+const canScrollRight = computed(() => {
+  return maxScrollLeft.value - scrollLeft.value > 1;
 });
 
-function handleHorizontalWheel(event: WheelEvent) {
-  if (!tabbarItemsRef.value) {
+const activeIndex = computed(() => {
+  return (
+    props.items?.findIndex((item) => item[props.idKey] === props.activeId) ?? -1
+  );
+});
+
+function updateScrollLeft() {
+  scrollLeft.value = tabbarItemsRef.value?.scrollLeft ?? 0;
+}
+
+function getScrollBehavior(): ScrollBehavior {
+  if (
+    typeof window !== "undefined" &&
+    window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+  ) {
+    return "auto";
+  }
+  return "smooth";
+}
+
+async function scrollTabIntoView(index: number, behavior: ScrollBehavior) {
+  await nextTick();
+  if (props.direction !== "row" || index < 0 || index !== activeIndex.value) {
     return;
   }
-  const { scrollLeft, scrollWidth, clientWidth } = tabbarItemsRef.value;
-  const toLeft = event.deltaY < 0 && scrollLeft > 0;
-  const toRight = event.deltaY > 0 && scrollLeft < scrollWidth - clientWidth;
+
+  const container = tabbarItemsRef.value;
+  const item = tabbarTrackRef.value?.children[index] as HTMLElement | undefined;
+  if (!container || !item) return;
+
+  const containerRect = container.getBoundingClientRect();
+  const itemRect = item.getBoundingClientRect();
+  const arrowOffset = 40;
+  const visibleLeft =
+    containerRect.left + (canScrollLeft.value ? arrowOffset : 0);
+  const visibleRight =
+    containerRect.right - (canScrollRight.value ? arrowOffset : 0);
+
+  let left = 0;
+  if (itemRect.left < visibleLeft) {
+    left = itemRect.left - visibleLeft;
+  } else if (itemRect.right > visibleRight) {
+    left = itemRect.right - visibleRight;
+  }
+
+  if (Math.abs(left) < 1) return;
+  container.scrollBy({ left, behavior });
+}
+
+function handleHorizontalWheel(event: WheelEvent) {
+  const container = tabbarItemsRef.value;
+  if (!container || props.direction !== "row") return;
+
+  const { scrollLeft, scrollWidth, clientWidth } = container;
+  const maxScrollLeft = Math.max(0, scrollWidth - clientWidth);
+  const toLeft = event.deltaY < 0 && scrollLeft > 1;
+  const toRight = event.deltaY > 0 && maxScrollLeft - scrollLeft > 1;
 
   if (toLeft || toRight) {
     event.preventDefault();
     event.stopPropagation();
-    tabbarItemsRef.value.scrollBy({ left: event.deltaY });
-  }
-}
-
-function saveItemsWidth() {
-  if (!tabbarItemsRef.value || !tabItemRefs.value) return;
-  itemWidthArr.value = [];
-  for (const item of tabItemRefs.value) {
-    itemWidthArr.value.push(item.offsetWidth);
-  }
-  arrowFlag.value = !arrowFlag.value;
-}
-
-function handleClickTabItem(index: number) {
-  if (!tabbarItemsRef.value || !indicatorRef.value) return;
-  const { scrollWidth, clientWidth } = tabbarItemsRef.value;
-  if (scrollWidth <= clientWidth) return;
-  if (index === 0) {
-    tabbarItemsRef.value.scrollTo({ left: 0, behavior: "smooth" });
-    return;
-  }
-  if (index === itemWidthArr.value.length - 1) {
-    tabbarItemsRef.value.scrollTo({
-      left: scrollWidth - clientWidth,
-      behavior: "smooth",
-    });
-    return;
+    container.scrollBy({ left: event.deltaY });
   }
 }
 
 function handleClickArrow(prev: boolean) {
-  if (!tabbarItemsRef.value || !indicatorRef.value || !tabItemRefs.value)
-    return;
-  const { scrollWidth, scrollLeft, clientWidth } = tabbarItemsRef.value;
-  if (scrollWidth <= clientWidth) return;
-  if (!itemWidthArr.value[0]) {
-    itemWidthArr.value = [];
-    for (const item of tabItemRefs.value) {
-      itemWidthArr.value.push(item.offsetWidth);
-    }
-  }
-  let hiddenNum = 0;
-  let totalWith = 0;
-  let scrollByX = 0;
-  const lastItemWidth = itemWidthArr.value[itemWidthArr.value.length - 1];
-  if (prev) {
-    for (let i = 0; i < itemWidthArr.value.length; i++) {
-      const w = itemWidthArr.value[i];
-      totalWith += w;
-      if (totalWith >= scrollLeft) {
-        hiddenNum = i;
-        break;
-      }
-    }
-    if (hiddenNum === 0) {
-      scrollByX = -itemWidthArr.value[0];
-    } else {
-      scrollByX = -(
-        itemWidthArr.value[hiddenNum] -
-        totalWith +
-        scrollLeft +
-        itemWidthArr.value[hiddenNum - 1]
-      );
-    }
-  } else {
-    const overWidth = scrollWidth - scrollLeft - clientWidth;
-    for (let i = itemWidthArr.value.length - 1; i >= 0; i--) {
-      const w = itemWidthArr.value[i];
-      totalWith += w;
-      if (totalWith >= overWidth) {
-        hiddenNum = i;
-        break;
-      }
-    }
+  const container = tabbarItemsRef.value;
+  if (!container || props.direction !== "row") return;
 
-    if (hiddenNum === itemWidthArr.value.length - 1) {
-      scrollByX =
-        lastItemWidth + itemWidthArr.value[itemWidthArr.value.length - 1];
-    } else {
-      scrollByX =
-        itemWidthArr.value[hiddenNum] -
-        (totalWith - overWidth) +
-        itemWidthArr.value[hiddenNum + 1];
-    }
+  const distance = container.clientWidth * 0.8;
+  if (distance <= 0) return;
+
+  const left = prev ? -distance : distance;
+  const maxScrollLeft = Math.max(
+    0,
+    container.scrollWidth - container.clientWidth
+  );
+  const targetScrollLeft = Math.min(
+    Math.max(0, container.scrollLeft + left),
+    maxScrollLeft
+  );
+  container.scrollBy({ left, behavior: getScrollBehavior() });
+
+  const sourceArrow = prev ? leftArrowRef.value : rightArrowRef.value;
+  const targetArrow = prev ? rightArrowRef.value : leftArrowRef.value;
+  const reachesBoundary = prev
+    ? targetScrollLeft <= 1
+    : maxScrollLeft - targetScrollLeft <= 1;
+
+  if (reachesBoundary && document.activeElement === sourceArrow) {
+    const focusTarget =
+      targetArrow && !targetArrow.disabled ? targetArrow : container;
+    focusTarget.focus({ preventScroll: true });
   }
-  tabbarItemsRef.value.scrollBy({
-    left: scrollByX,
-    behavior: "smooth",
-  });
 }
 
-const handleScroll = useThrottleFn(
-  () => {
-    arrowFlag.value = !arrowFlag.value;
+watch(
+  activeIndex,
+  (index) => {
+    void scrollTabIntoView(index, getScrollBehavior());
   },
-  100,
-  true
+  { flush: "post" }
 );
 
-watch(() => tabItemRefs.value?.length, saveItemsWidth);
+watch(
+  [tabbarWidth, tabbarContentWidth],
+  () => {
+    updateScrollLeft();
+    void scrollTabIntoView(activeIndex.value, "auto");
+  },
+  { flush: "post", immediate: true }
+);
 
-onMounted(() => {
-  tabbarItemsRef.value?.addEventListener("wheel", handleHorizontalWheel);
-  tabbarItemsRef.value?.addEventListener("scroll", handleScroll);
+useEventListener(tabbarItemsRef, "scroll", updateScrollLeft, {
+  passive: true,
 });
-
-onUnmounted(() => {
-  tabbarItemsRef.value?.removeEventListener("wheel", handleHorizontalWheel);
-  tabbarItemsRef.value?.removeEventListener("scroll", handleScroll);
+useEventListener(tabbarItemsRef, "wheel", handleHorizontalWheel, {
+  passive: false,
 });
 </script>
 <template>
   <div :class="classes" class="tabbar-wrapper">
     <div
-      ref="indicatorRef"
-      :class="['indicator', 'left', arrowShow.left ? 'visible' : 'invisible']"
+      :aria-hidden="!canScrollLeft"
+      :class="['indicator', 'left', canScrollLeft ? 'is-visible' : 'is-hidden']"
     >
-      <div title="向前" class="arrow-left" @click="handleClickArrow(true)">
+      <button
+        ref="leftArrowRef"
+        :disabled="!canScrollLeft"
+        aria-label="向左滚动标签"
+        class="tabbar-arrow"
+        title="向左滚动标签"
+        type="button"
+        @click="handleClickArrow(true)"
+      >
         <IconArrowLeft />
-      </div>
+      </button>
     </div>
     <div
-      :class="['indicator', 'right', arrowShow.right ? 'visible' : 'invisible']"
+      :aria-hidden="!canScrollRight"
+      :class="[
+        'indicator',
+        'right',
+        canScrollRight ? 'is-visible' : 'is-hidden',
+      ]"
     >
-      <div title="向后" class="arrow-right" @click="handleClickArrow(false)">
-        <IconArrowRight />
-      </div>
-    </div>
-    <div ref="tabbarItemsRef" class="tabbar-items">
-      <div
-        v-for="(item, index) in items"
-        :key="index"
-        ref="tabItemRefs"
-        :class="{ 'tabbar-item-active': item[idKey] === activeId }"
-        class="tabbar-item"
-        @click="handleChange(item[idKey], index)"
+      <button
+        ref="rightArrowRef"
+        :disabled="!canScrollRight"
+        aria-label="向右滚动标签"
+        class="tabbar-arrow"
+        title="向右滚动标签"
+        type="button"
+        @click="handleClickArrow(false)"
       >
-        <div v-if="item.icon" class="tabbar-item-icon">
-          <component :is="item.icon" />
-        </div>
-        <div v-if="item[labelKey]" class="tabbar-item-label">
-          {{ item[labelKey] }}
+        <IconArrowRight />
+      </button>
+    </div>
+    <div
+      ref="tabbarItemsRef"
+      :tabindex="maxScrollLeft > 0 ? 0 : undefined"
+      aria-label="标签列表"
+      class="tabbar-items"
+      role="group"
+    >
+      <div ref="tabbarTrackRef" class="tabbar-items-track">
+        <div
+          v-for="(item, index) in items"
+          :key="item[idKey]"
+          :class="{ 'tabbar-item-active': item[idKey] === activeId }"
+          class="tabbar-item"
+          @click="handleChange(item[idKey], index)"
+        >
+          <div v-if="item.icon" class="tabbar-item-icon">
+            <component :is="item.icon" />
+          </div>
+          <div v-if="item[labelKey]" class="tabbar-item-label">
+            {{ item[labelKey] }}
+          </div>
         </div>
       </div>
     </div>
@@ -223,51 +245,59 @@ onUnmounted(() => {
 </template>
 <style lang="scss">
 .tabbar-wrapper {
+  --tabbar-fade-color: theme("colors.white");
+
   @apply relative;
+
   .indicator {
-    @apply pointer-events-none absolute top-0 z-10 flex h-full w-20 items-center from-transparent from-10% via-white/80 via-30% to-white to-70% pb-1.5 pt-1;
+    @apply pointer-events-none absolute top-0 z-10 flex h-full w-16 items-center transition-opacity duration-150 ease-out;
 
     &.left {
-      @apply left-0 justify-start bg-gradient-to-l;
+      @apply left-0 justify-start;
+      background: linear-gradient(
+        to left,
+        transparent,
+        var(--tabbar-fade-color) 70%
+      );
     }
+
     &.right {
-      @apply right-0 justify-end bg-gradient-to-r;
+      @apply right-0 justify-end;
+      background: linear-gradient(
+        to right,
+        transparent,
+        var(--tabbar-fade-color) 70%
+      );
     }
-    .arrow-left,
-    .arrow-right {
-      @apply pointer-events-auto flex h-9 w-10 cursor-pointer select-none items-center justify-center;
+
+    &.is-hidden {
+      @apply opacity-0;
+
+      .tabbar-arrow {
+        @apply pointer-events-none;
+      }
+    }
+
+    .tabbar-arrow {
+      @apply pointer-events-auto mx-1 flex h-8 w-8 shrink-0 cursor-pointer select-none items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 shadow-sm transition-[color,background-color,border-color,box-shadow] duration-150 hover:bg-gray-50 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 active:bg-gray-200;
+
       svg {
-        font-size: 1.5em;
+        @apply h-4 w-4;
       }
     }
   }
 
   .tabbar-items {
-    @apply flex flex-row items-center overflow-x-auto py-0.5;
-
-    &::-webkit-scrollbar-track-piece {
-      background-color: #f8f8f8;
-      -webkit-border-radius: 2em;
-      -moz-border-radius: 2em;
-      border-radius: 2em;
-    }
+    @apply overflow-x-auto py-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1;
+    scrollbar-width: none;
 
     &::-webkit-scrollbar {
-      width: 4px;
-      height: 4px;
+      display: none;
     }
+  }
 
-    &::-webkit-scrollbar-thumb {
-      background-color: #ddd;
-      background-clip: padding-box;
-      -webkit-border-radius: 2em;
-      -moz-border-radius: 2em;
-      border-radius: 2em;
-    }
-
-    &::-webkit-scrollbar-thumb:hover {
-      background-color: #bbb;
-    }
+  .tabbar-items-track {
+    @apply flex items-center;
   }
 
   .tabbar-item {
@@ -285,6 +315,9 @@ onUnmounted(() => {
 
     .tabbar-items {
       margin-bottom: -4px;
+    }
+
+    .tabbar-items-track {
       justify-content: flex-start;
     }
 
@@ -300,9 +333,8 @@ onUnmounted(() => {
   }
 
   &.tabbar-pills {
-    .tabbar-items {
-      @apply gap-1;
-      justify-content: flex-start;
+    .tabbar-items-track {
+      @apply justify-start gap-1;
     }
 
     .tabbar-item {
@@ -319,9 +351,11 @@ onUnmounted(() => {
   }
 
   &.tabbar-outline {
+    --tabbar-fade-color: theme("colors.gray.100");
+
     @apply rounded-base bg-gray-100 px-1 py-0.5;
 
-    .tabbar-items {
+    .tabbar-items-track {
       @apply justify-start gap-1;
     }
 
@@ -339,14 +373,14 @@ onUnmounted(() => {
   }
 
   &.tabbar-direction-row {
-    .tabbar-items {
-      @apply flex-row;
+    .tabbar-items-track {
+      @apply w-max min-w-full flex-row;
     }
   }
 
   &.tabbar-direction-column {
-    .tabbar-items {
-      @apply flex-col;
+    .tabbar-items-track {
+      @apply w-full flex-col;
     }
 
     .tabbar-item {
@@ -372,6 +406,13 @@ onUnmounted(() => {
           @apply border-r-secondary;
         }
       }
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .indicator,
+    .tabbar-arrow {
+      @apply transition-none;
     }
   }
 }

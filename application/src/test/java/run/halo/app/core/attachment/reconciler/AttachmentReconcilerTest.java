@@ -3,6 +3,7 @@ package run.halo.app.core.attachment.reconciler;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -83,7 +84,23 @@ class AttachmentReconcilerTest {
                 .hasMessage("boom");
 
         verify(client, never()).update(any(Attachment.class));
-        verify(eventPublisher, never()).publishEvent(any(AttachmentChangedEvent.class));
+        // The cache must stop trusting the permalink even though the cleanup failed.
+        verify(eventPublisher).publishEvent(any(AttachmentChangedEvent.class));
+    }
+
+    @Test
+    void shouldCleanUpResourcesEvenIfEventPublishingFails() {
+        var attachment = deletedAttachment();
+        when(client.fetch(Attachment.class, "fake-attachment")).thenReturn(Optional.of(attachment));
+        when(attachmentService.delete(attachment)).thenReturn(Mono.just(attachment));
+        doThrow(new IllegalStateException("listener boom"))
+                .when(eventPublisher)
+                .publishEvent(any(AttachmentChangedEvent.class));
+
+        reconciler.reconcile(new Request("fake-attachment"));
+
+        assertThat(attachment.getMetadata().getFinalizers()).doesNotContain(Constant.FINALIZER_NAME);
+        verify(client).update(attachment);
     }
 
     private static Attachment deletedAttachment() {

@@ -17,6 +17,7 @@ import {
 } from "vue";
 import RiCodeSSlashLine from "~icons/ri/code-s-slash-line";
 import IconifyPicker from "./IconifyPicker.vue";
+import { sanitizeIconSvg } from "./sanitize-icon-svg";
 import type { IconifyFormat, IconifySizing, IconifyValue } from "./types";
 
 const props = defineProps({
@@ -45,6 +46,10 @@ const currentIconifyValue = computed(() => {
   return value as IconifyValue;
 });
 
+const sanitizedSvg = computed(() =>
+  sanitizeIconSvg(currentIconifyValue.value?.value)
+);
+
 provide<Ref<IconifyFormat>>("format", format);
 provide<Ref<IconifySizing>>("sizing", sizing);
 
@@ -60,6 +65,9 @@ const popperPlacement = computed(
 const dropdown = useTemplateRef<InstanceType<typeof VDropdown>>("dropdown");
 
 const onSelect = (icon: IconifyValue) => {
+  if (format.value === "svg") {
+    icon = { ...icon, value: sanitizeIconSvg(icon.value) };
+  }
   if (valueOnly.value) {
     props.context.node.input(icon.value);
   } else {
@@ -72,6 +80,9 @@ const editFormDropdown =
   useTemplateRef<InstanceType<typeof VDropdown>>("editFormDropdown");
 
 function onEditFormSubmit({ value: iconValue }: { value: string }) {
+  if (format.value === "svg") {
+    iconValue = sanitizeIconSvg(iconValue);
+  }
   if (valueOnly.value) {
     props.context.node.input(iconValue);
     editFormDropdown.value?.hide();
@@ -126,7 +137,7 @@ const editFormContainer = useTemplateRef<HTMLElement>("editFormContainer");
           <div
             v-else
             class="inline-flex size-full items-center justify-center [&>*]:h-full"
-            v-html="currentIconifyValue.value"
+            v-html="sanitizedSvg"
           ></div>
         </div>
         <div v-else class="text-sm text-gray-600">

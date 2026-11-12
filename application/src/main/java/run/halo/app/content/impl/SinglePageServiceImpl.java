@@ -2,15 +2,17 @@ package run.halo.app.content.impl;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
-import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -18,6 +20,8 @@ import reactor.util.retry.Retry;
 import run.halo.app.content.*;
 import run.halo.app.core.counter.CounterService;
 import run.halo.app.core.counter.MeterUtils;
+import run.halo.app.core.extension.Counter;
+import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.core.extension.content.Snapshot;
@@ -77,9 +81,8 @@ public class SinglePageServiceImpl extends AbstractContentService implements Sin
     @Override
     public Mono<ListResult<ListedSinglePage>> list(SinglePageQuery query) {
         return client.listBy(SinglePage.class, query.toListOptions(), query.toPageRequest())
-                .flatMap(listResult -> Flux.fromStream(listResult.get().map(this::getListedSinglePage))
-                        .flatMapSequential(Function.identity())
-                        .collectList()
+                .flatMap(listResult -> assembleListedSinglePages(
+                                listResult.get().toList())
                         .map(listedSinglePages -> new ListResult<>(
                                 listResult.getPage(), listResult.getSize(), listResult.getTotal(), listedSinglePages)));
     }
@@ -241,53 +244,98 @@ public class SinglePageServiceImpl extends AbstractContentService implements Sin
                                         .filter(OptimisticLockingFailureException.class::isInstance)));
     }
 
-    private Mono<ListedSinglePage> getListedSinglePage(SinglePage singlePage) {
-        Assert.notNull(singlePage, "The singlePage must not be null.");
+    private Mono<List<ListedSinglePage>> assembleListedSinglePages(List<SinglePage> singlePages) {
+        if (singlePages.isEmpty()) {
+            return Mono.just(List.of());
+        }
+        var usernames = new LinkedHashSet<String>();
+        usernames.add(UserService.GHOST_USER_NAME);
+        singlePages.forEach(singlePage -> {
+            var owner = singlePage.getSpec().getOwner();
+            if (StringUtils.isNotBlank(owner)) {
+                usernames.add(owner);
+            }
+            var contributors = singlePage.getStatusOrDefault().getContributors();
+            if (contributors != null) {
+                contributors.stream().filter(StringUtils::isNotBlank).forEach(usernames::add);
+            }
+        });
+
+        var statsMono = fetchStatsByPageName(singlePages);
+        var usersMono = fetchUsersByName(List.copyOf(usernames));
+
+        return Mono.zip(statsMono, usersMono).map(tuple -> {
+            var statsByCounterName = tuple.getT1();
+            var usersByName = tuple.getT2();
+            return singlePages.stream()
+                    .map(singlePage -> toListedSinglePage(singlePage, statsByCounterName, usersByName))
+                    .toList();
+        });
+    }
+
+    private Mono<Map<String, Stats>> fetchStatsByPageName(List<SinglePage> singlePages) {
+        var counterNames = singlePages.stream()
+                .map(singlePage -> MeterUtils.nameOf(
+                        SinglePage.class, singlePage.getMetadata().getName()))
+                .toList();
+        return counterService
+                .getByNames(counterNames)
+                .collectMap(counter -> counter.getMetadata().getName(), SinglePageServiceImpl::toStats);
+    }
+
+    private Mono<Map<String, Contributor>> fetchUsersByName(List<String> usernames) {
+        return userService.getUsersOrGhosts(usernames).collectList().map(users -> {
+            var usersByName = new HashMap<String, Contributor>();
+            users.forEach(user -> usersByName.putIfAbsent(user.getMetadata().getName(), toContributor(user)));
+            return usersByName;
+        });
+    }
+
+    private static ListedSinglePage toListedSinglePage(
+            SinglePage singlePage, Map<String, Stats> statsByCounterName, Map<String, Contributor> usersByName) {
         var listedSinglePage = new ListedSinglePage().setPage(singlePage);
 
-        var statsMono = fetchStats(singlePage).doOnNext(listedSinglePage::setStats);
+        var counterName =
+                MeterUtils.nameOf(SinglePage.class, singlePage.getMetadata().getName());
+        listedSinglePage.setStats(statsByCounterName.getOrDefault(counterName, Stats.empty()));
 
-        var contributorsMono = listContributors(singlePage.getStatusOrDefault().getContributors())
-                .collectList()
-                .doOnNext(listedSinglePage::setContributors);
+        var ghost = usersByName.get(UserService.GHOST_USER_NAME);
+        listedSinglePage.setOwner(
+                resolveUser(usersByName, ghost, singlePage.getSpec().getOwner()));
 
-        var ownerMono = userService
-                .getUserOrGhost(singlePage.getSpec().getOwner())
-                .map(user -> {
-                    Contributor contributor = new Contributor();
-                    contributor.setName(user.getMetadata().getName());
-                    contributor.setDisplayName(user.getSpec().getDisplayName());
-                    contributor.setAvatar(user.getSpec().getAvatar());
-                    return contributor;
-                })
-                .doOnNext(listedSinglePage::setOwner);
-        return Mono.when(statsMono, contributorsMono, ownerMono).thenReturn(listedSinglePage);
-    }
-
-    Mono<Stats> fetchStats(SinglePage singlePage) {
-        Assert.notNull(singlePage, "The singlePage must not be null.");
-        String name = singlePage.getMetadata().getName();
-        return counterService
-                .getByName(MeterUtils.nameOf(SinglePage.class, name))
-                .map(counter -> Stats.builder()
-                        .visit(counter.getVisit())
-                        .upvote(counter.getUpvote())
-                        .totalComment(counter.getTotalComment())
-                        .approvedComment(counter.getApprovedComment())
-                        .build())
-                .defaultIfEmpty(Stats.empty());
-    }
-
-    private Flux<Contributor> listContributors(List<String> usernames) {
-        if (usernames == null) {
-            return Flux.empty();
+        var contributorNames = singlePage.getStatusOrDefault().getContributors();
+        if (CollectionUtils.isEmpty(contributorNames)) {
+            listedSinglePage.setContributors(List.of());
+        } else {
+            listedSinglePage.setContributors(contributorNames.stream()
+                    .map(name -> resolveUser(usersByName, ghost, name))
+                    .filter(Objects::nonNull)
+                    .toList());
         }
-        return Flux.fromIterable(usernames).flatMap(userService::getUserOrGhost).map(user -> {
-            Contributor contributor = new Contributor();
-            contributor.setName(user.getMetadata().getName());
-            contributor.setDisplayName(user.getSpec().getDisplayName());
-            contributor.setAvatar(user.getSpec().getAvatar());
-            return contributor;
-        });
+        return listedSinglePage;
+    }
+
+    private static Contributor resolveUser(Map<String, Contributor> usersByName, Contributor ghost, String username) {
+        if (StringUtils.isBlank(username)) {
+            return ghost;
+        }
+        return usersByName.getOrDefault(username, ghost);
+    }
+
+    private static Stats toStats(Counter counter) {
+        return Stats.builder()
+                .visit(counter.getVisit())
+                .upvote(counter.getUpvote())
+                .totalComment(counter.getTotalComment())
+                .approvedComment(counter.getApprovedComment())
+                .build();
+    }
+
+    private static Contributor toContributor(User user) {
+        var contributor = new Contributor();
+        contributor.setName(user.getMetadata().getName());
+        contributor.setDisplayName(user.getSpec().getDisplayName());
+        contributor.setAvatar(user.getSpec().getAvatar());
+        return contributor;
     }
 }

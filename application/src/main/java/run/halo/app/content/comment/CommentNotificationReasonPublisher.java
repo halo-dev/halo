@@ -26,8 +26,10 @@ import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.core.extension.notification.Reason;
 import run.halo.app.core.extension.notification.Subscription;
 import run.halo.app.event.post.CommentCreatedEvent;
+import run.halo.app.event.post.ReplyApprovedEvent;
 import run.halo.app.event.post.ReplyCreatedEvent;
 import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.Ref;
 import run.halo.app.infra.ExternalLinkProcessor;
@@ -71,6 +73,27 @@ public class CommentNotificationReasonPublisher {
     @EventListener(ReplyCreatedEvent.class)
     public void onNewReply(ReplyCreatedEvent event) {
         Reply reply = event.getReply();
+        // Notify only if the reply is approved. Replies waiting for review will be notified by
+        // {@link #onReplyApproved(ReplyApprovedEvent)} after they get approved.
+        if (!Boolean.TRUE.equals(reply.getSpec().getApproved())) {
+            return;
+        }
+        publishNewReplyReason(reply);
+    }
+
+    /** On reply approved. */
+    @Async
+    @EventListener(ReplyApprovedEvent.class)
+    public void onReplyApproved(ReplyApprovedEvent event) {
+        var replyName = event.getReply().getMetadata().getName();
+        // The reply may have been unapproved or deleted before this async listener runs.
+        client.fetch(Reply.class, replyName)
+                .filter(reply -> !ExtensionUtil.isDeleted(reply))
+                .filter(reply -> Boolean.TRUE.equals(reply.getSpec().getApproved()))
+                .ifPresent(this::publishNewReplyReason);
+    }
+
+    private void publishNewReplyReason(Reply reply) {
         var commentName = reply.getSpec().getCommentName();
         client.fetch(Comment.class, commentName)
                 .ifPresent(comment -> newReplyReasonPublisher.publishReasonBy(reply, comment));
@@ -315,10 +338,20 @@ public class CommentNotificationReasonPublisher {
             var repliedOwner = quoteReplyOptional
                     .map(quoteReply -> quoteReply.getSpec().getOwner())
                     .orElseGet(() -> comment.getSpec().getOwner());
+            var parentPublic = Boolean.TRUE.equals(comment.getSpec().getApproved())
+                    && !Boolean.TRUE.equals(comment.getSpec().getHidden());
+            var isOriginalCommentOwner =
+                    repliedOwner.getKind().equals(comment.getSpec().getOwner().getKind())
+                            && repliedOwner
+                                    .getName()
+                                    .equals(comment.getSpec().getOwner().getName());
 
             var reasonAttributesBuilder = NewReplyReasonData.builder()
-                    .commentContent(commentContentConverter.convertRelativeLinks(
-                            comment.getSpec().getContent()))
+                    .commentContent(
+                            parentPublic || isOriginalCommentOwner
+                                    ? commentContentConverter.convertRelativeLinks(
+                                            comment.getSpec().getContent())
+                                    : "")
                     .isQuoteReply(isQuoteReply)
                     .quoteContent(quoteReplyContent)
                     .commentName(comment.getMetadata().getName())
@@ -333,10 +366,16 @@ public class CommentNotificationReasonPublisher {
                 var subjectUrl = externalLinkProcessor.processLink(subject.url());
                 reasonAttributesBuilder.commentSubjectTitle(subject.title());
                 reasonAttributesBuilder.commentSubjectUrl(subjectUrl);
-                reasonAttributesBuilder.replyUrl(CommentPermalinkService.getPermalink(
-                        subjectUrl,
-                        comment.getMetadata().getName(),
-                        reply.getMetadata().getName()));
+                var recipientCanOpen =
+                        User.KIND.equals(repliedOwner.getKind()) && (parentPublic || isOriginalCommentOwner);
+                var publicReply =
+                        parentPublic && !Boolean.TRUE.equals(reply.getSpec().getHidden());
+                if (Boolean.TRUE.equals(reply.getSpec().getApproved()) && (publicReply || recipientCanOpen)) {
+                    reasonAttributesBuilder.replyUrl(CommentPermalinkService.getPermalink(
+                            subjectUrl,
+                            comment.getMetadata().getName(),
+                            reply.getMetadata().getName()));
+                }
             });
 
             notificationReasonEmitter

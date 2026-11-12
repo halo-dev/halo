@@ -36,7 +36,7 @@
     };
   </script>
 
-  <script src="/js/main.js"></script>
+  <script th:src="|/js/main.js?v=${site.version}|"></script>
 </th:block>
 
 <th:block th:fragment="basicStyleResources">
@@ -123,7 +123,7 @@
     }
   </style>
   <div class="halo-logo">
-    <img src="/images/wordmark.svg" alt="Halo" />
+    <img th:src="|/images/wordmark.svg?v=${site.version}|" alt="Halo" />
   </div>
 </div>
 

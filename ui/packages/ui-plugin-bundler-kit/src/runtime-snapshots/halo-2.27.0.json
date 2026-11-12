@@ -1284,6 +1284,7 @@
         "isString",
         "isTableSelected",
         "isTextSelection",
+        "isValidCSSStyleValue",
         "isiOS",
         "joinPoint",
         "joinStyles",

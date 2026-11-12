@@ -33,8 +33,8 @@ import { computed, markRaw, provide, ref, toRefs, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
 import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
 import { useCommentLastReadTimeMutate } from "../composables/use-comment-last-readtime-mutate";
-import { useContentProviderExtensionPoint } from "../composables/use-content-provider-extension-point";
 import { useSubjectRef } from "../composables/use-subject-ref";
+import CollapsibleCommentContent from "./CollapsibleCommentContent.vue";
 import CommentDetailModal from "./CommentDetailModal.vue";
 import CommentEditingModal from "./CommentEditingModal.vue";
 import OwnerButton from "./OwnerButton.vue";
@@ -168,6 +168,22 @@ async function handleCancelApprove() {
   queryClient.invalidateQueries({ queryKey: ["core:comments"] });
 }
 
+async function handleToggleHidden() {
+  await coreApiClient.content.comment.patchComment({
+    name: props.comment.comment.metadata.name,
+    jsonPatchInner: [
+      {
+        op: "add",
+        path: "/spec/hidden",
+        value: !props.comment.comment.spec.hidden,
+      },
+    ],
+  });
+  Toast.success(t("core.common.toast.operation_success"));
+  queryClient.invalidateQueries({ queryKey: ["core:comments"] });
+  queryClient.invalidateQueries({ queryKey: ["core:comments:with-subject"] });
+}
+
 const {
   data: replies,
   isLoading,
@@ -255,15 +271,27 @@ const { data: operationItems } = useOperationItemExtensionPoint<ListedComment>(
     {
       priority: 20,
       component: markRaw(VDropdownItem),
+      label: t(
+        props.comment.comment.spec.hidden
+          ? "core.comment.operations.make_public.button"
+          : "core.comment.operations.make_private.button"
+      ),
+      permissions: ["system:comments:manage"],
+      hidden: !!props.comment.comment.metadata.deletionTimestamp,
+      action: handleToggleHidden,
+    },
+    {
+      priority: 30,
+      component: markRaw(VDropdownItem),
       label: t("core.comment.operations.approve_applies_in_batch.button"),
       action: handleApproveReplyInBatch,
     },
     {
-      priority: 30,
+      priority: 40,
       component: markRaw(VDropdownDivider),
     },
     {
-      priority: 40,
+      priority: 50,
       component: markRaw(VDropdownItem),
       props: {
         type: "danger",
@@ -273,7 +301,7 @@ const { data: operationItems } = useOperationItemExtensionPoint<ListedComment>(
       action: handleCancelApprove,
     },
     {
-      priority: 50,
+      priority: 60,
       component: markRaw(VDropdownItem),
       props: {
         type: "danger",
@@ -283,8 +311,6 @@ const { data: operationItems } = useOperationItemExtensionPoint<ListedComment>(
     },
   ])
 );
-
-const { data: contentProvider } = useContentProviderExtensionPoint();
 </script>
 
 <template>
@@ -341,8 +367,7 @@ const { data: contentProvider } = useContentProviderExtensionPoint();
                 <IconExternalLinkLine class="h-3.5 w-3.5" />
               </a>
             </div>
-            <component
-              :is="contentProvider?.component"
+            <CollapsibleCommentContent
               :content="comment?.comment?.spec.content"
             />
             <div class="flex items-center gap-3 text-xs">

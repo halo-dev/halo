@@ -29,4 +29,18 @@ public interface ThumbnailService {
      * @return the map of thumbnail size to thumbnail link
      */
     Mono<Map<ThumbnailSize, URI>> get(URI permalink);
+
+    /**
+     * Resolve a URI that is safe to put into an HTTP {@code Location} header.
+     *
+     * <p>Relative references and same-site http(s) absolute URLs may fall back to the input URI when no thumbnail is
+     * available. Other absolute or scheme-relative URLs may only resolve to an absolute http(s) URI already recorded on
+     * an Attachment ({@code status.thumbnails} or {@code status.permalink}); unknown, non-http or relative external
+     * URIs yield empty so callers can reject the request instead of echoing the input.
+     *
+     * @param permalink the image URI from the request
+     * @param size the thumbnail size
+     * @return a trusted redirect target, or empty if the URI must not be redirected to
+     */
+    Mono<URI> getSafeRedirectUri(URI permalink, ThumbnailSize size);
 }

@@ -124,7 +124,7 @@ defineExpose({
         ]"
         @click="handleDragButtonItemClick()"
       >
-        <button :title="displayTitle" class="flex-grow">
+        <button type="button" :title="displayTitle" class="flex-grow">
           <div class="flex items-center gap-2">
             <component
               :is="props.icon"

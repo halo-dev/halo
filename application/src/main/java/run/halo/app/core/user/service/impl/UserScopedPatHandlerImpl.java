@@ -1,10 +1,11 @@
 package run.halo.app.core.user.service.impl;
 
-import static run.halo.app.extension.Comparators.compareCreationTimestamp;
+import static org.springframework.data.domain.Sort.Order.asc;
+import static org.springframework.data.domain.Sort.Order.desc;
+import static run.halo.app.extension.index.query.Queries.equal;
 
 import java.util.HashMap;
-import java.util.Objects;
-import java.util.function.Predicate;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
 import org.springframework.security.core.Authentication;
@@ -17,6 +18,7 @@ import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.user.service.PatService;
 import run.halo.app.core.user.service.UserScopedPatHandler;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.exception.AccessDeniedException;
 import run.halo.app.security.PersonalAccessToken;
@@ -69,9 +71,13 @@ class UserScopedPatHandlerImpl implements UserScopedPatHandler {
         return ReactiveSecurityContextHolder.getContext()
                 .map(SecurityContext::getAuthentication)
                 .flatMap(auth -> {
-                    Predicate<PersonalAccessToken> predicate =
-                            pat -> Objects.equals(auth.getName(), pat.getSpec().getUsername());
-                    var pats = client.list(PersonalAccessToken.class, predicate, compareCreationTimestamp(false));
+                    var listOptions = ListOptions.builder()
+                            .fieldQuery(equal("spec.username", auth.getName()))
+                            .build();
+                    var pats = client.listAll(
+                            PersonalAccessToken.class,
+                            listOptions,
+                            Sort.by(desc("metadata.creationTimestamp"), asc("metadata.name")));
                     return ServerResponse.ok().body(pats, PersonalAccessToken.class);
                 });
     }

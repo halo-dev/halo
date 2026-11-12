@@ -53,6 +53,28 @@ type Story = StoryObj<typeof VTabbar>;
 
 export const Default: Story = {};
 
+const overflowDecorator = () => ({
+  template: '<div class="w-72"><story /></div>',
+});
+
+export const Overflow: Story = {
+  decorators: [overflowDecorator],
+};
+
+export const OverflowPills: Story = {
+  args: {
+    type: "pills",
+  },
+  decorators: [overflowDecorator],
+};
+
+export const OverflowOutline: Story = {
+  args: {
+    type: "outline",
+  },
+  decorators: [overflowDecorator],
+};
+
 export const Pills: Story = {
   args: {
     type: "pills",

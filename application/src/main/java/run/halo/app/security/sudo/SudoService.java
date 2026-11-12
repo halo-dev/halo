@@ -181,16 +181,19 @@ class SudoService {
     }
 
     private Mono<Void> activate(ServerWebExchange exchange) {
+        // Store epoch millis instead of Instant: session serialization (e.g. Redis with
+        // default Jackson typing) may not round-trip Instant into the same type.
         var expiresAt = clock.instant().plus(SUDO_TTL);
         return exchange.getSession()
-                .doOnNext(session -> session.getAttributes().put(SESSION_ATTRIBUTE, expiresAt))
+                .doOnNext(session -> session.getAttributes().put(SESSION_ATTRIBUTE, expiresAt.toEpochMilli()))
                 .then();
     }
 
     private Mono<Instant> expiresAt(ServerWebExchange exchange) {
         return exchange.getSession()
                 .mapNotNull(session -> session.getAttribute(SESSION_ATTRIBUTE))
-                .filter(Instant.class::isInstance)
-                .cast(Instant.class);
+                .filter(Number.class::isInstance)
+                .cast(Number.class)
+                .map(number -> Instant.ofEpochMilli(number.longValue()));
     }
 }

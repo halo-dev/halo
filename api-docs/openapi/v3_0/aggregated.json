@@ -2,7 +2,7 @@
   "openapi": "3.0.1",
   "info": {
     "title": "Halo",
-    "version": "2.27.0-SNAPSHOT"
+    "version": "2.28.0-SNAPSHOT"
   },
   "servers": [
     {
@@ -6277,7 +6277,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ListedPostVo"
+                  "$ref": "#/components/schemas/ListedPostVoList"
                 }
               }
             },
@@ -6945,6 +6945,40 @@
       }
     },
     "/apis/api.notification.halo.run/v1alpha1/userspaces/{username}/notifications": {
+      "delete": {
+        "description": "Delete all notifications matching the given field selector.",
+        "operationId": "DeleteAllNotifications",
+        "parameters": [
+          {
+            "description": "User metadata.name",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Field selector for filtering. e.g.: spec.unread\u003dtrue",
+            "in": "query",
+            "name": "fieldSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Notifications deleted successfully."
+          }
+        },
+        "tags": [
+          "NotificationV1alpha1Uc"
+        ]
+      },
       "get": {
         "description": "List notifications for the authenticated user.",
         "operationId": "ListUserNotifications",
@@ -7027,6 +7061,41 @@
         ]
       }
     },
+    "/apis/api.notification.halo.run/v1alpha1/userspaces/{username}/notifications/-/mark-all-as-read": {
+      "put": {
+        "description": "Mark all notifications as read.",
+        "operationId": "MarkAllNotificationsAsRead",
+        "parameters": [
+          {
+            "description": "User metadata.name",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "NotificationV1alpha1Uc"
+        ]
+      }
+    },
     "/apis/api.notification.halo.run/v1alpha1/userspaces/{username}/notifications/-/mark-specified-as-read": {
       "put": {
         "description": "Mark the specified notifications as read.",
@@ -7076,6 +7145,45 @@
       "delete": {
         "description": "Delete the specified notification.",
         "operationId": "DeleteSpecifiedNotification",
+        "parameters": [
+          {
+            "description": "User metadata.name",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Notification metadata.name",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Notification"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "NotificationV1alpha1Uc"
+        ]
+      },
+      "get": {
+        "description": "Get the specified notification.",
+        "operationId": "GetSpecifiedNotification",
         "parameters": [
           {
             "description": "User metadata.name",
@@ -7231,6 +7339,9 @@
           }
         ],
         "responses": {
+          "404": {
+            "description": "Thumbnail not found or the URI is not allowed to be redirected to"
+          },
           "default": {
             "content": {
               "*/*": {
@@ -19199,7 +19310,7 @@
             }
           }
         },
-        "description": "A value object for {@link Post Post}."
+        "description": "A value object for a post."
       },
       "ListedPostVoList": {
         "required": [
@@ -19723,6 +19834,7 @@
         "type": "object",
         "properties": {
           "children": {
+            "uniqueItems": true,
             "type": "array",
             "description": "Legacy child MenuItem names. Menu hierarchy is now sourced from MenuItem.spec.menuName and MenuItem.spec.parent.",
             "deprecated": true,
@@ -19912,6 +20024,7 @@
             "description": "Display name shown for the menu."
           },
           "menuItems": {
+            "uniqueItems": true,
             "type": "array",
             "description": "Legacy ordered root MenuItem names. Menu hierarchy is now sourced from MenuItem.spec.menuName and MenuItem.spec.parent.",
             "deprecated": true,
@@ -23113,7 +23226,6 @@
             "format": "email"
           },
           "externalUrl": {
-            "pattern": "",
             "type": "string"
           },
           "language": {

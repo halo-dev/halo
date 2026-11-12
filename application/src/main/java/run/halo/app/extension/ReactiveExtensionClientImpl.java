@@ -11,6 +11,7 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.StreamSupport;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.util.Predicates;
@@ -30,9 +31,11 @@ import run.halo.app.extension.store.ReactiveExtensionStoreClient;
 
 @Slf4j
 @Component
-public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
+public class ReactiveExtensionClientImpl implements ReactiveExtensionClient, DisposableBean {
 
     public static final int GENERATE_NAME_RANDOM_LENGTH = 8;
+
+    private static final int LIST_ALL_BATCH_SIZE = 1000;
 
     private final ReactiveExtensionStoreClient client;
 
@@ -47,6 +50,11 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
     private final IndexEngine indexEngine;
 
     private Scheduler scheduler;
+
+    // Keep index query computation isolated from the shared boundedElastic pool. Callers may
+    // block on boundedElastic while waiting for a query, so scheduling the query on the same
+    // pool can starve it and cause a timeout.
+    private Scheduler queryScheduler;
 
     private TransactionalOperator transactionalOperator;
 
@@ -64,6 +72,15 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
         this.indexEngine = indexEngine;
         this.transactionalOperator = TransactionalOperator.create(reactiveTransactionManager);
         this.scheduler = Schedulers.boundedElastic();
+        this.queryScheduler = Schedulers.newBoundedElastic(
+                Math.max(2, Runtime.getRuntime().availableProcessors()),
+                Schedulers.DEFAULT_BOUNDED_ELASTIC_QUEUESIZE,
+                "extension-query");
+    }
+
+    @Override
+    public void destroy() {
+        this.queryScheduler.dispose();
     }
 
     /**
@@ -73,6 +90,15 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
      */
     void setScheduler(Scheduler scheduler) {
         this.scheduler = scheduler;
+    }
+
+    /**
+     * Only for test.
+     *
+     * @param scheduler the scheduler to set
+     */
+    void setQueryScheduler(Scheduler scheduler) {
+        this.queryScheduler = scheduler;
     }
 
     /** Only for test. */
@@ -120,6 +146,7 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
         var scheme = schemeManager.get(type);
 
         return Mono.fromCallable(() -> indexEngine.retrieveAll(scheme.type(), options, nullSafeSort))
+                .subscribeOn(this.queryScheduler)
                 .flatMapMany(objectKeys -> {
                     var storeNames = StreamSupport.stream(objectKeys.spliterator(), false)
                             .map(objectKey -> ExtensionStoreUtil.buildStoreName(scheme, objectKey))
@@ -133,8 +160,10 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
                         }
                     }
                     long startTimeMs = System.currentTimeMillis();
-                    return client.listByNames(storeNames)
-                            .map(extensionStore -> converter.convertFrom(type, extensionStore))
+                    return Flux.fromIterable(storeNames)
+                            .buffer(LIST_ALL_BATCH_SIZE)
+                            .concatMap(batch -> client.listByNames(batch)
+                                    .map(extensionStore -> converter.convertFrom(type, extensionStore)))
                             .doOnComplete(() -> log.debug(
                                     "Successfully retrieved all by names from db for {} in {}ms",
                                     scheme.groupVersionKind(),
@@ -146,6 +175,7 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
     public <E extends Extension> Flux<String> listAllNames(Class<E> type, ListOptions options, Sort sort) {
         var scheme = schemeManager.get(type);
         return Mono.fromCallable(() -> indexEngine.retrieveAll(scheme.type(), options, sort))
+                .subscribeOn(this.queryScheduler)
                 .flatMapMany(Flux::fromIterable);
     }
 
@@ -153,6 +183,7 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
     public <E extends Extension> Flux<String> listTopNames(Class<E> type, ListOptions options, Sort sort, int topN) {
         var scheme = schemeManager.get(type);
         return Mono.fromCallable(() -> indexEngine.retrieveTopN(scheme.type(), options, sort, topN))
+                .subscribeOn(this.queryScheduler)
                 .flatMapMany(Flux::fromIterable);
     }
 
@@ -160,6 +191,7 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
     public <E extends Extension> Mono<ListResult<E>> listBy(Class<E> type, ListOptions options, PageRequest page) {
         var scheme = schemeManager.get(type);
         return Mono.fromCallable(() -> indexEngine.retrieve(scheme.type(), options, page))
+                .subscribeOn(this.queryScheduler)
                 .flatMap(listResult -> {
                     var storeNames = listResult
                             .get()
@@ -183,13 +215,15 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
     public <E extends Extension> Mono<ListResult<String>> listNamesBy(
             Class<E> type, ListOptions options, PageRequest pageable) {
         var scheme = schemeManager.get(type);
-        return Mono.fromCallable(() -> indexEngine.retrieve(scheme.type(), options, pageable));
+        return Mono.fromCallable(() -> indexEngine.retrieve(scheme.type(), options, pageable))
+                .subscribeOn(this.queryScheduler);
     }
 
     @Override
     public <E extends Extension> Mono<Long> countBy(Class<E> type, ListOptions options) {
         var scheme = schemeManager.get(type);
-        return Mono.fromCallable(() -> indexEngine.count(scheme.type(), options));
+        return Mono.fromCallable(() -> indexEngine.count(scheme.type(), options))
+                .subscribeOn(this.queryScheduler);
     }
 
     @Override

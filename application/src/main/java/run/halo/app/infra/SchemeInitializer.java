@@ -395,6 +395,11 @@ class SchemeInitializer implements SmartLifecycle {
                     .indexFunc(reply -> Optional.ofNullable(reply.getSpec())
                             .map(ReplySpec::getCommentName)
                             .orElse(null)));
+            indexSpecs.add(IndexSpecs.<Reply, String>single("spec.quoteReply", String.class)
+                    .indexFunc(reply -> Optional.ofNullable(reply.getSpec())
+                            .map(ReplySpec::getQuoteReply)
+                            .filter(StringUtils::isNotBlank)
+                            .orElse(null)));
             indexSpecs.add(IndexSpecs.<Reply, Boolean>single("spec.hidden", Boolean.class)
                     .indexFunc(reply -> Optional.ofNullable(reply.getSpec())
                             .map(ReplySpec::getHidden)

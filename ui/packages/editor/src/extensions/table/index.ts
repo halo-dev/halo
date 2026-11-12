@@ -21,7 +21,6 @@ import {
 } from "@/tiptap";
 import {
   Fragment,
-  handlePaste as handleTablePaste,
   Plugin,
   PluginKey,
   Slice,
@@ -42,6 +41,9 @@ import {
   type CellVerticalAlign,
   type TableLayoutMode,
 } from "./attributes";
+import { handlePastedTableCells } from "./clipboard";
+import { autoColumnResizing } from "./column-resizing";
+import { getColumnPercentages, getTableColumnWidths } from "./column-widths";
 import {
   fitTableToWidthCommand,
   clearSelectedAxisCommand,
@@ -55,7 +57,6 @@ import {
   setCellAttributeCommand,
   setTableLayoutCommand,
   setTableRowHeightCommand,
-  tableLayoutTransitionPluginAppendTransaction,
 } from "./commands";
 import TableBubbleMenu from "./components/TableBubbleMenu.vue";
 import TableInsertToolboxItem from "./components/TableInsertToolboxItem.vue";
@@ -351,24 +352,13 @@ export const ExtensionTable = TiptapTable.extend<ExtensionTableOptions>({
     return [
       new Plugin({
         key: TABLE_LAYOUT_PLUGIN_KEY,
-        appendTransaction: tableLayoutTransitionPluginAppendTransaction,
         props: {
-          handlePaste: handleTabSeparatedPaste,
-          handleDOMEvents: {
-            mousedown: (_view, event) => {
-              const target = event.target;
-              if (
-                target instanceof Element &&
-                target.closest(".column-resize-handle") &&
-                this.editor.getAttributes("table").layoutMode !== "fixed"
-              ) {
-                this.editor.commands.setTableLayout("fixed");
-              }
-              return false;
-            },
-          },
+          handlePaste: (view, event, slice) =>
+            handleTabSeparatedPaste(view, event) ||
+            handlePastedTableCells(view, slice),
         },
       }),
+      autoColumnResizing(this.options.cellMinWidth ?? 25),
       ...(this.parent?.() ?? []),
     ];
   },
@@ -398,9 +388,17 @@ export const ExtensionTable = TiptapTable.extend<ExtensionTableOptions>({
           )
         )
       : HTMLAttributes;
+    const autoWidths = layoutMode === "auto" ? getTableColumnWidths(node) : [];
+    const autoColgroup: DOMOutputSpec = [
+      "colgroup",
+      ...getColumnPercentages(autoWidths).map((width): DOMOutputSpec => [
+        "col",
+        { style: `width: ${width}; min-width: ${cellMinWidth}px` },
+      ]),
+    ];
     const layoutStyle =
       layoutMode === "auto"
-        ? "display: table; width: 100%; min-width: 100%; table-layout: auto"
+        ? `display: table; width: 100%; min-width: 100%; table-layout: ${autoWidths.length ? "fixed" : "auto"}`
         : joinStyles(
             "display: table",
             `width: ${tableWidth || "100%"}`,
@@ -419,7 +417,11 @@ export const ExtensionTable = TiptapTable.extend<ExtensionTableOptions>({
     const table: DOMOutputSpec = [
       "table",
       tableAttributes,
-      ...(layoutMode === "fixed" ? [colgroup] : []),
+      ...(layoutMode === "fixed"
+        ? [colgroup]
+        : autoWidths.length
+          ? [autoColgroup]
+          : []),
       ["tbody", 0],
     ];
 
@@ -556,7 +558,7 @@ function handleTabSeparatedPaste(view: EditorView, event: ClipboardEvent) {
   );
   const slice = new Slice(Fragment.from(rows), 0, 0);
 
-  if (handleTablePaste(view, event, slice)) {
+  if (handlePastedTableCells(view, slice)) {
     event.preventDefault();
     return true;
   }

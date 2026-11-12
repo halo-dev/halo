@@ -3,15 +3,24 @@ import Paragraph from "@tiptap/extension-paragraph";
 import Text from "@tiptap/extension-text";
 import { UndoRedo } from "@tiptap/extensions";
 import { Editor } from "@/tiptap";
-import { ExtensionTable } from "./index";
+import { ExtensionTable, type ExtensionTableOptions } from "./index";
 
-export function createTableEditor(content = "<p></p>") {
+export function createTableEditor(
+  content = "<p></p>",
+  tableOptions: Partial<ExtensionTableOptions> = {}
+) {
   const element = document.createElement("div");
   document.body.appendChild(element);
 
   return new Editor({
     element,
-    extensions: [Document, Paragraph, Text, UndoRedo, ExtensionTable],
+    extensions: [
+      Document,
+      Paragraph,
+      Text,
+      UndoRedo,
+      ExtensionTable.configure(tableOptions),
+    ],
     content,
   });
 }

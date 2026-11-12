@@ -17,6 +17,8 @@ import {
   VDropdownItem,
   VEmpty,
   VEntityContainer,
+  VFilterDropdown,
+  VFilterDropdownGroup,
   VLoading,
   VPageHeader,
   VSpace,
@@ -40,15 +42,6 @@ const keyword = useRouteQuery<string>("keyword", "");
 
 const selectedEnabledValue = useRouteQuery<string | undefined>("enabled");
 const selectedSortValue = useRouteQuery<string | undefined>("sort");
-
-const hasFilters = computed(() => {
-  return selectedEnabledValue.value !== undefined || selectedSortValue.value;
-});
-
-function handleClearFilters() {
-  selectedSortValue.value = undefined;
-  selectedEnabledValue.value = undefined;
-}
 
 const { data, isLoading, isFetching, refetch } = useQuery({
   queryKey: ["plugins", selectedEnabledValue, selectedSortValue],
@@ -174,7 +167,7 @@ const { handleChangeStatusInBatch, handleUninstallInBatch } =
             class="relative flex flex-col flex-wrap items-start gap-4 sm:flex-row sm:items-center"
           >
             <div
-              v-permission="['system:posts:manage']"
+              v-permission="['system:plugins:manage']"
               class="hidden items-center sm:flex"
             >
               <input
@@ -222,44 +215,46 @@ const { handleChangeStatusInBatch, handleUninstallInBatch } =
               </VSpace>
             </div>
             <VSpace spacing="lg" class="flex-wrap">
-              <FilterCleanButton
-                v-if="hasFilters"
-                @click="handleClearFilters"
-              />
-              <FilterDropdown
-                v-model="selectedEnabledValue"
-                :label="$t('core.common.filters.labels.status')"
-                :items="[
-                  {
-                    label: t('core.common.filters.item_labels.all'),
-                  },
-                  {
-                    label: t('core.plugin.filters.status.items.active'),
-                    value: 'true',
-                  },
-                  {
-                    label: t('core.plugin.filters.status.items.inactive'),
-                    value: 'false',
-                  },
-                ]"
-              />
-              <FilterDropdown
-                v-model="selectedSortValue"
-                :label="$t('core.common.filters.labels.sort')"
-                :items="[
-                  {
-                    label: t('core.common.filters.item_labels.default'),
-                  },
-                  {
-                    label: t('core.plugin.filters.sort.items.create_time_desc'),
-                    value: 'creationTimestamp,desc',
-                  },
-                  {
-                    label: t('core.plugin.filters.sort.items.create_time_asc'),
-                    value: 'creationTimestamp,asc',
-                  },
-                ]"
-              />
+              <VFilterDropdownGroup
+                :clear-label="$t('core.common.buttons.reset')"
+              >
+                <VFilterDropdown
+                  v-model="selectedEnabledValue"
+                  :label="$t('core.common.filters.labels.status')"
+                  show-clear-option
+                  :clear-label="t('core.common.filters.item_labels.all')"
+                  :options="[
+                    {
+                      label: t('core.plugin.filters.status.items.active'),
+                      value: 'true',
+                    },
+                    {
+                      label: t('core.plugin.filters.status.items.inactive'),
+                      value: 'false',
+                    },
+                  ]"
+                />
+                <VFilterDropdown
+                  v-model="selectedSortValue"
+                  :label="$t('core.common.filters.labels.sort')"
+                  show-clear-option
+                  :clear-label="t('core.common.filters.item_labels.default')"
+                  :options="[
+                    {
+                      label: t(
+                        'core.plugin.filters.sort.items.create_time_desc'
+                      ),
+                      value: 'creationTimestamp,desc',
+                    },
+                    {
+                      label: t(
+                        'core.plugin.filters.sort.items.create_time_asc'
+                      ),
+                      value: 'creationTimestamp,asc',
+                    },
+                  ]"
+                />
+              </VFilterDropdownGroup>
               <div class="flex flex-row gap-2">
                 <button
                   v-tooltip="$t('core.common.buttons.refresh')"

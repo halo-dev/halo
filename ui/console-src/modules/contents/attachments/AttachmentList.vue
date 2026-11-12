@@ -17,6 +17,8 @@ import {
   VDropdownItem,
   VEmpty,
   VEntityContainer,
+  VFilterDropdown,
+  VFilterDropdownGroup,
   VLoading,
   VPageHeader,
   VPagination,
@@ -74,22 +76,6 @@ watch(
     page.value = 1;
   }
 );
-
-const hasFilters = computed(() => {
-  return (
-    selectedPolicy.value ||
-    selectedUser.value ||
-    selectedSort.value ||
-    selectedAccepts.value
-  );
-});
-
-function handleClearFilters() {
-  selectedPolicy.value = undefined;
-  selectedUser.value = undefined;
-  selectedSort.value = undefined;
-  selectedAccepts.value = undefined;
-}
 
 const {
   attachments,
@@ -328,99 +314,110 @@ watch(
                   </VSpace>
                 </div>
                 <VSpace spacing="lg" class="flex-wrap">
-                  <FilterCleanButton
-                    v-if="hasFilters"
-                    @click="handleClearFilters"
-                  />
-                  <FilterDropdown
-                    v-model="selectedPolicy"
-                    :label="$t('core.attachment.filters.storage_policy.label')"
-                    :items="[
-                      {
-                        label: t('core.common.filters.item_labels.all'),
-                      },
-                      ...(policies?.map((policy) => {
-                        return {
-                          label: policy.spec.displayName,
-                          value: policy.metadata.name,
-                        };
-                      }) || []),
-                    ]"
-                  />
-                  <FilterDropdown
-                    v-model="selectedAccepts"
-                    :label="$t('core.attachment.filters.accept.label')"
-                    :items="[
-                      {
-                        label: t('core.common.filters.item_labels.all'),
-                      },
-                      {
-                        label: t('core.attachment.filters.accept.items.image'),
-                        value: 'image/*',
-                      },
-                      {
-                        label: t('core.attachment.filters.accept.items.audio'),
-                        value: 'audio/*',
-                      },
-                      {
-                        label: t('core.attachment.filters.accept.items.video'),
-                        value: 'video/*',
-                      },
-                      {
-                        label: t('core.attachment.filters.accept.items.file'),
-                        value: 'text/*,application/*',
-                      },
-                    ]"
-                  />
-                  <HasPermission :permissions="['system:users:view']">
-                    <UserFilterDropdown
-                      v-model="selectedUser"
-                      :label="$t('core.attachment.filters.owner.label')"
+                  <VFilterDropdownGroup
+                    :clear-label="$t('core.common.buttons.reset')"
+                    :has-external-filters="!!selectedUser"
+                    @clear="selectedUser = undefined"
+                  >
+                    <VFilterDropdown
+                      v-model="selectedPolicy"
+                      :label="
+                        $t('core.attachment.filters.storage_policy.label')
+                      "
+                      show-clear-option
+                      :clear-label="t('core.common.filters.item_labels.all')"
+                      :options="
+                        policies?.map((policy) => {
+                          return {
+                            label: policy.spec.displayName,
+                            value: policy.metadata.name,
+                          };
+                        }) || []
+                      "
                     />
-                  </HasPermission>
-                  <FilterDropdown
-                    v-model="selectedSort"
-                    :label="$t('core.common.filters.labels.sort')"
-                    :items="[
-                      {
-                        label: t('core.common.filters.item_labels.default'),
-                      },
-                      {
-                        label: t(
-                          'core.attachment.filters.sort.items.create_time_desc'
-                        ),
-                        value: 'metadata.creationTimestamp,desc',
-                      },
-                      {
-                        label: t(
-                          'core.attachment.filters.sort.items.create_time_asc'
-                        ),
-                        value: 'metadata.creationTimestamp,asc',
-                      },
-                      {
-                        label: t(
-                          'core.attachment.filters.sort.items.display_name_desc'
-                        ),
-                        value: 'spec.displayName,desc',
-                      },
-                      {
-                        label: t(
-                          'core.attachment.filters.sort.items.display_name_asc'
-                        ),
-                        value: 'spec.displayName,asc',
-                      },
-                      {
-                        label: t(
-                          'core.attachment.filters.sort.items.size_desc'
-                        ),
-                        value: 'spec.size,desc',
-                      },
-                      {
-                        label: t('core.attachment.filters.sort.items.size_asc'),
-                        value: 'spec.size,asc',
-                      },
-                    ]"
-                  />
+                    <VFilterDropdown
+                      v-model="selectedAccepts"
+                      :label="$t('core.attachment.filters.accept.label')"
+                      show-clear-option
+                      :clear-label="t('core.common.filters.item_labels.all')"
+                      :options="[
+                        {
+                          label: t(
+                            'core.attachment.filters.accept.items.image'
+                          ),
+                          value: 'image/*',
+                        },
+                        {
+                          label: t(
+                            'core.attachment.filters.accept.items.audio'
+                          ),
+                          value: 'audio/*',
+                        },
+                        {
+                          label: t(
+                            'core.attachment.filters.accept.items.video'
+                          ),
+                          value: 'video/*',
+                        },
+                        {
+                          label: t('core.attachment.filters.accept.items.file'),
+                          value: 'text/*,application/*',
+                        },
+                      ]"
+                    />
+                    <HasPermission :permissions="['system:users:view']">
+                      <UserFilterDropdown
+                        v-model="selectedUser"
+                        :label="$t('core.attachment.filters.owner.label')"
+                      />
+                    </HasPermission>
+                    <VFilterDropdown
+                      v-model="selectedSort"
+                      :label="$t('core.common.filters.labels.sort')"
+                      show-clear-option
+                      :clear-label="
+                        t('core.common.filters.item_labels.default')
+                      "
+                      :options="[
+                        {
+                          label: t(
+                            'core.attachment.filters.sort.items.create_time_desc'
+                          ),
+                          value: 'metadata.creationTimestamp,desc',
+                        },
+                        {
+                          label: t(
+                            'core.attachment.filters.sort.items.create_time_asc'
+                          ),
+                          value: 'metadata.creationTimestamp,asc',
+                        },
+                        {
+                          label: t(
+                            'core.attachment.filters.sort.items.display_name_desc'
+                          ),
+                          value: 'spec.displayName,desc',
+                        },
+                        {
+                          label: t(
+                            'core.attachment.filters.sort.items.display_name_asc'
+                          ),
+                          value: 'spec.displayName,asc',
+                        },
+                        {
+                          label: t(
+                            'core.attachment.filters.sort.items.size_desc'
+                          ),
+                          value: 'spec.size,desc',
+                        },
+                        {
+                          label: t(
+                            'core.attachment.filters.sort.items.size_asc'
+                          ),
+                          value: 'spec.size,asc',
+                        },
+                      ]"
+                    />
+                  </VFilterDropdownGroup>
                   <div class="flex flex-row gap-2">
                     <div
                       v-for="(item, index) in viewTypes"

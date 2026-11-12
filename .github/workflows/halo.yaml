@@ -91,6 +91,31 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh release upload ${{ github.event.release.tag_name }} application/build/libs/*
 
+  publish-maven-central:
+    needs: build
+    if: always() && needs.build.result == 'success' && github.repository == 'halo-dev/halo' && (github.event_name == 'push' || github.event_name == 'release')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Setup Environment
+        uses: ./.github/actions/setup-env
+      - name: Reset version of Halo
+        if: github.event_name == 'release'
+        shell: bash
+        run: |
+          # Set the version with tag name when releasing
+          version=${{ github.event.release.tag_name }}
+          version=${version#v}
+          sed -i "s/version=.*-SNAPSHOT$/version=$version/1" gradle.properties
+      - name: Publish to Maven Central
+        env:
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_KEY }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.SIGNING_KEY_ID }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
+        run: ./gradlew publishToMavenCentral --configuration-cache --configuration-cache-problems=warn
+
   build-and-publish-container-image-with-buildpacks:
     needs: build
     if: always() && needs.build.result == 'success' && (github.event_name == 'push' || github.event_name == 'release')

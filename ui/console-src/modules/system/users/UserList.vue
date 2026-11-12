@@ -13,6 +13,8 @@ import {
   VCard,
   VEmpty,
   VEntityContainer,
+  VFilterDropdown,
+  VFilterDropdownGroup,
   VLoading,
   VPageHeader,
   VPagination,
@@ -22,7 +24,7 @@ import { stores, utils } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
 import { chunk } from "es-toolkit";
-import { computed, onMounted, ref, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { rbacAnnotations } from "@/constants/annotations";
 import UserCreationModal from "./components/UserCreationModal.vue";
@@ -52,15 +54,6 @@ const size = useRouteQuery<number>("size", 20, {
 });
 const selectedRoleValue = useRouteQuery<string | undefined>("role");
 const selectedSortValue = useRouteQuery<string | undefined>("sort");
-
-function handleClearFilters() {
-  selectedRoleValue.value = undefined;
-  selectedSortValue.value = undefined;
-}
-
-const hasFilters = computed(() => {
-  return selectedRoleValue.value || selectedSortValue.value;
-});
 
 watch(
   () => [selectedRoleValue.value, selectedSortValue.value, keyword.value],
@@ -306,45 +299,43 @@ function onCreationModalClose() {
               </VSpace>
             </div>
             <VSpace spacing="lg" class="flex-wrap">
-              <FilterCleanButton
-                v-if="hasFilters"
-                @click="handleClearFilters"
-              />
-              <FilterDropdown
-                v-model="selectedRoleValue"
-                :label="$t('core.user.filters.role.label')"
-                :items="[
-                  {
-                    label: t('core.common.filters.item_labels.all'),
-                  },
-                  ...(roles?.map((role) => {
-                    return {
-                      label:
-                        role.metadata.annotations?.[
-                          rbacAnnotations.DISPLAY_NAME
-                        ] || role.metadata.name,
-                      value: role.metadata.name,
-                    };
-                  }) || []),
-                ]"
-              />
-              <FilterDropdown
-                v-model="selectedSortValue"
-                :label="$t('core.common.filters.labels.sort')"
-                :items="[
-                  {
-                    label: t('core.common.filters.item_labels.default'),
-                  },
-                  {
-                    label: t('core.user.filters.sort.items.create_time_desc'),
-                    value: 'metadata.creationTimestamp,desc',
-                  },
-                  {
-                    label: t('core.user.filters.sort.items.create_time_asc'),
-                    value: 'metadata.creationTimestamp,asc',
-                  },
-                ]"
-              />
+              <VFilterDropdownGroup
+                :clear-label="$t('core.common.buttons.reset')"
+              >
+                <VFilterDropdown
+                  v-model="selectedRoleValue"
+                  :label="$t('core.user.filters.role.label')"
+                  show-clear-option
+                  :clear-label="t('core.common.filters.item_labels.all')"
+                  :options="
+                    roles?.map((role) => {
+                      return {
+                        label:
+                          role.metadata.annotations?.[
+                            rbacAnnotations.DISPLAY_NAME
+                          ] || role.metadata.name,
+                        value: role.metadata.name,
+                      };
+                    }) || []
+                  "
+                />
+                <VFilterDropdown
+                  v-model="selectedSortValue"
+                  :label="$t('core.common.filters.labels.sort')"
+                  show-clear-option
+                  :clear-label="t('core.common.filters.item_labels.default')"
+                  :options="[
+                    {
+                      label: t('core.user.filters.sort.items.create_time_desc'),
+                      value: 'metadata.creationTimestamp,desc',
+                    },
+                    {
+                      label: t('core.user.filters.sort.items.create_time_asc'),
+                      value: 'metadata.creationTimestamp,asc',
+                    },
+                  ]"
+                />
+              </VFilterDropdownGroup>
               <div class="flex flex-row gap-2">
                 <button
                   v-tooltip="$t('core.common.buttons.refresh')"

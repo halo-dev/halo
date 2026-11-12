@@ -2,7 +2,8 @@ package run.halo.app.security.authentication.impl;
 
 import static com.nimbusds.jose.jwk.KeyOperation.SIGN;
 import static com.nimbusds.jose.jwk.KeyOperation.VERIFY;
-import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
+import static java.nio.file.StandardCopyOption.ATOMIC_MOVE;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -11,13 +12,20 @@ import com.nimbusds.jose.jwk.KeyUse;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.security.*;
+import java.security.interfaces.RSAPrivateCrtKey;
+import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Arrays;
 import java.util.Set;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -37,6 +45,9 @@ public class RsaKeyService implements CryptoService, InitializingBean {
     public static final String TRANSFORMATION = "RSA/ECB/PKCS1Padding";
 
     public static final String ALGORITHM = "RSA";
+
+    private static final String REGENERATION_WARNING =
+            "Generating a new key pair will invalidate JWTs signed with the previous key.";
 
     private final Path keysRoot;
 
@@ -67,38 +78,109 @@ public class RsaKeyService implements CryptoService, InitializingBean {
         var privKeyPath = keysRoot.resolve("pat_id_rsa");
         var pubKeyPath = keysRoot.resolve("pat_id_rsa.pub");
         try {
-            if (Files.exists(privKeyPath) && Files.exists(pubKeyPath)) {
-                log.debug("Skip initializing RSA Keys for PAT due to existence.");
-
-                var keyFactory = KeyFactory.getInstance(ALGORITHM);
-
-                var privKeyBytes = Files.readAllBytes(privKeyPath);
-                var privKeySpec = new PKCS8EncodedKeySpec(privKeyBytes);
-                var privKey = keyFactory.generatePrivate(privKeySpec);
-
-                var pubKeyBytes = Files.readAllBytes(pubKeyPath);
-                var pubKeySpec = new X509EncodedKeySpec(pubKeyBytes);
-                var pubKey = keyFactory.generatePublic(pubKeySpec);
-
-                return new KeyPair(pubKey, privKey);
+            var keyFactory = KeyFactory.getInstance(ALGORITHM);
+            var privKeyBytes = readKeyFileIfPresent(privKeyPath);
+            var pubKeyBytes = readKeyFileIfPresent(pubKeyPath);
+            if (privKeyBytes == null && pubKeyBytes != null) {
+                log.warn("RSA private key is missing at {}. " + REGENERATION_WARNING, privKeyPath);
             }
-
-            if (Files.notExists(keysRoot)) {
-                Files.createDirectories(keysRoot);
+            PrivateKey existingPrivateKey = null;
+            if (privKeyBytes != null) {
+                try {
+                    existingPrivateKey = keyFactory.generatePrivate(new PKCS8EncodedKeySpec(privKeyBytes));
+                } catch (InvalidKeySpecException e) {
+                    log.warn("Invalid RSA private key at {}. " + REGENERATION_WARNING, privKeyPath);
+                }
             }
-            Files.createFile(privKeyPath);
-            Files.createFile(pubKeyPath);
+            if (existingPrivateKey instanceof RSAPrivateCrtKey privateKey) {
+                var pubKey = keyFactory.generatePublic(
+                        new RSAPublicKeySpec(privateKey.getModulus(), privateKey.getPublicExponent()));
+                if (!Arrays.equals(pubKey.getEncoded(), pubKeyBytes)) {
+                    log.warn("Restoring RSA public key at {} from the existing private key.", pubKeyPath);
+                    writeKeyFileAtomically(pubKeyPath, pubKey.getEncoded());
+                }
+                return new KeyPair(pubKey, privateKey);
+            }
+            if (existingPrivateKey instanceof RSAPrivateKey privateKey) {
+                var pubKey = readMatchingPublicKey(keyFactory, privateKey, pubKeyBytes);
+                if (pubKey != null) {
+                    return new KeyPair(pubKey, privateKey);
+                }
+                log.warn(
+                        "Cannot derive or verify the public key for the non-CRT RSA private key at {}. "
+                                + REGENERATION_WARNING,
+                        privKeyPath);
+            }
 
             log.info("Generating RSA keys for PAT.");
             var rsaKey = new RSAKeyGenerator(4096).generate();
             var pubKey = rsaKey.toRSAPublicKey();
             var privKey = rsaKey.toRSAPrivateKey();
-            Files.write(privKeyPath, privKey.getEncoded(), TRUNCATE_EXISTING);
-            Files.write(pubKeyPath, pubKey.getEncoded(), TRUNCATE_EXISTING);
+            Files.createDirectories(keysRoot);
+            // Persist the private key first so an interrupted write can recover the public key.
+            writeKeyFileAtomically(privKeyPath, privKey.getEncoded());
+            writeKeyFileAtomically(pubKeyPath, pubKey.getEncoded());
             log.info("Wrote RSA keys for PAT into {} and {}", privKeyPath, pubKeyPath);
             return new KeyPair(pubKey, privKey);
         } catch (JOSEException | IOException | InvalidKeySpecException | NoSuchAlgorithmException e) {
             throw new RuntimeException("Failed to generate or read RSA key pair", e);
+        }
+    }
+
+    private static PublicKey readMatchingPublicKey(
+            KeyFactory keyFactory, RSAPrivateKey privateKey, byte[] pubKeyBytes) {
+        if (pubKeyBytes == null) {
+            return null;
+        }
+        PublicKey pubKey;
+        try {
+            pubKey = keyFactory.generatePublic(new X509EncodedKeySpec(pubKeyBytes));
+        } catch (InvalidKeySpecException e) {
+            return null;
+        }
+        if (!(pubKey instanceof RSAPublicKey publicKey)
+                || !privateKey.getModulus().equals(publicKey.getModulus())
+                || !verifyPublicKeyMatches(privateKey, pubKey)) {
+            return null;
+        }
+        return pubKey;
+    }
+
+    private static boolean verifyPublicKeyMatches(PrivateKey privateKey, PublicKey publicKey) {
+        try {
+            var payload = ALGORITHM.getBytes(StandardCharsets.UTF_8);
+            var signature = Signature.getInstance("SHA256withRSA");
+            signature.initSign(privateKey);
+            signature.update(payload);
+            var signed = signature.sign();
+            signature.initVerify(publicKey);
+            signature.update(payload);
+            return signature.verify(signed);
+        } catch (GeneralSecurityException e) {
+            return false;
+        }
+    }
+
+    private static byte[] readKeyFileIfPresent(Path path) throws IOException {
+        try {
+            return Files.readAllBytes(path);
+        } catch (NoSuchFileException e) {
+            return null;
+        }
+    }
+
+    private static void writeKeyFileAtomically(Path target, byte[] keyBytes) throws IOException {
+        var tempPath =
+                Files.createTempFile(target.getParent(), target.getFileName().toString(), ".tmp");
+        try {
+            Files.write(tempPath, keyBytes);
+            try {
+                Files.move(tempPath, target, ATOMIC_MOVE, REPLACE_EXISTING);
+            } catch (AtomicMoveNotSupportedException e) {
+                Files.move(tempPath, target, REPLACE_EXISTING);
+            }
+        } finally {
+            Files.deleteIfExists(tempPath);
         }
     }
 

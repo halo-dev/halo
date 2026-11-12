@@ -1,17 +1,13 @@
 <script lang="ts" setup>
 import { consoleApiClient, type User } from "@halo-dev/api-client";
 import {
-  IconArrowDown,
   VAvatar,
-  VDropdown,
-  VEntity,
-  VEntityContainer,
-  VEntityField,
+  VFilterDropdown,
+  type FilterDropdownOption,
+  type FilterDropdownValue,
 } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
-import { refDebounced } from "@vueuse/shared";
-import { ref, toRefs } from "vue";
-import { setFocus } from "@/formkit/utils/focus";
+import { computed, ref, toRefs } from "vue";
 
 const props = withDefaults(
   defineProps<{
@@ -30,7 +26,6 @@ const emit = defineEmits<{
 }>();
 
 const keyword = ref("");
-const debouncedKeyword = refDebounced(keyword, 300);
 
 const { data: selectedUser } = useQuery({
   queryKey: ["core:users:by-name", modelValue],
@@ -48,115 +43,117 @@ const { data: selectedUser } = useQuery({
   cacheTime: 0,
 });
 
-const { data: users } = useQuery({
-  queryKey: ["core:users", debouncedKeyword],
+const { data: users, isFetching } = useQuery({
+  queryKey: ["core:users", keyword],
   queryFn: async () => {
     const { data } = await consoleApiClient.user.listUsers({
       fieldSelector: [`name!=anonymousUser`],
-      keyword: debouncedKeyword.value,
+      keyword: keyword.value,
       page: 1,
       size: 30,
     });
 
-    const pureUsers = data?.items?.map((user) => user.user);
-
-    if (!pureUsers?.length) {
-      return [selectedUser.value].filter(Boolean) as User[];
-    }
-
-    if (selectedUser.value) {
-      return [
-        selectedUser.value,
-        ...pureUsers.filter(
-          (user) => user.metadata.name !== selectedUser.value?.metadata.name
-        ),
-      ];
-    }
-
-    return pureUsers;
+    return data?.items?.map((user) => user.user) || [];
   },
   staleTime: 2000,
 });
 
-const dropdown = ref();
+const userMap = computed(() => {
+  const map = new Map<string, User>();
 
-const handleSelect = (user: User) => {
-  const { name } = user.metadata || {};
+  users.value?.forEach((user) => {
+    map.set(user.metadata.name, user);
+  });
 
-  if (name === props.modelValue) {
-    emit("update:modelValue", undefined);
-  } else {
-    emit("update:modelValue", name);
+  if (selectedUser.value) {
+    map.set(selectedUser.value.metadata.name, selectedUser.value);
   }
 
-  dropdown.value.hide();
-};
+  return map;
+});
 
-function onDropdownShow() {
-  setTimeout(() => {
-    setFocus("userFilterDropdownInput");
-  }, 200);
+const options = computed<FilterDropdownOption[]>(() => {
+  const items =
+    users.value?.map((user) => ({
+      label: user.spec.displayName,
+      value: user.metadata.name,
+      description: user.metadata.name,
+    })) || [];
+
+  if (
+    selectedUser.value &&
+    !items.some((item) => item.value === selectedUser.value?.metadata.name)
+  ) {
+    items.unshift({
+      label: selectedUser.value.spec.displayName,
+      value: selectedUser.value.metadata.name,
+      description: selectedUser.value.metadata.name,
+    });
+  }
+
+  return items;
+});
+
+function getUser(option: FilterDropdownOption) {
+  if (option.value === undefined) {
+    return undefined;
+  }
+
+  return userMap.value.get(String(option.value));
+}
+
+function showUsername(option: FilterDropdownOption) {
+  if (!option.description) {
+    return false;
+  }
+
+  return (
+    option.description.toLowerCase() !== (option.label || "").toLowerCase()
+  );
+}
+
+function handleUpdate(value?: FilterDropdownValue) {
+  emit("update:modelValue", typeof value === "string" ? value : undefined);
 }
 </script>
 
 <template>
-  <VDropdown
-    ref="dropdown"
-    popper-class="[&_.v-popper\_\_inner]:!p-0"
-    @show="onDropdownShow"
+  <VFilterDropdown
+    :model-value="modelValue"
+    :label="label"
+    :options="options"
+    :selected-label="selectedUser?.spec.displayName"
+    searchable
+    remote-search
+    :loading="isFetching"
+    :search-placeholder="$t('core.common.placeholder.search')"
+    :empty-text="$t('core.components.global_search.no_results')"
+    panel-width="18rem"
+    @update:model-value="handleUpdate"
+    @search="keyword = $event"
   >
-    <div
-      class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
-      :class="{ 'font-semibold text-gray-700': modelValue !== undefined }"
-    >
-      <span v-if="!selectedUser" class="mr-0.5">
-        {{ label }}
-      </span>
-      <span v-else class="mr-0.5">
-        {{ label }}：{{ selectedUser.spec.displayName }}
-      </span>
-      <span>
-        <IconArrowDown />
-      </span>
-    </div>
-    <template #popper>
-      <div class="h-96 w-80">
-        <div class="border-b border-b-gray-100 bg-white p-4">
-          <FormKit
-            id="userFilterDropdownInput"
-            v-model="keyword"
-            :placeholder="$t('core.common.placeholder.search')"
-            type="text"
-          ></FormKit>
-        </div>
-        <div>
-          <VEntityContainer>
-            <VEntity
-              v-for="user in users"
-              :key="user.metadata.name"
-              :is-selected="modelValue === user.metadata.name"
-              @click="handleSelect(user)"
-            >
-              <template #start>
-                <VEntityField>
-                  <template #description>
-                    <VAvatar
-                      :key="user.metadata.name"
-                      :alt="user.spec.displayName"
-                      :src="user.spec.avatar"
-                      size="md"
-                    ></VAvatar>
-                  </template>
-                </VEntityField>
-                <VEntityField
-                  :title="user.spec.displayName"
-                  :description="user.metadata.name"
-                />
-              </template>
-            </VEntity>
-          </VEntityContainer>
-        </div>
+    <template #option="{ option, selected }">
+      <VAvatar
+        size="sm"
+        circle
+        :alt="option.label"
+        :src="getUser(option)?.spec.avatar"
+        aria-hidden="true"
+      />
+      <div class="flex min-w-0 flex-1 flex-col">
+        <span
+          class="truncate text-sm group-hover:text-gray-900"
+          :class="selected ? 'font-medium text-gray-900' : 'text-gray-700'"
+        >
+          {{ option.label }}
+        </span>
+        <span
+          v-if="showUsername(option)"
+          class="truncate text-xs text-gray-500"
+        >
+          {{ option.description }}
+        </span>
       </div>
     </template>
-  </VDropdown>
+  </VFilterDropdown>
 </template>
