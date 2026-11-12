@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { useEntityFieldItemExtensionPoint } from "@console/composables/use-entity-extension-points";
 import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
 import type { ListedComment, ListedReply } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
@@ -13,10 +14,15 @@ import {
   VStatusDot,
   VTag,
 } from "@halo-dev/components";
-import { utils, type OperationItem } from "@halo-dev/ui-shared";
+import {
+  utils,
+  type EntityFieldItem,
+  type OperationItem,
+} from "@halo-dev/ui-shared";
 import { useQueryClient } from "@tanstack/vue-query";
 import { computed, inject, markRaw, ref, toRefs, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
+import EntityFieldItems from "@/components/entity-fields/EntityFieldItems.vue";
 import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
 import { useCommentLastReadTimeMutate } from "../composables/use-comment-last-readtime-mutate";
 import CollapsibleCommentContent from "./CollapsibleCommentContent.vue";
@@ -40,6 +46,12 @@ const props = withDefaults(
 );
 
 const { reply } = toRefs(props);
+
+const { data: fields } = useEntityFieldItemExtensionPoint<ListedReply>(
+  "reply:list-item:field:create",
+  reply,
+  computed((): EntityFieldItem[] => [])
+);
 
 const creationTime = computed(() => {
   return (
@@ -259,6 +271,7 @@ const { data: operationItems } = useOperationItemExtensionPoint<ListedReply>(
     :class="{ 'animate-breath': isHoveredReply }"
   >
     <template #start>
+      <EntityFieldItems :fields="fields?.start || []" />
       <VEntityField width="100%" max-width="100%">
         <template #description>
           <div class="flex flex-col gap-2">
@@ -305,6 +318,7 @@ const { data: operationItems } = useOperationItemExtensionPoint<ListedReply>(
       </VEntityField>
     </template>
     <template #end>
+      <EntityFieldItems :fields="fields?.end || []" />
       <VEntityField v-if="!reply?.reply.spec.approved">
         <template #description>
           <VStatusDot
