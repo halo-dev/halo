@@ -5,7 +5,7 @@ presets:
   - vue-i18n
 resources:
   - pattern: src/locales/{locale}.json
-keyStyle: nested
+keyStyle: flat
 usage:
   include:
     - src/**/*.{vue,ts,tsx,js,jsx}

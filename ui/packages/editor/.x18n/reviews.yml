@@ -1,0 +1,525 @@
+# yaml-language-server: $schema=https://x18n.dev/schema/reviews.json
+x18n: 1
+sources:
+  editor.common.align_center:
+    zh-TW: 12c65a5b6fd607
+  editor.common.align_justify:
+    zh-TW: 1d1d8d5b2b9a8
+  editor.common.align_left:
+    zh-TW: 165285b2a9c5c5
+  editor.common.align_method:
+    zh-TW: 126e0908b2908d
+  editor.common.align_right:
+    zh-TW: 1d457bd5aedba4
+  editor.common.alt:
+    zh-TW: 1ff62f62e5133a
+  editor.common.bold:
+    zh-TW: 90f55c95d6508
+  editor.common.bullet_list:
+    zh-TW: e134e23156caf
+  editor.common.button.cancel:
+    zh-TW: 17135cdeb8cd9
+  editor.common.button.confirm:
+    zh-TW: 1585d7cec0cfe3
+  editor.common.button.delete:
+    zh-TW: 41c1206a9920f
+  editor.common.button.edit_link:
+    zh-TW: 80c5f2d2601aa
+  editor.common.button.restore_default:
+    zh-TW: 549055a2e3ea6
+  editor.common.button.upload:
+    zh-TW: 101e60a7137bd2
+  editor.common.clear_format:
+    zh-TW: 272f044fb1d46
+  editor.common.code:
+    zh-TW: 1c1c2ca0ec3385
+  editor.common.codeblock.copy_code:
+    zh-TW: a47bff3a8f271
+  editor.common.codeblock.copy_code_success:
+    zh-TW: 9e36c672668
+  editor.common.codeblock.language.none:
+    zh-TW: 189c9b507e1231
+  editor.common.codeblock.title:
+    zh-TW: 1f8247e7e0d3c5
+  editor.common.color:
+    zh-TW: 1d7df5fbc08ea6
+  editor.common.heading.heading1:
+    zh-TW: 13433ae152fe1c
+  editor.common.heading.heading2:
+    zh-TW: bfbf785be0de8
+  editor.common.heading.heading3:
+    zh-TW: 13770eaaa539b5
+  editor.common.heading.heading4:
+    zh-TW: 17ea6c706aa753
+  editor.common.heading.heading5:
+    zh-TW: 140f9b2842a23e
+  editor.common.heading.heading6:
+    zh-TW: 11228ee0dc3e96
+  editor.common.heading.paragraph:
+    zh-TW: 72b9623719609
+  editor.common.heading.title:
+    zh-TW: 348dd85fe7077
+  editor.common.height:
+    zh-TW: 13ed4dcf39f1d2
+  editor.common.highlight:
+    zh-TW: e023feaa95100
+  editor.common.horizontal_rule:
+    zh-TW: 180ab658904ad
+  editor.common.image:
+    zh-TW: 1ce0d8b2df9c5d
+  editor.common.italic:
+    zh-TW: 1ac20a5df6b4ac
+  editor.common.line_height:
+    zh-TW: 1ff126e49389a4
+  editor.common.list:
+    zh-TW: 13dd29d57dc750
+  editor.common.ordered_list:
+    zh-TW: 186c77ef840b7a
+  editor.common.placeholder.alt_href:
+    es: 1ee8ac25dc7549
+    zh-CN: 1ee8ac25dc7549
+    zh-TW: 1ee8ac25dc7549
+  editor.common.placeholder.alt_input:
+    zh-CN: 12c41411a94d4a
+    zh-TW: 12c41411a94d4a
+  editor.common.placeholder.link_input:
+    es: 1e814071f9e796
+    zh-CN: 1e814071f9e796
+    zh-TW: 1e814071f9e796
+  editor.common.quote:
+    zh-TW: 1d34f31b99aa89
+  editor.common.strike:
+    zh-TW: 1f0c2aa83f82d0
+  editor.common.subscript:
+    es: 14ff7c3d851ece
+    zh-CN: 14ff7c3d851ece
+    zh-TW: 14ff7c3d851ece
+  editor.common.superscript:
+    es: 15e39ca83341cd
+    zh-CN: 15e39ca83341cd
+    zh-TW: 15e39ca83341cd
+  editor.common.task_list:
+    zh-TW: 6b577218ff96
+  editor.common.text.default:
+    zh-TW: e1c6eb623f9f6
+  editor.common.text.tip:
+    zh-TW: e5706c0cc5188
+  editor.common.toast.save_success:
+    zh-TW: 11871cabe0af7
+  editor.common.tooltip.custom_height_input:
+    zh-TW: 16a036cf044dfd
+  editor.common.tooltip.custom_width_input:
+    zh-TW: fe7d207cc0bf
+  editor.common.tooltip.open_link:
+    zh-TW: 11acb2694543d5
+  editor.common.underline:
+    zh-TW: 1122a3bad8e3f
+  editor.common.width:
+    zh-TW: 83f25f631dd94
+  editor.components.color_picker.more_color:
+    zh-TW: bb02209cd4791
+  editor.components.editor_header.insert_content:
+    zh-TW: 1d180466321688
+  editor.components.editor_header.toolbar:
+    zh-TW: 53a6f26c1efb9
+  editor.drag.button.drag_handle:
+    zh-TW: f6f19df56bc4e
+  editor.drag.button.insert_block:
+    zh-TW: 1ae26d159ee421
+  editor.drag.menu.convert_to:
+    zh-TW: fea15a2d0dafe
+  editor.drag.menu.copy:
+    zh-TW: a94a1605aae39
+  editor.drag.menu.cut:
+    zh-TW: 4d92c94b11cfd
+  editor.drag.menu.delete:
+    zh-TW: 41c1206a9920f
+  editor.extensions.audio.disable_autoplay:
+    zh-TW: 10b054c4994c3
+  editor.extensions.audio.disable_loop:
+    zh-TW: 128bb6bf5cfbc7
+  editor.extensions.audio.enable_autoplay:
+    zh-TW: eaa563e3c05
+  editor.extensions.audio.enable_loop:
+    es: 1067943e2d795f
+    zh-CN: 1067943e2d795f
+    zh-TW: 1067943e2d795f
+  editor.extensions.audio.src_input_label:
+    zh-TW: 14cfd73b16684b
+  editor.extensions.columns.add_column_after:
+    zh-TW: fc3cd5a6a5b61
+  editor.extensions.columns.add_column_before:
+    zh-TW: 6dee92f975ea0
+  editor.extensions.columns.delete_column:
+    zh-TW: 15e949ecff50f4
+  editor.extensions.commands_menu.audio:
+    zh-TW: 705051b6e5921
+  editor.extensions.commands_menu.columns:
+    zh-TW: 1ab364042b3fed
+  editor.extensions.commands_menu.gallery:
+    zh-TW: 1fb5ae89320380
+  editor.extensions.commands_menu.iframe:
+    zh-TW: bf63e4b7a9d7c
+  editor.extensions.commands_menu.image:
+    es: 1ce0d8b2df9c5d
+    zh-CN: 1ce0d8b2df9c5d
+    zh-TW: 1ce0d8b2df9c5d
+  editor.extensions.commands_menu.label:
+    zh-TW: 1d180466321688
+  editor.extensions.commands_menu.no_results:
+    zh-TW: bbcc70f1b73a0
+  editor.extensions.commands_menu.placeholder:
+    zh-TW: 1c2717a2b7c41d
+  editor.extensions.commands_menu.table:
+    zh-TW: 11d0b0f5d218e9
+  editor.extensions.commands_menu.video:
+    zh-TW: 175d8bb147d86c
+  editor.extensions.details.command_item:
+    zh-TW: 1861d6aaa148cb
+  editor.extensions.figure_caption.empty_placeholder:
+    zh-TW: 12af6c942642a3
+  editor.extensions.font_size.title:
+    zh-TW: 1b4aff8a881df8
+  editor.extensions.format_brush.toolbar_item.cancel:
+    zh-TW: 1365c487a0d80c
+  editor.extensions.format_brush.toolbar_item.title:
+    zh-TW: 16e65c867a7a06
+  editor.extensions.gallery.add_image:
+    zh-TW: 26b40c539233e
+  editor.extensions.gallery.gap:
+    zh-TW: 1ee170e82e7686
+  editor.extensions.gallery.group_size:
+    zh-TW: 153a4eb6f1f706
+  editor.extensions.gallery.group_size_label:
+    zh-TW: 11ca23e76c0c65
+  editor.extensions.gallery.layout.auto:
+    zh-TW: 1701e466310efb
+  editor.extensions.gallery.layout.square:
+    zh-TW: 261a5f3840bd8
+  editor.extensions.gallery.layout.title:
+    zh-TW: 175acc2d68bc6e
+  editor.extensions.gallery.title:
+    zh-TW: 1fb5ae89320380
+  editor.extensions.highlight.unset:
+    zh-TW: 252c42d39384f
+  editor.extensions.iframe.desktop_size:
+    zh-TW: 6fdb511f9f563
+  editor.extensions.iframe.disable_frameborder:
+    zh-TW: 3b06e6ebed3cd
+  editor.extensions.iframe.enable_frameborder:
+    zh-TW: e7c501a7b1459
+  editor.extensions.iframe.phone_size:
+    zh-TW: 6c9d58b989b65
+  editor.extensions.iframe.resize:
+    zh-TW: 143a0cf9d808f5
+  editor.extensions.iframe.src_input_label:
+    zh-TW: 5cb66ef6381d3
+  editor.extensions.iframe.tablet_horizontal_size:
+    zh-TW: 1163eb183a41a6
+  editor.extensions.iframe.tablet_vertical_size:
+    zh-TW: 54874171080bd
+  editor.extensions.image.copy_width:
+    zh-TW: af746af98d231
+  editor.extensions.image.edit_alt:
+    zh-TW: 213537fd15a8b
+  editor.extensions.image.edit_caption:
+    zh-TW: 1d862200c1cd71
+  editor.extensions.image.edit_href:
+    zh-TW: 33f2008e9657a
+  editor.extensions.image.href_input_label:
+    zh-TW: 784a335b8e4e7
+  editor.extensions.image.large_size:
+    zh-TW: 158d9d495c001b
+  editor.extensions.image.medium_size:
+    zh-TW: 19d5a7668eebd0
+  editor.extensions.image.resize:
+    zh-TW: 143a0cf9d808f5
+  editor.extensions.image.restore_size:
+    zh-TW: 164998e3c588b0
+  editor.extensions.image.small_size:
+    zh-TW: fe4db88cf932
+  editor.extensions.image.src_input_label:
+    zh-TW: e57abd112f9d2
+  editor.extensions.link.add_link:
+    zh-TW: 8a781941cd0c0
+  editor.extensions.link.cancel_link:
+    zh-TW: 10e69107cdb937
+  editor.extensions.link.edit_link:
+    zh-TW: 80c5f2d2601aa
+  editor.extensions.link.nofollow:
+    zh-CN: 1a7fe0e5a0634a
+    zh-TW: 1a7fe0e5a0634a
+  editor.extensions.link.open_in_new_window:
+    zh-TW: 1fa675bb15ebde
+  editor.extensions.link.placeholder:
+    zh-TW: 11b8323393d041
+  editor.extensions.search_and_replace.case_sensitive:
+    zh-CN: 6f4ca89a5bc43
+    zh-TW: 6f4ca89a5bc43
+  editor.extensions.search_and_replace.close:
+    zh-TW: 15e916371129dc
+  editor.extensions.search_and_replace.find_next:
+    es: fc3a5e7477fc6
+    zh-CN: fc3a5e7477fc6
+    zh-TW: fc3a5e7477fc6
+  editor.extensions.search_and_replace.find_previous:
+    es: 6fa8acbd0549d
+    zh-CN: 6fa8acbd0549d
+    zh-TW: 6fa8acbd0549d
+  editor.extensions.search_and_replace.match_word:
+    es: a59b3dc4d3fdc
+    zh-CN: a59b3dc4d3fdc
+    zh-TW: a59b3dc4d3fdc
+  editor.extensions.search_and_replace.not_found:
+    es: 1b99ea715db039
+    zh-CN: 1b99ea715db039
+    zh-TW: 1b99ea715db039
+  editor.extensions.search_and_replace.occurrence_found:
+    zh-TW: 96340cb96f893
+  editor.extensions.search_and_replace.replace:
+    zh-TW: d46e0485795b6
+  editor.extensions.search_and_replace.replace_all:
+    es: d5c873b960cbe
+    zh-CN: d5c873b960cbe
+    zh-TW: d5c873b960cbe
+  editor.extensions.search_and_replace.replace_placeholder:
+    zh-TW: d46e0485795b6
+  editor.extensions.search_and_replace.search_placeholder:
+    zh-TW: 25151b7829ac9
+  editor.extensions.search_and_replace.title:
+    zh-TW: 17da8dc7c23afc
+  editor.extensions.search_and_replace.use_regex:
+    es: acc7ce260c693
+    zh-CN: acc7ce260c693
+    zh-TW: acc7ce260c693
+  editor.extensions.upload.attachment.title:
+    zh-TW: 188dea73ecbd64
+  editor.extensions.upload.click_retry:
+    zh-TW: 197c08b3a145fe
+  editor.extensions.upload.error:
+    zh-TW: 19e0033143704d
+  editor.extensions.upload.loading:
+    zh-TW: 1614480a6d56e5
+  editor.extensions.upload.operations.remove.button:
+    zh-TW: 41c1206a9920f
+  editor.extensions.upload.operations.replace.button:
+    zh-TW: d46e0485795b6
+  editor.extensions.upload.operations.transfer.button:
+    zh-TW: b96283099452a
+  editor.extensions.upload.operations.transfer.tooltip:
+    zh-TW: 1b614feee5c32f
+  editor.extensions.upload.operations.transfer_in_batch.description:
+    zh-TW: 1479272cdc9230
+  editor.extensions.upload.permalink.placeholder:
+    zh-TW: 1621104c73dd1f
+  editor.extensions.upload.permalink.title:
+    zh-CN: 142f497ae0c2ca
+    zh-TW: 142f497ae0c2ca
+  editor.extensions.video.disable_autoplay:
+    zh-TW: 10b054c4994c3
+  editor.extensions.video.disable_controls:
+    zh-TW: 1bd6be653d20e9
+  editor.extensions.video.disable_loop:
+    zh-TW: 128bb6bf5cfbc7
+  editor.extensions.video.edit_caption:
+    zh-TW: a155ee8583628
+  editor.extensions.video.enable_autoplay:
+    zh-TW: eaa563e3c05
+  editor.extensions.video.enable_controls:
+    zh-TW: 1da08a1f60f634
+  editor.extensions.video.enable_loop:
+    zh-TW: 1067943e2d795f
+  editor.extensions.video.large_size:
+    zh-TW: 158d9d495c001b
+  editor.extensions.video.medium_size:
+    zh-TW: 19d5a7668eebd0
+  editor.extensions.video.resize:
+    zh-TW: 143a0cf9d808f5
+  editor.extensions.video.small_size:
+    zh-TW: fe4db88cf932
+  editor.extensions.video.src_input_label:
+    zh-TW: cb9bc255d5d7a
+  editor.menus.redo:
+    zh-TW: 103aa0d4931c73
+  editor.menus.table.add:
+    zh-TW: 546718d7e5d15
+  editor.menus.table.add_column_after:
+    zh-TW: fc3cd5a6a5b61
+  editor.menus.table.add_column_before:
+    zh-TW: 6dee92f975ea0
+  editor.menus.table.add_row_after:
+    zh-TW: 1f33cf91b3ae98
+  editor.menus.table.add_row_before:
+    zh-TW: 1e10f739d83190
+  editor.menus.table.align_center:
+    zh-TW: 12c65a5b6fd607
+  editor.menus.table.align_left:
+    zh-TW: 165285b2a9c5c5
+  editor.menus.table.align_right:
+    zh-TW: 1d457bd5aedba4
+  editor.menus.table.background:
+    zh-TW: 6339dbaa55845
+  editor.menus.table.clear_column:
+    zh-TW: 1ba831081f57b7
+  editor.menus.table.clear_formatting:
+    zh-TW: 5e13e910fa408
+  editor.menus.table.clear_row:
+    zh-TW: 152efe3455952d
+  editor.menus.table.color_blue:
+    zh-TW: 1962522dbc1688
+  editor.menus.table.color_gray:
+    zh-TW: 12063089bd0223
+  editor.menus.table.color_green:
+    zh-TW: 1f87d59b31abdd
+  editor.menus.table.color_orange:
+    zh-TW: 1d31235f389c94
+  editor.menus.table.color_purple:
+    zh-TW: 11c93301361f30
+  editor.menus.table.color_red:
+    zh-TW: b5106eb72ab12
+  editor.menus.table.color_transparent:
+    zh-TW: be482df8a7e05
+  editor.menus.table.color_yellow:
+    zh-TW: 2ef544b679f9
+  editor.menus.table.column:
+    zh-TW: 14d1f769593703
+  editor.menus.table.copy_table:
+    zh-TW: 8ceb45cd84c79
+  editor.menus.table.delete_column:
+    zh-TW: 15e949ecff50f4
+  editor.menus.table.delete_row:
+    zh-TW: 1e5c88a55cd00c
+  editor.menus.table.delete_table:
+    zh-TW: f735ec76c47fa
+  editor.menus.table.duplicate_column:
+    zh-TW: d3e2eb5398dec
+  editor.menus.table.duplicate_row:
+    zh-TW: 127968cb928c02
+  editor.menus.table.fit_to_width:
+    zh-TW: 18dceea413b880
+  editor.menus.table.fixed_layout:
+    zh-TW: f007a6e5a0033
+  editor.menus.table.format:
+    zh-TW: 16620e2f45bc7e
+  editor.menus.table.horizontal_align:
+    zh-TW: 19c282e51312be
+  editor.menus.table.insert_description:
+    zh-TW: 11bb2eae3e9080
+  editor.menus.table.insert_dimensions:
+    zh-TW: 1ccf7b2b9f0ddd
+  editor.menus.table.merge_cells:
+    zh-TW: 1b718c948fd4f3
+  editor.menus.table.move_column_left:
+    zh-TW: 165eb35758d0f2
+  editor.menus.table.move_column_right:
+    zh-TW: 802bfeecd97eb
+  editor.menus.table.move_row_down:
+    zh-TW: 1b5a37c10af673
+  editor.menus.table.move_row_up:
+    zh-TW: 562408f192138
+  editor.menus.table.resize_row:
+    zh-TW: 193af80f57ffa4
+  editor.menus.table.row:
+    zh-TW: 164471a948bb65
+  editor.menus.table.row_height:
+    zh-TW: c2e96f76fa084
+  editor.menus.table.row_height_auto:
+    zh-TW: 1701e466310efb
+  editor.menus.table.select_column:
+    zh-TW: 5f5063851003a
+  editor.menus.table.select_row:
+    zh-TW: 7873dcc306c8b
+  editor.menus.table.select_table:
+    zh-TW: e1112e121d279
+  editor.menus.table.set_header_column:
+    zh-TW: 119b1c19f66c9c
+  editor.menus.table.set_header_row:
+    zh-TW: 1f08c21e8f9013
+  editor.menus.table.split_cell:
+    zh-TW: 1ea081c5d32e64
+  editor.menus.table.title:
+    zh-TW: 11d0b0f5d218e9
+  editor.menus.table.unset_header_column:
+    zh-TW: be992659e74bb
+  editor.menus.table.unset_header_row:
+    zh-TW: e970b002f6408
+  editor.menus.table.vertical_align:
+    zh-TW: 101ecd5fd32d2d
+  editor.menus.table.vertical_bottom:
+    zh-TW: f646e31a34487
+  editor.menus.table.vertical_middle:
+    zh-TW: 1264a0987a87c0
+  editor.menus.table.vertical_top:
+    zh-TW: b1890e21d2262
+  editor.menus.undo:
+    zh-TW: ab822a1baab7f
+  editor.shortcuts.categories.formatting:
+    zh-TW: 8682f7b36abb2
+  editor.shortcuts.categories.general:
+    zh-TW: 2944e997ba8d5
+  editor.shortcuts.categories.navigation:
+    zh-TW: 45654cdb3792e
+  editor.shortcuts.categories.structure:
+    zh-TW: 585a81ef7dd3b
+  editor.shortcuts.clear_search:
+    zh-TW: f3a17fe98fc39
+  editor.shortcuts.close:
+    zh-TW: 140390593b3d5b
+  editor.shortcuts.commands.bullet_list:
+    zh-TW: 1d6bcce5f0cb0d
+  editor.shortcuts.commands.copy:
+    zh-TW: a94a1605aae39
+  editor.shortcuts.commands.cut:
+    zh-TW: 4d92c94b11cfd
+  editor.shortcuts.commands.decrease_font_size:
+    zh-TW: 1ca88124a02b8a
+  editor.shortcuts.commands.decrease_line_height:
+    zh-TW: 16014b7f40231e
+  editor.shortcuts.commands.focus_toolbar:
+    zh-TW: 1983e1b78684db
+  editor.shortcuts.commands.hard_break:
+    zh-TW: 46fe231d0e3f7
+  editor.shortcuts.commands.heading:
+    zh-TW: 1ae6939993a441
+  editor.shortcuts.commands.increase_font_size:
+    zh-TW: 10da1d5a78af28
+  editor.shortcuts.commands.increase_line_height:
+    zh-TW: fd53fcc1a05c5
+  editor.shortcuts.commands.indent:
+    zh-TW: 94f9d68e001f9
+  editor.shortcuts.commands.open_help:
+    zh-TW: 15c85810d001af
+  editor.shortcuts.commands.ordered_list:
+    zh-TW: 864ba13895f
+  editor.shortcuts.commands.outdent:
+    zh-TW: 1959aa2f63de2
+  editor.shortcuts.commands.paragraph:
+    zh-TW: b1230abfe5562
+  editor.shortcuts.commands.paste:
+    zh-TW: d5f06f3d37b54
+  editor.shortcuts.commands.paste_plain_text:
+    zh-TW: 4c6639224412d
+  editor.shortcuts.commands.redo:
+    zh-TW: 103aa0d4931c73
+  editor.shortcuts.commands.select_all:
+    zh-TW: 5c4e424f3ad18
+  editor.shortcuts.commands.task_list:
+    zh-TW: 814fb28445343
+  editor.shortcuts.commands.undo:
+    zh-TW: ab822a1baab7f
+  editor.shortcuts.description:
+    zh-TW: a932dff0eb4ed
+  editor.shortcuts.empty_description:
+    zh-TW: cadcbc7cc603d
+  editor.shortcuts.empty_title:
+    zh-TW: 1300028f1c63b3
+  editor.shortcuts.key_column:
+    zh-TW: 105c3d81694283
+  editor.shortcuts.or:
+    zh-TW: 11b58ce98f31cc
+  editor.shortcuts.search:
+    zh-TW: 2d403cbdcb8b6
+  editor.shortcuts.search_placeholder:
+    zh-TW: "16723729331255"
+  editor.shortcuts.title:
+    zh-TW: 1a4ad1cfffd1da

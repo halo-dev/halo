@@ -195,7 +195,7 @@
   "editor.common.tooltip.custom_height_input": "自定义高度，按回车键生效",
   "editor.common.tooltip.open_link": "打开链接",
   "editor.common.placeholder.link_input": "输入链接，按回车确定",
-  "editor.common.placeholder.alt_input": "输入图片 alt 属性值，按回车确认",
+  "editor.common.placeholder.alt_input": "输入图片替代文本，按回车确认",
   "editor.common.placeholder.alt_href": "输入图片跳转链接，按回车确认",
   "editor.common.button.delete": "删除",
   "editor.common.button.edit_link": "修改链接",
