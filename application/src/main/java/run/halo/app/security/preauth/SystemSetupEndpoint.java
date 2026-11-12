@@ -44,6 +44,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.util.InMemoryResource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.PropertyPlaceholderHelper;
@@ -59,6 +60,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import reactor.util.retry.Retry;
+import run.halo.app.core.extension.User;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Unstructured;
@@ -142,7 +144,22 @@ public class SystemSetupEndpoint {
                         return handleValidationErrors(bindingResult, request);
                     }
                     return doInitialization(setupRequest, setupRequest.getUsername())
-                            .then(handleSetupSuccessfully(request));
+                            .then(handleSetupSuccessfully(request))
+                            .onErrorResume(DuplicateNameException.class, error -> {
+                                bindingResult.rejectValue(
+                                        "username",
+                                        "problemDetail.user.duplicateName",
+                                        new Object[] {setupRequest.getUsername()},
+                                        "The username already exists.");
+                                return handleValidationErrors(bindingResult, request);
+                            })
+                            .onErrorResume(BadCredentialsException.class, error -> {
+                                bindingResult.rejectValue(
+                                        "password",
+                                        "problemDetail.org.springframework.security.authentication.BadCredentialsException",
+                                        "The username or password is incorrect.");
+                                return handleValidationErrors(bindingResult, request);
+                            });
                 }))
                 .switchIfEmpty(redirectToConsole());
     }
@@ -197,13 +214,25 @@ public class SystemSetupEndpoint {
                 state.setSetupUsername(submittedUsername);
             }
         });
-        return markSetupStarted.then(Mono.defer(() -> {
-            if (setupCompleted.get()) {
-                log.info("System setup has already been completed, skip the initialization.");
-                return Mono.empty();
-            }
-            return resolveSetupUsername(submittedUsername).flatMap(username -> doInitialize(body, username));
-        }));
+        return checkSetupUsernameAvailable(submittedUsername)
+                .then(markSetupStarted)
+                .then(Mono.defer(() -> {
+                    if (setupCompleted.get()) {
+                        log.info("System setup has already been completed, skip the initialization.");
+                        return Mono.empty();
+                    }
+                    return resolveSetupUsername(submittedUsername).flatMap(username -> doInitialize(body, username));
+                }));
+    }
+
+    private Mono<Void> checkSetupUsernameAvailable(String submittedUsername) {
+        return client.fetch(ConfigMap.class, SystemState.SYSTEM_STATES_CONFIGMAP)
+                .map(SystemState::deserialize)
+                .defaultIfEmpty(new SystemState())
+                .filter(state -> !isTrue(state.getIsSetup()) && !StringUtils.hasText(state.getSetupUsername()))
+                .flatMap(state -> client.fetch(User.class, submittedUsername))
+                .flatMap(user -> Mono.error(new DuplicateNameException("The username already exists.")))
+                .then();
     }
 
     private Mono<Void> doInitialize(SetupRequest body, String username) {

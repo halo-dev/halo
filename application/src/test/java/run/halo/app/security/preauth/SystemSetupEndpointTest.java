@@ -2,6 +2,8 @@ package run.halo.app.security.preauth;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -19,10 +21,12 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.Validator;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import run.halo.app.core.extension.User;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
@@ -79,6 +83,7 @@ class SystemSetupEndpointTest {
 
         systemStates = configMap(SystemState.SYSTEM_STATES_CONFIGMAP);
         systemConfig = configMap("system");
+        when(client.fetch(eq(User.class), anyString())).thenReturn(Mono.empty());
 
         when(client.fetch(ConfigMap.class, SystemState.SYSTEM_STATES_CONFIGMAP)).thenReturn(Mono.just(systemStates));
         when(client.update(any(ConfigMap.class))).thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
@@ -262,6 +267,39 @@ class SystemSetupEndpointTest {
         verify(superAdminInitializer).initialize(paramCaptor.capture());
         assertThat(paramCaptor.getValue().getUsername()).isEqualTo("admin");
         assertThat(SystemState.deserialize(systemStates).getSetupUsername()).isEqualTo("admin");
+    }
+
+    @Test
+    void shouldRejectExistingUsernameBeforeWritingSetupState() {
+        when(client.fetch(User.class, "admin")).thenReturn(Mono.just(new User()));
+
+        StepVerifier.create(endpoint.doInitialization(setupRequest(), "admin"))
+                .verifyError(DuplicateNameException.class);
+
+        assertThat(systemStates.getData()).isEmpty();
+        verify(client, never()).update(any(ConfigMap.class));
+        verify(superAdminInitializer, never()).initialize(any());
+        verify(systemConfigFetcher, never()).getConfigMap();
+    }
+
+    @Test
+    void shouldNotChangeSettingsWhenResumeCredentialsAreRejected() {
+        var state = new SystemState();
+        state.setIsSetup(false);
+        state.setSetupUsername("admin");
+        SystemState.update(state, systemStates);
+        when(superAdminInitializer.initialize(any()))
+                .thenReturn(Mono.error(new BadCredentialsException("Invalid credentials")));
+
+        StepVerifier.create(endpoint.doInitialization(setupRequest(), "admin"))
+                .verifyError(BadCredentialsException.class);
+
+        assertThat(SystemState.deserialize(systemStates).getIsSetup()).isFalse();
+        assertThat(systemConfig.getData()).isEmpty();
+        verify(systemConfigFetcher, never()).getConfigMap();
+        verify(eventPublisher, never()).publishEvent(any(ExternalUrlChangedEvent.class));
+        verify(pluginService, never()).installPresetPlugins();
+        verify(themeService, never()).installPresetTheme();
     }
 
     private static SystemSetupEndpoint.SetupRequest setupRequest() {
