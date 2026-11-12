@@ -6,6 +6,7 @@ import static java.util.Comparator.comparing;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static run.halo.app.extension.GroupVersionKind.fromAPIVersionAndKind;
@@ -14,8 +15,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -27,6 +31,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.reactivestreams.Publisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.ReactiveTransactionManager;
@@ -34,6 +39,7 @@ import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import reactor.test.StepVerifier;
 import run.halo.app.extension.exception.SchemeNotFoundException;
 import run.halo.app.extension.index.IndexEngine;
@@ -216,6 +222,90 @@ class ReactiveExtensionClientTest {
         assertEquals(
                 List.of(1000, 1000, 500),
                 captor.getAllValues().stream().map(List::size).toList());
+    }
+
+    @Test
+    void shouldRunQueryComputationOnConfiguredScheduler() {
+        var eventLoop = Schedulers.newSingle("test-event-loop");
+        var queryScheduler = Schedulers.newSingle("test-query-scheduler");
+        try {
+            client.setQueryScheduler(queryScheduler);
+            var queryThread = new AtomicReference<Thread>();
+
+            lenient()
+                    .when(indexEngine.retrieveAll(eq(FakeExtension.class), any(ListOptions.class), any(Sort.class)))
+                    .thenAnswer(invocation -> {
+                        queryThread.set(Thread.currentThread());
+                        return List.of();
+                    });
+            lenient()
+                    .when(indexEngine.retrieve(eq(FakeExtension.class), any(ListOptions.class), any(PageRequest.class)))
+                    .thenAnswer(invocation -> {
+                        queryThread.set(Thread.currentThread());
+                        return new ListResult<>(1, 10, 0L, List.of());
+                    });
+            lenient()
+                    .when(indexEngine.retrieveTopN(
+                            eq(FakeExtension.class), any(ListOptions.class), any(Sort.class), anyInt()))
+                    .thenAnswer(invocation -> {
+                        queryThread.set(Thread.currentThread());
+                        return List.of();
+                    });
+            lenient()
+                    .when(indexEngine.count(eq(FakeExtension.class), any(ListOptions.class)))
+                    .thenAnswer(invocation -> {
+                        queryThread.set(Thread.currentThread());
+                        return 0L;
+                    });
+            lenient().when(storeClient.listByNames(anyList())).thenReturn(Flux.empty());
+
+            var queries = List.<Supplier<Publisher<?>>>of(
+                    () -> client.listAll(FakeExtension.class, new ListOptions(), Sort.unsorted()),
+                    () -> client.listAllNames(FakeExtension.class, new ListOptions(), Sort.unsorted()),
+                    () -> client.listTopNames(FakeExtension.class, new ListOptions(), Sort.unsorted(), 10),
+                    () -> client.listBy(FakeExtension.class, new ListOptions(), PageRequestImpl.of(1, 10)),
+                    () -> client.listNamesBy(FakeExtension.class, new ListOptions(), PageRequestImpl.of(1, 10)),
+                    () -> client.countBy(FakeExtension.class, new ListOptions()));
+
+            for (var query : queries) {
+                queryThread.set(null);
+                StepVerifier.create(Flux.from(query.get()).subscribeOn(eventLoop))
+                        .thenConsumeWhile(item -> true)
+                        .verifyComplete();
+                assertNotNull(queryThread.get(), "The index engine was not invoked");
+                assertTrue(
+                        queryThread.get().getName().startsWith("test-query-scheduler"),
+                        () -> "Unexpected query thread: " + queryThread.get().getName());
+            }
+        } finally {
+            eventLoop.dispose();
+            queryScheduler.dispose();
+        }
+    }
+
+    @Test
+    void shouldCompleteQueryWhenCallerBlocksOnSharedScheduler() {
+        var sharedScheduler = Schedulers.newBoundedElastic(1, 10, "test-shared-scheduler");
+        var queryScheduler = Schedulers.newBoundedElastic(1, 10, "test-query-scheduler");
+        try {
+            client.setScheduler(sharedScheduler);
+            client.setQueryScheduler(queryScheduler);
+
+            when(indexEngine.retrieve(eq(FakeExtension.class), any(ListOptions.class), any(PageRequest.class)))
+                    .thenAnswer(invocation -> new ListResult<>(1, 10, 0L, List.of()));
+            when(storeClient.listByNames(anyList())).thenReturn(Flux.empty());
+
+            var result = Mono.fromCallable(
+                            () -> client.listBy(FakeExtension.class, new ListOptions(), PageRequestImpl.of(1, 10))
+                                    .block(Duration.ofSeconds(2)))
+                    .subscribeOn(sharedScheduler)
+                    .block(Duration.ofSeconds(5));
+
+            assertNotNull(result);
+        } finally {
+            sharedScheduler.dispose();
+            queryScheduler.dispose();
+        }
     }
 
     @Test
