@@ -678,6 +678,7 @@
   "core.user.operations.disable_in_batch.title": "停用",
   "core.user.operations.disable_in_batch.description": "確定要停用所選用戶嗎？停用後這些用戶將無法登入系統",
   "core.user.filters.role.label": "角色",
+  "core.user.filters.status.items.normal": "正常",
   "core.user.filters.role.result": "角色：{role}",
   "core.user.filters.sort.items.create_time_desc": "較近創建",
   "core.user.filters.sort.items.create_time_asc": "較早創建",

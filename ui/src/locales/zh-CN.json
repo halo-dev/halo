@@ -688,6 +688,7 @@
   "core.user.operations.disable_in_batch.title": "禁用",
   "core.user.operations.disable_in_batch.description": "确定要禁用所选用户吗？禁用后这些用户将无法登录系统",
   "core.user.filters.role.label": "角色",
+  "core.user.filters.status.items.normal": "正常",
   "core.user.filters.role.result": "角色：{role}",
   "core.user.filters.sort.items.create_time_desc": "较近创建",
   "core.user.filters.sort.items.create_time_asc": "较早创建",

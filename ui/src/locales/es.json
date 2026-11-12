@@ -629,6 +629,7 @@
   "core.user.operations.disable_in_batch.title": "Deshabilitar",
   "core.user.operations.disable_in_batch.description": "¿Estás seguro de que quieres deshabilitar a los usuarios seleccionados? Una vez deshabilitados, ya no podrán entrar.",
   "core.user.filters.role.label": "Rol",
+  "core.user.filters.status.items.normal": "Activo",
   "core.user.filters.role.result": "Rol: {role}",
   "core.user.filters.sort.items.create_time_desc": "Últimos creados",
   "core.user.filters.sort.items.create_time_asc": "Más antiguos creados",
