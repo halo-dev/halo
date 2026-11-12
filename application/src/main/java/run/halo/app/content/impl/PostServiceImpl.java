@@ -5,9 +5,12 @@ import static run.halo.app.extension.index.query.Queries.in;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
-import java.util.function.Function;
 import java.util.function.ToIntFunction;
 import java.util.function.UnaryOperator;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +18,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Flux;
@@ -24,6 +26,8 @@ import reactor.util.retry.Retry;
 import run.halo.app.content.*;
 import run.halo.app.core.counter.CounterService;
 import run.halo.app.core.counter.MeterUtils;
+import run.halo.app.core.extension.Counter;
+import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Category;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.Snapshot;
@@ -65,13 +69,10 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
     public Mono<ListResult<ListedPost>> listPost(PostQuery query) {
         return buildListOptions(query)
                 .flatMap(listOptions -> client.listBy(Post.class, listOptions, query.toPageRequest()))
-                .flatMap(listResult -> Flux.fromStream(listResult.get())
-                        .map(this::getListedPost)
-                        .flatMapSequential(Function.identity())
-                        .collectList()
+                .flatMap(listResult -> assembleListedPosts(listResult.get().toList())
                         .map(listedPosts -> new ListResult<>(
-                                listResult.getPage(), listResult.getSize(), listResult.getTotal(), listedPosts))
-                        .defaultIfEmpty(ListResult.emptyResult()));
+                                listResult.getPage(), listResult.getSize(), listResult.getTotal(), listedPosts)))
+                .defaultIfEmpty(ListResult.emptyResult());
     }
 
     Mono<ListOptions> buildListOptions(PostQuery query) {
@@ -91,47 +92,140 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
         });
     }
 
-    Mono<Stats> fetchStats(Post post) {
-        Assert.notNull(post, "The post must not be null.");
-        String name = post.getMetadata().getName();
-        return counterService
-                .getByName(MeterUtils.nameOf(Post.class, name))
-                .map(counter -> Stats.builder()
-                        .visit(counter.getVisit())
-                        .upvote(counter.getUpvote())
-                        .totalComment(counter.getTotalComment())
-                        .approvedComment(counter.getApprovedComment())
-                        .build())
-                .defaultIfEmpty(Stats.empty());
+    private Mono<List<ListedPost>> assembleListedPosts(List<Post> posts) {
+        if (posts.isEmpty()) {
+            return Mono.just(List.of());
+        }
+        var tagNames = posts.stream()
+                .map(post -> post.getSpec().getTags())
+                .filter(Objects::nonNull)
+                .flatMap(List::stream)
+                .distinct()
+                .toList();
+        var categoryNames = posts.stream()
+                .map(post -> post.getSpec().getCategories())
+                .filter(Objects::nonNull)
+                .flatMap(List::stream)
+                .distinct()
+                .toList();
+        var usernames = new LinkedHashSet<String>();
+        usernames.add(UserService.GHOST_USER_NAME);
+        posts.forEach(post -> {
+            var owner = post.getSpec().getOwner();
+            if (StringUtils.isNotBlank(owner)) {
+                usernames.add(owner);
+            }
+            var contributors = post.getStatusOrDefault().getContributors();
+            if (contributors != null) {
+                contributors.stream().filter(StringUtils::isNotBlank).forEach(usernames::add);
+            }
+        });
+
+        var statsMono = fetchStatsByPostName(posts);
+        var tagsMono = listTags(tagNames).collectList();
+        var categoriesMono = listCategories(categoryNames).collectList();
+        var usersMono = fetchUsersByName(List.copyOf(usernames));
+
+        return Mono.zip(statsMono, tagsMono, categoriesMono, usersMono).map(tuple -> {
+            var statsByCounterName = tuple.getT1();
+            var tags = tuple.getT2();
+            var categories = tuple.getT3();
+            var usersByName = tuple.getT4();
+            return posts.stream()
+                    .map(post -> toListedPost(post, statsByCounterName, tags, categories, usersByName))
+                    .toList();
+        });
     }
 
-    private Mono<ListedPost> getListedPost(Post post) {
-        Assert.notNull(post, "The post must not be null.");
+    private Mono<Map<String, Stats>> fetchStatsByPostName(List<Post> posts) {
+        var counterNames = posts.stream()
+                .map(post -> MeterUtils.nameOf(Post.class, post.getMetadata().getName()))
+                .toList();
+        return counterService
+                .getByNames(counterNames)
+                .collectMap(counter -> counter.getMetadata().getName(), PostServiceImpl::toStats);
+    }
+
+    private Mono<Map<String, Contributor>> fetchUsersByName(List<String> usernames) {
+        return userService.getUsersOrGhosts(usernames).collectList().map(users -> {
+            var usersByName = new HashMap<String, Contributor>();
+            users.forEach(user -> usersByName.putIfAbsent(user.getMetadata().getName(), toContributor(user)));
+            return usersByName;
+        });
+    }
+
+    private static ListedPost toListedPost(
+            Post post,
+            Map<String, Stats> statsByCounterName,
+            List<Tag> tags,
+            List<Category> categories,
+            Map<String, Contributor> usersByName) {
         var listedPost = new ListedPost().setPost(post);
 
-        var statsMono = fetchStats(post).doOnNext(listedPost::setStats);
+        var counterName = MeterUtils.nameOf(Post.class, post.getMetadata().getName());
+        listedPost.setStats(statsByCounterName.getOrDefault(counterName, Stats.empty()));
 
-        var tagsMono = listTags(post.getSpec().getTags()).collectList().doOnNext(listedPost::setTags);
+        var postTagNames = post.getSpec().getTags();
+        if (CollectionUtils.isEmpty(postTagNames)) {
+            listedPost.setTags(List.of());
+        } else {
+            var postTagNameSet = new HashSet<>(postTagNames);
+            listedPost.setTags(tags.stream()
+                    .filter(tag -> postTagNameSet.contains(tag.getMetadata().getName()))
+                    .toList());
+        }
 
-        var categoriesMono =
-                listCategories(post.getSpec().getCategories()).collectList().doOnNext(listedPost::setCategories);
+        var postCategoryNames = post.getSpec().getCategories();
+        if (CollectionUtils.isEmpty(postCategoryNames)) {
+            listedPost.setCategories(List.of());
+        } else {
+            var categoriesByName = new HashMap<String, Category>();
+            categories.forEach(
+                    category -> categoriesByName.put(category.getMetadata().getName(), category));
+            listedPost.setCategories(new LinkedHashSet<>(postCategoryNames)
+                    .stream()
+                            .map(categoriesByName::get)
+                            .filter(Objects::nonNull)
+                            .toList());
+        }
 
-        var contributorsMono = listContributors(post.getStatusOrDefault().getContributors())
-                .collectList()
-                .doOnNext(listedPost::setContributors);
+        var ghost = usersByName.get(UserService.GHOST_USER_NAME);
+        listedPost.setOwner(resolveUser(usersByName, ghost, post.getSpec().getOwner()));
 
-        var ownerMono = userService
-                .getUserOrGhost(post.getSpec().getOwner())
-                .map(user -> {
-                    Contributor contributor = new Contributor();
-                    contributor.setName(user.getMetadata().getName());
-                    contributor.setDisplayName(user.getSpec().getDisplayName());
-                    contributor.setAvatar(user.getSpec().getAvatar());
-                    return contributor;
-                })
-                .doOnNext(listedPost::setOwner);
-        return Mono.when(statsMono, tagsMono, categoriesMono, contributorsMono, ownerMono)
-                .thenReturn(listedPost);
+        var contributorNames = post.getStatusOrDefault().getContributors();
+        if (CollectionUtils.isEmpty(contributorNames)) {
+            listedPost.setContributors(List.of());
+        } else {
+            listedPost.setContributors(contributorNames.stream()
+                    .map(name -> resolveUser(usersByName, ghost, name))
+                    .filter(Objects::nonNull)
+                    .toList());
+        }
+        return listedPost;
+    }
+
+    private static Contributor resolveUser(Map<String, Contributor> usersByName, Contributor ghost, String username) {
+        if (StringUtils.isBlank(username)) {
+            return ghost;
+        }
+        return usersByName.getOrDefault(username, ghost);
+    }
+
+    private static Stats toStats(Counter counter) {
+        return Stats.builder()
+                .visit(counter.getVisit())
+                .upvote(counter.getUpvote())
+                .totalComment(counter.getTotalComment())
+                .approvedComment(counter.getApprovedComment())
+                .build();
+    }
+
+    private static Contributor toContributor(User user) {
+        var contributor = new Contributor();
+        contributor.setName(user.getMetadata().getName());
+        contributor.setDisplayName(user.getSpec().getDisplayName());
+        contributor.setAvatar(user.getSpec().getAvatar());
+        return contributor;
     }
 
     private Flux<Tag> listTags(List<String> tagNames) {
@@ -155,27 +249,12 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
         return client.listAll(Category.class, listOptions, Sort.unsorted()).sort(Comparator.comparingInt(comparator));
     }
 
-    private Flux<Contributor> listContributors(List<String> usernames) {
-        if (CollectionUtils.isEmpty(usernames)) {
-            return Flux.empty();
-        }
-        return Flux.fromIterable(usernames)
-                .flatMapSequential(userService::getUserOrGhost)
-                .map(user -> {
-                    Contributor contributor = new Contributor();
-                    contributor.setName(user.getMetadata().getName());
-                    contributor.setDisplayName(user.getSpec().getDisplayName());
-                    contributor.setAvatar(user.getSpec().getAvatar());
-                    return contributor;
-                });
-    }
-
     @Override
     public Mono<Post> draftPost(PostRequest postRequest) {
         return Mono.defer(() -> {
                     var post = postRequest.post();
 
-                    if (post.getSpec().getOwner() != null) {
+                    if (StringUtils.isNotBlank(post.getSpec().getOwner())) {
                         return Mono.just(post);
                     }
 

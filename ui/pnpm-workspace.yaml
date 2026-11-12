@@ -39,12 +39,13 @@ catalog:
   "@tiptap/suggestion": "3.32.0"
   "@tiptap/vue-3": "3.32.0"
   "@tiptap/y-tiptap": "^3.0.10"
-  "@vitest/ui": 5.0.3
-  vite: npm:@voidzero-dev/vite-plus-core@1.1.0
-  vite-plus: 1.1.0
-  vitest: 5.0.3
+  "@vitest/ui": 5.1.0
+  vite: npm:@voidzero-dev/vite-plus-core@1.5.1
+  vite-plus: 1.5.1
+  vitest: 5.1.0
 overrides:
-  axios: ^1.16.1
+  axios: ^1.20.0
+  markdown-it: ^14.3.3
   vite-plus: "catalog:"
   "@lezer/javascript": 1.5.4
   vite@*: "catalog:"
@@ -74,24 +75,16 @@ minimumReleaseAgeExclude:
   - "@vueuse/metadata@14.4.0"
   - "@vueuse/router@14.4.0"
   - "@vueuse/shared@14.4.0"
-  - "@voidzero-dev/vite-plus-core@0.2.9 || 0.3.0 || 0.3.1 || 0.3.2 || 1.0.0-rc.1"
-  - "@voidzero-dev/vite-plus-darwin-arm64@0.2.9 || 0.3.0 || 0.3.1 || 0.3.2 ||
-    1.0.0-rc.1"
-  - "@voidzero-dev/vite-plus-darwin-x64@0.2.9 || 0.3.0 || 0.3.1 || 0.3.2 ||
-    1.0.0-rc.1"
-  - "@voidzero-dev/vite-plus-linux-arm64-gnu@0.2.9 || 0.3.0 || 0.3.1 || 0.3.2 ||
-    1.0.0-rc.1"
-  - "@voidzero-dev/vite-plus-linux-arm64-musl@0.2.9 || 0.3.0 || 0.3.1 || 0.3.2
-    || 1.0.0-rc.1"
-  - "@voidzero-dev/vite-plus-linux-x64-gnu@0.2.9 || 0.3.0 || 0.3.1 || 0.3.2 ||
-    1.0.0-rc.1"
-  - "@voidzero-dev/vite-plus-linux-x64-musl@0.2.9 || 0.3.0 || 0.3.1 || 0.3.2 ||
-    1.0.0-rc.1"
-  - "@voidzero-dev/vite-plus-win32-arm64-msvc@0.2.9 || 0.3.0 || 0.3.1 || 0.3.2
-    || 1.0.0-rc.1"
-  - "@voidzero-dev/vite-plus-win32-x64-msvc@0.2.9 || 0.3.0 || 0.3.1 || 0.3.2 ||
-    1.0.0-rc.1"
-  - vite-plus@0.2.9 || 0.3.0 || 0.3.1 || 0.3.2 || 1.0.0-rc.1
+  - "@voidzero-dev/vite-plus-core@0.2.9 || 0.3.0 || 0.3.1 || 0.3.2 || 1.0.0-rc.1 || 1.4.0 || 1.5.1"
+  - "@voidzero-dev/vite-plus-darwin-arm64@0.2.9 || 0.3.0 || 0.3.1 || 0.3.2 || 1.0.0-rc.1 || 1.4.0 || 1.5.1"
+  - "@voidzero-dev/vite-plus-darwin-x64@0.2.9 || 0.3.0 || 0.3.1 || 0.3.2 || 1.0.0-rc.1 || 1.4.0 || 1.5.1"
+  - "@voidzero-dev/vite-plus-linux-arm64-gnu@0.2.9 || 0.3.0 || 0.3.1 || 0.3.2 || 1.0.0-rc.1 || 1.4.0 || 1.5.1"
+  - "@voidzero-dev/vite-plus-linux-arm64-musl@0.2.9 || 0.3.0 || 0.3.1 || 0.3.2 || 1.0.0-rc.1 || 1.4.0 || 1.5.1"
+  - "@voidzero-dev/vite-plus-linux-x64-gnu@0.2.9 || 0.3.0 || 0.3.1 || 0.3.2 || 1.0.0-rc.1 || 1.4.0 || 1.5.1"
+  - "@voidzero-dev/vite-plus-linux-x64-musl@0.2.9 || 0.3.0 || 0.3.1 || 0.3.2 || 1.0.0-rc.1 || 1.4.0 || 1.5.1"
+  - "@voidzero-dev/vite-plus-win32-arm64-msvc@0.2.9 || 0.3.0 || 0.3.1 || 0.3.2 || 1.0.0-rc.1 || 1.4.0 || 1.5.1"
+  - "@voidzero-dev/vite-plus-win32-x64-msvc@0.2.9 || 0.3.0 || 0.3.1 || 0.3.2 || 1.0.0-rc.1 || 1.4.0 || 1.5.1"
+  - vite-plus@0.2.9 || 0.3.0 || 0.3.1 || 0.3.2 || 1.0.0-rc.1 || 1.4.0 || 1.5.1
   - "@tiptap/core@3.32.0"
   - "@tiptap/extension-audio@3.32.0"
   - "@tiptap/extension-blockquote@3.32.0"

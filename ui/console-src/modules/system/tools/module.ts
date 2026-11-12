@@ -13,7 +13,7 @@ export default definePlugin({
       meta: {
         title: "core.tool.title",
         menu: {
-          name: "core.sidebar.menu.items.tools",
+          name: /* @x18n-key */ "core.sidebar.menu.items.tools",
           group: "system",
           icon: markRaw(IconToolsFill),
           priority: 5,

@@ -199,7 +199,7 @@ const handleMouseover = (event: MouseEvent) => {
   <div
     id="select-option"
     ref="selectOptionRef"
-    v-scroll="[handleOptionScroll, { throttle: 10 }]"
+    v-scroll="handleOptionScroll"
     class="select max-h-64 overflow-y-auto p-1.5"
     :class="[isCursorHidden ? 'cursor-none' : 'cursor-pointer']"
     role="list"

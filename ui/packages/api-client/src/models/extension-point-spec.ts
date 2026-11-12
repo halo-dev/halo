@@ -42,7 +42,7 @@ export interface ExtensionPointSpec {
 
 export const ExtensionPointSpecTypeEnum = {
     Singleton: 'SINGLETON',
-    MultiInstance: 'MULTI_INSTANCE'
+    MultiInstance: 'MULTI_INSTANCE',
 } as const;
 
 export type ExtensionPointSpecTypeEnum = typeof ExtensionPointSpecTypeEnum[keyof typeof ExtensionPointSpecTypeEnum];

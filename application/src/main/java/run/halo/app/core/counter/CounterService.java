@@ -15,5 +15,14 @@ public interface CounterService {
 
     Flux<Counter> getByNames(Collection<String> names);
 
+    /**
+     * Gets aggregated statistics of all counters.
+     *
+     * <p>The result may be cached for a short period to avoid scanning all counters on every request.
+     *
+     * @return aggregated counter statistics
+     */
+    Mono<CounterStats> getStats();
+
     Mono<Counter> deleteByName(String counterName);
 }

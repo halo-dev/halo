@@ -58,7 +58,7 @@ export interface ThemeStatus {
 export const ThemeStatusPhaseEnum = {
     Ready: 'READY',
     Failed: 'FAILED',
-    Unknown: 'UNKNOWN'
+    Unknown: 'UNKNOWN',
 } as const;
 
 export type ThemeStatusPhaseEnum = typeof ThemeStatusPhaseEnum[keyof typeof ThemeStatusPhaseEnum];

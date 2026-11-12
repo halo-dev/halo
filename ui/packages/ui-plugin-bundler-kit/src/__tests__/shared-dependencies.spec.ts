@@ -3,6 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it } from "vite-plus/test";
+import packageJson from "../../package.json";
 import { HALO_HOST_RUNTIME_SNAPSHOTS } from "../runtime-snapshot";
 import {
   SharedDependencyValidator,
@@ -13,6 +14,12 @@ const uiRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "../../../.."
 );
+const currentSnapshot = HALO_HOST_RUNTIME_SNAPSHOTS.find(
+  (snapshot) => snapshot.haloVersion === packageJson.version
+);
+if (!currentSnapshot) {
+  throw new Error(`Missing Halo ${packageJson.version} host runtime snapshot.`);
+}
 const tempDirs: string[] = [];
 
 afterEach(() => {
@@ -96,7 +103,7 @@ describe("shared dependency validation", () => {
       path.join(installedDependencyRoot, "dist/index.mjs"),
       "export {};\n"
     );
-    const snapshot = structuredClone(HALO_HOST_RUNTIME_SNAPSHOTS[0]);
+    const snapshot = structuredClone(currentSnapshot);
     snapshot.packages["vue-router"].version = "4.2.5";
     const validator = new SharedDependencyValidator({
       snapshot,
@@ -113,7 +120,7 @@ describe("shared dependency validation", () => {
 
   it("reports installed shared versions without validating imported names", async () => {
     const validator = new SharedDependencyValidator({
-      snapshot: HALO_HOST_RUNTIME_SNAPSHOTS[0],
+      snapshot: currentSnapshot,
       providerRoot: uiRoot,
     });
 
@@ -129,7 +136,7 @@ describe("shared dependency validation", () => {
 
   it("rejects shared package subpaths", async () => {
     const validator = new SharedDependencyValidator({
-      snapshot: HALO_HOST_RUNTIME_SNAPSHOTS[0],
+      snapshot: currentSnapshot,
       providerRoot: uiRoot,
     });
 
@@ -142,7 +149,7 @@ describe("shared dependency validation", () => {
   });
 
   it("reports only a newer-provider version note", async () => {
-    const snapshot = structuredClone(HALO_HOST_RUNTIME_SNAPSHOTS[0]);
+    const snapshot = structuredClone(currentSnapshot);
     snapshot.packages.vue.version = "3.2.0";
     const validator = new SharedDependencyValidator({
       snapshot,
@@ -165,7 +172,7 @@ describe("shared dependency validation", () => {
   });
 
   it("does not warn for an older provider version in the same major", async () => {
-    const snapshot = structuredClone(HALO_HOST_RUNTIME_SNAPSHOTS[0]);
+    const snapshot = structuredClone(currentSnapshot);
     snapshot.packages.vue.version = "3.99.0";
     const validator = new SharedDependencyValidator({
       snapshot,
@@ -178,7 +185,7 @@ describe("shared dependency validation", () => {
   });
 
   it("warns but does not reject a different provider major", async () => {
-    const snapshot = structuredClone(HALO_HOST_RUNTIME_SNAPSHOTS[0]);
+    const snapshot = structuredClone(currentSnapshot);
     snapshot.packages.pinia.version = "2.3.1";
     const validator = new SharedDependencyValidator({
       snapshot,
@@ -202,7 +209,7 @@ describe("shared dependency validation", () => {
     );
     tempDirs.push(providerRoot);
     const validator = new SharedDependencyValidator({
-      snapshot: HALO_HOST_RUNTIME_SNAPSHOTS[0],
+      snapshot: currentSnapshot,
       providerRoot,
     });
 

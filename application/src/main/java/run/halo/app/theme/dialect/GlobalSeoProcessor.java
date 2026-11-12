@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.HtmlUtils;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.AttributeValueQuotes;
 import org.thymeleaf.model.IModel;
@@ -50,7 +51,7 @@ class GlobalSeoProcessor implements TemplateHeadProcessor {
                     if (seoMetaDescription instanceof String description && !description.isBlank()) {
                         var attributes = LinkedHashMap.<String, String>newLinkedHashMap(2);
                         attributes.put("name", "description");
-                        attributes.put("content", description);
+                        attributes.put("content", HtmlUtils.htmlEscape(description));
                         var metaTag = modelFactory.createStandaloneElementTag(
                                 "meta", attributes, AttributeValueQuotes.DOUBLE, false, true);
                         model.add(metaTag);

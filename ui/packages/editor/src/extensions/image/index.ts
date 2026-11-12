@@ -352,7 +352,7 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
         return {
           priority: 95,
           icon: markRaw(MingcutePicLine),
-          title: "editor.extensions.commands_menu.image",
+          title: /* @x18n-key */ "editor.extensions.commands_menu.image",
           keywords: ["image", "tupian"],
           command: ({ editor, range }: { editor: Editor; range: Range }) => {
             editor

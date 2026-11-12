@@ -268,6 +268,9 @@ const handleRemoveItem = (index: number) => {
                 "
                 :src="utils.attachment.getThumbnailUrl(itemLabel.value, 'S')"
                 class="size-full object-cover"
+                @error="
+                  utils.attachment.handleThumbnailError($event, itemLabel.value)
+                "
               />
             </a>
             <span v-if="itemLabel.type === 'text'">

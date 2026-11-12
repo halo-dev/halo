@@ -27,7 +27,7 @@ export interface ReplaceOperation {
 }
 
 export const ReplaceOperationOpEnum = {
-    Replace: 'replace'
+    Replace: 'replace',
 } as const;
 
 export type ReplaceOperationOpEnum = typeof ReplaceOperationOpEnum[keyof typeof ReplaceOperationOpEnum];

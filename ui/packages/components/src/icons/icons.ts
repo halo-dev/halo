@@ -12,6 +12,7 @@ import IconArrowUpLine from "~icons/ri/arrow-up-s-line";
 import IconBookRead from "~icons/ri/book-read-line";
 import IconCalendar from "~icons/ri/calendar-line";
 import IconCharacterRecognition from "~icons/ri/character-recognition-line";
+import IconCheck from "~icons/ri/check-line";
 import IconCheckboxFill from "~icons/ri/checkbox-circle-fill";
 import IconCheckboxCircle from "~icons/ri/checkbox-circle-line";
 import IconClipboardLine from "~icons/ri/clipboard-line";
@@ -91,6 +92,7 @@ export {
   IconBookRead,
   IconCalendar,
   IconCharacterRecognition,
+  IconCheck,
   IconCheckboxCircle,
   IconCheckboxFill,
   IconClipboardLine,

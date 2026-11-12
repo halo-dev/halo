@@ -27,7 +27,7 @@ export interface AddOperation {
 }
 
 export const AddOperationOpEnum = {
-    Add: 'add'
+    Add: 'add',
 } as const;
 
 export type AddOperationOpEnum = typeof AddOperationOpEnum[keyof typeof AddOperationOpEnum];

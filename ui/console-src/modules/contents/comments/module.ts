@@ -29,7 +29,7 @@ export default definePlugin({
         searchable: true,
         permissions: ["system:comments:view"],
         menu: {
-          name: "core.sidebar.menu.items.comments",
+          name: /* @x18n-key */ "core.sidebar.menu.items.comments",
           group: "content",
           icon: markRaw(IconMessage),
           priority: 2,

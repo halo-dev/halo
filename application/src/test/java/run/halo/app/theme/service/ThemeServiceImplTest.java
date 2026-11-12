@@ -56,6 +56,7 @@ import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.infra.ThemeRootGetter;
+import run.halo.app.infra.exception.AccessDeniedException;
 import run.halo.app.infra.exception.DuplicateNameException;
 import run.halo.app.infra.exception.ThemeInstallationException;
 import run.halo.app.infra.properties.HaloProperties;
@@ -215,6 +216,14 @@ class ThemeServiceImplTest {
             StepVerifier.create(themeService.install(content(defaultThemeZipPath)))
                     .verifyError(ThemeInstallationException.class);
         }
+
+        @Test
+        void shouldRejectThemeNameWithDirectoryTraversal() throws IOException, URISyntaxException {
+            var themeZipPath = prepareTheme("traversal-poc");
+            StepVerifier.create(themeService.install(content(themeZipPath))).verifyError(AccessDeniedException.class);
+            verify(client, never()).create(isA(Theme.class));
+            assertThat(tmpDir.resolve("static/traversal-poc")).doesNotExist();
+        }
     }
 
     @Nested
@@ -321,7 +330,7 @@ class ThemeServiceImplTest {
             return Mono.just(argument);
         });
 
-        when(client.list(eq(AnnotationSetting.class), any(), eq(null))).thenReturn(Flux.empty());
+        when(client.listAll(eq(AnnotationSetting.class), any(), any())).thenReturn(Flux.empty());
 
         themeService
                 .reloadTheme("fake-theme")
@@ -385,7 +394,7 @@ class ThemeServiceImplTest {
             return Mono.just(argument);
         });
 
-        when(client.list(eq(AnnotationSetting.class), any(), eq(null))).thenReturn(Flux.empty());
+        when(client.listAll(eq(AnnotationSetting.class), any(), any())).thenReturn(Flux.empty());
 
         themeService
                 .reloadTheme("fake-theme")

@@ -15,7 +15,7 @@ export default definePlugin({
         searchable: true,
         permissions: ["system:posts:view"],
         menu: {
-          name: "core.sidebar.menu.items.posts",
+          name: /* @x18n-key */ "core.sidebar.menu.items.posts",
           group: "content",
           icon: markRaw(IconBookRead),
           priority: 0,
@@ -43,7 +43,7 @@ export default definePlugin({
           name: "PostEditor",
           component: () => import("./PostEditor.vue"),
           meta: {
-            title: "core.post_editor.title",
+            title: /* @x18n-key */ "core.post_editor.title",
             searchable: true,
             hideFooter: true,
             permissions: ["system:posts:manage"],
@@ -88,7 +88,7 @@ export default definePlugin({
       name: "PostSnapshots",
       component: () => import("./PostSnapshots.vue"),
       meta: {
-        title: "core.post_snapshots.title",
+        title: /* @x18n-key */ "core.post_snapshots.title",
         searchable: false,
         hideFooter: true,
         permissions: ["system:posts:manage"],

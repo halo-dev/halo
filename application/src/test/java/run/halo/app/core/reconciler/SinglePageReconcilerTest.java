@@ -363,6 +363,7 @@ class SinglePageReconcilerTest {
     @Test
     void subscribeNewCommentNotificationTest() {
         var page = pageV1();
+        page.getSpec().setOwner("fake-user");
 
         singlePageReconciler.subscribeNewCommentNotification(page);
 
@@ -373,8 +374,18 @@ class SinglePageReconcilerTest {
                         assertArg(argReason -> {
                             var interestReason = new Subscription.InterestReason();
                             interestReason.setReasonType(NotificationReasonConst.NEW_COMMENT_ON_PAGE);
-                            interestReason.setExpression("props.pageOwner == 'null'");
+                            interestReason.setExpression("props.pageOwner == 'fake-user'");
                             assertThat(argReason).isEqualTo(interestReason);
                         }));
+    }
+
+    @Test
+    void shouldNotSubscribeNewCommentNotificationWhenOwnerIsBlank() {
+        var page = pageV1();
+        page.getSpec().setOwner("");
+
+        singlePageReconciler.subscribeNewCommentNotification(page);
+
+        verifyNoInteractions(notificationCenter);
     }
 }

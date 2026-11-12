@@ -99,7 +99,7 @@ export interface PostSpec {
 export const PostSpecVisibleEnum = {
     Public: 'PUBLIC',
     Internal: 'INTERNAL',
-    Private: 'PRIVATE'
+    Private: 'PRIVATE',
 } as const;
 
 export type PostSpecVisibleEnum = typeof PostSpecVisibleEnum[keyof typeof PostSpecVisibleEnum];

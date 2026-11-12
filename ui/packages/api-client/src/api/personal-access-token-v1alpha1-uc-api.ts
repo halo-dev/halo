@@ -18,7 +18,7 @@ import type { AxiosPromise, AxiosInstance, RawAxiosRequestConfig } from 'axios';
 import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
-import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
+import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction, replaceWithSerializableTypeIfNeeded } from '../common';
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
@@ -38,7 +38,7 @@ export const PersonalAccessTokenV1alpha1UcApiAxiosParamCreator = function (confi
             // verify required parameter 'name' is not null or undefined
             assertParamExists('deletePat', 'name', name)
             const localVarPath = `/apis/uc.api.security.halo.run/v1alpha1/personalaccesstokens/{name}`
-                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+                .replace('{name}', encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -58,8 +58,8 @@ export const PersonalAccessTokenV1alpha1UcApiAxiosParamCreator = function (confi
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            localVarHeaderParameter['Accept'] = '*/*';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -98,9 +98,8 @@ export const PersonalAccessTokenV1alpha1UcApiAxiosParamCreator = function (confi
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
-
-    
             localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = '*/*';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
@@ -122,7 +121,7 @@ export const PersonalAccessTokenV1alpha1UcApiAxiosParamCreator = function (confi
             // verify required parameter 'name' is not null or undefined
             assertParamExists('obtainPat', 'name', name)
             const localVarPath = `/apis/uc.api.security.halo.run/v1alpha1/personalaccesstokens/{name}`
-                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+                .replace('{name}', encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -142,8 +141,8 @@ export const PersonalAccessTokenV1alpha1UcApiAxiosParamCreator = function (confi
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            localVarHeaderParameter['Accept'] = '*/*';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -179,8 +178,8 @@ export const PersonalAccessTokenV1alpha1UcApiAxiosParamCreator = function (confi
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            localVarHeaderParameter['Accept'] = '*/*';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -200,7 +199,7 @@ export const PersonalAccessTokenV1alpha1UcApiAxiosParamCreator = function (confi
             // verify required parameter 'name' is not null or undefined
             assertParamExists('restorePat', 'name', name)
             const localVarPath = `/apis/uc.api.security.halo.run/v1alpha1/personalaccesstokens/{name}/actions/restoration`
-                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+                .replace('{name}', encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -220,8 +219,8 @@ export const PersonalAccessTokenV1alpha1UcApiAxiosParamCreator = function (confi
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            localVarHeaderParameter['Accept'] = '*/*';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -241,7 +240,7 @@ export const PersonalAccessTokenV1alpha1UcApiAxiosParamCreator = function (confi
             // verify required parameter 'name' is not null or undefined
             assertParamExists('revokePat', 'name', name)
             const localVarPath = `/apis/uc.api.security.halo.run/v1alpha1/personalaccesstokens/{name}/actions/revocation`
-                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+                .replace('{name}', encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -261,8 +260,8 @@ export const PersonalAccessTokenV1alpha1UcApiAxiosParamCreator = function (confi
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            localVarHeaderParameter['Accept'] = '*/*';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};

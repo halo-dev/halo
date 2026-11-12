@@ -114,7 +114,10 @@ public class ThemeUtils {
                             .<Unstructured>handle((themeManifestPath, sink) -> {
                                 var theme = loadThemeManifest(themeManifestPath);
                                 var themeName = theme.getMetadata().getName();
-                                var themeTargetPath = themeWorkDir.resolve(themeName);
+                                var themeTargetPath =
+                                        themeWorkDir.resolve(themeName).normalize();
+                                // Prevent path traversal via a crafted theme name, e.g. "../static/x".
+                                FileUtils.checkDirectoryTraversal(themeWorkDir.normalize(), themeTargetPath);
                                 var targetExisted = Files.exists(themeTargetPath);
                                 try {
                                     if (!override && !FileUtils.isEmpty(themeTargetPath)) {

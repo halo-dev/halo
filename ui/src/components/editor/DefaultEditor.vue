@@ -441,6 +441,7 @@ const expandedCover = ref(false);
                 )
               "
               class="size-full object-cover"
+              @error="utils.attachment.handleThumbnailError($event, cover)"
             />
             <div
               v-if="uploadProgress"

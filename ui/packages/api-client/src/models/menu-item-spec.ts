@@ -60,7 +60,7 @@ export interface MenuItemSpec {
 export const MenuItemSpecRouteRefEnum = {
     Archives: 'archives',
     Categories: 'categories',
-    Tags: 'tags'
+    Tags: 'tags',
 } as const;
 
 export type MenuItemSpecRouteRefEnum = typeof MenuItemSpecRouteRefEnum[keyof typeof MenuItemSpecRouteRefEnum];
@@ -68,7 +68,7 @@ export const MenuItemSpecTargetEnum = {
     Blank: '_blank',
     Self: '_self',
     Parent: '_parent',
-    Top: '_top'
+    Top: '_top',
 } as const;
 
 export type MenuItemSpecTargetEnum = typeof MenuItemSpecTargetEnum[keyof typeof MenuItemSpecTargetEnum];

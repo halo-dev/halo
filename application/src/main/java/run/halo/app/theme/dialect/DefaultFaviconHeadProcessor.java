@@ -1,9 +1,12 @@
 package run.halo.app.theme.dialect;
 
+import java.util.LinkedHashMap;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.HtmlUtils;
 import org.thymeleaf.context.ITemplateContext;
+import org.thymeleaf.model.AttributeValueQuotes;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IModelFactory;
 import org.thymeleaf.processor.element.IElementModelStructureHandler;
@@ -27,16 +30,17 @@ public class DefaultFaviconHeadProcessor implements TemplateHeadProcessor {
     public Mono<Void> process(ITemplateContext context, IModel model, IElementModelStructureHandler structureHandler) {
         return fetchBasicSetting()
                 .filter(basic -> StringUtils.isNotBlank(basic.getFavicon()))
-                .map(basic -> {
+                .doOnNext(basic -> {
                     IModelFactory modelFactory = context.getModelFactory();
-                    model.add(modelFactory.createText(faviconSnippet(basic.getFavicon())));
-                    return model;
+                    var attributes = LinkedHashMap.<String, String>newLinkedHashMap(2);
+                    attributes.put("rel", "icon");
+                    attributes.put("href", HtmlUtils.htmlEscape(basic.getFavicon()));
+                    var linkTag = modelFactory.createStandaloneElementTag(
+                            "link", attributes, AttributeValueQuotes.DOUBLE, false, true);
+                    model.add(linkTag);
+                    model.add(modelFactory.createText("\n"));
                 })
                 .then();
-    }
-
-    private String faviconSnippet(String favicon) {
-        return String.format("<link rel=\"icon\" href=\"%s\" />\n", favicon);
     }
 
     private Mono<SystemSetting.Basic> fetchBasicSetting() {

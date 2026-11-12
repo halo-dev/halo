@@ -10,11 +10,11 @@ export function getPageLayout(theme?: Theme): PageLayout | undefined {
 export function getPageLayoutLabelKey(state?: PageLayoutState): string {
   switch (state) {
     case "SUPPORTED":
-      return "core.theme.page_layout.status.supported";
+      return /* @x18n-key */ "core.theme.page_layout.status.supported";
     case "MISSING":
-      return "core.theme.page_layout.status.missing";
+      return /* @x18n-key */ "core.theme.page_layout.status.missing";
     case "INVALID":
-      return "core.theme.page_layout.status.invalid";
+      return /* @x18n-key */ "core.theme.page_layout.status.invalid";
     default:
       return "core.common.text.none";
   }
@@ -23,11 +23,11 @@ export function getPageLayoutLabelKey(state?: PageLayoutState): string {
 export function getPageLayoutDescriptionKey(state?: PageLayoutState): string {
   switch (state) {
     case "SUPPORTED":
-      return "core.theme.page_layout.description.supported";
+      return /* @x18n-key */ "core.theme.page_layout.description.supported";
     case "MISSING":
-      return "core.theme.page_layout.description.missing";
+      return /* @x18n-key */ "core.theme.page_layout.description.missing";
     case "INVALID":
-      return "core.theme.page_layout.description.invalid";
+      return /* @x18n-key */ "core.theme.page_layout.description.invalid";
     default:
       return "core.common.text.none";
   }

@@ -18,6 +18,7 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerWebExchange;
 
 @Slf4j
@@ -53,11 +54,37 @@ public enum Exceptions {
             }
             errorResponse = er;
         }
-        var problemDetail = errorResponse.updateAndGetBody(messageSource, getLocale(exchange));
+        var locale = getLocale(exchange);
+        var problemDetail = errorResponse.updateAndGetBody(messageSource, locale);
+        // Since Spring Framework 7.0.10 a custom reason takes precedence over the detail message code
+        // (see https://github.com/spring-projects/spring-framework/issues/36984). Halo uses the reason
+        // as an English fallback and relies on the message code for localization, so resolve the
+        // localized detail explicitly to keep error responses translated.
+        resolveLocalizedDetail(errorResponse, messageSource, locale);
         problemDetail.setInstance(exchange.getRequest().getURI());
         problemDetail.setProperty("requestId", exchange.getRequest().getId());
         problemDetail.setProperty("timestamp", Instant.now());
         return errorResponse;
+    }
+
+    private static void resolveLocalizedDetail(
+            ErrorResponse errorResponse, MessageSource messageSource, Locale locale) {
+        var detailCode = errorResponse.getDetailMessageCode();
+        var detail = detailCode == null
+                ? null
+                : messageSource.getMessage(
+                        detailCode, errorResponse.getDetailMessageArguments(messageSource, locale), null, locale);
+        if (detail == null && errorResponse instanceof ResponseStatusException statusException) {
+            // The reason may be a message code as well, consistent with ResponseStatusExceptionResolver.
+            var reason = statusException.getReason();
+            if (reason != null) {
+                detail = messageSource.getMessage(
+                        reason, statusException.getDetailMessageArguments(messageSource, locale), null, locale);
+            }
+        }
+        if (detail != null) {
+            errorResponse.getBody().setDetail(detail);
+        }
     }
 
     private static ErrorResponse handleException(Throwable t, @Nullable HttpStatusCode status) {

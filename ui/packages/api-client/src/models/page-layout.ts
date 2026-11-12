@@ -39,7 +39,7 @@ export interface PageLayout {
 export const PageLayoutStateEnum = {
     Supported: 'SUPPORTED',
     Missing: 'MISSING',
-    Invalid: 'INVALID'
+    Invalid: 'INVALID',
 } as const;
 
 export type PageLayoutStateEnum = typeof PageLayoutStateEnum[keyof typeof PageLayoutStateEnum];

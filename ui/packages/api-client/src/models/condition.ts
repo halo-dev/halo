@@ -43,7 +43,7 @@ export interface Condition {
 export const ConditionStatusEnum = {
     True: 'TRUE',
     False: 'FALSE',
-    Unknown: 'UNKNOWN'
+    Unknown: 'UNKNOWN',
 } as const;
 
 export type ConditionStatusEnum = typeof ConditionStatusEnum[keyof typeof ConditionStatusEnum];

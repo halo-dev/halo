@@ -1242,6 +1242,9 @@
           }
         ],
         "responses": {
+          "404": {
+            "description": "Thumbnail not found or the URI is not allowed to be redirected to"
+          },
           "default": {
             "content": {
               "*/*": {

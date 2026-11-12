@@ -20,6 +20,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
+import org.springframework.mock.web.server.MockServerWebExchange;
 import org.springframework.web.reactive.function.client.ClientRequest;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.ExchangeFunction;
@@ -36,6 +38,7 @@ import run.halo.app.core.extension.attachment.endpoint.AttachmentHandler;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.infra.exception.Exceptions;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 
 @ExtendWith(MockitoExtension.class)
@@ -171,9 +174,13 @@ class DefaultAttachmentServiceTest {
                     var messages = new ReloadableResourceBundleMessageSource();
                     messages.setBasename("file:src/main/resources/config/i18n/messages");
                     messages.setDefaultEncoding("UTF-8");
+                    var exchange = MockServerWebExchange.from(
+                            MockServerHttpRequest.get("/file.png").acceptLanguageAsLocales(Locale.CHINESE));
                     assertEquals(
                             "下载文件失败，远程服务器返回 502 BAD_GATEWAY。",
-                            exception.updateAndGetBody(messages, Locale.CHINESE).getDetail());
+                            Exceptions.createErrorResponse(exception, null, exchange, messages)
+                                    .getBody()
+                                    .getDetail());
                 })
                 .verify();
         verify(exchangeFunction).exchange(assertArg(r -> {

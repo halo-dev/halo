@@ -14,7 +14,7 @@ export default definePlugin({
         searchable: true,
         hideFooter: true,
         menu: {
-          name: "core.uc_sidebar.menu.items.notification",
+          name: /* @x18n-key */ "core.uc_sidebar.menu.items.notification",
           group: "dashboard",
           icon: markRaw(IconNotificationBadgeLine),
           priority: 1,

@@ -27,7 +27,7 @@ export interface TestOperation {
 }
 
 export const TestOperationOpEnum = {
-    Test: 'test'
+    Test: 'test',
 } as const;
 
 export type TestOperationOpEnum = typeof TestOperationOpEnum[keyof typeof TestOperationOpEnum];

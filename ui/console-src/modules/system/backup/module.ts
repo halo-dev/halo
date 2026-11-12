@@ -15,7 +15,7 @@ export default definePlugin({
         searchable: true,
         permissions: ["system:migrations:manage"],
         menu: {
-          name: "core.sidebar.menu.items.backup",
+          name: /* @x18n-key */ "core.sidebar.menu.items.backup",
           group: "system",
           icon: markRaw(IconServerLine),
           priority: 4,
