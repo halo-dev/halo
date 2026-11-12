@@ -42,6 +42,7 @@ sources:
   editor.common.codeblock.title:
     zh-TW: 1f8247e7e0d3c5
   editor.common.color:
+    es: 1d7df5fbc08ea6
     zh-TW: 1d7df5fbc08ea6
   editor.common.heading.heading1:
     zh-TW: 13433ae152fe1c
@@ -153,12 +154,14 @@ sources:
   editor.extensions.columns.delete_column:
     zh-TW: 15e949ecff50f4
   editor.extensions.commands_menu.audio:
+    es: 705051b6e5921
     zh-TW: 705051b6e5921
   editor.extensions.commands_menu.columns:
     zh-TW: 1ab364042b3fed
   editor.extensions.commands_menu.gallery:
     zh-TW: 1fb5ae89320380
   editor.extensions.commands_menu.iframe:
+    es: bf63e4b7a9d7c
     zh-TW: bf63e4b7a9d7c
   editor.extensions.commands_menu.image:
     es: 1ce0d8b2df9c5d
@@ -247,6 +250,7 @@ sources:
   editor.extensions.link.edit_link:
     zh-TW: 80c5f2d2601aa
   editor.extensions.link.nofollow:
+    es: 1a7fe0e5a0634a
     zh-CN: 1a7fe0e5a0634a
     zh-TW: 1a7fe0e5a0634a
   editor.extensions.link.open_in_new_window:
@@ -456,6 +460,7 @@ sources:
   editor.shortcuts.categories.formatting:
     zh-TW: 8682f7b36abb2
   editor.shortcuts.categories.general:
+    es: 2944e997ba8d5
     zh-TW: 2944e997ba8d5
   editor.shortcuts.categories.navigation:
     zh-TW: 45654cdb3792e
