@@ -53,10 +53,16 @@ const size = useRouteQuery<number>("size", 20, {
   transform: Number,
 });
 const selectedRoleValue = useRouteQuery<string | undefined>("role");
+const selectedDisabledValue = useRouteQuery<string | undefined>("disabled");
 const selectedSortValue = useRouteQuery<string | undefined>("sort");
 
 watch(
-  () => [selectedRoleValue.value, selectedSortValue.value, keyword.value],
+  () => [
+    selectedRoleValue.value,
+    selectedDisabledValue.value,
+    selectedSortValue.value,
+    keyword.value,
+  ],
   () => {
     page.value = 1;
   }
@@ -77,16 +83,25 @@ const {
     keyword,
     selectedSortValue,
     selectedRoleValue,
+    selectedDisabledValue,
   ],
   queryFn: async () => {
+    const fieldSelector = [
+      `name!=${ANONYMOUSUSER_NAME}`,
+      `name!=${DELETEDUSER_NAME}`,
+    ];
+    if (
+      selectedDisabledValue.value === "true" ||
+      selectedDisabledValue.value === "false"
+    ) {
+      fieldSelector.push(`spec.disabled=${selectedDisabledValue.value}`);
+    }
+
     const { data } = await consoleApiClient.user.listUsers({
       page: page.value,
       size: size.value,
       keyword: keyword.value,
-      fieldSelector: [
-        `name!=${ANONYMOUSUSER_NAME}`,
-        `name!=${DELETEDUSER_NAME}`,
-      ],
+      fieldSelector,
       sort: [selectedSortValue.value].filter(Boolean) as string[],
       role: selectedRoleValue.value,
     });
@@ -322,6 +337,22 @@ function onCreationModalClose() {
                       };
                     }) || []
                   "
+                />
+                <VFilterDropdown
+                  v-model="selectedDisabledValue"
+                  :label="$t('core.common.filters.labels.status')"
+                  show-clear-option
+                  :clear-label="t('core.common.filters.item_labels.all')"
+                  :options="[
+                    {
+                      label: t('core.user.filters.status.items.normal'),
+                      value: 'false',
+                    },
+                    {
+                      label: t('core.user.fields.disabled'),
+                      value: 'true',
+                    },
+                  ]"
                 />
                 <VFilterDropdown
                   v-model="selectedSortValue"

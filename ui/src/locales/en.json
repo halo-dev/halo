@@ -664,6 +664,7 @@
   "core.user.operations.disable_in_batch.title": "Disable",
   "core.user.operations.disable_in_batch.description": "Are you sure you want to disable the selected users? Once disabled, these users will no longer be able to log in.",
   "core.user.filters.role.label": "Role",
+  "core.user.filters.status.items.normal": "Active",
   "core.user.filters.sort.items.create_time_desc": "Latest Created",
   "core.user.filters.sort.items.create_time_asc": "Earliest Created",
   "core.user.editing_modal.titles.update": "Edit User",
