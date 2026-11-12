@@ -1,0 +1,17 @@
+# yaml-language-server: $schema=https://x18n.dev/schema/config.json
+name: halo-editor
+sourceLocale: en
+presets:
+  - vue-i18n
+resources:
+  - pattern: src/locales/{locale}.json
+keyStyle: flat
+usage:
+  include:
+    - src/**/*.{vue,ts,tsx,js,jsx}
+  exclude:
+    - "**/node_modules/**"
+    - "**/*.d.ts"
+    - "**/*.spec.*"
+    - "**/*.test.*"
+    - "**/__tests__/**"
