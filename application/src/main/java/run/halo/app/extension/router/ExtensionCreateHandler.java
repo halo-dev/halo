@@ -29,7 +29,10 @@ class ExtensionCreateHandler implements CreateHandler {
         return request.bodyToMono(Unstructured.class)
                 .switchIfEmpty(Mono.error(
                         () -> new ExtensionConvertException("Cannot read body to " + scheme.groupVersionKind())))
-                .flatMap(client::create)
+                .flatMap(unstructured -> {
+                    ExtensionIdentity.requireGroupVersionKind(scheme, unstructured);
+                    return client.create(unstructured);
+                })
                 .flatMap(createdExt -> ServerResponse.created(URI.create(
                                 pathPattern() + "/" + createdExt.getMetadata().getName()))
                         .contentType(MediaType.APPLICATION_JSON)
