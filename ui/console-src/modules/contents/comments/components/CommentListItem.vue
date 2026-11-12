@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { useEntityFieldItemExtensionPoint } from "@console/composables/use-entity-extension-points";
 import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
 import type {
   ListedComment,
@@ -27,10 +28,15 @@ import {
   VStatusDot,
   VTag,
 } from "@halo-dev/components";
-import { utils, type OperationItem } from "@halo-dev/ui-shared";
+import {
+  utils,
+  type EntityFieldItem,
+  type OperationItem,
+} from "@halo-dev/ui-shared";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { computed, markRaw, provide, ref, toRefs, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
+import EntityFieldItems from "@/components/entity-fields/EntityFieldItems.vue";
 import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
 import { useCommentLastReadTimeMutate } from "../composables/use-comment-last-readtime-mutate";
 import { useSubjectRef } from "../composables/use-subject-ref";
@@ -57,6 +63,12 @@ const props = withDefaults(
 );
 
 const { comment } = toRefs(props);
+
+const { data: fields } = useEntityFieldItemExtensionPoint<ListedComment>(
+  "comment:list-item:field:create",
+  comment,
+  computed((): EntityFieldItem[] => [])
+);
 
 const hoveredReply = ref<ListedReply>();
 const pendingReplyCount = computed(
@@ -337,6 +349,7 @@ const { data: operationItems } = useOperationItemExtensionPoint<ListedComment>(
       <slot name="checkbox" />
     </template>
     <template #start>
+      <EntityFieldItems :fields="fields?.start || []" />
       <VEntityField width="100%" max-width="100%">
         <template #description>
           <div class="flex flex-col gap-2">
@@ -412,6 +425,7 @@ const { data: operationItems } = useOperationItemExtensionPoint<ListedComment>(
       </VEntityField>
     </template>
     <template #end>
+      <EntityFieldItems :fields="fields?.end || []" />
       <VEntityField v-if="!comment?.comment.spec.approved">
         <template #description>
           <VStatusDot
