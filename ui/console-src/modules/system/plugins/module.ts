@@ -25,7 +25,7 @@ export default definePlugin({
         searchable: true,
         permissions: ["system:plugins:view"],
         menu: {
-          name: "core.sidebar.menu.items.plugins",
+          name: /* @x18n-key */ "core.sidebar.menu.items.plugins",
           group: "system",
           icon: markRaw(IconPlug),
           priority: 0,
@@ -52,7 +52,7 @@ export default definePlugin({
           name: "PluginDetail",
           component: () => import("./PluginDetail.vue"),
           meta: {
-            title: "core.plugin.detail.title",
+            title: /* @x18n-key */ "core.plugin.detail.title",
             permissions: ["system:plugins:view"],
           },
         },

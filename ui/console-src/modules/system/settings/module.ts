@@ -14,7 +14,7 @@ export default definePlugin({
         title: "core.setting.title",
         permissions: ["system:settings:view"],
         menu: {
-          name: "core.sidebar.menu.items.settings",
+          name: /* @x18n-key */ "core.sidebar.menu.items.settings",
           group: "system",
           icon: markRaw(IconSettings),
           priority: 2,

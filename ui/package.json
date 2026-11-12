@@ -14,6 +14,7 @@
     "test:unit:ui": "vp run app:test:unit:ui",
     "typecheck": "vp run app:typecheck",
     "lint": "vp run app:lint",
+    "i18n:check": "x18n check --root ..",
     "format": "vp fmt",
     "format:check": "vp fmt --check"
   },
@@ -131,6 +132,7 @@
     "@vue/language-core": "^3.3.9",
     "@vue/test-utils": "^2.4.11",
     "@vue/tsconfig": "^0.9.1",
+    "@x18n/cli": "0.1.14",
     "autoprefixer": "^10.5.4",
     "baseline-browser-mapping": "^2.11.13",
     "eslint": "^9.39.1",

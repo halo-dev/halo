@@ -10,11 +10,11 @@ export default definePlugin({
       name: "ThemeRoot",
       component: () => import("./layouts/ThemeLayout.vue"),
       meta: {
-        title: "core.theme.title",
+        title: /* @x18n-key */ "core.theme.title",
         searchable: true,
         permissions: ["system:themes:view"],
         menu: {
-          name: "core.sidebar.menu.items.themes",
+          name: /* @x18n-key */ "core.sidebar.menu.items.themes",
           group: "interface",
           icon: markRaw(IconPalette),
           priority: 0,
@@ -31,7 +31,7 @@ export default definePlugin({
           name: "ThemeSetting",
           component: () => import("./ThemeSetting.vue"),
           meta: {
-            title: "core.theme.settings.title",
+            title: /* @x18n-key */ "core.theme.settings.title",
             permissions: ["system:themes:view"],
           },
         },

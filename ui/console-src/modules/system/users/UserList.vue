@@ -321,7 +321,10 @@ function onCreationModalClose() {
                   v-model="selectedRoleValue"
                   :label="$t('core.user.filters.role.label')"
                   show-clear-option
+                  searchable
                   :clear-label="t('core.common.filters.item_labels.all')"
+                  :search-placeholder="$t('core.common.placeholder.search')"
+                  :empty-text="$t('core.components.global_search.no_results')"
                   :options="
                     roles?.map((role) => {
                       return {
@@ -330,6 +333,7 @@ function onCreationModalClose() {
                             rbacAnnotations.DISPLAY_NAME
                           ] || role.metadata.name,
                         value: role.metadata.name,
+                        keywords: [role.metadata.name],
                       };
                     }) || []
                   "

@@ -22,7 +22,7 @@ export default definePlugin({
           name: "AuthProviderDetail",
           component: () => import("./AuthProviderDetail.vue"),
           meta: {
-            title: "core.identity_authentication.detail.title",
+            title: /* @x18n-key */ "core.identity_authentication.detail.title",
             permissions: ["*"],
           },
         },

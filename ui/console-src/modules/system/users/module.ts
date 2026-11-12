@@ -14,7 +14,7 @@ export default definePlugin({
         searchable: true,
         permissions: ["system:users:view"],
         menu: {
-          name: "core.sidebar.menu.items.users",
+          name: /* @x18n-key */ "core.sidebar.menu.items.users",
           group: "system",
           icon: markRaw(IconUserSettings),
           priority: 1,
@@ -32,7 +32,7 @@ export default definePlugin({
           name: "UserDetail",
           component: () => import("./UserDetail.vue"),
           meta: {
-            title: "core.user.detail.title",
+            title: /* @x18n-key */ "core.user.detail.title",
           },
         },
       ],

@@ -14,7 +14,7 @@ export default definePlugin({
         searchable: true,
         permissions: ["system:singlepages:view"],
         menu: {
-          name: "core.sidebar.menu.items.single_pages",
+          name: /* @x18n-key */ "core.sidebar.menu.items.single_pages",
           group: "content",
           icon: markRaw(IconPages),
           priority: 1,
@@ -41,7 +41,7 @@ export default definePlugin({
           name: "SinglePageEditor",
           component: () => import("./SinglePageEditor.vue"),
           meta: {
-            title: "core.page_editor.title",
+            title: /* @x18n-key */ "core.page_editor.title",
             searchable: true,
             hideFooter: true,
             permissions: ["system:singlepages:manage"],
@@ -54,7 +54,7 @@ export default definePlugin({
       name: "SinglePageSnapshots",
       component: () => import("./SinglePageSnapshots.vue"),
       meta: {
-        title: "core.page_snapshots.title",
+        title: /* @x18n-key */ "core.page_snapshots.title",
         searchable: false,
         hideFooter: true,
         permissions: ["system:singlepages:manage"],

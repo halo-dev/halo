@@ -143,7 +143,7 @@ export const ExtensionTable = TiptapTable.extend<ExtensionTableOptions>({
         return {
           priority: 120,
           icon: markRaw(MdiTable),
-          title: "editor.extensions.commands_menu.table",
+          title: /* @x18n-key */ "editor.extensions.commands_menu.table",
           keywords: ["table", "biaoge"],
           command: ({ editor, range }: { editor: Editor; range: Range }) => {
             editor
