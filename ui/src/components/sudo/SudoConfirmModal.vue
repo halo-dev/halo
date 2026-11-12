@@ -135,7 +135,7 @@ const sendButtonText = computed(() => {
 
 function methodLabel(method: SudoMethod) {
   const key = `core.sudo.methods.${method.name}`;
-  const translated = t(key);
+  const translated = t(`core.sudo.methods.${method.name}`);
   if (translated !== key) {
     return method.maskedTarget
       ? `${translated} (${method.maskedTarget})`
