@@ -53,7 +53,7 @@ public class ThemeMessageResolverIntegrationTest {
 
     @BeforeEach
     void setUp() throws FileNotFoundException, URISyntaxException {
-        when(initializationStateGetter.userInitialized()).thenReturn(Mono.just(true));
+        when(initializationStateGetter.setupRequired()).thenReturn(Mono.just(false));
         defaultThemeUrl = ResourceUtils.getURL("classpath:themes/default");
         otherThemeUrl = ResourceUtils.getURL("classpath:themes/other");
 
