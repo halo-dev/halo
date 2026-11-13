@@ -18,6 +18,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.BadCredentialsException;
 import reactor.core.publisher.Flux;
@@ -30,6 +31,8 @@ import run.halo.app.extension.Metadata;
 import run.halo.app.notification.NotificationCenter;
 import run.halo.app.notification.NotificationReasonEmitter;
 import run.halo.app.notification.ReasonPayload;
+import run.halo.app.notification.TransientEmailNotificationCoordinator;
+import run.halo.app.notification.UserIdentity;
 
 /**
  * Tests for {@link InMemoryEmailCodeService}.
@@ -48,6 +51,9 @@ class InMemoryEmailCodeServiceTest {
 
     @Mock
     NotificationCenter notificationCenter;
+
+    @Spy
+    TransientEmailNotificationCoordinator notificationCoordinator = new TransientEmailNotificationCoordinator();
 
     @InjectMocks
     InMemoryEmailCodeService emailCodeService;
@@ -74,6 +80,11 @@ class InMemoryEmailCodeServiceTest {
         StepVerifier.create(emailCodeService.sendLoginCode("test@example.com")).verifyComplete();
 
         verify(reasonEmitter).emit(eq(InMemoryEmailCodeService.LOGIN_EMAIL_CODE_REASON_TYPE), any(Consumer.class));
+        verify(notificationCoordinator)
+                .publish(
+                        eq(InMemoryEmailCodeService.LOGIN_EMAIL_CODE_REASON_TYPE),
+                        eq(UserIdentity.anonymousWithEmail("test@example.com").name()),
+                        any());
     }
 
     @Test
