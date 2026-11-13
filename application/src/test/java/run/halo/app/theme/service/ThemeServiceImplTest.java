@@ -24,12 +24,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -43,6 +46,7 @@ import org.springframework.util.StreamUtils;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import reactor.test.StepVerifier;
 import run.halo.app.core.extension.AnnotationSetting;
 import run.halo.app.core.extension.Setting;
@@ -56,7 +60,11 @@ import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.infra.ThemeRootGetter;
+import run.halo.app.infra.exception.AccessDeniedException;
+import run.halo.app.infra.exception.DuplicateNameException;
 import run.halo.app.infra.exception.ThemeInstallationException;
+import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
+import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.utils.JsonUtils;
 
 @ExtendWith(MockitoExtension.class)
@@ -73,6 +81,9 @@ class ThemeServiceImplTest {
 
     @Mock
     SystemConfigFetcher systemConfigFetcher;
+
+    @Mock
+    HaloProperties haloProperties;
 
     @InjectMocks
     ThemeServiceImpl themeService;
@@ -180,6 +191,29 @@ class ThemeServiceImplTest {
         }
     }
 
+    private Path prepareThemeArchive(String invalidPart) throws IOException {
+        when(systemVersionSupplier.get()).thenReturn(Version.parse("2.28.0"));
+        var themeDir = Files.createDirectory(tmpDir.resolve("preset"));
+        var theme = createTheme(t -> {
+            t.getSpec().setSettingName("preset-setting");
+            t.getSpec().setConfigMapName("preset-config");
+            if ("version".equals(invalidPart)) {
+                t.getSpec().setRequires(">=999.0.0");
+            }
+        });
+        Files.writeString(themeDir.resolve("theme.yaml"), Unstructured.OBJECT_MAPPER.writeValueAsString(theme));
+        if ("settings".equals(invalidPart) || "config".equals(invalidPart)) {
+            var resource = "settings".equals(invalidPart)
+                    ? "{\"apiVersion\":\"v1alpha1\",\"kind\":\"Setting\",\"metadata\":{\"name\":\"preset-setting\"},\"spec\":{\"forms\":[]}}"
+                    : "{\"apiVersion\":\"v1alpha1\",\"kind\":\"ConfigMap\",\"metadata\":{\"name\":\"preset-config\"},\"data\":{}}";
+            Files.writeString(themeDir.resolve(invalidPart + ".yaml"), resource);
+            Files.writeString(themeDir.resolve(invalidPart + ".yml"), resource);
+        }
+        var archive = tmpDir.resolve("preset.zip");
+        zip(themeDir, archive);
+        return archive;
+    }
+
     @Nested
     class InstallTest {
 
@@ -205,10 +239,167 @@ class ThemeServiceImplTest {
         }
 
         @Test
+        void shouldRejectDuplicateThemeForOrdinaryInstallation() throws IOException, URISyntaxException {
+            var themeZipPath = prepareTheme("default");
+            when(client.create(isA(Theme.class))).thenReturn(Mono.error(new DuplicateNameException()));
+
+            StepVerifier.create(themeService.install(content(themeZipPath))).verifyError(DuplicateNameException.class);
+
+            verify(client, never()).get(eq(Theme.class), any());
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"version", "settings", "config"})
+        void shouldPreserveThemeRecordWhenOrdinaryInstallationValidationFails(String invalidPart) throws IOException {
+            var archive = prepareThemeArchive(invalidPart);
+            var persisted = new AtomicReference<Theme>();
+            when(client.create(isA(Theme.class))).thenAnswer(invocation -> {
+                var theme = invocation.getArgument(0, Theme.class);
+                return Mono.fromSupplier(() -> {
+                    persisted.set(theme);
+                    return theme;
+                });
+            });
+
+            StepVerifier.create(themeService.install(content(archive))).verifyErrorSatisfies(error -> {
+                if (invalidPart.equals("version")) {
+                    assertThat(error).isInstanceOf(UnsatisfiedAttributeValueException.class);
+                } else {
+                    assertThat(error).isInstanceOf(IllegalStateException.class).hasMessageContaining("only have one");
+                }
+                // Ordinary installation keeps the existing record so the user can uninstall or upgrade it.
+                assertThat(persisted.get()).isNotNull();
+                assertThat(persisted.get().getMetadata().getName()).isEqualTo("default");
+            });
+        }
+
+        @Test
         void shouldFailWhenThemeManifestIsInvalid() throws IOException, URISyntaxException {
             var defaultThemeZipPath = prepareTheme("invalid-missing-manifest");
             StepVerifier.create(themeService.install(content(defaultThemeZipPath)))
                     .verifyError(ThemeInstallationException.class);
+        }
+
+        @Test
+        void shouldRejectThemeNameWithDirectoryTraversal() throws IOException, URISyntaxException {
+            var themeZipPath = prepareTheme("traversal-poc");
+            StepVerifier.create(themeService.install(content(themeZipPath))).verifyError(AccessDeniedException.class);
+            verify(client, never()).create(isA(Theme.class));
+            assertThat(tmpDir.resolve("static/traversal-poc")).doesNotExist();
+        }
+    }
+
+    @Nested
+    class InstallPresetThemeTest {
+
+        @Test
+        void shouldRecoverThemeDirectoryLeftByInterruptedSetup() throws IOException {
+            when(haloProperties.getTheme()).thenReturn(new HaloProperties().getTheme());
+            when(systemVersionSupplier.get()).thenReturn(Version.parse("2.28.0"));
+            when(client.create(isA(Theme.class))).thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
+
+            // Simulate a theme directory left behind by an interrupted setup.
+            var leftoverThemeDir = themeRoot.get().resolve("theme-earth");
+            Files.createDirectories(leftoverThemeDir);
+            Files.writeString(leftoverThemeDir.resolve("leftover.txt"), "leftover");
+
+            StepVerifier.create(themeService.installPresetTheme()).verifyComplete();
+
+            // The Theme extension must be created even if the directory already exists.
+            verify(client).create(isA(Theme.class));
+            assertThat(leftoverThemeDir.resolve("theme.yaml")).exists();
+        }
+
+        @Test
+        void shouldFailWhenPresetThemeArchiveHasNoManifest() throws IOException {
+            var corruptThemeArchive = tmpDir.resolve("corrupt-theme.zip");
+            Files.writeString(corruptThemeArchive, "not a zip file");
+            var themeProperties = new HaloProperties().getTheme();
+            themeProperties
+                    .getInitializer()
+                    .setLocation(corruptThemeArchive.toUri().toString());
+            when(haloProperties.getTheme()).thenReturn(themeProperties);
+
+            StepVerifier.create(themeService.installPresetTheme()).verifyError(ThemeInstallationException.class);
+        }
+
+        @Test
+        void shouldFailWhenPresetThemeCannotBeCopied() throws IOException {
+            // A leftover file at the theme root path forces an IOException while copying the
+            // preset theme, which must fail the setup instead of being silently ignored.
+            var blockedThemeRoot = tmpDir.resolve("blocked-themes");
+            Files.writeString(blockedThemeRoot, "not a directory");
+            when(themeRoot.get()).thenReturn(blockedThemeRoot);
+            when(haloProperties.getTheme()).thenReturn(new HaloProperties().getTheme());
+
+            StepVerifier.create(themeService.installPresetTheme()).verifyError(ServerWebInputException.class);
+        }
+
+        @Test
+        void shouldIgnoreExistingPresetThemeExtension() throws IOException {
+            preparePresetTheme(null);
+            var existing = createTheme();
+            when(client.create(isA(Theme.class))).thenReturn(Mono.error(new DuplicateNameException("Duplicate name")));
+            when(client.get(Theme.class, "default"))
+                    .thenReturn(Mono.just(existing).publishOn(Schedulers.parallel()));
+            when(systemVersionSupplier.get()).thenAnswer(invocation -> {
+                assertThat(Schedulers.isInNonBlockingThread()).isFalse();
+                return Version.parse("2.28.0");
+            });
+
+            StepVerifier.create(themeService.installPresetTheme()).verifyComplete();
+
+            verify(client).create(isA(Theme.class));
+            verify(client).get(Theme.class, "default");
+            verify(client, never()).update(isA(Theme.class));
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"version", "settings", "config"})
+        void shouldKeepRejectingInvalidPresetBeforeCreatingTheme(String invalidPart) throws IOException {
+            preparePresetTheme(invalidPart);
+            // Model the resource left by the old create-before-validation implementation.
+            lenient()
+                    .when(client.create(isA(Theme.class)))
+                    .thenAnswer(invocation -> Mono.just(invocation.getArgument(0, Theme.class)))
+                    .thenReturn(Mono.error(new DuplicateNameException()));
+
+            for (int attempt = 0; attempt < 2; attempt++) {
+                StepVerifier.create(themeService.installPresetTheme()).verifyErrorSatisfies(error -> {
+                    if (invalidPart.equals("version")) {
+                        assertThat(error).isInstanceOf(UnsatisfiedAttributeValueException.class);
+                    } else {
+                        assertThat(error)
+                                .isInstanceOf(IllegalStateException.class)
+                                .hasMessageContaining("only have one");
+                    }
+                });
+            }
+
+            verify(client, never()).create(isA(Theme.class));
+        }
+
+        @Test
+        void shouldRejectIncompatibleExistingPresetTheme() throws IOException {
+            preparePresetTheme(null);
+            var existing = createTheme(theme -> theme.getSpec().setRequires(">=999.0.0"));
+            when(client.create(isA(Theme.class))).thenReturn(Mono.error(new DuplicateNameException()));
+            when(client.get(Theme.class, "default")).thenReturn(Mono.just(existing));
+
+            for (int attempt = 0; attempt < 2; attempt++) {
+                StepVerifier.create(themeService.installPresetTheme())
+                        .verifyError(UnsatisfiedAttributeValueException.class);
+            }
+
+            verify(client, times(2)).get(Theme.class, "default");
+            verify(client, never()).update(isA(Theme.class));
+        }
+
+        private void preparePresetTheme(String invalidPart) throws IOException {
+            var archive = prepareThemeArchive(invalidPart);
+            var themeProperties = new HaloProperties().getTheme();
+            themeProperties.getInitializer().setLocation(archive.toUri().toString());
+            when(haloProperties.getTheme()).thenReturn(themeProperties);
         }
     }
 

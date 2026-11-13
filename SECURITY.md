@@ -22,22 +22,29 @@ Halo development team you are helping Halo to become a much more safer project t
 To protect the existing users of Halo, we kindly ask you to not disclose the vulnerability to anyone except the Halo
 development team before a fix has been rolled out.
 
-To Report a Vulnerability, please complete the form below, and send such report by email to `hi@halo.run`.
+To report a vulnerability, please use
+[GitHub private vulnerability reporting](https://github.com/halo-dev/halo/security/advisories/new). This allows you to
+share the details privately with the Halo development team, and we will work with you on a fix and coordinated
+disclosure. The report form will ask for the affected versions, deployment method, environment details, reproduction
+steps, and impact.
 
-```
-Vulnerability has been observed in...
-  - Docker? [n/y]: 
-    if yes for the question above,
-    - `docker -v`: 
-    - `docker images halohub/halo`: 
-  
-  - by `java -jar halo.jar`? [n/y]: 
-    if yes for the question above,
-    - `uname -a`: 
-    - `java -version`: 
- 
-- Affected by Halo version(s) [e.g. v2.4.0]: 
-- Vulnerability self-scoring [1-10]: 
-- Would you like to be attributed? (Whether you agree us to appreciate you by putting your name in the CHANGELOG of the next fix release) [n/y]: 
-```
+If you are unable to use GitHub private vulnerability reporting, you can instead send the same information by email to
+`hi@halo.run`.
+
+## What to Expect
+
+- We will acknowledge your report within 5 business days.
+- We will investigate the issue and keep you informed of our progress.
+- We aim to release a fix within 90 days. We will coordinate the disclosure date with you, and credit you in the
+  security advisory and release notes unless you prefer to remain anonymous.
+
+## Scope
+
+This policy covers vulnerabilities in the Halo core repository. The following are generally out of scope:
+
+- Issues that require an already-compromised administrator account, or existing access to the server or database.
+- Vulnerabilities in third-party plugins, themes, or dependencies that do not have a demonstrated impact on Halo.
+  Please report those to their respective maintainers.
+- Reports for unsupported versions (0.x and 1.x).
+- Reports from automated scanners without a working proof of concept.
 

@@ -70,7 +70,7 @@
     "hasown": "2.0.4",
     "math-intrinsics": "1.1.0",
     "object-inspect": "1.13.4",
-    "qs": "6.15.3",
+    "qs": "6.16.1",
     "side-channel": "1.1.1",
     "side-channel-list": "1.0.1",
     "side-channel-map": "1.0.1",

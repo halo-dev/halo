@@ -1,0 +1,4 @@
+# yaml-language-server: $schema=https://x18n.dev/schema/config.json
+projects:
+  - ui
+  - ui/packages/editor

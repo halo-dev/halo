@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
@@ -41,7 +42,7 @@ class QueryVisitorTest {
         var index = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
         var query = (ValueIndexQuery) index;
         when(indices.getIndex("metadata.name")).thenReturn(index);
-        when(query.all()).thenReturn(Set.of("all", "data"));
+        when(query.all()).thenReturn(mutableSet("all", "data"));
         var condition = Queries.all("metadata.name");
         condition.visit(visitor);
         assertEquals(Set.of("all", "data"), visitor.getResult());
@@ -61,7 +62,7 @@ class QueryVisitorTest {
         var index = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
         var query = (ValueIndexQuery) index;
         when(indices.getIndex("metadata.name")).thenReturn(index);
-        when(query.all()).thenReturn(Set.of("all", "data"));
+        when(query.all()).thenReturn(mutableSet("all", "data"));
         var condition = Condition.empty();
         condition.visit(visitor);
         assertEquals(Set.of("all", "data"), visitor.getResult());
@@ -72,7 +73,7 @@ class QueryVisitorTest {
         var index = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
         var query = (ValueIndexQuery) index;
         when(indices.getIndex("metadata.name")).thenReturn(index);
-        when(query.equal("test-name")).thenReturn(Set.of("equal", "data"));
+        when(query.equal("test-name")).thenReturn(mutableSet("equal", "data"));
         when(index.getKeyType()).thenReturn(String.class);
         var condition = Queries.equal("metadata.name", "test-name");
         condition.visit(visitor);
@@ -87,7 +88,7 @@ class QueryVisitorTest {
         var index = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
         var query = (ValueIndexQuery) index;
         when(indices.getIndex("metadata.name")).thenReturn(index);
-        when(query.notEqual("test-name")).thenReturn(Set.of("not-equal", "data"));
+        when(query.notEqual("test-name")).thenReturn(mutableSet("not-equal", "data"));
         when(index.getKeyType()).thenReturn(String.class);
         var condition = Queries.notEqual("metadata.name", "test-name");
         condition.visit(visitor);
@@ -102,7 +103,7 @@ class QueryVisitorTest {
         var index = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
         var query = (ValueIndexQuery) index;
         when(indices.getIndex("metadata.name")).thenReturn(index);
-        when(query.in(argThat(c -> c.containsAll(List.of("name1", "name1"))))).thenReturn(Set.of("in", "data"));
+        when(query.in(argThat(c -> c.containsAll(List.of("name1", "name1"))))).thenReturn(mutableSet("in", "data"));
         when(index.getKeyType()).thenReturn(String.class);
         var condition = Queries.in("metadata.name", Set.<String>of("name1", "name2"));
         condition.visit(visitor);
@@ -118,7 +119,7 @@ class QueryVisitorTest {
         var query = (ValueIndexQuery) index;
         when(indices.getIndex("metadata.name")).thenReturn(index);
         when(query.notIn(argThat(c -> c.containsAll(List.of("name1", "name2")))))
-                .thenReturn(Set.of("not-in", "data"));
+                .thenReturn(mutableSet("not-in", "data"));
         when(index.getKeyType()).thenReturn(String.class);
         var condition =
                 Queries.in("metadata.name", Set.<String>of("name1", "name2")).not();
@@ -134,7 +135,7 @@ class QueryVisitorTest {
         var index = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
         var query = (ValueIndexQuery) index;
         when(indices.getIndex("metadata.age")).thenReturn(index);
-        when(query.greaterThan(18, false)).thenReturn(Set.of("gt", "data"));
+        when(query.greaterThan(18, false)).thenReturn(mutableSet("gt", "data"));
         when(index.getKeyType()).thenReturn(Integer.class);
         var condition = Queries.greaterThan("metadata.age", 18);
         condition.visit(visitor);
@@ -149,7 +150,7 @@ class QueryVisitorTest {
         var index = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
         var query = (ValueIndexQuery) index;
         when(indices.getIndex("metadata.age")).thenReturn(index);
-        when(query.lessThan(65, false)).thenReturn(Set.of("lt", "data"));
+        when(query.lessThan(65, false)).thenReturn(mutableSet("lt", "data"));
         when(index.getKeyType()).thenReturn(Integer.class);
         var condition = Queries.lessThan("metadata.age", 65);
         condition.visit(visitor);
@@ -164,7 +165,7 @@ class QueryVisitorTest {
         var index = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
         var query = (ValueIndexQuery) index;
         when(indices.getIndex("metadata.age")).thenReturn(index);
-        when(query.between(18, true, 65, false)).thenReturn(Set.of("between", "data"));
+        when(query.between(18, true, 65, false)).thenReturn(mutableSet("between", "data"));
         when(index.getKeyType()).thenReturn(Integer.class);
         var condition = Queries.between("metadata.age", 18, true, 65, false);
         condition.visit(visitor);
@@ -180,7 +181,7 @@ class QueryVisitorTest {
         var index = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
         var query = (ValueIndexQuery) index;
         when(indices.getIndex("metadata.age")).thenReturn(index);
-        when(query.notBetween(18, false, 65, true)).thenReturn(Set.of("not-between", "data"));
+        when(query.notBetween(18, false, 65, true)).thenReturn(mutableSet("not-between", "data"));
         when(index.getKeyType()).thenReturn(Integer.class);
         var condition = Queries.between("metadata.age", 18, true, 65, false).not();
         condition.visit(visitor);
@@ -196,7 +197,7 @@ class QueryVisitorTest {
         var index = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
         var query = (ValueIndexQuery) index;
         when(indices.getIndex("metadata.description")).thenReturn(index);
-        when(query.stringContains("keyword")).thenReturn(Set.of("contains", "data"));
+        when(query.stringContains("keyword")).thenReturn(mutableSet("contains", "data"));
         var condition = Queries.contains("metadata.description", "keyword");
         condition.visit(visitor);
         assertEquals(Set.of("contains", "data"), visitor.getResult());
@@ -210,7 +211,7 @@ class QueryVisitorTest {
         var index = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
         var query = (ValueIndexQuery) index;
         when(indices.getIndex("metadata.description")).thenReturn(index);
-        when(query.stringNotContains("keyword")).thenReturn(Set.of("not-contains", "data"));
+        when(query.stringNotContains("keyword")).thenReturn(mutableSet("not-contains", "data"));
         var condition = Queries.contains("metadata.description", "keyword").not();
         condition.visit(visitor);
         assertEquals(Set.of("not-contains", "data"), visitor.getResult());
@@ -224,7 +225,7 @@ class QueryVisitorTest {
         var index = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
         var query = (ValueIndexQuery) index;
         when(indices.getIndex("metadata.title")).thenReturn(index);
-        when(query.stringStartsWith("prefix")).thenReturn(Set.of("starts-with", "data"));
+        when(query.stringStartsWith("prefix")).thenReturn(mutableSet("starts-with", "data"));
         var condition = Queries.startsWith("metadata.title", "prefix");
         condition.visit(visitor);
         assertEquals(Set.of("starts-with", "data"), visitor.getResult());
@@ -238,7 +239,7 @@ class QueryVisitorTest {
         var index = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
         var query = (ValueIndexQuery) index;
         when(indices.getIndex("metadata.title")).thenReturn(index);
-        when(query.stringNotStartsWith("prefix")).thenReturn(Set.of("not-starts-with", "data"));
+        when(query.stringNotStartsWith("prefix")).thenReturn(mutableSet("not-starts-with", "data"));
         var condition = Queries.startsWith("metadata.title", "prefix").not();
         condition.visit(visitor);
         assertEquals(Set.of("not-starts-with", "data"), visitor.getResult());
@@ -252,7 +253,7 @@ class QueryVisitorTest {
         var index = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
         var query = (ValueIndexQuery) index;
         when(indices.getIndex("metadata.title")).thenReturn(index);
-        when(query.stringEndsWith("suffix")).thenReturn(Set.of("ends-with", "data"));
+        when(query.stringEndsWith("suffix")).thenReturn(mutableSet("ends-with", "data"));
         var condition = Queries.endsWith("metadata.title", "suffix");
         condition.visit(visitor);
         assertEquals(Set.of("ends-with", "data"), visitor.getResult());
@@ -266,7 +267,7 @@ class QueryVisitorTest {
         var index = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
         var query = (ValueIndexQuery) index;
         when(indices.getIndex("metadata.title")).thenReturn(index);
-        when(query.stringNotEndsWith("suffix")).thenReturn(Set.of("not-ends-with", "data"));
+        when(query.stringNotEndsWith("suffix")).thenReturn(mutableSet("not-ends-with", "data"));
         var condition = Queries.endsWith("metadata.title", "suffix").not();
         condition.visit(visitor);
         assertEquals(Set.of("not-ends-with", "data"), visitor.getResult());
@@ -280,7 +281,7 @@ class QueryVisitorTest {
         var index = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
         var query = (ValueIndexQuery) index;
         when(indices.getIndex("metadata.optionalField")).thenReturn(index);
-        when(query.isNull()).thenReturn(Set.of("is-null", "data"));
+        when(query.isNull()).thenReturn(mutableSet("is-null", "data"));
         var condition = Queries.isNull("metadata.optionalField");
         condition.visit(visitor);
         assertEquals(Set.of("is-null", "data"), visitor.getResult());
@@ -291,7 +292,7 @@ class QueryVisitorTest {
         var index = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
         var query = (ValueIndexQuery) index;
         when(indices.getIndex("metadata.optionalField")).thenReturn(index);
-        when(query.isNotNull()).thenReturn(Set.of("is-not-null", "data"));
+        when(query.isNotNull()).thenReturn(mutableSet("is-not-null", "data"));
         var condition = Queries.isNull("metadata.optionalField").not();
         condition.visit(visitor);
         assertEquals(Set.of("is-not-null", "data"), visitor.getResult());
@@ -302,7 +303,7 @@ class QueryVisitorTest {
         var index = mock(Index.class, withSettings().extraInterfaces(LabelIndexQuery.class));
         var query = (LabelIndexQuery) index;
         when(indices.getIndex("metadata.labels")).thenReturn(index);
-        when(query.equal("env", "production")).thenReturn(Set.of("label-equal", "data"));
+        when(query.equal("env", "production")).thenReturn(mutableSet("label-equal", "data"));
         var condition = Queries.labelEqual("env", "production");
         condition.visit(visitor);
         assertEquals(Set.of("label-equal", "data"), visitor.getResult());
@@ -319,8 +320,8 @@ class QueryVisitorTest {
         var primaryQuery = (ValueIndexQuery) primaryIndex;
         when(indices.getIndex("metadata.labels")).thenReturn(index);
         when(indices.getIndex("metadata.name")).thenReturn(primaryIndex);
-        when(query.equal("env", "production")).thenReturn(Set.of("equal", "data"));
-        when(primaryQuery.all()).thenReturn(Set.of("all", "data"));
+        when(query.equal("env", "production")).thenReturn(mutableSet("equal", "data"));
+        when(primaryQuery.all()).thenReturn(mutableSet("all", "data"));
         var condition = Queries.labelEqual("env", "production").not();
         condition.visit(visitor);
         assertEquals(Set.of("all"), visitor.getResult());
@@ -331,7 +332,7 @@ class QueryVisitorTest {
         var index = mock(Index.class, withSettings().extraInterfaces(LabelIndexQuery.class));
         var query = (LabelIndexQuery) index;
         when(indices.getIndex("metadata.labels")).thenReturn(index);
-        when(query.in(eq("env"), eq(Set.of("production", "staging")))).thenReturn(Set.of("label-in", "data"));
+        when(query.in(eq("env"), eq(Set.of("production", "staging")))).thenReturn(mutableSet("label-in", "data"));
         var condition = Queries.labelIn("env", Set.of("production", "staging"));
         condition.visit(visitor);
         assertEquals(Set.of("label-in", "data"), visitor.getResult());
@@ -346,7 +347,8 @@ class QueryVisitorTest {
         var index = mock(Index.class, withSettings().extraInterfaces(LabelIndexQuery.class));
         var query = (LabelIndexQuery) index;
         when(indices.getIndex("metadata.labels")).thenReturn(index);
-        when(query.notIn(eq("env"), eq(Set.of("production", "staging")))).thenReturn(Set.of("label-not-in", "data"));
+        when(query.notIn(eq("env"), eq(Set.of("production", "staging"))))
+                .thenReturn(mutableSet("label-not-in", "data"));
         var condition = Queries.labelIn("env", Set.of("production", "staging")).not();
         condition.visit(visitor);
         assertEquals(Set.of("label-not-in", "data"), visitor.getResult());
@@ -361,7 +363,7 @@ class QueryVisitorTest {
         var index = mock(Index.class, withSettings().extraInterfaces(LabelIndexQuery.class));
         var query = (LabelIndexQuery) index;
         when(indices.getIndex("metadata.labels")).thenReturn(index);
-        when(query.exists("env")).thenReturn(Set.of("label-exists", "data"));
+        when(query.exists("env")).thenReturn(mutableSet("label-exists", "data"));
         var condition = Queries.labelExists("env");
         condition.visit(visitor);
         assertEquals(Set.of("label-exists", "data"), visitor.getResult());
@@ -375,8 +377,8 @@ class QueryVisitorTest {
         var primaryQuery = (ValueIndexQuery) primaryIndex;
         when(indices.getIndex("metadata.name")).thenReturn(primaryIndex);
         when(indices.getIndex("metadata.labels")).thenReturn(index);
-        when(query.exists("env")).thenReturn(Set.of("label-exists", "data"));
-        when(primaryQuery.all()).thenReturn(Set.of("all", "data"));
+        when(query.exists("env")).thenReturn(mutableSet("label-exists", "data"));
+        when(primaryQuery.all()).thenReturn(mutableSet("all", "data"));
         var condition = Queries.labelExists("env").not();
         condition.visit(visitor);
         assertEquals(Set.of("all"), visitor.getResult());
@@ -387,8 +389,8 @@ class QueryVisitorTest {
         var index = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
         var query = (ValueIndexQuery) index;
         when(indices.getIndex("metadata.name")).thenReturn(index);
-        when(query.equal("name1")).thenReturn(Set.of("name1", "data"));
-        when(query.equal("name2")).thenReturn(Set.of("name2", "data"));
+        when(query.equal("name1")).thenReturn(mutableSet("name1", "data"));
+        when(query.equal("name2")).thenReturn(mutableSet("name2", "data"));
         when(index.getKeyType()).thenReturn(String.class);
         var condition = Queries.equal("metadata.name", "name1").and(Queries.equal("metadata.name", "name2"));
         condition.visit(visitor);
@@ -400,8 +402,8 @@ class QueryVisitorTest {
         var index = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
         var query = (ValueIndexQuery) index;
         when(indices.getIndex("metadata.name")).thenReturn(index);
-        when(query.equal("name1")).thenReturn(Set.of("name1", "data"));
-        when(query.equal("name2")).thenReturn(Set.of("name2", "data"));
+        when(query.equal("name1")).thenReturn(mutableSet("name1", "data"));
+        when(query.equal("name2")).thenReturn(mutableSet("name2", "data"));
         when(index.getKeyType()).thenReturn(String.class);
         var condition = Queries.equal("metadata.name", "name1").or(Queries.equal("metadata.name", "name2"));
         condition.visit(visitor);
@@ -409,11 +411,53 @@ class QueryVisitorTest {
     }
 
     @Test
+    void shouldVisitAndConditionWhenRightResultIsSmaller() {
+        var index = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
+        var query = (ValueIndexQuery) index;
+        when(indices.getIndex("metadata.name")).thenReturn(index);
+        when(query.equal("name1")).thenReturn(mutableSet("name1", "name2", "data"));
+        when(query.equal("name2")).thenReturn(mutableSet("data"));
+        when(index.getKeyType()).thenReturn(String.class);
+        var condition = Queries.equal("metadata.name", "name1").and(Queries.equal("metadata.name", "name2"));
+        condition.visit(visitor);
+        assertEquals(Set.of("data"), visitor.getResult());
+    }
+
+    @Test
+    void shouldVisitOrConditionWhenRightResultIsLarger() {
+        var index = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
+        var query = (ValueIndexQuery) index;
+        when(indices.getIndex("metadata.name")).thenReturn(index);
+        when(query.equal("name1")).thenReturn(mutableSet("name1"));
+        when(query.equal("name2")).thenReturn(mutableSet("name2", "data"));
+        when(index.getKeyType()).thenReturn(String.class);
+        var condition = Queries.equal("metadata.name", "name1").or(Queries.equal("metadata.name", "name2"));
+        condition.visit(visitor);
+        assertEquals(Set.of("name1", "name2", "data"), visitor.getResult());
+    }
+
+    @Test
+    void shouldVisitNestedAndOrCondition() {
+        var index = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
+        var query = (ValueIndexQuery) index;
+        when(indices.getIndex("metadata.name")).thenReturn(index);
+        when(query.equal("name1")).thenReturn(mutableSet("a", "b", "c"));
+        when(query.equal("name2")).thenReturn(mutableSet("b", "c"));
+        when(query.equal("name3")).thenReturn(mutableSet("d"));
+        when(index.getKeyType()).thenReturn(String.class);
+        var condition = Queries.equal("metadata.name", "name1")
+                .and(Queries.equal("metadata.name", "name2"))
+                .or(Queries.equal("metadata.name", "name3"));
+        condition.visit(visitor);
+        assertEquals(Set.of("b", "c", "d"), visitor.getResult());
+    }
+
+    @Test
     void shouldVisiteNotCondition() {
         var index = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
         var query = (ValueIndexQuery) index;
         when(indices.getIndex("metadata.name")).thenReturn(index);
-        when(query.notEqual("name1")).thenReturn(Set.of("not-equal", "data"));
+        when(query.notEqual("name1")).thenReturn(mutableSet("not-equal", "data"));
         when(index.getKeyType()).thenReturn(String.class);
         var condition = new NotCondition(Queries.equal("metadata.name", "name1"));
         condition.visit(visitor);
@@ -425,7 +469,7 @@ class QueryVisitorTest {
         var index = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
         var query = (ValueIndexQuery) index;
         when(indices.getIndex("metadata.name")).thenReturn(index);
-        when(query.equal("name1")).thenReturn(Set.of("name1", "data"));
+        when(query.equal("name1")).thenReturn(mutableSet("name1", "data"));
         when(index.getKeyType()).thenReturn(String.class);
         var condition = Condition.empty().and(Queries.equal("metadata.name", "name1"));
         condition.visit(visitor);
@@ -437,7 +481,7 @@ class QueryVisitorTest {
         var index = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
         var query = (ValueIndexQuery) index;
         when(indices.getIndex("metadata.name")).thenReturn(index);
-        when(query.equal("name1")).thenReturn(Set.of("name1", "data"));
+        when(query.equal("name1")).thenReturn(mutableSet("name1", "data"));
         when(index.getKeyType()).thenReturn(String.class);
         var condition = Queries.equal("metadata.name", "name1").and(Condition.empty());
         condition.visit(visitor);
@@ -449,7 +493,7 @@ class QueryVisitorTest {
         var index = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
         var query = (ValueIndexQuery) index;
         when(indices.getIndex("metadata.name")).thenReturn(index);
-        when(query.all()).thenReturn(Set.of("all"));
+        when(query.all()).thenReturn(mutableSet("all"));
         var condition = Condition.empty().or(Queries.equal("metadata.name", "name1"));
         condition.visit(visitor);
         assertEquals(Set.of("all"), visitor.getResult());
@@ -462,7 +506,7 @@ class QueryVisitorTest {
         var index = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
         var query = (ValueIndexQuery) index;
         when(indices.getIndex("metadata.name")).thenReturn(index);
-        when(query.all()).thenReturn(Set.of("all"));
+        when(query.all()).thenReturn(mutableSet("all"));
         var condition = Queries.equal("metadata.name", "name1").or(Condition.empty());
         condition.visit(visitor);
         assertEquals(Set.of("all"), visitor.getResult());
@@ -475,7 +519,7 @@ class QueryVisitorTest {
         var index = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
         var query = (ValueIndexQuery) index;
         when(indices.getIndex("metadata.name")).thenReturn(index);
-        when(query.all()).thenReturn(Set.of("all"));
+        when(query.all()).thenReturn(mutableSet("all"));
         var condition = Condition.empty().and(Condition.empty());
         condition.visit(visitor);
         assertEquals(Set.of("all"), visitor.getResult());
@@ -488,7 +532,7 @@ class QueryVisitorTest {
         var index = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
         var query = (ValueIndexQuery) index;
         when(indices.getIndex("metadata.name")).thenReturn(index);
-        when(query.all()).thenReturn(Set.of("all"));
+        when(query.all()).thenReturn(mutableSet("all"));
         var condition = Condition.empty().or(Condition.empty());
         condition.visit(visitor);
         assertEquals(Set.of("all"), visitor.getResult());
@@ -534,5 +578,9 @@ class QueryVisitorTest {
         assertThrows(ConversionFailedException.class, (() -> {
             condition.visit(visitor);
         }));
+    }
+
+    private static Set<String> mutableSet(String... values) {
+        return new HashSet<>(Set.of(values));
     }
 }

@@ -68,6 +68,7 @@ import run.halo.app.infra.exception.EmailAlreadyTakenException;
 import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.infra.exception.UserNotFoundException;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
+import run.halo.app.security.device.DeviceService;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
@@ -98,6 +99,9 @@ class UserServiceImplTest {
 
     @Mock
     ReactiveSessionRegistry sessionRegistry;
+
+    @Mock
+    DeviceService deviceService;
 
     @InjectMocks
     UserServiceImpl userService;
@@ -380,6 +384,38 @@ class UserServiceImplTest {
                     .verifyComplete();
 
             verify(client).update(notProvidedRoleBinding);
+        }
+    }
+
+    @Nested
+    class DisableTest {
+
+        @BeforeEach
+        void setUp() {
+            var tx = mock(ReactiveTransaction.class);
+
+            when(txManager.getReactiveTransaction(any())).thenReturn(Mono.just(tx));
+            when(txManager.commit(tx)).thenReturn(Mono.empty());
+        }
+
+        @Test
+        void shouldRevokeDevicesAndInvalidateSessions() {
+            var user = createUser("fake-password");
+            when(client.fetch(User.class, "fake-user")).thenReturn(Mono.just(user));
+            when(deviceService.revoke("fake-user")).thenReturn(Mono.empty());
+            var session = mock(ReactiveSessionInformation.class);
+            when(session.invalidate()).thenReturn(Mono.empty());
+            when(sessionRegistry.getAllSessions("fake-user")).thenReturn(Flux.just(session));
+            when(client.update(user)).thenReturn(Mono.just(user));
+
+            StepVerifier.create(userService.disable("fake-user"))
+                    .assertNext(disabledUser ->
+                            assertThat(disabledUser.getSpec().getDisabled()).isTrue())
+                    .verifyComplete();
+
+            verify(deviceService).revoke("fake-user");
+            verify(session).invalidate();
+            verify(client).update(user);
         }
     }
 

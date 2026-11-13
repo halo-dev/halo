@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -20,6 +22,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -125,6 +128,23 @@ class CategoryFinderImplTest {
                         .map(categoryVo -> categoryVo.getMetadata().getName())
                         .toList())
                 .isEqualTo(List.of("c3", "c2", "hello"));
+    }
+
+    @Test
+    void listAllUsesHideFromListIndexUnlessParentIsHidden() {
+        when(client.listAll(eq(Category.class), any(ListOptions.class), any(Sort.class)))
+                .thenReturn(Flux.empty());
+        when(categoryService.isCategoryHidden("hidden")).thenReturn(Mono.just(true));
+
+        categoryFinder.listAll().collectList().block();
+        categoryFinder.listAsTree("visible").collectList().block();
+        categoryFinder.listAsTree("hidden").collectList().block();
+
+        var optionsCaptor = ArgumentCaptor.forClass(ListOptions.class);
+        verify(client, times(3)).listAll(eq(Category.class), optionsCaptor.capture(), any(Sort.class));
+        assertThat(optionsCaptor.getAllValues())
+                .extracting(options -> options.toCondition().toString())
+                .containsExactly("spec.hideFromList != true", "spec.hideFromList != true", "EMPTY");
     }
 
     @Test

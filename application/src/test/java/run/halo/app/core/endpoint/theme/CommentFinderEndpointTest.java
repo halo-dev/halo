@@ -16,6 +16,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.comment.CommentRequest;
@@ -143,6 +144,29 @@ class CommentFinderEndpointTest {
         verify(commentPublicQueryService, times(1)).list(refCaptor.capture(), any(PageRequest.class));
         Ref value = refCaptor.getValue();
         assertThat(value).isEqualTo(ref);
+    }
+
+    @Test
+    void listCommentsWithCreationTimestampSort() {
+        when(commentPublicQueryService.list(any(), any(PageRequest.class)))
+                .thenReturn(Mono.just(new ListResult<>(1, 10, 0, List.of())));
+
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/comments")
+                        .queryParam("kind", "Post")
+                        .queryParam("name", "test")
+                        .queryParam("sort", "creationTimestamp,desc")
+                        .build())
+                .exchange()
+                .expectStatus()
+                .isOk();
+
+        var pageRequestCaptor = ArgumentCaptor.forClass(PageRequest.class);
+        verify(commentPublicQueryService).list(any(), pageRequestCaptor.capture());
+        assertThat(pageRequestCaptor.getValue().getSort())
+                .isEqualTo(Sort.by(Sort.Order.desc("metadata.creationTimestamp")));
     }
 
     @Test

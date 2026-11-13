@@ -98,9 +98,9 @@ public class CategoryFinderImpl implements CategoryFinder {
 
     @Override
     public Flux<CategoryVo> listAll() {
-        return client.listAll(Category.class, new ListOptions(), defaultSort())
-                .filter(category -> !category.getSpec().isHideFromList())
-                .map(CategoryVo::from);
+        var listOptions = new ListOptions();
+        listOptions.setFieldSelector(FieldSelector.of(notEqual("spec.hideFromList", BooleanUtils.TRUE)));
+        return client.listAll(Category.class, listOptions, defaultSort()).map(CategoryVo::from);
     }
 
     private Flux<CategoryVo> listAllFor(String parentName) {
@@ -110,14 +110,13 @@ public class CategoryFinderImpl implements CategoryFinder {
                     }
                     return categoryService.isCategoryHidden(parentName);
                 })
-                .flatMapMany(isHidden -> client.listAll(Category.class, new ListOptions(), defaultSort())
-                        .filter(category -> {
-                            if (isHidden) {
-                                return true;
-                            }
-                            return !category.getSpec().isHideFromList();
-                        })
-                        .map(CategoryVo::from));
+                .flatMapMany(isHidden -> {
+                    if (isHidden) {
+                        return client.listAll(Category.class, new ListOptions(), defaultSort())
+                                .map(CategoryVo::from);
+                    }
+                    return listAll();
+                });
     }
 
     private List<CategoryTreeVo> listToTree(List<CategoryVo> categoryVos, @Nullable String name) {

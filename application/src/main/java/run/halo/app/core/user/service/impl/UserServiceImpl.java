@@ -398,10 +398,23 @@ public class UserServiceImpl implements UserService {
         var tx = TransactionalOperator.create(transactionManager);
         return client.fetch(User.class, username)
                 .filter(user -> !Boolean.TRUE.equals(user.getSpec().getDisabled()))
-                .flatMap(user -> deviceService.revoke(username).thenReturn(user))
+                .flatMap(user -> revokeSessions(username).thenReturn(user))
                 .doOnNext(user -> user.getSpec().setDisabled(true))
                 .flatMap(client::update)
                 .as(tx::transactional);
+    }
+
+    private Mono<Void> revokeSessions(String username) {
+        var revokeDevices = deviceService.revoke(username);
+        var invalidateSessions = sessionRegistry
+                .getAllSessions(username)
+                .flatMap(reactiveSessionInformation -> {
+                    log.info(
+                            "Invalidating session {} for user {}", reactiveSessionInformation.getSessionId(), username);
+                    return reactiveSessionInformation.invalidate();
+                })
+                .then();
+        return revokeDevices.then(invalidateSessions);
     }
 
     @Override

@@ -25,7 +25,7 @@ public class QueryVisitor<E extends Extension> implements Visitor {
 
     private final Indices<E> indices;
 
-    private final Set<String> result;
+    private Set<String> result;
 
     public QueryVisitor(Indices<E> indices, ConversionService conversionService) {
         this.indices = indices;
@@ -37,7 +37,7 @@ public class QueryVisitor<E extends Extension> implements Visitor {
     public void enter(Visitable segment) {
         var visitor = new ConditionVisitor();
         segment.visit(visitor);
-        result.addAll(visitor.getResult());
+        this.result = visitor.getResult();
     }
 
     public Set<String> getResult() {
@@ -47,10 +47,14 @@ public class QueryVisitor<E extends Extension> implements Visitor {
     class ConditionVisitor implements Visitor {
 
         @Getter
-        private final Set<String> result;
+        private Set<String> result;
 
         ConditionVisitor() {
             result = new HashSet<>();
+        }
+
+        private void setResult(Set<String> result) {
+            this.result = result;
         }
 
         @Override
@@ -59,92 +63,124 @@ public class QueryVisitor<E extends Extension> implements Visitor {
                 case And(var left, var right) ->
                     // delegate to AndCondition for backward compatibility
                     new AndCondition(left, right).visit(this);
-                case EmptyCondition ignored -> result.addAll(allQuery("metadata.name", false));
-                case AndCondition(var left, var right) -> {
-                    if (left instanceof EmptyCondition) {
-                        right.visit(this);
-                        return;
-                    }
-                    if (right instanceof EmptyCondition) {
-                        left.visit(this);
-                        return;
-                    }
-                    left.visit(this);
-                    // fail fast if left result is empty
-                    if (!result.isEmpty()) {
-                        var rightVisitor = new ConditionVisitor();
-                        right.visit(rightVisitor);
-                        result.retainAll(rightVisitor.getResult());
-                    }
-                }
-                case OrCondition(var left, var right) -> {
-                    if (left instanceof EmptyCondition) {
-                        left.visit(this);
-                        return;
-                    }
-                    if (right instanceof EmptyCondition) {
-                        right.visit(this);
-                        return;
-                    }
-                    left.visit(this);
-                    var rightVisitor = new ConditionVisitor();
-                    right.visit(rightVisitor);
-                    result.addAll(rightVisitor.getResult());
-                }
+                case EmptyCondition ignored -> setResult(allQuery("metadata.name", false));
+                case AndCondition(var left, var right) -> visitAnd(left, right);
+                case OrCondition(var left, var right) -> visitOr(left, right);
                 case NotCondition(var condition) -> {
                     if (condition instanceof EmptyCondition) {
                         return;
                     }
                     condition.not().visit(this);
                 }
-                case EqualCondition(var indexName, var key) -> result.addAll(equalQuery(indexName, key, false));
-                case NotEqualCondition(var indexName, var key) -> result.addAll(equalQuery(indexName, key, true));
-                case InCondition(var indexName, var keys) -> result.addAll(inQuery(indexName, keys, false));
-                case NotInCondition(var indexName, var keys) -> result.addAll(inQuery(indexName, keys, true));
+                case EqualCondition(var indexName, var key) -> setResult(equalQuery(indexName, key, false));
+                case NotEqualCondition(var indexName, var key) -> setResult(equalQuery(indexName, key, true));
+                case InCondition(var indexName, var keys) -> setResult(inQuery(indexName, keys, false));
+                case NotInCondition(var indexName, var keys) -> setResult(inQuery(indexName, keys, true));
                 case LessThanCondition(var indexName, var upperBound, var inclusive) ->
-                    result.addAll(lessThanQuery(indexName, upperBound, inclusive, false));
+                    setResult(lessThanQuery(indexName, upperBound, inclusive, false));
                 case GreaterThanCondition(var indexName, var lowerBound, var inclusive) ->
-                    result.addAll(lessThanQuery(indexName, lowerBound, inclusive, true));
+                    setResult(lessThanQuery(indexName, lowerBound, inclusive, true));
                 case BetweenCondition bc ->
-                    result.addAll(betweenQuery(
+                    setResult(betweenQuery(
                             bc.indexName(), bc.fromKey(), bc.fromInclusive(), bc.toKey(), bc.toInclusive(), false));
                 case NotBetweenCondition nbc ->
-                    result.addAll(betweenQuery(
+                    setResult(betweenQuery(
                             nbc.indexName(), nbc.fromKey(), nbc.fromInclusive(), nbc.toKey(), nbc.toInclusive(), true));
-                case IsNullCondition(var indexName) -> result.addAll(isNullQuery(indexName, false));
-                case IsNotNullCondition(var indexName) -> result.addAll(isNullQuery(indexName, true));
+                case IsNullCondition(var indexName) -> setResult(isNullQuery(indexName, false));
+                case IsNotNullCondition(var indexName) -> setResult(isNullQuery(indexName, true));
                 case StringContainsCondition(var indexName, var keyword) ->
-                    result.addAll(stringContainsQuery(indexName, keyword, false));
+                    setResult(stringContainsQuery(indexName, keyword, false));
                 case StringNotContainsCondition(var indexName, var keyword) ->
-                    result.addAll(stringContainsQuery(indexName, keyword, true));
+                    setResult(stringContainsQuery(indexName, keyword, true));
                 case StringStartsWithCondition(var indexName, var prefix) ->
-                    result.addAll(stringStartsWithQuery(indexName, prefix, false));
+                    setResult(stringStartsWithQuery(indexName, prefix, false));
                 case StringNotStartsWithCondition(var indexName, var prefix) ->
-                    result.addAll(stringStartsWithQuery(indexName, prefix, true));
+                    setResult(stringStartsWithQuery(indexName, prefix, true));
                 case StringEndsWithCondition(var indexName, var suffix) ->
-                    result.addAll(stringEndsWithQuery(indexName, suffix, false));
+                    setResult(stringEndsWithQuery(indexName, suffix, false));
                 case StringNotEndsWithCondition(var indexName, var suffix) ->
-                    result.addAll(stringEndsWithQuery(indexName, suffix, true));
-                case AllCondition(var indexName) -> result.addAll(allQuery(indexName, false));
-                case NoneCondition(var indexName) -> result.addAll(allQuery(indexName, true));
-                case LabelExistsCondition(var labelKey) -> result.addAll(labelExistsQuery(labelKey));
+                    setResult(stringEndsWithQuery(indexName, suffix, true));
+                case AllCondition(var indexName) -> setResult(allQuery(indexName, false));
+                case NoneCondition(var indexName) -> setResult(allQuery(indexName, true));
+                case LabelExistsCondition(var labelKey) -> setResult(labelExistsQuery(labelKey));
                 case LabelNotExistsCondition(var labelKey) -> {
                     // To get all extensions that do not have the label, we get all extensions
-                    result.addAll(allQuery("metadata.name", false));
-                    result.removeAll(labelExistsQuery(labelKey));
+                    var allResult = allQuery("metadata.name", false);
+                    allResult.removeAll(labelExistsQuery(labelKey));
+                    setResult(allResult);
                 }
                 case LabelEqualsCondition(var labelKey, var labelValue) ->
-                    result.addAll(labelEqualsQuery(labelKey, labelValue, false));
+                    setResult(labelEqualsQuery(labelKey, labelValue, false));
                 case LabelNotEqualsCondition(var labelKey, var labelValue) -> {
                     // Only for backward compatibility
-                    result.addAll(allQuery("metadata.name", false));
-                    result.removeAll(labelEqualsQuery(labelKey, labelValue, false));
+                    var allResult = allQuery("metadata.name", false);
+                    allResult.removeAll(labelEqualsQuery(labelKey, labelValue, false));
+                    setResult(allResult);
                 }
                 case LabelInCondition(var labelKey, var labelValues) ->
-                    result.addAll(labelInQuery(labelKey, labelValues, false));
+                    setResult(labelInQuery(labelKey, labelValues, false));
                 case LabelNotInCondition(var labelKey, var labelValues) ->
-                    result.addAll(labelInQuery(labelKey, labelValues, true));
+                    setResult(labelInQuery(labelKey, labelValues, true));
                 default -> {}
+            }
+        }
+
+        private void visitAnd(Condition left, Condition right) {
+            if (left instanceof EmptyCondition) {
+                right.visit(this);
+                return;
+            }
+            if (right instanceof EmptyCondition) {
+                left.visit(this);
+                return;
+            }
+            left.visit(this);
+            // fail fast if left result is empty
+            if (result.isEmpty()) {
+                return;
+            }
+            var rightVisitor = new ConditionVisitor();
+            right.visit(rightVisitor);
+            var rightResult = rightVisitor.getResult();
+            if (rightResult.isEmpty()) {
+                setResult(rightResult);
+                return;
+            }
+            // Retain on the smaller set to avoid copying the larger one.
+            if (result.size() <= rightResult.size()) {
+                result.retainAll(rightResult);
+            } else {
+                rightResult.retainAll(result);
+                setResult(rightResult);
+            }
+        }
+
+        private void visitOr(Condition left, Condition right) {
+            if (left instanceof EmptyCondition) {
+                left.visit(this);
+                return;
+            }
+            if (right instanceof EmptyCondition) {
+                right.visit(this);
+                return;
+            }
+            left.visit(this);
+            var rightVisitor = new ConditionVisitor();
+            right.visit(rightVisitor);
+            var rightResult = rightVisitor.getResult();
+            if (result.isEmpty()) {
+                setResult(rightResult);
+                return;
+            }
+            if (rightResult.isEmpty()) {
+                return;
+            }
+            // Add into the larger set to reduce resizing and copying.
+            if (result.size() >= rightResult.size()) {
+                result.addAll(rightResult);
+            } else {
+                rightResult.addAll(result);
+                setResult(rightResult);
             }
         }
 
@@ -180,7 +216,7 @@ public class QueryVisitor<E extends Extension> implements Visitor {
         private Set<String> allQuery(String indexName, boolean negated) {
             var index = getValueIndexQuery(indexName);
             if (negated) {
-                return Set.of();
+                return new HashSet<>();
             }
             return index.all();
         }

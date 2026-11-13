@@ -55,7 +55,7 @@ class SingleValueIndex<E extends Extension, K extends Comparable<K>> implements 
     @Override
     public Set<String> equal(K key) {
         var primaryKeys = index.get(key);
-        return CollectionUtils.isEmpty(primaryKeys) ? Set.of() : new HashSet<>(primaryKeys);
+        return CollectionUtils.isEmpty(primaryKeys) ? new HashSet<>() : new HashSet<>(primaryKeys);
     }
 
     @Override
@@ -64,12 +64,12 @@ class SingleValueIndex<E extends Extension, K extends Comparable<K>> implements 
                 .filter(entry -> !Objects.equals(entry.getKey(), key))
                 .map(Map.Entry::getValue)
                 .flatMap(Set::stream)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(HashSet::new));
     }
 
     @Override
     public Set<String> all() {
-        return invertedIndex.keySet();
+        return new HashSet<>(invertedIndex.keySet());
     }
 
     @Override
@@ -79,7 +79,7 @@ class SingleValueIndex<E extends Extension, K extends Comparable<K>> implements 
         Assert.isTrue(fromKey.compareTo(toKey) <= 0, "From key must be less than or equal to to key");
         return index.subMap(fromKey, fromInclusive, toKey, toInclusive).values().stream()
                 .flatMap(Set::stream)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(HashSet::new));
     }
 
     @Override
@@ -91,26 +91,26 @@ class SingleValueIndex<E extends Extension, K extends Comparable<K>> implements 
                         index.headMap(fromKey, !fromInclusive).values().stream(),
                         index.tailMap(toKey, !toInclusive).values().stream())
                 .flatMap(Set::stream)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(HashSet::new));
     }
 
     @Override
     public Set<String> in(Collection<K> keys) {
         if (CollectionUtils.isEmpty(keys)) {
-            return Set.of();
+            return new HashSet<>();
         }
         return keys.stream()
                 .distinct()
                 .map(index::get)
                 .filter(Objects::nonNull)
                 .flatMap(Set::stream)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(HashSet::new));
     }
 
     @Override
     public Set<String> notIn(Collection<K> keys) {
         if (CollectionUtils.isEmpty(keys)) {
-            return Set.of();
+            return new HashSet<>();
         }
         var keySet = keys instanceof Set<K> set ? set : new HashSet<>(keys);
         return index.entrySet().stream()
@@ -118,7 +118,7 @@ class SingleValueIndex<E extends Extension, K extends Comparable<K>> implements 
                 .filter(entry -> !keySet.contains(entry.getKey()))
                 .map(Map.Entry::getValue)
                 .flatMap(Set::stream)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(HashSet::new));
     }
 
     @Override
@@ -126,7 +126,7 @@ class SingleValueIndex<E extends Extension, K extends Comparable<K>> implements 
         Assert.notNull(key, "Key must not be null");
         return index.headMap(key, inclusive).values().stream()
                 .flatMap(Set::stream)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(HashSet::new));
     }
 
     @Override
@@ -134,7 +134,7 @@ class SingleValueIndex<E extends Extension, K extends Comparable<K>> implements 
         Assert.notNull(key, "Key must not be null");
         return index.tailMap(key, inclusive).values().stream()
                 .flatMap(Set::stream)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(HashSet::new));
     }
 
     @Override
@@ -146,7 +146,7 @@ class SingleValueIndex<E extends Extension, K extends Comparable<K>> implements 
     @Override
     public Set<String> isNotNull() {
         Assert.isTrue(spec.isNullable(), "Index is not nullable");
-        return index.values().stream().flatMap(Set::stream).collect(Collectors.toSet());
+        return index.values().stream().flatMap(Set::stream).collect(Collectors.toCollection(HashSet::new));
     }
 
     @Override
@@ -156,7 +156,7 @@ class SingleValueIndex<E extends Extension, K extends Comparable<K>> implements 
                 .filter(entry -> StringUtils.containsIgnoreCase(entry.getKey().toString(), keyword))
                 .map(Map.Entry::getValue)
                 .flatMap(Set::stream)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(HashSet::new));
     }
 
     @Override
@@ -166,7 +166,7 @@ class SingleValueIndex<E extends Extension, K extends Comparable<K>> implements 
                 .filter(entry -> !StringUtils.containsIgnoreCase(entry.getKey().toString(), keyword))
                 .map(Map.Entry::getValue)
                 .flatMap(Set::stream)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(HashSet::new));
     }
 
     @Override
@@ -175,7 +175,7 @@ class SingleValueIndex<E extends Extension, K extends Comparable<K>> implements 
         var toKey = prefix + Character.MAX_VALUE;
         return index.subMap((K) prefix, true, (K) toKey, true).values().stream()
                 .flatMap(Set::stream)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(HashSet::new));
     }
 
     @Override
@@ -186,7 +186,7 @@ class SingleValueIndex<E extends Extension, K extends Comparable<K>> implements 
                         index.headMap((K) prefix, false).values().stream(),
                         index.tailMap((K) toKey, true).values().stream())
                 .flatMap(Set::stream)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(HashSet::new));
     }
 
     @Override
@@ -196,7 +196,7 @@ class SingleValueIndex<E extends Extension, K extends Comparable<K>> implements 
                 .filter(entry -> StringUtils.endsWithIgnoreCase(entry.getKey().toString(), suffix))
                 .map(Map.Entry::getValue)
                 .flatMap(Set::stream)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(HashSet::new));
     }
 
     @Override
@@ -206,7 +206,7 @@ class SingleValueIndex<E extends Extension, K extends Comparable<K>> implements 
                 .filter(entry -> !StringUtils.endsWithIgnoreCase(entry.getKey().toString(), suffix))
                 .map(Map.Entry::getValue)
                 .flatMap(Set::stream)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(HashSet::new));
     }
 
     @Override

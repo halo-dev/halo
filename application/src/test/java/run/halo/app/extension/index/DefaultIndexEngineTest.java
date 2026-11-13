@@ -7,6 +7,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -97,7 +98,7 @@ class DefaultIndexEngineTest {
                 ListOptions.builder().andQuery(Queries.all("metadata.name")).build();
         var page = PageRequestImpl.of(2, 2);
         when(indices.<String>getIndex("metadata.name")).thenReturn(singleValueIndex);
-        when(singleValueIndex.all()).thenReturn(Set.of("1", "2", "3", "4", "5", "6"));
+        when(singleValueIndex.all()).thenReturn(mutableSet("1", "2", "3", "4", "5", "6"));
         var result = engine.retrieve(Fake.class, options, page);
         assertEquals(6, result.getTotal());
         assertEquals(List.of("3", "4"), result.getItems());
@@ -106,7 +107,7 @@ class DefaultIndexEngineTest {
     @Test
     void shouldRetrieveWithConditionsAndFirstPage() {
         when(indices.<String>getIndex("metadata.name")).thenReturn(singleValueIndex);
-        when(singleValueIndex.all()).thenReturn(Set.of("1", "2", "3", "4", "5", "6"));
+        when(singleValueIndex.all()).thenReturn(mutableSet("1", "2", "3", "4", "5", "6"));
         var options =
                 ListOptions.builder().andQuery(Queries.all("metadata.name")).build();
         var page = PageRequestImpl.of(1, 4);
@@ -118,7 +119,7 @@ class DefaultIndexEngineTest {
     @Test
     void shouldRetrieveWithConditionsAndLastPage() {
         when(indices.<String>getIndex("metadata.name")).thenReturn(singleValueIndex);
-        when(singleValueIndex.all()).thenReturn(Set.of("1", "2", "3", "4", "5", "6"));
+        when(singleValueIndex.all()).thenReturn(mutableSet("1", "2", "3", "4", "5", "6"));
         var options =
                 ListOptions.builder().andQuery(Queries.all("metadata.name")).build();
         var page = PageRequestImpl.of(2, 4);
@@ -130,7 +131,7 @@ class DefaultIndexEngineTest {
     @Test
     void shouldRetrieveWithConditionsAndExceededPage() {
         when(indices.<String>getIndex("metadata.name")).thenReturn(singleValueIndex);
-        when(singleValueIndex.all()).thenReturn(Set.of("1", "2", "3", "4", "5", "6"));
+        when(singleValueIndex.all()).thenReturn(mutableSet("1", "2", "3", "4", "5", "6"));
         var options =
                 ListOptions.builder().andQuery(Queries.all("metadata.name")).build();
         var page = PageRequestImpl.of(4, 2);
@@ -143,7 +144,7 @@ class DefaultIndexEngineTest {
     void shouldRetrieveWithMultipleSortOrders() {
         when(indices.<String>getIndex("metadata.name")).thenReturn(singleValueIndex);
         when(indices.<Instant>getIndex("metadata.creationTimestamp")).thenReturn(creationTimestampIndex);
-        when(singleValueIndex.all()).thenReturn(Set.of("a", "b", "c"));
+        when(singleValueIndex.all()).thenReturn(mutableSet("a", "b", "c"));
         when(singleValueIndex.getKey("a")).thenReturn("a");
         when(singleValueIndex.getKey("b")).thenReturn("b");
         when(singleValueIndex.getKey("c")).thenReturn("c");
@@ -166,7 +167,7 @@ class DefaultIndexEngineTest {
     void shouldPaginateStablyWhenSortKeysAreEqual() {
         when(indices.<String>getIndex("metadata.name")).thenReturn(singleValueIndex);
         when(indices.<Instant>getIndex("metadata.creationTimestamp")).thenReturn(creationTimestampIndex);
-        when(singleValueIndex.all()).thenReturn(Set.of("a", "b", "c", "d", "e", "f"));
+        when(singleValueIndex.all()).thenReturn(mutableSet("a", "b", "c", "d", "e", "f"));
         when(creationTimestampIndex.getKey(anyString())).thenReturn(Instant.EPOCH);
 
         var options =
@@ -185,7 +186,7 @@ class DefaultIndexEngineTest {
     void shouldSortByMultiValueIndexAndTreatEmptyKeysAsNull() {
         when(indices.<String>getIndex("metadata.name")).thenReturn(singleValueIndex);
         when(indices.<String>getIndex("spec.tags")).thenReturn(multiValueIndex);
-        when(singleValueIndex.all()).thenReturn(Set.of("a", "b", "c"));
+        when(singleValueIndex.all()).thenReturn(mutableSet("a", "b", "c"));
         when(multiValueIndex.getKeys("a")).thenReturn(Set.of("z"));
         when(multiValueIndex.getKeys("b")).thenReturn(Set.of());
         when(multiValueIndex.getKeys("c")).thenReturn(Set.of("m"));
@@ -219,7 +220,7 @@ class DefaultIndexEngineTest {
             retained.setStringValues(Set.of("m"));
             engine.insert(List.of(deleted, retained));
 
-            // Sort indexes are resolved after the query has copied the candidate names.
+            // Sort indexes are resolved after the query has captured the candidate names.
             doAnswer(invocation -> {
                         if ("stringValues".equals(invocation.getArgument(0))) {
                             realIndices.delete(deleted);
@@ -273,7 +274,7 @@ class DefaultIndexEngineTest {
     @Test
     void shouldRetrieveTopNWithoutSort() {
         when(indices.<String>getIndex("metadata.name")).thenReturn(singleValueIndex);
-        when(singleValueIndex.all()).thenReturn(Set.of("3", "1", "2"));
+        when(singleValueIndex.all()).thenReturn(mutableSet("3", "1", "2"));
 
         var options =
                 ListOptions.builder().andQuery(Queries.all("metadata.name")).build();
@@ -307,7 +308,7 @@ class DefaultIndexEngineTest {
         var options =
                 ListOptions.builder().andQuery(Queries.all("metadata.name")).build();
         when(indices.<String>getIndex("metadata.name")).thenReturn(singleValueIndex);
-        when(singleValueIndex.all()).thenReturn(Set.of("1", "2", "3"));
+        when(singleValueIndex.all()).thenReturn(mutableSet("1", "2", "3"));
         when(singleValueIndex.getKey("1")).thenReturn("1");
         when(singleValueIndex.getKey("2")).thenReturn("2");
         when(singleValueIndex.getKey("3")).thenReturn("3");
@@ -322,7 +323,7 @@ class DefaultIndexEngineTest {
         var options =
                 ListOptions.builder().andQuery(Queries.all("metadata.name")).build();
         when(indices.<String>getIndex("metadata.name")).thenReturn(singleValueIndex);
-        when(singleValueIndex.all()).thenReturn(Set.of("1", "2", "3", "4", "5"));
+        when(singleValueIndex.all()).thenReturn(mutableSet("1", "2", "3", "4", "5"));
         when(singleValueIndex.getKey("1")).thenReturn("1");
         when(singleValueIndex.getKey("2")).thenReturn("2");
         when(singleValueIndex.getKey("3")).thenReturn("3");
@@ -344,7 +345,7 @@ class DefaultIndexEngineTest {
         var options =
                 ListOptions.builder().andQuery(Queries.all("metadata.name")).build();
         when(indices.<String>getIndex("metadata.name")).thenReturn(singleValueIndex);
-        when(singleValueIndex.all()).thenReturn(Set.of("1", "2", "3", "4"));
+        when(singleValueIndex.all()).thenReturn(mutableSet("1", "2", "3", "4"));
         var count = engine.count(Fake.class, options);
         assertEquals(4L, count);
     }
@@ -354,5 +355,9 @@ class DefaultIndexEngineTest {
         fake.setMetadata(new Metadata());
         fake.getMetadata().setName(name);
         return fake;
+    }
+
+    private static Set<String> mutableSet(String... values) {
+        return new HashSet<>(Set.of(values));
     }
 }

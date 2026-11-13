@@ -52,13 +52,13 @@ class InitializeRedirectionWebFilter implements WebFilter {
                 return chain.filter(exchange);
             }
             return initializationStateGetter
-                    .userInitialized()
+                    .setupRequired()
                     .defaultIfEmpty(false)
-                    .flatMap(initialized -> {
-                        if (initialized) {
+                    .flatMap(setupRequired -> {
+                        if (!setupRequired) {
                             return chain.filter(exchange);
                         }
-                        // Redirect to set up page if system is not initialized.
+                        // Redirect to set up page if the system setup is required or was interrupted.
                         return redirectStrategy.sendRedirect(exchange, location);
                     });
         });

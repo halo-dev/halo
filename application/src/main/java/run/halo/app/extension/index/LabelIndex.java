@@ -80,13 +80,13 @@ class LabelIndex<E extends Extension> implements LabelIndexQuery, Index<E, Strin
                 .values()
                 .stream()
                 .flatMap(Set::stream)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(HashSet::new));
     }
 
     @Override
     public Set<String> equal(String labelKey, String labelValue) {
-        return Optional.ofNullable(index.get(new LabelEntry(labelKey, labelValue)))
-                .orElse(Set.of());
+        var primaryKeys = index.get(new LabelEntry(labelKey, labelValue));
+        return primaryKeys == null ? new HashSet<>() : new HashSet<>(primaryKeys);
     }
 
     @Override
@@ -102,13 +102,13 @@ class LabelIndex<E extends Extension> implements LabelIndexQuery, Index<E, Strin
                 .filter(entry -> !Objects.equals(entry.getKey(), labelEntry))
                 .map(Map.Entry::getValue)
                 .flatMap(Set::stream)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(HashSet::new));
     }
 
     @Override
     public Set<String> in(String labelKey, Collection<String> labelValues) {
         if (CollectionUtils.isEmpty(labelValues)) {
-            return Set.of();
+            return new HashSet<>();
         }
         return labelValues.stream()
                 .distinct()
@@ -116,13 +116,13 @@ class LabelIndex<E extends Extension> implements LabelIndexQuery, Index<E, Strin
                 .map(index::get)
                 .filter(Objects::nonNull)
                 .flatMap(Set::stream)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(HashSet::new));
     }
 
     @Override
     public Set<String> notIn(String labelKey, Collection<String> labelValues) {
         if (CollectionUtils.isEmpty(labelValues)) {
-            return Set.of();
+            return new HashSet<>();
         }
         var valueSet = labelValues instanceof Set<String> set ? set : Set.copyOf(labelValues);
         return index
@@ -134,7 +134,7 @@ class LabelIndex<E extends Extension> implements LabelIndexQuery, Index<E, Strin
                 .filter(entry -> !valueSet.contains(entry.getKey().labelValue()))
                 .map(Map.Entry::getValue)
                 .flatMap(Set::stream)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(HashSet::new));
     }
 
     record LabelEntry(String labelKey, @Nullable String labelValue) implements Comparable<LabelEntry> {
