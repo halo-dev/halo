@@ -598,6 +598,7 @@
   "core.plugin.operations.reload.description": "Reloading the plugin will reload its code and may cause a brief interruption to plugin functionality. Do you want to continue?",
   "core.plugin.operations.reload.toast_success": "Reloaded successfully",
   "core.plugin.operations.reload_window.button": "Reload required",
+  "core.plugin.filters.author.label": "Author",
   "core.plugin.filters.status.items.active": "Active",
   "core.plugin.filters.status.items.inactive": "Inactive",
   "core.plugin.filters.sort.items.create_time_desc": "Latest Installed",
