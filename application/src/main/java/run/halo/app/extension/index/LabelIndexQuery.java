@@ -6,6 +6,9 @@ import java.util.Set;
 /**
  * Label index query interface.
  *
+ * <p>Implementations must return a new mutable {@link Set} owned by the caller. Callers may modify the returned set, so
+ * implementations must never expose a set that is backed by the index itself.
+ *
  * @author johnniang
  * @since 2.22.0
  */

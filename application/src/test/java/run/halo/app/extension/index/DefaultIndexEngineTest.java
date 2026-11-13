@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.data.domain.Sort.Direction.ASC;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -87,7 +88,7 @@ class DefaultIndexEngineTest {
                 ListOptions.builder().andQuery(Queries.all("metadata.name")).build();
         var page = PageRequestImpl.of(2, 2);
         when(indices.<String>getIndex("metadata.name")).thenReturn(singleValueIndex);
-        when(singleValueIndex.all()).thenReturn(Set.of("1", "2", "3", "4", "5", "6"));
+        when(singleValueIndex.all()).thenReturn(mutableSet("1", "2", "3", "4", "5", "6"));
         var result = engine.retrieve(Fake.class, options, page);
         assertEquals(6, result.getTotal());
         assertEquals(List.of("3", "4"), result.getItems());
@@ -96,7 +97,7 @@ class DefaultIndexEngineTest {
     @Test
     void shouldRetrieveWithConditionsAndFirstPage() {
         when(indices.<String>getIndex("metadata.name")).thenReturn(singleValueIndex);
-        when(singleValueIndex.all()).thenReturn(Set.of("1", "2", "3", "4", "5", "6"));
+        when(singleValueIndex.all()).thenReturn(mutableSet("1", "2", "3", "4", "5", "6"));
         var options =
                 ListOptions.builder().andQuery(Queries.all("metadata.name")).build();
         var page = PageRequestImpl.of(1, 4);
@@ -108,7 +109,7 @@ class DefaultIndexEngineTest {
     @Test
     void shouldRetrieveWithConditionsAndLastPage() {
         when(indices.<String>getIndex("metadata.name")).thenReturn(singleValueIndex);
-        when(singleValueIndex.all()).thenReturn(Set.of("1", "2", "3", "4", "5", "6"));
+        when(singleValueIndex.all()).thenReturn(mutableSet("1", "2", "3", "4", "5", "6"));
         var options =
                 ListOptions.builder().andQuery(Queries.all("metadata.name")).build();
         var page = PageRequestImpl.of(2, 4);
@@ -120,7 +121,7 @@ class DefaultIndexEngineTest {
     @Test
     void shouldRetrieveWithConditionsAndExceededPage() {
         when(indices.<String>getIndex("metadata.name")).thenReturn(singleValueIndex);
-        when(singleValueIndex.all()).thenReturn(Set.of("1", "2", "3", "4", "5", "6"));
+        when(singleValueIndex.all()).thenReturn(mutableSet("1", "2", "3", "4", "5", "6"));
         var options =
                 ListOptions.builder().andQuery(Queries.all("metadata.name")).build();
         var page = PageRequestImpl.of(4, 2);
@@ -152,7 +153,7 @@ class DefaultIndexEngineTest {
         var options =
                 ListOptions.builder().andQuery(Queries.all("metadata.name")).build();
         when(indices.<String>getIndex("metadata.name")).thenReturn(singleValueIndex);
-        when(singleValueIndex.all()).thenReturn(Set.of("1", "2", "3"));
+        when(singleValueIndex.all()).thenReturn(mutableSet("1", "2", "3"));
         when(singleValueIndex.getKey("1")).thenReturn("1");
         when(singleValueIndex.getKey("2")).thenReturn("2");
         when(singleValueIndex.getKey("3")).thenReturn("3");
@@ -167,7 +168,7 @@ class DefaultIndexEngineTest {
         var options =
                 ListOptions.builder().andQuery(Queries.all("metadata.name")).build();
         when(indices.<String>getIndex("metadata.name")).thenReturn(singleValueIndex);
-        when(singleValueIndex.all()).thenReturn(Set.of("1", "2", "3", "4", "5"));
+        when(singleValueIndex.all()).thenReturn(mutableSet("1", "2", "3", "4", "5"));
         when(singleValueIndex.getKey("1")).thenReturn("1");
         when(singleValueIndex.getKey("2")).thenReturn("2");
         when(singleValueIndex.getKey("3")).thenReturn("3");
@@ -189,7 +190,7 @@ class DefaultIndexEngineTest {
         var options =
                 ListOptions.builder().andQuery(Queries.all("metadata.name")).build();
         when(indices.<String>getIndex("metadata.name")).thenReturn(singleValueIndex);
-        when(singleValueIndex.all()).thenReturn(Set.of("1", "2", "3", "4"));
+        when(singleValueIndex.all()).thenReturn(mutableSet("1", "2", "3", "4"));
         var count = engine.count(Fake.class, options);
         assertEquals(4L, count);
     }
@@ -199,5 +200,9 @@ class DefaultIndexEngineTest {
         fake.setMetadata(new Metadata());
         fake.getMetadata().setName(name);
         return fake;
+    }
+
+    private static Set<String> mutableSet(String... values) {
+        return new HashSet<>(Set.of(values));
     }
 }
