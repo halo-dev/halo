@@ -24,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -190,6 +191,29 @@ class ThemeServiceImplTest {
         }
     }
 
+    private Path prepareThemeArchive(String invalidPart) throws IOException {
+        when(systemVersionSupplier.get()).thenReturn(Version.parse("2.28.0"));
+        var themeDir = Files.createDirectory(tmpDir.resolve("preset"));
+        var theme = createTheme(t -> {
+            t.getSpec().setSettingName("preset-setting");
+            t.getSpec().setConfigMapName("preset-config");
+            if ("version".equals(invalidPart)) {
+                t.getSpec().setRequires(">=999.0.0");
+            }
+        });
+        Files.writeString(themeDir.resolve("theme.yaml"), Unstructured.OBJECT_MAPPER.writeValueAsString(theme));
+        if ("settings".equals(invalidPart) || "config".equals(invalidPart)) {
+            var resource = "settings".equals(invalidPart)
+                    ? "{\"apiVersion\":\"v1alpha1\",\"kind\":\"Setting\",\"metadata\":{\"name\":\"preset-setting\"},\"spec\":{\"forms\":[]}}"
+                    : "{\"apiVersion\":\"v1alpha1\",\"kind\":\"ConfigMap\",\"metadata\":{\"name\":\"preset-config\"},\"data\":{}}";
+            Files.writeString(themeDir.resolve(invalidPart + ".yaml"), resource);
+            Files.writeString(themeDir.resolve(invalidPart + ".yml"), resource);
+        }
+        var archive = tmpDir.resolve("preset.zip");
+        zip(themeDir, archive);
+        return archive;
+    }
+
     @Nested
     class InstallTest {
 
@@ -222,6 +246,31 @@ class ThemeServiceImplTest {
             StepVerifier.create(themeService.install(content(themeZipPath))).verifyError(DuplicateNameException.class);
 
             verify(client, never()).get(eq(Theme.class), any());
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"version", "settings", "config"})
+        void shouldPreserveThemeRecordWhenOrdinaryInstallationValidationFails(String invalidPart) throws IOException {
+            var archive = prepareThemeArchive(invalidPart);
+            var persisted = new AtomicReference<Theme>();
+            when(client.create(isA(Theme.class))).thenAnswer(invocation -> {
+                var theme = invocation.getArgument(0, Theme.class);
+                return Mono.fromSupplier(() -> {
+                    persisted.set(theme);
+                    return theme;
+                });
+            });
+
+            StepVerifier.create(themeService.install(content(archive))).verifyErrorSatisfies(error -> {
+                if (invalidPart.equals("version")) {
+                    assertThat(error).isInstanceOf(UnsatisfiedAttributeValueException.class);
+                } else {
+                    assertThat(error).isInstanceOf(IllegalStateException.class).hasMessageContaining("only have one");
+                }
+                // Ordinary installation keeps the existing record so the user can uninstall or upgrade it.
+                assertThat(persisted.get()).isNotNull();
+                assertThat(persisted.get().getMetadata().getName()).isEqualTo("default");
+            });
         }
 
         @Test
@@ -347,25 +396,7 @@ class ThemeServiceImplTest {
         }
 
         private void preparePresetTheme(String invalidPart) throws IOException {
-            when(systemVersionSupplier.get()).thenReturn(Version.parse("2.28.0"));
-            var themeDir = Files.createDirectory(tmpDir.resolve("preset"));
-            var theme = createTheme(t -> {
-                t.getSpec().setSettingName("preset-setting");
-                t.getSpec().setConfigMapName("preset-config");
-                if ("version".equals(invalidPart)) {
-                    t.getSpec().setRequires(">=999.0.0");
-                }
-            });
-            Files.writeString(themeDir.resolve("theme.yaml"), Unstructured.OBJECT_MAPPER.writeValueAsString(theme));
-            if ("settings".equals(invalidPart) || "config".equals(invalidPart)) {
-                var resource = "settings".equals(invalidPart)
-                        ? "{\"apiVersion\":\"v1alpha1\",\"kind\":\"Setting\",\"metadata\":{\"name\":\"preset-setting\"},\"spec\":{\"forms\":[]}}"
-                        : "{\"apiVersion\":\"v1alpha1\",\"kind\":\"ConfigMap\",\"metadata\":{\"name\":\"preset-config\"},\"data\":{}}";
-                Files.writeString(themeDir.resolve(invalidPart + ".yaml"), resource);
-                Files.writeString(themeDir.resolve(invalidPart + ".yml"), resource);
-            }
-            var archive = tmpDir.resolve("preset.zip");
-            zip(themeDir, archive);
+            var archive = prepareThemeArchive(invalidPart);
             var themeProperties = new HaloProperties().getTheme();
             themeProperties.getInitializer().setLocation(archive.toUri().toString());
             when(haloProperties.getTheme()).thenReturn(themeProperties);

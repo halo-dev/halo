@@ -186,13 +186,18 @@ public class ThemeServiceImpl implements ThemeService {
     private Mono<Theme> doInstall(Publisher<DataBuffer> content, @Nullable Scheduler scheduler, boolean override) {
         var themeRoot = this.themeRoot.get();
         return unzipThemeTo(content, themeRoot, override, scheduler).flatMap(theme -> {
-            var install = persistent(theme, false);
-            return override
-                    ? install.onErrorResume(
+            if (!override) {
+                return persistent(theme, false);
+            }
+            // Setup must not leave an invalid Theme that a later attempt could mistake for success.
+            Assert.state(StringUtils.equals(Theme.KIND, theme.getKind()), "Theme manifest kind must be Theme.");
+            var presetTheme = Unstructured.OBJECT_MAPPER.convertValue(theme, Theme.class);
+            return validateTheme(presetTheme)
+                    .flatMap(client::create)
+                    .onErrorResume(
                             DuplicateNameException.class,
                             error -> client.get(Theme.class, theme.getMetadata().getName())
-                                    .flatMap(this::validateTheme))
-                    : install;
+                                    .flatMap(this::validateTheme));
         });
     }
 
@@ -213,7 +218,7 @@ public class ThemeServiceImpl implements ThemeService {
                     .flatMap(client::update)
                     .flatMap(this::validateTheme);
         }
-        return validateTheme(newTheme).flatMap(client::create);
+        return client.create(newTheme).flatMap(this::validateTheme);
     }
 
     private Mono<Theme> validateTheme(Theme theme) {
