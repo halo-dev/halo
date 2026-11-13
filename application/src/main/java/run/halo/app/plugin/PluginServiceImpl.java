@@ -58,6 +58,7 @@ import reactor.util.retry.Retry;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.SystemVersionSupplier;
+import run.halo.app.infra.exception.DuplicateNameException;
 import run.halo.app.infra.exception.PluginAlreadyExistsException;
 import run.halo.app.infra.exception.PluginDependenciesNotEnabledException;
 import run.halo.app.infra.exception.PluginDependencyException;
@@ -121,13 +122,22 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
     @Override
     public Mono<Void> installPresetPlugins() {
         return getPresetPlugins()
-                .flatMap(preset -> this.install(preset.path())
-                        .onErrorResume(PluginAlreadyExistsException.class, e -> Mono.empty())
-                        .flatMap(plugin ->
-                                FileUtils.deleteFileSilently(preset.path()).thenReturn(plugin))
-                        .flatMap(plugin -> preset.autoEnable() ? enablePlugin(plugin) : Mono.just(plugin)))
+                .flatMap(this::installPresetPlugin)
                 .subscribeOn(Schedulers.boundedElastic())
                 .then();
+    }
+
+    private Mono<Plugin> installPresetPlugin(PresetPlugin preset) {
+        return this.install(preset.path())
+                // The plugin may exist already when resuming an interrupted setup, or may be
+                // created concurrently by another setup request.
+                .onErrorResume(
+                        t -> t instanceof PluginAlreadyExistsException || t instanceof DuplicateNameException,
+                        e -> findPluginManifest(preset.path())
+                                .flatMap(plugin -> client.get(
+                                        Plugin.class, plugin.getMetadata().getName())))
+                .flatMap(plugin -> FileUtils.deleteFileSilently(preset.path()).thenReturn(plugin))
+                .flatMap(plugin -> preset.autoEnable() ? enablePlugin(plugin) : Mono.just(plugin));
     }
 
     private Mono<Plugin> enablePlugin(Plugin plugin) {

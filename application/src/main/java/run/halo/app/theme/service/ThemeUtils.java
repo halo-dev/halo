@@ -101,15 +101,6 @@ public class ThemeUtils {
     }
 
     static Mono<Unstructured> unzipThemeTo(
-            Publisher<DataBuffer> content, Path themeWorkDir, @Nullable Scheduler scheduler) {
-        return unzipThemeTo(content, themeWorkDir, false, scheduler)
-                .onErrorMap(e -> !(e instanceof ResponseStatusException), e -> {
-                    log.error("Failed to unzip theme", e);
-                    throw new ServerWebInputException("Failed to unzip theme");
-                });
-    }
-
-    static Mono<Unstructured> unzipThemeTo(
             Publisher<DataBuffer> content, Path themeWorkDir, boolean override, @Nullable Scheduler scheduler) {
         var unzipThem = Mono.usingWhen(
                 createTempDir(THEME_TMP_PREFIX, null),
@@ -127,6 +118,7 @@ public class ThemeUtils {
                                         themeWorkDir.resolve(themeName).normalize();
                                 // Prevent path traversal via a crafted theme name, e.g. "../static/x".
                                 FileUtils.checkDirectoryTraversal(themeWorkDir.normalize(), themeTargetPath);
+                                var targetExisted = Files.exists(themeTargetPath);
                                 try {
                                     if (!override && !FileUtils.isEmpty(themeTargetPath)) {
                                         sink.error(new ThemeAlreadyExistsException(themeName));
@@ -136,16 +128,21 @@ public class ThemeUtils {
                                     copyRecursively(themeManifestPath.getParent(), themeTargetPath);
                                     sink.next(theme);
                                 } catch (IOException e) {
-                                    deleteRecursivelyAndSilently(themeTargetPath);
+                                    if (!targetExisted) {
+                                        // Do not delete a directory that may have been installed
+                                        // by a concurrent setup request.
+                                        deleteRecursivelyAndSilently(themeTargetPath);
+                                    }
                                     sink.error(e);
                                 }
                             });
                 },
                 tempDir -> FileUtils.deleteRecursivelyAndSilently(tempDir, null));
-        if (scheduler != null) {
-            return unzipThem.subscribeOn(scheduler);
-        }
-        return unzipThem;
+        var result = scheduler != null ? unzipThem.subscribeOn(scheduler) : unzipThem;
+        return result.onErrorMap(e -> !(e instanceof ResponseStatusException), e -> {
+            log.error("Failed to unzip theme", e);
+            throw new ServerWebInputException("Failed to unzip theme");
+        });
     }
 
     static Unstructured loadThemeManifest(Path themeManifestPath) {
