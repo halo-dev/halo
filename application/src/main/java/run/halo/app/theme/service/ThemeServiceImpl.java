@@ -115,11 +115,10 @@ public class ThemeServiceImpl implements ThemeService {
                     log.warn("Failed to initialize theme from {}", location, e);
                     return Mono.empty();
                 })
-                .onErrorResume(
-                        t -> t instanceof ThemeAlreadyExistsException || t instanceof DuplicateNameException, e -> {
-                            log.warn("Failed to initialize theme from {}, because it already exists", location);
-                            return Mono.empty();
-                        })
+                .onErrorResume(ThemeAlreadyExistsException.class, e -> {
+                    log.warn("Failed to initialize theme from {}, because it already exists", location);
+                    return Mono.empty();
+                })
                 .then();
     }
 
@@ -186,7 +185,15 @@ public class ThemeServiceImpl implements ThemeService {
 
     private Mono<Theme> doInstall(Publisher<DataBuffer> content, @Nullable Scheduler scheduler, boolean override) {
         var themeRoot = this.themeRoot.get();
-        return unzipThemeTo(content, themeRoot, override, scheduler).flatMap(theme -> persistent(theme, false));
+        return unzipThemeTo(content, themeRoot, override, scheduler).flatMap(theme -> {
+            var install = persistent(theme, false);
+            return override
+                    ? install.onErrorResume(
+                            DuplicateNameException.class,
+                            error -> client.get(Theme.class, theme.getMetadata().getName())
+                                    .flatMap(this::validateTheme))
+                    : install;
+        });
     }
 
     /**
@@ -200,16 +207,17 @@ public class ThemeServiceImpl implements ThemeService {
     private Mono<Theme> persistent(Unstructured themeManifest, boolean isUpgrade) {
         Assert.state(StringUtils.equals(Theme.KIND, themeManifest.getKind()), "Theme manifest kind must be Theme.");
         var newTheme = Unstructured.OBJECT_MAPPER.convertValue(themeManifest, Theme.class);
-        final Mono<Theme> createOrUpdateTheme;
         if (isUpgrade) {
-            createOrUpdateTheme = client.get(Theme.class, newTheme.getMetadata().getName())
+            return client.get(Theme.class, newTheme.getMetadata().getName())
                     .doOnNext(theme -> updateTheme(theme, newTheme))
-                    .flatMap(client::update);
-        } else {
-            createOrUpdateTheme = client.create(newTheme);
+                    .flatMap(client::update)
+                    .flatMap(this::validateTheme);
         }
-        return createOrUpdateTheme
-                .doOnNext(theme -> {
+        return validateTheme(newTheme).flatMap(client::create);
+    }
+
+    private Mono<Theme> validateTheme(Theme theme) {
+        return Mono.fromCallable(() -> {
                     String systemVersion =
                             systemVersionSupplier.get().toStableVersion().toString();
                     String requires = theme.getSpec().getRequires();
@@ -222,19 +230,16 @@ public class ThemeServiceImpl implements ThemeService {
                                 "problemDetail.theme.version.unsatisfied.requires",
                                 new String[] {requires, systemVersion});
                     }
-                })
-                .delayUntil(theme -> {
                     var unstructureds = ThemeUtils.loadThemeResources(getThemePath(theme));
                     if (unstructureds.stream().filter(hasSettingsYaml(theme)).count() > 1) {
-                        return Mono.error(
-                                new IllegalStateException("Theme must only have one settings.yaml or settings.yml."));
+                        throw new IllegalStateException("Theme must only have one settings.yaml or settings.yml.");
                     }
                     if (unstructureds.stream().filter(hasConfigYaml(theme)).count() > 1) {
-                        return Mono.error(
-                                new IllegalStateException("Theme must only have one config.yaml or config.yml."));
+                        throw new IllegalStateException("Theme must only have one config.yaml or config.yml.");
                     }
-                    return Mono.empty();
-                });
+                    return theme;
+                })
+                .subscribeOn(scheduler);
     }
 
     @Override

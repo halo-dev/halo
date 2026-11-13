@@ -6,7 +6,10 @@ import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static run.halo.app.infra.utils.FileUtils.zip;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.UUID;
@@ -26,6 +29,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.RoleBinding;
+import run.halo.app.core.extension.Theme;
 import run.halo.app.core.extension.User;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.Metadata;
@@ -34,6 +38,7 @@ import run.halo.app.infra.InitializationStateGetter;
 import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.SystemState;
+import run.halo.app.infra.properties.HaloProperties;
 
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
@@ -58,6 +63,9 @@ class SystemSetupIntegrationTest {
 
     @Autowired
     PasswordEncoder passwordEncoder;
+
+    @Autowired
+    HaloProperties haloProperties;
 
     @MockitoSpyBean
     SystemConfigFetcher systemConfigFetcher;
@@ -174,6 +182,70 @@ class SystemSetupIntegrationTest {
                 .isFound()
                 .expectHeader()
                 .location("/console");
+    }
+
+    @Test
+    void shouldKeepInvalidPresetResumableUntilReplaced() throws IOException {
+        var themeDirectory = Files.createTempDirectory(workDir, "incompatible-theme-");
+        Files.writeString(themeDirectory.resolve("theme.yaml"), """
+            apiVersion: theme.halo.run/v1alpha1
+            kind: Theme
+            metadata:
+              name: theme-earth
+            spec:
+              displayName: Incompatible preset
+              author:
+                name: Halo
+              version: 1.0.0
+              requires: ">=999.0.0"
+            """);
+        var archive = themeDirectory.resolveSibling(themeDirectory.getFileName() + ".zip");
+        zip(themeDirectory, archive);
+        var initializer = haloProperties.getTheme().getInitializer();
+        var originalLocation = initializer.getLocation();
+        initializer.setLocation(archive.toUri().toString());
+        try {
+            for (int attempt = 0; attempt < 2; attempt++) {
+                setup("theme-admin", "Original123!").expectStatus().isBadRequest();
+                assertThat(readState().getIsSetup()).isFalse();
+                assertThat(initializationStateGetter.setupRequired().block()).isTrue();
+                assertThat(client.fetch(Theme.class, "theme-earth").block()).isNull();
+            }
+
+            var password =
+                    client.get(User.class, "theme-admin").block().getSpec().getPassword();
+            initializer.setLocation(originalLocation);
+            setup("theme-admin", "Original123!").expectStatus().isNoContent();
+            assertThat(readState().getIsSetup()).isTrue();
+            assertThat(client.get(Theme.class, "theme-earth").block()).isNotNull();
+            assertThat(client.get(User.class, "theme-admin").block().getSpec().getPassword())
+                    .isEqualTo(password);
+        } finally {
+            initializer.setLocation(originalLocation);
+        }
+    }
+
+    @Test
+    void shouldKeepSetupIncompleteWhenExistingPresetIsIncompatible() {
+        var theme = new Theme();
+        theme.setMetadata(new Metadata());
+        theme.getMetadata().setName("theme-earth");
+        theme.setSpec(new Theme.ThemeSpec());
+        theme.getSpec().setDisplayName("Existing incompatible preset");
+        var author = new Theme.Author();
+        author.setName("Halo");
+        theme.getSpec().setAuthor(author);
+        theme.getSpec().setVersion("1.0.0");
+        theme.getSpec().setRequires(">=999.0.0");
+        client.create(theme).block();
+
+        for (int attempt = 0; attempt < 2; attempt++) {
+            setup("theme-admin", "Original123!").expectStatus().isBadRequest();
+            assertThat(readState().getIsSetup()).isFalse();
+            assertThat(initializationStateGetter.setupRequired().block()).isTrue();
+            assertThat(client.get(Theme.class, "theme-earth").block().getSpec().getRequires())
+                    .isEqualTo(">=999.0.0");
+        }
     }
 
     private WebTestClient.ResponseSpec setup(String username, String password) {
