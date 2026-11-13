@@ -86,10 +86,10 @@ class MultiValueIndex<E extends Extension, K extends Comparable<K>> implements V
      * Get the keys associated with the given primary key.
      *
      * @param primaryKey the primary key
-     * @return the associated keys
+     * @return the associated keys, or an empty set if the primary key does not exist
      */
     Set<K> getKeys(String primaryKey) {
-        return Collections.unmodifiableSet(invertedIndex.get(primaryKey));
+        return Collections.unmodifiableSet(invertedIndex.getOrDefault(primaryKey, Set.of()));
     }
 
     @Override

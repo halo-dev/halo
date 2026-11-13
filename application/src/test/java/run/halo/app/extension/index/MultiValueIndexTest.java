@@ -26,6 +26,11 @@ class MultiValueIndexTest {
     @InjectMocks
     MultiValueIndex<Fake, String> index;
 
+    @Test
+    void shouldReturnEmptyKeysForMissingPrimaryKey() {
+        assertEquals(Set.of(), index.getKeys("missing"));
+    }
+
     @Nested
     class UniqueMultiValueTests {
 
