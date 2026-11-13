@@ -15,6 +15,8 @@ import java.util.stream.StreamSupport;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -196,6 +198,56 @@ class DefaultIndexEngineTest {
                 List.of("b", "c", "a"),
                 StreamSupport.stream(result.spliterator(), false).toList());
         verify(multiValueIndex, times(3)).getKeys(anyString());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"page", "all", "topN"})
+    void shouldSortWhenCandidateIsDeletedBeforeReadingSortKeys(String retrieval) throws Exception {
+        try (var manager = new DefaultIndicesManager()) {
+            manager.add(
+                    Fake.class,
+                    List.of(IndexSpecs.<Fake, String>multi("stringValues", String.class)
+                            .indexFunc(Fake::getStringValues)
+                            .build()));
+            var realIndices = spy(manager.get(Fake.class));
+            when(indicesManager.get(Fake.class)).thenReturn(realIndices);
+            var deleted = createFake("a");
+            deleted.getMetadata().setCreationTimestamp(Instant.EPOCH);
+            deleted.setStringValues(Set.of("z"));
+            var retained = createFake("b");
+            retained.getMetadata().setCreationTimestamp(Instant.EPOCH);
+            retained.setStringValues(Set.of("m"));
+            engine.insert(List.of(deleted, retained));
+
+            // Sort indexes are resolved after the query has copied the candidate names.
+            doAnswer(invocation -> {
+                        if ("stringValues".equals(invocation.getArgument(0))) {
+                            realIndices.delete(deleted);
+                        }
+                        return invocation.callRealMethod();
+                    })
+                    .when(realIndices)
+                    .getIndex(anyString());
+            var options =
+                    ListOptions.builder().andQuery(Queries.all("metadata.name")).build();
+            var sort = Sort.by(ASC, "metadata.name", "stringValues");
+
+            Iterable<String> result =
+                    switch (retrieval) {
+                        case "page" ->
+                            engine.retrieve(Fake.class, options, PageRequestImpl.of(1, 2, sort))
+                                    .getItems();
+                        case "all" -> engine.retrieveAll(Fake.class, options, sort);
+                        case "topN" -> engine.retrieveTopN(Fake.class, options, sort, 2);
+                        default -> throw new IllegalArgumentException(retrieval);
+                    };
+
+            assertEquals(
+                    List.of("a", "b"),
+                    StreamSupport.stream(result.spliterator(), false).toList());
+            verify(realIndices).delete(deleted);
+            assertEquals(1, engine.count(Fake.class, options));
+        }
     }
 
     @Test
