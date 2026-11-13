@@ -21,6 +21,9 @@
           <br />
           <span th:text="#{form.messages.h2.content}"> </span>
         </div>
+        <div class="alert alert-warning" role="alert" th:if="${resumingSetup}">
+          <span th:text="#{form.messages.resume.content}"> </span>
+        </div>
         <form th:object="${form}" th:action="@{/system/setup}" class="halo-form" method="post">
           <div class="form-item">
             <label for="language" th:text="#{form.language.label}"></label>
@@ -78,6 +81,7 @@
                 id="username"
                 type="text"
                 th:field="*{username}"
+                th:readonly="${resumingSetup}"
                 autocomplete="off"
                 spellcheck="false"
                 autocorrect="off"

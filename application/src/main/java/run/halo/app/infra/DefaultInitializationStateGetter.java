@@ -18,6 +18,9 @@ import run.halo.app.extension.router.selector.LabelSelector;
 /**
  * A cache that caches system setup state. when setUp state changed, the cache will be updated.
  *
+ * <p>The setup state is stored in the {@link SystemState} which is managed by the setup flow. Legacy installations
+ * without an explicit state are identified by their existing users.
+ *
  * @author guqing
  * @since 2.5.2
  */
@@ -25,39 +28,31 @@ import run.halo.app.extension.router.selector.LabelSelector;
 @RequiredArgsConstructor
 public class DefaultInitializationStateGetter implements InitializationStateGetter {
     private final ReactiveExtensionClient client;
-    private final AtomicBoolean userInitialized = new AtomicBoolean(false);
-    private final AtomicBoolean dataInitialized = new AtomicBoolean(false);
+    private final AtomicBoolean setupCompleted = new AtomicBoolean(false);
 
     @Override
-    public Mono<Boolean> userInitialized() {
-        // If user is initialized, return true directly.
-        if (userInitialized.get()) {
-            return Mono.just(true);
-        }
-        return hasUser().doOnNext(userInitialized::set);
-    }
-
-    @Override
-    public Mono<Boolean> dataInitialized() {
-        if (dataInitialized.get()) {
-            return Mono.just(true);
+    public Mono<Boolean> setupRequired() {
+        if (setupCompleted.get()) {
+            return Mono.just(false);
         }
         return client.fetch(ConfigMap.class, SystemState.SYSTEM_STATES_CONFIGMAP)
-                .map(config -> {
-                    SystemState systemState = SystemState.deserialize(config);
-                    return isTrue(systemState.getIsSetup());
+                .mapNotNull(configMap -> SystemState.deserialize(configMap).getIsSetup())
+                .map(initialized -> {
+                    var setupRequired = !isTrue(initialized);
+                    if (!setupRequired) {
+                        // A completed setup never becomes incomplete again, so it is safe to cache.
+                        setupCompleted.set(true);
+                    }
+                    return setupRequired;
                 })
-                .defaultIfEmpty(false)
-                .doOnNext(dataInitialized::set);
+                .switchIfEmpty(Mono.defer(this::setupRequiredWithoutState));
     }
 
-    private Mono<Boolean> hasUser() {
+    private Mono<Boolean> setupRequiredWithoutState() {
         var listOptions = new ListOptions();
         listOptions.setLabelSelector(
                 LabelSelector.builder().notEq(User.HIDDEN_USER_LABEL, "true").build());
         listOptions.setFieldSelector(FieldSelector.of(isNull("metadata.deletionTimestamp")));
-        return client.listBy(User.class, listOptions, PageRequestImpl.ofSize(1))
-                .map(result -> result.getTotal() > 0)
-                .defaultIfEmpty(false);
+        return client.listBy(User.class, listOptions, PageRequestImpl.ofSize(1)).map(result -> result.getTotal() == 0);
     }
 }

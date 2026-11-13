@@ -53,7 +53,7 @@ public class ThemeIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        when(initializationStateGetter.userInitialized()).thenReturn(Mono.just(true));
+        when(initializationStateGetter.setupRequired()).thenReturn(Mono.just(false));
 
         // create a menu item
         var menuItem = new MenuItem();
