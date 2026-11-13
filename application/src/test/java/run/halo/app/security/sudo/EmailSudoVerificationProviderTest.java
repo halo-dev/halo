@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -21,6 +22,8 @@ import run.halo.app.extension.Metadata;
 import run.halo.app.notification.NotificationCenter;
 import run.halo.app.notification.NotificationReasonEmitter;
 import run.halo.app.notification.ReasonPayload;
+import run.halo.app.notification.TransientEmailNotificationCoordinator;
+import run.halo.app.notification.UserIdentity;
 
 @ExtendWith(MockitoExtension.class)
 class EmailSudoVerificationProviderTest {
@@ -31,6 +34,9 @@ class EmailSudoVerificationProviderTest {
     @Mock
     NotificationCenter notificationCenter;
 
+    @Spy
+    TransientEmailNotificationCoordinator notificationCoordinator = new TransientEmailNotificationCoordinator();
+
     InMemorySudoCodeStore codeStore;
 
     EmailSudoVerificationProvider provider;
@@ -38,7 +44,8 @@ class EmailSudoVerificationProviderTest {
     @BeforeEach
     void setUp() {
         codeStore = new InMemorySudoCodeStore();
-        provider = new EmailSudoVerificationProvider(codeStore, reasonEmitter, notificationCenter);
+        provider = new EmailSudoVerificationProvider(
+                codeStore, reasonEmitter, notificationCenter, notificationCoordinator);
     }
 
     @Test
@@ -68,6 +75,12 @@ class EmailSudoVerificationProviderTest {
 
         var user = user(true, "alice@example.com");
         StepVerifier.create(provider.sendCode(user)).verifyComplete();
+
+        verify(notificationCoordinator)
+                .publish(
+                        eq(EmailSudoVerificationProvider.SUDO_EMAIL_CODE_REASON_TYPE),
+                        eq(UserIdentity.anonymousWithEmail("alice@example.com").name()),
+                        any());
 
         var captor = ArgumentCaptor.forClass(Consumer.class);
         verify(reasonEmitter).emit(eq(EmailSudoVerificationProvider.SUDO_EMAIL_CODE_REASON_TYPE), captor.capture());
