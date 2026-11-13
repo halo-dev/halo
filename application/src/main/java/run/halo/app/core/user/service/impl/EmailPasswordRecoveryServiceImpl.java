@@ -5,13 +5,11 @@ import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.security.core.token.Sha512DigestUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
-import reactor.util.retry.Retry;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.notification.Reason;
 import run.halo.app.core.extension.notification.Subscription;
@@ -21,6 +19,7 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.ExternalLinkProcessor;
 import run.halo.app.notification.NotificationCenter;
 import run.halo.app.notification.NotificationReasonEmitter;
+import run.halo.app.notification.TransientEmailNotificationCoordinator;
 import run.halo.app.notification.UserIdentity;
 
 /**
@@ -44,6 +43,7 @@ public class EmailPasswordRecoveryServiceImpl implements EmailPasswordRecoverySe
     private final NotificationCenter notificationCenter;
     private final UserService userService;
     private final ResetTokenRepository resetTokenRepository;
+    private final TransientEmailNotificationCoordinator notificationCoordinator;
 
     private Clock clock = Clock.systemDefaultZone();
 
@@ -82,8 +82,8 @@ public class EmailPasswordRecoveryServiceImpl implements EmailPasswordRecoverySe
         return getValidResetToken(token)
                 .flatMap(resetToken -> userService
                         .updateWithRawPassword(resetToken.username(), newPassword)
-                        .flatMap(user -> unSubscribeResetPasswordEmailNotification(
-                                user.getSpec().getEmail()))
+                        // A newer reset request may still need the shared subscription. Let scheduled cleanup reclaim
+                        // it.
                         .then(resetTokenRepository.removeByTokenHash(tokenHash)));
     }
 
@@ -95,19 +95,14 @@ public class EmailPasswordRecoveryServiceImpl implements EmailPasswordRecoverySe
                 .switchIfEmpty(Mono.error(InvalidResetTokenException::new));
     }
 
-    Mono<Void> unSubscribeResetPasswordEmailNotification(String email) {
-        if (StringUtils.isBlank(email)) {
-            return Mono.empty();
-        }
-        var subscriber = new Subscription.Subscriber();
-        subscriber.setName(UserIdentity.anonymousWithEmail(email).name());
-        return notificationCenter
-                .unsubscribe(subscriber, createInterestReason(email))
-                .retryWhen(Retry.backoff(8, Duration.ofMillis(100))
-                        .filter(OptimisticLockingFailureException.class::isInstance));
+    private Mono<Void> sendResetPasswordNotification(String username, String email) {
+        return notificationCoordinator.publish(
+                RESET_PASSWORD_BY_EMAIL_REASON_TYPE,
+                UserIdentity.anonymousWithEmail(email).name(),
+                () -> publishResetPasswordNotification(username, email));
     }
 
-    private Mono<Void> sendResetPasswordNotification(String username, String email) {
+    private Mono<Void> publishResetPasswordNotification(String username, String email) {
         var token = generateToken();
         var tokenHash = hashToken(token);
         var expiresAt = clock.instant().plus(RESET_TOKEN_LIFE_TIME);
