@@ -148,13 +148,35 @@ describe("Tabbar", () => {
     vi.unstubAllGlobals();
   });
 
+  it("supports keyboard navigation between tabs", async () => {
+    const { wrapper } = await mountTabbar();
+    await flushPromises();
+
+    const items = wrapper.findAll(".tabbar-item");
+
+    expect(items[0].attributes("role")).toBe("tab");
+    expect(items[0].attributes("aria-selected")).toBe("true");
+    expect(items[0].attributes("tabindex")).toBe("0");
+    expect(items[1].attributes("tabindex")).toBe("-1");
+
+    await items[0].trigger("keydown", { key: "ArrowRight" });
+
+    expect(wrapper.emitted("update:activeId")?.at(-1)).toEqual(["tab-2"]);
+    expect(document.activeElement).toBe(items[1].element);
+
+    await items[1].trigger("keydown", { key: "End" });
+
+    expect(wrapper.emitted("update:activeId")?.at(-1)).toEqual(["tab-6"]);
+    expect(document.activeElement).toBe(items[5].element);
+  });
+
   it("updates scroll controls for content size changes", async () => {
     contentWidth = 300;
     const { wrapper } = await mountTabbar();
     await flushPromises();
 
-    const left = wrapper.get('button[aria-label="向左滚动标签"]');
-    const right = wrapper.get('button[aria-label="向右滚动标签"]');
+    const left = wrapper.get('button[aria-label="Scroll tabs left"]');
+    const right = wrapper.get('button[aria-label="Scroll tabs right"]');
     expect(left.attributes("disabled")).toBeDefined();
     expect(right.attributes("disabled")).toBeDefined();
     expect(wrapper.get(".tabbar-items").attributes("tabindex")).toBeUndefined();
@@ -175,7 +197,7 @@ describe("Tabbar", () => {
       await flushPromises();
 
       expect(wrapper.classes()).toContain(`tabbar-${type}`);
-      const right = wrapper.get('button[aria-label="向右滚动标签"]');
+      const right = wrapper.get('button[aria-label="Scroll tabs right"]');
       expect(right.attributes("disabled")).toBeUndefined();
 
       await right.trigger("click");
@@ -191,8 +213,8 @@ describe("Tabbar", () => {
     const { wrapper, scroller } = await mountTabbar();
     await flushPromises();
 
-    const left = wrapper.get('button[aria-label="向左滚动标签"]');
-    const right = wrapper.get('button[aria-label="向右滚动标签"]');
+    const left = wrapper.get('button[aria-label="Scroll tabs left"]');
+    const right = wrapper.get('button[aria-label="Scroll tabs right"]');
     expect(left.attributes("disabled")).toBeDefined();
     expect(right.attributes("disabled")).toBeUndefined();
 
@@ -213,7 +235,9 @@ describe("Tabbar", () => {
     const { wrapper, scroller, scrollBy } = await mountTabbar();
     await flushPromises();
 
-    await wrapper.get('button[aria-label="向右滚动标签"]').trigger("click");
+    await wrapper
+      .get('button[aria-label="Scroll tabs right"]')
+      .trigger("click");
     expect(scrollBy).toHaveBeenLastCalledWith({
       left: 320,
       behavior: "smooth",
@@ -221,7 +245,7 @@ describe("Tabbar", () => {
 
     await setScrollLeft(scroller, 200);
     reducedMotion = true;
-    await wrapper.get('button[aria-label="向左滚动标签"]').trigger("click");
+    await wrapper.get('button[aria-label="Scroll tabs left"]').trigger("click");
     expect(scrollBy).toHaveBeenLastCalledWith({
       left: -320,
       behavior: "auto",
@@ -233,8 +257,8 @@ describe("Tabbar", () => {
     await flushPromises();
     await setScrollLeft(scroller, 200);
 
-    const left = wrapper.get('button[aria-label="向左滚动标签"]');
-    const right = wrapper.get('button[aria-label="向右滚动标签"]');
+    const left = wrapper.get('button[aria-label="Scroll tabs left"]');
+    const right = wrapper.get('button[aria-label="Scroll tabs right"]');
     right.element.focus();
     await right.trigger("click");
 
@@ -246,8 +270,8 @@ describe("Tabbar", () => {
     const { wrapper, scroller } = await mountTabbar();
     await flushPromises();
 
-    const left = wrapper.get('button[aria-label="向左滚动标签"]');
-    const right = wrapper.get('button[aria-label="向右滚动标签"]');
+    const left = wrapper.get('button[aria-label="Scroll tabs left"]');
+    const right = wrapper.get('button[aria-label="Scroll tabs right"]');
 
     right.element.focus();
     await right.trigger("click");
@@ -335,10 +359,14 @@ describe("Tabbar", () => {
 
     expect(wrapper.classes()).toContain("tabbar-direction-column");
     expect(
-      wrapper.get('button[aria-label="向左滚动标签"]').attributes("disabled")
+      wrapper
+        .get('button[aria-label="Scroll tabs left"]')
+        .attributes("disabled")
     ).toBeDefined();
     expect(
-      wrapper.get('button[aria-label="向右滚动标签"]').attributes("disabled")
+      wrapper
+        .get('button[aria-label="Scroll tabs right"]')
+        .attributes("disabled")
     ).toBeDefined();
     expect(wrapper.get(".tabbar-items").attributes("tabindex")).toBeUndefined();
 

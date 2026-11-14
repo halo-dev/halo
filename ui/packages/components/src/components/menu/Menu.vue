@@ -9,7 +9,7 @@ provide<string[] | undefined>("openIds", props.openIds);
 </script>
 
 <template>
-  <div class="menu-container w-full p-3">
+  <div class="menu-container w-full p-3" role="navigation">
     <ul>
       <slot />
     </ul>

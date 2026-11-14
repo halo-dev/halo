@@ -65,6 +65,47 @@ const activeIndex = computed(() => {
   );
 });
 
+const tabStopIndex = computed(() => {
+  if (!props.items?.length) {
+    return -1;
+  }
+  return activeIndex.value >= 0 ? activeIndex.value : 0;
+});
+
+function handleKeydown(event: KeyboardEvent, index: number) {
+  const items = props.items;
+  if (!items?.length) {
+    return;
+  }
+
+  const isColumn = props.direction === "column";
+  let targetIndex = -1;
+
+  if (event.key === (isColumn ? "ArrowDown" : "ArrowRight")) {
+    targetIndex = (index + 1) % items.length;
+  } else if (event.key === (isColumn ? "ArrowUp" : "ArrowLeft")) {
+    targetIndex = (index - 1 + items.length) % items.length;
+  } else if (event.key === "Home") {
+    targetIndex = 0;
+  } else if (event.key === "End") {
+    targetIndex = items.length - 1;
+  } else {
+    return;
+  }
+
+  event.preventDefault();
+
+  const targetItem = items[targetIndex];
+  if (!targetItem) {
+    return;
+  }
+
+  handleChange(targetItem[props.idKey], targetIndex);
+  (
+    tabbarTrackRef.value?.children[targetIndex] as HTMLElement | undefined
+  )?.focus();
+}
+
 function updateScrollLeft() {
   scrollLeft.value = tabbarItemsRef.value?.scrollLeft ?? 0;
 }
@@ -188,7 +229,7 @@ useEventListener(tabbarItemsRef, "wheel", handleHorizontalWheel, {
       <button
         ref="leftArrowRef"
         :disabled="!canScrollLeft"
-        aria-label="向左滚动标签"
+        aria-label="Scroll tabs left"
         class="tabbar-arrow"
         title="向左滚动标签"
         type="button"
@@ -208,7 +249,7 @@ useEventListener(tabbarItemsRef, "wheel", handleHorizontalWheel, {
       <button
         ref="rightArrowRef"
         :disabled="!canScrollRight"
-        aria-label="向右滚动标签"
+        aria-label="Scroll tabs right"
         class="tabbar-arrow"
         title="向右滚动标签"
         type="button"
@@ -220,20 +261,29 @@ useEventListener(tabbarItemsRef, "wheel", handleHorizontalWheel, {
     <div
       ref="tabbarItemsRef"
       :tabindex="maxScrollLeft > 0 ? 0 : undefined"
-      aria-label="标签列表"
+      aria-label="Tab list"
       class="tabbar-items"
       role="group"
     >
-      <div ref="tabbarTrackRef" class="tabbar-items-track">
+      <div
+        ref="tabbarTrackRef"
+        :aria-orientation="direction === 'column' ? 'vertical' : 'horizontal'"
+        class="tabbar-items-track"
+        role="tablist"
+      >
         <div
           v-for="(item, index) in items"
           :key="item[idKey]"
+          :aria-selected="item[idKey] === activeId"
           :class="{ 'tabbar-item-active': item[idKey] === activeId }"
+          :tabindex="index === tabStopIndex ? 0 : -1"
           class="tabbar-item"
+          role="tab"
           @click="handleChange(item[idKey], index)"
+          @keydown="handleKeydown($event, index)"
         >
           <div v-if="item.icon" class="tabbar-item-icon">
-            <component :is="item.icon" />
+            <component :is="item.icon" aria-hidden="true" />
           </div>
           <div v-if="item[labelKey]" class="tabbar-item-label">
             {{ item[labelKey] }}

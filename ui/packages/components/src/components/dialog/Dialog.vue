@@ -95,12 +95,20 @@ const handleClose = () => {
         <component
           :is="icons[type].icon"
           :class="`text-${icons[type].color}-500`"
+          aria-hidden="true"
           class="h-6 w-6 flex-none"
         ></component>
         <div class="text-base font-bold text-gray-900">{{ title }}</div>
       </div>
-      <div>
-        <IconClose class="cursor-pointer" @click="handleCancel" />
+      <div
+        aria-label="Close"
+        role="button"
+        tabindex="0"
+        @click="handleCancel"
+        @keydown.enter.prevent="handleCancel"
+        @keydown.space.prevent="handleCancel"
+      >
+        <IconClose aria-hidden="true" class="cursor-pointer" />
       </div>
     </div>
     <div class="flex items-center gap-4">

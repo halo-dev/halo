@@ -14,7 +14,7 @@ const isActive = computed(() => {
 });
 </script>
 <template>
-  <div v-if="isActive" class="tabs-item-wrapper">
+  <div v-if="isActive" class="tabs-item-wrapper" role="tabpanel">
     <slot />
   </div>
 </template>

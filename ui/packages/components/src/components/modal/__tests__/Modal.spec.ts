@@ -11,6 +11,45 @@ describe("Modal", () => {
     expect(VModal).toBeDefined();
   });
 
+  describe("accessibility", () => {
+    it("labels the dialog with its title", () => {
+      const wrapper = mount(VModal, {
+        props: { visible: true, title: "Hello Halo" },
+      });
+      const dialog = wrapper.get(".modal-wrapper");
+      const labelledby = dialog.attributes("aria-labelledby");
+
+      expect(labelledby).toBeTruthy();
+      expect(wrapper.get(`[id="${labelledby}"]`).text()).toBe("Hello Halo");
+    });
+
+    it("restores focus to the opener after closing", async () => {
+      const opener = document.createElement("button");
+      document.body.appendChild(opener);
+      opener.focus();
+
+      const wrapper = mount(VModal, {
+        attachTo: document.body,
+        props: { visible: false, title: "Hello Halo" },
+      });
+
+      await wrapper.setProps({ visible: true });
+      await nextTick();
+      await nextTick();
+
+      expect(document.activeElement).toBe(
+        wrapper.get(".modal-wrapper").element
+      );
+
+      await wrapper.setProps({ visible: false });
+      await nextTick();
+
+      expect(document.activeElement).toBe(opener);
+
+      opener.remove();
+    });
+  });
+
   describe.each([
     {
       name: "v-if",
