@@ -60,6 +60,11 @@ class MultiValueBuilder<E extends Extension, K extends Comparable<K>>
             public Set<K> getValues(E extension) {
                 return indexFunc.apply(extension);
             }
+
+            @Override
+            public int getVersion() {
+                return version;
+            }
         };
     }
 }

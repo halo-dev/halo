@@ -78,11 +78,17 @@ class DefaultIndexEngine implements IndexEngine, DisposableBean {
     }
 
     @Override
+    public <E extends Extension> void deleteByName(Class<E> type, String primaryKey) {
+        indicesManager.get(type).deleteByName(primaryKey);
+    }
+
+    @Override
     public <E extends Extension> ListResult<String> retrieve(Class<E> type, ListOptions options, PageRequest page) {
         if (options == null) {
             options = ListOptions.builder().build();
         }
         var finalCondition = options.toCondition();
+        indicesManager.awaitReady(type);
         var indices = indicesManager.get(type);
         var queryVisitor = new QueryVisitor<>(indices, conversionService);
         queryVisitor.enter(finalCondition);
@@ -101,6 +107,7 @@ class DefaultIndexEngine implements IndexEngine, DisposableBean {
             sort = Sort.unsorted();
         }
         var finalCondition = options.toCondition();
+        indicesManager.awaitReady(type);
         var indices = indicesManager.get(type);
         var queryVisitor = new QueryVisitor<>(indices, conversionService);
         queryVisitor.enter(finalCondition);
@@ -124,6 +131,7 @@ class DefaultIndexEngine implements IndexEngine, DisposableBean {
             sort = Sort.unsorted();
         }
         var finalCondition = options.toCondition();
+        indicesManager.awaitReady(type);
         var indices = indicesManager.get(type);
         var queryVisitor = new QueryVisitor<>(indices, conversionService);
         queryVisitor.enter(finalCondition);
@@ -138,6 +146,7 @@ class DefaultIndexEngine implements IndexEngine, DisposableBean {
             options = ListOptions.builder().build();
         }
         var finalCondition = options.toCondition();
+        indicesManager.awaitReady(type);
         var indices = indicesManager.get(type);
         var queryVisitor = new QueryVisitor<>(indices, conversionService);
         queryVisitor.enter(finalCondition);

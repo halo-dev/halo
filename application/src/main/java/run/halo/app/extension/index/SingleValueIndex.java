@@ -249,6 +249,32 @@ class SingleValueIndex<E extends Extension, K extends Comparable<K>> implements 
         return spec.isUnique();
     }
 
+    @Override
+    public IndexSnapshot dump() {
+        var entries = index.entrySet().stream()
+                .map(e -> new IndexSnapshot.Entry(List.of(IndexKeyCodec.encode(e.getKey())), List.copyOf(e.getValue())))
+                .toList();
+        return new IndexSnapshot(
+                getName(), getFingerprint(), getKeyType().getName(), entries, List.copyOf(nullKeyValues));
+    }
+
+    @Override
+    public void restore(IndexSnapshot snapshot) {
+        for (var entry : snapshot.entries()) {
+            K key = IndexKeyCodec.decode(getKeyType(), entry.keyParts().getFirst());
+            var primaryKeys = ConcurrentHashMap.<String>newKeySet();
+            primaryKeys.addAll(entry.primaryKeys());
+            index.put(key, primaryKeys);
+            entry.primaryKeys().forEach(pk -> invertedIndex.put(pk, key));
+        }
+        nullKeyValues.addAll(snapshot.nullKeys());
+    }
+
+    @Override
+    public String getFingerprint() {
+        return IndexFingerprints.fingerprint(spec);
+    }
+
     class UpsertTransactionalOperation implements TransactionalOperation {
 
         private final String primaryKey;

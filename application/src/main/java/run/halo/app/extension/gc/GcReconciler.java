@@ -11,11 +11,10 @@ import org.springframework.transaction.ReactiveTransactionManager;
 import org.springframework.transaction.reactive.TransactionalOperator;
 import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Scheduler;
-import reactor.core.scheduler.Schedulers;
 import run.halo.app.extension.Extension;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ExtensionConverter;
+import run.halo.app.extension.IndexOperationRegistrar;
 import run.halo.app.extension.SchemeManager;
 import run.halo.app.extension.controller.*;
 import run.halo.app.extension.event.SchemeAddedEvent;
@@ -42,7 +41,7 @@ class GcReconciler implements Reconciler<GcRequest> {
 
     private final ReactiveTransactionManager transactionManager;
 
-    private Scheduler scheduler;
+    private final IndexOperationRegistrar indexOperationRegistrar;
 
     GcReconciler(
             ExtensionClient client,
@@ -50,16 +49,17 @@ class GcReconciler implements Reconciler<GcRequest> {
             ExtensionConverter converter,
             SchemeManager schemeManager,
             IndexEngine indexEngine,
-            ReactiveTransactionManager transactionManager) {
+            ReactiveTransactionManager transactionManager,
+            IndexOperationRegistrar indexOperationRegistrar) {
         this.client = client;
         this.storeClient = storeClient;
         this.converter = converter;
         this.indexEngine = indexEngine;
         this.transactionManager = transactionManager;
+        this.indexOperationRegistrar = indexOperationRegistrar;
         this.queue = new DefaultQueue<>(Instant::now, Duration.ofMillis(500));
         this.synchronizer = new GcSynchronizer(client, queue, schemeManager);
         this.schemeManager = schemeManager;
-        this.scheduler = Schedulers.boundedElastic();
     }
 
     @Override
@@ -78,8 +78,7 @@ class GcReconciler implements Reconciler<GcRequest> {
 
         return storeClient
                 .delete(extensionStore.getName(), extensionStore.getVersion())
-                .flatMap(deleted -> Mono.fromRunnable(() -> indexEngine.delete(List.of(extension)))
-                        .subscribeOn(this.scheduler))
+                .flatMap(deleted -> indexOperationRegistrar.afterCommit(() -> indexEngine.delete(List.of(extension))))
                 .as(tx::transactional)
                 .then()
                 .doOnSuccess(ignored -> log.info(

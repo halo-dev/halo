@@ -29,6 +29,16 @@ public interface IndexSpecBuilder<E extends Extension, K extends Comparable<K>, 
     B nullable(boolean nullable);
 
     /**
+     * Sets the version of the index. Bump it when the index function changes its semantics so that persisted snapshots
+     * of this index are invalidated.
+     *
+     * @param version the index version, must be positive, default is 1
+     * @return the updated IndexSpecBuilder
+     * @since 2.26.0
+     */
+    B version(int version);
+
+    /**
      * Builds the value index specification.
      *
      * @return the value index specification

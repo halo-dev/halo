@@ -40,6 +40,16 @@ public interface IndexEngine {
     <E extends Extension> void delete(Iterable<E> extensions);
 
     /**
+     * Deletes all index entries for the given primary key of the given type.
+     *
+     * @param type the extension type
+     * @param primaryKey the primary key
+     * @param <E> the extension type
+     * @since 2.26.0
+     */
+    <E extends Extension> void deleteByName(Class<E> type, String primaryKey);
+
+    /**
      * Retrieve extension names from the index.
      *
      * @param type the type of the extension

@@ -61,6 +61,11 @@ class SingleValueBuilder<E extends Extension, K extends Comparable<K>>
             public Class<K> getKeyType() {
                 return keyType;
             }
+
+            @Override
+            public int getVersion() {
+                return version;
+            }
         };
     }
 }

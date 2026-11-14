@@ -24,6 +24,8 @@ abstract class AbstractValueIndexSpecBuilder<
 
     protected boolean nullable = true;
 
+    protected int version = 1;
+
     protected AbstractValueIndexSpecBuilder(String name, Class<K> keyType) {
         Assert.hasText(name, "Index name must not be blank");
         Assert.notNull(keyType, "Key type must not be null");
@@ -38,6 +40,13 @@ abstract class AbstractValueIndexSpecBuilder<
 
     public B nullable(boolean nullable) {
         this.nullable = nullable;
+        return (B) this;
+    }
+
+    @Override
+    public B version(int version) {
+        Assert.isTrue(version > 0, "Index version must be positive");
+        this.version = version;
         return (B) this;
     }
 }

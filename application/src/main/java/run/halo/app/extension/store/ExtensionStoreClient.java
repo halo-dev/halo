@@ -35,6 +35,14 @@ public interface ExtensionStoreClient {
     List<ExtensionStore> listByNames(List<String> names);
 
     /**
+     * Lists name and version only, by name prefix. Does not load the data column.
+     *
+     * @param prefix the name prefix
+     * @return list of name-version projections
+     */
+    List<NameVersion> listNameVersionsByNamePrefix(String prefix);
+
+    /**
      * Fetches an ExtensionStore by unique name.
      *
      * @param name is the full name of an ExtensionStore.

@@ -299,8 +299,8 @@ The helper owns the Vue plugin instance. Keep `@vitejs/plugin-vue` and `@rsbuild
 ### Adding Path Aliases (Vite)
 
 ```typescript
-import { viteConfig } from "@halo-dev/ui-plugin-bundler-kit/vite";
 import path from "path";
+import { viteConfig } from "@halo-dev/ui-plugin-bundler-kit/vite";
 
 export default viteConfig({
   vite: {
@@ -335,8 +335,8 @@ export default rsbuildConfig({
 
 ```typescript
 import { viteConfig } from "@halo-dev/ui-plugin-bundler-kit/vite";
-import { defineConfig } from "vite";
 import UnoCSS from "unocss/vite";
+import { defineConfig } from "vite";
 
 export default viteConfig({
   vite: {
@@ -473,9 +473,9 @@ Choose Rsbuild when at least one of these conditions applies:
 Do not choose a build system based only on plugin size. With ESM output, both Vite and Rsbuild support dynamic imports and code splitting. The following pattern works with either preset:
 
 ```typescript
+import { VLoading } from "@halo-dev/components";
 import { definePlugin } from "@halo-dev/ui-shared";
 import { defineAsyncComponent } from "vue";
-import { VLoading } from "@halo-dev/components";
 
 export default definePlugin({
   routes: [

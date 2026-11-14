@@ -26,6 +26,14 @@ public interface ReactiveExtensionStoreClient {
     Mono<Long> countByNamePrefix(String prefix);
 
     /**
+     * Lists name and version only, by name prefix. Does not load the data column.
+     *
+     * @param prefix the name prefix
+     * @return a flux of name-version projections
+     */
+    Flux<NameVersion> listNameVersionsByNamePrefix(String prefix);
+
+    /**
      * List stores by names and return data according to given names order.
      *
      * @param names store names to list

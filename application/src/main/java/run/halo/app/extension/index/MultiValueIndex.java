@@ -64,6 +64,35 @@ class MultiValueIndex<E extends Extension, K extends Comparable<K>> implements V
     }
 
     @Override
+    public IndexSnapshot dump() {
+        var entries = index.entrySet().stream()
+                .map(e -> new IndexSnapshot.Entry(List.of(IndexKeyCodec.encode(e.getKey())), List.copyOf(e.getValue())))
+                .toList();
+        return new IndexSnapshot(
+                getName(), getFingerprint(), getKeyType().getName(), entries, List.copyOf(nullKeyValues));
+    }
+
+    @Override
+    public void restore(IndexSnapshot snapshot) {
+        for (var entry : snapshot.entries()) {
+            K key = IndexKeyCodec.decode(getKeyType(), entry.keyParts().getFirst());
+            var primaryKeys = ConcurrentHashMap.<String>newKeySet();
+            primaryKeys.addAll(entry.primaryKeys());
+            index.put(key, primaryKeys);
+            entry.primaryKeys()
+                    .forEach(pk -> invertedIndex
+                            .computeIfAbsent(pk, k -> ConcurrentHashMap.newKeySet())
+                            .add(key));
+        }
+        nullKeyValues.addAll(snapshot.nullKeys());
+    }
+
+    @Override
+    public String getFingerprint() {
+        return IndexFingerprints.fingerprint(spec);
+    }
+
+    @Override
     public TransactionalOperation prepareInsert(E extension) {
         var keys = spec.getValues(extension);
         return new UpsertTransactionalOperation(extension.getMetadata().getName(), keys);

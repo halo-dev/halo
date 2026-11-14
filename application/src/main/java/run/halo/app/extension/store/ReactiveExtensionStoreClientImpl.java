@@ -95,6 +95,13 @@ public class ReactiveExtensionStoreClientImpl implements ReactiveExtensionStoreC
     }
 
     @Override
+    public Flux<NameVersion> listNameVersionsByNamePrefix(String prefix) {
+        Assert.hasText(prefix, "Prefix must not be blank");
+        prefix = Strings.CS.appendIfMissing(prefix, "/");
+        return repository.findAllNameVersionByNameLike(prefix + "%");
+    }
+
+    @Override
     public Flux<ExtensionStore> listByNames(List<String> names) {
         if (CollectionUtils.isEmpty(names)) {
             return Flux.empty();

@@ -4,6 +4,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.reverseOrder;
 import static java.util.Comparator.comparing;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -18,9 +19,11 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
+import java.util.stream.StreamSupport;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -35,6 +38,10 @@ import org.reactivestreams.Publisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.ReactiveTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.reactive.AbstractReactiveTransactionManager;
+import org.springframework.transaction.reactive.GenericReactiveTransaction;
+import org.springframework.transaction.reactive.TransactionSynchronizationManager;
 import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
@@ -69,6 +76,9 @@ class ReactiveExtensionClientTest {
 
     @Mock
     IndexEngine indexEngine;
+
+    @Spy
+    IndexOperationRegistrar indexOperationRegistrar = new IndexOperationRegistrar();
 
     @InjectMocks
     ReactiveExtensionClientImpl client;
@@ -649,6 +659,106 @@ class ReactiveExtensionClientTest {
 
         verify(storeClient, times(1)).fetchByName(eq(storeName));
         verify(converter, times(1)).convertFrom(eq(JsonExtension.class), eq(createExtensionStore(storeName)));
+    }
+
+    @Test
+    void indexShouldBeUpdatedImmediatelyWhenNoTransactionContext() {
+        // The pass-through TransactionalOperator in setUp provides no transaction context,
+        // so the index mutation must fall back to being applied immediately.
+        var fake = createFakeExtension("fake", null);
+        when(converter.convertTo(any())).thenReturn(createExtensionStore("/registry/fake.halo.run/fakes/fake"));
+        when(storeClient.create(any(), any()))
+                .thenReturn(Mono.just(createExtensionStore("/registry/fake.halo.run/fakes/fake")));
+        when(converter.convertFrom(same(FakeExtension.class), any())).thenReturn(fake);
+
+        StepVerifier.create(client.create(fake)).expectNext(fake).verifyComplete();
+
+        verify(indexEngine, times(1))
+                .insert(argThat(iterable ->
+                        StreamSupport.stream(iterable.spliterator(), false).anyMatch(fake::equals)));
+    }
+
+    @Test
+    void indexOperationShouldBeDeferredToAfterCommit() {
+        var fake = createFakeExtension("fake", null);
+        when(converter.convertTo(any())).thenReturn(createExtensionStore("/registry/fake.halo.run/fakes/fake"));
+        when(storeClient.create(any(), any()))
+                .thenReturn(Mono.just(createExtensionStore("/registry/fake.halo.run/fakes/fake")));
+        when(converter.convertFrom(same(FakeExtension.class), any())).thenReturn(fake);
+
+        var indexMutated = new AtomicBoolean(false);
+        doAnswer(invocation -> {
+                    indexMutated.set(true);
+                    return null;
+                })
+                .when(indexEngine)
+                .insert(any());
+
+        var transactionManager = new FakeReactiveTransactionManager();
+        var indexMutatedBeforeCommit = new AtomicBoolean(false);
+        transactionManager.commitHook = () -> indexMutatedBeforeCommit.set(indexMutated.get());
+        client.setTransactionalOperator(TransactionalOperator.create(transactionManager));
+
+        StepVerifier.create(client.create(fake)).expectNext(fake).verifyComplete();
+
+        assertFalse(indexMutatedBeforeCommit.get(), "Index must not be updated before the commit");
+        verify(indexEngine, times(1)).insert(any());
+    }
+
+    @Test
+    void indexOperationShouldBeSkippedWhenTransactionRollsBack() {
+        var fake = createFakeExtension("fake", null);
+        when(converter.convertTo(any())).thenReturn(createExtensionStore("/registry/fake.halo.run/fakes/fake"));
+        when(storeClient.create(any(), any()))
+                .thenReturn(Mono.just(createExtensionStore("/registry/fake.halo.run/fakes/fake")));
+        when(converter.convertFrom(same(FakeExtension.class), any())).thenReturn(fake);
+
+        var transactionManager = new FakeReactiveTransactionManager();
+        transactionManager.failOnCommit = true;
+        client.setTransactionalOperator(TransactionalOperator.create(transactionManager));
+
+        StepVerifier.create(client.create(fake)).expectError().verify();
+
+        verify(indexEngine, never()).insert(any());
+    }
+
+    /**
+     * Minimal in-memory {@link ReactiveTransactionManager} that drives the real
+     * {@link AbstractReactiveTransactionManager} commit/rollback lifecycle, including transaction synchronizations.
+     */
+    static class FakeReactiveTransactionManager extends AbstractReactiveTransactionManager {
+
+        Runnable commitHook = () -> {};
+
+        boolean failOnCommit;
+
+        @Override
+        protected Object doGetTransaction(TransactionSynchronizationManager synchronizationManager) {
+            return new Object();
+        }
+
+        @Override
+        protected Mono<Void> doBegin(
+                TransactionSynchronizationManager synchronizationManager,
+                Object transaction,
+                TransactionDefinition definition) {
+            return Mono.empty();
+        }
+
+        @Override
+        protected Mono<Void> doCommit(
+                TransactionSynchronizationManager synchronizationManager, GenericReactiveTransaction transaction) {
+            if (failOnCommit) {
+                return Mono.error(new IllegalStateException("Commit failed on purpose"));
+            }
+            return Mono.fromRunnable(commitHook);
+        }
+
+        @Override
+        protected Mono<Void> doRollback(
+                TransactionSynchronizationManager synchronizationManager, GenericReactiveTransaction transaction) {
+            return Mono.empty();
+        }
     }
 
     @Nested

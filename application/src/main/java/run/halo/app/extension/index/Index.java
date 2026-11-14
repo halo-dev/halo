@@ -59,4 +59,28 @@ public interface Index<E extends Extension, K extends Comparable<K>> extends Clo
      * @return the transactional operation.
      */
     TransactionalOperation prepareDelete(String primaryKey);
+
+    /**
+     * Dumps the content of this index into a serializable snapshot.
+     *
+     * @return the snapshot of this index
+     * @since 2.26.0
+     */
+    IndexSnapshot dump();
+
+    /**
+     * Restores the content of this index from a snapshot. The index must be empty.
+     *
+     * @param snapshot the snapshot to restore from
+     * @since 2.26.0
+     */
+    void restore(IndexSnapshot snapshot);
+
+    /**
+     * Gets the structural fingerprint of this index, used to match snapshots against specs.
+     *
+     * @return the fingerprint
+     * @since 2.26.0
+     */
+    String getFingerprint();
 }
