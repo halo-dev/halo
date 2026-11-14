@@ -3,7 +3,6 @@ package run.halo.app.core.user.service.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -29,6 +28,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -66,6 +68,7 @@ import run.halo.app.infra.exception.EmailAlreadyTakenException;
 import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.infra.exception.UserNotFoundException;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
+import run.halo.app.security.device.DeviceService;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
@@ -96,6 +99,9 @@ class UserServiceImplTest {
 
     @Mock
     ReactiveSessionRegistry sessionRegistry;
+
+    @Mock
+    DeviceService deviceService;
 
     @InjectMocks
     UserServiceImpl userService;
@@ -382,6 +388,38 @@ class UserServiceImplTest {
     }
 
     @Nested
+    class DisableTest {
+
+        @BeforeEach
+        void setUp() {
+            var tx = mock(ReactiveTransaction.class);
+
+            when(txManager.getReactiveTransaction(any())).thenReturn(Mono.just(tx));
+            when(txManager.commit(tx)).thenReturn(Mono.empty());
+        }
+
+        @Test
+        void shouldRevokeDevicesAndInvalidateSessions() {
+            var user = createUser("fake-password");
+            when(client.fetch(User.class, "fake-user")).thenReturn(Mono.just(user));
+            when(deviceService.revoke("fake-user")).thenReturn(Mono.empty());
+            var session = mock(ReactiveSessionInformation.class);
+            when(session.invalidate()).thenReturn(Mono.empty());
+            when(sessionRegistry.getAllSessions("fake-user")).thenReturn(Flux.just(session));
+            when(client.update(user)).thenReturn(Mono.just(user));
+
+            StepVerifier.create(userService.disable("fake-user"))
+                    .assertNext(disabledUser ->
+                            assertThat(disabledUser.getSpec().getDisabled()).isTrue())
+                    .verifyComplete();
+
+            verify(deviceService).revoke("fake-user");
+            verify(session).invalidate();
+            verify(client).update(user);
+        }
+    }
+
+    @Nested
     class SignUpTest {
 
         @Test
@@ -398,7 +436,9 @@ class UserServiceImplTest {
                     .as(StepVerifier::create)
                     .consumeErrorWith(e -> {
                         assertInstanceOf(ServerWebInputException.class, e);
-                        assertTrue(e.getMessage().contains("registration is not allowed"));
+                        assertEquals(
+                                "problemDetail.user.signUpFailed.disallowed",
+                                ((ServerWebInputException) e).getReason());
                     })
                     .verify();
         }
@@ -453,10 +493,13 @@ class UserServiceImplTest {
                     .verifyComplete();
         }
 
-        @Test
-        void signUpWhenRegistrationDefaultRoleNotConfigured() {
+        @ParameterizedTest
+        @NullAndEmptySource
+        @ValueSource(strings = {" ", "super-role"})
+        void signUpWhenRegistrationDefaultRoleIsInvalid(String role) {
             SystemSetting.User userSetting = new SystemSetting.User();
             userSetting.setAllowRegistration(true);
+            userSetting.setDefaultRole(role);
             when(environmentFetcher.fetch(eq(SystemSetting.User.GROUP), eq(SystemSetting.User.class)))
                     .thenReturn(Mono.just(userSetting));
 
@@ -467,9 +510,13 @@ class UserServiceImplTest {
                     .as(StepVerifier::create)
                     .consumeErrorWith(e -> {
                         assertInstanceOf(ServerWebInputException.class, e);
-                        assertTrue(e.getMessage().contains("default role is not configured"));
+                        assertEquals(
+                                "problemDetail.user.signup.defaultRoleMissing",
+                                ((ServerWebInputException) e).getReason());
                     })
                     .verify();
+
+            verify(client, never()).create(any(User.class));
         }
 
         @Test

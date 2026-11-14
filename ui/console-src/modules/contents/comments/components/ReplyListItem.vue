@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { useEntityFieldItemExtensionPoint } from "@console/composables/use-entity-extension-points";
 import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
 import type { ListedComment, ListedReply } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
@@ -13,13 +14,19 @@ import {
   VStatusDot,
   VTag,
 } from "@halo-dev/components";
-import { utils, type OperationItem } from "@halo-dev/ui-shared";
+import {
+  utils,
+  type EntityFieldItem,
+  type OperationItem,
+} from "@halo-dev/ui-shared";
 import { useQueryClient } from "@tanstack/vue-query";
 import { computed, inject, markRaw, ref, toRefs, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
+import EntityFieldItems from "@/components/entity-fields/EntityFieldItems.vue";
 import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
 import { useCommentLastReadTimeMutate } from "../composables/use-comment-last-readtime-mutate";
-import { useContentProviderExtensionPoint } from "../composables/use-content-provider-extension-point";
+import CollapsibleCommentContent from "./CollapsibleCommentContent.vue";
+import CommentEditingModal from "./CommentEditingModal.vue";
 import OwnerButton from "./OwnerButton.vue";
 import ReplyCreationModal from "./ReplyCreationModal.vue";
 import ReplyDetailModal from "./ReplyDetailModal.vue";
@@ -39,6 +46,12 @@ const props = withDefaults(
 );
 
 const { reply } = toRefs(props);
+
+const { data: fields } = useEntityFieldItemExtensionPoint<ListedReply>(
+  "reply:list-item:field:create",
+  reply,
+  computed((): EntityFieldItem[] => [])
+);
 
 const creationTime = computed(() => {
   return (
@@ -109,6 +122,24 @@ async function handleCancelApprove() {
   });
 }
 
+async function handleToggleHidden() {
+  await coreApiClient.content.reply.patchReply({
+    name: props.reply.reply.metadata.name,
+    jsonPatchInner: [
+      {
+        op: "add",
+        path: "/spec/hidden",
+        value: !props.reply.reply.spec.hidden,
+      },
+    ],
+  });
+  Toast.success(t("core.common.toast.operation_success"));
+  queryClient.invalidateQueries({
+    queryKey: ["core:comment-replies", props.comment.comment.metadata.name],
+  });
+  queryClient.invalidateQueries({ queryKey: ["core:comments"] });
+}
+
 // Show hovered reply
 const hoveredReply = inject<Ref<ListedReply | undefined>>("hoveredReply");
 
@@ -127,6 +158,7 @@ const isHoveredReply = computed(() => {
 // Create reply
 const replyModal = ref(false);
 const detailModalVisible = ref(false);
+const editingModalVisible = ref(false);
 
 const { mutate: updateCommentLastReadTimeMutate } =
   useCommentLastReadTimeMutate(props.comment);
@@ -165,7 +197,29 @@ const { data: operationItems } = useOperationItemExtensionPoint<ListedReply>(
       },
     },
     {
+      priority: 15,
+      component: markRaw(VDropdownItem),
+      label: t("core.common.buttons.edit"),
+      permissions: ["system:comments:manage"],
+      hidden: !!props.reply.reply.metadata.deletionTimestamp,
+      action: () => {
+        editingModalVisible.value = true;
+      },
+    },
+    {
       priority: 20,
+      component: markRaw(VDropdownItem),
+      label: t(
+        props.reply.reply.spec.hidden
+          ? "core.comment.operations.make_public.button"
+          : "core.comment.operations.make_private.button"
+      ),
+      permissions: ["system:comments:manage"],
+      hidden: !!props.reply.reply.metadata.deletionTimestamp,
+      action: handleToggleHidden,
+    },
+    {
+      priority: 25,
       component: markRaw(VDropdownDivider),
     },
     {
@@ -190,11 +244,14 @@ const { data: operationItems } = useOperationItemExtensionPoint<ListedReply>(
     },
   ])
 );
-
-const { data: contentProvider } = useContentProviderExtensionPoint();
 </script>
 
 <template>
+  <CommentEditingModal
+    v-if="editingModalVisible"
+    :target="reply.reply"
+    @close="editingModalVisible = false"
+  />
   <ReplyCreationModal
     v-if="replyModal"
     :comment="comment"
@@ -214,6 +271,7 @@ const { data: contentProvider } = useContentProviderExtensionPoint();
     :class="{ 'animate-breath': isHoveredReply }"
   >
     <template #start>
+      <EntityFieldItems :fields="fields?.start || []" />
       <VEntityField width="100%" max-width="100%">
         <template #description>
           <div class="flex flex-col gap-2">
@@ -222,7 +280,9 @@ const { data: contentProvider } = useContentProviderExtensionPoint();
                 :owner="reply?.owner"
                 @click="detailModalVisible = true"
               />
-              <VTag v-if="comment.comment.spec.hidden">
+              <VTag
+                v-if="reply.reply.spec.hidden || comment.comment.spec.hidden"
+              >
                 {{ $t("core.comment.list.fields.private") }}
               </VTag>
               <span class="whitespace-nowrap text-sm text-gray-900">
@@ -239,8 +299,7 @@ const { data: contentProvider } = useContentProviderExtensionPoint();
               >
                 <IconReplyLine />
                 <span>{{ quoteReply.owner.displayName }}</span> </a
-              ><br v-if="quoteReply" /><component
-                :is="contentProvider?.component"
+              ><br v-if="quoteReply" /><CollapsibleCommentContent
                 :content="reply?.reply.spec.content"
               />
             </div>
@@ -259,6 +318,7 @@ const { data: contentProvider } = useContentProviderExtensionPoint();
       </VEntityField>
     </template>
     <template #end>
+      <EntityFieldItems :fields="fields?.end || []" />
       <VEntityField v-if="!reply?.reply.spec.approved">
         <template #description>
           <VStatusDot

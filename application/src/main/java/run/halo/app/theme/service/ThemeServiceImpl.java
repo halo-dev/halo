@@ -26,6 +26,7 @@ import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.ResourceUtils;
@@ -40,13 +41,14 @@ import run.halo.app.core.extension.AnnotationSetting;
 import run.halo.app.core.extension.Setting;
 import run.halo.app.core.extension.Theme;
 import run.halo.app.extension.ConfigMap;
-import run.halo.app.extension.MetadataUtil;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Unstructured;
 import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.infra.ThemeRootGetter;
+import run.halo.app.infra.exception.DuplicateNameException;
 import run.halo.app.infra.exception.ThemeAlreadyExistsException;
 import run.halo.app.infra.exception.ThemeUpgradeException;
 import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
@@ -103,8 +105,9 @@ public class ThemeServiceImpl implements ThemeService {
                                             DefaultDataBufferFactory.sharedInstance,
                                             StreamUtils.BUFFER_SIZE);
                                     // We don't want to run on the bounded elastic scheduler again, so pass null
-                                    // here.
-                                    return doInstall(content, null);
+                                    // here. The override flag heals the theme directory left behind by an
+                                    // interrupted setup.
+                                    return doInstall(content, null, true);
                                 }),
                         FileUtils::deleteRecursivelyAndSilently)
                 .subscribeOn(scheduler)
@@ -177,8 +180,25 @@ public class ThemeServiceImpl implements ThemeService {
     }
 
     private Mono<Theme> doInstall(Publisher<DataBuffer> content, @Nullable Scheduler scheduler) {
+        return doInstall(content, scheduler, false);
+    }
+
+    private Mono<Theme> doInstall(Publisher<DataBuffer> content, @Nullable Scheduler scheduler, boolean override) {
         var themeRoot = this.themeRoot.get();
-        return unzipThemeTo(content, themeRoot, scheduler).flatMap(theme -> persistent(theme, false));
+        return unzipThemeTo(content, themeRoot, override, scheduler).flatMap(theme -> {
+            if (!override) {
+                return persistent(theme, false);
+            }
+            // Setup must not leave an invalid Theme that a later attempt could mistake for success.
+            Assert.state(StringUtils.equals(Theme.KIND, theme.getKind()), "Theme manifest kind must be Theme.");
+            var presetTheme = Unstructured.OBJECT_MAPPER.convertValue(theme, Theme.class);
+            return validateTheme(presetTheme)
+                    .flatMap(client::create)
+                    .onErrorResume(
+                            DuplicateNameException.class,
+                            error -> client.get(Theme.class, theme.getMetadata().getName())
+                                    .flatMap(this::validateTheme));
+        });
     }
 
     /**
@@ -192,16 +212,17 @@ public class ThemeServiceImpl implements ThemeService {
     private Mono<Theme> persistent(Unstructured themeManifest, boolean isUpgrade) {
         Assert.state(StringUtils.equals(Theme.KIND, themeManifest.getKind()), "Theme manifest kind must be Theme.");
         var newTheme = Unstructured.OBJECT_MAPPER.convertValue(themeManifest, Theme.class);
-        final Mono<Theme> createOrUpdateTheme;
         if (isUpgrade) {
-            createOrUpdateTheme = client.get(Theme.class, newTheme.getMetadata().getName())
+            return client.get(Theme.class, newTheme.getMetadata().getName())
                     .doOnNext(theme -> updateTheme(theme, newTheme))
-                    .flatMap(client::update);
-        } else {
-            createOrUpdateTheme = client.create(newTheme);
+                    .flatMap(client::update)
+                    .flatMap(this::validateTheme);
         }
-        return createOrUpdateTheme
-                .doOnNext(theme -> {
+        return client.create(newTheme).flatMap(this::validateTheme);
+    }
+
+    private Mono<Theme> validateTheme(Theme theme) {
+        return Mono.fromCallable(() -> {
                     String systemVersion =
                             systemVersionSupplier.get().toStableVersion().toString();
                     String requires = theme.getSpec().getRequires();
@@ -214,19 +235,16 @@ public class ThemeServiceImpl implements ThemeService {
                                 "problemDetail.theme.version.unsatisfied.requires",
                                 new String[] {requires, systemVersion});
                     }
-                })
-                .delayUntil(theme -> {
                     var unstructureds = ThemeUtils.loadThemeResources(getThemePath(theme));
                     if (unstructureds.stream().filter(hasSettingsYaml(theme)).count() > 1) {
-                        return Mono.error(
-                                new IllegalStateException("Theme must only have one settings.yaml or settings.yml."));
+                        throw new IllegalStateException("Theme must only have one settings.yaml or settings.yml.");
                     }
                     if (unstructureds.stream().filter(hasConfigYaml(theme)).count() > 1) {
-                        return Mono.error(
-                                new IllegalStateException("Theme must only have one config.yaml or config.yml."));
+                        throw new IllegalStateException("Theme must only have one config.yaml or config.yml.");
                     }
-                    return Mono.empty();
-                });
+                    return theme;
+                })
+                .subscribeOn(scheduler);
     }
 
     @Override
@@ -296,13 +314,12 @@ public class ThemeServiceImpl implements ThemeService {
     }
 
     private Mono<Void> waitForAnnotationSettingsDeleted(String themeName) {
-        return client.list(
-                        AnnotationSetting.class,
-                        annotationSetting -> {
-                            Map<String, String> labels = MetadataUtil.nullSafeLabels(annotationSetting);
-                            return StringUtils.equals(themeName, labels.get(Theme.THEME_NAME_LABEL));
-                        },
-                        null)
+        var listOptions = ListOptions.builder()
+                .labelSelector()
+                .eq(Theme.THEME_NAME_LABEL, themeName)
+                .end()
+                .build();
+        return client.listAll(AnnotationSetting.class, listOptions, Sort.unsorted())
                 .flatMap(annotationSetting -> client.delete(annotationSetting)
                         .flatMap(deleted -> client.fetch(
                                         AnnotationSetting.class,

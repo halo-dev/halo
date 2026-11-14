@@ -24,7 +24,8 @@ class CsrfConfigurer implements SecurityConfigurer {
         var csrfMatcher = new AndServerWebExchangeMatcher(
                 CsrfWebFilter.DEFAULT_CSRF_MATCHER,
                 new NegatedServerWebExchangeMatcher(
-                        pathMatchers("/api/**", "/apis/**", "/actuator/**", "/system/setup")),
+                        // /sudo/** is SPA JSON like /apis/**; XOR CSRF cannot be sent from the cookie.
+                        pathMatchers("/api/**", "/apis/**", "/actuator/**", "/system/setup", "/sudo/**")),
                 new NegatedServerWebExchangeMatcher(tokenAuthMatcher()));
         http.csrf(csrfSpec -> csrfSpec.csrfTokenRepository(new CookieServerCsrfTokenRepository())
                 .csrfTokenRequestHandler(new XorServerCsrfTokenRequestAttributeHandler())

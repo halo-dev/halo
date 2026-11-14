@@ -25,12 +25,20 @@ const src = computed({
   },
 });
 
-const autoplay = computed(() => {
-  return props.node.attrs.autoplay;
-});
+const previewAudioAttributes = computed(() => {
+  const { controlslist, crossorigin, disableremoteplayback, muted } =
+    props.node.attrs;
 
-const loop = computed(() => {
-  return props.node.attrs.loop;
+  return {
+    autoplay: false,
+    controls: true,
+    controlslist,
+    crossorigin,
+    disableremoteplayback,
+    loop: false,
+    muted,
+    preload: "metadata",
+  };
 });
 
 const initialization = computed(() => {
@@ -112,12 +120,9 @@ const isPercentageWidth = computed(() => {
     >
       <div v-if="src" class="group relative">
         <audio
+          v-bind="previewAudioAttributes"
           class="m-0 rounded-md"
-          controls
           :src="src"
-          :autoplay="autoplay"
-          :loop="loop"
-          preload="metadata"
           :style="{
             width: isPercentageWidth ? '100%' : node.attrs.width,
             height: isPercentageWidth ? '100%' : node.attrs.height,

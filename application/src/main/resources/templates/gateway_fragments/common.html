@@ -36,7 +36,7 @@
     };
   </script>
 
-  <script src="/js/main.js"></script>
+  <script th:src="|/js/main.js?v=${site.version}|"></script>
 </th:block>
 
 <th:block th:fragment="basicStyleResources">
@@ -123,7 +123,7 @@
     }
   </style>
   <div class="halo-logo">
-    <img src="/images/wordmark.svg" alt="Halo" />
+    <img th:src="|/images/wordmark.svg?v=${site.version}|" alt="Halo" />
   </div>
 </div>
 
@@ -158,12 +158,10 @@
         return;
       }
 
-      rememberMeCheckbox.addEventListener("change", function (e) {
-        const rememberMe = e.target.checked;
-
-        socialAuthProviders.forEach((form) => {
+      socialAuthProviders.forEach((form) => {
+        form.addEventListener("submit", function () {
           const url = new URL(form.action, window.location.origin);
-          url.searchParams.set("remember-me", rememberMe ? "true" : "false");
+          url.searchParams.set("remember-me", rememberMeCheckbox.checked ? "true" : "false");
           form.action = url.pathname + url.search;
         });
       });

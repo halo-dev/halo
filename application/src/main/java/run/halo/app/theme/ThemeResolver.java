@@ -2,6 +2,7 @@ package run.halo.app.theme;
 
 import static run.halo.app.security.authorization.AuthorityUtils.authoritiesToRoles;
 
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Set;
 import lombok.AllArgsConstructor;
@@ -21,6 +22,8 @@ import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.SystemSetting.ThemeRouteRules;
 import run.halo.app.infra.ThemeRootGetter;
+import run.halo.app.infra.exception.AccessDeniedException;
+import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.security.authorization.AuthorityUtils;
 
 /**
@@ -39,7 +42,7 @@ public class ThemeResolver {
 
     public Mono<ThemeContext> getThemeContext(String themeName) {
         Assert.hasText(themeName, "Theme name cannot be empty");
-        var path = themeRoot.get().resolve(themeName);
+        var path = resolveThemePath(themeName);
         return Mono.just(ThemeContext.builder().name(themeName).path(path))
                 .flatMap(builder -> {
                     var activeMono = environmentFetcher
@@ -73,7 +76,15 @@ public class ThemeResolver {
                             }
 
                             boolean active = StringUtils.equals(activatedTheme, themeName);
-                            var path = themeRoot.get().resolve(themeName);
+                            Path path;
+                            try {
+                                path = resolveThemePath(themeName);
+                            } catch (AccessDeniedException e) {
+                                // Reject path traversal via preview-theme; fall back to activated theme.
+                                themeName = activatedTheme;
+                                active = true;
+                                path = resolveThemePath(themeName);
+                            }
                             builder.name(themeName).path(path).active(active);
 
                             return client.fetch(Theme.class, themeName)
@@ -94,6 +105,14 @@ public class ThemeResolver {
                 .filter(attrs -> attrs.containsKey(ThemeContext.class.getName()))
                 .map(attrs -> attrs.get(ThemeContext.class.getName()))
                 .cast(ThemeContext.class);
+    }
+
+    /** Resolve a theme directory under the themes root and reject path traversal. */
+    Path resolveThemePath(String themeName) {
+        var themeRootPath = themeRoot.get();
+        var path = themeRootPath.resolve(themeName).normalize();
+        FileUtils.checkDirectoryTraversal(themeRootPath, path);
+        return path;
     }
 
     private Mono<ThemeActivationState> fetchActivationState() {

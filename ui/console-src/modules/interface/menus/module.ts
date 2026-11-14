@@ -15,7 +15,7 @@ export default definePlugin({
         searchable: true,
         permissions: ["system:menus:view"],
         menu: {
-          name: "core.sidebar.menu.items.menus",
+          name: /* @x18n-key */ "core.sidebar.menu.items.menus",
           group: "interface",
           icon: markRaw(IconListSettings),
           priority: 1,

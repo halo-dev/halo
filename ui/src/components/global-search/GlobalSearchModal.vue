@@ -1,47 +1,14 @@
 <script lang="ts" setup>
-import { useThemeStore } from "@console/stores/theme";
-import {
-  consoleApiClient,
-  coreApiClient,
-  paginate,
-  type Attachment,
-  type AttachmentV1alpha1ApiListAttachmentRequest,
-  type Category,
-  type CategoryV1alpha1ApiListCategoryRequest,
-  type Plugin,
-  type PluginV1alpha1ApiListPluginRequest,
-  type Post,
-  type PostV1alpha1ApiListPostRequest,
-  type SinglePage,
-  type SinglePageV1alpha1ApiListSinglePageRequest,
-  type Tag,
-  type TagV1alpha1ApiListTagRequest,
-  type User,
-  type UserV1alpha1ApiListUserRequest,
-} from "@halo-dev/api-client";
-import {
-  IconBookRead,
-  IconFolder,
-  IconLink,
-  IconPages,
-  IconPalette,
-  IconSettings,
-  IconUserSettings,
-  VModal,
-} from "@halo-dev/components";
-import { utils } from "@halo-dev/ui-shared";
+import { VModal } from "@halo-dev/components";
 import { useEventListener } from "@vueuse/core";
-import Fuse from "fuse.js";
-import { storeToRefs } from "pinia";
-import { computed, markRaw, onMounted, ref, watch, type Component } from "vue";
-import { useI18n } from "vue-i18n";
-import { useRoute, useRouter, type RouteLocationRaw } from "vue-router";
+import { onMounted, ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import GlobalSearchResultItem from "./GlobalSearchResultItem.vue";
+import type { GlobalSearchResult } from "./types";
+import { useGlobalSearch } from "./use-global-search";
 
 const router = useRouter();
 const route = useRoute();
-const { t } = useI18n();
-
-const { activatedTheme } = storeToRefs(useThemeStore());
 
 const emit = defineEmits<{
   (e: "close"): void;
@@ -49,293 +16,35 @@ const emit = defineEmits<{
 
 const modal = ref<InstanceType<typeof VModal> | null>(null);
 const globalSearchInput = ref<HTMLInputElement | null>(null);
-const keyword = ref("");
 
-interface SearchableItem {
-  title: string;
-  icon: { component: Component } | { src: string };
-  group?: string;
-  route: RouteLocationRaw;
-}
-
-const searchableItem: SearchableItem[] = [];
-const selectedIndex = ref(0);
-
-const fuse = new Fuse(searchableItem, {
-  keys: ["title", "group", "route.path", "route.name"],
-  useExtendedSearch: true,
-  threshold: 0.2,
-});
-
-const searchResults = computed((): SearchableItem[] => {
-  return fuse
-    .search(keyword.value, {
-      limit: 20,
-    })
-    .map((result) => result.item);
-});
-
-const handleBuildSearchIndex = () => {
-  fuse.remove(() => true);
-
-  const routes = router.getRoutes().filter((route) => {
-    return !!route.meta?.title && route.meta?.searchable;
-  });
-
-  routes.forEach((route) => {
-    fuse.add({
-      title: t(route.meta?.title as string),
-      icon: {
-        component: markRaw(IconLink),
-      },
-      group: t("core.components.global_search.groups.console"),
-      route,
-    });
-  });
-
-  if (utils.permission.has(["system:users:view"])) {
-    paginate<UserV1alpha1ApiListUserRequest, User>(
-      (params) => coreApiClient.user.listUser(params),
-      {
-        labelSelector: ["!halo.run/hidden-user"],
-        size: 1000,
-      }
-    ).then((users) => {
-      for (const user of users) {
-        fuse.add({
-          title: user.spec.displayName,
-          icon: {
-            component: markRaw(IconUserSettings),
-          },
-          group: t("core.components.global_search.groups.user"),
-          route: {
-            name: "UserDetail",
-            params: {
-              name: user.metadata.name,
-            },
-          },
-        });
-      }
-    });
-  }
-
-  if (utils.permission.has(["system:plugins:view"])) {
-    paginate<PluginV1alpha1ApiListPluginRequest, Plugin>(
-      (params) => coreApiClient.plugin.plugin.listPlugin(params),
-      {
-        size: 1000,
-      }
-    ).then((plugins) => {
-      for (const plugin of plugins) {
-        fuse.add({
-          title: plugin.spec.displayName as string,
-          icon: {
-            src: plugin.status?.logo as string,
-          },
-          group: t("core.components.global_search.groups.plugin"),
-          route: {
-            name: "PluginDetail",
-            params: {
-              name: plugin.metadata.name,
-            },
-          },
-        });
-      }
-    });
-  }
-
-  if (utils.permission.has(["system:posts:view"])) {
-    paginate<PostV1alpha1ApiListPostRequest, Post>(
-      (params) => coreApiClient.content.post.listPost(params),
-      {
-        size: 1000,
-      }
-    ).then((posts) => {
-      for (const post of posts) {
-        fuse.add({
-          title: post.spec.title,
-          icon: {
-            component: markRaw(IconBookRead),
-          },
-          group: t("core.components.global_search.groups.post"),
-          route: {
-            name: "PostEditor",
-            query: {
-              name: post.metadata.name,
-            },
-          },
-        });
-      }
-    });
-
-    paginate<CategoryV1alpha1ApiListCategoryRequest, Category>(
-      (params) => coreApiClient.content.category.listCategory(params),
-      {
-        size: 1000,
-        sort: ["metadata.creationTimestamp,desc"],
-      }
-    ).then((categories) => {
-      for (const category of categories) {
-        fuse.add({
-          title: category.spec.displayName,
-          icon: {
-            component: markRaw(IconBookRead),
-          },
-          group: t("core.components.global_search.groups.category"),
-          route: {
-            name: "Categories",
-            query: {
-              name: category.metadata.name,
-            },
-          },
-        });
-      }
-    });
-
-    paginate<TagV1alpha1ApiListTagRequest, Tag>(
-      (params) => coreApiClient.content.tag.listTag(params),
-      {
-        size: 1000,
-        sort: ["metadata.creationTimestamp,desc"],
-      }
-    ).then((tags) => {
-      for (const tag of tags) {
-        fuse.add({
-          title: tag.spec.displayName,
-          icon: {
-            component: markRaw(IconBookRead),
-          },
-          group: t("core.components.global_search.groups.tag"),
-          route: {
-            name: "Tags",
-            query: {
-              name: tag.metadata.name,
-            },
-          },
-        });
-      }
-    });
-  }
-
-  if (utils.permission.has(["system:singlepages:view"])) {
-    paginate<SinglePageV1alpha1ApiListSinglePageRequest, SinglePage>(
-      (params) => coreApiClient.content.singlePage.listSinglePage(params),
-      {
-        size: 1000,
-      }
-    ).then((singlePages) => {
-      for (const singlePage of singlePages) {
-        fuse.add({
-          title: singlePage.spec.title,
-          icon: {
-            component: markRaw(IconPages),
-          },
-          group: t("core.components.global_search.groups.page"),
-          route: {
-            name: "SinglePageEditor",
-            query: {
-              name: singlePage.metadata.name,
-            },
-          },
-        });
-      }
-    });
-  }
-
-  if (utils.permission.has(["system:attachments:view"])) {
-    paginate<AttachmentV1alpha1ApiListAttachmentRequest, Attachment>(
-      (params) => coreApiClient.storage.attachment.listAttachment(params),
-      {
-        size: 1000,
-      }
-    ).then((attachments) => {
-      for (const attachment of attachments) {
-        fuse.add({
-          title: attachment.spec.displayName as string,
-          icon: {
-            component: markRaw(IconFolder),
-          },
-          group: t("core.components.global_search.groups.attachment"),
-          route: {
-            name: "Attachments",
-            query: {
-              name: attachment.metadata.name,
-            },
-          },
-        });
-      }
-    });
-  }
-
-  if (
-    utils.permission.has(
-      ["system:settings:view", "system:configmaps:view"],
-      false
-    )
-  ) {
-    coreApiClient.setting.getSetting({ name: "system" }).then((response) => {
-      response.data.spec.forms.forEach((form) => {
-        fuse.add({
-          title: form.label as string,
-          icon: {
-            component: markRaw(IconSettings),
-          },
-          group: t("core.components.global_search.groups.setting"),
-          route: {
-            name: "SystemSetting",
-            params: {
-              group: form.group,
-            },
-          },
-        });
-      });
-    });
-  }
-
-  if (utils.permission.has(["system:themes:view"])) {
-    consoleApiClient.theme.theme
-      .fetchThemeSetting({ name: "-" })
-      .then(({ data: themeSettings }) => {
-        themeSettings.spec.forms.forEach((form) => {
-          fuse.add({
-            title: [activatedTheme.value?.spec.displayName, form.label].join(
-              " / "
-            ),
-            icon: {
-              component: markRaw(IconPalette),
-            },
-            group: t("core.components.global_search.groups.theme_setting"),
-            route: {
-              name: "ThemeSetting",
-              params: {
-                group: form.group,
-              },
-            },
-          });
-        });
-      });
-  }
-};
+const {
+  keyword,
+  results,
+  selectedIndex,
+  selectedResult,
+  selectNext,
+  selectPrevious,
+  isInitial,
+  isSearching,
+  hasPartialFailure,
+  isFinalEmpty,
+} = useGlobalSearch();
 
 const handleKeydown = (e: KeyboardEvent) => {
   const { key, ctrlKey } = e;
 
   if (key === "ArrowUp" || (key === "k" && ctrlKey)) {
-    selectedIndex.value = Math.max(0, selectedIndex.value - 1);
+    selectPrevious();
     e.preventDefault();
   }
 
   if (key === "ArrowDown" || (key === "j" && ctrlKey)) {
-    selectedIndex.value = Math.min(
-      searchResults.value.length - 1,
-      selectedIndex.value + 1
-    );
+    selectNext();
     e.preventDefault();
   }
 
   if (key === "Enter") {
-    const searchResult = searchResults.value[selectedIndex.value];
-    handleRoute(searchResult);
+    handleRoute(selectedResult.value);
   }
 
   if (key === "Escape") {
@@ -344,7 +53,10 @@ const handleKeydown = (e: KeyboardEvent) => {
   }
 };
 
-const handleRoute = async (item: SearchableItem) => {
+const handleRoute = async (item: GlobalSearchResult | null) => {
+  if (!item) {
+    return;
+  }
   // if route has query params, need router.go(0)
   if (typeof item.route !== "string" && "query" in item.route) {
     if ("name" in item.route && route.name === item.route.name) {
@@ -368,16 +80,7 @@ watch(
   }
 );
 
-watch(
-  () => keyword.value,
-  () => {
-    selectedIndex.value = 0;
-  }
-);
-
 onMounted(() => {
-  handleBuildSearchIndex();
-
   setTimeout(() => {
     globalSearchInput.value?.focus();
   }, 100);
@@ -409,47 +112,50 @@ useEventListener("keydown", handleKeydown);
     </div>
     <div class="px-2 py-2.5">
       <div
-        v-if="!searchResults.length"
+        v-if="isInitial"
         class="flex items-center justify-center text-sm text-gray-500"
       >
-        <span>{{ $t("core.components.global_search.no_results") }}</span>
+        <span>{{ $t("core.components.global_search.states.initial") }}</span>
       </div>
-      <ul
-        v-if="searchResults.length > 0"
-        class="box-border flex h-full w-full flex-col gap-1"
-        role="list"
-      >
-        <li
-          v-for="(item, itemIndex) in searchResults"
-          :id="`search-item-${itemIndex}`"
-          :key="itemIndex"
-          @click="handleRoute(item)"
+      <template v-else>
+        <div
+          v-if="isFinalEmpty"
+          class="flex items-center justify-center text-sm text-gray-500"
         >
-          <div
-            class="flex cursor-pointer items-center rounded-md px-2 py-2.5 hover:bg-gray-100"
-            :class="{ 'bg-gray-100': selectedIndex === itemIndex }"
+          <span>{{ $t("core.components.global_search.no_results") }}</span>
+        </div>
+        <ul
+          v-if="results.length > 0"
+          class="box-border flex h-full w-full flex-col gap-1"
+          role="list"
+        >
+          <li
+            v-for="(item, itemIndex) in results"
+            :id="`search-item-${itemIndex}`"
+            :key="item.id"
+            @click="handleRoute(item)"
           >
-            <div class="inline-flex flex-1 items-center gap-3">
-              <div class="h-5 w-5 rounded border p-0.5">
-                <component
-                  :is="item.icon.component"
-                  v-if="'component' in item.icon"
-                  class="h-full w-full"
-                />
-                <img
-                  v-if="'src' in item.icon"
-                  :src="item.icon.src"
-                  class="h-full w-full object-cover"
-                />
-              </div>
-              <span class="text-sm font-medium">{{ item.title }}</span>
-            </div>
-            <div class="flex-none flex-shrink-0 text-xs text-gray-500">
-              {{ item.group }}
-            </div>
-          </div>
-        </li>
-      </ul>
+            <GlobalSearchResultItem
+              :item="item"
+              :selected="selectedIndex === itemIndex"
+            />
+          </li>
+        </ul>
+        <div
+          v-if="isSearching"
+          class="flex items-center justify-center px-2 py-1 text-xs text-gray-500"
+        >
+          <span>{{ $t("core.components.global_search.states.loading") }}</span>
+        </div>
+        <div
+          v-if="hasPartialFailure"
+          class="flex items-center justify-center px-2 py-1 text-xs text-gray-500"
+        >
+          <span>
+            {{ $t("core.components.global_search.states.partial_failure") }}
+          </span>
+        </div>
+      </template>
     </div>
     <div class="border-t border-gray-100 px-4 py-2.5">
       <div class="flex items-center justify-end">

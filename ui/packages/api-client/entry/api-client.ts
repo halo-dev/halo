@@ -71,10 +71,12 @@ import {
   ThemeV1alpha1Api,
   ThemeV1alpha1ConsoleApi,
   TwoFactorAuthV1alpha1UcApi,
+  UiPluginV1alpha1ConsoleApi,
   UserConnectionV1alpha1Api,
   UserPreferenceV1alpha1UcApi,
   UserV1alpha1Api,
   UserV1alpha1ConsoleApi,
+  UserV1alpha1UcApi,
 } from "../src";
 
 const defaultAxiosInstance = axios.create({
@@ -286,6 +288,7 @@ function createConsoleApiClient(axiosInstance: AxiosInstance) {
       baseURL,
       axiosInstance
     ),
+    uiPlugin: new UiPluginV1alpha1ConsoleApi(undefined, baseURL, axiosInstance),
     storage: {
       attachment: new AttachmentV1alpha1ConsoleApi(
         undefined,
@@ -410,6 +413,7 @@ function createUcApiClient(axiosInstance: AxiosInstance) {
         baseURL,
         axiosInstance
       ),
+      currentUser: new UserV1alpha1UcApi(undefined, baseURL, axiosInstance),
     },
     core: {
       annotationSetting: new AnnotationSettingV1AlphaUcApi(

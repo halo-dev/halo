@@ -16,6 +16,47 @@ const DEV_SERVER_PORT = 3000;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig(({ command, mode }) => ({
+  run: {
+    tasks: {
+      "app:dev": {
+        command: "vp dev . --host",
+        dependsOn: ["build:packages"],
+        cache: false,
+      },
+      "app:build": {
+        command: "vp build",
+        dependsOn: ["build:packages"],
+      },
+      "app:test:unit": {
+        command:
+          "vp test --run && vp run --parallel --filter @halo-dev/* test:unit",
+        dependsOn: ["build:packages"],
+        cache: false,
+      },
+      "app:test:unit:watch": {
+        command: "vp test --watch",
+        dependsOn: ["build:packages"],
+        cache: false,
+      },
+      "app:test:unit:ui": {
+        command: "vp test --watch --ui",
+        dependsOn: ["build:packages"],
+        cache: false,
+      },
+      "app:typecheck": {
+        command:
+          "vue-tsc --noEmit -p tsconfig.app.json --composite false && vp run --parallel --filter @halo-dev/* typecheck",
+        dependsOn: ["build:packages"],
+        cache: false,
+      },
+      "app:lint": {
+        command:
+          "eslint . --max-warnings=0 -f html -o build/lint-result/index.html",
+        dependsOn: ["build:packages"],
+        cache: false,
+      },
+    },
+  },
   plugins: [
     Vue(),
     VueJsx(),
@@ -31,7 +72,7 @@ export default defineConfig(({ command, mode }) => ({
     VueI18n({
       include: [path.resolve(__dirname, "./src/locales/*.json")],
     }),
-    setupLibraryExternal(mode === "test" ? "test" : command),
+    setupLibraryExternal(mode === "test" ? "test" : command, DEV_SERVER_PORT),
     devPlugin({ port: DEV_SERVER_PORT }),
   ],
   resolve: {
@@ -71,12 +112,16 @@ export default defineConfig(({ command, mode }) => ({
     },
   },
   test: {
+    // Vitest v4 compatibility: preserve mock call history.
+    // Remove after tests no longer rely on calls from setup or earlier tests.
+    // https://viteplus.dev/guide/vitest-v5#remove-unneeded-compatibility-settings
+    // https://vitest.dev/guide/migration/#clearmocks-is-enabled-by-default
+    clearMocks: false,
     environment: "jsdom",
     include: ["**/*.spec.ts"],
     root: fileURLToPath(new URL("./", import.meta.url)),
     exclude: [...configDefaults.exclude, "./packages/**/*.ts"],
-    reporters: "html",
-    outputFile: "build/test-result/index.html",
+    reporters: [["html", { outputDir: "build/test-result" }]],
   },
   fmt: {
     sortTailwindcss: {},

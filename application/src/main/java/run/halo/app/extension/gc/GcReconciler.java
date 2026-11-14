@@ -81,8 +81,10 @@ class GcReconciler implements Reconciler<GcRequest> {
                 .flatMap(deleted -> indexOperationRegistrar.afterCommit(() -> indexEngine.delete(List.of(extension))))
                 .as(tx::transactional)
                 .then()
-                .doOnSuccess(
-                        ignored -> log.info("Extension {}/{} was deleted", extension.groupVersionKind(), extension));
+                .doOnSuccess(ignored -> log.info(
+                        "Extension {}/{} was deleted",
+                        extension.groupVersionKind(),
+                        extension.getMetadata().getName()));
     }
 
     @Override

@@ -35,6 +35,7 @@ public class CommentServiceImpl extends AbstractCommentService implements Commen
 
     private final ExtensionGetter extensionGetter;
     private final SystemConfigFetcher environmentFetcher;
+    private final CommentPermalinkService permalinkService;
 
     public CommentServiceImpl(
             RoleService roleService,
@@ -42,10 +43,12 @@ public class CommentServiceImpl extends AbstractCommentService implements Commen
             UserService userService,
             CounterService counterService,
             ExtensionGetter extensionGetter,
-            SystemConfigFetcher environmentFetcher) {
+            SystemConfigFetcher environmentFetcher,
+            CommentPermalinkService permalinkService) {
         super(roleService, client, userService, counterService);
         this.extensionGetter = extensionGetter;
         this.environmentFetcher = environmentFetcher;
+        this.permalinkService = permalinkService;
     }
 
     @Override
@@ -64,9 +67,7 @@ public class CommentServiceImpl extends AbstractCommentService implements Commen
         if (comment.getSpec() == null
                 || comment.getSpec().getContent() == null
                 || !isSafeHtml(comment.getSpec().getContent())) {
-            return Mono.error(new ServerWebInputException("""
-                The content of comment must not be empty or contains unsafe HTML.\
-                """));
+            return Mono.error(new ServerWebInputException("problemDetail.comment.content.unsafe"));
         }
         return environmentFetcher
                 .fetchComment()
@@ -107,6 +108,14 @@ public class CommentServiceImpl extends AbstractCommentService implements Commen
                                 populateOwner(populatedComment), populateApproveState(populatedComment))
                         .thenReturn(populatedComment))
                 .flatMap(client::create);
+    }
+
+    @Override
+    public Mono<Comment> updateContent(String name, CommentContentRequest request) {
+        return client.get(Comment.class, name).flatMap(comment -> {
+            updateContent(comment.getSpec(), comment.getMetadata(), request);
+            return client.update(comment);
+        });
     }
 
     private Mono<Void> populateApproveState(Comment comment) {
@@ -181,7 +190,8 @@ public class CommentServiceImpl extends AbstractCommentService implements Commen
         var ownerInfoMono = getOwnerInfo(comment.getSpec().getOwner()).doOnNext(builder::owner);
         var subjectMono = getCommentSubject(comment.getSpec().getSubjectRef()).doOnNext(builder::subject);
         var statsMono = fetchCommentStats(comment.getMetadata().getName()).doOnNext(builder::stats);
-        return Mono.when(ownerInfoMono, subjectMono, statsMono).then(Mono.fromSupplier(builder::build));
+        var permalinkMono = permalinkService.getPermalink(comment).doOnNext(builder::permalink);
+        return Mono.when(ownerInfoMono, subjectMono, statsMono, permalinkMono).then(Mono.fromSupplier(builder::build));
     }
 
     @SuppressWarnings("unchecked")

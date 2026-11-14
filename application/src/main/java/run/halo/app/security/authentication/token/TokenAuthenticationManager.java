@@ -11,6 +11,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtRea
 import org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtGrantedAuthoritiesConverterAdapter;
 import reactor.core.publisher.Mono;
+import run.halo.app.core.user.service.RoleService;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.security.authorization.AuthorityUtils;
 
@@ -30,10 +31,10 @@ class TokenAuthenticationManager implements ReactiveAuthenticationManager {
 
     private final ReactiveAuthenticationManager jwtAuthManager;
 
-    TokenAuthenticationManager(ReactiveExtensionClient client, ReactiveJwtDecoder jwtDecoder) {
+    TokenAuthenticationManager(ReactiveExtensionClient client, ReactiveJwtDecoder jwtDecoder, RoleService roleService) {
         this.client = client;
         this.jwtDecoder = jwtDecoder;
-        this.patAuthManager = createPatAuthManager();
+        this.patAuthManager = createPatAuthManager(roleService);
         this.jwtAuthManager = createJwtAuthManager();
     }
 
@@ -49,9 +50,9 @@ class TokenAuthenticationManager implements ReactiveAuthenticationManager {
         return a instanceof BearerTokenAuthenticationToken t && t.getToken().startsWith(PAT_TOKEN_PREFIX);
     }
 
-    private ReactiveAuthenticationManager createPatAuthManager() {
+    private ReactiveAuthenticationManager createPatAuthManager(RoleService roleService) {
         var delegate = new JwtReactiveAuthenticationManager(this.jwtDecoder);
-        return new PatAuthenticationManager(client, delegate);
+        return new PatAuthenticationManager(client, delegate, roleService);
     }
 
     private ReactiveAuthenticationManager createJwtAuthManager() {

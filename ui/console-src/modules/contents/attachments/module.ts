@@ -31,7 +31,7 @@ export default definePlugin({
         title: "core.attachment.title",
         permissions: ["system:attachments:view"],
         menu: {
-          name: "core.sidebar.menu.items.attachments",
+          name: /* @x18n-key */ "core.sidebar.menu.items.attachments",
           group: "content",
           icon: markRaw(IconFolder),
           priority: 3,

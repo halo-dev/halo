@@ -16,6 +16,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.comment.CommentRequest;
@@ -30,6 +31,8 @@ import run.halo.app.extension.Ref;
 import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.theme.finders.CommentFinder;
 import run.halo.app.theme.finders.CommentPublicQueryService;
+import run.halo.app.theme.finders.vo.CommentVo;
+import run.halo.app.theme.finders.vo.ReplyVo;
 
 /**
  * Tests for {@link CommentFinderEndpoint}.
@@ -70,6 +73,50 @@ class CommentFinderEndpointTest {
     }
 
     @Test
+    void getReplyReturnsPrivateUncachedDisplayOrNotFound() {
+        when(commentPublicQueryService.getReply("comment-a", "reply-b"))
+                .thenReturn(Mono.just(ReplyVo.builder()
+                        .permalink("/post#halo-comment=comment-a&reply=reply-b")
+                        .build()))
+                .thenReturn(Mono.empty());
+        webTestClient
+                .get()
+                .uri("/comments/comment-a/reply/reply-b")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectHeader()
+                .valueEquals("Cache-Control", "no-store, private")
+                .expectHeader()
+                .value("Vary", value -> assertThat(value).contains("Cookie", "Authorization"))
+                .expectBody()
+                .jsonPath("$.permalink")
+                .isEqualTo("/post#halo-comment=comment-a&reply=reply-b");
+        webTestClient
+                .get()
+                .uri("/comments/comment-a/reply/reply-b")
+                .exchange()
+                .expectStatus()
+                .isNotFound()
+                .expectHeader()
+                .valueEquals("Cache-Control", "no-store, private")
+                .expectHeader()
+                .value("Vary", value -> assertThat(value).contains("Cookie", "Authorization"));
+    }
+
+    @Test
+    void getReplyDoesNotHideServiceFailuresAsNotFound() {
+        when(commentPublicQueryService.getReply("comment-a", "reply-b"))
+                .thenReturn(Mono.error(new IllegalStateException("storage failure")));
+        webTestClient
+                .get()
+                .uri("/comments/comment-a/reply/reply-b")
+                .exchange()
+                .expectStatus()
+                .is5xxServerError();
+    }
+
+    @Test
     void listComments() {
         when(commentPublicQueryService.list(any(), any(PageRequest.class)))
                 .thenReturn(Mono.just(new ListResult<>(1, 10, 0, List.of())));
@@ -100,15 +147,44 @@ class CommentFinderEndpointTest {
     }
 
     @Test
+    void listCommentsWithCreationTimestampSort() {
+        when(commentPublicQueryService.list(any(), any(PageRequest.class)))
+                .thenReturn(Mono.just(new ListResult<>(1, 10, 0, List.of())));
+
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/comments")
+                        .queryParam("kind", "Post")
+                        .queryParam("name", "test")
+                        .queryParam("sort", "creationTimestamp,desc")
+                        .build())
+                .exchange()
+                .expectStatus()
+                .isOk();
+
+        var pageRequestCaptor = ArgumentCaptor.forClass(PageRequest.class);
+        verify(commentPublicQueryService).list(any(), pageRequestCaptor.capture());
+        assertThat(pageRequestCaptor.getValue().getSort())
+                .isEqualTo(Sort.by(Sort.Order.desc("metadata.creationTimestamp")));
+    }
+
+    @Test
     void getComment() {
-        when(commentPublicQueryService.getByName(any())).thenReturn(null);
+        var spec = new Comment.CommentSpec();
+        spec.setContent("Test comment content");
+        var comment = new CommentVo().setSpec(spec);
+        when(commentPublicQueryService.getByName(any())).thenReturn(Mono.just(comment));
 
         webTestClient
                 .get()
                 .uri("/comments/test-comment")
                 .exchange()
                 .expectStatus()
-                .isOk();
+                .isOk()
+                .expectBody()
+                .jsonPath("$.spec.content")
+                .isEqualTo("Test comment content");
 
         verify(commentPublicQueryService, times(1)).getByName(eq("test-comment"));
     }

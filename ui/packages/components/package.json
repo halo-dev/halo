@@ -1,6 +1,6 @@
 {
   "name": "@halo-dev/components",
-  "version": "2.25.2",
+  "version": "2.28.0",
   "description": "",
   "keywords": [
     "@halo-dev/components",
@@ -54,19 +54,19 @@
     "floating-vue": "^5.2.2"
   },
   "devDependencies": {
-    "@storybook/addon-docs": "^10.4.1",
-    "@storybook/addon-links": "^10.4.1",
+    "@storybook/addon-docs": "^10.5.7",
+    "@storybook/addon-links": "^10.5.7",
     "@storybook/testing-library": "^0.2.2",
-    "@storybook/vue3-vite": "^10.4.1",
-    "eslint-plugin-storybook": "10.4.1",
+    "@storybook/vue3-vite": "^10.5.7",
+    "eslint-plugin-storybook": "10.5.7",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "storybook": "^10.4.1",
+    "storybook": "^10.6.2",
     "vite": "catalog:",
     "vite-plus": "catalog:"
   },
   "peerDependencies": {
     "vue": "^3.5.x",
-    "vue-router": "^5.0.x"
+    "vue-router": "~5.1.0"
   }
 }

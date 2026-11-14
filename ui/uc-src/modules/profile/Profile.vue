@@ -31,6 +31,14 @@ const { currentUser } = storeToRefs(stores.currentUser());
 const { fetchCurrentUser } = stores.currentUser();
 fetchCurrentUser();
 
+const hasPassword = computed(() => currentUser.value?.passwordSet === true);
+
+const changePasswordLabel = computed(() =>
+  hasPassword.value
+    ? t("core.uc_profile.actions.change_password.title")
+    : t("core.uc_profile.actions.set_password.title")
+);
+
 const tabs = shallowRef<UserProfileTab[]>([
   {
     id: "detail",
@@ -118,6 +126,7 @@ const activeTab = useRouteQuery<string>("tab", tabs.value[0].id, {
 
   <PasswordChangeModal
     v-if="passwordChangeModal"
+    :has-password="hasPassword"
     @close="passwordChangeModal = false"
   />
 
@@ -150,7 +159,7 @@ const activeTab = useRouteQuery<string>("tab", tabs.value[0].id, {
                 {{ $t("core.uc_profile.actions.update_profile.title") }}
               </VDropdownItem>
               <VDropdownItem @click="passwordChangeModal = true">
-                {{ $t("core.uc_profile.actions.change_password.title") }}
+                {{ changePasswordLabel }}
               </VDropdownItem>
             </template>
           </VDropdown>

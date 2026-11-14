@@ -33,6 +33,8 @@ export interface ToolbarItemComponentProps {
   disabled?: boolean;
   icon?: Component;
   title?: string;
+  shortcutId?: string;
+  shortcutIds?: string[];
   action?: () => void;
   children?: ToolbarItemType[];
 }
@@ -176,6 +178,7 @@ export interface BubbleItemComponentProps {
   icon?: Component;
   iconStyle?: string;
   title?: string;
+  shortcutId?: string;
   action?: ({ editor }: { editor: Editor }) => Component | boolean | void;
 }
 
@@ -222,6 +225,7 @@ export interface CommandMenuItemType {
   icon: Component;
   title: string;
   keywords: string[];
+  shortcutId?: string;
   command: ({ editor, range }: { editor: Editor; range: Range }) => void;
 }
 

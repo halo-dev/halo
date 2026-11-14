@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { User } from "@halo-dev/api-client";
-import { consoleApiClient } from "@halo-dev/api-client";
+import { ucApiClient } from "@halo-dev/api-client";
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import { stores } from "@halo-dev/ui-shared";
 import { cloneDeep } from "es-toolkit";
@@ -50,8 +50,11 @@ const handleUpdateUser = async () => {
         formState.value.spec.displayName.trim();
     }
 
-    await consoleApiClient.user.updateCurrentUser({
-      user: formState.value,
+    await ucApiClient.user.currentUser.updateMyProfile({
+      updateMyProfileRequest: {
+        displayName: formState.value.spec.displayName,
+        bio: formState.value.spec.bio,
+      },
     });
 
     modal.value?.close();

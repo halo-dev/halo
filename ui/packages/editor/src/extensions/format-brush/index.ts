@@ -1,6 +1,7 @@
 import { markRaw } from "vue";
 import MingcuteBrush3Line from "~icons/mingcute/brush-3-line";
 import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
+import { defineHaloKeyboardShortcuts } from "@/keyboard-shortcuts";
 import { i18n } from "@/locales";
 import { Editor, Extension, Plugin, PluginKey } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
@@ -47,6 +48,7 @@ export const ExtensionFormatBrush = Extension.create<
               : i18n.global.t(
                   "editor.extensions.format_brush.toolbar_item.title"
                 ),
+            shortcutId: "editor.format.formatBrush",
             action: () => {
               if (formatBrush) {
                 editor.commands.pasteFormatBrush();
@@ -115,11 +117,19 @@ export const ExtensionFormatBrush = Extension.create<
   },
 
   addKeyboardShortcuts() {
-    return {
-      "Shift-Mod-c": () => {
-        this.editor.commands.copyFormatBrush();
-        return true;
+    return defineHaloKeyboardShortcuts(this, [
+      {
+        id: "editor.format.formatBrush",
+        keys: ["Shift-Mod-s"],
+        label: () =>
+          i18n.global.t("editor.extensions.format_brush.toolbar_item.title"),
+        category: "formatting",
+        priority: 130,
+        command: () => {
+          this.editor.commands.copyFormatBrush();
+          return true;
+        },
       },
-    };
+    ]);
   },
 });

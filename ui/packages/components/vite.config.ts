@@ -2,8 +2,8 @@ import path from "node:path";
 import { fileURLToPath, URL } from "node:url";
 import Vue from "@vitejs/plugin-vue";
 import VueJsx from "@vitejs/plugin-vue-jsx";
+import Dts from "unplugin-dts/vite";
 import Icons from "unplugin-icons/vite";
-import Dts from "vite-plugin-dts";
 import { defineConfig, type Plugin } from "vite-plus";
 import { configDefaults } from "vite-plus";
 
@@ -13,9 +13,10 @@ export default defineConfig({
     VueJsx(),
     Icons({ compiler: "vue3" }),
     Dts({
+      processor: "vue",
       tsconfigPath: "./tsconfig.app.json",
       entryRoot: "./src",
-      outDir: "./dist",
+      outDirs: "./dist",
       insertTypesEntry: true,
     }) as Plugin,
   ],
@@ -58,6 +59,11 @@ export default defineConfig({
     sourcemap: true,
   },
   test: {
+    // Vitest v4 compatibility: preserve mock call history.
+    // Remove after tests no longer rely on calls from setup or earlier tests.
+    // https://viteplus.dev/guide/vitest-v5#remove-unneeded-compatibility-settings
+    // https://vitest.dev/guide/migration/#clearmocks-is-enabled-by-default
+    clearMocks: false,
     environment: "jsdom",
     exclude: [...configDefaults.exclude],
     root: fileURLToPath(new URL("./", import.meta.url)),

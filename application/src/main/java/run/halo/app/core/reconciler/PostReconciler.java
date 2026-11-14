@@ -14,6 +14,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
@@ -156,12 +157,16 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
             var ref = Ref.of(post);
             // handle contributors
             var headSnapshot = post.getSpec().getHeadSnapshot();
-            var contributors = listSnapshots(ref).stream()
+            var snapshotContributors = listSnapshots(ref).stream()
                     .map(snapshot -> {
                         Set<String> usernames = snapshot.getSpec().getContributors();
                         return Objects.requireNonNullElseGet(usernames, () -> new HashSet<String>());
                     })
-                    .flatMap(Set::stream)
+                    .flatMap(Set::stream);
+            // the owner is always treated as a contributor, even if they never edited the content
+            // see https://github.com/halo-dev/halo/issues/8284
+            var ownerContributor = Stream.ofNullable(post.getSpec().getOwner()).filter(StringUtils::isNotBlank);
+            var contributors = Stream.concat(snapshotContributors, ownerContributor)
                     .distinct()
                     .sorted()
                     .toList();
@@ -263,13 +268,20 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
     }
 
     void subscribeNewCommentNotification(Post post) {
+        var owner = post.getSpec().getOwner();
+        if (StringUtils.isBlank(owner)) {
+            log.debug(
+                    "Skip subscribing new comment notification for post [{}] because the owner is blank",
+                    post.getMetadata().getName());
+            return;
+        }
+
         var subscriber = new Subscription.Subscriber();
-        subscriber.setName(post.getSpec().getOwner());
+        subscriber.setName(owner);
 
         var interestReason = new Subscription.InterestReason();
         interestReason.setReasonType(NotificationReasonConst.NEW_COMMENT_ON_POST);
-        interestReason.setExpression(
-                "props.postOwner == '%s'".formatted(post.getSpec().getOwner()));
+        interestReason.setExpression("props.postOwner == '%s'".formatted(owner));
         notificationCenter.subscribe(subscriber, interestReason).block(BLOCKING_TIMEOUT);
     }
 

@@ -16,9 +16,18 @@ import run.halo.app.extension.MetadataOperator;
 class IndicesReadinessTest {
 
     @Test
+    void awaitReadyShouldReturnImmediatelyWhenNotBuilding() {
+        var manager = new DefaultIndicesManager();
+        manager.add(FakeExt.class, List.of());
+        // no markBuilding called: freshly added (empty) indices are safe to query
+        manager.awaitReady(FakeExt.class);
+    }
+
+    @Test
     void awaitReadyShouldBlockUntilMarkReady() throws InterruptedException {
         var manager = new DefaultIndicesManager();
         manager.add(FakeExt.class, List.of());
+        manager.markBuilding(FakeExt.class);
         var queried = new AtomicBoolean(false);
         var threadStarted = new CountDownLatch(1);
         var thread = new Thread(() -> {
@@ -42,28 +51,51 @@ class IndicesReadinessTest {
     }
 
     @Test
+    void markBuildingShouldThrowForUnknownType() {
+        var manager = new DefaultIndicesManager();
+        assertThatThrownBy(() -> manager.markBuilding(FakeExt.class))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
     void markReadyShouldBeIdempotent() {
         var manager = new DefaultIndicesManager();
         manager.add(FakeExt.class, List.of());
+        manager.markBuilding(FakeExt.class);
         manager.markReady(FakeExt.class);
         manager.markReady(FakeExt.class);
         manager.awaitReady(FakeExt.class); // returns immediately
     }
 
     @Test
+    void markBuildingShouldStartANewBuildCycle() {
+        var manager = new DefaultIndicesManager();
+        manager.add(FakeExt.class, List.of());
+        manager.markBuilding(FakeExt.class);
+        manager.markReady(FakeExt.class);
+        manager.markBuilding(FakeExt.class);
+        manager.setReadyTimeout(Duration.ofMillis(100));
+        // still building: await must time out rather than see the previous cycle's readiness
+        assertThatThrownBy(() -> manager.awaitReady(FakeExt.class))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
     void removeShouldDiscardLatch() {
         var manager = new DefaultIndicesManager();
         manager.add(FakeExt.class, List.of());
+        manager.markBuilding(FakeExt.class);
         manager.markReady(FakeExt.class);
         manager.remove(FakeExt.class);
         assertThatThrownBy(() -> manager.awaitReady(FakeExt.class)).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    void awaitReadyShouldTimeout() {
+    void awaitReadyShouldTimeoutWhileBuilding() {
         var manager = new DefaultIndicesManager();
         manager.setReadyTimeout(Duration.ofMillis(100));
         manager.add(FakeExt.class, List.of());
+        manager.markBuilding(FakeExt.class);
         assertThatThrownBy(() -> manager.awaitReady(FakeExt.class))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("not ready");

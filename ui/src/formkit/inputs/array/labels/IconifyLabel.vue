@@ -2,6 +2,7 @@
 import { Icon } from "@iconify/vue";
 import { computed } from "vue";
 import type { ArrayItemLabelType } from "..";
+import { sanitizeIconSvg } from "../../iconify/sanitize-icon-svg";
 import type { IconifyFormat, IconifyValue } from "../../iconify/types";
 
 const props = defineProps<{
@@ -19,6 +20,8 @@ const value = computed(() => {
   }
   return (props.itemLabel.value as IconifyValue)?.value;
 });
+
+const sanitizedSvg = computed(() => sanitizeIconSvg(value.value));
 </script>
 <template>
   <div class="inline-flex items-center [&>*]:size-4">
@@ -31,7 +34,7 @@ const value = computed(() => {
     <div
       v-else
       class="inline-flex items-center justify-center"
-      v-html="value"
+      v-html="sanitizedSvg"
     ></div>
   </div>
 </template>

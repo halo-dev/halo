@@ -263,6 +263,30 @@ export interface ExtensionPoint {
   "post:list-item:field:create"?: (post: Ref<ListedPost>) => EntityFieldItem[];
 
   /**
+   * Creates custom fields for comment list items.
+   * Fields are sorted by priority within their start or end region and rendered
+   * before the built-in content in that region.
+   *
+   * @param comment - A reactive reference to the comment object.
+   * @returns An array of entity field items for the comment.
+   */
+  "comment:list-item:field:create"?: (
+    comment: Ref<ListedComment>
+  ) => EntityFieldItem[];
+
+  /**
+   * Creates custom fields for reply list items.
+   * Fields are sorted by priority within their start or end region and rendered
+   * before the built-in content in that region.
+   *
+   * @param reply - A reactive reference to the reply object.
+   * @returns An array of entity field items for the reply.
+   */
+  "reply:list-item:field:create"?: (
+    reply: Ref<ListedReply>
+  ) => EntityFieldItem[];
+
+  /**
    * Creates custom fields for single page list items.
    * Allows plugins to add custom columns or metadata fields to the single page list display.
    *

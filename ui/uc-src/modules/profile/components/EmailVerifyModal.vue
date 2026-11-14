@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { VerifyCodeRequest } from "@halo-dev/api-client";
-import { consoleApiClient } from "@halo-dev/api-client";
+import { ucApiClient } from "@halo-dev/api-client";
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import { stores } from "@halo-dev/ui-shared";
 import { useMutation } from "@tanstack/vue-query";
@@ -47,7 +47,7 @@ const { mutate: sendVerifyCode, isLoading: isSending } = useMutation({
       );
       throw new Error("email is empty");
     }
-    return await consoleApiClient.user.sendEmailVerificationCode({
+    return await ucApiClient.user.currentUser.sendMyEmailVerificationCode({
       emailVerifyRequest: {
         email: email.value,
       },
@@ -79,7 +79,7 @@ const sendVerifyCodeButtonText = computed(() => {
 const { mutate: verifyEmail, isLoading: isVerifying } = useMutation({
   mutationKey: ["verify-email"],
   mutationFn: async ({ password, code }: VerifyCodeRequest) => {
-    return await consoleApiClient.user.verifyEmail({
+    return await ucApiClient.user.currentUser.verifyMyEmail({
       verifyCodeRequest: {
         password,
         code,

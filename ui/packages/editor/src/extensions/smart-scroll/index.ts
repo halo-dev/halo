@@ -1,6 +1,11 @@
 import { Plugin, PluginKey } from "@tiptap/pm/state";
 import { EditorView, Extension } from "@/tiptap";
-import { getCursorCoords } from "@/utils/get-cursor-coords";
+import { NodeSelection } from "@/tiptap/pm";
+import {
+  getCursorCoords,
+  getNestedCursorCoords,
+  type Coords,
+} from "@/utils/get-cursor-coords";
 
 export interface SmartScrollOptions {
   /**
@@ -30,9 +35,11 @@ export interface SmartScrollOptions {
 }
 
 /**
- * Smart scroll extension
+ * Keeps explicit editor navigation inside a comfortable viewport buffer.
  *
- * When the cursor is close to the top or bottom of the viewport, trigger scrolling to keep the cursor in the center of the viewport
+ * ProseMirror handles the normal selection path. The plugin view only bridges
+ * document synchronization from a verified nested contenteditable, whose
+ * caret is not represented by the outer ProseMirror selection.
  */
 export const ExtensionSmartScroll = Extension.create<SmartScrollOptions>({
   name: "smartScroll",
@@ -47,177 +54,285 @@ export const ExtensionSmartScroll = Extension.create<SmartScrollOptions>({
   },
 
   addProseMirrorPlugins() {
-    const options = this.options;
-    let isMouseSelecting = false;
-    let lastMouseInteractionTime = 0;
+    const options = normalizeOptions(this.options);
+    const useCustomSelectionScroll =
+      Boolean(options.scrollContainer) || options.smooth;
 
     return [
       new Plugin({
         key: new PluginKey("smartScroll"),
+        props: {
+          scrollThreshold: {
+            top: options.topThreshold,
+            right: 0,
+            bottom: options.bottomThreshold,
+            left: 0,
+          },
+          scrollMargin: {
+            top: options.topThreshold,
+            right: 5,
+            bottom: options.bottomThreshold,
+            left: 5,
+          },
+          ...(useCustomSelectionScroll
+            ? {
+                handleScrollToSelection: (view: EditorView) =>
+                  scrollSelectionIntoView(view, options),
+              }
+            : {}),
+        },
         view() {
-          const handleMouseUp = () => {
-            isMouseSelecting = false;
-            lastMouseInteractionTime = Date.now();
-          };
-
-          window.addEventListener("mouseup", handleMouseUp, true);
-          window.addEventListener("dragend", handleMouseUp, true);
+          let animationFrame: number | null = null;
 
           return {
             update(view, prevState) {
-              if (!prevState) {
+              if (prevState.doc.eq(view.state.doc)) {
+                return;
+              }
+              if (!getNestedCursorCoords(view) || animationFrame !== null) {
                 return;
               }
 
-              const { state } = view;
-              const { doc, selection } = state;
+              animationFrame = requestAnimationFrame(() => {
+                animationFrame = null;
+                if (view.isDestroyed) {
+                  return;
+                }
 
-              const docChanged = prevState.doc !== doc;
-              const selectionChanged = !prevState.selection.eq(selection);
-
-              const isRecentMouseInteraction =
-                isMouseSelecting || Date.now() - lastMouseInteractionTime < 150;
-
-              // The conditions for triggering scrolling:
-              // 1. Document content changed (input, delete, etc.)
-              // 2. Selection changed but not caused by mouse interaction
-              // (arrow keys, keyboard selection, etc.)
-              if (
-                docChanged ||
-                (selectionChanged && !isRecentMouseInteraction)
-              ) {
-                requestAnimationFrame(() => {
-                  smartScroll(view, options);
-                });
-              }
+                const nestedCursor = getNestedCursorCoords(view);
+                if (!nestedCursor) {
+                  return;
+                }
+                scrollCoordsIntoView(
+                  view,
+                  nestedCursor.coords,
+                  nestedCursor.startDOM,
+                  options
+                );
+              });
             },
             destroy() {
-              window.removeEventListener("mouseup", handleMouseUp, true);
-              window.removeEventListener("dragend", handleMouseUp, true);
+              if (animationFrame !== null) {
+                cancelAnimationFrame(animationFrame);
+                animationFrame = null;
+              }
             },
           };
-        },
-        props: {
-          handleDOMEvents: {
-            mousedown: () => {
-              isMouseSelecting = true;
-              lastMouseInteractionTime = Date.now();
-              return false;
-            },
-            mouseup: () => {
-              isMouseSelecting = false;
-              lastMouseInteractionTime = Date.now();
-              return false;
-            },
-            dragend: () => {
-              isMouseSelecting = false;
-              lastMouseInteractionTime = Date.now();
-              return false;
-            },
-          },
         },
       }),
     ];
   },
 });
 
-const getScrollContainer = (
+const normalizeOptions = (options: SmartScrollOptions): SmartScrollOptions => ({
+  ...options,
+  topThreshold: normalizeThreshold(options.topThreshold),
+  bottomThreshold: normalizeThreshold(options.bottomThreshold),
+});
+
+const normalizeThreshold = (value: number): number =>
+  Number.isFinite(value) ? Math.max(0, value) : 0;
+
+const scrollSelectionIntoView = (
   view: EditorView,
   options: SmartScrollOptions
-): HTMLElement | null => {
-  let scrollContainer: HTMLElement | null = null;
-  if (!options.scrollContainer) {
-    const editorElement = view.dom as HTMLElement;
-    scrollContainer = findScrollContainer(editorElement);
-  } else {
-    if (typeof options.scrollContainer === "function") {
-      scrollContainer = options.scrollContainer(view);
-    } else if (typeof options.scrollContainer === "string") {
-      scrollContainer = document.querySelector(
-        options.scrollContainer
-      ) as HTMLElement;
-    } else {
-      scrollContainer = options.scrollContainer;
-    }
-  }
-
-  return scrollContainer;
-};
-
-const smartScroll = (view: EditorView, options: SmartScrollOptions): void => {
+): boolean => {
   try {
-    const scrollContainer = getScrollContainer(view, options);
-    if (!scrollContainer) {
-      return;
+    const nestedCursor = getNestedCursorCoords(view);
+    if (nestedCursor) {
+      return scrollCoordsIntoView(
+        view,
+        nestedCursor.coords,
+        nestedCursor.startDOM,
+        options
+      );
     }
 
-    const containerRect = scrollContainer.getBoundingClientRect();
-    const viewportTop = containerRect.top;
-    const viewportBottom = containerRect.bottom;
-
-    const coords = getCursorCoords(view);
-    if (!coords) {
-      return;
-    }
-
-    const cursorTop = coords.top;
-    const cursorBottom = coords.bottom;
-
-    const distanceFromTop = cursorTop - viewportTop;
-    const distanceFromBottom = viewportBottom - cursorBottom;
-
-    let scrollAmount = 0;
-
-    if (distanceFromTop < options.topThreshold && distanceFromTop > 0) {
-      scrollAmount = distanceFromTop - options.topThreshold;
-    } else if (
-      distanceFromBottom < options.bottomThreshold &&
-      distanceFromBottom > 0
-    ) {
-      scrollAmount = options.bottomThreshold - distanceFromBottom;
-    } else if (distanceFromTop < 0) {
-      scrollAmount = distanceFromTop - options.topThreshold;
-    } else if (distanceFromBottom < 0) {
-      scrollAmount = options.bottomThreshold - distanceFromBottom;
-    }
-
-    if (scrollAmount !== 0) {
-      const currentScrollTop = scrollContainer.scrollTop;
-      const targetScrollTop = currentScrollTop + scrollAmount;
-
-      if (scrollContainer.scrollTo) {
-        scrollContainer.scrollTo({
-          top: targetScrollTop,
-          behavior: options.smooth ? "smooth" : "instant",
-        });
-      } else {
-        scrollContainer.scrollTop = targetScrollTop;
+    const selection = view.state.selection;
+    if (selection instanceof NodeSelection) {
+      const nodeDOM = view.nodeDOM(selection.from);
+      if (nodeDOM?.nodeType === Node.ELEMENT_NODE) {
+        return scrollCoordsIntoView(
+          view,
+          (nodeDOM as Element).getBoundingClientRect(),
+          nodeDOM,
+          options
+        );
       }
     }
-  } catch (error) {
-    console.debug("Smart scroll error:", error);
+
+    const coords = getCursorCoords(view);
+    return coords
+      ? scrollCoordsIntoView(view, coords, view.dom, options)
+      : false;
+  } catch {
+    return false;
   }
 };
 
-/**
- * Find the scrollable container element
- */
-const findScrollContainer = (element: HTMLElement): HTMLElement | null => {
-  let current: HTMLElement | null = element;
+const scrollCoordsIntoView = (
+  view: EditorView,
+  initialCoords: Coords,
+  startDOM: Node,
+  options: SmartScrollOptions
+): boolean => {
+  const containers = getScrollContainers(view, startDOM, options);
+  if (containers.length === 0) {
+    return false;
+  }
 
-  while (current && current !== document.body) {
-    const style = window.getComputedStyle(current);
-    const overflowY = style.overflowY;
-
-    if (
-      (overflowY === "auto" || overflowY === "scroll") &&
-      current.scrollHeight > current.clientHeight
-    ) {
-      return current;
+  let coords = initialCoords;
+  for (const container of containers) {
+    const bounds = getVisibleBounds(container);
+    const scrollAmount = getVerticalScrollAmount(coords, bounds, options);
+    if (scrollAmount === 0) {
+      continue;
     }
 
-    current = current.parentElement;
+    const currentScrollTop = container.scrollTop;
+    const maxScrollTop = Math.max(
+      0,
+      container.scrollHeight - container.clientHeight
+    );
+    const targetScrollTop = clamp(
+      currentScrollTop + scrollAmount,
+      0,
+      maxScrollTop
+    );
+    const appliedAmount = targetScrollTop - currentScrollTop;
+    if (appliedAmount === 0) {
+      continue;
+    }
+
+    if (typeof container.scrollTo === "function") {
+      container.scrollTo({
+        top: targetScrollTop,
+        behavior: options.smooth ? "smooth" : "instant",
+      });
+    } else {
+      container.scrollTop = targetScrollTop;
+    }
+
+    // Keep geometry consistent while walking outer scroll ancestors. This is
+    // also deterministic when a browser applies smooth scrolling later.
+    coords = {
+      top: coords.top - appliedAmount,
+      bottom: coords.bottom - appliedAmount,
+      left: coords.left,
+      right: coords.right,
+    };
   }
 
-  return document.documentElement;
+  return true;
 };
+
+const getVerticalScrollAmount = (
+  coords: Coords,
+  bounds: Pick<Coords, "top" | "bottom">,
+  options: SmartScrollOptions
+): number => {
+  const viewportTop = bounds.top + options.topThreshold;
+  const viewportBottom = bounds.bottom - options.bottomThreshold;
+
+  if (coords.top < viewportTop) {
+    return coords.top - viewportTop;
+  }
+  if (coords.bottom > viewportBottom) {
+    const availableHeight = Math.max(0, viewportBottom - viewportTop);
+    return coords.bottom - coords.top > availableHeight
+      ? coords.top - viewportTop
+      : coords.bottom - viewportBottom;
+  }
+  return 0;
+};
+
+const getScrollContainers = (
+  view: EditorView,
+  startDOM: Node,
+  options: SmartScrollOptions
+): HTMLElement[] => {
+  if (options.scrollContainer) {
+    const container = resolveScrollContainer(view, options.scrollContainer);
+    return container && containsEditor(container, view.dom) ? [container] : [];
+  }
+
+  const containers: HTMLElement[] = [];
+  const doc = view.dom.ownerDocument;
+  const scrollingElement = (doc.scrollingElement ??
+    doc.documentElement) as HTMLElement;
+  let element =
+    startDOM.nodeType === Node.ELEMENT_NODE
+      ? (startDOM as HTMLElement)
+      : startDOM.parentElement;
+
+  while (element) {
+    if (element === scrollingElement || isScrollable(element)) {
+      containers.push(element);
+    }
+
+    const position = getComputedStyle(element).position;
+    if (/^(fixed|sticky)$/.test(position)) {
+      break;
+    }
+    element =
+      position === "absolute"
+        ? (element.offsetParent as HTMLElement | null)
+        : element.parentElement;
+  }
+
+  if (!containers.includes(scrollingElement) && scrollingElement.isConnected) {
+    containers.push(scrollingElement);
+  }
+  return containers;
+};
+
+const resolveScrollContainer = (
+  view: EditorView,
+  scrollContainer: NonNullable<SmartScrollOptions["scrollContainer"]>
+): HTMLElement | null => {
+  try {
+    let container: HTMLElement | null;
+    if (typeof scrollContainer === "function") {
+      container = scrollContainer(view);
+    } else if (typeof scrollContainer === "string") {
+      container =
+        view.dom.ownerDocument.querySelector<HTMLElement>(scrollContainer);
+    } else {
+      container = scrollContainer;
+    }
+    return container?.isConnected ? container : null;
+  } catch {
+    return null;
+  }
+};
+
+const containsEditor = (container: HTMLElement, editor: HTMLElement) =>
+  container === editor || container.contains(editor);
+
+const isScrollable = (element: HTMLElement): boolean => {
+  if (element.scrollHeight <= element.clientHeight) {
+    return false;
+  }
+  return /^(auto|hidden|overlay|scroll)$/.test(
+    getComputedStyle(element).overflowY
+  );
+};
+
+const getVisibleBounds = (
+  container: HTMLElement
+): Pick<Coords, "top" | "bottom"> => {
+  const doc = container.ownerDocument;
+  if (container === doc.scrollingElement || container === doc.documentElement) {
+    const viewport = doc.defaultView?.visualViewport;
+    const top = viewport?.offsetTop ?? 0;
+    const height = viewport?.height ?? doc.defaultView?.innerHeight ?? 0;
+    return { top, bottom: top + height };
+  }
+
+  const rect = container.getBoundingClientRect();
+  const top = rect.top + container.clientTop;
+  return { top, bottom: top + container.clientHeight };
+};
+
+const clamp = (value: number, min: number, max: number): number =>
+  Math.min(Math.max(value, min), max);

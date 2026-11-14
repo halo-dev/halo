@@ -17,6 +17,7 @@ export default definePlugin({
     "comment:editor:replace": () => {
       return {
         component: markRaw(CommentEditor),
+        supportsEditing: true,
       };
     },
   },
@@ -26,6 +27,9 @@ export default definePlugin({
 其中，组件需要包含的 props 如下：
 
 1. `autoFocus`：是否自动聚焦，需要在组件中判断是否为 `true`，然后聚焦输入框。
+2. `initialContent`：可选的初始正文，在组件创建时回填。编辑已有评论时会传入保存的 `spec.raw`，新建回复时不传。回填需要保留原有 HTML 格式，不能在异步加载或父组件刷新时清空用户的修改。
+
+组件实现回填后，提供者应声明 `supportsEditing: true`。未声明时，新建回复仍使用该组件，编辑已有评论则使用默认正文源码输入框，保留原文及 HTML 标签。
 
 需要定义的 emit 如下：
 

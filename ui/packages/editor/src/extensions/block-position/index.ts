@@ -54,6 +54,26 @@ export const ExtensionBlockPosition =
   Extension.create<ExtensionBlockPositionOptions>({
     name: "blockPosition",
 
+    addHaloEditorMetadata() {
+      return {
+        contributions: this.options.types.map((name) => ({
+          targets: [{ kind: "node" as const, name }],
+          metadata: {
+            ai: {
+              attributeGuidance: {
+                alignItems: {
+                  description:
+                    "Cross-axis alignment of this container's child content.",
+                  allowedValues: this.options.positions,
+                  omitWhen: ["The default child alignment is appropriate."],
+                },
+              },
+            },
+          },
+        })),
+      };
+    },
+
     addOptions() {
       return {
         types: [],
@@ -130,9 +150,9 @@ export const ExtensionBlockPosition =
 
     addKeyboardShortcuts() {
       return {
-        "Mod-Shift-l": () => this.editor.commands.setBlockPosition("left"),
+        "Mod-Shift-l": () => this.editor.commands.setBlockPosition("start"),
         "Mod-Shift-e": () => this.editor.commands.setBlockPosition("center"),
-        "Mod-Shift-r": () => this.editor.commands.setBlockPosition("right"),
+        "Mod-Shift-r": () => this.editor.commands.setBlockPosition("end"),
       };
     },
   }).configure({

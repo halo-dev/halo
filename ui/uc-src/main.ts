@@ -7,6 +7,7 @@ import { createApp } from "vue";
 import { builtinFormKitInputs } from "@/formkit/inputs";
 import { setLanguage, setupI18n } from "@/locales";
 import { setupApiClient } from "@/setup/setupApiClient";
+import "@/setup/setupFormKitRuntime";
 import {
   setupComponents,
   type SetupComponentsOptions,
@@ -40,13 +41,13 @@ async function initApp() {
   try {
     setupCoreModules({ app, router, platform: "uc", modules });
 
+    await setLanguage();
+
     const currentUserStore = stores.currentUser();
     await currentUserStore.fetchCurrentUser();
 
     const globalInfoStore = stores.globalInfo();
     await globalInfoStore.fetchGlobalInfo();
-
-    await setLanguage();
 
     if (currentUserStore.isAnonymous) {
       setupAppComponents();

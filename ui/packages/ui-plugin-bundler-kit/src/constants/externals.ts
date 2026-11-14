@@ -1,3 +1,4 @@
+// TODO(Halo 3): Remove after legacy IIFE UI provider support ends.
 const GLOBALS = {
   vue: "Vue",
   "vue-router": "VueRouter",

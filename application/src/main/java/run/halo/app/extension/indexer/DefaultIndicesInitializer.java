@@ -74,6 +74,8 @@ class DefaultIndicesInitializer implements IndicesInitializer {
         var type = (Class<E>) scheme.type();
         var prefix = ExtensionStoreUtil.buildStoreNamePrefix(scheme);
         try {
+            // gate queries until the build/restore below completes
+            indexEngine.getIndicesManager().markBuilding(type);
             var loaded = snapshotManager.load(type);
             if (loaded.isPresent()) {
                 try {

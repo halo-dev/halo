@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 import run.halo.app.core.attachment.AttachmentChangedEvent;
 import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.attachment.Attachment.AttachmentStatus;
@@ -23,6 +24,7 @@ import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.extension.controller.Reconciler.Request;
 import run.halo.app.extension.controller.RequeueException;
+import run.halo.app.extension.exception.ExtensionNotFoundException;
 
 @Slf4j
 @Component
@@ -41,9 +43,18 @@ class AttachmentReconciler implements Reconciler<Request> {
                 .map(attachment -> {
                     if (ExtensionUtil.isDeleted(attachment)) {
                         if (removeFinalizers(attachment.getMetadata(), Set.of(Constant.FINALIZER_NAME))) {
+                            try {
+                                // Publish before cleaning up so the thumbnail cache stops trusting the permalink even
+                                // if the cleanup fails or is slow. A failing listener must not block the cleanup.
+                                this.eventPublisher.publishEvent(new AttachmentChangedEvent(this, attachment));
+                            } catch (RuntimeException e) {
+                                log.warn(
+                                        "Failed to publish attachment changed event for {}",
+                                        attachment.getMetadata().getName(),
+                                        e);
+                            }
                             cleanUpResources(attachment);
                             client.update(attachment);
-                            this.eventPublisher.publishEvent(new AttachmentChangedEvent(this, attachment));
                         }
                         return null;
                     }
@@ -84,6 +95,18 @@ class AttachmentReconciler implements Reconciler<Request> {
     }
 
     void cleanUpResources(Attachment attachment) {
-        attachmentService.delete(attachment).block(Duration.ofSeconds(20));
+        attachmentService
+                .delete(attachment)
+                // A missing policy or config map is permanent: no handler can resolve the
+                // attachment any more, so there is nothing left to clean up and requeuing
+                // would only spin forever. Give up on the resources and let the finalizer go.
+                .onErrorResume(ExtensionNotFoundException.class, e -> {
+                    log.warn(
+                            "Skipped cleaning up resources of attachment {}: {} Removing the attachment record anyway.",
+                            attachment.getMetadata().getName(),
+                            e.getMessage());
+                    return Mono.empty();
+                })
+                .block(Duration.ofSeconds(20));
     }
 }

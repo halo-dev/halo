@@ -27,6 +27,8 @@ public interface IndicesManager extends Closeable {
 
     /**
      * Awaits until the indices for the given type are fully built or restored, with a timeout.
+     * Indices are ready immediately after {@link #add(Class, List)}; this method blocks only
+     * between {@link #markBuilding(Class)} and {@link #markReady(Class)}.
      *
      * @param type the extension type
      * @throws IllegalArgumentException if no indices are registered for the type
@@ -34,6 +36,15 @@ public interface IndicesManager extends Closeable {
      * @since 2.26.0
      */
     void awaitReady(Class<? extends Extension> type);
+
+    /**
+     * Marks the indices for the given type as building, so that queries block until
+     * {@link #markReady(Class)} is called. Call this before (re)building or restoring indices.
+     *
+     * @param type the extension type
+     * @since 2.26.0
+     */
+    void markBuilding(Class<? extends Extension> type);
 
     /**
      * Marks the indices for the given type as ready. Idempotent.

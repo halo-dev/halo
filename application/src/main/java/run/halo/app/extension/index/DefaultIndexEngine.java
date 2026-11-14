@@ -1,8 +1,12 @@
 package run.halo.app.extension.index;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.PriorityQueue;
+import java.util.function.Function;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Sort;
@@ -89,47 +93,9 @@ class DefaultIndexEngine implements IndexEngine, DisposableBean {
         var queryVisitor = new QueryVisitor<>(indices, conversionService);
         queryVisitor.enter(finalCondition);
         var result = queryVisitor.getResult();
-        var total = result.size();
-        // create comparator
         var sort = page.getSort();
-        var comparator = buildComparator(sort, indices);
-
-        int offset = (page.getPageNumber() - 1) * page.getPageSize();
-        int limit = page.getPageSize();
-        if (limit <= 0) {
-            // return all results for backward compatibility
-            var finalResult = result.stream().sorted(comparator).toList();
-            return new ListResult<>(page.getPageNumber(), page.getPageSize(), total, finalResult);
-        }
-        if (offset >= total) {
-            return new ListResult<>(page.getPageNumber(), page.getPageSize(), total, new LinkedList<>());
-        }
-        if (offset + limit > total) {
-            limit = total - offset;
-        }
-        var n = offset + limit;
-        if (n > 1000) {
-            var finalResult =
-                    result.stream().sorted(comparator).skip(offset).limit(limit).toList();
-            return new ListResult<>(page.getPageNumber(), page.getPageSize(), total, finalResult);
-        }
-        var pq = new PriorityQueue<>(n, comparator.reversed());
-        result.forEach(primaryKey -> {
-            pq.offer(primaryKey);
-            if (pq.size() > n) {
-                pq.poll();
-            }
-        });
-        var finalResult = new LinkedList<String>();
-        while (!pq.isEmpty()) {
-            finalResult.addFirst(pq.poll());
-            if (finalResult.size() >= limit) {
-                // no need to compare further
-                break;
-            }
-        }
-        pq.clear();
-        return new ListResult<>(page.getPageNumber(), page.getPageSize(), total, finalResult);
+        var sortOrders = sort.isUnsorted() ? List.<SortOrder>of() : buildSortOrders(sort, indices);
+        return paginate(result, page, sortOrders);
     }
 
     @Override
@@ -150,9 +116,8 @@ class DefaultIndexEngine implements IndexEngine, DisposableBean {
             // no need to sort the result
             return result.stream()::iterator;
         }
-        // create comparator
-        var comparator = buildComparator(sort, indices);
-        return result.stream().sorted(comparator)::iterator;
+        var sortOrders = buildSortOrders(sort, indices);
+        return sortedPrimaryKeys(result, sortOrders)::iterator;
     }
 
     @Override
@@ -171,21 +136,8 @@ class DefaultIndexEngine implements IndexEngine, DisposableBean {
         var queryVisitor = new QueryVisitor<>(indices, conversionService);
         queryVisitor.enter(finalCondition);
         var result = queryVisitor.getResult();
-        // create comparator
-        var comparator = buildComparator(sort, indices);
-        // make sure using reversed comparator to get top N
-        var pq = new PriorityQueue<>(topN + 1, comparator.reversed());
-        result.forEach(primaryKey -> {
-            pq.offer(primaryKey);
-            if (pq.size() > topN) {
-                pq.poll();
-            }
-        });
-        var finalResult = new LinkedList<String>();
-        while (!pq.isEmpty()) {
-            finalResult.addFirst(pq.poll());
-        }
-        return finalResult;
+        var sortOrders = sort.isUnsorted() ? List.<SortOrder>of() : buildSortOrders(sort, indices);
+        return topN(result, sortOrders, topN);
     }
 
     @Override
@@ -206,52 +158,164 @@ class DefaultIndexEngine implements IndexEngine, DisposableBean {
         return this.indicesManager;
     }
 
-    private <E extends Extension> Comparator<String> buildComparator(Sort sort, Indices<E> indices) {
-        return sort.stream()
-                .map(order -> buildComparator(order, indices))
-                .reduce(Comparator::thenComparing)
-                .orElseGet(Comparator::naturalOrder);
+    private <E extends Extension> List<SortOrder> buildSortOrders(Sort sort, Indices<E> indices) {
+        var sortOrders = new ArrayList<SortOrder>(sort.toList().size());
+        for (var order : sort) {
+            Index<E, ?> index = indices.getIndex(order.getProperty());
+            Function<String, Object> accessor;
+            if (index instanceof MultiValueIndex<?, ?> multiValueIndex) {
+                accessor = primaryKey -> {
+                    var keys = multiValueIndex.getKeys(primaryKey);
+                    return CollectionUtils.isEmpty(keys)
+                            ? null
+                            : keys.iterator().next();
+                };
+            } else if (index instanceof SingleValueIndex<?, ?> singleValueIndex) {
+                accessor = singleValueIndex::getKey;
+            } else {
+                throw new UnsupportedOperationException("Unsupported index type for sorting: " + index.getClass());
+            }
+            sortOrders.add(new SortOrder(accessor, order.isDescending()));
+        }
+        return sortOrders;
     }
 
-    private <K extends Comparable<K>, E extends Extension> Comparator<String> buildComparator(
-            Sort.Order order, Indices<E> indices) {
-        var index = indices.<K>getIndex(order.getProperty());
-        Comparator<String> comparator;
-        if (index instanceof MultiValueIndex<E, K> multiValueIndex) {
-            comparator = (left, right) -> {
-                var leftKeys = multiValueIndex.getKeys(left);
-                var rightKeys = multiValueIndex.getKeys(right);
-                // null first by default
-                if (CollectionUtils.isEmpty(leftKeys)) {
-                    return CollectionUtils.isEmpty(rightKeys) ? 0 : -1;
-                }
-                if (CollectionUtils.isEmpty(rightKeys)) {
-                    return 1;
-                }
-                // compare the first key
-                K leftKey = leftKeys.iterator().next();
-                K rightKey = rightKeys.iterator().next();
-                return Comparator.<K>naturalOrder().compare(leftKey, rightKey);
+    private static Comparator<Object[]> buildComparator(List<SortOrder> sortOrders) {
+        Comparator<Object[]> comparator = null;
+        for (var i = 0; i < sortOrders.size(); i++) {
+            var index = i;
+            var sortOrder = sortOrders.get(i);
+            Comparator<Object[]> orderComparator = (left, right) -> {
+                // index 0 is the primary key, sort keys start at index 1
+                var leftKey = left[index + 1];
+                var rightKey = right[index + 1];
+                return sortOrder.descending() ? compareSortKeys(rightKey, leftKey) : compareSortKeys(leftKey, rightKey);
             };
-        } else if (index instanceof SingleValueIndex<E, K> singleValueIndex) {
-            comparator = (left, right) -> {
-                K leftKey = singleValueIndex.getKey(left);
-                K rightKey = singleValueIndex.getKey(right);
-                // null first by default
-                if (leftKey == null) {
-                    return rightKey == null ? 0 : -1;
-                }
-                if (rightKey == null) {
-                    return 1;
-                }
-                return leftKey.compareTo(rightKey);
-            };
-        } else {
-            throw new UnsupportedOperationException("Unsupported index type for sorting: " + index.getClass());
+            comparator = comparator == null ? orderComparator : comparator.thenComparing(orderComparator);
         }
-        if (order.isDescending()) {
-            comparator = comparator.reversed();
+        if (comparator == null) {
+            return Comparator.comparing(DefaultIndexEngine::primaryKey);
         }
-        return comparator;
+        // Use the primary key as a tie-breaker so that paging over equal sort keys is stable.
+        return comparator.thenComparing(Comparator.comparing(DefaultIndexEngine::primaryKey));
     }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private static int compareSortKeys(Object left, Object right) {
+        // null first by default
+        if (left == null) {
+            return right == null ? 0 : -1;
+        }
+        if (right == null) {
+            return 1;
+        }
+        return ((Comparable) left).compareTo(right);
+    }
+
+    private static List<Object[]> createSortEntries(Collection<String> primaryKeys, List<SortOrder> sortOrders) {
+        var entries = new ArrayList<Object[]>(primaryKeys.size());
+        for (var primaryKey : primaryKeys) {
+            var sortEntry = newSortEntry(sortOrders);
+            fillSortEntry(sortEntry, primaryKey, sortOrders);
+            entries.add(sortEntry);
+        }
+        return entries;
+    }
+
+    private static Object[] newSortEntry(List<SortOrder> sortOrders) {
+        return new Object[sortOrders.size() + 1];
+    }
+
+    private static void fillSortEntry(Object[] sortEntry, String primaryKey, List<SortOrder> sortOrders) {
+        sortEntry[0] = primaryKey;
+        for (var i = 0; i < sortOrders.size(); i++) {
+            sortEntry[i + 1] = sortOrders.get(i).accessor().apply(primaryKey);
+        }
+    }
+
+    private static String primaryKey(Object[] sortEntry) {
+        return (String) sortEntry[0];
+    }
+
+    private static List<String> sortedPrimaryKeys(Collection<String> primaryKeys, List<SortOrder> sortOrders) {
+        if (sortOrders.isEmpty()) {
+            var sortedResult = new ArrayList<>(primaryKeys);
+            sortedResult.sort(Comparator.naturalOrder());
+            return sortedResult;
+        }
+        var entries = createSortEntries(primaryKeys, sortOrders);
+        entries.sort(buildComparator(sortOrders));
+        var sortedResult = new ArrayList<String>(entries.size());
+        for (var entry : entries) {
+            sortedResult.add(primaryKey(entry));
+        }
+        return sortedResult;
+    }
+
+    private ListResult<String> paginate(Collection<String> result, PageRequest page, List<SortOrder> sortOrders) {
+        var total = result.size();
+        int offset = (page.getPageNumber() - 1) * page.getPageSize();
+        int limit = page.getPageSize();
+        if (limit <= 0) {
+            // return all results for backward compatibility
+            var finalResult = sortedPrimaryKeys(result, sortOrders);
+            return new ListResult<>(page.getPageNumber(), page.getPageSize(), total, finalResult);
+        }
+        if (offset >= total) {
+            return new ListResult<>(page.getPageNumber(), page.getPageSize(), total, new LinkedList<>());
+        }
+        if (offset + limit > total) {
+            limit = total - offset;
+        }
+        var n = offset + limit;
+        if (n > 1000) {
+            var sortedResult = sortedPrimaryKeys(result, sortOrders);
+            var finalResult = new ArrayList<String>(limit);
+            for (var i = offset; i < offset + limit; i++) {
+                finalResult.add(sortedResult.get(i));
+            }
+            return new ListResult<>(page.getPageNumber(), page.getPageSize(), total, finalResult);
+        }
+        var pq = topNHeap(result, sortOrders, n);
+        var finalResult = new LinkedList<String>();
+        while (!pq.isEmpty()) {
+            finalResult.addFirst(primaryKey(pq.poll()));
+            if (finalResult.size() >= limit) {
+                // no need to compare further
+                break;
+            }
+        }
+        pq.clear();
+        return new ListResult<>(page.getPageNumber(), page.getPageSize(), total, finalResult);
+    }
+
+    private static List<String> topN(Collection<String> result, List<SortOrder> sortOrders, int topN) {
+        var pq = topNHeap(result, sortOrders, topN);
+        var finalResult = new LinkedList<String>();
+        while (!pq.isEmpty()) {
+            finalResult.addFirst(primaryKey(pq.poll()));
+        }
+        return finalResult;
+    }
+
+    private static PriorityQueue<Object[]> topNHeap(Collection<String> result, List<SortOrder> sortOrders, int topN) {
+        var comparator = buildComparator(sortOrders);
+        var pq = new PriorityQueue<Object[]>(topN + 1, comparator.reversed());
+        // Reuse one buffer for rejected candidates, so only candidates entering the heap allocate.
+        var candidate = newSortEntry(sortOrders);
+        for (var primaryKey : result) {
+            fillSortEntry(candidate, primaryKey, sortOrders);
+            if (pq.size() < topN) {
+                pq.offer(candidate);
+                candidate = newSortEntry(sortOrders);
+            } else if (comparator.compare(candidate, pq.peek()) < 0) {
+                pq.poll();
+                pq.offer(candidate);
+                candidate = newSortEntry(sortOrders);
+            }
+        }
+        return pq;
+    }
+
+    private record SortOrder(Function<String, Object> accessor, boolean descending) {}
 }

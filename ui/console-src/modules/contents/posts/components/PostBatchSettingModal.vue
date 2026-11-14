@@ -314,8 +314,18 @@ function onSubmit(data: FormData) {
         <FormKit
           v-if="value?.enabled"
           :options="[
-            { label: $t('core.common.radio.yes'), value: true },
-            { label: $t('core.common.radio.no'), value: false },
+            {
+              label: $t(
+                'core.post.batch_setting_modal.fields.allow_comment_options.allow'
+              ),
+              value: true,
+            },
+            {
+              label: $t(
+                'core.post.batch_setting_modal.fields.allow_comment_options.disallow'
+              ),
+              value: false,
+            },
           ]"
           :label="
             $t('core.post.batch_setting_modal.fields.allow_comment_value')

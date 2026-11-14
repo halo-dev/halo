@@ -19,5 +19,8 @@ export * from "./bubble";
 // base
 export * from "./base";
 
+// keyboard shortcuts
+export * from "./keyboard-shortcuts";
+
 export { default as RichTextEditor } from "./Editor.vue";
 export { default as EditorHeader } from "./EditorHeader.vue";

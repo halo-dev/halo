@@ -8,6 +8,9 @@ import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -47,6 +50,23 @@ class PostCommentSubjectTest {
                 .verifyComplete();
 
         postCommentSubject.get("fake-post2").as(StepVerifier::create).verifyComplete();
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = {"/archives/example?lang=zh", "https://example.test/archives/example?lang=zh"})
+    void subjectDisplayPreservesStoredPermalink(String permalink) {
+        var subject = new Post();
+        subject.setSpec(new Post.PostSpec());
+        subject.getSpec().setTitle("Subject");
+        subject.getStatusOrDefault().setPermalink(permalink);
+        when(client.fetch(Post.class, "subject")).thenReturn(Mono.just(subject));
+
+        postCommentSubject
+                .getSubjectDisplay("subject")
+                .as(StepVerifier::create)
+                .expectNext(new CommentSubject.SubjectDisplay("Subject", permalink, "文章"))
+                .verifyComplete();
     }
 
     @Test

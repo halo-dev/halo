@@ -187,6 +187,40 @@ class DefaultNotificationCenterTest {
     }
 
     @Test
+    public void testDispatchNotificationWithMultipleNotifiers() {
+        var spyNotificationCenter = spy(notificationCenter);
+
+        doReturn(Flux.just("email-notifier", "wechat-notifier"))
+                .when(spyNotificationCenter)
+                .getNotifiersBySubscriber(any(), any());
+
+        when(client.fetch(eq(NotifierDescriptor.class), eq("email-notifier")))
+                .thenReturn(Mono.just(mock(NotifierDescriptor.class)));
+        when(client.fetch(eq(NotifierDescriptor.class), eq("wechat-notifier")))
+                .thenReturn(Mono.just(mock(NotifierDescriptor.class)));
+
+        var notificationElement = mock(DefaultNotificationCenter.NotificationElement.class);
+        doReturn(Mono.just(notificationElement))
+                .when(spyNotificationCenter)
+                .prepareNotificationElement(any(), any(), any());
+
+        doReturn(Mono.empty()).when(spyNotificationCenter).sendNotification(any());
+        doReturn(Mono.empty()).when(spyNotificationCenter).createNotification(any());
+
+        var reason = new Reason();
+        reason.setMetadata(new Metadata());
+        reason.getMetadata().setName("reason-a");
+        reason.setSpec(new Reason.Spec());
+        reason.getSpec().setReasonType("new-reply-on-comment");
+
+        var subscriber = new Subscriber(UserIdentity.of("fake-user"), "subscription-a");
+        spyNotificationCenter.dispatchNotification(reason, subscriber).block();
+
+        verify(spyNotificationCenter, times(2)).sendNotification(any());
+        verify(spyNotificationCenter, times(1)).createNotification(any());
+    }
+
+    @Test
     public void testPrepareNotificationElement() {
         var spyNotificationCenter = spy(notificationCenter);
 

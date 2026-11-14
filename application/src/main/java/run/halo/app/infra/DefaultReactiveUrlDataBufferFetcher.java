@@ -80,7 +80,7 @@ class DefaultReactiveUrlDataBufferFetcher implements ReactiveUrlDataBufferFetche
 
     private static Throwable mapRequestException(WebClientRequestException ex) {
         if (ex.getCause() instanceof UnknownHostException uhe) {
-            return new ServerWebInputException("Unable to resolve host or private IP resolved: " + uhe.getMessage());
+            return new ServerWebInputException("problemDetail.attachment.remote.host", null, uhe);
         }
         return ex;
     }

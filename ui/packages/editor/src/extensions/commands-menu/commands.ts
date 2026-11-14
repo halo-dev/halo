@@ -1,5 +1,6 @@
 import { computePosition, flip, shift } from "@floating-ui/dom";
 import Suggestion, { type SuggestionOptions } from "@tiptap/suggestion";
+import { i18n } from "@/locales";
 import {
   Extension,
   PluginKey,
@@ -10,10 +11,14 @@ import {
   type Range,
 } from "@/tiptap";
 import type { CommandMenuItemType } from "@/types";
+import { prepareBlockCommandFromList } from "@/utils";
 import CommandsView from "./CommandsView.vue";
 
 export const ExtensionCommandsMenu = Extension.create({
   name: "commands-menu",
+  // Suggestion popovers must get the first chance to handle navigation keys.
+  // Structural editor plugins should only run when the menu is inactive.
+  priority: 1000,
 
   addProseMirrorPlugins() {
     const commandMenuItems = getToolbarItemsFromExtensions(this.editor);
@@ -29,14 +34,18 @@ export const ExtensionCommandsMenu = Extension.create({
         range: Range;
         props: CommandMenuItemType;
       }) => {
-        props.command({ editor, range });
+        props.command({
+          editor,
+          range: prepareBlockCommandFromList(editor, range),
+        });
       },
       items: ({ query }: { query: string }) => {
-        return commandMenuItems.filter((item) =>
-          [...item.keywords, item.title].some((keyword) =>
-            keyword.includes(query)
-          )
-        );
+        const normalizedQuery = query.trim().toLocaleLowerCase();
+        return commandMenuItems.filter((item) => {
+          return [...item.keywords, item.title, i18n.global.t(item.title)].some(
+            (keyword) => keyword.toLocaleLowerCase().includes(normalizedQuery)
+          );
+        });
       },
       render: () => {
         let component: VueRenderer | null = null;

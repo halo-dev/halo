@@ -3,23 +3,55 @@ import "./styles/index.scss";
 import "./styles/tailwind.css";
 
 export * from "./components";
+export * from "./composables/use-halo-keyboard-shortcut";
+export * from "./editor-metadata";
 export * from "./extensions";
+export * from "./keyboard-shortcuts";
 export * from "./tiptap";
 export * from "./types";
 export {
   convertToMediaContents,
+  createTextblockFragmentAt,
   deleteNode,
   deleteNodeByPos,
   filterDuplicateExtensions,
+  findAncestorListItems,
+  findGapCursorFrom,
   generateAnchor,
   generateAnchorId,
+  getBlockIndentAtSelection,
+  getCursorCoords,
+  getEditorNodeElement,
+  getGapCursorTarget,
+  isGapCursorPosition,
+  isGapCursorTargetNode,
   isAllowedUri,
   isBlockEmpty,
   isEmpty,
   isListActive,
   isNodeContentEmpty,
-  getCursorCoords,
+  findTable,
+  getCellsInColumn,
+  getCellsInRow,
+  getTableHeaderState,
+  hasTableBefore,
+  isCellSelection,
+  isColumnSelected,
+  isRowSelected,
+  isTableSelected,
+  selectColumn,
+  selectRow,
+  selectTable,
+  prepareBlockCommandFromList,
+  resolveGapCursorSide,
+  type AncestorListItem,
+  type GapCursorDirection,
+  type GapCursorSide,
+  type GapCursorTarget,
   type MatchAttachmentPermalinks,
+  type TableCellPosition,
+  type TablePosition,
+  type TableHeaderState,
   type Upload,
   type UploadFile,
 } from "./utils";

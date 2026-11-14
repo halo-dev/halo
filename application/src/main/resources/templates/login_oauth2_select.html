@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html
+  lang="en"
+  th:lang="${#locale.toLanguageTag}"
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{gateway_fragments/layout :: layout(title = |#{title} - ${site.title}|, head = null, body = ~{::body})}"
+>
+  <head>
+    <title th:text="|#{title} - ${site.title}|">Continue with OAuth2</title>
+  </head>
+  <th:block th:fragment="body">
+    <div class="gateway-wrapper">
+      <div th:replace="~{gateway_fragments/common::haloLogo}"></div>
+
+      <div class="halo-form-wrapper">
+        <div th:replace="~{gateway_fragments/oauth2_select::form}"></div>
+      </div>
+
+      <div th:replace="~{gateway_fragments/common::returnToSiteContent}"></div>
+      <div th:replace="~{gateway_fragments/common::languageSwitcher}"></div>
+    </div>
+  </th:block>
+</html>

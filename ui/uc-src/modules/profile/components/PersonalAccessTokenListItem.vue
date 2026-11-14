@@ -90,6 +90,16 @@ const statusTheme = computed<StatusDotState>(() => {
   }
   return props.token.spec?.revoked ? "default" : "success";
 });
+
+const lastUsedDescription = computed(() => {
+  const lastUsed = props.token.spec?.lastUsed;
+  if (!lastUsed) {
+    return t("core.uc_profile.pat.list.fields.lastUsed.never");
+  }
+  return t("core.uc_profile.pat.list.fields.lastUsed.dynamic", {
+    lastUsed: utils.date.timeAgo(lastUsed),
+  });
+});
 </script>
 
 <template>
@@ -135,7 +145,21 @@ const statusTheme = computed<StatusDotState>(() => {
         </template>
       </VEntityField>
       <VEntityField
-        :description="utils.date.format(token.metadata.creationTimestamp)"
+        v-tooltip="{
+          content: utils.date.format(token.spec?.lastUsed),
+          disabled: !token.spec?.lastUsed,
+        }"
+        :description="lastUsedDescription"
+      ></VEntityField>
+      <VEntityField
+        v-tooltip="
+          $t('core.uc_profile.pat.list.fields.creationTimestamp.tooltip', {
+            creationTimestamp: utils.date.format(
+              token.metadata.creationTimestamp
+            ),
+          })
+        "
+        :description="utils.date.timeAgo(token.metadata.creationTimestamp)"
       ></VEntityField>
     </template>
     <template #dropdownItems>

@@ -7,6 +7,7 @@ import ToolboxItem from "@/components/toolbox/ToolboxItem.vue";
 import { i18n } from "@/locales";
 import {
   isActive,
+  mergeAttributes,
   Node,
   PluginKey,
   VueNodeViewRenderer,
@@ -21,6 +22,13 @@ import BubbleItemAddImage from "./BubbleItemAddImage.vue";
 import BubbleItemGap from "./BubbleItemGap.vue";
 import BubbleItemGroupSize from "./BubbleItemGroupSize.vue";
 import BubbleItemLayout from "./BubbleItemLayout.vue";
+import {
+  DEFAULT_GALLERY_GAP,
+  DEFAULT_GALLERY_GROUP_SIZE,
+  DEFAULT_GALLERY_LAYOUT,
+  GALLERY_LAYOUT_SQUARE,
+  GALLERY_LAYOUTS,
+} from "./constants";
 import { ExtensionGalleryBubble } from "./gallery-bubble";
 import GalleryView from "./GalleryView.vue";
 
@@ -35,6 +43,7 @@ declare module "@/tiptap" {
 export type ExtensionGalleryImageItem = {
   src: string;
   aspectRatio: number;
+  alt?: string;
 };
 
 export const GALLERY_BUBBLE_MENU_KEY = new PluginKey("galleryBubbleMenu");
@@ -63,7 +72,54 @@ export const ExtensionGallery = Node.create<
 
   fakeSelection: true,
 
-  allowGapCursor: true,
+  addHaloEditorMetadata() {
+    return {
+      ai: {
+        description:
+          "A gallery that presents multiple images in configurable groups.",
+        exposure: "available",
+        useWhen: [
+          "Several related images should be presented as one visual set.",
+        ],
+        avoidWhen: ["Only one image is needed."],
+        attributeGuidance: {
+          images: {
+            description:
+              "Ordered gallery items, each containing a source URL, aspect ratio, and optional alternative text.",
+            format:
+              "array of { src: string, aspectRatio: number, alt?: string }",
+          },
+          groupSize: {
+            description: "Maximum number of images in each visual group.",
+            examples: [2, DEFAULT_GALLERY_GROUP_SIZE, 4],
+          },
+          layout: {
+            description: "Gallery layout strategy.",
+            allowedValues: [...GALLERY_LAYOUTS],
+          },
+          gap: {
+            description: "Gap between gallery images in pixels.",
+            examples: [0, DEFAULT_GALLERY_GAP, 16],
+          },
+          file: {
+            description:
+              "Editor-only upload state that is not part of persisted article HTML.",
+            omitWhen: ["Generating or editing persisted article content."],
+          },
+        },
+        generation: {
+          mode: "direct-html",
+          guidelines: [
+            "Use stable accessible image URLs; uploading local files requires a separate plugin capability.",
+          ],
+        },
+        examples: [
+          `<div data-type="gallery" data-group-size="2" data-layout="${DEFAULT_GALLERY_LAYOUT}" data-gap="${DEFAULT_GALLERY_GAP}"><div data-type="gallery-group"><div data-aspect-ratio="1.5"><img src="https://example.com/one.jpg"></div><div data-aspect-ratio="1.5"><img src="https://example.com/two.jpg"></div></div></div>`,
+          `<div data-type="gallery" data-group-size="${DEFAULT_GALLERY_GROUP_SIZE}" data-layout="${GALLERY_LAYOUT_SQUARE}" data-gap="12"><div data-type="gallery-group"><div data-aspect-ratio="1"><img src="https://example.com/one.jpg"></div><div data-aspect-ratio="1.5"><img src="https://example.com/two.jpg"></div><div data-aspect-ratio="0.75"><img src="https://example.com/three.jpg"></div></div></div>`,
+        ],
+      },
+    };
+  },
 
   addAttributes() {
     return {
@@ -78,24 +134,28 @@ export const ExtensionGallery = Node.create<
             return {
               src: img.getAttribute("src") || "",
               aspectRatio: aspectRatio || 0,
+              alt: img.getAttribute("alt") ?? "",
             };
           });
         },
       },
       groupSize: {
-        default: 3,
+        default: DEFAULT_GALLERY_GROUP_SIZE,
         parseHTML: (element) => {
-          return Number(element.getAttribute("data-group-size")) || 3;
+          return (
+            Number(element.getAttribute("data-group-size")) ||
+            DEFAULT_GALLERY_GROUP_SIZE
+          );
         },
       },
       layout: {
-        default: "auto",
+        default: DEFAULT_GALLERY_LAYOUT,
         parseHTML: (element) => {
-          return element.getAttribute("data-layout") || "auto";
+          return element.getAttribute("data-layout") || DEFAULT_GALLERY_LAYOUT;
         },
       },
       gap: {
-        default: 8,
+        default: DEFAULT_GALLERY_GAP,
         parseHTML: (element) => {
           const gap = Number(element.getAttribute("data-gap"));
           if (isNaN(gap) || gap < 0) {
@@ -124,10 +184,13 @@ export const ExtensionGallery = Node.create<
     ];
   },
 
-  renderHTML({ node }) {
+  renderHTML({ node, HTMLAttributes }) {
     const images: ExtensionGalleryImageItem[] = node.attrs.images || [];
-    const groupSize = node.attrs.groupSize || this.options?.groupSize || 3;
-    const layout = node.attrs.layout || "auto";
+    const groupSize =
+      node.attrs.groupSize ||
+      this.options?.groupSize ||
+      DEFAULT_GALLERY_GROUP_SIZE;
+    const layout = node.attrs.layout || DEFAULT_GALLERY_LAYOUT;
     const gap = node.attrs.gap || this.options?.gap || 0;
     const imageGroups: ExtensionGalleryImageItem[][] = images.reduce(
       (
@@ -153,13 +216,14 @@ export const ExtensionGallery = Node.create<
           return [
             "div",
             {
-              style: `flex: ${layout === "square" ? "1" : image.aspectRatio} 1 0%;${layout === "square" ? "aspect-ratio: 1/1;" : ""}`,
+              style: `flex: ${layout === GALLERY_LAYOUT_SQUARE ? "1" : image.aspectRatio} 1 0%;${layout === GALLERY_LAYOUT_SQUARE ? "aspect-ratio: 1/1;" : ""}`,
               "data-aspect-ratio": image.aspectRatio.toString(),
             },
             [
               "img",
               {
                 src: image.src,
+                alt: image.alt ?? "",
                 "data-type": "gallery-image",
                 style:
                   "width: 100%; height: 100%; margin: 0; object-fit: cover;",
@@ -172,12 +236,12 @@ export const ExtensionGallery = Node.create<
 
     return [
       "div",
-      {
+      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
         "data-type": "gallery",
         "data-group-size": groupSize.toString(),
         "data-layout": layout,
         "data-gap": gap?.toString(),
-      },
+      }),
       [
         "div",
         { style: `display: grid; gap: ${gap}px;` },
@@ -229,7 +293,7 @@ export const ExtensionGallery = Node.create<
         return {
           priority: 96,
           icon: markRaw(MingcutePhotoAlbumLine),
-          title: "editor.extensions.commands_menu.gallery",
+          title: /* @x18n-key */ "editor.extensions.commands_menu.gallery",
           keywords: ["gallery", "hualang", "tupian", "images"],
           command: ({ editor, range }: { editor: Editor; range: Range }) => {
             editor

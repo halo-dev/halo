@@ -17,6 +17,8 @@ import {
   VDropdownItem,
   VEmpty,
   VEntityContainer,
+  VFilterDropdown,
+  VFilterDropdownGroup,
   VLoading,
   VPageHeader,
   VSpace,
@@ -39,16 +41,32 @@ const pluginInstallationModalVisible = ref(false);
 const keyword = useRouteQuery<string>("keyword", "");
 
 const selectedEnabledValue = useRouteQuery<string | undefined>("enabled");
+const selectedAuthorName = useRouteQuery<string | undefined>("author");
+const selectedAuthorWebsite = useRouteQuery<string | undefined>(
+  "authorWebsite"
+);
 const selectedSortValue = useRouteQuery<string | undefined>("sort");
 
-const hasFilters = computed(() => {
-  return selectedEnabledValue.value !== undefined || selectedSortValue.value;
-});
-
-function handleClearFilters() {
-  selectedSortValue.value = undefined;
-  selectedEnabledValue.value = undefined;
+function getAuthorKey(author: Plugin["spec"]["author"]) {
+  return JSON.stringify([author?.name, author?.website?.trim() || ""]);
 }
+
+const selectedAuthor = computed({
+  get: () =>
+    selectedAuthorName.value
+      ? getAuthorKey({
+          name: selectedAuthorName.value,
+          website: selectedAuthorWebsite.value,
+        })
+      : undefined,
+  set: (value: string | undefined) => {
+    const [name, website] = value
+      ? (JSON.parse(value) as [string, string])
+      : [];
+    selectedAuthorName.value = name;
+    selectedAuthorWebsite.value = website || undefined;
+  },
+});
 
 const { data, isLoading, isFetching, refetch } = useQuery({
   queryKey: ["plugins", selectedEnabledValue, selectedSortValue],
@@ -89,26 +107,72 @@ const { data, isLoading, isFetching, refetch } = useQuery({
   },
 });
 
-const { results } = useFuse(
-  keyword,
-  computed(() => data.value || []),
-  {
-    fuseOptions: {
-      keys: ["metadata.name", "spec.displayName", "spec.description"],
-    },
-    matchAllWhenSearchEmpty: true,
+const authorOptions = computed(() => {
+  const authors = new Map<
+    string,
+    { name: string; count: number; website?: string; homepage?: string }
+  >();
+
+  for (const plugin of data.value || []) {
+    const name = plugin.spec.author?.name;
+    if (!name?.trim()) continue;
+
+    const key = getAuthorKey(plugin.spec.author);
+    const author = authors.get(key) || {
+      name,
+      count: 0,
+      website: plugin.spec.author?.website?.trim() || undefined,
+    };
+    author.count++;
+    author.homepage ||= plugin.spec.homepage?.trim() || undefined;
+    authors.set(key, author);
   }
-);
+
+  return [...authors]
+    .map(([key, author]) => ({
+      label: author.name,
+      value: key,
+      description: author.website || author.homepage,
+      count: author.count,
+    }))
+    .sort(
+      (a, b) =>
+        b.count - a.count ||
+        a.label.localeCompare(b.label) ||
+        a.value.localeCompare(b.value)
+    );
+});
+
+const filteredPlugins = computed(() => {
+  const plugins = data.value || [];
+  return selectedAuthor.value
+    ? plugins.filter(
+        (plugin) => getAuthorKey(plugin.spec.author) === selectedAuthor.value
+      )
+    : plugins;
+});
+
+const { results } = useFuse(keyword, filteredPlugins, {
+  fuseOptions: {
+    keys: ["metadata.name", "spec.displayName", "spec.description"],
+  },
+  matchAllWhenSearchEmpty: true,
+});
 
 // selection
 const selectedNames = ref<string[]>([]);
 provide<Ref<string[]>>("selectedNames", selectedNames);
 const checkedAll = ref(false);
 
+watch(selectedAuthor, () => {
+  selectedNames.value = [];
+});
+
 watch(
   () => selectedNames.value,
   (value) => {
-    checkedAll.value = value.length === results.value?.length;
+    checkedAll.value =
+      value.length > 0 && value.length === results.value?.length;
   }
 );
 
@@ -174,7 +238,7 @@ const { handleChangeStatusInBatch, handleUninstallInBatch } =
             class="relative flex flex-col flex-wrap items-start gap-4 sm:flex-row sm:items-center"
           >
             <div
-              v-permission="['system:posts:manage']"
+              v-permission="['system:plugins:manage']"
               class="hidden items-center sm:flex"
             >
               <input
@@ -222,44 +286,86 @@ const { handleChangeStatusInBatch, handleUninstallInBatch } =
               </VSpace>
             </div>
             <VSpace spacing="lg" class="flex-wrap">
-              <FilterCleanButton
-                v-if="hasFilters"
-                @click="handleClearFilters"
-              />
-              <FilterDropdown
-                v-model="selectedEnabledValue"
-                :label="$t('core.common.filters.labels.status')"
-                :items="[
-                  {
-                    label: t('core.common.filters.item_labels.all'),
-                  },
-                  {
-                    label: t('core.plugin.filters.status.items.active'),
-                    value: 'true',
-                  },
-                  {
-                    label: t('core.plugin.filters.status.items.inactive'),
-                    value: 'false',
-                  },
-                ]"
-              />
-              <FilterDropdown
-                v-model="selectedSortValue"
-                :label="$t('core.common.filters.labels.sort')"
-                :items="[
-                  {
-                    label: t('core.common.filters.item_labels.default'),
-                  },
-                  {
-                    label: t('core.plugin.filters.sort.items.create_time_desc'),
-                    value: 'creationTimestamp,desc',
-                  },
-                  {
-                    label: t('core.plugin.filters.sort.items.create_time_asc'),
-                    value: 'creationTimestamp,asc',
-                  },
-                ]"
-              />
+              <VFilterDropdownGroup
+                :clear-label="$t('core.common.buttons.reset')"
+              >
+                <VFilterDropdown
+                  v-model="selectedEnabledValue"
+                  :label="$t('core.common.filters.labels.status')"
+                  show-clear-option
+                  :clear-label="t('core.common.filters.item_labels.all')"
+                  :options="[
+                    {
+                      label: t('core.plugin.filters.status.items.active'),
+                      value: 'true',
+                    },
+                    {
+                      label: t('core.plugin.filters.status.items.inactive'),
+                      value: 'false',
+                    },
+                  ]"
+                />
+                <VFilterDropdown
+                  v-model="selectedAuthor"
+                  :label="$t('core.plugin.filters.author.label')"
+                  :options="authorOptions"
+                  :selected-label="selectedAuthorName"
+                  searchable
+                  :search-placeholder="$t('core.common.placeholder.search')"
+                  :empty-text="$t('core.components.global_search.no_results')"
+                  show-clear-option
+                  :clear-label="t('core.common.filters.item_labels.all')"
+                  panel-width="22rem"
+                >
+                  <template #option="{ option, selected }">
+                    <div class="flex min-w-0 flex-1 flex-col">
+                      <span
+                        class="truncate text-sm"
+                        :class="
+                          selected
+                            ? 'font-medium text-gray-900'
+                            : 'text-gray-700'
+                        "
+                      >
+                        {{ option.label }}
+                      </span>
+                      <span
+                        v-if="option.description"
+                        class="truncate text-xs text-gray-500"
+                        :title="option.description"
+                      >
+                        {{ option.description }}
+                      </span>
+                    </div>
+                    <span
+                      v-if="option.count"
+                      class="shrink-0 text-xs text-gray-500"
+                    >
+                      {{ option.count }}
+                    </span>
+                  </template>
+                </VFilterDropdown>
+                <VFilterDropdown
+                  v-model="selectedSortValue"
+                  :label="$t('core.common.filters.labels.sort')"
+                  show-clear-option
+                  :clear-label="t('core.common.filters.item_labels.default')"
+                  :options="[
+                    {
+                      label: t(
+                        'core.plugin.filters.sort.items.create_time_desc'
+                      ),
+                      value: 'creationTimestamp,desc',
+                    },
+                    {
+                      label: t(
+                        'core.plugin.filters.sort.items.create_time_asc'
+                      ),
+                      value: 'creationTimestamp,asc',
+                    },
+                  ]"
+                />
+              </VFilterDropdownGroup>
               <div class="flex flex-row gap-2">
                 <button
                   v-tooltip="$t('core.common.buttons.refresh')"

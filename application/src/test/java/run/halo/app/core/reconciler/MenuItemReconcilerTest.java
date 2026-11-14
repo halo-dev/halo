@@ -2,15 +2,19 @@ package run.halo.app.core.reconciler;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.Instant;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -20,6 +24,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import run.halo.app.core.extension.MenuItem;
 import run.halo.app.core.extension.MenuItem.MenuItemSpec;
+import run.halo.app.core.extension.MenuItem.RouteRef;
 import run.halo.app.core.extension.content.Category;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.SinglePage;
@@ -27,6 +32,7 @@ import run.halo.app.core.extension.content.Tag;
 import run.halo.app.event.post.*;
 import run.halo.app.extension.*;
 import run.halo.app.extension.controller.Reconciler.Request;
+import run.halo.app.infra.SystemConfigChangedEvent;
 
 @ExtendWith(MockitoExtension.class)
 class MenuItemReconcilerTest {
@@ -39,6 +45,134 @@ class MenuItemReconcilerTest {
 
     @InjectMocks
     MenuItemReconciler reconciler;
+
+    @Nested
+    class WhenRouteRefSet {
+
+        @ParameterizedTest
+        @CsvSource({"ARCHIVES,/news", "CATEGORIES,/topics", "TAGS,/labels"})
+        void shouldResolveCurrentRouteRules(RouteRef routeRef, String expectedHref) {
+            var menuItem = createMenuItem("fake-name", spec -> {
+                spec.setDisplayName("Posts");
+                spec.setRouteRef(routeRef);
+            });
+            when(client.fetch(MenuItem.class, "fake-name")).thenReturn(Optional.of(menuItem));
+            mockRouteRules("news/", "topics/", "labels/");
+
+            var result = reconciler.reconcile(new Request("fake-name"));
+
+            assertFalse(result.reEnqueue());
+            assertEquals(expectedHref, menuItem.getStatus().getHref());
+            assertEquals("Posts", menuItem.getStatus().getDisplayName());
+            verify(client).update(menuItem);
+        }
+
+        @Test
+        void shouldUseRouteDefaultsIfConfigMapsAreMissing() {
+            var menuItem = createMenuItem("fake-name", spec -> {
+                spec.setDisplayName("Tags");
+                spec.setRouteRef(RouteRef.TAGS);
+            });
+            when(client.fetch(MenuItem.class, "fake-name")).thenReturn(Optional.of(menuItem));
+
+            reconciler.reconcile(new Request("fake-name"));
+
+            assertEquals("/tags", menuItem.getStatus().getHref());
+            assertEquals("Tags", menuItem.getStatus().getDisplayName());
+        }
+
+        @Test
+        void shouldResetStatusIfRouteAndResourceRefsConflict() {
+            var menuItem = createMenuItem("fake-name", spec -> {
+                spec.setDisplayName("Posts");
+                spec.setRouteRef(RouteRef.ARCHIVES);
+                spec.setTargetRef(Ref.of("fake-post", Post.GVK));
+            });
+            menuItem.setStatus(status("/old", "Old"));
+            when(client.fetch(MenuItem.class, "fake-name")).thenReturn(Optional.of(menuItem));
+
+            reconciler.reconcile(new Request("fake-name"));
+
+            assertNull(menuItem.getStatus().getHref());
+            assertNull(menuItem.getStatus().getDisplayName());
+            verify(client).update(menuItem);
+        }
+
+        @Test
+        void shouldResetStatusIfDisplayNameIsMissing() {
+            var menuItem = createMenuItem("fake-name", spec -> spec.setRouteRef(RouteRef.ARCHIVES));
+            menuItem.setStatus(status("/old", "Old"));
+            when(client.fetch(MenuItem.class, "fake-name")).thenReturn(Optional.of(menuItem));
+
+            reconciler.reconcile(new Request("fake-name"));
+
+            assertNull(menuItem.getStatus().getHref());
+            assertNull(menuItem.getStatus().getDisplayName());
+            verify(client).update(menuItem);
+        }
+
+        @Test
+        void shouldPreserveStatusIfRouteRuleCannotBeNormalized() {
+            var menuItem = createMenuItem("fake-name", spec -> {
+                spec.setDisplayName("Posts");
+                spec.setRouteRef(RouteRef.ARCHIVES);
+            });
+            menuItem.setStatus(status("/old", "Old"));
+            when(client.fetch(MenuItem.class, "fake-name")).thenReturn(Optional.of(menuItem));
+            mockRouteRules("/", "topics", "labels");
+
+            reconciler.reconcile(new Request("fake-name"));
+
+            assertEquals("/old", menuItem.getStatus().getHref());
+            assertEquals("Old", menuItem.getStatus().getDisplayName());
+            verify(client, never()).update(menuItem);
+        }
+    }
+
+    @Nested
+    class WhenRouteRulesChanged {
+
+        @Test
+        void shouldRequestUpdatesOnlyForMatchingRouteRefs() {
+            var archives = createMenuItem("archives", spec -> spec.setRouteRef(RouteRef.ARCHIVES));
+            var tags = createMenuItem("tags", spec -> spec.setRouteRef(RouteRef.TAGS));
+            var custom = createMenuItem("custom", spec -> spec.setHref("/custom"));
+            when(reactiveClient.listAll(same(MenuItem.class), isA(ListOptions.class), eq(Sort.unsorted())))
+                    .thenReturn(Flux.just(archives, tags, custom));
+            when(reactiveClient.update(archives)).thenReturn(Mono.just(archives));
+
+            reconciler
+                    .onSystemConfigChanged(routeRulesChanged("old", "categories", "tags", "new", "categories", "tags"))
+                    .as(StepVerifier::create)
+                    .verifyComplete();
+
+            assertNotNull(archives.getMetadata().getAnnotations());
+            assertTrue(archives.getMetadata().getAnnotations().containsKey(MenuItem.REQUEST_TO_UPDATE_ANNO));
+            assertNull(tags.getMetadata().getAnnotations());
+            assertNull(custom.getMetadata().getAnnotations());
+            verify(reactiveClient).update(archives);
+            verify(reactiveClient, never()).update(tags);
+            verify(reactiveClient, never()).update(custom);
+        }
+
+        @Test
+        void shouldContinueRequestingUpdatesAfterOneFailure() {
+            var first = createMenuItem("first", spec -> spec.setRouteRef(RouteRef.ARCHIVES));
+            var second = createMenuItem("second", spec -> spec.setRouteRef(RouteRef.ARCHIVES));
+            when(reactiveClient.listAll(same(MenuItem.class), isA(ListOptions.class), eq(Sort.unsorted())))
+                    .thenReturn(Flux.just(first, second));
+            when(reactiveClient.update(first)).thenReturn(Mono.error(new IllegalStateException("failed")));
+            when(reactiveClient.update(second)).thenReturn(Mono.just(second));
+
+            reconciler
+                    .onSystemConfigChanged(routeRulesChanged("old", "categories", "tags", "new", "categories", "tags"))
+                    .as(StepVerifier::create)
+                    .verifyComplete();
+
+            verify(reactiveClient).update(first);
+            verify(reactiveClient).update(second);
+        }
+    }
 
     @Nested
     class WhenCategoryRefSet {
@@ -422,5 +556,42 @@ class MenuItemReconcilerTest {
         }
         menuItem.setSpec(spec);
         return menuItem;
+    }
+
+    void mockRouteRules(String archives, String categories, String tags) {
+        var defaults = new ConfigMap();
+        defaults.setData(Map.of("routeRules", """
+                {"archives":"archives","categories":"categories","tags":"tags"}
+                """));
+        var current = new ConfigMap();
+        current.setData(Map.of("routeRules", """
+                {"archives":"%s","categories":"%s","tags":"%s"}
+                """.formatted(archives, categories, tags)));
+        when(client.fetch(ConfigMap.class, "system-default")).thenReturn(Optional.of(defaults));
+        when(client.fetch(ConfigMap.class, "system")).thenReturn(Optional.of(current));
+    }
+
+    MenuItem.MenuItemStatus status(String href, String displayName) {
+        var status = new MenuItem.MenuItemStatus();
+        status.setHref(href);
+        status.setDisplayName(displayName);
+        return status;
+    }
+
+    SystemConfigChangedEvent routeRulesChanged(
+            String oldArchives,
+            String oldCategories,
+            String oldTags,
+            String newArchives,
+            String newCategories,
+            String newTags) {
+        return new SystemConfigChangedEvent(
+                this,
+                Map.of("routeRules", """
+                        {"archives":"%s","categories":"%s","tags":"%s"}
+                        """.formatted(oldArchives, oldCategories, oldTags)),
+                Map.of("routeRules", """
+                        {"archives":"%s","categories":"%s","tags":"%s"}
+                        """.formatted(newArchives, newCategories, newTags)));
     }
 }

@@ -8,6 +8,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -21,8 +22,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.reactive.function.server.MockServerRequest;
 import org.springframework.web.reactive.function.server.EntityResponse;
+import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.FakeExtension;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
@@ -86,6 +89,81 @@ class ExtensionCreateHandlerTest {
         var getHandler = new ExtensionCreateHandler(scheme, client);
         var responseMono = getHandler.handle(serverRequest);
         StepVerifier.create(responseMono).verifyError(ExtensionConvertException.class);
+    }
+
+    @Test
+    void shouldRejectCreateWhenKindDoesNotMatchScheme() {
+        assertRejectedCreate("fake.halo.run/v1alpha1", "Other");
+    }
+
+    @Test
+    void shouldRejectCreateWhenApiVersionDoesNotMatchScheme() {
+        assertRejectedCreate("other.halo.run/v1alpha1", "Fake");
+    }
+
+    private void assertRejectedCreate(String apiVersion, String kind) {
+        var metadata = new Metadata();
+        metadata.setName("my-fake");
+        var unstructured = new Unstructured();
+        unstructured.setMetadata(metadata);
+        unstructured.setApiVersion(apiVersion);
+        unstructured.setKind(kind);
+
+        var serverRequest = MockServerRequest.builder().body(Mono.just(unstructured));
+        var scheme = Scheme.buildFromType(FakeExtension.class);
+        var createHandler = new ExtensionCreateHandler(scheme, client);
+        StepVerifier.create(createHandler.handle(serverRequest)).verifyError(ServerWebInputException.class);
+        verify(client, never()).create(any());
+    }
+
+    @Test
+    void shouldAllowCreateWithGenerateNameOnly() {
+        var metadata = new Metadata();
+        metadata.setGenerateName("generated-");
+        var unstructured = new Unstructured();
+        unstructured.setMetadata(metadata);
+        unstructured.setApiVersion("fake.halo.run/v1alpha1");
+        unstructured.setKind("Fake");
+
+        var serverRequest = MockServerRequest.builder().body(Mono.just(unstructured));
+        when(client.create(any(Unstructured.class))).thenAnswer(invocation -> {
+            Unstructured created = invocation.getArgument(0);
+            created.getMetadata().setName("generated-1");
+            return Mono.just(created);
+        });
+
+        var scheme = Scheme.buildFromType(FakeExtension.class);
+        var createHandler = new ExtensionCreateHandler(scheme, client);
+        StepVerifier.create(createHandler.handle(serverRequest))
+                .assertNext(response -> {
+                    assertEquals(HttpStatus.CREATED, response.statusCode());
+                    assertEquals(
+                            "/apis/fake.halo.run/v1alpha1/fakes/generated-1",
+                            Objects.requireNonNull(response.headers().getLocation())
+                                    .toString());
+                })
+                .verifyComplete();
+        verify(client).create(eq(unstructured));
+    }
+
+    @Test
+    void shouldAllowCreateForCoreGroup() {
+        var metadata = new Metadata();
+        metadata.setName("my-config");
+        var unstructured = new Unstructured();
+        unstructured.setMetadata(metadata);
+        unstructured.setApiVersion("v1alpha1");
+        unstructured.setKind("ConfigMap");
+
+        var serverRequest = MockServerRequest.builder().body(Mono.just(unstructured));
+        when(client.create(any(Unstructured.class))).thenReturn(Mono.just(unstructured));
+
+        var scheme = Scheme.buildFromType(ConfigMap.class);
+        var createHandler = new ExtensionCreateHandler(scheme, client);
+        StepVerifier.create(createHandler.handle(serverRequest))
+                .assertNext(response -> assertEquals(HttpStatus.CREATED, response.statusCode()))
+                .verifyComplete();
+        verify(client).create(eq(unstructured));
     }
 
     @Test

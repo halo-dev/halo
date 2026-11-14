@@ -62,6 +62,23 @@ public class UserNotificationEndpoint implements CustomEndpoint {
                                     .implementation(ListResult.generateGenericClass(Notification.class)));
                     UserNotificationQuery.buildParameters(builder);
                 })
+                .GET(
+                        "/notifications/{name}",
+                        this::getNotification,
+                        builder -> builder.operationId("GetSpecifiedNotification")
+                                .description("Get the specified notification.")
+                                .tag(tag)
+                                .parameter(parameterBuilder()
+                                        .in(ParameterIn.PATH)
+                                        .name("username")
+                                        .description("User metadata.name")
+                                        .required(true))
+                                .parameter(parameterBuilder()
+                                        .in(ParameterIn.PATH)
+                                        .name("name")
+                                        .description("Notification metadata.name")
+                                        .required(true))
+                                .response(responseBuilder().implementation(Notification.class)))
                 .PUT(
                         "/notifications/{name}/mark-as-read",
                         this::markNotificationAsRead,
@@ -97,6 +114,38 @@ public class UserNotificationEndpoint implements CustomEndpoint {
                                                 .schema(Builder.schemaBuilder()
                                                         .implementation(MarkSpecifiedRequest.class))))
                                 .response(responseBuilder().implementationArray(String.class)))
+                .PUT(
+                        "/notifications/-/mark-all-as-read",
+                        this::markAllNotificationsAsRead,
+                        builder -> builder.operationId("MarkAllNotificationsAsRead")
+                                .description("Mark all notifications as read.")
+                                .tag(tag)
+                                .parameter(parameterBuilder()
+                                        .in(ParameterIn.PATH)
+                                        .name("username")
+                                        .description("User metadata.name")
+                                        .required(true))
+                                .response(responseBuilder().implementationArray(String.class)))
+                .DELETE(
+                        "/notifications",
+                        this::deleteAllNotifications,
+                        builder -> builder.operationId("DeleteAllNotifications")
+                                .description("Delete all notifications matching the given field selector.")
+                                .tag(tag)
+                                .parameter(parameterBuilder()
+                                        .in(ParameterIn.PATH)
+                                        .name("username")
+                                        .description("User metadata.name")
+                                        .required(true))
+                                .parameter(parameterBuilder()
+                                        .in(ParameterIn.QUERY)
+                                        .name("fieldSelector")
+                                        .description("Field selector for filtering. e.g.: spec.unread=true")
+                                        .required(false)
+                                        .implementationArray(String.class))
+                                .response(responseBuilder()
+                                        .responseCode("200")
+                                        .description("Notifications deleted successfully.")))
                 .DELETE(
                         "/notifications/{name}",
                         this::deleteNotification,
@@ -125,6 +174,14 @@ public class UserNotificationEndpoint implements CustomEndpoint {
                 .flatMap(notification -> ServerResponse.ok().bodyValue(notification));
     }
 
+    private Mono<ServerResponse> deleteAllNotifications(ServerRequest request) {
+        var username = request.pathVariable("username");
+        var query = new UserNotificationQuery(request.exchange(), username);
+        return notificationService
+                .deleteAllByUser(query)
+                .then(ServerResponse.ok().build());
+    }
+
     @Override
     public GroupVersion groupVersion() {
         return GroupVersion.parseAPIVersion("api.notification.halo.run/v1alpha1");
@@ -146,12 +203,28 @@ public class UserNotificationEndpoint implements CustomEndpoint {
                 .flatMap(notifications -> ServerResponse.ok().bodyValue(notifications));
     }
 
+    private Mono<ServerResponse> getNotification(ServerRequest request) {
+        var username = request.pathVariable("username");
+        var name = request.pathVariable("name");
+        return notificationService
+                .getByName(username, name)
+                .flatMap(notification -> ServerResponse.ok().bodyValue(notification));
+    }
+
     private Mono<ServerResponse> markNotificationAsRead(ServerRequest request) {
         var username = request.pathVariable("username");
         var name = request.pathVariable("name");
         return notificationService
                 .markAsRead(username, name)
                 .flatMap(notification -> ServerResponse.ok().bodyValue(notification));
+    }
+
+    Mono<ServerResponse> markAllNotificationsAsRead(ServerRequest request) {
+        var username = request.pathVariable("username");
+        return notificationService
+                .markAllAsRead(username)
+                .collectList()
+                .flatMap(names -> ServerResponse.ok().bodyValue(names));
     }
 
     Mono<ServerResponse> markNotificationsAsRead(ServerRequest request) {

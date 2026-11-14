@@ -21,6 +21,7 @@ import { computed, ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import { useContentProviderExtensionPoint } from "../composables/use-content-provider-extension-point";
 import { useSubjectRef } from "../composables/use-subject-ref";
+import CommentEditingModal from "./CommentEditingModal.vue";
 import CommentEditor from "./CommentEditor.vue";
 import OwnerButton from "./OwnerButton.vue";
 
@@ -51,6 +52,7 @@ const creationTime = computed(() => {
 
 const editorContent = ref("");
 const editorCharacterCount = ref(0);
+const hidden = ref(false);
 
 function onCommentEditorUpdate(value: {
   content: string;
@@ -84,6 +86,7 @@ async function handleApprove() {
         raw: editorContent.value,
         content: editorContent.value,
         allowNotification: true,
+        hidden: hidden.value,
         quoteReply: undefined,
       },
     });
@@ -100,6 +103,8 @@ const websiteOfAnonymous = computed(() => {
 });
 
 const { data: contentProvider } = useContentProviderExtensionPoint();
+
+const editingModalVisible = ref(false);
 </script>
 <template>
   <VModal
@@ -117,7 +122,7 @@ const { data: contentProvider } = useContentProviderExtensionPoint();
           <div class="flex items-center gap-3">
             <OwnerButton
               v-if="comment.comment.spec.owner.kind === 'User'"
-              :owner="comment.comment.spec.owner"
+              :owner="comment.owner"
               @click="
                 $router.push({
                   name: 'UserDetail',
@@ -165,8 +170,8 @@ const { data: contentProvider } = useContentProviderExtensionPoint();
               {{ subjectRefResult.title }}
             </RouterLink>
             <a
-              v-if="subjectRefResult.externalUrl"
-              :href="subjectRefResult.externalUrl"
+              v-if="comment.permalink || subjectRefResult.externalUrl"
+              :href="comment.permalink || subjectRefResult.externalUrl"
               target="_blank"
               class="text-gray-600 hover:text-gray-900"
             >
@@ -186,6 +191,16 @@ const { data: contentProvider } = useContentProviderExtensionPoint();
             :is="contentProvider?.component"
             :content="comment.comment.spec.content"
           />
+          <HasPermission :permissions="['system:comments:manage']">
+            <div
+              v-if="!comment.comment.metadata.deletionTimestamp"
+              class="mt-2"
+            >
+              <VButton size="sm" @click="editingModalVisible = true">
+                {{ $t("core.common.buttons.edit") }}
+              </VButton>
+            </div>
+          </HasPermission>
         </VDescriptionItem>
         <HasPermission :permissions="['system:comments:manage']">
           <VDescriptionItem
@@ -193,6 +208,13 @@ const { data: contentProvider } = useContentProviderExtensionPoint();
             :label="$t('core.comment.detail_modal.fields.new_reply')"
           >
             <CommentEditor @update="onCommentEditorUpdate" />
+            <FormKit
+              v-model="hidden"
+              type="checkbox"
+              :label="$t('core.comment.reply_modal.fields.private.label')"
+              :help="$t('core.comment.reply_modal.fields.private.help')"
+              outer-class="mt-3"
+            />
           </VDescriptionItem>
         </HasPermission>
       </VDescription>
@@ -218,6 +240,12 @@ const { data: contentProvider } = useContentProviderExtensionPoint();
       </VSpace>
     </template>
   </VModal>
+
+  <CommentEditingModal
+    v-if="editingModalVisible"
+    :target="comment.comment"
+    @close="editingModalVisible = false"
+  />
 </template>
 
 <style scoped>

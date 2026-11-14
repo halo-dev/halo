@@ -25,7 +25,11 @@ const setting = inject<Ref<Setting | undefined>>("setting", ref());
 const saving = ref(false);
 
 const { data: configMapData, suspense } = useQuery({
-  queryKey: ["core:theme:configMap:data", selectedTheme],
+  queryKey: [
+    "core:theme:configMap:data",
+    computed(() => selectedTheme?.value?.metadata.name),
+    computed(() => selectedTheme?.value?.spec.configMapName),
+  ],
   queryFn: async () => {
     const { data } = await consoleApiClient.theme.theme.fetchThemeJsonConfig({
       name: selectedTheme?.value?.metadata.name as string,

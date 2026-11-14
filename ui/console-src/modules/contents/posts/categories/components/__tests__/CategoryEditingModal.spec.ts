@@ -1,3 +1,4 @@
+import { utils } from "@halo-dev/ui-shared";
 import messages from "@intlify/unplugin-vue-i18n/messages";
 import { VueQueryPlugin } from "@tanstack/vue-query";
 import { mount } from "@vue/test-utils";
@@ -9,6 +10,7 @@ import CategoryEditingModal from "../CategoryEditingModal.vue";
 describe("CategoryEditingModal", function () {
   beforeEach(() => {
     setActivePinia(createPinia());
+    utils.permission.setUserPermissions([]);
   });
 
   it("should render", function () {

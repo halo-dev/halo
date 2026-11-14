@@ -16,10 +16,10 @@ export default definePlugin({
           name: "Profile",
           component: () => import("./Profile.vue"),
           meta: {
-            title: "core.uc_profile.title",
+            title: /* @x18n-key */ "core.uc_profile.title",
             searchable: true,
             menu: {
-              name: "core.uc_sidebar.menu.items.profile",
+              name: /* @x18n-key */ "core.uc_sidebar.menu.items.profile",
               group: "dashboard",
               icon: markRaw(IconAccountCircleLine),
               priority: 0,

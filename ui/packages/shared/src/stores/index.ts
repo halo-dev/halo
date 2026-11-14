@@ -1,11 +1,70 @@
 import {
   axiosInstance,
-  consoleApiClient,
+  ucApiClient,
   type DetailedUser,
 } from "@halo-dev/api-client";
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import { ref, shallowRef } from "vue";
 import type { GlobalInfo } from "./types";
+
+export interface UiPluginRegistration {
+  name: string;
+  type: "plugin" | "theme";
+  version: string;
+  status: "pending" | "registered" | "failed";
+}
+
+export interface UiPluginsStore {
+  readonly registrations: readonly Readonly<UiPluginRegistration>[];
+  get(name: string): Readonly<UiPluginRegistration> | undefined;
+  isEnabled(name: string): boolean;
+  isRegistered(name: string): boolean;
+}
+
+/** @internal Host loader lifecycle actions; UI providers consume UiPluginsStore. */
+export interface UiPluginsHostStore extends UiPluginsStore {
+  _seed(registrations: readonly UiPluginRegistration[]): void;
+  _setStatus(name: string, status: UiPluginRegistration["status"]): void;
+}
+
+const useUiPluginsStore = defineStore("ui-plugins", () => {
+  const registrations = shallowRef<UiPluginRegistration[]>([]);
+
+  function get(name: string) {
+    return registrations.value.find(
+      (registration) => registration.name === name
+    );
+  }
+
+  function isEnabled(name: string) {
+    return Boolean(get(name));
+  }
+
+  function isRegistered(name: string) {
+    return get(name)?.status === "registered";
+  }
+
+  function _seed(nextRegistrations: readonly UiPluginRegistration[]) {
+    registrations.value = nextRegistrations.map((registration) => ({
+      ...registration,
+    }));
+  }
+
+  function _setStatus(name: string, status: UiPluginRegistration["status"]) {
+    registrations.value = registrations.value.map((registration) =>
+      registration.name === name ? { ...registration, status } : registration
+    );
+  }
+
+  return {
+    registrations,
+    get,
+    isEnabled,
+    isRegistered,
+    _seed,
+    _setStatus,
+  };
+});
 
 /**
  * Collection of Pinia stores for shared application state.
@@ -15,12 +74,15 @@ import type { GlobalInfo } from "./types";
  * that needs to be accessed across multiple components and plugins.
  */
 export const stores = {
+  /** Reactive metadata for UI providers discovered in the current descriptor. */
+  uiPlugins: useUiPluginsStore as unknown as () => UiPluginsStore,
   /**
-   * Store for managing the current authenticated user's information.
+   * Store for managing the current user information.
    *
    * @remarks
    * This store provides access to the current user's details and authentication state.
-   * It includes helper methods to fetch the latest user information from the server.
+   * Unauthenticated visitors are represented by Halo's `anonymousUser` account.
+   * The store includes helper methods to fetch the latest user information from the server.
    *
    * @example
    * ```typescript
@@ -38,7 +100,7 @@ export const stores = {
    */
   currentUser: defineStore("currentUser", () => {
     /**
-     * The current authenticated user's detailed information.
+     * The current user's detailed information, including the anonymous user.
      * Will be `undefined` until `fetchCurrentUser` is called.
      */
     const currentUser = ref<DetailedUser>();
@@ -53,10 +115,10 @@ export const stores = {
      * Fetches the current user's information from the server.
      * Updates both `currentUser` and `isAnonymous` reactive references.
      *
-     * @throws Will throw an error if the API request fails or user is not authenticated.
+     * @throws Will throw an error if the API request fails.
      */
     async function fetchCurrentUser() {
-      const { data } = await consoleApiClient.user.getCurrentUserDetail();
+      const { data } = await ucApiClient.user.currentUser.getMyUserDetail();
       currentUser.value = data;
       isAnonymous.value = data.user.metadata.name === "anonymousUser";
     }

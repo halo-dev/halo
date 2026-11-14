@@ -1,78 +1,87 @@
-import { Plugin, PluginKey } from "@/tiptap/pm";
-import { Extension } from "@/tiptap/vue-3";
+import {
+  skipTrailingNodeMeta,
+  TrailingNode,
+  type TrailingNodeOptions,
+} from "@tiptap/extensions";
+import {
+  GapCursor,
+  Plugin,
+  type EditorState,
+  type Transaction,
+} from "@/tiptap/pm";
+import { isGapCursorTargetNode } from "@/utils/gap-cursor";
 
-/**
- * @param {object} args Arguments as deconstructable object
- * @param {Array | object} args.types possible types
- * @param {object} args.node node to check
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function nodeEqualsType({ types, node }: { types: any; node: any }) {
+function shouldSkipTrailingNode(transaction: Transaction) {
+  let current: Transaction | undefined = transaction;
+  const visited = new Set<Transaction>();
+
+  while (current) {
+    if (visited.has(current)) {
+      break;
+    }
+    visited.add(current);
+
+    if (current.getMeta(skipTrailingNodeMeta)) {
+      return true;
+    }
+
+    current = current.getMeta("appendedTransaction") as Transaction | undefined;
+  }
+
+  return false;
+}
+
+function shouldPreserveTerminalGapCursor(state: EditorState) {
+  const { doc, selection } = state;
   return (
-    (Array.isArray(types) && types.includes(node.type)) || node.type === types
+    selection instanceof GapCursor &&
+    selection.from === doc.content.size &&
+    isGapCursorTargetNode(selection.$from.nodeBefore)
   );
 }
 
-/**
- * Extension based on:
- * - https://github.com/ueberdosis/tiptap/tree/main/demos/src/Experiments/TrailingNode
- * - https://github.com/ueberdosis/tiptap/blob/v1/packages/tiptap-extensions/src/extensions/TrailingNode.js
- * - https://github.com/remirror/remirror/blob/e0f1bec4a1e8073ce8f5500d62193e52321155b9/packages/prosemirror-trailing-node/src/trailing-node-plugin.ts
- */
-
-export const ExtensionTrailingNode = Extension.create({
-  name: "trailingNode",
-
+export const ExtensionTrailingNode = TrailingNode.extend<TrailingNodeOptions>({
   addOptions() {
     return {
+      ...this.parent!(),
       node: "paragraph",
       notAfter: ["paragraph"],
     };
   },
 
   addProseMirrorPlugins() {
-    const plugin = new PluginKey(this.name);
-    const disabledNodes = Object.entries(this.editor.schema.nodes)
-      .map(([, value]) => value)
-      .filter((node) => this.options.notAfter.includes(node.name));
+    if (this.editor.options.editable === false) {
+      return [];
+    }
 
-    const isEditable = this.editor.isEditable;
-
-    return [
-      new Plugin({
-        key: plugin,
-        appendTransaction: (_, __, state) => {
-          if (!isEditable) return;
-
-          const { doc, tr, schema } = state;
-          const shouldInsertNodeAtEnd = plugin.getState(state);
-          const endPosition = doc.content.size;
-          const type = schema.nodes[this.options.node];
-
-          if (!shouldInsertNodeAtEnd) {
-            return;
-          }
-
-          return tr.insert(endPosition, type.create());
-        },
-        state: {
-          init: (_, state) => {
-            if (!isEditable) return false;
-            const lastNode = state.tr.doc.lastChild;
-            return !nodeEqualsType({ node: lastNode, types: disabledNodes });
-          },
-          apply: (tr, value) => {
-            if (!isEditable) return value;
-
-            if (!tr.docChanged) {
-              return value;
-            }
-
-            const lastNode = tr.doc.lastChild;
-            return !nodeEqualsType({ node: lastNode, types: disabledNodes });
-          },
-        },
-      }),
-    ];
+    return (this.parent?.() ?? []).map(preserveSkipMetaAcrossAppendRounds);
   },
 });
+
+function preserveSkipMetaAcrossAppendRounds(plugin: Plugin) {
+  const appendTransaction = plugin.spec.appendTransaction;
+  if (!appendTransaction) {
+    return plugin;
+  }
+
+  return new Plugin({
+    ...plugin.spec,
+    appendTransaction(transactions, oldState, newState) {
+      // A plugin ordered after TrailingNode can append another transaction
+      // after the direct skip was observed. ProseMirror links that transaction
+      // to its root through `appendedTransaction`.
+      if (transactions.some(shouldSkipTrailingNode)) {
+        return null;
+      }
+      if (shouldPreserveTerminalGapCursor(newState)) {
+        return null;
+      }
+      return appendTransaction.call(plugin, transactions, oldState, newState);
+    },
+  });
+}
+
+export {
+  skipTrailingNodeMeta,
+  type TrailingNodeOptions,
+} from "@tiptap/extensions";

@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +21,7 @@ import org.springframework.http.CacheControl;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import run.halo.app.plugin.UiPluginBundleService;
+import run.halo.app.plugin.UiPluginProviderDescriptor;
 
 @ExtendWith(MockitoExtension.class)
 class UiPluginEndpointTest {
@@ -117,6 +119,41 @@ class UiPluginEndpointTest {
                 .contentType("text/css")
                 .expectBody(String.class)
                 .isEqualTo("fake-css");
+    }
+
+    @Test
+    void shouldFetchProviderDescriptorWithoutCaching() {
+        var descriptor = new UiPluginProviderDescriptor(
+                List.of(new UiPluginProviderDescriptor.Provider(
+                        "esm-plugin",
+                        "plugin",
+                        "1.0.0",
+                        "esm",
+                        "/plugins/esm-plugin/assets/ui/main.js?v=version",
+                        "/plugins/esm-plugin/assets/ui/style.css?v=version",
+                        null)),
+                null);
+        when(uiPluginBundleService.getProviderDescriptor()).thenReturn(Mono.just(descriptor));
+
+        webClient
+                .get()
+                .uri("/ui-plugins/-/providers")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectHeader()
+                .cacheControl(CacheControl.noStore())
+                .expectBody()
+                .jsonPath("$.providers[0].style")
+                .isEqualTo("/plugins/esm-plugin/assets/ui/style.css?v=version")
+                .jsonPath("$.providers[0].name")
+                .isEqualTo("esm-plugin")
+                .jsonPath("$.providers[0].kind")
+                .isEqualTo("esm")
+                .jsonPath("$.providers[0].entry")
+                .isEqualTo("/plugins/esm-plugin/assets/ui/main.js?v=version")
+                .jsonPath("$.legacyScript")
+                .doesNotExist();
     }
 
     Resource mockResource(String content) {

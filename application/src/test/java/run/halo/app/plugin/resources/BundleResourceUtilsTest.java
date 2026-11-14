@@ -70,17 +70,6 @@ class BundleResourceUtilsTest {
                 .isInstanceOf(AccessDeniedException.class);
     }
 
-    @SuppressWarnings("deprecation")
-    @Test
-    void getJsBundleResourceShouldDelegateToSelectedBundleResource() throws IOException {
-        lenient().when(pluginClassLoader.getResource(eq("ui/main.js"))).thenReturn(new URL("file://ui/main.js"));
-
-        Resource jsBundleResource = BundleResourceUtils.getJsBundleResource(pluginManager, "fake-plugin", "main.js");
-
-        assertThat(jsBundleResource).isNotNull();
-        assertThat(jsBundleResource.getURL().toString()).isEqualTo("file://ui/main.js");
-    }
-
     @Test
     void shouldPreferUiBundleLocation() throws IOException {
         lenient().when(pluginClassLoader.getResource(eq("ui/main.js"))).thenReturn(new URL("file://ui/main.js"));
@@ -151,5 +140,12 @@ class BundleResourceUtilsTest {
                         () -> BundleResourceUtils.getBundleResource(pluginManager, "fake-plugin", "admin", "main.js"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Unsupported bundle location: admin");
+    }
+
+    @Test
+    void shouldBuildVersionedAssetUrlWithoutFlatteningNestedPath() {
+        assertThat(BundleResourceUtils.buildAssetUrl(
+                        "fake-plugin", BundleResourceUtils.UI_BUNDLE_LOCATION, "chunks/lazy.js", "version 1"))
+                .isEqualTo("/plugins/fake-plugin/assets/ui/chunks/lazy.js?v=version%201");
     }
 }

@@ -358,6 +358,10 @@ class SchemeInitializer implements SmartLifecycle {
                     .indexFunc(comment -> Optional.ofNullable(comment.getStatus())
                             .map(CommentStatus::getReplyCount)
                             .orElse(0)));
+            indexSpecs.add(IndexSpecs.<Comment, Integer>single("status.pendingReplyCount", Integer.class)
+                    .indexFunc(comment -> Optional.ofNullable(comment.getStatus())
+                            .map(CommentStatus::getPendingReplyCount)
+                            .orElse(null)));
             indexSpecs.add(
                     IndexSpecs.<Comment, Boolean>single(Comment.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME, Boolean.class)
                             .indexFunc(comment -> {
@@ -372,6 +376,17 @@ class SchemeInitializer implements SmartLifecycle {
                             }));
         });
         schemeManager.register(Reply.class, indexSpecs -> {
+            indexSpecs.add(IndexSpecs.<Reply, Boolean>single("spec.top", Boolean.class)
+                    .indexFunc(reply -> Optional.ofNullable(reply.getSpec())
+                            .map(ReplySpec::getTop)
+                            .orElse(false))
+                    .nullable(false));
+            indexSpecs.add(IndexSpecs.<Reply, Integer>single("spec.priority", Integer.class)
+                    .indexFunc(reply -> Optional.ofNullable(reply.getSpec())
+                            .filter(spec -> Boolean.TRUE.equals(spec.getTop()))
+                            .map(ReplySpec::getPriority)
+                            .orElse(0))
+                    .nullable(false));
             indexSpecs.add(IndexSpecs.<Reply, Instant>single("spec.creationTime", Instant.class)
                     .indexFunc(reply -> Optional.ofNullable(reply.getSpec())
                             .map(ReplySpec::getCreationTime)
@@ -379,6 +394,11 @@ class SchemeInitializer implements SmartLifecycle {
             indexSpecs.add(IndexSpecs.<Reply, String>single("spec.commentName", String.class)
                     .indexFunc(reply -> Optional.ofNullable(reply.getSpec())
                             .map(ReplySpec::getCommentName)
+                            .orElse(null)));
+            indexSpecs.add(IndexSpecs.<Reply, String>single("spec.quoteReply", String.class)
+                    .indexFunc(reply -> Optional.ofNullable(reply.getSpec())
+                            .map(ReplySpec::getQuoteReply)
+                            .filter(StringUtils::isNotBlank)
                             .orElse(null)));
             indexSpecs.add(IndexSpecs.<Reply, Boolean>single("spec.hidden", Boolean.class)
                     .indexFunc(reply -> Optional.ofNullable(reply.getSpec())
@@ -509,7 +529,12 @@ class SchemeInitializer implements SmartLifecycle {
         });
 
         // security.halo.run
-        schemeManager.register(PersonalAccessToken.class);
+        schemeManager.register(PersonalAccessToken.class, indexSpecs -> {
+            indexSpecs.add(IndexSpecs.<PersonalAccessToken, String>single("spec.username", String.class)
+                    .indexFunc(token -> Optional.ofNullable(token.getSpec())
+                            .map(PersonalAccessToken.Spec::getUsername)
+                            .orElse(null)));
+        });
         schemeManager.register(RememberMeToken.class, indexSpecs -> {
             indexSpecs.add(IndexSpecs.<RememberMeToken, String>single("spec.series", String.class)
                     .indexFunc(token -> Optional.ofNullable(token.getSpec())
@@ -532,7 +557,17 @@ class SchemeInitializer implements SmartLifecycle {
 
         // notification.halo.run
         schemeManager.register(ReasonType.class);
-        schemeManager.register(Reason.class);
+        schemeManager.register(Reason.class, indexSpecs -> {
+            indexSpecs.add(IndexSpecs.<Reason, String>single("spec.reasonType", String.class)
+                    .indexFunc(reason -> Optional.ofNullable(reason.getSpec())
+                            .map(Reason.Spec::getReasonType)
+                            .orElse(null)));
+            indexSpecs.add(IndexSpecs.<Reason, String>single("spec.subject", String.class)
+                    .indexFunc(reason -> Optional.ofNullable(reason.getSpec())
+                            .map(Reason.Spec::getSubject)
+                            .map(subject -> subject.getKind() + "#" + subject.getApiVersion() + "/" + subject.getName())
+                            .orElse(null)));
+        });
         schemeManager.register(NotificationTemplate.class, indexSpecs -> {
             indexSpecs.add(
                     IndexSpecs.<NotificationTemplate, String>single("spec.reasonSelector.reasonType", String.class)

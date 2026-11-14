@@ -1,7 +1,14 @@
 // @vitest-environment jsdom
 
 import { mount } from "@vue/test-utils";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vite-plus/test";
 import CodeBlockSelect from "./CodeBlockSelect.vue";
 
 const options = [

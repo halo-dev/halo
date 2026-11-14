@@ -4,7 +4,7 @@ import { Icon as IconifyIcon } from "@iconify/vue";
 import { refDefault } from "@vueuse/shared";
 import { AxiosError } from "axios";
 import { computed, inject, onMounted, ref, type Ref } from "vue";
-import { ICONIFY_BASE_URL, iconifyClient } from "./api";
+import { buildIconifySvgUrl, iconifyClient } from "./api";
 import type { IconifyFormat, IconifySizing, IconifyValue } from "./types";
 
 const props = defineProps<{
@@ -59,7 +59,10 @@ async function handleConfirm() {
     value: "",
   };
 
-  const iconifyUrl = `${ICONIFY_BASE_URL}/${props.iconName}.svg?width=${width.value}&color=${encodeURIComponent(color.value!)}`;
+  const iconifyUrl = buildIconifySvgUrl(props.iconName, {
+    width: width.value,
+    color: color.value,
+  });
 
   if (format.value === "name") {
     iconifyValue.value = props.iconName;

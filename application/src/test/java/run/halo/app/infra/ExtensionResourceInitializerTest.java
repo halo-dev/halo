@@ -10,11 +10,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -24,7 +27,9 @@ import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.util.FileSystemUtils;
 import reactor.core.publisher.Mono;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.GroupVersionKind;
+import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Unstructured;
 import run.halo.app.infra.properties.HaloProperties;
@@ -115,6 +120,43 @@ class ExtensionResourceInitializerTest {
         }
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void shouldRetireThumbnailProvider(boolean existing) {
+        when(haloProperties.isRequiredExtensionDisabled()).thenReturn(true);
+        when(haloProperties.getInitialExtensionLocations())
+                .thenReturn(Set.of("classpath:/extensions/extensionpoint-definitions.yaml"));
+        var definition = new Unstructured();
+        definition.setMetadata(new Metadata());
+        definition.getMetadata().setName("thumbnail-provider");
+        definition.getMetadata().setVersion(1L);
+        when(extensionClient.fetch(any(GroupVersionKind.class), any()))
+                .thenAnswer(invocation -> existing && "thumbnail-provider".equals(invocation.getArgument(1))
+                        ? Mono.just(definition)
+                        : Mono.empty());
+        when(extensionClient.create(any())).thenReturn(Mono.empty());
+        if (existing) {
+            when(extensionClient.update(any())).thenReturn(Mono.empty());
+        }
+
+        extensionResourceInitializer.start();
+
+        var created = ArgumentCaptor.forClass(Unstructured.class);
+        verify(extensionClient, atLeastOnce()).create(created.capture());
+        assertThat(created.getAllValues())
+                .noneMatch(resource ->
+                        "thumbnail-provider".equals(resource.getMetadata().getName()));
+        if (existing) {
+            var updated = ArgumentCaptor.forClass(Unstructured.class);
+            verify(extensionClient).update(updated.capture());
+            assertThat(updated.getValue().getMetadata().getName()).isEqualTo("thumbnail-provider");
+            assertThat(updated.getValue().getMetadata().getDeletionTimestamp()).isNotNull();
+            assertThat(updated.getValue().getMetadata().getVersion()).isEqualTo(1L);
+        } else {
+            verify(extensionClient, never()).update(any());
+        }
+    }
+
     @Test
     void shouldStartCorrectly() throws Exception {
         when(haloProperties.isRequiredExtensionDisabled()).thenReturn(true);
@@ -164,5 +206,26 @@ class ExtensionResourceInitializerTest {
                  }
             ]
             """, JsonUtils.objectToJson(values), false);
+    }
+
+    @Test
+    void shouldNotUpdateExtensionWithDoNotOverwriteLabel() throws Exception {
+        when(haloProperties.isRequiredExtensionDisabled()).thenReturn(true);
+        var existing = new Unstructured(Map.of(
+                "apiVersion", "v1",
+                "kind", "FakeExtension",
+                "metadata",
+                        Map.of(
+                                "name",
+                                "fake-extension",
+                                "labels",
+                                Map.of(ExtensionUtil.DO_NOT_OVERWRITE_LABEL, "true"))));
+
+        when(extensionClient.fetch(any(GroupVersionKind.class), any())).thenReturn(Mono.just(existing));
+
+        extensionResourceInitializer.start();
+
+        verify(extensionClient, never()).update(any());
+        verify(extensionClient, never()).create(any());
     }
 }

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.comment.*;
 import run.halo.app.core.extension.content.Comment;
@@ -83,6 +84,20 @@ public class CommentEndpoint implements CustomEndpoint {
                                                 .mediaType(MediaType.APPLICATION_JSON_VALUE)
                                                 .schema(Builder.schemaBuilder().implementation(ReplyRequest.class))))
                                 .response(responseBuilder().implementation(Reply.class)))
+                .PUT(
+                        "comments/{name}/content",
+                        this::updateContent,
+                        builder -> builder.operationId("UpdateCommentContent")
+                                .description(
+                                        "Update only the body of an existing comment. Requires its current version.")
+                                .tag(tag)
+                                .parameter(parameterBuilder()
+                                        .name("name")
+                                        .in(ParameterIn.PATH)
+                                        .required(true))
+                                .requestBody(
+                                        requestBodyBuilder().required(true).implementation(CommentContentRequest.class))
+                                .response(responseBuilder().implementation(Comment.class)))
                 .build();
     }
 
@@ -121,5 +136,12 @@ public class CommentEndpoint implements CustomEndpoint {
                     return replyService.create(commentName, reply);
                 })
                 .flatMap(comment -> ServerResponse.ok().bodyValue(comment));
+    }
+
+    Mono<ServerResponse> updateContent(ServerRequest request) {
+        return request.bodyToMono(CommentContentRequest.class)
+                .switchIfEmpty(Mono.error(new ServerWebInputException("Request body required.")))
+                .flatMap(body -> commentService.updateContent(request.pathVariable("name"), body))
+                .flatMap(updated -> ServerResponse.ok().bodyValue(updated));
     }
 }

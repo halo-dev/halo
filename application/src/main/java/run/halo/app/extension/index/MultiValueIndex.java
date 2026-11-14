@@ -115,10 +115,10 @@ class MultiValueIndex<E extends Extension, K extends Comparable<K>> implements V
      * Get the keys associated with the given primary key.
      *
      * @param primaryKey the primary key
-     * @return the associated keys
+     * @return the associated keys, or an empty set if the primary key does not exist
      */
     Set<K> getKeys(String primaryKey) {
-        return Collections.unmodifiableSet(invertedIndex.get(primaryKey));
+        return Collections.unmodifiableSet(invertedIndex.getOrDefault(primaryKey, Set.of()));
     }
 
     @Override
@@ -134,14 +134,14 @@ class MultiValueIndex<E extends Extension, K extends Comparable<K>> implements V
     @Override
     public Set<String> in(Collection<K> keys) {
         if (CollectionUtils.isEmpty(keys)) {
-            return Set.of();
+            return new HashSet<>();
         }
         return keys.stream()
                 .distinct()
                 .map(index::get)
                 .filter(Objects::nonNull)
                 .flatMap(Set::stream)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(HashSet::new));
     }
 
     @Override
@@ -153,7 +153,7 @@ class MultiValueIndex<E extends Extension, K extends Comparable<K>> implements V
         return index.values().stream()
                 .flatMap(Set::stream)
                 .filter(v -> !inResult.contains(v))
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(HashSet::new));
     }
 
     @Override
@@ -168,12 +168,12 @@ class MultiValueIndex<E extends Extension, K extends Comparable<K>> implements V
 
     @Override
     public Set<String> isNull() {
-        return Collections.unmodifiableSet(nullKeyValues);
+        return new HashSet<>(nullKeyValues);
     }
 
     @Override
     public Set<String> isNotNull() {
-        return index.values().stream().flatMap(Set::stream).collect(Collectors.toSet());
+        return index.values().stream().flatMap(Set::stream).collect(Collectors.toCollection(HashSet::new));
     }
 
     @Override
@@ -213,14 +213,15 @@ class MultiValueIndex<E extends Extension, K extends Comparable<K>> implements V
 
     @Override
     public Set<String> equal(K key) {
-        return index.getOrDefault(key, Set.of());
+        var primaryKeys = index.get(key);
+        return primaryKeys == null ? new HashSet<>() : new HashSet<>(primaryKeys);
     }
 
     @Override
     public Set<String> all() {
         return Stream.concat(index.values().stream(), Stream.of(nullKeyValues))
                 .flatMap(Set::stream)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(HashSet::new));
     }
 
     class UpsertTransactionalOperation implements TransactionalOperation {

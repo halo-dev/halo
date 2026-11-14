@@ -1,6 +1,8 @@
 package run.halo.app.security.switchuser;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -14,6 +16,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
+import run.halo.app.core.user.service.UserService;
+import run.halo.app.extension.Metadata;
 
 @SpringBootTest
 @AutoConfigureWebTestClient
@@ -24,6 +28,9 @@ class SwitchUserConfigurerTest {
 
     @MockitoSpyBean
     ReactiveUserDetailsService userDetailsService;
+
+    @MockitoSpyBean
+    UserService userService;
 
     @Test
     @WithMockUser(username = "admin", roles = "super-role")
@@ -78,5 +85,87 @@ class SwitchUserConfigurerTest {
                 .exchange()
                 .expectStatus()
                 .isForbidden();
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = "super-role")
+    void shouldRenderSwitchUserPageWithSuperRole() {
+        stubFakeUser();
+        webClient
+                .get()
+                .uri("/login/impersonate?username={username}", "faker")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(String.class)
+                .value(body -> {
+                    assertTrue(body.contains("action=\"/login/impersonate?username=faker\""));
+                    assertTrue(body.contains("name=\"_csrf\""));
+                });
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = "non-super-role")
+    void shouldNotRenderSwitchUserPageWithoutSuperRole() {
+        webClient
+                .get()
+                .uri("/login/impersonate?username={username}", "faker")
+                .exchange()
+                .expectStatus()
+                .isForbidden();
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = "super-role")
+    void shouldGetBadRequestIfUsernameMissing() {
+        webClient.get().uri("/login/impersonate").exchange().expectStatus().isBadRequest();
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = "super-role")
+    void shouldGetNotFoundIfUserNotExists() {
+        webClient
+                .get()
+                .uri("/login/impersonate?username={username}", "non-existent-user")
+                .exchange()
+                .expectStatus()
+                .isNotFound();
+    }
+
+    @Test
+    @WithSwitchUser(
+            username = "admin",
+            roles = {"super-role"},
+            targetUsername = "faker",
+            targetRoles = {"user"})
+    void shouldRenderExitSwitchUserPageWhileSwitching() {
+        stubFakeUser();
+        webClient
+                .get()
+                .uri("/logout/impersonate")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(String.class)
+                .value(body -> {
+                    assertTrue(body.contains("action=\"/logout/impersonate\""));
+                    assertTrue(body.contains("name=\"_csrf\""));
+                });
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = "super-role")
+    void shouldNotRenderExitSwitchUserPageIfNotSwitching() {
+        webClient.get().uri("/logout/impersonate").exchange().expectStatus().isForbidden();
+    }
+
+    private void stubFakeUser() {
+        var user = new run.halo.app.core.extension.User();
+        var metadata = new Metadata();
+        metadata.setName("faker");
+        user.setMetadata(metadata);
+        user.setSpec(new run.halo.app.core.extension.User.UserSpec());
+        user.getSpec().setDisplayName("Faker");
+        doReturn(Mono.just(user)).when(userService).getUser("faker");
     }
 }

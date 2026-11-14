@@ -5,7 +5,7 @@ import {
 } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
 import { sortBy } from "es-toolkit";
-import { ref, watch } from "vue";
+import { markRaw, ref, watch } from "vue";
 import {
   useRouter,
   type RouteRecordNormalized,
@@ -53,6 +53,8 @@ export function useRouteMenuGenerator(menuGroups: MenuGroupType[]) {
   }
 
   const { data, isLoading: isDataLoading } = useQuery({
+    // Deep structural sharing would clone component definitions and lose markRaw.
+    structuralSharing: false,
     queryKey: ["core:sidebar:menus"],
     queryFn: async () => {
       const allRoutes = router.getRoutes();
@@ -127,7 +129,7 @@ export function useRouteMenuGenerator(menuGroups: MenuGroupType[]) {
             return {
               name: child.meta.menu.name,
               path: child.path,
-              icon: child.meta.menu.icon,
+              icon: child.meta.menu.icon && markRaw(child.meta.menu.icon),
               mobile: child.meta.menu.mobile,
             };
           })
@@ -137,7 +139,7 @@ export function useRouteMenuGenerator(menuGroups: MenuGroupType[]) {
           group.items?.push({
             name: menu.name,
             path: route.path,
-            icon: menu.icon,
+            icon: menu.icon && markRaw(menu.icon),
             mobile: menu.mobile,
             children: menuChildren,
           });
@@ -157,7 +159,7 @@ export function useRouteMenuGenerator(menuGroups: MenuGroupType[]) {
               {
                 name: menu.name,
                 path: route.path,
-                icon: menu.icon,
+                icon: menu.icon && markRaw(menu.icon),
                 mobile: menu.mobile,
                 children: menuChildren,
               },

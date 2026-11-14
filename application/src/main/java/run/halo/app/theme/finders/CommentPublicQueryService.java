@@ -17,6 +17,8 @@ import run.halo.app.theme.finders.vo.ReplyVo;
 public interface CommentPublicQueryService {
     Mono<CommentVo> getByName(String name);
 
+    Mono<ReplyVo> getReply(String commentName, String replyName);
+
     Mono<ListResult<CommentVo>> list(Ref ref, @Nullable Integer page, @Nullable Integer size);
 
     Mono<ListResult<CommentVo>> list(Ref ref, @Nullable PageRequest pageRequest);

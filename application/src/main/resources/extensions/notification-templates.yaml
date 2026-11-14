@@ -14,6 +14,8 @@ spec:
         [(${commenter})] 评论了你的文章 《[(${postTitle})]》，以下是评论的具体内容：
 
         [(${content})]
+
+        [(${commentUrl != null ? '查看评论：' + commentUrl : ''})]
     htmlBody: |
       <div class="notification-content">
         <div class="head">
@@ -26,6 +28,7 @@ spec:
             <span>，以下是评论的具体内容：</span>
           </p>
           <div class="content" th:utext="${content}"></div>
+          <p th:if="${commentUrl}"><a th:href="${commentUrl}" target="_blank">查看评论</a></p>
         </div>
         <div></div>
       </div>
@@ -47,6 +50,8 @@ spec:
         [(${commenter})] 评论了你的页面 《[(${pageTitle})]》，以下是评论的具体内容：
 
         [(${content})]
+
+        [(${commentUrl != null ? '查看评论：' + commentUrl : ''})]
     htmlBody: |
       <div class="notification-content">
         <div class="head">
@@ -59,6 +64,7 @@ spec:
             <span>，以下是评论的具体内容：</span>
           </p>
           <div class="content" th:utext="${content}"></div>
+          <p th:if="${commentUrl}"><a th:href="${commentUrl}" target="_blank">查看评论</a></p>
         </div>
         <div></div>
       </div>
@@ -80,6 +86,8 @@ spec:
         [(${replier})] 在评论“[(${isQuoteReply ? quoteContent : commentContent})]”中回复了你，以下是回复的具体内容：
 
         [(${content})]
+
+        [(${replyUrl != null ? '查看回复：' + replyUrl : ''})]
     htmlBody: |
       <div class="notification-content">
         <div class="head">
@@ -99,6 +107,7 @@ spec:
           <div class="content" th:utext="${isQuoteReply ? quoteContent : commentContent}"></div>
           <p>回复的内容：</p>
           <div class="content" th:utext="${content}"></div>
+          <p th:if="${replyUrl}"><a th:href="${replyUrl}" target="_blank">查看回复</a></p>
         </div>
         <div></div>
       </div>
@@ -188,5 +197,59 @@ spec:
           </div>
           <p>如果你知悉上述信息，请忽略此电子邮件。</p>
           <p th:text="|如果你最近没有使用你的 ${site.title} 账号登录并相信有人可能访问了你的账户，请尽快重设你的密码。|"></p>
+        </div>
+      </div>
+---
+apiVersion: notification.halo.run/v1alpha1
+kind: NotificationTemplate
+metadata:
+  name: template-login-email-code
+spec:
+  reasonSelector:
+    reasonType: login-email-code
+    language: default
+  template:
+    title: "登录验证码-[(${site.title})]"
+    rawBody: |
+      【[(${site.title})]】你的登录验证码是：[(${code})]，请在 [(${expirationAtMinutes})] 分钟内完成登录。
+    htmlBody: |
+      <div class="notification-content">
+        <div class="head">
+          <p class="honorific" th:text="|${username} 你好：|"></p>
+        </div>
+        <div class="body">
+          <p>使用下面的动态验证码（OTP）完成登录。</p>
+          <div class="verify-code" style="font-size:24px;line-height:24px;color:#333;">
+            <b th:text="${code}"></b>
+          </div>
+          <p th:text="|动态验证码的有效期为 ${expirationAtMinutes} 分钟。|"></p>
+          <p>如果您没有尝试登录，请忽略此电子邮件。</p>
+        </div>
+      </div>
+---
+apiVersion: notification.halo.run/v1alpha1
+kind: NotificationTemplate
+metadata:
+  name: template-sudo-email-code
+spec:
+  reasonSelector:
+    reasonType: sudo-email-code
+    language: default
+  template:
+    title: "安全确认验证码-[(${site.title})]"
+    rawBody: |
+      【[(${site.title})]】你的安全确认验证码是：[(${code})]，请在 [(${expirationAtMinutes})] 分钟内完成确认。
+    htmlBody: |
+      <div class="notification-content">
+        <div class="head">
+          <p class="honorific" th:text="|${username} 你好：|"></p>
+        </div>
+        <div class="body">
+          <p>使用下面的动态验证码（OTP）完成安全确认。</p>
+          <div class="verify-code" style="font-size:24px;line-height:24px;color:#333;">
+            <b th:text="${code}"></b>
+          </div>
+          <p th:text="|动态验证码的有效期为 ${expirationAtMinutes} 分钟。|"></p>
+          <p>如果您没有尝试进行安全确认，请忽略此电子邮件。</p>
         </div>
       </div>

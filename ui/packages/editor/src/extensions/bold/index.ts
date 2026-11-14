@@ -2,6 +2,7 @@ import TiptapBold, { type BoldOptions } from "@tiptap/extension-bold";
 import { markRaw } from "vue";
 import MingcuteBoldLine from "~icons/mingcute/bold-line";
 import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
+import { defineHaloKeyboardShortcuts } from "@/keyboard-shortcuts";
 import { i18n } from "@/locales";
 import type { Editor } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
@@ -9,6 +10,33 @@ import type { ExtensionOptions } from "@/types";
 export type ExtensionBoldOptions = Partial<BoldOptions> & ExtensionOptions;
 
 export const ExtensionBold = TiptapBold.extend<ExtensionBoldOptions>({
+  addKeyboardShortcuts() {
+    return defineHaloKeyboardShortcuts(this, [
+      {
+        id: "editor.format.bold",
+        keys: ["Mod-b"],
+        label: () => i18n.global.t("editor.common.bold"),
+        category: "formatting",
+        priority: 10,
+      },
+    ]);
+  },
+
+  addHaloEditorMetadata() {
+    return {
+      ai: {
+        description: "Strong emphasis for important inline text.",
+        exposure: "recommended",
+        useWhen: ["Emphasizing a key term or important phrase."],
+        avoidWhen: ["Styling long passages or headings solely for appearance."],
+        generation: {
+          mode: "direct-html",
+        },
+        examples: ["<p>This is <strong>important</strong>.</p>"],
+      },
+    };
+  },
+
   addOptions() {
     return {
       ...this.parent?.(),
@@ -21,6 +49,7 @@ export const ExtensionBold = TiptapBold.extend<ExtensionBoldOptions>({
             isActive: editor.isActive(TiptapBold.name),
             icon: markRaw(MingcuteBoldLine),
             title: i18n.global.t("editor.common.bold"),
+            shortcutId: "editor.format.bold",
             action: () => {
               editor.chain().focus().toggleBold().run();
             },

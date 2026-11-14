@@ -1,0 +1,288 @@
+# yaml-language-server: $schema=https://x18n.dev/schema/reviews.json
+x18n: 1
+sources:
+  core.attachment.common.text.original:
+    es: 25db309879067
+  core.attachment.filters.accept.items.audio:
+    es: 705051b6e5921
+  core.attachment.filters.accept.items.video:
+    es: 175d8bb147d86c
+  core.attachment.group_list.operations.delete.button:
+    zh-CN: 7b5a4be7ccda6
+    zh-TW: 7b5a4be7ccda6
+  core.attachment.upload_modal.upload_options.download:
+    es: c06b9883165e4
+    zh-CN: c06b9883165e4
+    zh-TW: c06b9883165e4
+  core.backup.operations.restore.title:
+    es: 48894f5a03688
+    zh-CN: 48894f5a03688
+    zh-TW: 48894f5a03688
+  core.comment.comment_detail_modal.title:
+    zh-CN: ae5bdb668bdfb
+    zh-TW: ae5bdb668bdfb
+  core.comment.reply_detail_modal.title:
+    zh-CN: 1a20f8e57effc8
+    zh-TW: 1a20f8e57effc8
+  core.common.buttons.setting:
+    es: 1af5213c3ebb9e
+    zh-CN: 1af5213c3ebb9e
+    zh-TW: 1af5213c3ebb9e
+  core.common.toast.operation_failed:
+    es: aa9847059bfc3
+    zh-CN: aa9847059bfc3
+    zh-TW: aa9847059bfc3
+  core.common.toast.operation_success:
+    es: 279e86399add3
+    zh-CN: 279e86399add3
+    zh-TW: 279e86399add3
+  core.common.toast.recovery_success:
+    zh-CN: bd5041de3ea15
+    zh-TW: bd5041de3ea15
+  core.components.default_editor.tabs.toc.empty:
+    es: 97530672db546
+    zh-CN: 97530672db546
+    zh-TW: 97530672db546
+  core.components.default_editor.tabs.toc.title:
+    es: 184f0b44c3ce8b
+    zh-CN: 184f0b44c3ce8b
+    zh-TW: 184f0b44c3ce8b
+  core.dashboard.actions.setting:
+    es: 1af5213c3ebb9e
+    zh-CN: 1af5213c3ebb9e
+    zh-TW: 1af5213c3ebb9e
+  core.dashboard.widgets.presets.iframe.title:
+    es: bf63e4b7a9d7c
+  core.dashboard.widgets.presets.quickaction.actions.plugin_manage.title:
+    es: 16234104b8d9de
+    zh-CN: 16234104b8d9de
+    zh-TW: 16234104b8d9de
+  core.dashboard.widgets.presets.quickaction.actions.theme_manage.title:
+    es: a5ee4e8c73727
+    zh-CN: a5ee4e8c73727
+    zh-TW: a5ee4e8c73727
+  core.dashboard.widgets.presets.stack.config_modal.fields.widgets.label:
+    es: 196408d193b5ad
+  core.dashboard_designer.widgets_modal.title:
+    es: 196408d193b5ad
+  core.deleted_post.operations.recovery_in_batch.description:
+    es: 10e3e7b93c963d
+    zh-CN: 10e3e7b93c963d
+    zh-TW: 10e3e7b93c963d
+  core.exception.forbidden.message:
+    zh-CN: 121dbca67e8b1
+    zh-TW: 121dbca67e8b1
+  core.formkit.iconify.option_color:
+    es: 1d7df5fbc08ea6
+  core.identity_authentication.detail.title:
+    zh-CN: "15940844867504"
+    zh-TW: "15940844867504"
+  core.identity_authentication.list.types.form:
+    zh-CN: 1853fb7daa557f
+    zh-TW: 1853fb7daa557f
+  core.identity_authentication.list.types.oauth2:
+    zh-CN: 3ae5e76dd9a27
+    zh-TW: 3ae5e76dd9a27
+  core.menu.menu_item_editing_modal.fields.target.options.blank:
+    es: 869e8d519c0a7
+    zh-CN: 869e8d519c0a7
+    zh-TW: 869e8d519c0a7
+  core.menu.menu_item_editing_modal.fields.target.options.parent:
+    es: 176d1dae755830
+    zh-CN: 176d1dae755830
+    zh-TW: 176d1dae755830
+  core.menu.menu_item_editing_modal.fields.target.options.self:
+    es: 11e677a0b500f6
+    zh-CN: 11e677a0b500f6
+    zh-TW: 11e677a0b500f6
+  core.menu.menu_item_editing_modal.fields.target.options.top:
+    es: a45a7adbdc9e
+    zh-CN: a45a7adbdc9e
+    zh-TW: a45a7adbdc9e
+  core.menu.menu_item_editing_modal.groups.general:
+    es: 2944e997ba8d5
+  core.overview.alert.external_url_invalid:
+    es: e7a6e480b7dd5
+    zh-CN: e7a6e480b7dd5
+    zh-TW: e7a6e480b7dd5
+  core.overview.external_url_form.operations.save.title:
+    es: 1da6836b62b35e
+    zh-CN: 1da6836b62b35e
+    zh-TW: 1da6836b62b35e
+  core.overview.fields.external_url:
+    es: 1f3734f6ccfcbe
+    zh-CN: 1f3734f6ccfcbe
+    zh-TW: 1f3734f6ccfcbe
+  core.overview.fields.locale:
+    zh-CN: 8c8cdf54f76ec
+    zh-TW: 8c8cdf54f76ec
+  core.overview.fields.timezone:
+    zh-CN: f374b4d11c7ce
+    zh-TW: f374b4d11c7ce
+  core.overview.fields_values.external_url.not_setup:
+    es: 1531923faddd4b
+    zh-CN: 1531923faddd4b
+    zh-TW: 1531923faddd4b
+  core.page.filters.visible.label:
+    es: 55bda15d3bf70
+  core.page.settings.fields.slug.label:
+    es: 1f170b52389daf
+  core.page.settings.fields.visible.label:
+    es: 55bda15d3bf70
+  core.page.settings.groups.general:
+    es: 2944e997ba8d5
+  core.page_editor.title:
+    zh-CN: 7e3d8add599d0
+    zh-TW: 7e3d8add599d0
+  core.page_editor.untitled:
+    zh-TW: e9e46f2a6b12f
+  core.page_snapshots.title:
+    zh-CN: 9399ea4295afc
+    zh-TW: 9399ea4295afc
+  core.plugin.conditions_modal.title:
+    zh-CN: 3d6a622fe559
+    zh-TW: 3d6a622fe559
+  core.plugin.detail.operations.view_conditions.button:
+    zh-CN: 627134d31accd
+    zh-TW: 627134d31accd
+  core.plugin.loader.toast.entry_load_failed:
+    zh-CN: 1884ce1e3ac278
+    zh-TW: 1884ce1e3ac278
+  core.plugin.loader.toast.style_load_failed:
+    zh-CN: 5d05e418655bd
+    zh-TW: 5d05e418655bd
+  core.plugin.operations.uninstall_and_delete_config_in_batch.title:
+    es: f124a2d05023f
+    zh-CN: f124a2d05023f
+    zh-TW: f124a2d05023f
+  core.plugin.upload_modal.tabs.local:
+    es: 1cb9b85a77172
+  core.post.batch_setting_modal.fields.allow_comment_group:
+    zh-CN: 11255fcfd74fe
+    zh-TW: 11255fcfd74fe
+  core.post.batch_setting_modal.fields.allow_comment_options.allow:
+    es: 11255fcfd74fe
+    zh-CN: 11255fcfd74fe
+    zh-TW: 11255fcfd74fe
+  core.post.batch_setting_modal.fields.allow_comment_options.disallow:
+    es: 16d3b5ce4b8ef8
+    zh-CN: 16d3b5ce4b8ef8
+    zh-TW: 16d3b5ce4b8ef8
+  core.post.batch_setting_modal.fields.visible_group:
+    es: 55bda15d3bf70
+  core.post.batch_setting_modal.fields.visible_value:
+    zh-CN: 1b18d975085c2
+    zh-TW: 1b18d975085c2
+  core.post.filters.visible.label:
+    es: 55bda15d3bf70
+  core.post.settings.fields.slug.label:
+    es: 1f170b52389daf
+  core.post.settings.fields.visible.label:
+    es: 55bda15d3bf70
+  core.post.settings.groups.general:
+    es: 2944e997ba8d5
+  core.post_category.editing_modal.fields.slug.label:
+    es: 1f170b52389daf
+  core.post_category.editing_modal.groups.general:
+    es: 2944e997ba8d5
+  core.post_category.list.fields.hide_from_list:
+    zh-CN: 178de1360b1534
+    zh-TW: 178de1360b1534
+  core.post_editor.title:
+    zh-CN: 15a4b4aab7e51e
+    zh-TW: 15a4b4aab7e51e
+  core.post_snapshots.title:
+    zh-CN: 1c3771def508fb
+    zh-TW: 1c3771def508fb
+  core.post_tag.editing_modal.fields.color.label:
+    es: 1d7df5fbc08ea6
+  core.post_tag.editing_modal.fields.slug.label:
+    es: 1f170b52389daf
+  core.post_tag.editing_modal.groups.general:
+    es: 2944e997ba8d5
+  core.rbac.ConfigMaps Management:
+    es: 4cd978c9094b0
+  core.rbac.Post Publisher:
+    es: 1dc1a97a6a8eb1
+    zh-CN: 1dc1a97a6a8eb1
+    zh-TW: 1dc1a97a6a8eb1
+  core.rbac.Recycle My Post:
+    zh-CN: 5f21de6d6bc44
+    zh-TW: 5f21de6d6bc44
+  core.rbac.Roles Management:
+    es: 1acf90e9d9688f
+  core.rbac.SinglePages Management:
+    es: 188d6d3a0f217f
+  core.rbac.Theme Manage:
+    es: 11c92ffa147fc0
+    zh-CN: 11c92ffa147fc0
+    zh-TW: 11c92ffa147fc0
+  core.rbac.UC Attachment Manage:
+    es: 15df50acd0c311
+    zh-CN: 15df50acd0c311
+    zh-TW: 15df50acd0c311
+  core.rbac.role-template-post-publisher:
+    es: 1dc1a97a6a8eb1
+    zh-CN: 1dc1a97a6a8eb1
+    zh-TW: 1dc1a97a6a8eb1
+  core.rbac.role-template-recycle-my-post:
+    zh-CN: 5f21de6d6bc44
+    zh-TW: 5f21de6d6bc44
+  core.rbac.role-template-uc-attachment-manager:
+    es: 15df50acd0c311
+    zh-CN: 15df50acd0c311
+    zh-TW: 15df50acd0c311
+  core.rbac.role-template-view-menus:
+    es: 175a73be3a8fd
+    zh-CN: 175a73be3a8fd
+    zh-TW: 175a73be3a8fd
+  core.role.editing_modal.groups.general:
+    es: 2944e997ba8d5
+  core.role.title:
+    es: 1acf90e9d9688f
+  core.snapshots.status.base:
+    es: 19d0b68839e29b
+  core.theme.list_modal.not_installed_empty.title:
+    zh-CN: 1e51fc76867db2
+    zh-TW: 1e51fc76867db2
+  core.theme.operations.import_configuration.version_mismatch.description:
+    es: 15f1056c841b07
+    zh-CN: 15f1056c841b07
+    zh-TW: 15f1056c841b07
+  core.theme.preview_model.actions.setting:
+    zh-CN: 1af5213c3ebb9e
+    zh-TW: 1af5213c3ebb9e
+  core.uc_profile.2fa.methods.totp.description:
+    es: 19a44f71b0f6ec
+    zh-CN: 19a44f71b0f6ec
+    zh-TW: 19a44f71b0f6ec
+  core.uc_profile.2fa.methods.totp.operations.configure.fields.code.help:
+    zh-CN: 1d5fd3fd480b1b
+    zh-TW: 1d5fd3fd480b1b
+  core.uc_profile.2fa.methods.totp.operations.configure.fields.manual.help:
+    zh-CN: b4cc99d6364de
+    zh-TW: b4cc99d6364de
+  core.uc_profile.2fa.methods.totp.operations.configure.fields.manual.label:
+    es: 15c350faf3707c
+    zh-CN: 15c350faf3707c
+    zh-TW: 15c350faf3707c
+  core.uc_profile.2fa.methods.totp.operations.configure.fields.qrcode.label:
+    zh-CN: c9c669086a7a0
+    zh-TW: c9c669086a7a0
+  core.uc_profile.detail.fields.roles:
+    es: 1acf90e9d9688f
+  core.uc_profile.editing_modal.groups.general:
+    es: 2944e997ba8d5
+  core.uc_profile.email_verify_modal.operations.send_code.buttons.sending:
+    zh-CN: a7cd0081f0da6
+    zh-TW: a7cd0081f0da6
+  core.uc_profile.pat.creation_modal.groups.general:
+    es: 2944e997ba8d5
+  core.uc_profile.pat.list.fields.status.normal:
+    es: 3591fa4fb7f6d
+  core.user.actions.roles:
+    es: 1acf90e9d9688f
+  core.user.detail.fields.roles:
+    es: 1acf90e9d9688f
+  core.user.editing_modal.groups.general:
+    es: 2944e997ba8d5

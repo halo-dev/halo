@@ -32,7 +32,6 @@ const internalFormState = ref<PostFormState>(
     excerptAutoGenerate: true,
     excerptRaw: "",
     allowComment: true,
-    pinned: false,
     visible: "PUBLIC",
     publishTime: undefined,
     cover: undefined,
@@ -216,11 +215,6 @@ const publishTimeHelp = computed(() => {
           <FormKit
             name="allowComment"
             :label="$t('core.post.settings.fields.allow_comment.label')"
-            type="checkbox"
-          ></FormKit>
-          <FormKit
-            :label="$t('core.post.settings.fields.pinned.label')"
-            name="pinned"
             type="checkbox"
           ></FormKit>
           <FormKit

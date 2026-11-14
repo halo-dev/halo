@@ -39,6 +39,7 @@ import BubbleItemImageHref from "./BubbleItemImageHref.vue";
 import BubbleItemImageLink from "./BubbleItemImageLink.vue";
 import BubbleItemImagePosition from "./BubbleItemImagePosition.vue";
 import BubbleItemImageSize from "./BubbleItemImageSize.vue";
+import { IMAGE_LINK_TARGET_BLANK, IMAGE_LINK_TARGETS } from "./constants";
 import ImageView from "./ImageView.vue";
 
 export const IMAGE_BUBBLE_MENU_KEY = new PluginKey("imageBubbleMenu");
@@ -56,6 +57,74 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
   group: "block",
 
   defining: false,
+
+  addHaloEditorMetadata() {
+    return {
+      ai: {
+        description:
+          "An image with alternative text, optional dimensions, and an optional destination link, normally used as the media child of a figure. Standalone images are legacy content that the editor may normalize into a figure.",
+        exposure: "recommended",
+        useWhen: ["An image directly supports the surrounding content."],
+        avoidWhen: ["No meaningful or accessible image source is available."],
+        contentGuidelines: [
+          "Provide concise alternative text that describes the image's purpose.",
+        ],
+        attributeGuidance: {
+          src: {
+            description: "URL of the image resource.",
+            format: "absolute or site-relative URL",
+          },
+          alt: {
+            description: "Alternative text for accessibility.",
+            omitWhen: ["The image is purely decorative."],
+          },
+          title: {
+            description: "Optional advisory title for the image.",
+            omitWhen: ["It would merely repeat the alternative text."],
+          },
+          width: {
+            description: "Rendered image width.",
+            format: "HTML dimension or CSS length",
+            examples: ["100%", "640px"],
+            omitWhen: ["Natural or container sizing is appropriate."],
+          },
+          height: {
+            description: "Rendered image height.",
+            format: "HTML dimension or CSS length",
+            examples: ["auto", "360px"],
+            omitWhen: ["Natural or proportional sizing is appropriate."],
+          },
+          href: {
+            description: "Optional URL opened when the image is activated.",
+            format: "absolute or site-relative URL",
+            omitWhen: ["The image should not act as a link."],
+          },
+          target: {
+            description:
+              "Browsing context used when the linked image is activated.",
+            allowedValues: [...IMAGE_LINK_TARGETS, null],
+            omitWhen: ["The image should not act as a link."],
+          },
+          file: {
+            description:
+              "Editor-only upload state that is not part of persisted article HTML.",
+            omitWhen: ["Generating or editing persisted article content."],
+          },
+        },
+        generation: {
+          mode: "direct-html",
+          guidelines: [
+            "Use a stable accessible URL; uploading a local file requires a separate plugin capability.",
+            "Place the image inside a figure and keep the figure contentType set to image.",
+          ],
+        },
+        examples: [
+          '<figure data-content-type="image"><img src="https://example.com/diagram.png" alt="Architecture diagram"></figure>',
+          '<figure data-content-type="image"><img src="https://example.com/photo.jpg" alt="Team members at the event" width="640px" height="auto"></figure>',
+        ],
+      },
+    };
+  },
 
   addAttributes() {
     return {
@@ -95,12 +164,30 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
       href: {
         default: null,
         parseHTML: (element) => {
-          const href = element.getAttribute("href") || null;
+          const href =
+            element.getAttribute("href") ||
+            element.closest("a")?.getAttribute("href") ||
+            null;
           return href;
         },
         renderHTML: (attributes) => {
           return {
             href: attributes.href,
+          };
+        },
+      },
+      target: {
+        default: null,
+        parseHTML: (element) => {
+          return (
+            element.getAttribute("target") ||
+            element.closest("a")?.getAttribute("target") ||
+            null
+          );
+        },
+        renderHTML: (attributes) => {
+          return {
+            target: attributes.target,
           };
         },
       },
@@ -265,7 +352,7 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
         return {
           priority: 95,
           icon: markRaw(MingcutePicLine),
-          title: "editor.extensions.commands_menu.image",
+          title: /* @x18n-key */ "editor.extensions.commands_menu.image",
           keywords: ["image", "tupian"],
           command: ({ editor, range }: { editor: Editor; range: Range }) => {
             editor
@@ -401,7 +488,7 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
                 action: () => {
                   window.open(
                     editor.getAttributes(ExtensionImage.name).src,
-                    "_blank"
+                    IMAGE_LINK_TARGET_BLANK
                   );
                 },
               },
@@ -516,14 +603,11 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
     };
   },
   renderHTML({ HTMLAttributes }) {
-    if (HTMLAttributes.href) {
-      return [
-        "a",
-        { href: HTMLAttributes.href },
-        ["img", mergeAttributes(HTMLAttributes)],
-      ];
+    const { href, target, ...imageAttributes } = HTMLAttributes;
+    if (href) {
+      return ["a", { href, target }, ["img", mergeAttributes(imageAttributes)]];
     }
-    return ["img", mergeAttributes(HTMLAttributes)];
+    return ["img", mergeAttributes(imageAttributes)];
   },
 }).configure({
   inline: true,

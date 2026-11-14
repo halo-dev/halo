@@ -7,6 +7,7 @@ export * from "./components/dialog";
 export * from "./components/dropdown";
 export * from "./components/empty";
 export * from "./components/entity";
+export * from "./components/filter";
 export * from "./components/header";
 export * from "./components/loading";
 export * from "./components/menu";

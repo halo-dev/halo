@@ -37,9 +37,9 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from "vue";
+import { computed, inject } from "vue";
 import type { RouteLocationRaw } from "vue-router";
-import { useRouter } from "vue-router";
+import { routerKey } from "vue-router";
 import type { ButtonSize, ButtonType } from "./types";
 
 const props = withDefaults(
@@ -65,7 +65,7 @@ const props = withDefaults(
   }
 );
 
-const router = useRouter();
+const router = inject(routerKey, undefined);
 const emit = defineEmits<{
   (event: "click"): void;
 }>();
@@ -84,7 +84,7 @@ const classes = computed(() => {
 function handleClick() {
   if (props.disabled || props.loading) return;
   if (props.route) {
-    router.push(props.route);
+    router?.push(props.route);
   }
   emit("click");
 }

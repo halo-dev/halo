@@ -16,6 +16,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.util.Assert;
 import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.web.util.UriComponentsBuilder;
 import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.infra.utils.PathUtils;
 
@@ -30,6 +31,7 @@ public abstract class BundleResourceUtils {
     public static final String CONSOLE_BUNDLE_LOCATION = "console";
     public static final String JS_BUNDLE = "main.js";
     public static final String CSS_BUNDLE = "style.css";
+    // TODO(Halo 3): Remove after legacy IIFE UI provider support ends.
     private static final String[] BUNDLE_LOCATIONS = {UI_BUNDLE_LOCATION, CONSOLE_BUNDLE_LOCATION};
 
     /**
@@ -53,18 +55,6 @@ public abstract class BundleResourceUtils {
         return getBundleResource(resourceLoader, bundleLocation, bundleName);
     }
 
-    /**
-     * Gets bundle resource by plugin name in the selected location.
-     *
-     * @return bundle resource if exists, otherwise null
-     * @deprecated use {@link #getSelectedBundleResource(PluginManager, String, String)} instead
-     */
-    @Deprecated
-    public static @Nullable Resource getJsBundleResource(
-            PluginManager pluginManager, String pluginName, String bundleName) {
-        return getSelectedBundleResource(pluginManager, pluginName, bundleName);
-    }
-
     public static @Nullable Resource getBundleResource(
             PluginManager pluginManager, String pluginName, String bundleLocation, String bundleName) {
         Assert.hasText(pluginName, "The pluginName must not be blank");
@@ -86,6 +76,20 @@ public abstract class BundleResourceUtils {
             return null;
         }
         return selectBundleLocation(resourceLoader);
+    }
+
+    public static String buildAssetUrl(
+            String pluginName, String bundleLocation, String resourceName, @Nullable String version) {
+        Assert.hasText(pluginName, "The pluginName must not be blank");
+        Assert.hasText(resourceName, "Resource name must not be blank");
+        assertSupportedBundleLocation(bundleLocation);
+
+        var builder = UriComponentsBuilder.fromPath("/plugins/{pluginName}/assets/{bundleLocation}/")
+                .path(resourceName);
+        if (StringUtils.hasText(version)) {
+            builder.queryParam("v", version);
+        }
+        return builder.buildAndExpand(pluginName, bundleLocation).encode().toUriString();
     }
 
     /**

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { consoleApiClient } from "@halo-dev/api-client";
+import { consoleApiClient, ucApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
   IconAddCircle,
@@ -40,13 +40,12 @@ const { t } = useI18n();
 const { data: avatar, isFetching } = useQuery({
   queryKey: ["user-avatar", name, isCurrentUser],
   queryFn: async () => {
-    const { data } = props.isCurrentUser
-      ? await consoleApiClient.user.getCurrentUserDetail()
-      : await consoleApiClient.user.getUserDetail({
-          name: props.name,
-        });
+    const user = props.isCurrentUser
+      ? (await ucApiClient.user.currentUser.getMyUserDetail()).data.user
+      : (await consoleApiClient.user.getUserDetail({ name: props.name })).data
+          .user;
 
-    const annotations = data?.user.metadata.annotations;
+    const annotations = user.metadata.annotations;
 
     // Check avatar has been updated. if not, we need retry.
     if (
@@ -56,7 +55,7 @@ const { data: avatar, isFetching } = useQuery({
       throw new Error("Avatar is not updated");
     }
 
-    return data.user.spec.avatar || "";
+    return user.spec.avatar || "";
   },
   retry: 5,
   retryDelay: 1000,
@@ -96,11 +95,13 @@ const handleUploadAvatar = () => {
   userAvatarCropper.value?.getCropperFile().then((file) => {
     uploadSaving.value = true;
 
-    consoleApiClient.user
-      .uploadUserAvatar({
-        name: props.isCurrentUser ? "-" : props.name,
-        file: file,
-      })
+    const uploadAvatar = props.isCurrentUser
+      ? ucApiClient.user.currentUser.uploadMyAvatar({ file })
+      : consoleApiClient.user.uploadUserAvatar({
+          name: props.name,
+          file,
+        });
+    uploadAvatar
       .then(() => {
         queryClient.invalidateQueries({ queryKey: ["user-avatar"] });
         queryClient.invalidateQueries({ queryKey: ["user-detail"] });
@@ -126,10 +127,12 @@ const handleRemoveCurrentAvatar = () => {
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
-      consoleApiClient.user
-        .deleteUserAvatar({
-          name: props.isCurrentUser ? "-" : props.name,
-        })
+      const deleteAvatar = props.isCurrentUser
+        ? ucApiClient.user.currentUser.deleteMyAvatar()
+        : consoleApiClient.user.deleteUserAvatar({
+            name: props.name,
+          });
+      deleteAvatar
         .then(() => {
           queryClient.invalidateQueries({ queryKey: ["user-avatar"] });
           queryClient.invalidateQueries({ queryKey: ["user-detail"] });

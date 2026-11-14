@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { useEntityFieldItemExtensionPoint } from "@console/composables/use-entity-extension-points";
 import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
 import type {
   ListedComment,
@@ -27,15 +28,21 @@ import {
   VStatusDot,
   VTag,
 } from "@halo-dev/components";
-import { utils, type OperationItem } from "@halo-dev/ui-shared";
+import {
+  utils,
+  type EntityFieldItem,
+  type OperationItem,
+} from "@halo-dev/ui-shared";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { computed, markRaw, provide, ref, toRefs, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
+import EntityFieldItems from "@/components/entity-fields/EntityFieldItems.vue";
 import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
 import { useCommentLastReadTimeMutate } from "../composables/use-comment-last-readtime-mutate";
-import { useContentProviderExtensionPoint } from "../composables/use-content-provider-extension-point";
 import { useSubjectRef } from "../composables/use-subject-ref";
+import CollapsibleCommentContent from "./CollapsibleCommentContent.vue";
 import CommentDetailModal from "./CommentDetailModal.vue";
+import CommentEditingModal from "./CommentEditingModal.vue";
 import OwnerButton from "./OwnerButton.vue";
 import ReplyCreationModal from "./ReplyCreationModal.vue";
 import ReplyListItem from "./ReplyListItem.vue";
@@ -47,18 +54,32 @@ const props = withDefaults(
   defineProps<{
     comment: ListedComment;
     isSelected?: boolean;
+    defaultExpandReplies?: boolean;
   }>(),
   {
     isSelected: false,
+    defaultExpandReplies: false,
   }
 );
 
 const { comment } = toRefs(props);
 
+const { data: fields } = useEntityFieldItemExtensionPoint<ListedComment>(
+  "comment:list-item:field:create",
+  comment,
+  computed((): EntityFieldItem[] => [])
+);
+
 const hoveredReply = ref<ListedReply>();
-const showReplies = ref(false);
+const pendingReplyCount = computed(
+  () => props.comment.comment.status?.pendingReplyCount || 0
+);
+const showReplies = ref(
+  props.defaultExpandReplies && pendingReplyCount.value > 0
+);
 const replyModal = ref(false);
 const detailModalVisible = ref(false);
+const editingModalVisible = ref(false);
 
 provide<Ref<ListedReply | undefined>>("hoveredReply", hoveredReply);
 
@@ -159,6 +180,22 @@ async function handleCancelApprove() {
   queryClient.invalidateQueries({ queryKey: ["core:comments"] });
 }
 
+async function handleToggleHidden() {
+  await coreApiClient.content.comment.patchComment({
+    name: props.comment.comment.metadata.name,
+    jsonPatchInner: [
+      {
+        op: "add",
+        path: "/spec/hidden",
+        value: !props.comment.comment.spec.hidden,
+      },
+    ],
+  });
+  Toast.success(t("core.common.toast.operation_success"));
+  queryClient.invalidateQueries({ queryKey: ["core:comments"] });
+  queryClient.invalidateQueries({ queryKey: ["core:comments:with-subject"] });
+}
+
 const {
   data: replies,
   isLoading,
@@ -234,17 +271,39 @@ const { data: operationItems } = useOperationItemExtensionPoint<ListedComment>(
       },
     },
     {
+      priority: 15,
+      component: markRaw(VDropdownItem),
+      label: t("core.common.buttons.edit"),
+      permissions: ["system:comments:manage"],
+      hidden: !!props.comment.comment.metadata.deletionTimestamp,
+      action: () => {
+        editingModalVisible.value = true;
+      },
+    },
+    {
       priority: 20,
+      component: markRaw(VDropdownItem),
+      label: t(
+        props.comment.comment.spec.hidden
+          ? "core.comment.operations.make_public.button"
+          : "core.comment.operations.make_private.button"
+      ),
+      permissions: ["system:comments:manage"],
+      hidden: !!props.comment.comment.metadata.deletionTimestamp,
+      action: handleToggleHidden,
+    },
+    {
+      priority: 30,
       component: markRaw(VDropdownItem),
       label: t("core.comment.operations.approve_applies_in_batch.button"),
       action: handleApproveReplyInBatch,
     },
     {
-      priority: 30,
+      priority: 40,
       component: markRaw(VDropdownDivider),
     },
     {
-      priority: 40,
+      priority: 50,
       component: markRaw(VDropdownItem),
       props: {
         type: "danger",
@@ -254,7 +313,7 @@ const { data: operationItems } = useOperationItemExtensionPoint<ListedComment>(
       action: handleCancelApprove,
     },
     {
-      priority: 50,
+      priority: 60,
       component: markRaw(VDropdownItem),
       props: {
         type: "danger",
@@ -264,11 +323,14 @@ const { data: operationItems } = useOperationItemExtensionPoint<ListedComment>(
     },
   ])
 );
-
-const { data: contentProvider } = useContentProviderExtensionPoint();
 </script>
 
 <template>
+  <CommentEditingModal
+    v-if="editingModalVisible"
+    :target="comment.comment"
+    @close="editingModalVisible = false"
+  />
   <ReplyCreationModal
     v-if="replyModal"
     :comment="comment"
@@ -287,6 +349,7 @@ const { data: contentProvider } = useContentProviderExtensionPoint();
       <slot name="checkbox" />
     </template>
     <template #start>
+      <EntityFieldItems :fields="fields?.start || []" />
       <VEntityField width="100%" max-width="100%">
         <template #description>
           <div class="flex flex-col gap-2">
@@ -309,16 +372,15 @@ const { data: contentProvider } = useContentProviderExtensionPoint();
                 {{ subjectRefResult.title }}
               </RouterLink>
               <a
-                v-if="subjectRefResult.externalUrl"
-                :href="subjectRefResult.externalUrl"
+                v-if="comment.permalink || subjectRefResult.externalUrl"
+                :href="comment.permalink || subjectRefResult.externalUrl"
                 target="_blank"
                 class="invisible text-gray-600 hover:text-gray-900 group-hover:visible"
               >
                 <IconExternalLinkLine class="h-3.5 w-3.5" />
               </a>
             </div>
-            <component
-              :is="contentProvider?.component"
+            <CollapsibleCommentContent
               :content="comment?.comment?.spec.content"
             />
             <div class="flex items-center gap-3 text-xs">
@@ -329,6 +391,17 @@ const { data: contentProvider } = useContentProviderExtensionPoint();
                 {{
                   $t("core.comment.list.fields.reply_count", {
                     count: comment?.comment?.status?.replyCount || 0,
+                  })
+                }}
+              </span>
+              <span
+                v-if="pendingReplyCount > 0"
+                class="cursor-pointer select-none text-gray-700 hover:text-gray-900"
+                @click="handleToggleShowReplies"
+              >
+                {{
+                  $t("core.comment.list.fields.pending_reply_count", {
+                    count: pendingReplyCount,
                   })
                 }}
               </span>
@@ -352,6 +425,7 @@ const { data: contentProvider } = useContentProviderExtensionPoint();
       </VEntityField>
     </template>
     <template #end>
+      <EntityFieldItems :fields="fields?.end || []" />
       <VEntityField v-if="!comment?.comment.spec.approved">
         <template #description>
           <VStatusDot

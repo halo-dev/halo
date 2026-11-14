@@ -15,7 +15,6 @@ import BlockActionSeparator from "@/components/block/BlockActionSeparator.vue";
 import ColorBubbleItem from "@/extensions/color/ColorBubbleItem.vue";
 import HighlightBubbleItem from "@/extensions/highlight/HighlightBubbleItem.vue";
 import LinkBubbleButton from "@/extensions/link/LinkBubbleButton.vue";
-import { RangeSelection } from "@/extensions/range-selection";
 import { i18n } from "@/locales";
 import { PluginKey, type EditorState } from "@/tiptap/pm";
 import { isActive, isTextSelection } from "@/tiptap/vue-3";
@@ -45,6 +44,26 @@ export const TEXT_BUBBLE_MENU_KEY = new PluginKey("textBubbleMenu");
 export type ExtensionTextOptions = ExtensionOptions;
 
 export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
+  addHaloEditorMetadata() {
+    return {
+      ai: {
+        description:
+          "Plain text content inside text-bearing nodes such as paragraphs, headings, and captions.",
+        exposure: "recommended",
+        useWhen: [
+          "Writing ordinary textual content inside a node that accepts inline text.",
+        ],
+        contentGuidelines: [
+          "Place text inside a valid text-bearing parent rather than as a top-level node.",
+        ],
+        generation: {
+          mode: "direct-html",
+        },
+        examples: ["<p>Plain text content</p>"],
+      },
+    };
+  },
+
   addOptions() {
     return {
       ...this.parent?.(),
@@ -73,10 +92,7 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
               return false;
             }
 
-            if (
-              !isTextSelection(selection) &&
-              !(selection instanceof RangeSelection)
-            ) {
+            if (!isTextSelection(selection)) {
               return false;
             }
 
@@ -97,6 +113,7 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
                 isActive: ({ editor }) => editor.isActive(ExtensionBold.name),
                 icon: markRaw(MingcuteBoldLine),
                 title: i18n.global.t("editor.common.bold"),
+                shortcutId: "editor.format.bold",
                 action: ({ editor }) => {
                   editor.chain().focus().toggleBold().run();
                 },
@@ -108,6 +125,7 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
                 isActive: ({ editor }) => editor.isActive(ExtensionItalic.name),
                 icon: markRaw(MingcuteItalicLine),
                 title: i18n.global.t("editor.common.italic"),
+                shortcutId: "editor.format.italic",
                 action: ({ editor }) => {
                   editor.chain().focus().toggleItalic().run();
                 },
@@ -120,6 +138,7 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
                   editor.isActive(ExtensionUnderline.name),
                 icon: markRaw(MingcuteUnderlineLine),
                 title: i18n.global.t("editor.common.underline"),
+                shortcutId: "editor.format.underline",
                 action: ({ editor }) =>
                   editor.chain().focus().toggleUnderline().run(),
               },
@@ -130,6 +149,7 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
                 isActive: ({ editor }) => editor.isActive(ExtensionStrike.name),
                 icon: markRaw(MingcuteStrikethroughLine),
                 title: i18n.global.t("editor.common.strike"),
+                shortcutId: "editor.format.strike",
                 action: ({ editor }) =>
                   editor.chain().focus().toggleStrike().run(),
               },
@@ -142,6 +162,7 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
                   editor.isActive(ExtensionHighlight.name),
                 icon: markRaw(MingcuteMarkPenLine),
                 title: i18n.global.t("editor.common.highlight"),
+                shortcutId: "editor.format.highlight",
               },
             },
             {
@@ -159,6 +180,7 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
                 isActive: ({ editor }) => editor.isActive(ExtensionCode.name),
                 icon: markRaw(MingcuteCodeLine),
                 title: i18n.global.t("editor.common.code"),
+                shortcutId: "editor.format.code",
                 action: ({ editor }) =>
                   editor.chain().focus().toggleCode().run(),
               },
@@ -170,6 +192,7 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
                   editor.isActive(ExtensionSuperscript.name),
                 icon: markRaw(PhTextSuperscript),
                 title: i18n.global.t("editor.common.superscript"),
+                shortcutId: "editor.format.superscript",
                 action: ({ editor }) =>
                   editor.chain().focus().toggleSuperscript().run(),
               },
@@ -181,6 +204,7 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
                   editor.isActive(ExtensionSubscript.name),
                 icon: markRaw(PhTextSubscript),
                 title: i18n.global.t("editor.common.subscript"),
+                shortcutId: "editor.format.subscript",
                 action: ({ editor }) =>
                   editor.chain().focus().toggleSubscript().run(),
               },

@@ -28,6 +28,7 @@ export * from "./iframe";
 export * from "./image";
 export * from "./indent";
 export * from "./italic";
+export * from "./keyboard-shortcuts";
 export * from "./link";
 export * from "./list-keymap";
 export * from "./node-selected";

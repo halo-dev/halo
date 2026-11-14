@@ -87,6 +87,50 @@ class MenuItemConsoleServiceTest {
     }
 
     @Test
+    void updatePositionUsesDisplayedRootsForInvalidParents() {
+        menuItems.addAll(List.of(
+                menuItem("root", "primary", null, 0),
+                menuItem("orphan", "primary", "missing", 1),
+                menuItem("self", "primary", "self", 2),
+                menuItem("cycle-a", "primary", "cycle-b", 3),
+                menuItem("cycle-b", "primary", "cycle-a", 4),
+                menuItem("cycle-child", "primary", "cycle-a", 5),
+                menuItem("moved", "primary", null, 6)));
+
+        service.updatePosition("moved", new MenuItemPositionRequest("primary", null, "orphan"))
+                .as(StepVerifier::create)
+                .assertNext(tree -> assertThat(names(tree))
+                        .containsExactly("root", "moved", "orphan", "self", "cycle-a", "cycle-b", "cycle-child"))
+                .verifyComplete();
+        assertThat(menuItems)
+                .allSatisfy(item -> assertThat(item.getSpec().getParent()).isNull());
+        service.listTree("primary")
+                .as(StepVerifier::create)
+                .assertNext(tree -> assertThat(names(tree))
+                        .containsExactly("root", "moved", "orphan", "self", "cycle-a", "cycle-b", "cycle-child"))
+                .verifyComplete();
+    }
+
+    @Test
+    void updatePositionReordersDisplayedSiblingsWhenMovingOrphanUnderParent() {
+        menuItems.addAll(List.of(
+                menuItem("root", "primary", null, 7),
+                menuItem("orphan", "primary", "missing", 2),
+                menuItem("other-orphan", "primary", "other-missing", 4)));
+
+        service.updatePosition("orphan", new MenuItemPositionRequest("primary", "root", null))
+                .as(StepVerifier::create)
+                .assertNext(tree -> {
+                    assertThat(names(tree)).containsExactly("other-orphan", "root");
+                    assertThat(names(tree.get(1).getChildren())).containsExactly("orphan");
+                })
+                .verifyComplete();
+        assertThat(menuItem("other-orphan").getSpec().getParent()).isNull();
+        assertThat(menuItem("other-orphan").getSpec().getPriority()).isZero();
+        assertThat(menuItem("root").getSpec().getPriority()).isEqualTo(1);
+    }
+
+    @Test
     void updatePositionMovesRootBeforeSibling() {
         menuItems.addAll(List.of(
                 menuItem("root-a", "primary", null, 0),

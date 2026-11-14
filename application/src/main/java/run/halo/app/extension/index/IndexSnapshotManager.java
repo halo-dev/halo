@@ -9,7 +9,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import run.halo.app.extension.Extension;
 import run.halo.app.infra.properties.HaloProperties;
 
@@ -17,15 +16,16 @@ import run.halo.app.infra.properties.HaloProperties;
  * Persists and loads index snapshots under {@code <work-dir>/indices/}. All failures are logged and degraded to a full
  * index rebuild; nothing here may break startup or shutdown.
  *
+ * <p>Registered explicitly as a bean in {@code ExtensionConfiguration} instead of component scanning, so that sliced
+ * test contexts scanning this package do not require {@link HaloProperties}.
+ *
  * @since 2.26.0
  */
 @Slf4j
-@Component
 public class IndexSnapshotManager {
 
     private final Path snapshotDir;
 
-    @org.springframework.beans.factory.annotation.Autowired
     public IndexSnapshotManager(HaloProperties haloProperties) {
         this(haloProperties.getWorkDir().resolve("indices"));
     }

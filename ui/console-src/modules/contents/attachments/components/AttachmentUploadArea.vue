@@ -59,6 +59,7 @@ const finalGroupName = computed(() => {
             : $t('core.attachment.upload_modal.filters.policy.not_select')
         "
         :done-button-handler="() => emit('done')"
+        allow-file-name-editing
         @uploaded="onUploaded"
       />
     </VTabItem>

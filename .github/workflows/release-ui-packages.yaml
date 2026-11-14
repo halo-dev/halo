@@ -19,6 +19,9 @@ jobs:
           fetch-depth: 0
       - name: Setup Environment
         uses: ./.github/actions/setup-env
-      - run: ./gradlew pnpmInstall
+      - name: Install Dependencies
+        working-directory: ui
+        run: vp install --frozen-lockfile
       - name: Publish to NPM
-        run: cd ui && pnpm build:packages && pnpm -r publish --access public --no-git-checks
+        working-directory: ui
+        run: vp run build:packages && vp pm publish -r --access public --no-git-checks

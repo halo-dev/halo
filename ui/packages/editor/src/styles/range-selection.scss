@@ -1,14 +1,21 @@
 .halo-rich-text-editor {
-  $editorRangeFakeSelection: rgba(27, 162, 227, 0.2);
+  $editorRangeFakeSelection: Highlight;
 
+  .ProseMirror-noderangeselection,
   .no-selection {
     *::selection {
       background-color: transparent;
       color: inherit;
     }
+
+    * {
+      caret-color: transparent;
+    }
   }
 
+  .ProseMirror-selectednoderange,
   .range-fake-selection {
+    isolation: isolate;
     position: relative;
 
     &::after {
@@ -20,7 +27,7 @@
       bottom: 0;
       background-color: $editorRangeFakeSelection;
       pointer-events: none;
-      z-index: 99;
+      z-index: -1;
       caret-color: transparent;
     }
 
@@ -29,5 +36,11 @@
         border-radius: 5px;
       }
     }
+  }
+
+  [data-node-view-wrapper].ProseMirror-selectednoderange,
+  [data-node-view-wrapper].range-fake-selection {
+    outline: 2px solid rgba(47, 142, 244);
+    box-shadow: 0 0 0 3px rgba(47, 142, 244, 0.14);
   }
 }

@@ -3,6 +3,7 @@ import {
   Dialog,
   IconAccountCircleLine,
   IconArrowDownLine,
+  IconExchange,
   IconLogoutCircleRLine,
   IconSettings3Line,
   IconShieldUser,
@@ -49,6 +50,16 @@ const actions = computed(() => {
       onClick: handleLogout,
     },
   ];
+
+  if (currentUser.value?.impersonator) {
+    items.unshift({
+      label: t("core.impersonation.operations.exit.tooltip"),
+      icon: IconExchange,
+      onClick: () => {
+        window.location.href = "/logout/impersonate";
+      },
+    });
+  }
 
   if (props.platform === "console") {
     items.unshift({

@@ -69,6 +69,7 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.IListRequest;
 import run.halo.app.extension.router.SortableRequest;
 import run.halo.app.infra.ReactiveUrlDataBufferFetcher;
+import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.infra.utils.SettingUtils;
 import run.halo.app.plugin.PluginService;
 import run.halo.app.plugin.UiPluginBundleService;
@@ -272,6 +273,7 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
                                         .required(true)
                                         .implementation(String.class))
                                 .response(responseBuilder().implementation(Object.class)))
+                // TODO(Halo 3): Remove after legacy IIFE UI provider support ends.
                 .GET(
                         "plugins/-/bundle.js",
                         this::fetchJsBundle,
@@ -652,13 +654,13 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
         public FilePart getFile() {
             var part = multipartData.getFirst("file");
             if (part == null) {
-                throw new ServerWebInputException("Form field file is required");
+                throw new ServerWebInputException("problemDetail.upload.fileRequired");
             }
             if (!(part instanceof FilePart file)) {
-                throw new ServerWebInputException("Invalid parameter of file");
+                throw new ServerWebInputException("problemDetail.upload.fileRequired");
             }
             if (!Paths.get(file.filename()).toString().endsWith(".jar")) {
-                throw new ServerWebInputException("Invalid file type, only jar is supported");
+                throw new UnsatisfiedAttributeValueException("problemDetail.plugin.archiveType");
             }
             return file;
         }

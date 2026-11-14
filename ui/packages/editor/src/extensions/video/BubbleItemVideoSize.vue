@@ -98,6 +98,7 @@ const presetSizes = [
             v-for="item in presetSizes"
             :key="item.width"
             v-tooltip="item.title"
+            type="button"
             class="inline-flex flex-1 items-center justify-center rounded px-2 py-1.5 text-gray-600 transition-all hover:text-gray-900"
             :class="{
               'bg-white text-gray-900':

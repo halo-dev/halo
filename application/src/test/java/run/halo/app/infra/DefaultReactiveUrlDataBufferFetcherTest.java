@@ -4,10 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.net.URI;
 import java.net.UnknownHostException;
+import java.util.Locale;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -54,8 +56,14 @@ class DefaultReactiveUrlDataBufferFetcherTest {
         StepVerifier.create(fetcher.fetch(URI.create("http://nonexistent-host/")))
                 .expectErrorSatisfies(e -> {
                     assertThat(e).isInstanceOf(ServerWebInputException.class);
-                    assertThat(e.getMessage()).contains("Unable to resolve host");
-                    assertThat(e.getMessage()).contains("nonexistent-host");
+                    var messages = new ReloadableResourceBundleMessageSource();
+                    messages.setBasename("file:src/main/resources/config/i18n/messages");
+                    messages.setDefaultEncoding("UTF-8");
+                    assertThat(((ServerWebInputException) e)
+                                    .updateAndGetBody(messages, Locale.CHINESE)
+                                    .getDetail())
+                            .isEqualTo("无法解析远程主机，或其地址不允许访问。");
+                    assertThat(e.getCause()).hasMessage("nonexistent-host");
                 })
                 .verify();
     }
@@ -109,7 +117,13 @@ class DefaultReactiveUrlDataBufferFetcherTest {
         StepVerifier.create(fetcher.head(URI.create("http://nonexistent-host/")))
                 .expectErrorSatisfies(e -> {
                     assertThat(e).isInstanceOf(ServerWebInputException.class);
-                    assertThat(e.getMessage()).contains("Unable to resolve host");
+                    var messages = new ReloadableResourceBundleMessageSource();
+                    messages.setBasename("file:src/main/resources/config/i18n/messages");
+                    messages.setDefaultEncoding("UTF-8");
+                    assertThat(((ServerWebInputException) e)
+                                    .updateAndGetBody(messages, Locale.CHINESE)
+                                    .getDetail())
+                            .isEqualTo("无法解析远程主机，或其地址不允许访问。");
                 })
                 .verify();
     }
@@ -162,7 +176,13 @@ class DefaultReactiveUrlDataBufferFetcherTest {
         StepVerifier.create(fetcher.fetchResponseEntity(URI.create("http://nonexistent-host/")))
                 .expectErrorSatisfies(e -> {
                     assertThat(e).isInstanceOf(ServerWebInputException.class);
-                    assertThat(e.getMessage()).contains("Unable to resolve host");
+                    var messages = new ReloadableResourceBundleMessageSource();
+                    messages.setBasename("file:src/main/resources/config/i18n/messages");
+                    messages.setDefaultEncoding("UTF-8");
+                    assertThat(((ServerWebInputException) e)
+                                    .updateAndGetBody(messages, Locale.CHINESE)
+                                    .getDetail())
+                            .isEqualTo("无法解析远程主机，或其地址不允许访问。");
                 })
                 .verify();
     }

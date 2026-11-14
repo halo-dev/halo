@@ -261,7 +261,7 @@ public class UserServiceImpl implements UserService {
                 .fetch(SystemSetting.User.GROUP, SystemSetting.User.class)
                 .filter(SystemSetting.User::isAllowRegistration)
                 .switchIfEmpty(Mono.error(
-                        () -> new ServerWebInputException("The registration is not allowed by the administrator.")))
+                        () -> new UnsatisfiedAttributeValueException("problemDetail.user.signUpFailed.disallowed")))
                 .filter(setting -> isUsernameAllowed(setting, signUpData.getUsername()))
                 .switchIfEmpty(Mono.error(() -> new RestrictedNameException(
                         "The username is restricted.",
@@ -273,8 +273,9 @@ public class UserServiceImpl implements UserService {
                         "problemDetail.user.displayName.restricted",
                         new Object[] {signUpData.getDisplayName()})))
                 .filter(setting -> StringUtils.hasText(setting.getDefaultRole()))
+                .filter(setting -> !AuthorityUtils.SUPER_ROLE_NAME.equals(setting.getDefaultRole()))
                 .switchIfEmpty(Mono.error(
-                        () -> new ServerWebInputException("The default role is not configured by the administrator.")))
+                        () -> new UnsatisfiedAttributeValueException("problemDetail.user.signup.defaultRoleMissing")))
                 .filter(setting -> {
                     var pages = setting.getRequiredAgreementPages();
                     if (CollectionUtils.isEmpty(pages)) {
@@ -397,10 +398,23 @@ public class UserServiceImpl implements UserService {
         var tx = TransactionalOperator.create(transactionManager);
         return client.fetch(User.class, username)
                 .filter(user -> !Boolean.TRUE.equals(user.getSpec().getDisabled()))
-                .flatMap(user -> deviceService.revoke(username).thenReturn(user))
+                .flatMap(user -> revokeSessions(username).thenReturn(user))
                 .doOnNext(user -> user.getSpec().setDisabled(true))
                 .flatMap(client::update)
                 .as(tx::transactional);
+    }
+
+    private Mono<Void> revokeSessions(String username) {
+        var revokeDevices = deviceService.revoke(username);
+        var invalidateSessions = sessionRegistry
+                .getAllSessions(username)
+                .flatMap(reactiveSessionInformation -> {
+                    log.info(
+                            "Invalidating session {} for user {}", reactiveSessionInformation.getSessionId(), username);
+                    return reactiveSessionInformation.invalidate();
+                })
+                .then();
+        return revokeDevices.then(invalidateSessions);
     }
 
     @Override

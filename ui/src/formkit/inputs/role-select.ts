@@ -21,14 +21,18 @@ function optionsHandler(node: FormKitNode) {
     );
 
     const options = [
-      ...roles.map((role) => {
-        return {
-          label:
-            role.metadata?.annotations?.[rbacAnnotations.DISPLAY_NAME] ||
-            role.metadata.name,
-          value: role.metadata?.name,
-        };
-      }),
+      ...roles
+        .filter(
+          (role) => !node.props.excludedNames?.includes(role.metadata.name)
+        )
+        .map((role) => {
+          return {
+            label:
+              role.metadata?.annotations?.[rbacAnnotations.DISPLAY_NAME] ||
+              role.metadata.name,
+            value: role.metadata?.name,
+          };
+        }),
     ];
     if (node.context) {
       node.context.attrs.options = options;
@@ -39,6 +43,7 @@ function optionsHandler(node: FormKitNode) {
 export const roleSelect: FormKitTypeDefinition = {
   ...select,
   forceTypeProp: "select",
+  props: [...(select.props as string[]), "excludedNames"],
   features: [optionsHandler],
 };
 
@@ -47,6 +52,7 @@ declare module "@formkit/inputs" {
     roleSelect: {
       type: "roleSelect";
       value?: string;
+      excludedNames?: string[];
     };
   }
 }

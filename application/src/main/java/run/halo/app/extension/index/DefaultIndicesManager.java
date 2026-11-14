@@ -40,7 +40,6 @@ class DefaultIndicesManager implements IndicesManager {
 
     @Override
     public <E extends Extension> void add(Class<E> type, List<ValueIndexSpec<E, ?>> indexSpecs) {
-        readyLatches.putIfAbsent(type, new CountDownLatch(1));
         indicesMap.computeIfAbsent(type, t -> {
             var indices = new ArrayList<Index<E, ?>>();
             // the default index specs should be added first in case of index overwriting
@@ -79,9 +78,13 @@ class DefaultIndicesManager implements IndicesManager {
 
     @Override
     public void awaitReady(Class<? extends Extension> type) {
+        if (!indicesMap.containsKey(type)) {
+            throw new IllegalArgumentException("No indices found for type: " + type.getName());
+        }
+        // no latch means the indices are not being (re)built right now and are safe to query
         var latch = readyLatches.get(type);
         if (latch == null) {
-            throw new IllegalArgumentException("No indices found for type: " + type.getName());
+            return;
         }
         try {
             if (!latch.await(readyTimeout.toMillis(), TimeUnit.MILLISECONDS)) {
@@ -96,8 +99,17 @@ class DefaultIndicesManager implements IndicesManager {
     }
 
     @Override
+    public void markBuilding(Class<? extends Extension> type) {
+        if (!indicesMap.containsKey(type)) {
+            throw new IllegalArgumentException("No indices found for type: " + type.getName());
+        }
+        // replace any stale latch: a new build cycle starts now
+        readyLatches.put(type, new CountDownLatch(1));
+    }
+
+    @Override
     public void markReady(Class<? extends Extension> type) {
-        var latch = readyLatches.get(type);
+        var latch = readyLatches.remove(type);
         if (latch != null) {
             latch.countDown();
         }

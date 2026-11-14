@@ -14,6 +14,20 @@ import { computed, defineAsyncComponent, ref, shallowRef } from "vue";
 import { useI18n } from "vue-i18n";
 import { usePluginModuleStore } from "@/stores/plugin";
 
+export function getPluginStatusRefetchInterval(
+  enabled: boolean | undefined,
+  phase: PluginStatusPhaseEnum | undefined
+) {
+  if (
+    enabled &&
+    phase !== PluginStatusPhaseEnum.Started &&
+    phase !== PluginStatusPhaseEnum.Failed
+  ) {
+    return 1000;
+  }
+  return false;
+}
+
 export function usePluginLifeCycle(plugin?: Ref<Plugin | undefined>) {
   const { t } = useI18n();
   const queryClient = useQueryClient();
@@ -356,6 +370,8 @@ export function usePluginDetailTabs(
         tabs.value = [...initialTabs, ...(await getTabsFromExtensions())];
       }
     },
+    refetchInterval: (data) =>
+      getPluginStatusRefetchInterval(data?.spec.enabled, data?.status?.phase),
   });
 
   const { data: setting } = useQuery({

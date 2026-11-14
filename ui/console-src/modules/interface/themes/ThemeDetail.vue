@@ -31,8 +31,12 @@ const { t } = useI18n();
 const selectedTheme = inject<Ref<Theme | undefined>>("selectedTheme", ref());
 const themesModal = inject<Ref<boolean>>("themesModal");
 
-const { isActivated, getFailedMessage, handleResetSettingConfig } =
-  useThemeLifeCycle(selectedTheme);
+const {
+  isActivated,
+  isActivationKnown,
+  getFailedMessage,
+  handleResetSettingConfig,
+} = useThemeLifeCycle(selectedTheme);
 
 const pageLayout = computed(() => getPageLayout(selectedTheme.value));
 const pageLayoutLabelKey = computed(() =>
@@ -118,7 +122,7 @@ const { handleExportThemeConfiguration, openSelectImportFileDialog } =
               <span class="text-sm text-gray-500">
                 {{ selectedTheme?.spec.version }}
               </span>
-              <VTag>
+              <VTag v-if="isActivationKnown">
                 {{
                   isActivated
                     ? t("core.common.status.activated")

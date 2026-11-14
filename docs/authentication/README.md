@@ -124,37 +124,17 @@ PAT）功能。
 
 ### 设计
 
-PAT 以 `pat_` 开头，剩余部分为随机字符串，随机字符串可以是 [JWT](https://datatracker.ietf.org/doc/html/rfc7519)、UUID
-或其他经过加密的随机字符串。目前，Halo 的实现是 `pat_` + `JWT` 的形式，例如：
+PAT 以 `pat_` 开头，剩余部分为 `PAT 名称:随机密钥` 经过 Base64URL（无填充）编码后的字符串，例如：
 
 ```text
-pat_eyJraWQiOiJabUNtcWhJX2FuaFlWQW5aRlVTS0lOckxXRFhqaEp1Nk9ZRGRtcW13Rno4IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJhZG1pbiIsInJvbGVzIjpbInN1cGVyLXJvbGUiXSwicGF0X25hbWUiOiJwYXQtYWRtaW4tSVdvbFEiLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwOTAvIiwiZXhwIjoxNjk0NjcyMDc5LCJpYXQiOjE2OTQ1ODU3MjAsImp0aSI6IjE3ZWFkNzlkLTRkMjctYjg4NS02YjAzLTM4Y2JlYzQxMmFlMyJ9.xiq36NZIM3_ynBx-l0scGdfX-89aJi6uV7HJz_kNnuT78CFmxD-XTpncK1E-hqPdQSrSwyG4gT1pVO17UmUCoyoAkZKKKVk_seFwxdbygIueo2UJA5kVw1Naf_6iLtNkAXxAiYUpd8ihIwvVedhmOMQ9UUfd4QKZDR1XnTW4EAteWBi7b0pWqSa4h5lv7TpmAECY_KDAGrBRGGhc9AxsrGYPNZo68n2QGJ5BjH29vfdQaZz4vwsgKxG1WJ9Y7c8cQI9JN8EyQD_n560NWAaoFnRi1qL3nexvhjq8EVyGVyM48aKA02UcyvI9cxZFk6ZgnzmUsMjyA6ZL7wuexkujVqmc3iO5plBDCjW7oMe1zPQq-gEJXJU6gdr_SHcGG1BjamoekCkOeNT3CPzA_-5j3AVlj7FTFQkbn_h-kV07mfNO45BVVKsMb08HrN6iEk7TOX7SxN0s2gFc3xYVcXBMveLtftOfXs04SvSFCfTDeJH_Jy-3lYb_GLOji7xSc6FgRbuAwmzHLlsgBT4NJhR_0dZ-jNsCDIQCIC3iDc0qbcNTJYYocT77YaQzIkleFIXyPiV0RsNPmSTEDGiDlctsZ-AmcGCDQ-UmW8SIFBrA93OHncvb47o0-uBwZLdF_we4S90hJlNiAPVhhrBMtCoTJotyrODMEzwbLIukvewFXp8
+pat_cGF0LWFkbWluLWxvYmttOmdBWDBBMUp1SzgxVTg4dFdScFJDd05oRmNxTk12bkI2
 ```
 
-示例 Token 中 JWT 部分所对应的 Header 如下：
+其中随机密钥为 192 位随机数（Base64URL 编码后 32 个字符）。服务端仅保存密钥的 SHA-256
+哈希值（存储在 `spec.tokenId` 中），校验时通过恒定时间比较进行匹配，因此完整的 PAT 只会在创建时返回一次。
 
-```json
-{
-  "kid": "ZmCmqhI_anhYVAnZFUSKINrLWDXjhJu6OYDdmqmwFz8",
-  "alg": "RS256"
-}
-```
-
-Payload 如下：
-
-```json
-{
-  "sub": "admin",
-  "roles": [
-    "super-role"
-  ],
-  "pat_name": "pat-admin-IWolQ",
-  "iss": "http://localhost:8090/",
-  "exp": 1694672079,
-  "iat": 1694585720,
-  "jti": "17ead79d-4d27-b885-6b03-38cbec412ae3"
-}
-```
+需要注意的是，在此变更之前签发的 `pat_` + [JWT](https://datatracker.ietf.org/doc/html/rfc7519) 形式的 PAT
+仍然可用，直到被撤销或过期。
 
 ### 使用方式
 
@@ -186,7 +166,7 @@ curl -u admin:admin -X 'POST' \
     "roles": [],
     "username": "admin",
     "revoked": false,
-    "tokenId": "0b897d9c-56d7-5541-2662-110b70e3f9fd"
+    "tokenId": "157a402e40e89d20c1005ad17ab52a156e15bafa16056cbd53d010d4d186f332"
   },
   "apiVersion": "security.halo.run/v1alpha1",
   "kind": "PersonalAccessToken",
@@ -194,7 +174,7 @@ curl -u admin:admin -X 'POST' \
     "generateName": "pat-admin-",
     "name": "pat-admin-lobkm",
     "annotations": {
-      "security.halo.run/access-token": "pat_eyJraWQiOiJabUNtcWhJX2FuaFlWQW5aRlVTS0lOckxXRFhqaEp1Nk9ZRGRtcW13Rno4IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJhZG1pbiIsInJvbGVzIjpbXSwicGF0X25hbWUiOiJwYXQtYWRtaW4tbG9ia20iLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwOTAvIiwiZXhwIjoxNjk0ODMyMTU1LCJpYXQiOjE2OTQ3NDcyOTgsImp0aSI6IjBiODk3ZDljLTU2ZDctNTU0MS0yNjYyLTExMGI3MGUzZjlmZCJ9.UVFYzKmz3bUk7fV6xh_CpuNJA-BR8bci-DIJ7o0fk-hayHXFHr_-7HMrVn7iZcphryqmk0RLv7Zsu_AjY9Qn9iCYybBJBycU0tUJzhDexRtj1ViJtlsraoYxLNSYpJK1hcPngeJuiMa9FZrYGp0k_7GX1NddoXLUBI9orN9DbdKmmJXtvigaxPCp52Mu7fBtVsTmO5fk_y2CglqRl_tkLRpFSgUbERKOqKItctDFRg-WUALBYEpXbhZIXBMuTCsJwhniBMpc1Uu_a1Dqa3K5hDgfHTeUADY2BuhEdYJCODPCzmdfWMNqxYSKQT5JFYoDv-ed6cRqNjKeNvd1IPT3RDkVt_fbo8KPrzvkgIjIzni-Wlwe-pXXQbj_n8iax-jkeK526iu8q2CLptxYxLGD0j8htKZramrov4UkK_eIsotEZZfqig9sYVU5_b442WhOWatdB_pbKj7h-YK1Cb2ueg5kl73bcbBu63b8edJZClp6xr72az343SfBZdwrT_JJ5HR0hJmckAMR_U4qvGWrJ-dobXDgY9Oz-qObfiyglzn0Wrz4HRPlmqDFr2o6TMV7UVjQiV77tDzaNbaXVevXGPS5MaZr313dia7XLpIV3QopXma7rDR6Xnqg7ftDQb5vAvsjwN-JsVabAsdFeCo6ejE1slAD9ZQrD88kgfAIuX4"
+      "security.halo.run/access-token": "pat_cGF0LWFkbWluLWxvYmttOmdBWDBBMUp1SzgxVTg4dFdScFJDd05oRmNxTk12bkI2"
     },
     "version": 0,
     "creationTimestamp": "2023-09-15T03:08:18.875350Z"
@@ -223,6 +203,6 @@ curl -u admin:admin -X 'POST' \
 
 ```shell
 curl http://localhost:8090/apis/api.console.halo.run/v1alpha1/users/- \
-  -H "Authorization: Bearer pat_eyJraWQiOiJabUNtcWhJX2FuaFlWQW5aRlVTS0lOckxXRFhqaEp1Nk9ZRGRtcW13Rno4IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJhZG1pbiIsInJvbGVzIjpbXSwicGF0X25hbWUiOiJwYXQtYWRtaW4tbG9ia20iLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwOTAvIiwiZXhwIjoxNjk0ODMyMTU1LCJpYXQiOjE2OTQ3NDcyOTgsImp0aSI6IjBiODk3ZDljLTU2ZDctNTU0MS0yNjYyLTExMGI3MGUzZjlmZCJ9.UVFYzKmz3bUk7fV6xh_CpuNJA-BR8bci-DIJ7o0fk-hayHXFHr_-7HMrVn7iZcphryqmk0RLv7Zsu_AjY9Qn9iCYybBJBycU0tUJzhDexRtj1ViJtlsraoYxLNSYpJK1hcPngeJuiMa9FZrYGp0k_7GX1NddoXLUBI9orN9DbdKmmJXtvigaxPCp52Mu7fBtVsTmO5fk_y2CglqRl_tkLRpFSgUbERKOqKItctDFRg-WUALBYEpXbhZIXBMuTCsJwhniBMpc1Uu_a1Dqa3K5hDgfHTeUADY2BuhEdYJCODPCzmdfWMNqxYSKQT5JFYoDv-ed6cRqNjKeNvd1IPT3RDkVt_fbo8KPrzvkgIjIzni-Wlwe-pXXQbj_n8iax-jkeK526iu8q2CLptxYxLGD0j8htKZramrov4UkK_eIsotEZZfqig9sYVU5_b442WhOWatdB_pbKj7h-YK1Cb2ueg5kl73bcbBu63b8edJZClp6xr72az343SfBZdwrT_JJ5HR0hJmckAMR_U4qvGWrJ-dobXDgY9Oz-qObfiyglzn0Wrz4HRPlmqDFr2o6TMV7UVjQiV77tDzaNbaXVevXGPS5MaZr313dia7XLpIV3QopXma7rDR6Xnqg7ftDQb5vAvsjwN-JsVabAsdFeCo6ejE1slAD9ZQrD88kgfAIuX4"
+  -H "Authorization: Bearer pat_cGF0LWFkbWluLWxvYmttOmdBWDBBMUp1SzgxVTg4dFdScFJDd05oRmNxTk12bkI2"
 ```
 

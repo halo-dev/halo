@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.net.URI;
+import java.util.Locale;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,12 +13,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
+import org.springframework.mock.web.server.MockServerWebExchange;
 import org.springframework.web.reactive.function.client.ClientRequest;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.ExchangeFunction;
@@ -34,6 +38,7 @@ import run.halo.app.core.extension.attachment.endpoint.AttachmentHandler;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.infra.exception.Exceptions;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 
 @ExtendWith(MockitoExtension.class)
@@ -166,7 +171,16 @@ class DefaultAttachmentServiceTest {
         StepVerifier.create(attachmentService.uploadFromUrl(url, "fake-policy", "", ""))
                 .consumeErrorWith(error -> {
                     var exception = assertInstanceOf(ServerWebInputException.class, error);
-                    assertTrue(exception.getMessage().contains(HttpStatus.BAD_GATEWAY.toString()));
+                    var messages = new ReloadableResourceBundleMessageSource();
+                    messages.setBasename("file:src/main/resources/config/i18n/messages");
+                    messages.setDefaultEncoding("UTF-8");
+                    var exchange = MockServerWebExchange.from(
+                            MockServerHttpRequest.get("/file.png").acceptLanguageAsLocales(Locale.CHINESE));
+                    assertEquals(
+                            "下载文件失败，远程服务器返回 502 BAD_GATEWAY。",
+                            Exceptions.createErrorResponse(exception, null, exchange, messages)
+                                    .getBody()
+                                    .getDetail());
                 })
                 .verify();
         verify(exchangeFunction).exchange(assertArg(r -> {

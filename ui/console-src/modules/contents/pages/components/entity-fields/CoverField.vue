@@ -26,6 +26,12 @@ withDefaults(
               GetThumbnailByUriSizeEnum.S
             )
           "
+          @error="
+            utils.attachment.handleThumbnailError(
+              $event,
+              singlePage.page.spec.cover
+            )
+          "
         />
       </div>
     </template>

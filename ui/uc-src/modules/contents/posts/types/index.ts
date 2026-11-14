@@ -8,7 +8,6 @@ export interface PostFormState {
   excerptAutoGenerate: boolean;
   excerptRaw?: string;
   allowComment: boolean;
-  pinned: boolean;
   visible: PostSpecVisibleEnum;
   publishTime?: string;
   cover?: string;

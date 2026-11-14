@@ -2,7 +2,7 @@ import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
 plugins {
     id 'java-platform'
-    id 'halo.publish'
+    alias(libs.plugins.vanniktech.maven.publish)
     alias(libs.plugins.spring.boot) apply false
 }
 
@@ -38,12 +38,9 @@ dependencies {
     }
 }
 
-publishing {
-    publications.named('mavenJava', MavenPublication) {
-        from components.javaPlatform
-        pom {
-            name = 'Application platform.'
-            description = "$project.description"
-        }
+mavenPublishing {
+    pom {
+        name = 'Application platform.'
+        description = project.description
     }
 }

@@ -4,28 +4,55 @@ import Input from "@/components/base/Input.vue";
 import { ExtensionImage, ExtensionLink } from "@/extensions";
 import { i18n } from "@/locales";
 import type { BubbleItemComponentProps } from "@/types";
+import { isAllowedUri } from "@/utils/is-allowed-uri";
+import { IMAGE_LINK_TARGET_BLANK, IMAGE_LINK_TARGET_SELF } from "./constants";
 
 const props = defineProps<BubbleItemComponentProps>();
 
+const getImageLinkAttributes = () => {
+  const imageAttrs = props.editor.getAttributes(ExtensionImage.name);
+  if (imageAttrs.href) {
+    return imageAttrs;
+  }
+  return props.editor.getAttributes(ExtensionLink.name);
+};
+
+const updateImageLinkAttributes = (
+  attributes: Record<string, string | null>
+) => {
+  if (attributes.href && !isAllowedUri(attributes.href)) {
+    return;
+  }
+  const imagePosition = props.editor.state.selection.from;
+  props.editor
+    .chain()
+    .unsetLink()
+    .updateAttributes(ExtensionImage.name, attributes)
+    .setNodeSelection(imagePosition)
+    .run();
+};
+
 const href = computed({
-  get: () => {
-    const attrs = props.editor.getAttributes(ExtensionLink.name);
-    return attrs?.href || props.editor.getAttributes(ExtensionImage.name).href;
-  },
+  get: () => getImageLinkAttributes().href,
   set: (href: string) => {
-    props.editor.commands.setLink({ href: href, target: "_blank" });
+    const currentAttributes = getImageLinkAttributes();
+    updateImageLinkAttributes({
+      href,
+      target: currentAttributes.href
+        ? currentAttributes.target || IMAGE_LINK_TARGET_SELF
+        : IMAGE_LINK_TARGET_BLANK,
+    });
   },
 });
 
 const target = computed({
   get() {
-    const attrs = props.editor.getAttributes(ExtensionLink.name);
-    return attrs?.target === "_blank";
+    return getImageLinkAttributes().target === IMAGE_LINK_TARGET_BLANK;
   },
   set(value) {
-    props.editor.commands.setLink({
+    updateImageLinkAttributes({
       href: href.value,
-      target: value ? "_blank" : "_self",
+      target: value ? IMAGE_LINK_TARGET_BLANK : IMAGE_LINK_TARGET_SELF,
     });
   },
 });

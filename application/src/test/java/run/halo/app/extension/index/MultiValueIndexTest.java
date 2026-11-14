@@ -26,6 +26,11 @@ class MultiValueIndexTest {
     @InjectMocks
     MultiValueIndex<Fake, String> index;
 
+    @Test
+    void shouldReturnEmptyKeysForMissingPrimaryKey() {
+        assertEquals(Set.of(), index.getKeys("missing"));
+    }
+
     @Nested
     class UniqueMultiValueTests {
 
@@ -291,6 +296,29 @@ class MultiValueIndexTest {
             void allQuery() {
                 var result = index.all();
                 assertEquals(Set.of("fake1", "fake2", "fake3", "fakenull"), result);
+            }
+
+            @Test
+            void shouldReturnModifiableSnapshots() {
+                var equalResult = index.equal("string1");
+                equalResult.clear();
+                assertEquals(Set.of("fake1"), index.equal("string1"));
+
+                var allResult = index.all();
+                allResult.clear();
+                assertEquals(Set.of("fake1", "fake2", "fake3", "fakenull"), index.all());
+
+                var nullResult = index.isNull();
+                nullResult.clear();
+                assertEquals(Set.of("fakenull"), index.isNull());
+
+                var notEqualResult = index.notEqual("string1");
+                notEqualResult.clear();
+                assertEquals(Set.of("fake2", "fake3"), index.notEqual("string1"));
+
+                var notInResult = index.notIn(Set.of("string1"));
+                notInResult.clear();
+                assertEquals(Set.of("fake2", "fake3"), index.notIn(Set.of("string1")));
             }
 
             @Test
@@ -636,6 +664,29 @@ class MultiValueIndexTest {
             void allQuery() {
                 var result = index.all();
                 assertEquals(Set.of("fake1", "fake2", "fake3", "fakenull"), result);
+            }
+
+            @Test
+            void shouldReturnModifiableSnapshots() {
+                var equalResult = index.equal("string1");
+                equalResult.clear();
+                assertEquals(Set.of("fake1"), index.equal("string1"));
+
+                var allResult = index.all();
+                allResult.clear();
+                assertEquals(Set.of("fake1", "fake2", "fake3", "fakenull"), index.all());
+
+                var nullResult = index.isNull();
+                nullResult.clear();
+                assertEquals(Set.of("fakenull"), index.isNull());
+
+                var notEqualResult = index.notEqual("string1");
+                notEqualResult.clear();
+                assertEquals(Set.of("fake2", "fake3"), index.notEqual("string1"));
+
+                var notInResult = index.notIn(Set.of("string1"));
+                notInResult.clear();
+                assertEquals(Set.of("fake2", "fake3"), index.notIn(Set.of("string1")));
             }
 
             @Test

@@ -1,8 +1,4 @@
 <script lang="ts" setup>
-import type {
-  NodeDragEventData,
-  NodeTouchEventData,
-} from "@formkit/drag-and-drop";
 import { useDragAndDrop } from "@formkit/drag-and-drop/vue";
 import { watch } from "vue";
 import MultipleOverflowItem from "./MultipleOverflowItem.vue";
@@ -22,15 +18,16 @@ const emit = defineEmits<{
 const [parent, options] = useDragAndDrop<SelectOption>(props.selectedOptions, {
   disabled: !props.sortable,
   sortable: true,
-  handleEnd: (
-    data: NodeDragEventData<SelectOption> | NodeTouchEventData<SelectOption>
-  ) => {
-    const nodeData = data.targetData.node.data;
+  onDragend: ({ draggedNode, values }) => {
+    const nodeData = draggedNode.data;
     const dragBeforeIndex = props.selectedOptions.findIndex(
       (option) => option.value === nodeData.value.value
     );
-    if (dragBeforeIndex != nodeData.index) {
-      emit("sort", options.value);
+    const dragAfterIndex = values.findIndex(
+      (option) => option.value === nodeData.value.value
+    );
+    if (dragBeforeIndex != dragAfterIndex) {
+      emit("sort", values);
     }
   },
 });

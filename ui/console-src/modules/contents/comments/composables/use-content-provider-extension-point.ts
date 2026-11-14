@@ -12,6 +12,8 @@ export function useContentProviderExtensionPoint() {
   const { pluginModules } = usePluginModuleStore();
 
   return useQuery({
+    // Deep structural sharing would clone component definitions and lose markRaw.
+    structuralSharing: false,
     queryKey: ["core:comment:list-item:content:provider"],
     queryFn: async () => {
       const result: CommentContentProvider[] = [];
@@ -25,6 +27,7 @@ export function useContentProviderExtensionPoint() {
 
         const item = await callbackFunction();
 
+        markRaw(item.component);
         result.push(item);
       }
 

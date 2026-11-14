@@ -26,8 +26,10 @@ import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.core.extension.notification.Reason;
 import run.halo.app.core.extension.notification.Subscription;
 import run.halo.app.event.post.CommentCreatedEvent;
+import run.halo.app.event.post.ReplyApprovedEvent;
 import run.halo.app.event.post.ReplyCreatedEvent;
 import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.Ref;
 import run.halo.app.infra.ExternalLinkProcessor;
@@ -71,6 +73,27 @@ public class CommentNotificationReasonPublisher {
     @EventListener(ReplyCreatedEvent.class)
     public void onNewReply(ReplyCreatedEvent event) {
         Reply reply = event.getReply();
+        // Notify only if the reply is approved. Replies waiting for review will be notified by
+        // {@link #onReplyApproved(ReplyApprovedEvent)} after they get approved.
+        if (!Boolean.TRUE.equals(reply.getSpec().getApproved())) {
+            return;
+        }
+        publishNewReplyReason(reply);
+    }
+
+    /** On reply approved. */
+    @Async
+    @EventListener(ReplyApprovedEvent.class)
+    public void onReplyApproved(ReplyApprovedEvent event) {
+        var replyName = event.getReply().getMetadata().getName();
+        // The reply may have been unapproved or deleted before this async listener runs.
+        client.fetch(Reply.class, replyName)
+                .filter(reply -> !ExtensionUtil.isDeleted(reply))
+                .filter(reply -> Boolean.TRUE.equals(reply.getSpec().getApproved()))
+                .ifPresent(this::publishNewReplyReason);
+    }
+
+    private void publishNewReplyReason(Reply reply) {
         var commentName = reply.getSpec().getCommentName();
         client.fetch(Comment.class, commentName)
                 .ifPresent(comment -> newReplyReasonPublisher.publishReasonBy(reply, comment));
@@ -139,6 +162,8 @@ public class CommentNotificationReasonPublisher {
                                 .postOwner(post.getSpec().getOwner())
                                 .postTitle(post.getSpec().getTitle())
                                 .postUrl(postUrl)
+                                .commentUrl(CommentPermalinkService.getPermalink(
+                                        postUrl, comment.getMetadata().getName(), null))
                                 .commenter(owner.getDisplayName())
                                 .content(commentContentConverter.convertRelativeLinks(
                                         comment.getSpec().getContent()))
@@ -174,6 +199,7 @@ public class CommentNotificationReasonPublisher {
                 String postOwner,
                 String postTitle,
                 String postUrl,
+                String commentUrl,
                 String commenter,
                 String content,
                 String commentName) {}
@@ -215,6 +241,8 @@ public class CommentNotificationReasonPublisher {
                                 .pageOwner(singlePage.getSpec().getOwner())
                                 .pageTitle(singlePage.getSpec().getTitle())
                                 .pageUrl(pageUrl)
+                                .commentUrl(CommentPermalinkService.getPermalink(
+                                        pageUrl, comment.getMetadata().getName(), null))
                                 .commenter(defaultIfBlank(owner.getDisplayName(), owner.getName()))
                                 .content(commentContentConverter.convertRelativeLinks(
                                         comment.getSpec().getContent()))
@@ -250,6 +278,7 @@ public class CommentNotificationReasonPublisher {
                 String pageOwner,
                 String pageTitle,
                 String pageUrl,
+                String commentUrl,
                 String commenter,
                 String content,
                 String commentName) {}
@@ -270,6 +299,7 @@ public class CommentNotificationReasonPublisher {
         private final NotificationReasonEmitter notificationReasonEmitter;
         private final ExtensionGetter extensionGetter;
         private final CommentContentConverter commentContentConverter;
+        private final ExternalLinkProcessor externalLinkProcessor;
 
         public void publishReasonBy(Reply reply, Comment comment) {
             boolean isQuoteReply = StringUtils.isNotBlank(reply.getSpec().getQuoteReply());
@@ -308,10 +338,20 @@ public class CommentNotificationReasonPublisher {
             var repliedOwner = quoteReplyOptional
                     .map(quoteReply -> quoteReply.getSpec().getOwner())
                     .orElseGet(() -> comment.getSpec().getOwner());
+            var parentPublic = Boolean.TRUE.equals(comment.getSpec().getApproved())
+                    && !Boolean.TRUE.equals(comment.getSpec().getHidden());
+            var isOriginalCommentOwner =
+                    repliedOwner.getKind().equals(comment.getSpec().getOwner().getKind())
+                            && repliedOwner
+                                    .getName()
+                                    .equals(comment.getSpec().getOwner().getName());
 
             var reasonAttributesBuilder = NewReplyReasonData.builder()
-                    .commentContent(commentContentConverter.convertRelativeLinks(
-                            comment.getSpec().getContent()))
+                    .commentContent(
+                            parentPublic || isOriginalCommentOwner
+                                    ? commentContentConverter.convertRelativeLinks(
+                                            comment.getSpec().getContent())
+                                    : "")
                     .isQuoteReply(isQuoteReply)
                     .quoteContent(quoteReplyContent)
                     .commentName(comment.getMetadata().getName())
@@ -323,8 +363,19 @@ public class CommentNotificationReasonPublisher {
                     .repliedOwner(identityFrom(repliedOwner).name());
 
             getCommentSubjectDisplay(comment.getSpec().getSubjectRef()).ifPresent(subject -> {
+                var subjectUrl = externalLinkProcessor.processLink(subject.url());
                 reasonAttributesBuilder.commentSubjectTitle(subject.title());
-                reasonAttributesBuilder.commentSubjectUrl(subject.url());
+                reasonAttributesBuilder.commentSubjectUrl(subjectUrl);
+                var recipientCanOpen =
+                        User.KIND.equals(repliedOwner.getKind()) && (parentPublic || isOriginalCommentOwner);
+                var publicReply =
+                        parentPublic && !Boolean.TRUE.equals(reply.getSpec().getHidden());
+                if (Boolean.TRUE.equals(reply.getSpec().getApproved()) && (publicReply || recipientCanOpen)) {
+                    reasonAttributesBuilder.replyUrl(CommentPermalinkService.getPermalink(
+                            subjectUrl,
+                            comment.getMetadata().getName(),
+                            reply.getMetadata().getName()));
+                }
             });
 
             notificationReasonEmitter
@@ -360,9 +411,11 @@ public class CommentNotificationReasonPublisher {
                 throw new IllegalArgumentException("quoteReply can not be null when currentReply is reply to quote");
             }
 
-            Comment.CommentOwner commentOwner = isQuoteReply
-                    ? quoteReply.getSpec().getOwner()
-                    : comment.getSpec().getOwner();
+            var repliedSpec = isQuoteReply ? quoteReply.getSpec() : comment.getSpec();
+            if (Boolean.FALSE.equals(repliedSpec.getAllowNotification())) {
+                return true;
+            }
+            var commentOwner = repliedSpec.getOwner();
 
             var currentReplyOwner = currentReply.getSpec().getOwner();
             // reply to oneself do not emit reason
@@ -375,6 +428,7 @@ public class CommentNotificationReasonPublisher {
                 String commentContent,
                 String commentSubjectTitle,
                 String commentSubjectUrl,
+                String replyUrl,
                 boolean isQuoteReply,
                 String quoteContent,
                 String commentName,

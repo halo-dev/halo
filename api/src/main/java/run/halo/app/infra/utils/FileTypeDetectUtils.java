@@ -7,10 +7,12 @@ import java.util.List;
 import lombok.experimental.UtilityClass;
 import org.apache.tika.detect.DefaultDetector;
 import org.apache.tika.detect.Detector;
+import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.TikaCoreProperties;
 import org.apache.tika.mime.MimeTypeException;
 import org.apache.tika.mime.MimeTypes;
+import org.apache.tika.parser.ParseContext;
 import org.springframework.util.Assert;
 
 @UtilityClass
@@ -45,7 +47,8 @@ public class FileTypeDetectUtils {
     private static String doDetectMimeType(InputStream inputStream, Metadata metadata) throws IOException {
         Assert.notNull(inputStream, "The inputStream must not be null");
         try (var stream = (!inputStream.markSupported() ? new BufferedInputStream(inputStream) : inputStream)) {
-            return detector.detect(stream, metadata).toString();
+            return detector.detect(TikaInputStream.get(stream), metadata, new ParseContext())
+                    .toString();
         }
     }
 

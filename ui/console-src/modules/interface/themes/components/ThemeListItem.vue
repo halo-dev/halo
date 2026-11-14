@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { invalidateThemeQueries } from "@console/composables/use-activated-theme";
 import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
 import type { Theme } from "@halo-dev/api-client";
 import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
@@ -50,6 +51,7 @@ const activeTabId = inject<Ref<string>>("activeTabId", ref(""));
 
 const {
   isActivated,
+  isActivationKnown,
   getFailedMessage,
   handleActiveTheme,
   handleResetSettingConfig,
@@ -67,7 +69,7 @@ const handleCreateTheme = async () => {
     });
 
     // create theme settings
-    consoleApiClient.theme.theme.reload({ name: data.metadata.name });
+    await consoleApiClient.theme.theme.reload({ name: data.metadata.name });
 
     activeTabId.value = "installed";
 
@@ -76,8 +78,7 @@ const handleCreateTheme = async () => {
     console.error("Failed to create theme", error);
   } finally {
     creating.value = false;
-    queryClient.invalidateQueries({ queryKey: ["installed-themes"] });
-    queryClient.invalidateQueries({ queryKey: ["not-installed-themes"] });
+    void invalidateThemeQueries(queryClient);
   }
 };
 
@@ -93,7 +94,7 @@ const { data: operationItems } = useOperationItemExtensionPoint<Theme>(
       },
       action: () => handleActiveTheme(true),
       label: t("core.common.buttons.activate"),
-      hidden: isActivated.value,
+      hidden: !isActivationKnown.value || isActivated.value,
       permissions: ["system:themes:manage"],
     },
     {

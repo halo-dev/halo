@@ -11,12 +11,12 @@ import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.*;
-import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.core.user.service.UserService;
 import run.halo.app.extension.GroupVersion;
+import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 
 /**
  * User endpoint for console.
@@ -72,8 +72,8 @@ class ConsoleUserEndpoint implements CustomEndpoint {
     private Mono<ServerResponse> handleEnableUser(ServerRequest request) {
         return userService
                 .enable(request.pathVariable("username"))
-                .switchIfEmpty(
-                        Mono.error(() -> new ServerWebInputException("The user was not found or has been enabled.")))
+                .switchIfEmpty(Mono.error(
+                        () -> new UnsatisfiedAttributeValueException("problemDetail.user.notFoundOrEnabled")))
                 .flatMap(user -> ServerResponse.ok().bodyValue(user));
     }
 
@@ -82,13 +82,14 @@ class ConsoleUserEndpoint implements CustomEndpoint {
         return ReactiveSecurityContextHolder.getContext()
                 .map(SecurityContext::getAuthentication)
                 .map(Authentication::getName)
-                .switchIfEmpty(Mono.error(() -> new ServerWebInputException("The current user is not authenticated.")))
+                .switchIfEmpty(Mono.error(
+                        () -> new UnsatisfiedAttributeValueException("problemDetail.authentication.required")))
                 .filter(currentUsername -> !Objects.equals(currentUsername, username))
                 .switchIfEmpty(Mono.error(
-                        () -> new ServerWebInputException("The user is the current user, can't disable it.")))
+                        () -> new UnsatisfiedAttributeValueException("problemDetail.user.cannotDisableSelf")))
                 .then(Mono.defer(() -> userService.disable(username)))
-                .switchIfEmpty(
-                        Mono.error(() -> new ServerWebInputException("The user was not found or has been disabled.")))
+                .switchIfEmpty(Mono.error(
+                        () -> new UnsatisfiedAttributeValueException("problemDetail.user.notFoundOrDisabled")))
                 .flatMap(user -> ServerResponse.ok().bodyValue(user));
     }
 

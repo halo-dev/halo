@@ -17,5 +17,7 @@ public interface CommentService {
 
     Mono<Comment> create(Comment comment);
 
+    Mono<Comment> updateContent(String name, CommentContentRequest request);
+
     Mono<Void> removeBySubject(Ref subjectRef);
 }

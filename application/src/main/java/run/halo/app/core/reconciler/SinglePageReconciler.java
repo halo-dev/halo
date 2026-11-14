@@ -7,6 +7,7 @@ import com.google.common.hash.Hashing;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -105,13 +106,20 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
     }
 
     void subscribeNewCommentNotification(SinglePage page) {
+        var owner = page.getSpec().getOwner();
+        if (StringUtils.isBlank(owner)) {
+            log.debug(
+                    "Skip subscribing new comment notification for single page [{}] because the owner is blank",
+                    page.getMetadata().getName());
+            return;
+        }
+
         var subscriber = new Subscription.Subscriber();
-        subscriber.setName(page.getSpec().getOwner());
+        subscriber.setName(owner);
 
         var interestReason = new Subscription.InterestReason();
         interestReason.setReasonType(NotificationReasonConst.NEW_COMMENT_ON_PAGE);
-        interestReason.setExpression(
-                "props.pageOwner == '%s'".formatted(page.getSpec().getOwner()));
+        interestReason.setExpression("props.pageOwner == '%s'".formatted(owner));
         notificationCenter.subscribe(subscriber, interestReason).block(BLOCKING_TIMEOUT);
     }
 
@@ -327,7 +335,7 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
 
             // handle contributors
             String headSnapshot = singlePage.getSpec().getHeadSnapshot();
-            List<String> contributors = listSnapshots(Ref.of(singlePage)).stream()
+            Stream<String> snapshotContributors = listSnapshots(Ref.of(singlePage)).stream()
                     .peek(snapshot -> {
                         snapshot.getSpec().setContentPatch(StringUtils.EMPTY);
                         snapshot.getSpec().setRawPatch(StringUtils.EMPTY);
@@ -336,7 +344,11 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
                         Set<String> usernames = snapshot.getSpec().getContributors();
                         return Objects.requireNonNullElseGet(usernames, () -> new HashSet<String>());
                     })
-                    .flatMap(Set::stream)
+                    .flatMap(Set::stream);
+            // the owner is always treated as a contributor, even if they never edited the content
+            // see https://github.com/halo-dev/halo/issues/8284
+            Stream<String> ownerContributor = Stream.ofNullable(spec.getOwner()).filter(StringUtils::isNotBlank);
+            List<String> contributors = Stream.concat(snapshotContributors, ownerContributor)
                     .distinct()
                     .sorted()
                     .toList();

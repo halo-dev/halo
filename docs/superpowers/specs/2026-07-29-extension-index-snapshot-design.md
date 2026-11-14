@@ -133,11 +133,16 @@ manifest:  entryCount | { name -> version }
 
 ### 4.6 就绪门闩与查询行为
 
-- `DefaultIndicesManager` 为每个类型维护一个 `CountDownLatch`（1）：注册类型时创建，
-  构建/恢复完成后 `countDown`。不引入状态枚举，门闩即"就绪"语义本身。
+- 就绪语义为**默认可查、构建期阻塞**：`IndicesManager.add` 之后索引即视为就绪（空索引
+  是一致的）；`DefaultIndicesInitializer` 构建/恢复前调用 `markBuilding(type)`（创建
+  `CountDownLatch`），完成后 `markReady(type)`（`countDown` 并移除）。`awaitReady`
+  仅在门闩存在时阻塞。不引入状态枚举，门闩即"构建中"语义本身。
   旧设计残留的无引用类 `IndexBuildState`、`IndexerBuiltEvent` 已移除。
-- `DefaultIndexEngine.retrieve*` 在目标类型门闩未就绪时阻塞等待（超时时间可配置，
-  默认 30s），超时抛出明确异常；就绪后正常执行。
+  （注：早期设计为"注册时创建门闩、构建后放行"，后改为当前语义——`add` 与构建分属
+  两个调用方时，隐式的"未就绪"契约过于脆弱，直接使用 `IndicesManager` 的调用方
+  会被无端阻塞。）
+- `DefaultIndexEngine.retrieve*` 在目标类型门闩存在时阻塞等待（超时 30s），
+  超时抛出明确异常；否则正常执行。
 - Halo 重启场景无需防护：核心模型在 SmartLifecycle（SCHEME phase）同步构建，早于应用
   ready 与 ApplicationRunner，启动顺序天然阻塞。门闩只覆盖插件热重启的运行期重建窗口。
 - 事件顺序约束：`DefaultIndicesInitializer` 必须先于 `GcSynchronizer`（后者依赖

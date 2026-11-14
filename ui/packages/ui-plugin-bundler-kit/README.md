@@ -29,17 +29,19 @@ pnpm add @halo-dev/ui-plugin-bundler-kit
 
 ### Additional Dependencies
 
-**For Vite users**, you need to install Vite:
+**For Vite users**, install Vite and its Vue plugin:
 
 ```bash
-npm install vite
+npm install vite @vitejs/plugin-vue
 ```
 
-**For Rsbuild users**, you need to install Rsbuild:
+**For Rsbuild users**, install Rsbuild and its Vue plugin:
 
 ```bash
-npm install @rsbuild/core
+npm install @rsbuild/core @rsbuild/plugin-vue
 ```
+
+The Vite and Rsbuild peer dependencies are optional. Install only the build tool and Vue plugin you use, and import its configuration helper from `@halo-dev/ui-plugin-bundler-kit/vite` or `@halo-dev/ui-plugin-bundler-kit/rsbuild`. The package root exports and the deprecated `HaloUIPluginBundlerKit` helper have been removed.
 
 ## Usage
 
@@ -48,7 +50,7 @@ npm install @rsbuild/core
 Create or update `vite.config.ts` file in your UI plugin project root:
 
 ```typescript
-import { viteConfig } from "@halo-dev/ui-plugin-bundler-kit";
+import { viteConfig } from "@halo-dev/ui-plugin-bundler-kit/vite";
 
 export default viteConfig({
   // provider defaults to "plugin"
@@ -62,14 +64,14 @@ export default viteConfig({
 });
 ```
 
-> **Note**: Vue plugin is pre-configured, no need to add it manually.
+> **Note**: Vue plugin is pre-configured. Pass its options through the top-level `vue` field instead of adding another `@vitejs/plugin-vue` instance.
 
 ### Rsbuild Configuration
 
 Create or update `rsbuild.config.ts` file in your UI plugin project root:
 
 ```typescript
-import { rsbuildConfig } from "@halo-dev/ui-plugin-bundler-kit";
+import { rsbuildConfig } from "@halo-dev/ui-plugin-bundler-kit/rsbuild";
 
 export default rsbuildConfig({
   // provider defaults to "plugin"
@@ -83,7 +85,7 @@ export default rsbuildConfig({
 });
 ```
 
-> **Note**: Vue plugin is pre-configured, no need to add it manually.
+> **Note**: Vue plugin is pre-configured. Pass its options through the top-level `vue` field instead of adding another `@rsbuild/plugin-vue` instance.
 
 ### Theme UI Plugin Configuration
 
@@ -101,7 +103,7 @@ theme-root/
 Vite:
 
 ```typescript
-import { viteConfig } from "@halo-dev/ui-plugin-bundler-kit";
+import { viteConfig } from "@halo-dev/ui-plugin-bundler-kit/vite";
 
 export default viteConfig({
   provider: "theme",
@@ -112,7 +114,7 @@ export default viteConfig({
 Rsbuild:
 
 ```typescript
-import { rsbuildConfig } from "@halo-dev/ui-plugin-bundler-kit";
+import { rsbuildConfig } from "@halo-dev/ui-plugin-bundler-kit/rsbuild";
 
 export default rsbuildConfig({
   provider: "theme",
@@ -122,21 +124,71 @@ export default rsbuildConfig({
 
 The theme provider reads `../theme.yaml`, outputs to `dist`, registers the module as `theme:{metadata.name}`, and configures assets for `/themes/{metadata.name}/ui-plugin/assets/`. Halo reads only `ui-plugin/dist/**` from the theme package.
 
-### Legacy Configuration (Deprecated)
+### Output Format and Halo Target
 
-> ⚠️ **Note**: The `HaloUIPluginBundlerKit` function is deprecated. Please use `viteConfig` or `rsbuildConfig` instead. It does not support `provider: "theme"`.
+`viteConfig` and `rsbuildConfig` accept the same format options:
 
 ```typescript
-import { HaloUIPluginBundlerKit } from "@halo-dev/ui-plugin-bundler-kit";
-
-export default {
-  plugins: [
-    HaloUIPluginBundlerKit({
-      // Configuration options
-    }),
-  ],
-};
+export default viteConfig({
+  format: "auto", // "auto" | "iife" | "esm"
+  vite: {},
+});
 ```
+
+`auto` is the default. It emits ESM when `spec.requires` is a stable Halo version or a simple `>=MAJOR.MINOR.PATCH` target whose minimum is Halo 2.26.0 or newer. Missing, wildcard, composite, or otherwise unsupported ranges produce a warning and keep the compatible IIFE output. This fallback is intentional: ESM is optional, and Halo continues loading old IIFE plugin and theme artifacts throughout Halo 2.x.
+
+Use an explicit target only when intentionally forcing ESM and a target cannot be derived:
+
+```typescript
+export default viteConfig({
+  format: "esm",
+  targetHaloVersion: "2.26.0",
+  vite: {},
+});
+```
+
+After ESM is selected, successful builds generate `ui-plugin.json`. This filename is reserved for the bundler kit: do not create, copy, or emit another file with that name. A provider artifact without this file remains legacy, even if its `spec.requires` also supports Halo 2.26 or newer.
+
+ESM entries must default-export the existing `PluginModule`. The generated manifest records one optional main stylesheet; CSS belonging to asynchronous chunks stays out of the manifest and loads on demand with its JavaScript chunk. Halo starts every provider-owned startup stylesheet and entry in parallel, then commits modules in provider order without reloading after each entry. Top-level module effects, timers, listeners, and arbitrary asynchronous effects are not transactional; a full page reload remains the lifecycle and recovery boundary after provider changes.
+
+The default Vite and Rsbuild presets provide ESM output, provider-relative resource paths, content-hashed entry and startup-style filenames, content-hashed secondary resources, and Halo shared-runtime externals. The generated manifest records the actual startup filenames. Raw `vite` and `rsbuild` configuration is merged after these defaults and is not inspected, rejected, or rewritten. If it changes entry names, formats, public paths, externals, or caching behavior, the caller owns the resulting manifest consistency, Import Map compatibility, shared dependency identity, resource relocation, and cache safety. Compatible IIFE overrides retain their previous stable `main.js` behavior.
+
+### Shared Runtime Dependencies
+
+ESM providers may import these package roots from Halo:
+
+- `vue`
+- `vue-router`
+- `pinia`
+- `axios`
+- `@formkit/vue`
+- `@formkit/core`
+- `@halo-dev/ui-shared`
+- `@halo-dev/components`
+- `@halo-dev/api-client`
+- `@halo-dev/richtext-editor`
+
+The bundler discovers shared package root imports and reports the installed provider version beside the selected Halo host snapshot version when package metadata is available. A newer provider dependency emits a compatibility note, and a different major emits a stronger note, but version drift does not fail the build. Export usage, aliases, forks, and final bundler resolution are not inspected. Deep imports such as `vue/dist/vue.esm-bundler.js` still fail because Halo's Import Map exposes shared package roots only.
+
+Vue, Vue Router, Pinia, and the FormKit Vue/Core graph share host identity. Other `@formkit/*` packages and VueUse stay provider-private. Non-shared dependencies are bundled by the default presets.
+
+The shared `axios` import is the standard package module. Do not mutate its shared defaults or interceptors. For isolated clients, call `axios.create()`. `@halo-dev/api-client` exports Halo's separate authenticated `axiosInstance`; do not mutate that instance either.
+
+### Querying Other UI Providers
+
+Use the shared registration store instead of checking another provider's `window.PluginName` global:
+
+```typescript
+import { stores } from "@halo-dev/ui-shared";
+
+const uiPlugins = stores.uiPlugins();
+
+uiPlugins.isEnabled("plugin-search");
+uiPlugins.isRegistered("plugin-search");
+uiPlugins.get("plugin-search");
+```
+
+The reactive record contains only Halo-owned `name`, `type`, `version`, and `pending | registered | failed` status. `isEnabled` means the provider was discovered in the current descriptor; `isRegistered` becomes true after its current-page registration succeeds. Provider code treats this store as read-only and must not depend on another provider's evaluation order or module object.
 
 ## Configuration Options
 
@@ -155,6 +207,15 @@ interface ViteUserConfig {
    * @default "../src/main/resources/plugin.yaml" for plugins, "../theme.yaml" for themes
    */
   manifestPath?: string;
+
+  /** @default "auto" */
+  format?: "auto" | "iife" | "esm";
+
+  /** Required for explicit ESM when spec.requires has no derivable target. */
+  targetHaloVersion?: string;
+
+  /** Options for the built-in @vitejs/plugin-vue instance. */
+  vue?: VuePluginOptions;
 
   /**
    * Custom Vite configuration
@@ -179,6 +240,15 @@ interface RsBuildUserConfig {
    */
   manifestPath?: string;
 
+  /** @default "auto" */
+  format?: "auto" | "iife" | "esm";
+
+  /** Required for explicit ESM when spec.requires has no derivable target. */
+  targetHaloVersion?: string;
+
+  /** Options for the built-in @rsbuild/plugin-vue instance. */
+  vue?: PluginVueOptions;
+
   /**
    * Custom Rsbuild configuration
    */
@@ -188,11 +258,49 @@ interface RsBuildUserConfig {
 
 ## Advanced Configuration Examples
 
+### Customizing the Vue Compiler
+
+Vite:
+
+```typescript
+import { viteConfig } from "@halo-dev/ui-plugin-bundler-kit/vite";
+
+export default viteConfig({
+  vue: {
+    template: {
+      compilerOptions: {
+        isCustomElement: (tag) => tag === "halo-app-card",
+      },
+    },
+  },
+  vite: {},
+});
+```
+
+Rsbuild:
+
+```typescript
+import { rsbuildConfig } from "@halo-dev/ui-plugin-bundler-kit/rsbuild";
+
+export default rsbuildConfig({
+  vue: {
+    vueLoaderOptions: {
+      compilerOptions: {
+        isCustomElement: (tag) => tag === "halo-app-card",
+      },
+    },
+  },
+  rsbuild: {},
+});
+```
+
+The helper owns the Vue plugin instance. Keep `@vitejs/plugin-vue` and `@rsbuild/plugin-vue` out of the nested `plugins` array to avoid running the SFC transform twice.
+
 ### Adding Path Aliases (Vite)
 
 ```typescript
-import { viteConfig } from "@halo-dev/ui-plugin-bundler-kit";
 import path from "path";
+import { viteConfig } from "@halo-dev/ui-plugin-bundler-kit/vite";
 
 export default viteConfig({
   vite: {
@@ -209,7 +317,7 @@ export default viteConfig({
 ### Adding Path Aliases (Rsbuild)
 
 ```typescript
-import { rsbuildConfig } from "@halo-dev/ui-plugin-bundler-kit";
+import { rsbuildConfig } from "@halo-dev/ui-plugin-bundler-kit/rsbuild";
 
 export default rsbuildConfig({
   rsbuild: {
@@ -226,9 +334,9 @@ export default rsbuildConfig({
 ### Adding Additional Vite Plugins
 
 ```typescript
-import { viteConfig } from "@halo-dev/ui-plugin-bundler-kit";
-import { defineConfig } from "vite";
+import { viteConfig } from "@halo-dev/ui-plugin-bundler-kit/vite";
 import UnoCSS from "unocss/vite";
+import { defineConfig } from "vite";
 
 export default viteConfig({
   vite: {
@@ -242,7 +350,7 @@ export default viteConfig({
 ### Adding Additional Rsbuild Plugins
 
 ```typescript
-import { rsbuildConfig } from "@halo-dev/ui-plugin-bundler-kit";
+import { rsbuildConfig } from "@halo-dev/ui-plugin-bundler-kit/rsbuild";
 import { pluginSass } from "@rsbuild/plugin-sass";
 
 export default rsbuildConfig({
@@ -257,7 +365,7 @@ export default rsbuildConfig({
 ### Custom Plugin Manifest Path
 
 ```typescript
-import { viteConfig } from "@halo-dev/ui-plugin-bundler-kit";
+import { viteConfig } from "@halo-dev/ui-plugin-bundler-kit/vite";
 
 export default viteConfig({
   manifestPath: "application/src/main/resources/plugin.yaml", // Custom manifest file path
@@ -270,7 +378,7 @@ export default viteConfig({
 ### Custom Theme Manifest Path
 
 ```typescript
-import { viteConfig } from "@halo-dev/ui-plugin-bundler-kit";
+import { viteConfig } from "@halo-dev/ui-plugin-bundler-kit/vite";
 
 export default viteConfig({
   provider: "theme",
@@ -319,35 +427,55 @@ Theme provider:
 - **Development**: `dist`
 - **Production**: `dist`
 
-> **Note**: The production build output directory of `HaloUIPluginBundlerKit` is still `src/main/resources/console` to ensure compatibility.
+An ESM output additionally contains the reserved, generated `ui-plugin.json` manifest and may contain content-hashed `chunks/` and `assets/`. The manifest contains `format`, the actual content-hashed `entry`, and an optional content-hashed `style`; asynchronous chunk CSS is not listed. Keep the complete output directory together. Halo serves these canonical paths through the existing plugin or theme static resource mapping without adding query cache keys, so imports back to the entry resolve to the same ESM module URL. Callers that replace the default content-hashed filenames accept the risk of stale resources under Halo's production static-resource cache. Legacy IIFE resources retain their version query behavior. The Halo 2.x compatibility `bundle.css` endpoint remains available for older callers, but now contains ordered `@import` rules pointing at those direct styles so relative asset URLs keep the correct provider base; it is not used by the new runtime.
+
+## Maintaining Halo Host Runtime Snapshots
+
+Snapshots capture the exact host version, statically importable root exports that are also present on the browser runtime global, bridge global, and identity category for each shared root. Synthetic namespace metadata such as `__esModule` is excluded when the browser global does not expose it. Snapshots do not claim an accepted provider version range. They are intentionally sparse: add a new immutable snapshot when Halo's shared runtime contract changes, not automatically for every Halo patch. A newer target selects the latest eligible older snapshot and emits a forward-compatibility warning; a target older than every packaged snapshot cannot build ESM.
+
+When the host dependency graph changes:
+
+1. Set `@halo-dev/ui-plugin-bundler-kit` to the Halo version represented by the snapshot.
+2. Run `pnpm --filter @halo-dev/ui-plugin-bundler-kit snapshot:generate` to derive the versioned output path and capture resolved host versions and exports.
+3. Run `pnpm --filter @halo-dev/ui-plugin-bundler-kit snapshot:check` and the compatibility fixtures before publishing.
+4. Preserve older snapshot files while supported provider artifacts may still target them.
+
+Snapshot generation is currently an explicit maintainer action; it is not coupled to every package build or CI job.
 
 ## Requirements
 
 - **Node.js**: ^18.0.0 || >=20.0.0
 - **Peer Dependencies**:
-  - `@rsbuild/core`: ^1.0.0 (when using Rsbuild)
-  - `@rsbuild/plugin-vue`: ^1.0.0 (when using Rsbuild)
-  - `@vitejs/plugin-vue`: ^4.0.0 || ^5.0.0 (when using Vite)
-  - `vite`: ^4.0.0 || ^5.0.0 || ^6.0.0 (when using Vite)
+  - `@rsbuild/core`: ^1.0.0 || ^2.0.0 (when using Rsbuild)
+  - `@rsbuild/plugin-vue`: ^1.0.0 || ^2.0.0 (when using Rsbuild)
+  - `@vitejs/plugin-vue`: ^5.0.0 || ^6.0.0 (when using Vite)
+  - `vite`: ^6.0.0 || ^7.0.0 || ^8.0.0 (when using Vite)
 
-## Vite vs Rsbuild
+## Choosing Between Vite and Rsbuild
 
-Both Vite and Rsbuild are excellent build tools, but they have different strengths depending on your use case:
+**Vite is the recommended default for new UI plugins.** Halo 2.26.0 and later can load ESM plugin resources, so Vite builds can use dynamic imports and emit separate asynchronous chunks. Rsbuild was originally introduced to support code splitting while UI plugins were limited to legacy IIFE output; that is no longer a reason to prefer Rsbuild when targeting Halo 2.26.0 or later.
 
-### When to Use Rsbuild
+### Use Vite by Default
 
-**Recommended for large-scale plugins**
+- **ESM code splitting** - Supports lazy loading and asynchronous chunks when the target Halo version selects ESM output.
+- **Broader ecosystem** - Provides wider plugin coverage and closer alignment with Vue ecosystem tooling.
+- **Strong build performance** - Recent Vite versions have substantially improved build performance, so build speed alone is usually not a reason to choose Rsbuild.
+- **Familiar configuration** - Keeps plugin projects aligned with the tooling commonly used by Vue applications.
 
-- ✅ **Code Splitting Support** - Rsbuild provides excellent support for code splitting and lazy loading
-- ✅ **Better Performance** - Generally faster build times and smaller bundle sizes for complex applications
-- ✅ **Dynamic Imports** - Perfect for plugins with heavy frontend components
+### Use Rsbuild When Needed
 
-**Example with dynamic imports:**
+Choose Rsbuild when at least one of these conditions applies:
+
+- The plugin must keep legacy IIFE output, such as when targeting Halo versions earlier than 2.26.0, but still needs code splitting.
+- The project already uses Rsbuild or depends on Rsbuild/Rspack-specific plugins and configuration.
+- Measurements on the actual project show a meaningful build-performance advantage.
+
+Do not choose a build system based only on plugin size. With ESM output, both Vite and Rsbuild support dynamic imports and code splitting. The following pattern works with either preset:
 
 ```typescript
+import { VLoading } from "@halo-dev/components";
 import { definePlugin } from "@halo-dev/ui-shared";
 import { defineAsyncComponent } from "vue";
-import { VLoading } from "@halo-dev/components";
 
 export default definePlugin({
   routes: [
@@ -368,26 +496,15 @@ export default definePlugin({
 });
 ```
 
-### When to Use Vite
-
-**Recommended for simple to medium-scale plugins**
-
-- ✅ **Vue Ecosystem Friendly** - Better integration with Vue ecosystem tools and plugins
-- ✅ **Rich Plugin Ecosystem** - Extensive collection of Vite plugins available
-- ✅ **Simple Configuration** - Easier to configure for straightforward use cases
-
 ### Summary
 
-| Feature           | Vite         | Rsbuild      |
-| ----------------- | ------------ | ------------ |
-| Code Splitting    | ❌ Limited   | ✅ Excellent |
-| Vue Ecosystem     | ✅ Excellent | ✅ Good      |
-| Build Performance | ✅ Good      | ✅ Excellent |
-| Dev Experience    | ✅ Excellent | ✅ Excellent |
-| Plugin Ecosystem  | ✅ Rich      | ✅ Growing   |
-| Configuration     | ✅ Simple    | ⚖️ Moderate  |
-
-**Recommendation**: Use **Rsbuild** for complex plugins with large frontend codebases, and **Vite** for simpler plugins or when you need extensive Vue ecosystem integration.
+| Consideration              | Vite                                       | Rsbuild                                         |
+| -------------------------- | ------------------------------------------ | ----------------------------------------------- |
+| Recommended use            | New plugins targeting Halo 2.26.0 or later | Existing Rsbuild projects or legacy IIFE builds |
+| ESM code splitting         | Supported                                  | Supported                                       |
+| Legacy IIFE code splitting | Not supported by the default preset        | Supported                                       |
+| Plugin ecosystem           | Broader Vite and Vue ecosystem             | Smaller, focused on Rsbuild and Rspack          |
+| Build performance          | Fast; recommended default                  | Fast; benchmark when performance is decisive    |
 
 ## License
 
@@ -402,4 +519,4 @@ Issues and Pull Requests are welcome! Please check our [Contributing Guide](http
 - [Halo Website](https://www.halo.run/)
 - [Halo Documentation](https://docs.halo.run/)
 - [GitHub Repository](https://github.com/halo-dev/halo)
-- [Plugin Development Guide](https://docs.halo.run/category/ui)
+- [Plugin Development Guide](https://docs.halo.run/developer-guide/plugin/basics/ui/)

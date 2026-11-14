@@ -34,6 +34,7 @@ import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.ValidationUtils;
 import run.halo.app.infra.exception.AccessDeniedException;
 import run.halo.app.infra.exception.RequestBodyValidationException;
+import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.security.authentication.twofactor.totp.TotpAuthService;
 
 @Component
@@ -142,7 +143,8 @@ public class TwoFactorAuthEndpoint implements CustomEndpoint {
                     var encodedPassword = user.getSpec().getPassword();
                     return this.passwordEncoder.matches(rawPassword, encodedPassword);
                 })
-                .switchIfEmpty(Mono.error(() -> new ServerWebInputException("Invalid password")))
+                .switchIfEmpty(Mono.error(
+                        () -> new UnsatisfiedAttributeValueException("problemDetail.user.password.notMatch")))
                 .delayUntil(user -> validateTotpCode(user, passwordRequest.getTotpCode()))
                 .doOnNext(user -> {
                     var spec = user.getSpec();
@@ -184,7 +186,8 @@ public class TwoFactorAuthEndpoint implements CustomEndpoint {
                             var rawPassword = passwordRequest.getPassword();
                             return passwordEncoder.matches(rawPassword, encodedPassword);
                         })
-                        .switchIfEmpty(Mono.error(() -> new ServerWebInputException("Invalid password")))
+                        .switchIfEmpty(Mono.error(
+                                () -> new UnsatisfiedAttributeValueException("problemDetail.user.password.notMatch")))
                         .delayUntil(user -> validateTotpCode(user, passwordRequest.getTotpCode()))
                         .doOnNext(user -> user.getSpec().setTwoFactorAuthEnabled(enabled))
                         .flatMap(client::update)
@@ -240,7 +243,8 @@ public class TwoFactorAuthEndpoint implements CustomEndpoint {
                         var rawPassword = totpRequest.getPassword();
                         return passwordEncoder.matches(rawPassword, encodedPassword);
                     })
-                    .switchIfEmpty(Mono.error(() -> new ServerWebInputException("Invalid password")))
+                    .switchIfEmpty(Mono.error(
+                            () -> new UnsatisfiedAttributeValueException("problemDetail.user.password.notMatch")))
                     .delayUntil(user -> validateTotpCode(user, totpRequest.getCurrentTotpCode()))
                     .delayUntil(user -> {
                         var rawSecret = totpRequest.getSecret();
@@ -298,17 +302,17 @@ public class TwoFactorAuthEndpoint implements CustomEndpoint {
 
     private Mono<Void> validateTotpCode(String totpEncryptedSecret, String totpCode) {
         if (StringUtils.isBlank(totpCode)) {
-            return Mono.error(new ServerWebInputException("TOTP code is required"));
+            return Mono.error(new UnsatisfiedAttributeValueException("problemDetail.user.twoFactor.code.required"));
         }
         int code;
         try {
             code = Integer.parseInt(totpCode);
         } catch (NumberFormatException e) {
-            return Mono.error(new ServerWebInputException("Invalid TOTP code"));
+            return Mono.error(new UnsatisfiedAttributeValueException("problemDetail.user.twoFactor.code.invalid"));
         }
         var rawSecret = totpAuthService.decryptSecret(totpEncryptedSecret);
         if (!totpAuthService.validateTotp(rawSecret, code)) {
-            return Mono.error(new ServerWebInputException("Invalid TOTP code"));
+            return Mono.error(new UnsatisfiedAttributeValueException("problemDetail.user.twoFactor.code.invalid"));
         }
         return Mono.empty();
     }

@@ -56,7 +56,7 @@ class PluginAutoConfigurationTest {
     void shouldServeConsoleAssets() {
         webClient
                 .get()
-                .uri("/plugins/fake-plugin/assets/console/main.js")
+                .uri("/plugins/fake-plugin/assets/console/main.js?v=plugin-version")
                 .exchange()
                 .expectStatus()
                 .isOk()

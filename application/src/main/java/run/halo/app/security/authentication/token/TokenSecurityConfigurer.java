@@ -13,6 +13,7 @@ import org.springframework.security.web.server.authentication.AuthenticationWebF
 import org.springframework.security.web.server.authentication.ServerAuthenticationEntryPointFailureHandler;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
+import run.halo.app.core.user.service.RoleService;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.security.authentication.CryptoService;
 import run.halo.app.security.authentication.SecurityConfigurer;
@@ -27,11 +28,13 @@ class TokenSecurityConfigurer implements SecurityConfigurer {
 
     private final ReactiveExtensionClient client;
 
+    private final RoleService roleService;
+
     @Override
     public void configure(ServerHttpSecurity http) {
         var jwtDecoder =
                 withJwkSource(signedJWT -> Flux.just(cryptoService.getJwk())).build();
-        var tokenAuthenticationManager = new TokenAuthenticationManager(client, jwtDecoder);
+        var tokenAuthenticationManager = new TokenAuthenticationManager(client, jwtDecoder, roleService);
 
         var entryPoint = new BearerTokenServerAuthenticationEntryPoint();
         var failureHandler = new ServerAuthenticationEntryPointFailureHandler(entryPoint);

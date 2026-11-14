@@ -252,7 +252,11 @@ watch(
 );
 
 // custom templates
-const { templates } = useThemeCustomTemplates("page");
+const {
+  templates,
+  isInitialLoading: templatesLoading,
+  isError: templatesError,
+} = useThemeCustomTemplates("page", () => formState.value.spec.template);
 
 // slug
 const { handleGenerateSlug } = useSlugify(
@@ -439,6 +443,7 @@ async function slugUniqueValidation(node: FormKitNode) {
             <FormKit
               v-model="formState.spec.template"
               :options="templates"
+              :disabled="templatesLoading || templatesError"
               :label="$t('core.page.settings.fields.template.label')"
               type="select"
               name="template"

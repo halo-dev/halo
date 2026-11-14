@@ -34,7 +34,10 @@ public class CommentRequest {
             minLength = 1)
     private String content;
 
-    @Schema(description = "Whether to subscribe the owner to notifications for future replies.", defaultValue = "false")
+    @Schema(
+            description =
+                    "Whether to notify the owner of future replies. Only an explicit false disables notifications.",
+            defaultValue = "true")
     private Boolean allowNotification;
 
     @Schema(description = "Whether the comment should be hidden from normal display.", defaultValue = "false")

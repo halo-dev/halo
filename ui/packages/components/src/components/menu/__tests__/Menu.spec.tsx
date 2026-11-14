@@ -7,7 +7,9 @@ describe("Menu", () => {
     expect(VMenu).toBeDefined();
     expect(VMenuItem).toBeDefined();
     expect(mount(VMenu).html()).toMatchSnapshot();
-    expect(mount(VMenuItem).html()).toMatchSnapshot();
+    expect(
+      mount(VMenuItem, { global: { stubs: { Transition: false } } }).html()
+    ).toMatchSnapshot();
   });
 
   // fixme: fix this test
@@ -51,19 +53,22 @@ describe("Menu", () => {
   });
 
   it("should work with openIds prop", function () {
-    const wrapper = mount({
-      setup() {
-        return () => (
-          <VMenu openIds={["3"]}>
-            <VMenuItem id="1" title="Menu Item 1" />
-            <VMenuItem id="2" title="Menu Item 2" />
-            <VMenuItem id="3" title="Menu Item 3">
-              <VMenuItem key="4" title="Menu Item 4" />
-            </VMenuItem>
-          </VMenu>
-        );
+    const wrapper = mount(
+      {
+        setup() {
+          return () => (
+            <VMenu openIds={["3"]}>
+              <VMenuItem id="1" title="Menu Item 1" />
+              <VMenuItem id="2" title="Menu Item 2" />
+              <VMenuItem id="3" title="Menu Item 3">
+                <VMenuItem key="4" title="Menu Item 4" />
+              </VMenuItem>
+            </VMenu>
+          );
+        },
       },
-    });
+      { global: { stubs: { Transition: false } } }
+    );
 
     expect(wrapper.html()).toMatchSnapshot();
 

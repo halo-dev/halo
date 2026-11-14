@@ -24,6 +24,7 @@ import { computed, ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import { useContentProviderExtensionPoint } from "../composables/use-content-provider-extension-point";
 import { useSubjectRef } from "../composables/use-subject-ref";
+import CommentEditingModal from "./CommentEditingModal.vue";
 import CommentEditor from "./CommentEditor.vue";
 import OwnerButton from "./OwnerButton.vue";
 
@@ -58,6 +59,7 @@ const creationTime = computed(() => {
 
 const editorContent = ref("");
 const editorCharacterCount = ref(0);
+const hidden = ref(false);
 
 function onCommentEditorUpdate(value: {
   content: string;
@@ -91,6 +93,7 @@ async function handleApprove() {
         raw: editorContent.value,
         content: editorContent.value,
         allowNotification: true,
+        hidden: hidden.value,
         quoteReply: props.reply.reply.metadata.name,
       },
     });
@@ -109,6 +112,9 @@ const websiteOfAnonymous = computed(() => {
 });
 
 const { data: contentProvider } = useContentProviderExtensionPoint();
+
+const commentEditingModalVisible = ref(false);
+const replyEditingModalVisible = ref(false);
 </script>
 <template>
   <VModal
@@ -174,8 +180,8 @@ const { data: contentProvider } = useContentProviderExtensionPoint();
               {{ subjectRefResult.title }}
             </RouterLink>
             <a
-              v-if="subjectRefResult.externalUrl"
-              :href="subjectRefResult.externalUrl"
+              v-if="reply.permalink || subjectRefResult.externalUrl"
+              :href="reply.permalink || subjectRefResult.externalUrl"
               target="_blank"
               class="text-gray-600 hover:text-gray-900"
             >
@@ -196,11 +202,24 @@ const { data: contentProvider } = useContentProviderExtensionPoint();
             :is="contentProvider?.component"
             :content="comment.comment.spec.content"
           />
+          <HasPermission :permissions="['system:comments:manage']">
+            <div
+              v-if="!comment.comment.metadata.deletionTimestamp"
+              class="mt-2"
+            >
+              <VButton size="sm" @click="commentEditingModalVisible = true">
+                {{ $t("core.common.buttons.edit") }}
+              </VButton>
+            </div>
+          </HasPermission>
         </VDescriptionItem>
         <VDescriptionItem
           :label="$t('core.comment.reply_detail_modal.fields.content')"
         >
-          <div v-if="reply.reply.spec.hidden" class="mb-2">
+          <div
+            v-if="reply.reply.spec.hidden || comment.comment.spec.hidden"
+            class="mb-2"
+          >
             <VTag>
               {{ $t("core.comment.list.fields.private") }}
             </VTag>
@@ -223,12 +242,26 @@ const { data: contentProvider } = useContentProviderExtensionPoint();
               :content="reply?.reply.spec.content"
             />
           </div>
+          <HasPermission :permissions="['system:comments:manage']">
+            <div v-if="!reply.reply.metadata.deletionTimestamp" class="mt-2">
+              <VButton size="sm" @click="replyEditingModalVisible = true">
+                {{ $t("core.common.buttons.edit") }}
+              </VButton>
+            </div>
+          </HasPermission>
         </VDescriptionItem>
         <VDescriptionItem
           v-if="!reply.reply.spec.approved"
           :label="$t('core.comment.detail_modal.fields.new_reply')"
         >
           <CommentEditor @update="onCommentEditorUpdate" />
+          <FormKit
+            v-model="hidden"
+            type="checkbox"
+            :label="$t('core.comment.reply_modal.fields.private.label')"
+            :help="$t('core.comment.reply_modal.fields.private.help')"
+            outer-class="mt-3"
+          />
         </VDescriptionItem>
       </VDescription>
     </div>
@@ -251,6 +284,18 @@ const { data: contentProvider } = useContentProviderExtensionPoint();
       </VSpace>
     </template>
   </VModal>
+
+  <CommentEditingModal
+    v-if="commentEditingModalVisible"
+    :target="comment.comment"
+    @close="commentEditingModalVisible = false"
+  />
+
+  <CommentEditingModal
+    v-if="replyEditingModalVisible"
+    :target="reply.reply"
+    @close="replyEditingModalVisible = false"
+  />
 </template>
 
 <style scoped>

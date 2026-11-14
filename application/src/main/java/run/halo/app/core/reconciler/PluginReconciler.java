@@ -33,7 +33,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +41,7 @@ import org.pf4j.PluginState;
 import org.pf4j.PluginWrapper;
 import org.pf4j.RuntimeMode;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -56,6 +56,7 @@ import run.halo.app.core.extension.Setting;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ExtensionUtil;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.Unstructured;
@@ -69,12 +70,14 @@ import run.halo.app.infra.ConditionList;
 import run.halo.app.infra.ConditionStatus;
 import run.halo.app.infra.utils.PathUtils;
 import run.halo.app.infra.utils.SettingUtils;
+import run.halo.app.infra.utils.VersionUtils;
 import run.halo.app.infra.utils.YamlUnstructuredLoader;
 import run.halo.app.plugin.OptionalDependentResolver;
 import run.halo.app.plugin.PluginConst;
 import run.halo.app.plugin.PluginProperties;
 import run.halo.app.plugin.PluginService;
 import run.halo.app.plugin.SpringPluginManager;
+import run.halo.app.plugin.YamlPluginFinder;
 import run.halo.app.plugin.resources.BundleResourceUtils;
 
 /**
@@ -295,21 +298,65 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
             log.info("Deleting plugin {} in plugin manager.", pluginName);
             var deleted = pluginManager.deletePlugin(pluginName);
             if (!deleted) {
-                log.warn("Failed to delete plugin {}", pluginName);
+                throw new RequeueException(
+                        Result.requeue(Duration.ofSeconds(10)),
+                        "Failed to delete plugin " + pluginName + " in plugin manager");
             }
+        }
+        // Clean up orphaned JARs (historical leftovers from failed upgrades/uninstalls)
+        cleanUpOrphanedJars(pluginName);
+    }
+
+    private void cleanUpOrphanedJars(String pluginName) {
+        var prefix = pluginName + "-";
+        for (var pluginRoot : pluginManager.getPluginsRoots()) {
+            if (!Files.exists(pluginRoot)) {
+                continue;
+            }
+            try (var files = Files.list(pluginRoot)) {
+                files.filter(f -> {
+                            var fn = f.getFileName().toString();
+                            return fn.startsWith(prefix) && fn.endsWith(".jar");
+                        })
+                        .forEach(jar -> {
+                            var name = readPluginNameFromJar(jar);
+                            if (pluginName.equals(name)) {
+                                try {
+                                    log.info("Deleting orphaned plugin JAR {}", jar);
+                                    Files.deleteIfExists(jar);
+                                } catch (IOException e) {
+                                    throw new RequeueException(
+                                            Result.requeue(Duration.ofSeconds(10)),
+                                            "Failed to delete orphaned JAR " + jar + " for plugin " + pluginName);
+                                }
+                            }
+                        });
+            } catch (IOException e) {
+                log.warn("Failed to list plugins directory {} for cleanup", pluginRoot, e);
+            }
+        }
+    }
+
+    private String readPluginNameFromJar(Path jarPath) {
+        try {
+            // YamlPluginFinder properly closes the zip FileSystem opened for the JAR.
+            return new YamlPluginFinder().find(jarPath).getMetadata().getName();
+        } catch (Exception e) {
+            log.warn("Failed to read manifest from {}", jarPath, e);
+            return null;
         }
     }
 
     private Result enablePlugin(Plugin plugin) {
         // start the plugin
         var pluginName = plugin.getMetadata().getName();
-        log.info("Starting plugin {}", pluginName);
         var status = plugin.getStatus();
+        var conditions = status.getConditions();
+        log.info("Starting plugin {}", pluginName);
 
         // check if the parent plugin is started
         var unstartedDependencies = pluginService.getRequiredDependencies(
                 plugin, pw -> pw == null || !PluginState.STARTED.equals(pw.getPluginState()));
-        var conditions = status.getConditions();
         if (!CollectionUtils.isEmpty(unstartedDependencies)) {
             removeConditionBy(conditions, ConditionType.READY);
             conditions.addAndEvictFIFO(Condition.builder()
@@ -401,6 +448,29 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
             log.debug("Plugin {} is starting...", pluginName);
         }
         return Result.requeue(Duration.ofSeconds(2));
+    }
+
+    private Result checkRequiresVersion(Plugin plugin) {
+        var pluginName = plugin.getMetadata().getName();
+        var status = plugin.getStatus();
+        var conditions = status.getConditions();
+        var systemVersion = pluginManager.getSystemVersion();
+        var requires = plugin.getSpec().getRequires();
+        if (!VersionUtils.satisfiesRequires(systemVersion, requires)) {
+            removeConditionBy(conditions, ConditionType.PROGRESSING);
+            conditions.addAndEvictFIFO(Condition.builder()
+                    .type(ConditionType.READY)
+                    .status(ConditionStatus.FALSE)
+                    .reason(ConditionReason.UNSATISFIED_REQUIRES_VERSION)
+                    .message("Plugin requires Halo version [%s], but the current version is [%s]."
+                            .formatted(requires, systemVersion))
+                    .lastTransitionTime(clock.instant())
+                    .build());
+            status.setPhase(Plugin.Phase.FAILED);
+            removeStartTaskIfPresent(pluginName);
+            return Result.doNotRetry();
+        }
+        return null;
     }
 
     void requestToReloadPluginsOptionallyDependentOn(String pluginName) {
@@ -603,6 +673,13 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
 
             if (requestToReload) {
                 removeRequestToReload(plugin);
+            }
+        }
+
+        if (requestToEnable(plugin)) {
+            var result = checkRequiresVersion(plugin);
+            if (result != null) {
+                return result;
             }
         }
 
@@ -908,13 +985,12 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
 
     private void cancelUnloadRequest(String pluginName) {
         // remove label REQUEST_TO_UNLOAD_LABEL
-        // TODO Use index mechanism
-        Predicate<Plugin> filter = aplugin -> {
-            var labels = aplugin.getMetadata().getLabels();
-            return labels != null && pluginName.equals(labels.get(REQUEST_TO_UNLOAD_LABEL));
-        };
-
-        client.list(Plugin.class, filter, null).forEach(aplugin -> {
+        var listOptions = ListOptions.builder()
+                .labelSelector()
+                .eq(REQUEST_TO_UNLOAD_LABEL, pluginName)
+                .end()
+                .build();
+        client.listAll(Plugin.class, listOptions, Sort.unsorted()).forEach(aplugin -> {
             var labels = aplugin.getMetadata().getLabels();
             if (labels != null && labels.remove(REQUEST_TO_UNLOAD_LABEL) != null) {
                 client.update(aplugin);
@@ -958,5 +1034,7 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
         public static final String DISABLE_ERROR = "DisableError";
         public static final String INVALID_RUNTIME_MODE = "InvalidRuntimeMode";
         public static final String PLUGIN_PATH_NOT_SET = "PluginPathNotSet";
+
+        public static final String UNSATISFIED_REQUIRES_VERSION = "UnsatisfiedRequiresVersion";
     }
 }

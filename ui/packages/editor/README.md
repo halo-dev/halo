@@ -50,6 +50,11 @@ onMounted(() => {
 - Vue 3.5.x or higher
 - Halo plugin environment
 
+## Extension development
+
+- [Editor extensions, toolbar items, and keyboard shortcuts](./docs/extension.md)
+- [Editor extension runtime metadata](./docs/runtime-metadata.md)
+
 ## Links
 
 - [Halo](https://github.com/halo-dev/halo)

@@ -18,7 +18,7 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
   {
     id: "core:post:stats",
     component: markRaw(PostStatsWidget),
-    group: "core.dashboard.widgets.groups.post",
+    group: /* @x18n-key */ "core.dashboard.widgets.groups.post",
     configFormKitSchema: () => [
       {
         $formkit: "checkbox",
@@ -41,7 +41,7 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
   {
     id: "core:post:recent-published",
     component: markRaw(RecentPublishedWidget),
-    group: "core.dashboard.widgets.groups.post",
+    group: /* @x18n-key */ "core.dashboard.widgets.groups.post",
     defaultConfig: {},
     defaultSize: {
       w: 6,
@@ -54,7 +54,7 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
   {
     id: "core:singlepage:stats",
     component: markRaw(SinglePageStatsWidget),
-    group: "core.dashboard.widgets.groups.page",
+    group: /* @x18n-key */ "core.dashboard.widgets.groups.page",
     configFormKitSchema: () => [
       {
         $formkit: "checkbox",
@@ -78,7 +78,7 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
   {
     id: "core:comment:stats",
     component: markRaw(CommentStatsWidget),
-    group: "core.dashboard.widgets.groups.comment",
+    group: /* @x18n-key */ "core.dashboard.widgets.groups.comment",
     configFormKitSchema: () => [
       {
         $formkit: "checkbox",
@@ -102,7 +102,7 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
   {
     id: "core:comment:pending",
     component: markRaw(PendingCommentsWidget),
-    group: "core.dashboard.widgets.groups.comment",
+    group: /* @x18n-key */ "core.dashboard.widgets.groups.comment",
     defaultConfig: {},
     defaultSize: {
       w: 6,
@@ -115,7 +115,7 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
   {
     id: "core:user:stats",
     component: markRaw(UserStatsWidget),
-    group: "core.dashboard.widgets.groups.user",
+    group: /* @x18n-key */ "core.dashboard.widgets.groups.user",
     configFormKitSchema: () => [
       {
         $formkit: "checkbox",
@@ -138,7 +138,7 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
   {
     id: "core:view:stats",
     component: markRaw(ViewsStatsWidget),
-    group: "core.dashboard.widgets.groups.other",
+    group: /* @x18n-key */ "core.dashboard.widgets.groups.other",
     configFormKitSchema: () => [
       {
         $formkit: "checkbox",
@@ -161,7 +161,7 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
   {
     id: "core:upvotes:stats",
     component: markRaw(UpvotesStatsWidget),
-    group: "core.dashboard.widgets.groups.other",
+    group: /* @x18n-key */ "core.dashboard.widgets.groups.other",
     configFormKitSchema: () => [
       {
         $formkit: "checkbox",
@@ -184,7 +184,7 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
   {
     id: "core:quick-action",
     component: markRaw(QuickActionWidget),
-    group: "core.dashboard.widgets.groups.other",
+    group: /* @x18n-key */ "core.dashboard.widgets.groups.other",
     defaultConfig: {
       enabled_items: [
         "core:user-center",
@@ -208,7 +208,7 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
   {
     id: "core:notifications",
     component: markRaw(NotificationWidget),
-    group: "core.dashboard.widgets.groups.other",
+    group: /* @x18n-key */ "core.dashboard.widgets.groups.other",
     defaultConfig: {},
     defaultSize: {
       w: 6,
@@ -220,7 +220,7 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
   {
     id: "core:stack",
     component: markRaw(StackWidget),
-    group: "core.dashboard.widgets.groups.other",
+    group: /* @x18n-key */ "core.dashboard.widgets.groups.other",
     defaultConfig: {},
     defaultSize: {
       w: 6,
@@ -232,7 +232,7 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
   {
     id: "core:iframe",
     component: markRaw(IframeWidget),
-    group: "core.dashboard.widgets.groups.other",
+    group: /* @x18n-key */ "core.dashboard.widgets.groups.other",
     configFormKitSchema: () => [
       {
         $formkit: "text",
