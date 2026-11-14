@@ -53,8 +53,7 @@ class IndicesReadinessTest {
     @Test
     void markBuildingShouldThrowForUnknownType() {
         var manager = new DefaultIndicesManager();
-        assertThatThrownBy(() -> manager.markBuilding(FakeExt.class))
-                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> manager.markBuilding(FakeExt.class)).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -76,8 +75,7 @@ class IndicesReadinessTest {
         manager.markBuilding(FakeExt.class);
         manager.setReadyTimeout(Duration.ofMillis(100));
         // still building: await must time out rather than see the previous cycle's readiness
-        assertThatThrownBy(() -> manager.awaitReady(FakeExt.class))
-                .isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(() -> manager.awaitReady(FakeExt.class)).isInstanceOf(IllegalStateException.class);
     }
 
     @Test

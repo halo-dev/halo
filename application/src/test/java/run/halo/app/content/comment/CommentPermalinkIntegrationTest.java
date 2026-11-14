@@ -137,7 +137,8 @@ class CommentPermalinkIntegrationTest {
                 storeClient.delete(name, stored.getVersion()).block();
                 // the raw store delete above bypasses the extension client, so the in-memory
                 // indices and their version manifest must be maintained explicitly
-                indexEngine.deleteByName(extension.getClass(), extension.getMetadata().getName());
+                indexEngine.deleteByName(
+                        extension.getClass(), extension.getMetadata().getName());
             }
         }
     }
