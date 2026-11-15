@@ -1,93 +1,251 @@
 package run.halo.app.extension.index;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.Optional;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.time.Duration;
+import java.util.HexFormat;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.SmartLifecycle;
+import org.springframework.context.event.EventListener;
 import run.halo.app.extension.Extension;
-import run.halo.app.infra.properties.HaloProperties;
+import run.halo.app.extension.ExtensionStoreUtil;
+import run.halo.app.extension.Scheme;
+import run.halo.app.extension.SchemeManager;
+import run.halo.app.extension.store.ExtensionStore;
+import run.halo.app.extension.store.ExtensionStoreRepository;
+import run.halo.app.infra.InitializationPhase;
+import run.halo.app.plugin.SpringPluginManager;
 
-/**
- * Persists and loads index snapshots under {@code <work-dir>/indices/}. All failures are logged and degraded to a full
- * index rebuild; nothing here may break startup or shutdown.
- *
- * <p>Registered explicitly as a bean in {@code ExtensionConfiguration} instead of component scanning, so that sliced
- * test contexts scanning this package do not require {@link HaloProperties}.
- *
- * @since 2.26.0
- */
+/** Per-resource-type disposable cache shared by Halo and plugin lifecycles. */
 @Slf4j
-public class IndexSnapshotManager {
+public class IndexSnapshotManager implements ApplicationContextAware, SmartLifecycle {
+    /** Also excludes the legacy whole-application checkpoint from backups. */
+    public static final String CHECKPOINT_PREFIX = "/system/index-snapshot";
 
-    private final Path snapshotDir;
+    private static final String TYPE_CHECKPOINT_PREFIX = CHECKPOINT_PREFIX + "s/";
+    // Bump when shared index semantics change. Individual index functions use ValueIndexSpec.version.
+    static final String ENGINE_VERSION = "1";
+    private static final Duration TIMEOUT = Duration.ofSeconds(30);
 
-    public IndexSnapshotManager(HaloProperties haloProperties) {
-        this(haloProperties.getWorkDir().resolve("indices"));
+    private final Path directory;
+    private final ExtensionStoreRepository repository;
+    private final IndexSnapshotWriteBarrier writes;
+    private final IndexEngine engine;
+    private final ObjectProvider<SchemeManager> schemes;
+    private ApplicationContext applicationContext;
+    private boolean ready;
+    private volatile boolean running;
+    private final ObjectProvider<SpringPluginManager> plugins;
+
+    public IndexSnapshotManager(
+            Path workDir,
+            ExtensionStoreRepository repository,
+            IndexSnapshotWriteBarrier writes,
+            IndexEngine engine,
+            ObjectProvider<SchemeManager> schemes,
+            ObjectProvider<SpringPluginManager> plugins) {
+        this.directory = workDir.resolve("indices").resolve("snapshots");
+        this.repository = repository;
+        this.writes = writes;
+        this.engine = engine;
+        this.schemes = schemes;
+        this.plugins = plugins;
     }
 
-    /** Also usable in tests with an arbitrary directory. */
-    public IndexSnapshotManager(Path snapshotDir) {
-        this.snapshotDir = snapshotDir;
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
     }
 
-    public void save(Class<? extends Extension> type, IndicesSnapshot snapshot) {
-        var file = snapshotFile(type);
-        var tempFile = file.resolveSibling(file.getFileName() + ".tmp");
+    @EventListener(ApplicationReadyEvent.class)
+    public void onApplicationEvent(ApplicationEvent event) {
+        if (event instanceof ApplicationReadyEvent started && started.getApplicationContext() == applicationContext) {
+            ready = true;
+        }
+    }
+
+    @Override
+    public void start() {
+        running = true;
+    }
+
+    @Override
+    public boolean isRunning() {
+        return running;
+    }
+
+    @Override
+    public int getPhase() {
+        // Spring stops higher phases first. Keep plugin contexts, schemes, indices and storage alive.
+        return InitializationPhase.CONTROLLERS.getPhase() - 1;
+    }
+
+    @Override
+    public void stop() {
         try {
-            Files.createDirectories(snapshotDir);
-            try (OutputStream out = Files.newOutputStream(tempFile)) {
-                IndexSnapshotCodec.write(snapshot, out);
+            if (ready) {
+                var manager = plugins.getIfAvailable();
+                if (manager != null) {
+                    manager.stopPlugins();
+                }
+                saveOnShutdown();
             }
-            moveAtomically(tempFile, file);
-        } catch (Exception e) {
-            log.error("Failed to save index snapshot for type {}", type.getName(), e);
-            try {
-                Files.deleteIfExists(tempFile);
-            } catch (IOException ignored) {
-                // ignore cleanup failure
-            }
+        } finally {
+            running = false;
         }
     }
 
-    public Optional<IndicesSnapshot> load(Class<? extends Extension> type) {
-        var file = snapshotFile(type);
-        if (!Files.exists(file)) {
-            return Optional.empty();
+    /** Called with the scheme registration lock held, before exposing the new indices. */
+    public void initialize(Scheme scheme, Runnable rebuild) {
+        var prefix = ExtensionStoreUtil.buildStoreNamePrefix(scheme);
+        withFrozen(prefix, () -> {
+            var saved = repository.findById(checkpointName(prefix)).block(TIMEOUT);
+            // Must commit before restoring OR rebuilding: a crash must never leave the old cache authorized.
+            repository.deleteById(checkpointName(prefix)).block(TIMEOUT);
+            if (writes.isReusable(prefix) && saved != null && restore(scheme, saved)) {
+                log.info(
+                        "Restored indices for type {} from clean shutdown snapshot",
+                        scheme.type().getName());
+            } else {
+                rebuild.run();
+            }
+            writes.initialized(prefix);
+        });
+    }
+
+    private boolean restore(Scheme scheme, ExtensionStore saved) {
+        var parts = new String(saved.getData(), StandardCharsets.UTF_8).split("\n", 2);
+        if (parts.length != 2 || !identity(scheme).equals(parts[0])) {
+            return false;
         }
-        try (InputStream in = Files.newInputStream(file)) {
-            return Optional.of(IndexSnapshotCodec.read(in));
+        try (var in = Files.newInputStream(snapshotFile(scheme.type()))) {
+            var snapshot = IndexSnapshotCodec.read(in);
+            return parts[1].equals(snapshot.checkpoint())
+                    && engine.getIndicesManager().get(scheme.type()).restore(snapshot);
         } catch (RuntimeException | IOException e) {
             log.warn(
-                    "Index snapshot for type {} is corrupted ({}), falling back to full build",
-                    type.getName(),
-                    e.getMessage());
-            try {
-                Files.deleteIfExists(file);
-            } catch (IOException ignored) {
-                // ignore cleanup failure
-            }
-            return Optional.empty();
+                    "Cannot restore snapshot for {}; rebuilding indices",
+                    scheme.type().getName(),
+                    e);
+            return false;
         }
     }
 
-    /**
-     * Some file systems (e.g. moving across stores) do not support {@link StandardCopyOption#ATOMIC_MOVE}; fall back to
-     * a regular move instead of dropping the snapshot.
-     */
-    private static void moveAtomically(Path tempFile, Path file) throws IOException {
+    /** Keep the gate held until indices are removed, so late writers cannot escape snapshot invalidation. */
+    public void unregister(Scheme scheme, Runnable remove) {
+        var prefix = ExtensionStoreUtil.buildStoreNamePrefix(scheme);
+        withFrozen(prefix, () -> {
+            save(scheme, prefix);
+            remove.run();
+        });
+    }
+
+    void saveOnShutdown() {
+        var manager = schemes.getObject();
+        synchronized (manager) {
+            for (var scheme : manager.schemes()) {
+                var prefix = ExtensionStoreUtil.buildStoreNamePrefix(scheme);
+                try {
+                    withFrozen(prefix, () -> save(scheme, prefix));
+                } catch (RuntimeException e) {
+                    log.warn(
+                            "Could not capture index snapshot for {}",
+                            scheme.type().getName(),
+                            e);
+                }
+            }
+        }
+    }
+
+    private void save(Scheme scheme, String prefix) {
+        if (!writes.isInitialized(prefix) || !writes.isReusable(prefix)) {
+            log.info("Skipping index snapshot for {}: {}", scheme.type().getName(), writes.reason(prefix));
+            return;
+        }
+        // Root capture may be followed by SchemeInitializer unregistration. Without intervening
+        // writes the published generation is already current; do not replace its file/token again.
+        if (writes.hasCheckpoint(prefix)) {
+            return;
+        }
         try {
-            Files.move(tempFile, file, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
-        } catch (AtomicMoveNotSupportedException e) {
-            Files.move(tempFile, file, StandardCopyOption.REPLACE_EXISTING);
+            var token = UUID.randomUUID().toString();
+            var data = engine.getIndicesManager().get(scheme.type()).dump();
+            write(scheme.type(), new IndicesSnapshot(token, data.indices()));
+            // Recheck global invalidation (e.g. a concurrent backup restoration) before publishing.
+            if (!writes.isReusable(prefix)) {
+                return;
+            }
+            repository
+                    .save(new ExtensionStore(
+                            checkpointName(prefix), (identity(scheme) + "\n" + token).getBytes(StandardCharsets.UTF_8)))
+                    .block(TIMEOUT);
+            writes.saved(prefix);
+            log.info(
+                    "Saved clean shutdown index snapshot checkpoint for {}",
+                    scheme.type().getName());
+        } catch (Exception e) {
+            writes.invalidate(prefix, "snapshot persistence failed");
+            log.warn(
+                    "Failed to save index snapshot for {}; next startup will rebuild",
+                    scheme.type().getName(),
+                    e);
+        }
+    }
+
+    private void withFrozen(String prefix, Runnable operation) {
+        try (var ignored = writes.freeze(prefix, TIMEOUT)) {
+            operation.run();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            writes.invalidate(prefix, "interrupted while draining writes");
+            throw new IllegalStateException("Interrupted index lifecycle for " + prefix, e);
+        } catch (RuntimeException e) {
+            writes.invalidate(prefix, "index lifecycle failed");
+            throw e;
+        }
+    }
+
+    private static String identity(Scheme scheme) {
+        return ENGINE_VERSION + "|" + scheme.type().getName() + "|" + scheme.groupVersionKind();
+    }
+
+    static String checkpointName(String prefix) {
+        try {
+            return TYPE_CHECKPOINT_PREFIX
+                    + HexFormat.of()
+                            .formatHex(MessageDigest.getInstance("SHA-256")
+                                    .digest(prefix.getBytes(StandardCharsets.UTF_8)));
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private void write(Class<? extends Extension> type, IndicesSnapshot snapshot) throws IOException {
+        Files.createDirectories(directory);
+        var file = snapshotFile(type);
+        var temporary = file.resolveSibling(file.getFileName() + ".tmp");
+        try {
+            try (var out = Files.newOutputStream(temporary)) {
+                IndexSnapshotCodec.write(snapshot, out);
+            }
+            Files.move(temporary, file, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+        } finally {
+            Files.deleteIfExists(temporary);
         }
     }
 
     private Path snapshotFile(Class<? extends Extension> type) {
-        return snapshotDir.resolve(type.getName() + ".snapshot.gz");
+        return directory.resolve(type.getName() + ".snapshot.gz");
     }
 }

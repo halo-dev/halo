@@ -5,11 +5,8 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -29,8 +26,6 @@ class DefaultIndices<E extends Extension> implements Indices<E> {
     private final Map<String, Index<E, ?>> indexMap;
 
     private final Cache<String, ReadWriteLock> lockCache;
-
-    private final ConcurrentMap<String, Long> versionMap = new ConcurrentHashMap<>();
 
     private volatile boolean closed;
 
@@ -61,45 +56,19 @@ class DefaultIndices<E extends Extension> implements Indices<E> {
         ensureNotClosed();
         // get primary key
         var primaryKey = extension.getMetadata().getName();
-        var version = extension.getMetadata().getVersion();
-        // the stale-version guard passes trivially for genuine creates (no recorded version) and skips
-        // deferred inserts that are older than an already-applied update
-        applyAll(extension, Index::prepareInsert, primaryKey, version, false, true);
-    }
-
-    @Override
-    public void update(E extension) {
-        ensureNotClosed();
-        var primaryKey = extension.getMetadata().getName();
-        var version = extension.getMetadata().getVersion();
-        // the stale-version guard is checked under the per-primary-key write lock inside
-        // applyAll, so that check-and-act is atomic
-        applyAll(extension, Index::prepareUpdate, primaryKey, version, false, true);
-    }
-
-    @Override
-    public void delete(E extension) {
-        ensureNotClosed();
-        var primaryKey = extension.getMetadata().getName();
-        applyAll(extension, (index, ext) -> index.prepareDelete(primaryKey), primaryKey, null, true, false);
-    }
-
-    @Override
-    public void deleteByName(String primaryKey) {
-        ensureNotClosed();
         var lock = Objects.requireNonNull(lockCache.get(primaryKey, pk -> new ReentrantReadWriteLock()))
                 .writeLock();
         var ops = new ArrayList<TransactionalOperation>();
         lock.lock();
         try {
             for (var index : indexMap.values()) {
-                var op = index.prepareDelete(primaryKey);
+                var op = index.prepareInsert(extension);
                 op.prepare();
                 ops.add(op);
             }
             ops.forEach(TransactionalOperation::commit);
-            versionMap.remove(primaryKey);
         } catch (Exception e) {
+            log.warn("Failed to insert extension {} and trying to rollback", primaryKey, e);
             ops.forEach(TransactionalOperation::rollback);
             throw e;
         } finally {
@@ -108,29 +77,45 @@ class DefaultIndices<E extends Extension> implements Indices<E> {
     }
 
     @Override
-    public void updateIndices(E extension, Set<String> indexNames) {
+    public void update(E extension) {
         ensureNotClosed();
         var primaryKey = extension.getMetadata().getName();
         var lock = Objects.requireNonNull(lockCache.get(primaryKey, pk -> new ReentrantReadWriteLock()))
                 .writeLock();
-        var ops = new ArrayList<TransactionalOperation>();
+        var updaters = new ArrayList<TransactionalOperation>();
         lock.lock();
         try {
             for (var index : indexMap.values()) {
-                if (!indexNames.contains(index.getName())) {
-                    continue;
-                }
-                var op = index.prepareUpdate(extension);
-                op.prepare();
-                ops.add(op);
+                var updater = index.prepareUpdate(extension);
+                updater.prepare();
+                updaters.add(updater);
             }
-            ops.forEach(TransactionalOperation::commit);
-            var version = extension.getMetadata().getVersion();
-            if (version != null) {
-                versionMap.put(primaryKey, version);
-            }
+            updaters.forEach(TransactionalOperation::commit);
         } catch (Exception e) {
-            ops.forEach(TransactionalOperation::rollback);
+            updaters.forEach(TransactionalOperation::rollback);
+            throw e;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @Override
+    public void delete(E extension) {
+        ensureNotClosed();
+        var primaryKey = extension.getMetadata().getName();
+        var lock = Objects.requireNonNull(lockCache.get(primaryKey, pk -> new ReentrantReadWriteLock()))
+                .writeLock();
+        var updaters = new ArrayList<TransactionalOperation>();
+        lock.lock();
+        try {
+            for (var index : indexMap.values()) {
+                var updater = index.prepareDelete(primaryKey);
+                updater.prepare();
+                updaters.add(updater);
+            }
+            updaters.forEach(TransactionalOperation::commit);
+        } catch (Exception e) {
+            updaters.forEach(TransactionalOperation::rollback);
             throw e;
         } finally {
             lock.unlock();
@@ -139,29 +124,33 @@ class DefaultIndices<E extends Extension> implements Indices<E> {
 
     @Override
     public IndicesSnapshot dump() {
-        // Capture the manifest BEFORE dumping indices: a torn dump then always satisfies
-        // "manifest version <= index content", which delta recovery can only over-fetch from.
-        var versions = Map.copyOf(versionMap);
-        var snapshots = indexMap.values().stream().map(Index::dump).toList();
-        return new IndicesSnapshot(snapshots, versions);
+        return new IndicesSnapshot(indexMap.values().stream().map(Index::dump).toList());
     }
 
     @Override
-    public void restore(IndicesSnapshot snapshot) {
-        for (var indexSnapshot : snapshot.indices()) {
-            var index = indexMap.get(indexSnapshot.name());
-            if (index != null) {
-                index.restore(indexSnapshot);
-            }
+    public boolean restore(IndicesSnapshot snapshot) {
+        var fingerprints = new HashMap<String, String>();
+        snapshot.indices().forEach(index -> fingerprints.put(index.name(), index.fingerprint()));
+        if (snapshot.indices().size() != indexMap.size() || !fingerprints.equals(currentFingerprints())) {
+            return false;
         }
-        versionMap.putAll(snapshot.versions());
+        try {
+            for (var snapshotIndex : snapshot.indices()) {
+                indexMap.get(snapshotIndex.name()).restore(snapshotIndex);
+            }
+            return true;
+        } catch (RuntimeException e) {
+            // A failed decode may have restored part of an index. Full rebuild must start empty.
+            indexMap.values().forEach(IOUtils::closeQuietly);
+            log.warn("Failed to restore index snapshot; rebuilding all indices", e);
+            return false;
+        }
     }
 
-    @Override
-    public Map<String, String> currentFingerprints() {
-        var result = new LinkedHashMap<String, String>();
-        indexMap.values().forEach(index -> result.put(index.getName(), index.getFingerprint()));
-        return result;
+    private Map<String, String> currentFingerprints() {
+        var fingerprints = new HashMap<String, String>();
+        indexMap.values().forEach(index -> fingerprints.put(index.getName(), index.getFingerprint()));
+        return fingerprints;
     }
 
     @Override
@@ -172,46 +161,6 @@ class DefaultIndices<E extends Extension> implements Indices<E> {
             throw new IllegalArgumentException("No index found with name: " + indexName);
         }
         return index;
-    }
-
-    private void applyAll(
-            E extension,
-            BiFunction<Index<E, ?>, E, TransactionalOperation> opFactory,
-            String primaryKey,
-            Long version,
-            boolean deletion,
-            boolean staleGuard) {
-        var lock = Objects.requireNonNull(lockCache.get(primaryKey, pk -> new ReentrantReadWriteLock()))
-                .writeLock();
-        var ops = new ArrayList<TransactionalOperation>();
-        lock.lock();
-        try {
-            if (staleGuard) {
-                var recorded = versionMap.get(primaryKey);
-                if (version != null && recorded != null && version < recorded) {
-                    // stale update, skip it entirely
-                    return;
-                }
-            }
-            for (var index : indexMap.values()) {
-                var op = opFactory.apply(index, extension);
-                op.prepare();
-                ops.add(op);
-            }
-            ops.forEach(TransactionalOperation::commit);
-            // the version manifest is updated only after the index entries have committed
-            if (deletion) {
-                versionMap.remove(primaryKey);
-            } else if (version != null) {
-                versionMap.put(primaryKey, version);
-            }
-        } catch (Exception e) {
-            log.warn("Failed to apply index operation for {} and trying to rollback", primaryKey, e);
-            ops.forEach(TransactionalOperation::rollback);
-            throw e;
-        } finally {
-            lock.unlock();
-        }
     }
 
     private void ensureNotClosed() {

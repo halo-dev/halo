@@ -25,11 +25,22 @@ class ReactiveExtensionStoreClientImplTest {
     @Mock
     ExtensionStoreRepository repository;
 
+    @org.mockito.Spy
+    run.halo.app.extension.index.IndexSnapshotWriteBarrier snapshotWrites =
+            new run.halo.app.extension.index.IndexSnapshotWriteBarrier();
+
     @Mock
     R2dbcEntityOperations entityOperations;
 
     @InjectMocks
     ReactiveExtensionStoreClientImpl client;
+
+    @org.junit.jupiter.api.BeforeEach
+    void checkpointRepository() {
+        org.mockito.Mockito.lenient()
+                .when(repository.deleteAllById(org.mockito.ArgumentMatchers.<Iterable<String>>any()))
+                .thenReturn(Mono.empty());
+    }
 
     @Test
     void listByNamePrefix() {

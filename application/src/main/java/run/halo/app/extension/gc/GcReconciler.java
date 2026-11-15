@@ -11,14 +11,16 @@ import org.springframework.transaction.ReactiveTransactionManager;
 import org.springframework.transaction.reactive.TransactionalOperator;
 import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Scheduler;
+import reactor.core.scheduler.Schedulers;
 import run.halo.app.extension.Extension;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ExtensionConverter;
-import run.halo.app.extension.IndexOperationRegistrar;
 import run.halo.app.extension.SchemeManager;
 import run.halo.app.extension.controller.*;
 import run.halo.app.extension.event.SchemeAddedEvent;
 import run.halo.app.extension.index.IndexEngine;
+import run.halo.app.extension.index.IndexSnapshotWriteBarrier;
 import run.halo.app.extension.store.ReactiveExtensionStoreClient;
 
 @Slf4j
@@ -41,7 +43,7 @@ class GcReconciler implements Reconciler<GcRequest> {
 
     private final ReactiveTransactionManager transactionManager;
 
-    private final IndexOperationRegistrar indexOperationRegistrar;
+    private Scheduler scheduler;
 
     GcReconciler(
             ExtensionClient client,
@@ -49,17 +51,16 @@ class GcReconciler implements Reconciler<GcRequest> {
             ExtensionConverter converter,
             SchemeManager schemeManager,
             IndexEngine indexEngine,
-            ReactiveTransactionManager transactionManager,
-            IndexOperationRegistrar indexOperationRegistrar) {
+            ReactiveTransactionManager transactionManager) {
         this.client = client;
         this.storeClient = storeClient;
         this.converter = converter;
         this.indexEngine = indexEngine;
         this.transactionManager = transactionManager;
-        this.indexOperationRegistrar = indexOperationRegistrar;
         this.queue = new DefaultQueue<>(Instant::now, Duration.ofMillis(500));
         this.synchronizer = new GcSynchronizer(client, queue, schemeManager);
         this.schemeManager = schemeManager;
+        this.scheduler = Schedulers.boundedElastic();
     }
 
     @Override
@@ -78,8 +79,10 @@ class GcReconciler implements Reconciler<GcRequest> {
 
         return storeClient
                 .delete(extensionStore.getName(), extensionStore.getVersion())
-                .flatMap(deleted -> indexOperationRegistrar.afterCommit(() -> indexEngine.delete(List.of(extension))))
+                .flatMap(deleted -> Mono.fromRunnable(() -> indexEngine.delete(List.of(extension)))
+                        .subscribeOn(this.scheduler))
                 .as(tx::transactional)
+                .contextWrite(context -> context.put(IndexSnapshotWriteBarrier.INDEXED_WRITE, true))
                 .then()
                 .doOnSuccess(ignored -> log.info(
                         "Extension {}/{} was deleted",

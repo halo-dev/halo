@@ -37,7 +37,7 @@ public enum SharedApplicationContextFactory {
     public static ApplicationContext create(ApplicationContext rootContext) {
         // TODO Optimize creation timing
         var sharedContext = new GenericApplicationContext();
-        sharedContext.registerShutdownHook();
+        // Closed by the root plugin manager after all plugin contexts have stopped.
 
         var beanFactory = sharedContext.getBeanFactory();
 

@@ -7,9 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -17,10 +15,9 @@ import java.util.zip.GZIPOutputStream;
  * Binary (GZIP-compressed) codec for {@link IndicesSnapshot}. Layout:
  *
  * <pre>
- * 4B magic 'HAIS' | 4B formatVersion
+ * 4B magic 'HAIS' | 4B formatVersion | UTF checkpoint
  * 4B indexCount | per index: UTF name, UTF fingerprint, UTF keyType,
  *     4B nullKeyCount + UTF*, 4B entryCount + per entry: 4B keyPartCount + UTF*, 4B pkCount + UTF*
- * 4B versionCount | per entry: UTF name, 8B version
  * </pre>
  *
  * @since 2.26.0
@@ -29,7 +26,7 @@ final class IndexSnapshotCodec {
 
     private static final int MAGIC = 0x48414953; // 'HAIS'
 
-    private static final int FORMAT_VERSION = 1;
+    private static final int FORMAT_VERSION = 2;
 
     /** Upper bound for every count field; anything larger is treated as corruption instead of allocated. */
     private static final int MAX_COUNT = 1 << 24; // 16_777_216
@@ -40,6 +37,7 @@ final class IndexSnapshotCodec {
         try (var data = new DataOutputStream(new GZIPOutputStream(out))) {
             data.writeInt(MAGIC);
             data.writeInt(FORMAT_VERSION);
+            data.writeUTF(snapshot.checkpoint());
             data.writeInt(snapshot.indices().size());
             for (var index : snapshot.indices()) {
                 data.writeUTF(index.name());
@@ -61,11 +59,6 @@ final class IndexSnapshotCodec {
                     }
                 }
             }
-            data.writeInt(snapshot.versions().size());
-            for (var versionEntry : snapshot.versions().entrySet()) {
-                data.writeUTF(versionEntry.getKey());
-                data.writeLong(versionEntry.getValue());
-            }
         }
     }
 
@@ -77,6 +70,7 @@ final class IndexSnapshotCodec {
             if (data.readInt() != FORMAT_VERSION) {
                 throw new IndexSnapshotCorruptedException("Unsupported format version");
             }
+            var checkpoint = data.readUTF();
             var indexCount = readCount(data);
             var indices = new ArrayList<IndexSnapshot>(indexCount);
             for (var i = 0; i < indexCount; i++) {
@@ -105,12 +99,11 @@ final class IndexSnapshotCodec {
                 }
                 indices.add(new IndexSnapshot(name, fingerprint, keyType, List.copyOf(entries), List.copyOf(nullKeys)));
             }
-            var versionCount = readCount(data);
-            var versions = new LinkedHashMap<String, Long>(versionCount);
-            for (var i = 0; i < versionCount; i++) {
-                versions.put(data.readUTF(), data.readLong());
+            // Read through the GZIP trailer to verify CRC and reject trailing payload.
+            if (data.read() != -1) {
+                throw new IndexSnapshotCorruptedException("Trailing snapshot data");
             }
-            return new IndicesSnapshot(List.copyOf(indices), Map.copyOf(versions));
+            return new IndicesSnapshot(checkpoint, List.copyOf(indices));
         } catch (IndexSnapshotCorruptedException e) {
             throw e;
         } catch (EOFException e) {

@@ -2,13 +2,9 @@ package run.halo.app.extension;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,10 +16,7 @@ import run.halo.app.extension.event.SchemeAddedEvent;
 import run.halo.app.extension.event.SchemeRemovedEvent;
 import run.halo.app.extension.exception.SchemeNotFoundException;
 import run.halo.app.extension.index.IndexEngine;
-import run.halo.app.extension.index.IndexSnapshotManager;
-import run.halo.app.extension.index.Indices;
 import run.halo.app.extension.index.IndicesManager;
-import run.halo.app.extension.index.IndicesSnapshot;
 
 @ExtendWith(MockitoExtension.class)
 class DefaultSchemeManagerTest {
@@ -38,7 +31,11 @@ class DefaultSchemeManagerTest {
     ApplicationEventPublisher eventPublisher;
 
     @Mock
-    IndexSnapshotManager snapshotManager;
+    run.halo.app.extension.index.IndexSnapshotManager snapshots;
+
+    @Mock
+    org.springframework.beans.factory.ObjectProvider<run.halo.app.extension.index.IndexSnapshotManager>
+            snapshotProvider;
 
     @InjectMocks
     DefaultSchemeManager schemeManager;
@@ -46,10 +43,14 @@ class DefaultSchemeManagerTest {
     @BeforeEach
     void setUp() {
         lenient().when(indexEngine.getIndicesManager()).thenReturn(indicesManager);
-        @SuppressWarnings("unchecked")
-        Indices<FakeExtension> indices = mock(Indices.class);
-        lenient().when(indices.dump()).thenReturn(new IndicesSnapshot(List.of(), Map.of()));
-        lenient().when(indicesManager.get(any())).thenAnswer(invocation -> indices);
+        lenient().when(snapshotProvider.getObject()).thenReturn(snapshots);
+        org.mockito.Mockito.lenient()
+                .doAnswer(call -> {
+                    call.getArgument(1, Runnable.class).run();
+                    return null;
+                })
+                .when(snapshots)
+                .unregister(any(), any());
     }
 
     @Test
@@ -89,28 +90,6 @@ class DefaultSchemeManagerTest {
         assertNotNull(scheme);
 
         schemeManager.unregister(scheme);
-        assertThrows(SchemeNotFoundException.class, () -> schemeManager.get(FakeExtension.class));
-    }
-
-    @Test
-    void shouldSaveSnapshotOnUnregister() {
-        schemeManager.register(FakeExtension.class);
-        var scheme = schemeManager.get(FakeExtension.class);
-
-        schemeManager.unregister(scheme);
-
-        verify(snapshotManager).save(eq(FakeExtension.class), any(IndicesSnapshot.class));
-    }
-
-    @Test
-    void unregisterShouldSucceedEvenIfSnapshotSaveFails() {
-        doThrow(new RuntimeException("disk full")).when(snapshotManager).save(any(), any());
-        schemeManager.register(FakeExtension.class);
-        var scheme = schemeManager.get(FakeExtension.class);
-
-        schemeManager.unregister(scheme);
-
-        verify(eventPublisher).publishEvent(isA(SchemeRemovedEvent.class));
         assertThrows(SchemeNotFoundException.class, () -> schemeManager.get(FakeExtension.class));
     }
 

@@ -38,7 +38,12 @@ class IndexKeyCodecTest {
 
     enum TestVisibility {
         PUBLIC,
-        PRIVATE
+        PRIVATE;
+
+        @Override
+        public String toString() {
+            return "display-" + name();
+        }
     }
 
     @Test

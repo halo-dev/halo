@@ -26,6 +26,7 @@ import reactor.core.scheduler.Schedulers;
 import reactor.util.retry.Retry;
 import run.halo.app.extension.exception.ExtensionNotFoundException;
 import run.halo.app.extension.index.IndexEngine;
+import run.halo.app.extension.index.IndexSnapshotWriteBarrier;
 import run.halo.app.extension.index.IndexedQueryEngine;
 import run.halo.app.extension.store.ReactiveExtensionStoreClient;
 
@@ -49,8 +50,6 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient, Dis
 
     private final IndexEngine indexEngine;
 
-    private final IndexOperationRegistrar indexOperationRegistrar;
-
     private Scheduler scheduler;
 
     // Keep index query computation isolated from the shared boundedElastic pool. Callers may
@@ -66,14 +65,12 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient, Dis
             SchemeManager schemeManager,
             ObjectMapper objectMapper,
             IndexEngine indexEngine,
-            ReactiveTransactionManager reactiveTransactionManager,
-            IndexOperationRegistrar indexOperationRegistrar) {
+            ReactiveTransactionManager reactiveTransactionManager) {
         this.client = client;
         this.converter = converter;
         this.schemeManager = schemeManager;
         this.objectMapper = objectMapper;
         this.indexEngine = indexEngine;
-        this.indexOperationRegistrar = indexOperationRegistrar;
         this.transactionalOperator = TransactionalOperator.create(reactiveTransactionManager);
         this.scheduler = Schedulers.boundedElastic();
         this.queryScheduler = Schedulers.newBoundedElastic(
@@ -405,10 +402,13 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient, Dis
             var type = (Class<E>) oldExtension.getClass();
             return client.create(name, data)
                     .map(created -> converter.convertFrom(type, created))
-                    .flatMap(extension -> indexOperationRegistrar
-                            .afterCommit(() -> this.indexEngine.insert(List.of(convertToRealExtension(extension))))
-                            .thenReturn(extension))
-                    .as(transactionalOperator::transactional);
+                    .flatMap(extension -> Mono.fromCallable(() -> {
+                                this.indexEngine.insert(List.of(convertToRealExtension(extension)));
+                                return extension;
+                            })
+                            .subscribeOn(this.scheduler))
+                    .as(transactionalOperator::transactional)
+                    .contextWrite(context -> context.put(IndexSnapshotWriteBarrier.INDEXED_WRITE, true));
         });
     }
 
@@ -428,10 +428,13 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient, Dis
             var type = (Class<E>) oldExtension.getClass();
             return client.update(name, version, data)
                     .map(updated -> converter.convertFrom(type, updated))
-                    .flatMap(extension -> indexOperationRegistrar
-                            .afterCommit(() -> this.indexEngine.update(List.of(convertToRealExtension(extension))))
-                            .thenReturn(extension))
-                    .as(transactionalOperator::transactional);
+                    .flatMap(extension -> Mono.fromCallable(() -> {
+                                this.indexEngine.update(List.of(convertToRealExtension(extension)));
+                                return extension;
+                            })
+                            .subscribeOn(this.scheduler))
+                    .as(transactionalOperator::transactional)
+                    .contextWrite(context -> context.put(IndexSnapshotWriteBarrier.INDEXED_WRITE, true));
         });
     }
 

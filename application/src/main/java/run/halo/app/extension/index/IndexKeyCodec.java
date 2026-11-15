@@ -16,7 +16,7 @@ final class IndexKeyCodec {
         if (key instanceof Instant instant) {
             return instant.toString();
         }
-        return key.toString();
+        return key instanceof Enum<?> value ? value.name() : key.toString();
     }
 
     @SuppressWarnings("unchecked")

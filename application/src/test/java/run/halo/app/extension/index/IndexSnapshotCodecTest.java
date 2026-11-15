@@ -8,7 +8,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.zip.GZIPOutputStream;
 import org.junit.jupiter.api.Test;
 
@@ -16,23 +15,21 @@ class IndexSnapshotCodecTest {
 
     @Test
     void shouldRoundTrip() throws Exception {
-        var snapshot = new IndicesSnapshot(
-                List.of(
-                        new IndexSnapshot(
-                                "spec.slug",
-                                "fp-1",
-                                "java.lang.String",
-                                List.of(
-                                        new IndexSnapshot.Entry(List.of("hello"), List.of("p1", "p2")),
-                                        new IndexSnapshot.Entry(List.of("world"), List.of("p3"))),
-                                List.of("p4")),
-                        new IndexSnapshot(
-                                "metadata.labels",
-                                "label-fp",
-                                "label",
-                                List.of(new IndexSnapshot.Entry(List.of("app", "halo"), List.of("p1"))),
-                                List.of())),
-                Map.of("p1", 1L, "p2", 2L, "p3", 7L, "p4", 9L));
+        var snapshot = new IndicesSnapshot(List.of(
+                new IndexSnapshot(
+                        "spec.slug",
+                        "fp-1",
+                        "java.lang.String",
+                        List.of(
+                                new IndexSnapshot.Entry(List.of("hello"), List.of("p1", "p2")),
+                                new IndexSnapshot.Entry(List.of("world"), List.of("p3"))),
+                        List.of("p4")),
+                new IndexSnapshot(
+                        "metadata.labels",
+                        "label-fp",
+                        "label",
+                        List.of(new IndexSnapshot.Entry(List.of("app", "halo"), List.of("p1"))),
+                        List.of())));
 
         var out = new ByteArrayOutputStream();
         IndexSnapshotCodec.write(snapshot, out);
@@ -50,12 +47,22 @@ class IndexSnapshotCodecTest {
 
     @Test
     void shouldRejectTruncatedStream() throws Exception {
-        var snapshot = new IndicesSnapshot(List.of(), Map.of("a", 1L));
+        var snapshot = new IndicesSnapshot("checkpoint", List.of());
         var out = new ByteArrayOutputStream();
         IndexSnapshotCodec.write(snapshot, out);
         var truncated = new byte[out.size() / 2];
         System.arraycopy(out.toByteArray(), 0, truncated, 0, truncated.length);
         assertThatThrownBy(() -> IndexSnapshotCodec.read(new ByteArrayInputStream(truncated)))
+                .isInstanceOf(IndexSnapshotCorruptedException.class);
+    }
+
+    @Test
+    void shouldValidateGzipTrailer() throws Exception {
+        var out = new ByteArrayOutputStream();
+        IndexSnapshotCodec.write(new IndicesSnapshot("checkpoint", List.of()), out);
+        var bytes = out.toByteArray();
+        bytes[bytes.length - 1] ^= 1;
+        assertThatThrownBy(() -> IndexSnapshotCodec.read(new ByteArrayInputStream(bytes)))
                 .isInstanceOf(IndexSnapshotCorruptedException.class);
     }
 
@@ -80,7 +87,8 @@ class IndexSnapshotCodecTest {
         var out = new ByteArrayOutputStream();
         try (var data = new DataOutputStream(new GZIPOutputStream(out))) {
             data.writeInt(0x48414953); // magic 'HAIS'
-            data.writeInt(1); // format version
+            data.writeInt(2); // format version
+            data.writeUTF("checkpoint");
             data.writeInt(indexCount);
         }
         return out.toByteArray();

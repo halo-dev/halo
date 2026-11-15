@@ -44,11 +44,6 @@ public class ExtensionStoreClientJPAImpl implements ExtensionStoreClient {
     }
 
     @Override
-    public List<NameVersion> listNameVersionsByNamePrefix(String prefix) {
-        return storeClient.listNameVersionsByNamePrefix(prefix).collectList().block(TIMEOUT);
-    }
-
-    @Override
     public Optional<ExtensionStore> fetchByName(String name) {
         return storeClient.fetchByName(name).blockOptional(TIMEOUT);
     }

@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -17,7 +17,6 @@ import run.halo.app.extension.index.IndexSnapshotManager;
 import run.halo.app.extension.index.IndexSpecs;
 import run.halo.app.extension.index.ValueIndexSpec;
 
-@Slf4j
 @Component
 public class DefaultSchemeManager implements SchemeManager {
 
@@ -25,22 +24,24 @@ public class DefaultSchemeManager implements SchemeManager {
 
     private final IndexEngine indexEngine;
 
+    private final ObjectProvider<IndexSnapshotManager> snapshots;
+
     private final ApplicationEventPublisher eventPublisher;
 
-    private final IndexSnapshotManager snapshotManager;
-
     public DefaultSchemeManager(
-            IndexEngine indexEngine, ApplicationEventPublisher eventPublisher, IndexSnapshotManager snapshotManager) {
+            IndexEngine indexEngine,
+            ApplicationEventPublisher eventPublisher,
+            ObjectProvider<IndexSnapshotManager> snapshots) {
+        this.snapshots = snapshots;
         this.indexEngine = indexEngine;
         this.eventPublisher = eventPublisher;
-        this.snapshotManager = snapshotManager;
         // we have to use CopyOnWriteArrayList at here to prevent concurrent modification between
         // registering and listing.
         schemes = new CopyOnWriteArrayList<>();
     }
 
     @Override
-    public <E extends Extension> void register(Class<E> type, Consumer<IndexSpecs<E>> specsConsumer) {
+    public synchronized <E extends Extension> void register(Class<E> type, Consumer<IndexSpecs<E>> specsConsumer) {
         var scheme = Scheme.buildFromType(type);
         if (schemes.contains(scheme)) {
             return;
@@ -55,21 +56,13 @@ public class DefaultSchemeManager implements SchemeManager {
     }
 
     @Override
-    public void unregister(Scheme scheme) {
+    public synchronized void unregister(Scheme scheme) {
         if (schemes.contains(scheme)) {
-            saveIndexSnapshot(scheme);
-            indexEngine.getIndicesManager().remove(scheme.type());
-            schemes.remove(scheme);
+            snapshots.getObject().unregister(scheme, () -> {
+                indexEngine.getIndicesManager().remove(scheme.type());
+                schemes.remove(scheme);
+            });
             eventPublisher.publishEvent(new SchemeRemovedEvent(this, scheme));
-        }
-    }
-
-    private void saveIndexSnapshot(Scheme scheme) {
-        try {
-            var indices = indexEngine.getIndicesManager().get(scheme.type());
-            snapshotManager.save(scheme.type(), indices.dump());
-        } catch (Exception e) {
-            log.error("Failed to save index snapshot for type {}", scheme.type().getName(), e);
         }
     }
 

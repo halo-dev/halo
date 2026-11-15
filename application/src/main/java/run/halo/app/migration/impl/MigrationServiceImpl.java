@@ -46,6 +46,8 @@ import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 import run.halo.app.extension.ExtensionStoreUtil;
 import run.halo.app.extension.Scheme;
+import run.halo.app.extension.index.IndexSnapshotManager;
+import run.halo.app.extension.index.IndexSnapshotWriteBarrier;
 import run.halo.app.extension.store.ExtensionStore;
 import run.halo.app.extension.store.ExtensionStoreRepository;
 import run.halo.app.infra.BackupRootGetter;
@@ -68,6 +70,8 @@ class MigrationServiceImpl implements MigrationService, InitializingBean {
             ExtensionStoreUtil.buildStoreNamePrefix(Scheme.buildFromType(Backup.class)) + "/";
 
     private final ExtensionStoreRepository repository;
+
+    private final IndexSnapshotWriteBarrier snapshotWrites;
 
     private final HaloProperties haloProperties;
 
@@ -150,21 +154,23 @@ class MigrationServiceImpl implements MigrationService, InitializingBean {
     @Override
     public Mono<Void> restore(Publisher<DataBuffer> content) {
         var tx = TransactionalOperator.create(txManager);
-        return Mono.usingWhen(
-                createTempDir("halo-restore-", scheduler),
-                tempDir -> unpackBackup(content, tempDir)
-                        .then(Mono.defer(() ->
-                                // This step skips index verification such as unique index.
-                                // In order to avoid index conflicts after recovery or
-                                // OptimisticLockingFailureException when updating the same record,
-                                // so we need to truncate all extension stores before saving(create or
-                                // update).
-                                repository
-                                        .deleteAll()
-                                        .then(restoreExtensions(tempDir))
-                                        .as(tx::transactional)))
-                        .then(Mono.defer(() -> restoreWorkdir(tempDir))),
-                tempDir -> deleteRecursivelyAndSilently(tempDir, scheduler));
+        return snapshotWrites
+                .invalidateAll()
+                .then(Mono.defer(() -> Mono.usingWhen(
+                        createTempDir("halo-restore-", scheduler),
+                        tempDir -> unpackBackup(content, tempDir)
+                                .then(Mono.defer(() ->
+                                        // This step skips index verification such as unique index.
+                                        // In order to avoid index conflicts after recovery or
+                                        // OptimisticLockingFailureException when updating the same record,
+                                        // so we need to truncate all extension stores before saving(create or
+                                        // update).
+                                        repository
+                                                .deleteAll()
+                                                .then(restoreExtensions(tempDir))
+                                                .as(tx::transactional)))
+                                .then(Mono.defer(() -> restoreWorkdir(tempDir))),
+                        tempDir -> deleteRecursivelyAndSilently(tempDir, scheduler))));
     }
 
     @Override
@@ -372,6 +378,7 @@ class MigrationServiceImpl implements MigrationService, InitializingBean {
     }
 
     private static boolean isInBlocklist(ExtensionStore store) {
-        return store.getName().startsWith(BACKUP_STORE_PREFIX);
+        return store.getName().startsWith(BACKUP_STORE_PREFIX)
+                || store.getName().startsWith(IndexSnapshotManager.CHECKPOINT_PREFIX);
     }
 }
