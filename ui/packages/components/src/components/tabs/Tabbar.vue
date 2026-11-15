@@ -1,6 +1,13 @@
 <script lang="ts" setup>
 import { useElementSize, useEventListener } from "@vueuse/core";
-import { computed, nextTick, shallowRef, useTemplateRef, watch } from "vue";
+import {
+  computed,
+  inject,
+  nextTick,
+  shallowRef,
+  useTemplateRef,
+  watch,
+} from "vue";
 import { IconArrowLeft, IconArrowRight } from "../../icons/icons";
 import type { TabsDirection, TabsType } from "./types";
 
@@ -64,6 +71,16 @@ const activeIndex = computed(() => {
     props.items?.findIndex((item) => item[props.idKey] === props.activeId) ?? -1
   );
 });
+
+const tabsId = inject<string | undefined>("tabsId", undefined);
+
+function getTabElementId(item: Record<string, string>) {
+  return tabsId ? `${tabsId}-tab-${item[props.idKey]}` : undefined;
+}
+
+function getPanelElementId(item: Record<string, string>) {
+  return tabsId ? `${tabsId}-panel-${item[props.idKey]}` : undefined;
+}
 
 const tabStopIndex = computed(() => {
   if (!props.items?.length) {
@@ -273,7 +290,9 @@ useEventListener(tabbarItemsRef, "wheel", handleHorizontalWheel, {
       >
         <div
           v-for="(item, index) in items"
+          :id="getTabElementId(item)"
           :key="item[idKey]"
+          :aria-controls="getPanelElementId(item)"
           :aria-selected="item[idKey] === activeId"
           :class="{ 'tabbar-item-active': item[idKey] === activeId }"
           :tabindex="index === tabStopIndex ? 0 : -1"

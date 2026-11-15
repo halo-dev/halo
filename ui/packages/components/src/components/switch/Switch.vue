@@ -1,33 +1,37 @@
 <script lang="ts" setup>
-import { computed, useAttrs } from "vue";
+import { useAttrs } from "vue";
 
 defineOptions({ inheritAttrs: false });
 
 const attrs = useAttrs();
 
-const controlAttrs = computed(() => {
+function isControlAttr(key: string) {
+  return key === "id" || key.startsWith("aria-");
+}
+
+function getControlAttrs() {
   const result: Record<string, unknown> = {};
 
   for (const [key, value] of Object.entries(attrs)) {
-    if (key === "id" || key.startsWith("aria-")) {
+    if (isControlAttr(key)) {
       result[key] = value;
     }
   }
 
   return result;
-});
+}
 
-const wrapperAttrs = computed(() => {
+function getWrapperAttrs() {
   const result: Record<string, unknown> = {};
 
   for (const [key, value] of Object.entries(attrs)) {
-    if (key !== "id" && !key.startsWith("aria-")) {
+    if (!isControlAttr(key)) {
       result[key] = value;
     }
   }
 
   return result;
-});
+}
 
 const props = withDefaults(
   defineProps<{
@@ -55,9 +59,9 @@ const handleChange = () => {
 };
 </script>
 <template>
-  <div class="switch-wrapper" v-bind="wrapperAttrs">
+  <div class="switch-wrapper" v-bind="getWrapperAttrs()">
     <button
-      v-bind="controlAttrs"
+      v-bind="getControlAttrs()"
       :aria-busy="loading ? 'true' : undefined"
       :class="{
         'bg-gray-200': !modelValue,

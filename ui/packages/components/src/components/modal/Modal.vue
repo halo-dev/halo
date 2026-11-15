@@ -105,12 +105,27 @@ function restoreFocus() {
   }
 }
 
+function hasNegativeTabIndex(element: HTMLElement) {
+  const tabindex = element.getAttribute("tabindex");
+
+  if (!tabindex) {
+    return false;
+  }
+
+  const match = /^[\t\n\f\r ]*([+-]?)(\d+)/.exec(tabindex);
+
+  return match?.[1] === "-" && Number(match[2]) > 0;
+}
+
 function getFocusableElements(container: HTMLElement) {
   return Array.from(
     container.querySelectorAll<HTMLElement>(
-      'a[href], area[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), iframe, object, embed, [contenteditable="true"], [tabindex]:not([tabindex="-1"])'
+      'a[href], area[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), summary, iframe, object, embed, [contenteditable="true"], [tabindex]'
     )
-  ).filter((element) => element.getClientRects().length > 0);
+  ).filter(
+    (element) =>
+      element.getClientRects().length > 0 && !hasNegativeTabIndex(element)
+  );
 }
 
 function handleTabKey(event: KeyboardEvent) {

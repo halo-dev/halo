@@ -55,8 +55,8 @@ function handleExpand() {
     class="menu-item group"
     tabindex="0"
     @click.stop="handleClick"
-    @keydown.enter.prevent="handleClick"
-    @keydown.space.prevent="handleClick"
+    @keydown.enter.stop.prevent="handleClick"
+    @keydown.space.stop.prevent="handleClick"
   >
     <div :class="{ active }" class="menu-item-title">
       <span v-if="$slots.icon" class="menu-icon mr-3 self-center">

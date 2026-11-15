@@ -85,6 +85,7 @@ const handleClose = () => {
 <template>
   <VModal
     :visible="visible"
+    :aria-label="title"
     :width="450"
     :layer-closable="false"
     :data-unique-id="uniqueId"

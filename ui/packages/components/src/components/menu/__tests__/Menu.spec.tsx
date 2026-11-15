@@ -52,6 +52,22 @@ describe("Menu", () => {
     ).toBe("display: none;");
   });
 
+  it("names the navigation landmark", () => {
+    const namedByProp = mount(VMenu, {
+      props: { ariaLabel: "Main menu" },
+    });
+    expect(
+      namedByProp.get('[role="navigation"]').attributes("aria-label")
+    ).toBe("Main menu");
+
+    const namedByAttr = mount(VMenu, {
+      attrs: { "aria-label": "Home" },
+    });
+    expect(
+      namedByAttr.get('[role="navigation"]').attributes("aria-label")
+    ).toBe("Home");
+  });
+
   it("should work with openIds prop", function () {
     const wrapper = mount(
       {

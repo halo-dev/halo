@@ -6,6 +6,10 @@ import { VModal } from "../index";
 
 enableAutoUnmount(afterEach);
 
+afterEach(() => {
+  vi.restoreAllMocks();
+});
+
 describe("Modal", () => {
   it("should render", () => {
     expect(VModal).toBeDefined();
@@ -22,6 +26,123 @@ describe("Modal", () => {
       expect(labelledby).toBeTruthy();
       expect(wrapper.get(`[id="${labelledby}"]`).text()).toBe("Hello Halo");
     });
+
+    it("keeps a native summary in the tab sequence", async () => {
+      vi.spyOn(HTMLElement.prototype, "getClientRects").mockReturnValue([
+        { width: 10, height: 10 },
+      ] as unknown as DOMRectList);
+
+      const wrapper = mount(VModal, {
+        attachTo: document.body,
+        props: { visible: false },
+        slots: {
+          default: `
+            <button id="before">Before</button>
+            <details>
+              <summary id="more">More</summary>
+              <div>Hidden content</div>
+            </details>
+          `,
+        },
+      });
+
+      await wrapper.setProps({ visible: true });
+      await nextTick();
+      await nextTick();
+
+      const before = document.getElementById("before") as HTMLButtonElement;
+      before.focus();
+
+      const event = new KeyboardEvent("keydown", {
+        key: "Tab",
+        bubbles: true,
+        cancelable: true,
+      });
+      before.dispatchEvent(event);
+
+      expect(event.defaultPrevented).toBe(false);
+    });
+
+    it.each(["-1", "-2", "-1x", "-1.5", " -2 "])(
+      "ignores a summary with tabindex %j in the tab order",
+      async (tabindex) => {
+        vi.spyOn(HTMLElement.prototype, "getClientRects").mockReturnValue([
+          { width: 10, height: 10 },
+        ] as unknown as DOMRectList);
+
+        const wrapper = mount(VModal, {
+          attachTo: document.body,
+          props: { visible: false },
+          slots: {
+            default: `
+              <button id="before">Before</button>
+              <details>
+                <summary id="more" tabindex="${tabindex}">More</summary>
+                <div>Hidden content</div>
+              </details>
+            `,
+          },
+        });
+
+        await wrapper.setProps({ visible: true });
+        await nextTick();
+        await nextTick();
+
+        const before = document.getElementById("before") as HTMLButtonElement;
+        before.focus();
+
+        const event = new KeyboardEvent("keydown", {
+          key: "Tab",
+          bubbles: true,
+          cancelable: true,
+        });
+        before.dispatchEvent(event);
+
+        expect(event.defaultPrevented).toBe(true);
+      }
+    );
+
+    it.each(["invalid", "", " -1", "-0"])(
+      "keeps a focusable element with tabindex %j in the tab sequence",
+      async (tabindex) => {
+        vi.spyOn(HTMLElement.prototype, "getClientRects").mockReturnValue([
+          { width: 10, height: 10 },
+        ] as unknown as DOMRectList);
+
+        const wrapper = mount(VModal, {
+          attachTo: document.body,
+          props: { visible: false },
+          slots: {
+            default: `
+              <button id="before">Before</button>
+              <div id="edit" contenteditable="true" tabindex="${tabindex}">Edit</div>
+            `,
+          },
+        });
+
+        await wrapper.setProps({ visible: true });
+        await nextTick();
+        await nextTick();
+
+        const edit = document.getElementById("edit") as HTMLElement;
+        Object.defineProperty(edit, "tabIndex", {
+          configurable: true,
+          get: () => -1,
+        });
+
+        const before = document.getElementById("before") as HTMLButtonElement;
+        before.focus();
+
+        const event = new KeyboardEvent("keydown", {
+          key: "Tab",
+          bubbles: true,
+          cancelable: true,
+        });
+        before.dispatchEvent(event);
+
+        expect(event.defaultPrevented).toBe(false);
+      }
+    );
 
     it("restores focus to the opener after closing", async () => {
       const opener = document.createElement("button");

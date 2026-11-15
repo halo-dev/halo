@@ -96,7 +96,7 @@ function handleSelectHome() {
               class="drawer__body"
               defer
             >
-              <VMenu class="!pb-1">
+              <VMenu aria-label="Home" class="!pb-1">
                 <VMenuItem
                   id="home"
                   :title="$t('core.sidebar.menu.items.home')"
@@ -107,7 +107,11 @@ function handleSelectHome() {
                   </template>
                 </VMenuItem>
               </VMenu>
-              <RoutesMenu :menus="menus" @select="moreMenuVisible = false" />
+              <RoutesMenu
+                aria-label="Main menu"
+                :menus="menus"
+                @select="moreMenuVisible = false"
+              />
             </OverlayScrollbarsComponent>
             <div class="drawer__footer">
               <UserProfileBanner :platform="platform" />

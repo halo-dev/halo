@@ -8,13 +8,32 @@ const props = defineProps<{
 }>();
 
 const activeId = inject<ComputedRef<string | number | undefined>>("activeId");
+const tabsId = inject<string | undefined>("tabsId", undefined);
 
 const isActive = computed(() => {
   return activeId?.value === props.id;
 });
+
+const tabId = computed(() => {
+  return tabsId && props.id !== undefined
+    ? `${tabsId}-tab-${props.id}`
+    : undefined;
+});
+
+const panelId = computed(() => {
+  return tabsId && props.id !== undefined
+    ? `${tabsId}-panel-${props.id}`
+    : undefined;
+});
 </script>
 <template>
-  <div v-if="isActive" class="tabs-item-wrapper" role="tabpanel">
+  <div
+    v-if="isActive"
+    :id="panelId"
+    :aria-labelledby="tabId"
+    class="tabs-item-wrapper"
+    role="tabpanel"
+  >
     <slot />
   </div>
 </template>
