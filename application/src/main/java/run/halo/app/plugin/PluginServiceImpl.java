@@ -128,14 +128,14 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
     }
 
     private Mono<Plugin> installPresetPlugin(PresetPlugin preset) {
-        return findPluginManifest(preset.path())
-                .flatMap(manifest -> this.install(manifest)
-                        // Reuse the parsed name: upstream cancellation can interrupt the
-                        // installation worker, so recovery must not reopen the archive.
-                        .onErrorResume(
-                                t -> t instanceof PluginAlreadyExistsException || t instanceof DuplicateNameException,
-                                e -> client.get(
-                                        Plugin.class, manifest.getMetadata().getName())))
+        return this.install(preset.path())
+                // The plugin may exist already when resuming an interrupted setup, or may be
+                // created concurrently by another setup request.
+                .onErrorResume(
+                        t -> t instanceof PluginAlreadyExistsException || t instanceof DuplicateNameException,
+                        e -> findPluginManifest(preset.path())
+                                .flatMap(plugin -> client.get(
+                                        Plugin.class, plugin.getMetadata().getName())))
                 .flatMap(plugin -> FileUtils.deleteFileSilently(preset.path()).thenReturn(plugin))
                 .flatMap(plugin -> preset.autoEnable() ? enablePlugin(plugin) : Mono.just(plugin));
     }
@@ -159,11 +159,7 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
 
     @Override
     public Mono<Plugin> install(Path path) {
-        return findPluginManifest(path).flatMap(this::install);
-    }
-
-    private Mono<Plugin> install(Plugin manifest) {
-        return Mono.just(manifest)
+        return findPluginManifest(path)
                 .doOnNext(plugin -> {
                     // validate the plugin version
                     satisfiesRequiresVersion(plugin);
