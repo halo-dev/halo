@@ -14,6 +14,29 @@ import org.junit.jupiter.api.Test;
 class IndexSnapshotCodecTest {
 
     @Test
+    void truncatedLargeCountsMustNotExhaustHeap() throws Exception {
+        var javaExecutable = java.nio.file.Path.of(System.getProperty("java.home"), "bin", "java")
+                .toString();
+        var classpath = java.util.stream.Stream.of(IndexSnapshotCodec.class, SnapshotCountProbe.class)
+                .map(type ->
+                        type.getProtectionDomain().getCodeSource().getLocation().getPath())
+                .collect(java.util.stream.Collectors.joining(java.io.File.pathSeparator));
+        var process = new ProcessBuilder(
+                        javaExecutable, "-Xmx32m", "-cp", classpath, SnapshotCountProbe.class.getName())
+                .redirectErrorStream(true)
+                .start();
+        try {
+            assertThat(process.waitFor(20, java.util.concurrent.TimeUnit.SECONDS))
+                    .isTrue();
+            var output = new String(process.getInputStream().readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
+            assertThat(process.exitValue()).as(output).isZero();
+            assertThat(output).contains("Rejected all five truncated counts");
+        } finally {
+            process.destroyForcibly();
+        }
+    }
+
+    @Test
     void shouldRoundTrip() throws Exception {
         var snapshot = new IndicesSnapshot(List.of(
                 new IndexSnapshot(
@@ -151,5 +174,42 @@ class IndexSnapshotCodecTest {
             data.writeInt(indexCount);
         }
         return out.toByteArray();
+    }
+}
+
+/** Standalone small-heap probe: depends only on the production codec and the JDK. */
+class SnapshotCountProbe {
+    public static void main(String[] args) throws Exception {
+        for (int field = 0; field < 5; field++) {
+            var bytes = new ByteArrayOutputStream();
+            try (var data = new DataOutputStream(new GZIPOutputStream(bytes))) {
+                data.writeInt(0x48414953);
+                data.writeInt(3);
+                data.writeInt(0); // checkpoint
+                if (field > 0) {
+                    data.writeInt(1); // index count
+                    data.writeInt(0); // name
+                    data.writeInt(0); // fingerprint
+                    data.writeInt(0); // key type
+                }
+                if (field > 1) {
+                    data.writeInt(0); // null keys
+                }
+                if (field > 2) {
+                    data.writeInt(1); // entries
+                }
+                if (field > 3) {
+                    data.writeInt(0); // key parts
+                }
+                data.writeInt(1 << 24);
+            }
+            try {
+                IndexSnapshotCodec.read(new ByteArrayInputStream(bytes.toByteArray()));
+                throw new AssertionError("Accepted truncated count " + field);
+            } catch (IndexSnapshotCorruptedException expected) {
+                // No array may be preallocated from an untrusted count before reading its contents.
+            }
+        }
+        System.out.println("Rejected all five truncated counts");
     }
 }

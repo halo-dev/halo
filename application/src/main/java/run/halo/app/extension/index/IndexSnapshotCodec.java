@@ -103,26 +103,27 @@ final class IndexSnapshotCodec {
             }
             var checkpoint = readString(data);
             var indexCount = readCount(data);
-            var indices = new ArrayList<IndexSnapshot>(indexCount);
+            // Counts are untrusted: grow with decoded data instead of allocating from the header.
+            var indices = new ArrayList<IndexSnapshot>(Math.min(indexCount, 1024));
             for (var i = 0; i < indexCount; i++) {
                 var name = readString(data);
                 var fingerprint = readString(data);
                 var keyType = readString(data);
                 var nullKeyCount = readCount(data);
-                var nullKeys = new ArrayList<String>(nullKeyCount);
+                var nullKeys = new ArrayList<String>(Math.min(nullKeyCount, 1024));
                 for (var j = 0; j < nullKeyCount; j++) {
                     nullKeys.add(readString(data));
                 }
                 var entryCount = readCount(data);
-                var entries = new ArrayList<IndexSnapshot.Entry>(entryCount);
+                var entries = new ArrayList<IndexSnapshot.Entry>(Math.min(entryCount, 1024));
                 for (var j = 0; j < entryCount; j++) {
                     var partCount = readCount(data);
-                    var keyParts = new ArrayList<String>(partCount);
+                    var keyParts = new ArrayList<String>(Math.min(partCount, 1024));
                     for (var k = 0; k < partCount; k++) {
                         keyParts.add(readString(data));
                     }
                     var pkCount = readCount(data);
-                    var primaryKeys = new ArrayList<String>(pkCount);
+                    var primaryKeys = new ArrayList<String>(Math.min(pkCount, 1024));
                     for (var k = 0; k < pkCount; k++) {
                         primaryKeys.add(readString(data));
                     }

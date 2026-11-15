@@ -410,6 +410,82 @@ class IndexSnapshotManagerTest {
         assertThat(next.scans).hasValue(2);
     }
 
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(
+            strings = {"missing", "empty", "truncated", "crc", "token", "tmp-only"})
+    void damagedCacheMustRepairItselfAndRestoreOnFollowingRestart(String damage) throws Exception {
+        var first = new Process();
+        first.start(PluginRecord.class);
+        first.stop(PluginRecord.class);
+        var file = workDir.resolve("indices/snapshots/" + PluginRecord.class.getName() + ".snapshot.gz");
+        var bytes = Files.readAllBytes(file);
+        switch (damage) {
+            case "missing" -> Files.delete(file);
+            case "empty" -> Files.write(file, new byte[0]);
+            case "truncated" -> Files.write(file, java.util.Arrays.copyOf(bytes, bytes.length / 2));
+            case "crc" -> {
+                bytes[bytes.length - 1] ^= 1;
+                Files.write(file, bytes);
+            }
+            case "token" -> {
+                var snapshot = IndexSnapshotCodec.read(new java.io.ByteArrayInputStream(bytes));
+                try (var output = Files.newOutputStream(file)) {
+                    IndexSnapshotCodec.write(new IndicesSnapshot("foreign", snapshot.indices()), output);
+                }
+            }
+            case "tmp-only" -> Files.move(file, file.resolveSibling(file.getFileName() + ".tmp"));
+            default -> throw new AssertionError(damage);
+        }
+        var recovery = new Process();
+        recovery.start(PluginRecord.class);
+        assertThat(recovery.scans).hasValue(1);
+        assertThat(recovery.query(PluginRecord.class, "plugin")).containsExactly("b");
+        recovery.stop(PluginRecord.class);
+        var warm = new Process();
+        warm.start(PluginRecord.class);
+        assertThat(warm.scans).hasValue(0);
+        assertThat(warm.query(PluginRecord.class, "plugin")).containsExactly("b");
+    }
+
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(strings = {"read-only", "symlink", "directory"})
+    void staleTemporaryPathMustNotPreventFutureSnapshotsOrOverwriteItsTarget(String kind) throws Exception {
+        var process = new Process();
+        process.start(PluginRecord.class);
+        var directory = workDir.resolve("indices/snapshots");
+        Files.createDirectories(directory);
+        var temporary = directory.resolve(PluginRecord.class.getName() + ".snapshot.gz.tmp");
+        var unrelated = workDir.resolve("unrelated.txt");
+        Files.writeString(unrelated, "must remain unchanged");
+        var abandoned = Files.createTempFile(directory, PluginRecord.class.getName() + ".snapshot.gz.", ".tmp");
+        Files.writeString(abandoned, "incomplete snapshot");
+        if (kind.equals("symlink")) {
+            Files.createSymbolicLink(temporary, unrelated);
+        } else if (kind.equals("directory")) {
+            Files.createDirectory(temporary);
+            Files.writeString(temporary.resolve("unrelated"), "keep");
+        } else {
+            Files.writeString(temporary, "abandoned");
+            Files.setPosixFilePermissions(
+                    temporary, java.nio.file.attribute.PosixFilePermissions.fromString("r--------"));
+        }
+        process.stop(PluginRecord.class);
+        assertThat(Files.readString(unrelated)).isEqualTo("must remain unchanged");
+        assertThat(abandoned).doesNotExist();
+        if (kind.equals("directory")) {
+            assertThat(Files.readString(temporary.resolve("unrelated"))).isEqualTo("keep");
+        } else {
+            assertThat(Files.exists(temporary, java.nio.file.LinkOption.NOFOLLOW_LINKS))
+                    .isFalse();
+        }
+        assertThat(repository.existsById(checkpoint(PluginRecord.class)).block())
+                .isTrue();
+        var next = new Process();
+        next.start(PluginRecord.class);
+        assertThat(next.scans).hasValue(0);
+        assertThat(next.query(PluginRecord.class, "plugin")).containsExactly("b");
+    }
+
     @Test
     void sharedEngineCompatibilityChangeMustRebuild() {
         var process = new Process();

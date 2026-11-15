@@ -3,6 +3,7 @@ package run.halo.app.extension.index;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.security.MessageDigest;
@@ -245,7 +246,21 @@ public class IndexSnapshotManager implements ApplicationContextAware, SmartLifec
     private void write(Class<? extends Extension> type, IndicesSnapshot snapshot) throws IOException {
         Files.createDirectories(directory);
         var file = snapshotFile(type);
-        var temporary = file.resolveSibling(file.getFileName() + ".tmp");
+        // A killed process can leave temporary files. Never reuse their paths or follow symlinks.
+        try (var leftovers = Files.newDirectoryStream(directory, file.getFileName() + "*.tmp")) {
+            for (var leftover : leftovers) {
+                if (Files.isRegularFile(leftover, LinkOption.NOFOLLOW_LINKS) || Files.isSymbolicLink(leftover)) {
+                    try {
+                        Files.deleteIfExists(leftover);
+                    } catch (IOException e) {
+                        log.debug("Cannot remove abandoned snapshot temporary file {}", leftover, e);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            log.debug("Cannot scan abandoned snapshot temporary files for {}", type.getName(), e);
+        }
+        var temporary = Files.createTempFile(directory, file.getFileName() + ".", ".tmp");
         try {
             try (var out = Files.newOutputStream(temporary)) {
                 IndexSnapshotCodec.write(snapshot, out);
