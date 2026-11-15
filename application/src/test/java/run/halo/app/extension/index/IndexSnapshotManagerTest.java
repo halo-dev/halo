@@ -417,7 +417,7 @@ class IndexSnapshotManagerTest {
         process.stop(PluginRecord.class);
         var marker = repository.findById(checkpoint(PluginRecord.class)).block();
         marker.setData(new String(marker.getData(), java.nio.charset.StandardCharsets.UTF_8)
-                .replaceFirst("^1\\|", "previous-engine|")
+                .replaceFirst("^[^|]+\\|", "previous-engine|")
                 .getBytes(java.nio.charset.StandardCharsets.UTF_8));
         repository.save(marker).block();
         process.start(PluginRecord.class);
@@ -610,6 +610,155 @@ class IndexSnapshotManagerTest {
         assertThat(repository.existsById(checkpoint(PluginRecord.class)).block())
                 .isTrue();
         assertThat(lifecycle.getPhase()).isLessThan(run.halo.app.infra.InitializationPhase.CONTROLLERS.getPhase());
+    }
+
+    @Test
+    void committedCheckpointWithLostAcknowledgementMustBeInvalidatedByNextWrite() {
+        var process = new Process();
+        process.start(PluginRecord.class);
+        var uncertain = org.mockito.Mockito.mock(
+                ExtensionStoreRepository.class, org.mockito.AdditionalAnswers.delegatesTo(repository));
+        doAnswer(call -> {
+                    ExtensionStore row = call.getArgument(0);
+                    var saved = repository.save(row);
+                    return row.getData().length == 0
+                            ? saved
+                            : saved.flatMap(
+                                    ignored -> Mono.error(new IllegalStateException("lost commit acknowledgement")));
+                })
+                .when(uncertain)
+                .save(any(ExtensionStore.class));
+        var manager = snapshotManager(process, uncertain);
+        manager.unregister(
+                Scheme.buildFromType(PluginRecord.class),
+                () -> process.engine.getIndicesManager().remove(PluginRecord.class));
+        assertThat(repository.existsById(checkpoint(PluginRecord.class)).block())
+                .isTrue();
+        dormantUpdate(process, "after-error");
+        assertThat(repository.existsById(checkpoint(PluginRecord.class)).block())
+                .isFalse();
+        var next = new Process();
+        next.start(PluginRecord.class);
+        assertThat(next.scans).hasValue(1);
+        assertThat(next.query(PluginRecord.class, "after-error")).containsExactly("b");
+        assertThat(next.query(PluginRecord.class, "plugin")).isEmpty();
+    }
+
+    @Test
+    void delayedPublicationMustNotRecreateCheckpointAfterAWrite() {
+        var process = new Process();
+        process.start(PluginRecord.class);
+        var delayed = new java.util.concurrent.atomic.AtomicReference<ExtensionStore>();
+        var uncertain = org.mockito.Mockito.mock(
+                ExtensionStoreRepository.class, org.mockito.AdditionalAnswers.delegatesTo(repository));
+        doAnswer(call -> {
+                    ExtensionStore row = call.getArgument(0);
+                    if (row.getData().length == 0) {
+                        return repository.save(row);
+                    }
+                    delayed.set(row);
+                    return Mono.error(new IllegalStateException("publication timed out before DB completion"));
+                })
+                .when(uncertain)
+                .save(any(ExtensionStore.class));
+        snapshotManager(process, uncertain)
+                .unregister(
+                        Scheme.buildFromType(PluginRecord.class),
+                        () -> process.engine.getIndicesManager().remove(PluginRecord.class));
+        dormantUpdate(process, "after-timeout");
+        assertThatThrownBy(() -> repository.save(delayed.get()).block())
+                .isInstanceOf(org.springframework.dao.OptimisticLockingFailureException.class);
+        assertThat(repository.existsById(checkpoint(PluginRecord.class)).block())
+                .isFalse();
+        var next = new Process();
+        next.start(PluginRecord.class);
+        assertThat(next.scans).hasValue(1);
+        assertThat(next.query(PluginRecord.class, "after-timeout")).containsExactly("b");
+    }
+
+    @Test
+    void lateReservationAfterAWriteMustNeverAuthorizeRestoration() {
+        var process = new Process();
+        process.start(PluginRecord.class);
+        var delayed = new java.util.concurrent.atomic.AtomicReference<ExtensionStore>();
+        var uncertain = org.mockito.Mockito.mock(
+                ExtensionStoreRepository.class, org.mockito.AdditionalAnswers.delegatesTo(repository));
+        doAnswer(call -> {
+                    delayed.set(call.getArgument(0));
+                    return Mono.error(new IllegalStateException("reservation timed out before DB completion"));
+                })
+                .when(uncertain)
+                .save(any(ExtensionStore.class));
+        snapshotManager(process, uncertain)
+                .unregister(
+                        Scheme.buildFromType(PluginRecord.class),
+                        () -> process.engine.getIndicesManager().remove(PluginRecord.class));
+        dormantUpdate(process, "after-reservation-timeout");
+        repository.save(delayed.get()).block();
+        var next = new Process();
+        next.start(PluginRecord.class);
+        assertThat(next.scans).hasValue(1);
+        assertThat(next.query(PluginRecord.class, "after-reservation-timeout")).containsExactly("b");
+        assertThat(next.query(PluginRecord.class, "plugin")).isEmpty();
+    }
+
+    @Test
+    void lateReservationAfterReinitializationMustNotPreventTheNextSnapshot() {
+        var process = new Process();
+        process.start(PluginRecord.class);
+        var delayed = new java.util.concurrent.atomic.AtomicReference<ExtensionStore>();
+        var uncertain = mock(ExtensionStoreRepository.class, org.mockito.AdditionalAnswers.delegatesTo(repository));
+        doAnswer(call -> {
+                    delayed.set(call.getArgument(0));
+                    return Mono.error(new IllegalStateException("reservation timed out"));
+                })
+                .when(uncertain)
+                .save(any(ExtensionStore.class));
+        var scheme = Scheme.buildFromType(PluginRecord.class);
+        snapshotManager(process, uncertain).unregister(scheme, () -> {
+            process.engine.getIndicesManager().remove(PluginRecord.class);
+            process.registered.remove(scheme);
+        });
+        process.start(PluginRecord.class);
+        repository.save(delayed.get()).block();
+        indexed(process.update(PluginRecord.class, "b", "latest")).block();
+        process.stop(PluginRecord.class);
+        var next = new Process();
+        next.start(PluginRecord.class);
+        assertThat(next.scans).hasValue(0);
+        assertThat(next.query(PluginRecord.class, "latest")).containsExactly("b");
+        assertThat(next.query(PluginRecord.class, "plugin")).isEmpty();
+    }
+
+    @Test
+    void longTextKeyShouldRecoverWithoutScanning() {
+        var process = new Process();
+        process.start(PluginRecord.class);
+        var text = "评论😀".repeat(30000);
+        indexed(process.update(PluginRecord.class, "b", text)).block();
+        process.stop(PluginRecord.class);
+        var next = new Process();
+        next.start(PluginRecord.class);
+        assertThat(next.scans).hasValue(0);
+        assertThat(next.query(PluginRecord.class, text)).containsExactly("b");
+    }
+
+    private void dormantUpdate(Process process, String value) {
+        var key = prefix(PluginRecord.class) + "/b";
+        var row = repository.findById(key).block();
+        process.store
+                .update(key, row.getVersion(), data(PluginRecord.class, "b", value))
+                .as(tx::transactional)
+                .block();
+    }
+
+    private IndexSnapshotManager snapshotManager(Process process, ExtensionStoreRepository checkpointRepository) {
+        var schemes = mock(SchemeManager.class);
+        when(schemes.schemes()).thenReturn(process.registered);
+        ObjectProvider<SchemeManager> provider = mock(ObjectProvider.class);
+        when(provider.getObject()).thenReturn(schemes);
+        return new IndexSnapshotManager(
+                workDir, checkpointRepository, process.writes, process.engine, provider, mock(ObjectProvider.class));
     }
 
     @GVK(group = "snapshot.test", version = "v1", kind = "PluginRecord", plural = "records", singular = "record")

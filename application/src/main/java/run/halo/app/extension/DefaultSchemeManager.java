@@ -52,7 +52,21 @@ public class DefaultSchemeManager implements SchemeManager {
         }
         indexEngine.getIndicesManager().add(type, indexSpecs.getIndexSpecs());
         schemes.add(scheme);
-        eventPublisher.publishEvent(new SchemeAddedEvent(this, scheme));
+        try {
+            eventPublisher.publishEvent(new SchemeAddedEvent(this, scheme));
+        } catch (RuntimeException | Error failure) {
+            // Failed or cancelled initialization must not make the next registration a no-op.
+            schemes.remove(scheme);
+            try {
+                indexEngine.getIndicesManager().remove(type);
+                eventPublisher.publishEvent(new SchemeRemovedEvent(this, scheme));
+            } catch (RuntimeException | Error cleanupFailure) {
+                if (cleanupFailure != failure) {
+                    failure.addSuppressed(cleanupFailure);
+                }
+            }
+            throw failure;
+        }
     }
 
     @Override

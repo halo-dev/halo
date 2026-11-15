@@ -85,6 +85,62 @@ class IndexDumpRestoreTest {
     }
 
     @Test
+    void legacyWrappedNullAndLiteralNullShouldRemainDistinct() {
+        var spec = (MultiValueIndexSpec<FakePost, UnknownKey>) new IndexSpec<FakePost, UnknownKey>()
+                .setName("legacy")
+                .setIndexFunc(IndexAttributeFactory.multiValueAttribute(
+                        FakePost.class, p -> java.util.Collections.singleton(p.slug)))
+                .normalize();
+        var index = new MultiValueIndex<>(spec);
+        insert(index, new FakePost("empty", null, null));
+        insert(index, new FakePost("literal", "null", null));
+        var restored = new MultiValueIndex<>(spec);
+        restored.restore(index.dump());
+        assertThat(restored.equal(new UnknownKey(null))).containsExactly("empty");
+        assertThat(restored.equal(new UnknownKey("null"))).containsExactly("literal");
+    }
+
+    @Test
+    void multiValueSortingShouldUseMinimumKeyBeforeAndAfterRestore() {
+        var spec = IndexSpecs.<run.halo.app.extension.ConfigMap, String>multi("values", String.class)
+                .indexFunc(e -> e.getMetadata().getName().equals("a")
+                        ? new java.util.LinkedHashSet<>(java.util.List.of("z", "a"))
+                        : Set.of("m"))
+                .build();
+        var engine = IndexEngineTestSupport.newIndexEngine();
+        engine.getIndicesManager().add(run.halo.app.extension.ConfigMap.class, java.util.List.of(spec));
+        for (var name : java.util.List.of("a", "b")) {
+            var resource = new run.halo.app.extension.ConfigMap();
+            var metadata = new Metadata();
+            metadata.setName(name);
+            metadata.setCreationTimestamp(Instant.EPOCH);
+            resource.setMetadata(metadata);
+            engine.insert(java.util.List.of(resource));
+        }
+        var restored = IndexEngineTestSupport.newIndexEngine();
+        restored.getIndicesManager().add(run.halo.app.extension.ConfigMap.class, java.util.List.of(spec));
+        assertThat(restored.getIndicesManager()
+                        .get(run.halo.app.extension.ConfigMap.class)
+                        .restore(engine.getIndicesManager()
+                                .get(run.halo.app.extension.ConfigMap.class)
+                                .dump()))
+                .isTrue();
+        for (var candidate : java.util.List.of(engine, restored)) {
+            assertThat(candidate.retrieveAll(
+                            run.halo.app.extension.ConfigMap.class,
+                            null,
+                            org.springframework.data.domain.Sort.by("values")))
+                    .containsExactly("a", "b");
+            assertThat(candidate.retrieveTopN(
+                            run.halo.app.extension.ConfigMap.class,
+                            null,
+                            org.springframework.data.domain.Sort.by("values").descending(),
+                            1))
+                    .containsExactly("b");
+        }
+    }
+
+    @Test
     void labelIndexShouldRoundTrip() {
         var index = new LabelIndex<FakePost>();
         var post = new FakePost("post-1", "a", null);

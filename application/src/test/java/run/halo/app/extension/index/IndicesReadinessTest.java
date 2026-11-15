@@ -89,6 +89,97 @@ class IndicesReadinessTest {
     }
 
     @Test
+    void removingFailedIndicesMustReleaseAlreadyBlockedQueries() throws Exception {
+        var manager = new DefaultIndicesManager();
+        manager.add(FakeExt.class, List.of());
+        manager.markBuilding(FakeExt.class);
+        var outcome = new java.util.concurrent.CompletableFuture<Throwable>();
+        var thread = new Thread(() -> {
+            try {
+                manager.awaitReady(FakeExt.class);
+                manager.get(FakeExt.class);
+                outcome.complete(null);
+            } catch (Throwable failure) {
+                outcome.complete(failure);
+            }
+        });
+        thread.start();
+        try {
+            long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5);
+            while (thread.getState() != Thread.State.TIMED_WAITING
+                    && thread.isAlive()
+                    && System.nanoTime() < deadline) {
+                Thread.yield();
+            }
+            assertThat(thread.getState()).isEqualTo(Thread.State.TIMED_WAITING);
+            manager.remove(FakeExt.class);
+            assertThat(outcome.get(5, TimeUnit.SECONDS))
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessageContaining("initialization was aborted");
+        } finally {
+            thread.interrupt();
+            thread.join(5000);
+        }
+    }
+
+    @Test
+    void failedBuildWaiterMustNotReadPartialIndicesFromARetry() throws Exception {
+        var manager = new DefaultIndicesManager();
+        manager.add(FakeExt.class, List.of());
+        manager.markBuilding(FakeExt.class);
+        var exitedWait = new CountDownLatch(1);
+        var resumeQuery = new CountDownLatch(1);
+        var outcome = new java.util.concurrent.CompletableFuture<java.util.Set<String>>();
+        var thread = new Thread(() -> {
+            try {
+                try {
+                    manager.awaitReady(FakeExt.class);
+                } finally {
+                    exitedWait.countDown();
+                    resumeQuery.await();
+                }
+                outcome.complete(
+                        ((ValueIndexQuery<String>) manager.get(FakeExt.class).<String>getIndex("metadata.name")).all());
+            } catch (Throwable failure) {
+                outcome.completeExceptionally(failure);
+            }
+        });
+        thread.start();
+        try {
+            long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5);
+            while (thread.getState() != Thread.State.TIMED_WAITING
+                    && thread.isAlive()
+                    && System.nanoTime() < deadline) {
+                Thread.yield();
+            }
+            assertThat(thread.getState()).isEqualTo(Thread.State.TIMED_WAITING);
+            manager.remove(FakeExt.class);
+            assertThat(exitedWait.await(5, TimeUnit.SECONDS)).isTrue();
+            manager.add(FakeExt.class, List.of());
+            manager.markBuilding(FakeExt.class);
+            var partial = new FakeExt();
+            partial.getMetadata().setName("partial");
+            partial.getMetadata().setCreationTimestamp(java.time.Instant.EPOCH);
+            manager.get(FakeExt.class).insert(partial);
+            resumeQuery.countDown();
+            assertThatThrownBy(() -> outcome.get(5, TimeUnit.SECONDS))
+                    .isInstanceOf(java.util.concurrent.ExecutionException.class)
+                    .hasCauseInstanceOf(IllegalStateException.class);
+            manager.setReadyTimeout(Duration.ofMillis(20));
+            assertThatThrownBy(() -> manager.awaitReady(FakeExt.class))
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessageContaining("not ready");
+            manager.markReady(FakeExt.class);
+            manager.awaitReady(FakeExt.class);
+        } finally {
+            resumeQuery.countDown();
+            thread.interrupt();
+            thread.join(5000);
+            manager.close();
+        }
+    }
+
+    @Test
     void awaitReadyShouldTimeoutWhileBuilding() {
         var manager = new DefaultIndicesManager();
         manager.setReadyTimeout(Duration.ofMillis(100));

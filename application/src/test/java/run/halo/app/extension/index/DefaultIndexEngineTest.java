@@ -187,6 +187,7 @@ class DefaultIndexEngineTest {
         when(indices.<String>getIndex("metadata.name")).thenReturn(singleValueIndex);
         when(indices.<String>getIndex("spec.tags")).thenReturn(multiValueIndex);
         when(singleValueIndex.all()).thenReturn(mutableSet("a", "b", "c"));
+        when(multiValueIndex.getSortKey(anyString())).thenCallRealMethod();
         when(multiValueIndex.getKeys("a")).thenReturn(Set.of("z"));
         when(multiValueIndex.getKeys("b")).thenReturn(Set.of());
         when(multiValueIndex.getKeys("c")).thenReturn(Set.of("m"));

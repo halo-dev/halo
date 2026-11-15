@@ -6,6 +6,9 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
@@ -15,9 +18,10 @@ import java.util.zip.GZIPOutputStream;
  * Binary (GZIP-compressed) codec for {@link IndicesSnapshot}. Layout:
  *
  * <pre>
- * 4B magic 'HAIS' | 4B formatVersion | UTF checkpoint
- * 4B indexCount | per index: UTF name, UTF fingerprint, UTF keyType,
- *     4B nullKeyCount + UTF*, 4B entryCount + per entry: 4B keyPartCount + UTF*, 4B pkCount + UTF*
+ * 4B magic 'HAIS' | 4B formatVersion | string checkpoint
+ * 4B indexCount | per index: string name, string fingerprint, string keyType,
+ *     4B nullKeyCount + string*, 4B entryCount + per entry: 4B keyPartCount + string*, 4B pkCount + string*
+ * Strings use a 4B UTF-8 byte length followed by those bytes.
  * </pre>
  *
  * @since 2.26.0
@@ -26,36 +30,63 @@ final class IndexSnapshotCodec {
 
     private static final int MAGIC = 0x48414953; // 'HAIS'
 
-    private static final int FORMAT_VERSION = 2;
+    private static final int FORMAT_VERSION = 3;
 
     /** Upper bound for every count field; anything larger is treated as corruption instead of allocated. */
     private static final int MAX_COUNT = 1 << 24; // 16_777_216
 
+    // Enough for indexed request bodies while bounding allocation for malformed files.
+    private static final int MAX_STRING_BYTES = 64 * 1024 * 1024;
+
     private IndexSnapshotCodec() {}
+
+    private static void writeString(DataOutputStream data, String value) throws IOException {
+        var bytes = StandardCharsets.UTF_8.newEncoder().encode(CharBuffer.wrap(value));
+        if (bytes.remaining() > MAX_STRING_BYTES) {
+            throw new IOException("Snapshot string exceeds " + MAX_STRING_BYTES + " bytes");
+        }
+        data.writeInt(bytes.remaining());
+        data.write(bytes.array(), bytes.position(), bytes.remaining());
+    }
+
+    private static String readString(DataInputStream data) throws IOException {
+        var length = data.readInt();
+        if (length < 0 || length > MAX_STRING_BYTES) {
+            throw new IndexSnapshotCorruptedException("Invalid string length: " + length);
+        }
+        var bytes = data.readNBytes(length);
+        if (bytes.length != length) {
+            throw new EOFException("Truncated string");
+        }
+        return StandardCharsets.UTF_8
+                .newDecoder()
+                .decode(ByteBuffer.wrap(bytes))
+                .toString();
+    }
 
     static void write(IndicesSnapshot snapshot, OutputStream out) throws IOException {
         try (var data = new DataOutputStream(new GZIPOutputStream(out))) {
             data.writeInt(MAGIC);
             data.writeInt(FORMAT_VERSION);
-            data.writeUTF(snapshot.checkpoint());
+            writeString(data, snapshot.checkpoint());
             data.writeInt(snapshot.indices().size());
             for (var index : snapshot.indices()) {
-                data.writeUTF(index.name());
-                data.writeUTF(index.fingerprint());
-                data.writeUTF(index.keyType());
+                writeString(data, index.name());
+                writeString(data, index.fingerprint());
+                writeString(data, index.keyType());
                 data.writeInt(index.nullKeys().size());
                 for (var nullKey : index.nullKeys()) {
-                    data.writeUTF(nullKey);
+                    writeString(data, nullKey);
                 }
                 data.writeInt(index.entries().size());
                 for (var entry : index.entries()) {
                     data.writeInt(entry.keyParts().size());
                     for (var part : entry.keyParts()) {
-                        data.writeUTF(part);
+                        writeString(data, part);
                     }
                     data.writeInt(entry.primaryKeys().size());
                     for (var pk : entry.primaryKeys()) {
-                        data.writeUTF(pk);
+                        writeString(data, pk);
                     }
                 }
             }
@@ -70,17 +101,17 @@ final class IndexSnapshotCodec {
             if (data.readInt() != FORMAT_VERSION) {
                 throw new IndexSnapshotCorruptedException("Unsupported format version");
             }
-            var checkpoint = data.readUTF();
+            var checkpoint = readString(data);
             var indexCount = readCount(data);
             var indices = new ArrayList<IndexSnapshot>(indexCount);
             for (var i = 0; i < indexCount; i++) {
-                var name = data.readUTF();
-                var fingerprint = data.readUTF();
-                var keyType = data.readUTF();
+                var name = readString(data);
+                var fingerprint = readString(data);
+                var keyType = readString(data);
                 var nullKeyCount = readCount(data);
                 var nullKeys = new ArrayList<String>(nullKeyCount);
                 for (var j = 0; j < nullKeyCount; j++) {
-                    nullKeys.add(data.readUTF());
+                    nullKeys.add(readString(data));
                 }
                 var entryCount = readCount(data);
                 var entries = new ArrayList<IndexSnapshot.Entry>(entryCount);
@@ -88,12 +119,12 @@ final class IndexSnapshotCodec {
                     var partCount = readCount(data);
                     var keyParts = new ArrayList<String>(partCount);
                     for (var k = 0; k < partCount; k++) {
-                        keyParts.add(data.readUTF());
+                        keyParts.add(readString(data));
                     }
                     var pkCount = readCount(data);
                     var primaryKeys = new ArrayList<String>(pkCount);
                     for (var k = 0; k < pkCount; k++) {
-                        primaryKeys.add(data.readUTF());
+                        primaryKeys.add(readString(data));
                     }
                     entries.add(new IndexSnapshot.Entry(List.copyOf(keyParts), List.copyOf(primaryKeys)));
                 }

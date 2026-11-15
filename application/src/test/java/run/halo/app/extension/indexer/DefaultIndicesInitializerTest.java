@@ -71,6 +71,26 @@ class DefaultIndicesInitializerTest {
         verifyNoInteractions(store, converter);
     }
 
+    @Test
+    void failedInitializationMustDiscardPartialIndicesBeforeReleasingQueries() {
+        var failure = new IllegalStateException("interrupted initialization");
+        doAnswer(call -> {
+                    engine.insert(List.of(new FakePost("partial", "partial", Set.of())));
+                    throw failure;
+                })
+                .when(snapshots)
+                .initialize(eq(scheme), any());
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> initializer.initialize(scheme))
+                .isSameAs(failure);
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> engine.retrieveAll(FakePost.class, null, null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("No indices found");
+        register(1);
+        doNothing().when(snapshots).initialize(eq(scheme), any());
+        initializer.initialize(scheme);
+        assertThat(engine.retrieveAll(FakePost.class, null, null)).isEmpty();
+    }
+
     @GVK(group = "", version = "v1alpha1", kind = "FakePost", plural = "fakeposts", singular = "fakepost")
     static class FakePost implements Extension {
 

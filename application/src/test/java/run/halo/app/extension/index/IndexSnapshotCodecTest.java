@@ -39,6 +39,22 @@ class IndexSnapshotCodecTest {
     }
 
     @Test
+    void shouldRoundTripLongTextKeys() throws Exception {
+        for (var text : List.of("a".repeat(65536), "评论😀".repeat(30000))) {
+            var snapshot = new IndicesSnapshot(List.of(new IndexSnapshot(
+                    "text",
+                    "fp",
+                    "java.lang.String",
+                    List.of(new IndexSnapshot.Entry(List.of(text), List.of("one"))),
+                    List.of())));
+            var out = new ByteArrayOutputStream();
+            IndexSnapshotCodec.write(snapshot, out);
+            assertThat(IndexSnapshotCodec.read(new ByteArrayInputStream(out.toByteArray())))
+                    .isEqualTo(snapshot);
+        }
+    }
+
+    @Test
     void shouldRejectBadMagic() {
         var garbage = new byte[] {0x1f, (byte) 0x8b, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
         assertThatThrownBy(() -> IndexSnapshotCodec.read(new ByteArrayInputStream(garbage)))
@@ -82,13 +98,56 @@ class IndexSnapshotCodecTest {
                 .hasMessageContaining("Invalid count: " + Integer.MAX_VALUE);
     }
 
+    @Test
+    void shouldRejectInvalidStringLengthsAndTruncatedText() throws Exception {
+        for (var length : List.of(-1, Integer.MAX_VALUE, 10)) {
+            var bytes = stringPayload(3, length, new byte[0]);
+            assertThatThrownBy(() -> IndexSnapshotCodec.read(new ByteArrayInputStream(bytes)))
+                    .isInstanceOf(IndexSnapshotCorruptedException.class);
+        }
+    }
+
+    @Test
+    void shouldRejectInvalidUtf8InsteadOfChangingKeys() throws Exception {
+        var bytes = stringPayload(3, 1, new byte[] {(byte) 0xff});
+        assertThatThrownBy(() -> IndexSnapshotCodec.read(new ByteArrayInputStream(bytes)))
+                .isInstanceOf(IndexSnapshotCorruptedException.class);
+    }
+
+    @Test
+    void shouldRejectUnpairedSurrogatesInsteadOfChangingKeys() {
+        var snapshot = new IndicesSnapshot("\ud800", List.of());
+        assertThatThrownBy(() -> IndexSnapshotCodec.write(snapshot, new ByteArrayOutputStream()))
+                .isInstanceOf(java.nio.charset.CharacterCodingException.class);
+    }
+
+    @Test
+    void shouldRejectPreviousFormat() throws Exception {
+        var bytes = stringPayload(2, 0, new byte[0]);
+        assertThatThrownBy(() -> IndexSnapshotCodec.read(new ByteArrayInputStream(bytes)))
+                .isInstanceOf(IndexSnapshotCorruptedException.class)
+                .hasMessageContaining("Unsupported format version");
+    }
+
+    private static byte[] stringPayload(int format, int length, byte[] value) throws IOException {
+        var out = new ByteArrayOutputStream();
+        try (var data = new DataOutputStream(new GZIPOutputStream(out))) {
+            data.writeInt(0x48414953);
+            data.writeInt(format);
+            data.writeInt(length);
+            data.write(value);
+        }
+        return out.toByteArray();
+    }
+
     /** Writes a valid GZIP stream with the magic and format version, followed by the given index count. */
     static byte[] craftedStreamWithIndexCount(int indexCount) throws IOException {
         var out = new ByteArrayOutputStream();
         try (var data = new DataOutputStream(new GZIPOutputStream(out))) {
             data.writeInt(0x48414953); // magic 'HAIS'
-            data.writeInt(2); // format version
-            data.writeUTF("checkpoint");
+            data.writeInt(3); // format version
+            data.writeInt(10);
+            data.writeBytes("checkpoint");
             data.writeInt(indexCount);
         }
         return out.toByteArray();

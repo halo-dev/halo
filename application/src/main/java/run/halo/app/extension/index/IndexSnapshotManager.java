@@ -18,6 +18,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.context.event.EventListener;
+import org.springframework.dao.DuplicateKeyException;
 import run.halo.app.extension.Extension;
 import run.halo.app.extension.ExtensionStoreUtil;
 import run.halo.app.extension.Scheme;
@@ -35,7 +36,7 @@ public class IndexSnapshotManager implements ApplicationContextAware, SmartLifec
 
     private static final String TYPE_CHECKPOINT_PREFIX = CHECKPOINT_PREFIX + "s/";
     // Bump when shared index semantics change. Individual index functions use ValueIndexSpec.version.
-    static final String ENGINE_VERSION = "1";
+    static final String ENGINE_VERSION = "2";
     private static final Duration TIMEOUT = Duration.ofSeconds(30);
 
     private final Path directory;
@@ -186,18 +187,28 @@ public class IndexSnapshotManager implements ApplicationContextAware, SmartLifec
             if (!writes.isReusable(prefix)) {
                 return;
             }
-            repository
-                    .save(new ExtensionStore(
-                            checkpointName(prefix), (identity(scheme) + "\n" + token).getBytes(StandardCharsets.UTF_8)))
+            // Even a timed-out save may have committed. Writers must invalidate its row.
+            writes.checkpointPublicationStarted(prefix);
+            // Reserve an unusable marker first. Publishing is then a version-checked UPDATE,
+            // so a late completion cannot INSERT authorization after a writer deleted it.
+            var reserved = repository
+                    .save(new ExtensionStore(checkpointName(prefix), new byte[0]))
+                    // An aborted reservation can arrive after reinitialization consumed its row.
+                    // Reuse its current version; publication must still win the optimistic update.
+                    .onErrorResume(DuplicateKeyException.class, error -> repository.findById(checkpointName(prefix)))
                     .block(TIMEOUT);
-            writes.saved(prefix);
+            if (reserved == null) {
+                throw new IllegalStateException("Checkpoint reservation returned no row");
+            }
+            reserved.setData((identity(scheme) + "\n" + token).getBytes(StandardCharsets.UTF_8));
+            repository.save(reserved).block(TIMEOUT);
             log.info(
                     "Saved clean shutdown index snapshot checkpoint for {}",
                     scheme.type().getName());
         } catch (Exception e) {
             writes.invalidate(prefix, "snapshot persistence failed");
             log.warn(
-                    "Failed to save index snapshot for {}; next startup will rebuild",
+                    "Failed to save index snapshot for {}; checkpoint publication may be incomplete",
                     scheme.type().getName(),
                     e);
         }

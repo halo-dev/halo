@@ -1,3 +1,29 @@
+## Readiness retry race closure
+
+- A deterministic probe reproduced an old failed-build waiter reading the next build's partial indices. Readiness now stores an independent completion result per build; removing a failed build completes its result exceptionally. A retry cannot turn that result into success. The same probe now reports an initialization-aborted exception. Evidence: `/tmp/halo-snapshot-review-fixes/readiness-race/red.log`, `green.log`, and `ReadinessRaceProbe.java`.
+- Final regression after this change: API 269 tests, application 2649 tests, zero failures/errors and 3 skipped; formatting checks passed. Evidence: `/tmp/halo-snapshot-review-fixes/accepted-test-summary.json` and `regression-readiness.log`.
+- The full nine-stage, 100,000-record real-plugin probe including intentionally interrupted registration and recovery passed again. Evidence: `/tmp/halo-snapshot-review-fixes/e2e-readiness/results.json`. Runtime JAR SHA-256: `38774c5aa8a8113a09fdc274a736274bd7da9a6995a0021e6b212c142c70e58c`.
+
+## Final follow-up after independent rereview
+
+- A second failure test reproduced a late reservation arriving after reinitialization and preventing the next capture. On a duplicate reservation, publication now reads the existing row version and still uses an optimistic update. The test fails before the change and passes afterward (`/tmp/halo-snapshot-review-fixes/late-reservation-red.log`).
+- An intermediate real plugin upgrade was cancelled during index construction. Failed registration remained present and the retry skipped rebuilding (`e2e-round2/failure.txt`). Registration now rolls back its scheme and removal listeners; initialization discards partial indices before releasing blocked queries. Dedicated tests cover interruption/retry, partial-index rejection, blocked queries and cleanup-listener errors. This resolves the previously unconfirmed registration-failure concern.
+- Final full regression: API 269 tests, application 2648 tests; zero failures/errors, 3 skipped. Java formatting and OpenSpec checks passed. Evidence: `/tmp/halo-snapshot-review-fixes/final-test-summary.json` and `regression-accepted.log`.
+- Final real-plugin validation repeats all nine stages with 100,000 records and actively injects an interrupted index build in version 3. It observes FAILED, retries, rebuilds correctly, verifies HTTP/index results, and completes subsequent upgrades/restarts/crash recovery. Evidence: `/tmp/halo-snapshot-review-fixes/e2e-final/results.json` and adjacent fixture sources/logs. Final runtime JAR SHA-256: `a106ca3b239f13a64feb69df532c1b069fca96c06331bffc0ca23c794d754c3b`.
+- Intermediate failed runs remain preserved; they are not reported as passes. Earlier result counts/artifact hashes below identify earlier snapshots. The old-production probe `late-red-probe/run.log` also supplies the previously missing red evidence for the late-reservation-after-write case.
+
+## Current review corrections (supersedes historical implementation details below)
+
+- R1 uses an unusable reservation followed by a version-checked checkpoint update. Real H2 tests cover committed publication with a lost acknowledgement, publication completing after invalidating writes, and reservation completing after writes. These are deterministic fault injections, not actual network-disconnection tests.
+- R2/R4 use snapshot format 3: wrapped null values remain distinct, 64 KiB-plus ASCII and multibyte keys round-trip, malformed UTF-8/lengths and older formats are rejected. The per-string limit is 64 MiB.
+- R3 uses the minimum multi-value key for sorting before and after restoration. Shared engine compatibility version 2 forces one safe rebuild of older snapshots. R5 preserves custom-builder compatibility with an explicit unsupported-versioning default; an old compiled implementation was also exercised against the new API.
+- Full API/application tests and Java formatting checks passed: API 269 tests, application 2643 tests, zero failures/errors and 3 skipped. The runnable JAR was built from the same production code. Evidence: `/tmp/halo-snapshot-review-fixes/test-summary.json`, `regression-final.log`, `red-test-results/`, and `binary-compat.log`.
+- Five isolated Halo processes, PostgreSQL 15.4, four actual plugin versions and 100,000 plugin records passed nine HTTP validation stages. Hot restart, compatible upgrade, semantic/structural changes, root restart, crash recovery and disabled-plugin restart all selected the expected restore/rebuild paths. Every stage checked long-text indexing, legacy literal-null matching and ascending/descending multi-value sorting. Evidence: `/tmp/halo-snapshot-review-fixes/e2e/results.json` and adjacent scripts/logs. JAR SHA-256: `0f1dbdf1c53344736a17bf7666bca4f42502d2497f08bf1d57bc6c1de0b9ca27`.
+- Upgrade-transition polling encountered two transient HTTP 500s before readiness; all stable-stage assertions passed. A separate run against the pre-fix JAR reproduced three upgrade-transition 500s (and 404s), so seamless availability during plugin replacement remains outside these fixes. Evidence: `/tmp/halo-snapshot-review-fixes/baseline-upgrade/results.json`. The macOS native DNS fallback log also remains. All owned services/containers were stopped; original user data was untouched.
+- Earlier build-identity and global-checkpoint descriptions below document historical runs; the current design is the per-type lifecycle described in `design.md`. This round does not claim to rerun the historical huge-halo performance benchmark or real network-fault recovery.
+
+## Historical verification
+
 ## Automated checks
 
 - Java 21: `:api:test :application:test` passed. API: 268 tests, 0 failures; application: 2,615 tests, 0 failures, 3 skipped. Evidence: `/tmp/halo-pr10492-full-tests-final.log` and `/tmp/halo-pr10492-e2e/full-test-summary.json`.

@@ -121,6 +121,12 @@ class MultiValueIndex<E extends Extension, K extends Comparable<K>> implements V
         return Collections.unmodifiableSet(invertedIndex.getOrDefault(primaryKey, Set.of()));
     }
 
+    /** A deterministic representative, independent of the set's iteration order. */
+    K getSortKey(String primaryKey) {
+        var keys = getKeys(primaryKey);
+        return CollectionUtils.isEmpty(keys) ? null : Collections.min(keys);
+    }
+
     @Override
     public Set<String> between(K fromKey, boolean fromInclusive, K toKey, boolean toInclusive) {
         throw new UnsupportedOperationException("Multi-value index does not support between operation");

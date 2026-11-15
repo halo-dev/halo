@@ -43,6 +43,34 @@ class IndexSpecVersionTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
+    @Test
+    void legacyCustomBuilderShouldWorkWithoutImplementingVersion() {
+        var builder = new LegacyBuilder();
+        assertThat(builder.build().getVersion()).isEqualTo(1);
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> builder.version(2))
+                .isInstanceOf(UnsupportedOperationException.class)
+                .hasMessageContaining("versioning");
+    }
+
+    static class LegacyBuilder implements IndexSpecBuilder<FakeExtension, String, LegacyBuilder> {
+        @Override
+        public LegacyBuilder unique(boolean unique) {
+            return this;
+        }
+
+        @Override
+        public LegacyBuilder nullable(boolean nullable) {
+            return this;
+        }
+
+        @Override
+        public ValueIndexSpec<FakeExtension, String> build() {
+            return IndexSpecs.<FakeExtension, String>single("name", String.class)
+                    .indexFunc(e -> e.getMetadata().getName())
+                    .build();
+        }
+    }
+
     static class FakeExtension implements Extension {
         private final Metadata metadata = new Metadata();
 

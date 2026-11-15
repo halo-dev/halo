@@ -5,10 +5,12 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Stream;
 import org.apache.commons.io.IOUtils;
 import run.halo.app.extension.Extension;
@@ -25,7 +27,8 @@ class DefaultIndicesManager implements IndicesManager {
 
     private final ConcurrentMap<Class<? extends Extension>, Indices<? extends Extension>> indicesMap;
 
-    private final ConcurrentMap<Class<? extends Extension>, CountDownLatch> readyLatches = new ConcurrentHashMap<>();
+    private final ConcurrentMap<Class<? extends Extension>, CompletableFuture<Void>> readiness =
+            new ConcurrentHashMap<>();
 
     private Duration readyTimeout = DEFAULT_READY_TIMEOUT;
 
@@ -61,8 +64,9 @@ class DefaultIndicesManager implements IndicesManager {
     @Override
     public void close() throws IOException {
         // release shutdown-time awaiters immediately instead of letting them block until the timeout
-        readyLatches.forEach((type, latch) -> latch.countDown());
-        readyLatches.clear();
+        readiness.forEach((type, state) -> state.completeExceptionally(
+                new IllegalStateException("Indices closed before initialization completed: " + type.getName())));
+        readiness.clear();
         IOUtils.close(indicesMap.values().toArray(Indices[]::new));
         indicesMap.clear();
     }
@@ -81,16 +85,20 @@ class DefaultIndicesManager implements IndicesManager {
         if (!indicesMap.containsKey(type)) {
             throw new IllegalArgumentException("No indices found for type: " + type.getName());
         }
-        // no latch means the indices are not being (re)built right now and are safe to query
-        var latch = readyLatches.get(type);
-        if (latch == null) {
+        // Each build owns its completion result, including failure. A retry must not release
+        // an old waiter into the new, partially built indices.
+        var state = readiness.get(type);
+        if (state == null) {
             return;
         }
         try {
-            if (!latch.await(readyTimeout.toMillis(), TimeUnit.MILLISECONDS)) {
-                throw new IllegalStateException(
-                        "Indices are not ready for type: %s after %s".formatted(type.getName(), readyTimeout));
-            }
+            state.get(readyTimeout.toMillis(), TimeUnit.MILLISECONDS);
+        } catch (TimeoutException e) {
+            throw new IllegalStateException(
+                    "Indices are not ready for type: %s after %s".formatted(type.getName(), readyTimeout), e);
+        } catch (ExecutionException e) {
+            throw new IllegalStateException(
+                    "Indices initialization was aborted for type: " + type.getName(), e.getCause());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new IllegalStateException(
@@ -103,15 +111,14 @@ class DefaultIndicesManager implements IndicesManager {
         if (!indicesMap.containsKey(type)) {
             throw new IllegalArgumentException("No indices found for type: " + type.getName());
         }
-        // replace any stale latch: a new build cycle starts now
-        readyLatches.put(type, new CountDownLatch(1));
+        readiness.put(type, new CompletableFuture<>());
     }
 
     @Override
     public void markReady(Class<? extends Extension> type) {
-        var latch = readyLatches.remove(type);
-        if (latch != null) {
-            latch.countDown();
+        var state = readiness.remove(type);
+        if (state != null) {
+            state.complete(null);
         }
     }
 
@@ -119,7 +126,10 @@ class DefaultIndicesManager implements IndicesManager {
     public <E extends Extension> void remove(Class<E> type) {
         var indices = indicesMap.remove(type);
         IOUtils.closeQuietly(indices);
-        readyLatches.remove(type);
+        var state = readiness.remove(type);
+        if (state != null) {
+            state.completeExceptionally(new IllegalStateException("Indices removed before initialization completed"));
+        }
     }
 
     private <E extends Extension> List<ValueIndexSpec<E, ?>> createDefaultIndexSpecs() {

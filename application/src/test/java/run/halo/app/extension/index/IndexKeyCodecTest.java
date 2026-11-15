@@ -29,6 +29,21 @@ class IndexKeyCodecTest {
     }
 
     @Test
+    void shouldDistinguishWrappedNullFromLiteralStrings() {
+        for (var key : java.util.List.of(
+                new UnknownKey(null),
+                new UnknownKey("null"),
+                new UnknownKey(""),
+                new UnknownKey("0"),
+                new UnknownKey("1null"))) {
+            assertThat(IndexKeyCodec.decode(UnknownKey.class, IndexKeyCodec.encode(key)))
+                    .isEqualTo(key);
+        }
+        assertThat(IndexKeyCodec.encode(new UnknownKey(null)))
+                .isNotEqualTo(IndexKeyCodec.encode(new UnknownKey("null")));
+    }
+
+    @Test
     void shouldRoundTripEnumType() {
         assertThat(IndexKeyCodec.decode(TestVisibility.class, IndexKeyCodec.encode(TestVisibility.PUBLIC)))
                 .isEqualTo(TestVisibility.PUBLIC);

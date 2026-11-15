@@ -13,6 +13,9 @@ final class IndexKeyCodec {
     private IndexKeyCodec() {}
 
     static String encode(Object key) {
+        if (key instanceof UnknownKey unknown) {
+            return unknown.value() == null ? "0" : "1" + unknown.value();
+        }
         if (key instanceof Instant instant) {
             return instant.toString();
         }
@@ -25,7 +28,13 @@ final class IndexKeyCodec {
             return (K) text;
         }
         if (keyType == UnknownKey.class) {
-            return (K) new UnknownKey(text);
+            if (text.equals("0")) {
+                return (K) new UnknownKey(null);
+            }
+            if (text.startsWith("1")) {
+                return (K) new UnknownKey(text.substring(1));
+            }
+            throw new IllegalArgumentException("Invalid wrapped string key");
         }
         if (keyType == Long.class) {
             return (K) Long.valueOf(text);

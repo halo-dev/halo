@@ -68,9 +68,11 @@ class DefaultIndicesInitializer implements IndicesInitializer {
             // gate queries until the build/restore below completes
             indexEngine.getIndicesManager().markBuilding(type);
             snapshotManager.initialize(scheme, () -> fullBuild(type, prefix));
-        } finally {
-            indexEngine.getIndicesManager().markReady(type);
+        } catch (RuntimeException | Error failure) {
+            indexEngine.getIndicesManager().remove(type);
+            throw failure;
         }
+        indexEngine.getIndicesManager().markReady(type);
     }
 
     private <E extends Extension> void fullBuild(Class<E> type, String prefix) {

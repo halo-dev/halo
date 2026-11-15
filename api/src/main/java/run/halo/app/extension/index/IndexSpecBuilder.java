@@ -34,9 +34,12 @@ public interface IndexSpecBuilder<E extends Extension, K extends Comparable<K>, 
      *
      * @param version the index version, must be positive, default is 1
      * @return the updated IndexSpecBuilder
+     * @throws UnsupportedOperationException if this builder does not support index versioning
      * @since 2.26.0
      */
-    B version(int version);
+    default B version(int version) {
+        throw new UnsupportedOperationException("Index versioning is not supported by this builder");
+    }
 
     /**
      * Builds the value index specification.

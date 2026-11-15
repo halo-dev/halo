@@ -55,7 +55,8 @@ public class IndexSnapshotWriteBarrier {
         return state(prefix).initialized && !state(prefix).consumed;
     }
 
-    synchronized void saved(String prefix) {
+    // Publication may commit even when its acknowledgement fails or times out.
+    synchronized void checkpointPublicationStarted(String prefix) {
         state(prefix).consumed = false;
     }
 
