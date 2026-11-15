@@ -28,25 +28,12 @@ class PluginBeforeStopSyncListener {
 
     private final ReactiveExtensionClient client;
 
-    private volatile boolean shuttingDown;
-
-    @EventListener
-    void onRootClosing(org.springframework.context.event.ContextClosedEvent event) {
-        if (event.getApplicationContext().getParent() == null) {
-            shuttingDown = true;
-        }
-    }
-
     public PluginBeforeStopSyncListener(ReactiveExtensionClient client) {
         this.client = client;
     }
 
     @EventListener
     void onApplicationEvent(HaloPluginBeforeStopEvent event) {
-        // Root shutdown already stops controllers; bundled resources need no cleanup until hot stop.
-        if (shuttingDown) {
-            return;
-        }
         var pluginWrapper = event.getPlugin();
         var p = pluginWrapper.getPlugin();
         if (!(p instanceof SpringPlugin springPlugin)) {

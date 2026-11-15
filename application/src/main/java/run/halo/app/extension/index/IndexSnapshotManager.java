@@ -27,7 +27,6 @@ import run.halo.app.extension.SchemeManager;
 import run.halo.app.extension.store.ExtensionStore;
 import run.halo.app.extension.store.ExtensionStoreRepository;
 import run.halo.app.infra.InitializationPhase;
-import run.halo.app.plugin.SpringPluginManager;
 
 /** Per-resource-type disposable cache shared by Halo and plugin lifecycles. */
 @Slf4j
@@ -48,21 +47,18 @@ public class IndexSnapshotManager implements ApplicationContextAware, SmartLifec
     private ApplicationContext applicationContext;
     private boolean ready;
     private volatile boolean running;
-    private final ObjectProvider<SpringPluginManager> plugins;
 
     public IndexSnapshotManager(
             Path workDir,
             ExtensionStoreRepository repository,
             IndexSnapshotWriteBarrier writes,
             IndexEngine engine,
-            ObjectProvider<SchemeManager> schemes,
-            ObjectProvider<SpringPluginManager> plugins) {
+            ObjectProvider<SchemeManager> schemes) {
         this.directory = workDir.resolve("indices").resolve("snapshots");
         this.repository = repository;
         this.writes = writes;
         this.engine = engine;
         this.schemes = schemes;
-        this.plugins = plugins;
     }
 
     @Override
@@ -89,7 +85,7 @@ public class IndexSnapshotManager implements ApplicationContextAware, SmartLifec
 
     @Override
     public int getPhase() {
-        // Spring stops higher phases first. Keep plugin contexts, schemes, indices and storage alive.
+        // Capture remaining core types after controllers stop, but before schemes/storage are destroyed.
         return InitializationPhase.CONTROLLERS.getPhase() - 1;
     }
 
@@ -97,10 +93,6 @@ public class IndexSnapshotManager implements ApplicationContextAware, SmartLifec
     public void stop() {
         try {
             if (ready) {
-                var manager = plugins.getIfAvailable();
-                if (manager != null) {
-                    manager.stopPlugins();
-                }
                 saveOnShutdown();
             }
         } finally {

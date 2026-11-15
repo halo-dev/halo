@@ -28,8 +28,7 @@ public class ExtensionConfiguration {
             ExtensionStoreRepository repository,
             IndexSnapshotWriteBarrier writes,
             IndexEngine engine,
-            ObjectProvider<SchemeManager> schemes,
-            ObjectProvider<run.halo.app.plugin.SpringPluginManager> plugins) {
-        return new IndexSnapshotManager(haloProperties.getWorkDir(), repository, writes, engine, schemes, plugins);
+            ObjectProvider<SchemeManager> schemes) {
+        return new IndexSnapshotManager(haloProperties.getWorkDir(), repository, writes, engine, schemes);
     }
 }

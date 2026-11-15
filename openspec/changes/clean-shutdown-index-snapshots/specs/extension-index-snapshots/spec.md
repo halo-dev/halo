@@ -90,8 +90,17 @@ The system SHALL compare complete index fingerprints, existing semantic versions
 
 ### Requirement: Order shutdown before snapshot capture
 
-The system SHALL stop background controllers before root snapshot capture and SHALL preserve indices until plugin unregistration captures them.
+The system SHALL stop plugins and clean their bundled resources before stopping core controllers, then capture remaining root snapshots. It SHALL preserve indices until plugin unregistration captures them and retain resources marked do-not-overwrite.
 
 #### Scenario: Late shutdown write
 - **WHEN** a supported write occurs after its type checkpoint was published
 - **THEN** the checkpoint SHALL be invalidated before that data can commit
+
+#### Scenario: Plugin fails after a normal root shutdown
+- **GIVEN** a running plugin supplies an enabled form login provider
+- **WHEN** Halo shuts down normally and the plugin fails before loading bundled resources on the next startup
+- **THEN** its old provider SHALL have been removed and the default login page SHALL remain renderable
+
+#### Scenario: Offline upgrade removes a bundled declaration
+- **WHEN** Halo shuts down normally and the plugin package is replaced with one that omits a prior declaration
+- **THEN** the old declaration SHALL NOT remain active, and compatible business-data indices SHALL remain eligible for snapshot recovery

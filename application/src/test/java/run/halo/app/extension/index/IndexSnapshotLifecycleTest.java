@@ -24,10 +24,11 @@ class IndexSnapshotLifecycleTest {
     Path workDir;
 
     @Test
-    void actualSpringDependencyGraphMustStopControllersThenPluginsThenSchemes() {
+    void actualSpringDependencyGraphMustStopPluginsThenControllersThenSnapshotsThenSchemes() {
         var order = new StopOrder();
         var plugins = mock(SpringPluginManager.class);
         doAnswer(ignored -> {
+                    assertThat(order).isEmpty();
                     order.add("plugins");
                     return null;
                 })
@@ -37,15 +38,22 @@ class IndexSnapshotLifecycleTest {
             context.registerBean(StopOrder.class, () -> order);
             context.registerBean(IndexEngine.class, () -> mock(IndexEngine.class));
             context.registerBean(SpringPluginManager.class, () -> plugins);
-            context.registerBean(
-                    IndexSnapshotManager.class,
-                    () -> new IndexSnapshotManager(
-                            workDir,
-                            mock(ExtensionStoreRepository.class),
-                            new IndexSnapshotWriteBarrier(),
-                            context.getBean(IndexEngine.class),
-                            context.getBeanProvider(SchemeManager.class),
-                            context.getBeanProvider(SpringPluginManager.class)));
+            context.registerBean(IndexSnapshotManager.class, () -> {
+                var snapshots = spy(new IndexSnapshotManager(
+                        workDir,
+                        mock(ExtensionStoreRepository.class),
+                        new IndexSnapshotWriteBarrier(),
+                        context.getBean(IndexEngine.class),
+                        context.getBeanProvider(SchemeManager.class)));
+                doAnswer(call -> {
+                            order.add("snapshots");
+                            return call.callRealMethod();
+                        })
+                        .when(snapshots)
+                        .saveOnShutdown();
+                return snapshots;
+            });
+            context.registerBean(run.halo.app.plugin.PluginShutdownLifecycle.class);
             context.registerBean(DefaultSchemeManager.class);
             context.registerBean(CoreControllers.class);
             context.registerBean(SchemeInitialization.class);
@@ -53,7 +61,7 @@ class IndexSnapshotLifecycleTest {
             context.publishEvent(
                     new ApplicationReadyEvent(new SpringApplication(), new String[0], context, Duration.ZERO));
         }
-        assertThat(order).containsExactly("controllers", "plugins", "schemes");
+        assertThat(order).containsExactly("plugins", "controllers", "snapshots", "schemes");
     }
 
     static class StopOrder extends ArrayList<String> {}

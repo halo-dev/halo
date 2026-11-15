@@ -7,7 +7,7 @@ Accelerate both Halo and plugin startup without changing the existing index vali
 - Share per-storage-prefix checkpoint consumption, write admission and snapshot publication between application shutdown and scheme unregistration/re-registration.
 - Validate complete index definitions and existing explicit semantic versions, plus a shared engine compatibility version. Remove the whole-backend build fingerprint.
 - Invalidate dormant snapshots before store writes, including unregistered types and slash-containing resource names. Track transactions through completion and contain uncertainty to affected types.
-- Save after controllers stop on root shutdown; save before removing indices on plugin unregistration. Skip bundled plugin resource cleanup during root shutdown.
+- Stop plugins and clean their bundled resources while core controllers are running, then stop core controllers and save remaining snapshots. Save plugin types before removing their indices on unregistration.
 - Keep snapshots under `indices/snapshots/`, with atomic file replacement and database publication last. Rebuild whole affected types on any mismatch.
 
 ## Capabilities

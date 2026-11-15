@@ -93,8 +93,7 @@ class IndexSnapshotManagerTest {
             when(schemes.schemes()).thenReturn(registered);
             ObjectProvider<SchemeManager> provider = mock(ObjectProvider.class);
             when(provider.getObject()).thenReturn(schemes);
-            snapshots =
-                    new IndexSnapshotManager(workDir, repository, writes, engine, provider, mock(ObjectProvider.class));
+            snapshots = new IndexSnapshotManager(workDir, repository, writes, engine, provider);
         }
 
         <E extends ConfigMap> void start(Class<E> type) {
@@ -524,13 +523,8 @@ class IndexSnapshotManagerTest {
         doReturn(Mono.error(new IllegalStateException("database unavailable")))
                 .when(failing)
                 .deleteById(checkpoint(PluginRecord.class));
-        var manager = new IndexSnapshotManager(
-                workDir,
-                failing,
-                process.writes,
-                process.engine,
-                mock(ObjectProvider.class),
-                mock(ObjectProvider.class));
+        var manager =
+                new IndexSnapshotManager(workDir, failing, process.writes, process.engine, mock(ObjectProvider.class));
         assertThatThrownBy(() ->
                         manager.initialize(Scheme.buildFromType(PluginRecord.class), () -> fail("must not build")))
                 .hasMessage("database unavailable");
@@ -647,45 +641,6 @@ class IndexSnapshotManagerTest {
         next.start(ConfigMap.class);
         assertThat(next.scans).hasValue(0);
         assertThat(next.query(ConfigMap.class, "original")).containsExactly("a");
-    }
-
-    @Test
-    void rootLifecycleMustStopPluginsBeforeSavingRemainingCoreTypes() {
-        var process = new Process();
-        process.start(ConfigMap.class);
-        process.start(PluginRecord.class);
-        var schemeManager = mock(SchemeManager.class);
-        when(schemeManager.schemes()).thenReturn(process.registered);
-        ObjectProvider<SchemeManager> schemeProvider = mock(ObjectProvider.class);
-        when(schemeProvider.getObject()).thenReturn(schemeManager);
-        var plugins = mock(run.halo.app.plugin.SpringPluginManager.class);
-        ObjectProvider<run.halo.app.plugin.SpringPluginManager> pluginProvider = mock(ObjectProvider.class);
-        when(pluginProvider.getIfAvailable()).thenReturn(plugins);
-        doAnswer(ignored -> {
-                    assertThat(repository
-                                    .existsById(checkpoint(ConfigMap.class))
-                                    .block())
-                            .isFalse();
-                    process.stop(PluginRecord.class);
-                    return null;
-                })
-                .when(plugins)
-                .stopPlugins();
-        var lifecycle = new IndexSnapshotManager(
-                workDir, repository, process.writes, process.engine, schemeProvider, pluginProvider);
-        try (var context = new org.springframework.context.support.GenericApplicationContext()) {
-            lifecycle.setApplicationContext(context);
-            lifecycle.start();
-            lifecycle.onApplicationEvent(new org.springframework.boot.context.event.ApplicationReadyEvent(
-                    new org.springframework.boot.SpringApplication(), new String[0], context, Duration.ZERO));
-            lifecycle.stop();
-        }
-        verify(plugins).stopPlugins();
-        assertThat(lifecycle.isRunning()).isFalse();
-        assertThat(repository.existsById(checkpoint(ConfigMap.class)).block()).isTrue();
-        assertThat(repository.existsById(checkpoint(PluginRecord.class)).block())
-                .isTrue();
-        assertThat(lifecycle.getPhase()).isLessThan(run.halo.app.infra.InitializationPhase.CONTROLLERS.getPhase());
     }
 
     @Test
@@ -833,8 +788,7 @@ class IndexSnapshotManagerTest {
         when(schemes.schemes()).thenReturn(process.registered);
         ObjectProvider<SchemeManager> provider = mock(ObjectProvider.class);
         when(provider.getObject()).thenReturn(schemes);
-        return new IndexSnapshotManager(
-                workDir, checkpointRepository, process.writes, process.engine, provider, mock(ObjectProvider.class));
+        return new IndexSnapshotManager(workDir, checkpointRepository, process.writes, process.engine, provider);
     }
 
     @GVK(group = "snapshot.test", version = "v1", kind = "PluginRecord", plural = "records", singular = "record")
