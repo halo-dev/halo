@@ -401,6 +401,28 @@ class PluginServiceImplTest {
 
             verify(client).update(isA(Plugin.class));
         }
+
+        @Test
+        void shouldRecoverConcurrentPresetCreationAfterInstallationThreadIsInterrupted() {
+            var existingPlugin = new Plugin();
+            existingPlugin.setMetadata(new Metadata());
+            existingPlugin.getMetadata().setName("fake-plugin");
+            existingPlugin.setSpec(new Plugin.PluginSpec());
+            when(client.fetch(Plugin.class, "fake-plugin")).thenReturn(Mono.empty());
+            when(client.create(isA(Plugin.class)))
+                    .thenReturn(Mono.<Plugin>defer(() -> {
+                                Thread.currentThread().interrupt();
+                                return Mono.error(new DuplicateNameException("Duplicate name"));
+                            })
+                            .doFinally(signal -> Thread.interrupted()));
+            when(client.get(Plugin.class, "fake-plugin")).thenReturn(Mono.just(existingPlugin));
+            when(client.update(isA(Plugin.class)))
+                    .thenAnswer(invocation -> Mono.just(invocation.getArgument(0, Plugin.class)));
+
+            pluginService.installPresetPlugins().as(StepVerifier::create).verifyComplete();
+
+            verify(client).update(isA(Plugin.class));
+        }
     }
 
     @Test
