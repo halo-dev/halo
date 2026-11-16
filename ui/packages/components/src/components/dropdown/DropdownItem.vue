@@ -33,6 +33,7 @@ function onClick(e: MouseEvent) {
 
 <template>
   <div
+    :aria-disabled="disabled ? 'true' : undefined"
     class="dropdown-item-wrapper"
     :class="[
       `dropdown-item-wrapper--${type}${selected ? '--selected' : ''}`,

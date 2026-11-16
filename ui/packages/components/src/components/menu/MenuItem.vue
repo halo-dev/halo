@@ -49,9 +49,14 @@ function handleExpand() {
 
 <template>
   <li
+    :aria-current="active ? 'page' : undefined"
+    :aria-expanded="hasSubmenus ? open : undefined"
     :class="{ 'has-submenus': hasSubmenus }"
     class="menu-item group"
+    tabindex="0"
     @click.stop="handleClick"
+    @keydown.enter.stop.prevent="handleClick"
+    @keydown.space.stop.prevent="handleClick"
   >
     <div :class="{ active }" class="menu-item-title">
       <span v-if="$slots.icon" class="menu-icon mr-3 self-center">
@@ -66,7 +71,7 @@ function handleExpand() {
         class="menu-icon-collapse self-center transition-all"
         @click.stop="handleExpand"
       >
-        <IconArrowRight />
+        <IconArrowRight aria-hidden="true" />
       </span>
     </div>
 

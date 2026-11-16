@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { ComputedRef } from "vue";
-import { computed, provide, useSlots } from "vue";
+import { computed, provide, useId, useSlots } from "vue";
 import { VTabbar } from "./index";
 import type { TabsDirection, TabsType } from "./types";
 
@@ -25,6 +25,8 @@ provide<ComputedRef<string | number | undefined>>(
   "activeId",
   computed(() => props.activeId)
 );
+
+provide<string>("tabsId", useId());
 
 const emit = defineEmits<{
   (event: "update:activeId", value: number | string): void;

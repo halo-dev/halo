@@ -13,6 +13,10 @@ const RoutesMenu = defineComponent({
       type: Object as PropType<MenuGroupType[]>,
       required: true,
     },
+    ariaLabel: {
+      type: String,
+      default: undefined,
+    },
   },
   emits: ["select"],
   setup(props, { emit }) {
@@ -72,7 +76,7 @@ const RoutesMenu = defineComponent({
 
     return () => (
       // @ts-ignore
-      <VMenu openIds={openIds.value}>
+      <VMenu openIds={openIds.value} ariaLabel={props.ariaLabel}>
         {props.menus?.map((menu: MenuGroupType) => {
           return (
             <>

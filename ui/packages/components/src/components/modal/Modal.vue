@@ -4,9 +4,12 @@ import { useOverlayScrollbars } from "overlayscrollbars-vue";
 import {
   computed,
   nextTick,
+  onBeforeUnmount,
   onMounted,
   reactive,
   ref,
+  useId,
+  useSlots,
   useTemplateRef,
   watch,
 } from "vue";
@@ -45,6 +48,12 @@ const emit = defineEmits<{
 const internalVisible = ref<boolean | undefined>(false);
 const rootVisible = ref(false);
 const modelWrapper = useTemplateRef<HTMLElement>("modelWrapper");
+const slots = useSlots();
+const titleId = useId();
+
+const labelledby = computed(() => {
+  return props.title && !slots.header ? titleId : undefined;
+});
 
 watch(
   () => props.visible,
@@ -85,6 +94,75 @@ defineExpose({
   close: handleClose,
 });
 
+let previouslyFocusedElement: HTMLElement | null = null;
+
+function restoreFocus() {
+  const element = previouslyFocusedElement;
+  previouslyFocusedElement = null;
+
+  if (element?.isConnected) {
+    element.focus({ preventScroll: true });
+  }
+}
+
+function hasNegativeTabIndex(element: HTMLElement) {
+  const tabindex = element.getAttribute("tabindex");
+
+  if (!tabindex) {
+    return false;
+  }
+
+  const match = /^[\t\n\f\r ]*([+-]?)(\d+)/.exec(tabindex);
+
+  return match?.[1] === "-" && Number(match[2]) > 0;
+}
+
+function getFocusableElements(container: HTMLElement) {
+  return Array.from(
+    container.querySelectorAll<HTMLElement>(
+      'a[href], area[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), summary, iframe, object, embed, [contenteditable="true"], [tabindex]'
+    )
+  ).filter(
+    (element) =>
+      element.getClientRects().length > 0 && !hasNegativeTabIndex(element)
+  );
+}
+
+function handleTabKey(event: KeyboardEvent) {
+  const container = modelWrapper.value;
+  if (!internalVisible.value || !container) return;
+
+  const focusableElements = getFocusableElements(container);
+  if (focusableElements.length === 0) {
+    event.preventDefault();
+    container.focus();
+    return;
+  }
+
+  const firstElement = focusableElements[0];
+  const lastElement = focusableElements[focusableElements.length - 1];
+  const activeElement = document.activeElement;
+
+  if (event.shiftKey) {
+    if (
+      activeElement === firstElement ||
+      activeElement === container ||
+      !container.contains(activeElement)
+    ) {
+      event.preventDefault();
+      lastElement.focus();
+    }
+    return;
+  }
+
+  if (activeElement === lastElement || activeElement === container) {
+    event.preventDefault();
+    firstElement.focus();
+  }
+}
+
+onBeforeUnmount(restoreFocus);
+
 const focus = ref(false);
 
 function handleClickLayer() {
@@ -115,6 +193,14 @@ watch(
   () => internalVisible.value,
   (value) => {
     if (value) {
+      if (
+        !previouslyFocusedElement &&
+        document.activeElement instanceof HTMLElement &&
+        document.activeElement !== document.body
+      ) {
+        previouslyFocusedElement = document.activeElement;
+      }
+
       if (modalBody.value && modalViewport.value) {
         initialize({
           target: modalBody.value,
@@ -130,6 +216,7 @@ watch(
       });
     } else {
       instance()?.destroy();
+      restoreFocus();
     }
   }
 );
@@ -140,11 +227,13 @@ watch(
       v-show="rootVisible"
       ref="modelWrapper"
       :class="wrapperClasses"
+      :aria-labelledby="labelledby"
       aria-modal="true"
       class="modal-wrapper"
       role="dialog"
       tabindex="0"
       v-bind="$attrs"
+      @keydown.tab="handleTabKey"
       @keyup.esc.stop="handleClose()"
     >
       <transition
@@ -179,14 +268,22 @@ watch(
         >
           <div v-if="$slots.header || title" class="modal-header group">
             <slot name="header">
-              <div class="modal-header-title">{{ title }}</div>
+              <div :id="titleId" class="modal-header-title">{{ title }}</div>
               <div v-if="$slots.center" class="modal-header-center">
                 <slot name="center"></slot>
               </div>
               <div class="modal-header-actions">
                 <slot name="actions"></slot>
-                <span class="bg-gray-50" @click="handleClose()">
-                  <IconClose />
+                <span
+                  aria-label="Close"
+                  class="bg-gray-50"
+                  role="button"
+                  tabindex="0"
+                  @click="handleClose()"
+                  @keydown.enter.prevent="handleClose()"
+                  @keydown.space.prevent="handleClose()"
+                >
+                  <IconClose aria-hidden="true" />
                 </span>
               </div>
             </slot>

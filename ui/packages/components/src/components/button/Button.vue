@@ -1,14 +1,16 @@
 <template>
   <button
+    :aria-busy="loading ? 'true' : undefined"
     :class="classes"
     :disabled="disabled"
     class="btn"
     type="button"
     @click="handleClick"
   >
-    <span v-if="$slots.icon || loading" class="btn-icon">
+    <span v-if="$slots.icon || loading" aria-hidden="true" class="btn-icon">
       <svg
         v-if="loading"
+        aria-hidden="true"
         class="animate-spin"
         fill="none"
         viewBox="0 0 24 24"
@@ -198,6 +200,11 @@ $btn-themes: (
 
   &:hover {
     opacity: 0.9;
+  }
+
+  &:focus-visible {
+    outline: 2px solid theme("colors.primary");
+    outline-offset: 2px;
   }
 
   &:not(:disabled):not(.btn-loading):active {

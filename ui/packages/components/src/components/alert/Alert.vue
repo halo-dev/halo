@@ -51,7 +51,7 @@ const handleClose = () => {
     <div class="alert-header">
       <div class="alert-icon">
         <slot name="icon">
-          <component :is="TypeIcons[type]" />
+          <component :is="TypeIcons[type]" aria-hidden="true" />
         </slot>
       </div>
       <div v-if="title || $slots.title" class="alert-title">
@@ -59,8 +59,17 @@ const handleClose = () => {
           {{ title }}
         </slot>
       </div>
-      <div v-if="closable" class="alert-close" @click="handleClose">
-        <IconClose />
+      <div
+        v-if="closable"
+        aria-label="Close"
+        class="alert-close"
+        role="button"
+        tabindex="0"
+        @click="handleClose"
+        @keydown.enter.prevent="handleClose"
+        @keydown.space.prevent="handleClose"
+      >
+        <IconClose aria-hidden="true" />
       </div>
     </div>
     <div v-if="description || $slots.description" class="alert-description">

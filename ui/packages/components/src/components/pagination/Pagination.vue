@@ -12,6 +12,8 @@ const props = withDefaults(
     pageLabel?: string;
     sizeLabel?: string;
     totalLabel?: string;
+    prevLabel?: string;
+    nextLabel?: string;
   }>(),
   {
     page: 1,
@@ -22,6 +24,8 @@ const props = withDefaults(
     pageLabel: "页",
     sizeLabel: "条 / 页",
     totalLabel: undefined,
+    prevLabel: "Previous page",
+    nextLabel: "Next page",
   }
 );
 
@@ -85,22 +89,25 @@ const next = () => {
     <div class="pagination__controller">
       <nav aria-label="Pagination" class="pagination__nav">
         <button
-          class="pagination__btn pagination__btn--prev"
+          :aria-label="prevLabel"
           :disabled="!hasPrevious"
+          class="pagination__btn pagination__btn--prev"
           @click="previous"
         >
-          <IconArrowLeft />
+          <IconArrowLeft aria-hidden="true" />
         </button>
         <button
-          class="pagination__btn pagination__btn--next"
+          :aria-label="nextLabel"
           :disabled="!hasNext"
+          class="pagination__btn pagination__btn--next"
           @click="next"
         >
-          <IconArrowRight />
+          <IconArrowRight aria-hidden="true" />
         </button>
       </nav>
       <div class="pagination__select-wrap">
         <select
+          :aria-label="pageLabel"
           :value="page"
           :disabled="totalPages === 0"
           class="pagination__select"
@@ -116,7 +123,12 @@ const next = () => {
         </span>
       </div>
       <div class="pagination__select-wrap">
-        <select :value="size" class="pagination__select" @change="onSizeChange">
+        <select
+          :aria-label="sizeLabel"
+          :value="size"
+          class="pagination__select"
+          @change="onSizeChange"
+        >
           <option
             v-for="(sizeOption, index) in sizeOptions"
             :key="index"
