@@ -22,6 +22,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import run.halo.app.extension.index.IndexSnapshotWriteBarrier;
 import run.halo.app.infra.exception.DuplicateNameException;
 
 @Component
@@ -33,6 +34,8 @@ public class ReactiveExtensionStoreClientImpl implements ReactiveExtensionStoreC
     private final ExtensionStoreRepository repository;
 
     private final R2dbcEntityOperations entityOperations;
+
+    private final IndexSnapshotWriteBarrier snapshotWrites;
 
     private int fetchSize = DEFAULT_FETCH_SIZE;
 
@@ -113,23 +116,30 @@ public class ReactiveExtensionStoreClientImpl implements ReactiveExtensionStoreC
 
     @Override
     public Mono<ExtensionStore> create(String name, byte[] data) {
-        return repository
-                .save(new ExtensionStore(name, data))
-                .onErrorMap(
-                        DuplicateKeyException.class, t -> new DuplicateNameException("Duplicate name detected.", t));
+        return snapshotWrites.track(
+                name,
+                repository,
+                () -> repository
+                        .save(new ExtensionStore(name, data))
+                        .onErrorMap(
+                                DuplicateKeyException.class,
+                                t -> new DuplicateNameException("Duplicate name detected.", t)));
     }
 
     @Override
     public Mono<ExtensionStore> update(String name, Long version, byte[] data) {
-        return repository.save(new ExtensionStore(name, data, version));
+        return snapshotWrites.track(name, repository, () -> repository.save(new ExtensionStore(name, data, version)));
     }
 
     @Override
     public Mono<ExtensionStore> delete(String name, Long version) {
-        return repository.findById(name).flatMap(extensionStore -> {
-            // reset the version
-            extensionStore.setVersion(version);
-            return repository.delete(extensionStore).thenReturn(extensionStore);
-        });
+        return snapshotWrites.track(
+                name,
+                repository,
+                () -> repository.findById(name).flatMap(extensionStore -> {
+                    // reset the version
+                    extensionStore.setVersion(version);
+                    return repository.delete(extensionStore).thenReturn(extensionStore);
+                }));
     }
 }

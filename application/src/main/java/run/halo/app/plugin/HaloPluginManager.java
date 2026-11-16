@@ -9,7 +9,7 @@ import org.pf4j.*;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
-import org.springframework.data.util.Lazy;
+import org.springframework.context.ConfigurableApplicationContext;
 import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.plugin.event.PluginStartedEvent;
 
@@ -25,7 +25,7 @@ class HaloPluginManager extends DefaultPluginManager implements SpringPluginMana
 
     private final ApplicationContext rootContext;
 
-    private Lazy<ApplicationContext> sharedContext;
+    private volatile ApplicationContext sharedContext;
 
     private final PluginProperties pluginProperties;
 
@@ -53,7 +53,6 @@ class HaloPluginManager extends DefaultPluginManager implements SpringPluginMana
     @Override
     public void afterPropertiesSet() throws Exception {
         super.runtimeMode = pluginProperties.getRuntimeMode();
-        this.sharedContext = Lazy.of(() -> SharedApplicationContextFactory.create(rootContext));
         setExactVersionAllowed(pluginProperties.isExactVersionAllowed());
         setSystemVersion(systemVersionSupplier.get().toStableVersion().toString());
 
@@ -172,6 +171,9 @@ class HaloPluginManager extends DefaultPluginManager implements SpringPluginMana
         log.info("Stopping and unloading all plugins before application context shutdown...");
         stopPlugins();
         unloadPlugins();
+        if (sharedContext instanceof ConfigurableApplicationContext context) {
+            context.close();
+        }
         log.info("All plugins stopped and unloaded.");
     }
 
@@ -181,8 +183,11 @@ class HaloPluginManager extends DefaultPluginManager implements SpringPluginMana
     }
 
     @Override
-    public ApplicationContext getSharedContext() {
-        return sharedContext.get();
+    public synchronized ApplicationContext getSharedContext() {
+        if (sharedContext == null) {
+            sharedContext = SharedApplicationContextFactory.create(rootContext);
+        }
+        return sharedContext;
     }
 
     @Override

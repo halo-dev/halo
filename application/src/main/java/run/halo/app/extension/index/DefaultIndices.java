@@ -123,6 +123,37 @@ class DefaultIndices<E extends Extension> implements Indices<E> {
     }
 
     @Override
+    public IndicesSnapshot dump() {
+        return new IndicesSnapshot(indexMap.values().stream().map(Index::dump).toList());
+    }
+
+    @Override
+    public boolean restore(IndicesSnapshot snapshot) {
+        var fingerprints = new HashMap<String, String>();
+        snapshot.indices().forEach(index -> fingerprints.put(index.name(), index.fingerprint()));
+        if (snapshot.indices().size() != indexMap.size() || !fingerprints.equals(currentFingerprints())) {
+            return false;
+        }
+        try {
+            for (var snapshotIndex : snapshot.indices()) {
+                indexMap.get(snapshotIndex.name()).restore(snapshotIndex);
+            }
+            return true;
+        } catch (RuntimeException e) {
+            // A failed decode may have restored part of an index. Full rebuild must start empty.
+            indexMap.values().forEach(IOUtils::closeQuietly);
+            log.warn("Failed to restore index snapshot; rebuilding all indices", e);
+            return false;
+        }
+    }
+
+    private Map<String, String> currentFingerprints() {
+        var fingerprints = new HashMap<String, String>();
+        indexMap.values().forEach(index -> fingerprints.put(index.getName(), index.getFingerprint()));
+        return fingerprints;
+    }
+
+    @Override
     public <K extends Comparable<K>> Index<E, K> getIndex(String indexName) {
         ensureNotClosed();
         var index = (Index<E, K>) indexMap.get(indexName);

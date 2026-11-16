@@ -39,4 +39,15 @@ public interface ValueIndexSpec<E extends Extension, K extends Comparable<K>> {
      * @return the type of the key
      */
     Class<K> getKeyType();
+
+    /**
+     * Gets the version of this index spec. Bump the version to trigger a rebuild of the index when the semantics of the
+     * index function change without any structural change.
+     *
+     * @return the version of this index spec, defaults to 1
+     * @since 2.26.0
+     */
+    default int getVersion() {
+        return 1;
+    }
 }

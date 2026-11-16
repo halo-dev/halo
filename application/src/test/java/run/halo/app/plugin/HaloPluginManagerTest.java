@@ -157,6 +157,19 @@ class HaloPluginManagerTest {
     }
 
     @Test
+    void destroyShouldCloseSharedContextAfterStoppingAndUnloadingPlugins() {
+        var shared = org.mockito.Mockito.mock(org.springframework.context.ConfigurableApplicationContext.class);
+        org.springframework.test.util.ReflectionTestUtils.setField(pluginManager, "sharedContext", shared);
+        org.mockito.Mockito.doNothing().when(pluginManager).stopPlugins();
+        org.mockito.Mockito.doNothing().when(pluginManager).unloadPlugins();
+        pluginManager.destroy();
+        var order = org.mockito.Mockito.inOrder(pluginManager, shared);
+        order.verify(pluginManager).stopPlugins();
+        order.verify(pluginManager).unloadPlugins();
+        order.verify(shared).close();
+    }
+
+    @Test
     void destroyShouldStopAndUnloadPlugins() {
         doReturn(List.of()).when(pluginManager).startedPlugins();
         doReturn(List.of()).when(pluginManager).getResolvedPlugins();

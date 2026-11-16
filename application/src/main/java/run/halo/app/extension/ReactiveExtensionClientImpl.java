@@ -26,6 +26,7 @@ import reactor.core.scheduler.Schedulers;
 import reactor.util.retry.Retry;
 import run.halo.app.extension.exception.ExtensionNotFoundException;
 import run.halo.app.extension.index.IndexEngine;
+import run.halo.app.extension.index.IndexSnapshotWriteBarrier;
 import run.halo.app.extension.index.IndexedQueryEngine;
 import run.halo.app.extension.store.ReactiveExtensionStoreClient;
 
@@ -406,7 +407,8 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient, Dis
                                 return extension;
                             })
                             .subscribeOn(this.scheduler))
-                    .as(transactionalOperator::transactional);
+                    .as(transactionalOperator::transactional)
+                    .contextWrite(context -> context.put(IndexSnapshotWriteBarrier.INDEXED_WRITE, true));
         });
     }
 
@@ -431,7 +433,8 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient, Dis
                                 return extension;
                             })
                             .subscribeOn(this.scheduler))
-                    .as(transactionalOperator::transactional);
+                    .as(transactionalOperator::transactional)
+                    .contextWrite(context -> context.put(IndexSnapshotWriteBarrier.INDEXED_WRITE, true));
         });
     }
 

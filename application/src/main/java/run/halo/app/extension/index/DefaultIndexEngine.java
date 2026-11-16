@@ -12,7 +12,6 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
 import run.halo.app.extension.Extension;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
@@ -83,6 +82,7 @@ class DefaultIndexEngine implements IndexEngine, DisposableBean {
             options = ListOptions.builder().build();
         }
         var finalCondition = options.toCondition();
+        indicesManager.awaitReady(type);
         var indices = indicesManager.get(type);
         var queryVisitor = new QueryVisitor<>(indices, conversionService);
         queryVisitor.enter(finalCondition);
@@ -101,6 +101,7 @@ class DefaultIndexEngine implements IndexEngine, DisposableBean {
             sort = Sort.unsorted();
         }
         var finalCondition = options.toCondition();
+        indicesManager.awaitReady(type);
         var indices = indicesManager.get(type);
         var queryVisitor = new QueryVisitor<>(indices, conversionService);
         queryVisitor.enter(finalCondition);
@@ -124,6 +125,7 @@ class DefaultIndexEngine implements IndexEngine, DisposableBean {
             sort = Sort.unsorted();
         }
         var finalCondition = options.toCondition();
+        indicesManager.awaitReady(type);
         var indices = indicesManager.get(type);
         var queryVisitor = new QueryVisitor<>(indices, conversionService);
         queryVisitor.enter(finalCondition);
@@ -138,6 +140,7 @@ class DefaultIndexEngine implements IndexEngine, DisposableBean {
             options = ListOptions.builder().build();
         }
         var finalCondition = options.toCondition();
+        indicesManager.awaitReady(type);
         var indices = indicesManager.get(type);
         var queryVisitor = new QueryVisitor<>(indices, conversionService);
         queryVisitor.enter(finalCondition);
@@ -155,12 +158,7 @@ class DefaultIndexEngine implements IndexEngine, DisposableBean {
             Index<E, ?> index = indices.getIndex(order.getProperty());
             Function<String, Object> accessor;
             if (index instanceof MultiValueIndex<?, ?> multiValueIndex) {
-                accessor = primaryKey -> {
-                    var keys = multiValueIndex.getKeys(primaryKey);
-                    return CollectionUtils.isEmpty(keys)
-                            ? null
-                            : keys.iterator().next();
-                };
+                accessor = multiValueIndex::getSortKey;
             } else if (index instanceof SingleValueIndex<?, ?> singleValueIndex) {
                 accessor = singleValueIndex::getKey;
             } else {

@@ -84,7 +84,7 @@ public class DefaultPluginApplicationContextFactory implements PluginApplication
 
         var context = new PluginApplicationContext(pluginId, pluginManager, beanFactory);
         context.setBeanNameGenerator(DefaultBeanNameGenerator.INSTANCE);
-        context.registerShutdownHook();
+        // The root plugin manager owns shutdown; an independent JVM hook races plugin stop().
         context.setParent(pluginManager.getSharedContext());
 
         var resourceLoader = new DefaultResourceLoader(classLoader);

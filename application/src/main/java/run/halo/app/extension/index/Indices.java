@@ -11,6 +11,12 @@ public interface Indices<E extends Extension> extends Closeable {
 
     void delete(E extension);
 
+    /** Capture only after all writes have drained. */
+    IndicesSnapshot dump();
+
+    /** Restore into empty indices, or return false so the caller can rebuild the complete type. */
+    boolean restore(IndicesSnapshot snapshot);
+
     /**
      * Get index by name.
      *

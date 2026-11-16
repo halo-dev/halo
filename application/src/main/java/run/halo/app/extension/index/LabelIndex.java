@@ -72,6 +72,35 @@ class LabelIndex<E extends Extension> implements LabelIndexQuery, Index<E, Strin
     }
 
     @Override
+    public IndexSnapshot dump() {
+        var entries = index.entrySet().stream()
+                .map(e -> new IndexSnapshot.Entry(
+                        List.of(e.getKey().labelKey(), e.getKey().labelValue()), List.copyOf(e.getValue())))
+                .toList();
+        return new IndexSnapshot(getName(), getFingerprint(), "label", entries, List.of());
+    }
+
+    @Override
+    public void restore(IndexSnapshot snapshot) {
+        for (var entry : snapshot.entries()) {
+            var labelEntry =
+                    new LabelEntry(entry.keyParts().get(0), entry.keyParts().get(1));
+            var primaryKeys = ConcurrentHashMap.<String>newKeySet();
+            primaryKeys.addAll(entry.primaryKeys());
+            index.put(labelEntry, primaryKeys);
+            entry.primaryKeys()
+                    .forEach(pk -> invertedIndex
+                            .computeIfAbsent(pk, k -> ConcurrentHashMap.newKeySet())
+                            .add(labelEntry));
+        }
+    }
+
+    @Override
+    public String getFingerprint() {
+        return IndexFingerprints.LABEL_FINGERPRINT;
+    }
+
+    @Override
     public Set<String> exists(String labelKey) {
         return index
                 .subMap(

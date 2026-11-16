@@ -49,6 +49,10 @@ class MigrationServiceImplTest {
     @Mock
     ExtensionStoreRepository repository;
 
+    @org.mockito.Spy
+    run.halo.app.extension.index.IndexSnapshotWriteBarrier snapshotWrites =
+            new run.halo.app.extension.index.IndexSnapshotWriteBarrier();
+
     @Mock
     HaloProperties haloProperties;
 
@@ -147,6 +151,7 @@ class MigrationServiceImplTest {
         var content = DataBufferUtils.read(
                 backupFile, DefaultDataBufferFactory.sharedInstance, 2048, StandardOpenOption.READ);
         StepVerifier.create(migrationService.restore(content)).verifyComplete();
+        assertFalse(snapshotWrites.isReusable(), "Restored database must invalidate shutdown snapshots");
 
         verify(haloProperties).getWorkDir();
         verify(repository).deleteAll();

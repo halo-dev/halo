@@ -30,12 +30,27 @@ class DefaultSchemeManagerTest {
     @Mock
     ApplicationEventPublisher eventPublisher;
 
+    @Mock
+    run.halo.app.extension.index.IndexSnapshotManager snapshots;
+
+    @Mock
+    org.springframework.beans.factory.ObjectProvider<run.halo.app.extension.index.IndexSnapshotManager>
+            snapshotProvider;
+
     @InjectMocks
     DefaultSchemeManager schemeManager;
 
     @BeforeEach
     void setUp() {
         lenient().when(indexEngine.getIndicesManager()).thenReturn(indicesManager);
+        lenient().when(snapshotProvider.getObject()).thenReturn(snapshots);
+        org.mockito.Mockito.lenient()
+                .doAnswer(call -> {
+                    call.getArgument(1, Runnable.class).run();
+                    return null;
+                })
+                .when(snapshots)
+                .unregister(any(), any());
     }
 
     @Test
@@ -116,6 +131,59 @@ class DefaultSchemeManagerTest {
             // make sure concurrent modification won't happen
             schemeManager.register(FooExtension.class);
         });
+    }
+
+    @Test
+    void interruptedRegistrationMustRollBackAndAllowRetry() {
+        var engine = run.halo.app.extension.index.IndexEngineTestSupport.newIndexEngine();
+        var attempts = new java.util.concurrent.atomic.AtomicInteger();
+        var removals = new java.util.concurrent.atomic.AtomicInteger();
+        var resource = new ConfigMap();
+        var metadata = new Metadata();
+        metadata.setName("existing");
+        metadata.setCreationTimestamp(java.time.Instant.EPOCH);
+        resource.setMetadata(metadata);
+        var failure = new IllegalStateException("cancelled during index construction");
+        ApplicationEventPublisher publisher = event -> {
+            if (event instanceof SchemeAddedEvent) {
+                engine.insert(java.util.List.of(resource));
+                if (attempts.getAndIncrement() == 0) {
+                    Thread.currentThread().interrupt();
+                    throw failure;
+                }
+            } else if (event instanceof SchemeRemovedEvent) {
+                removals.incrementAndGet();
+            }
+        };
+        var manager = new DefaultSchemeManager(engine, publisher, snapshotProvider);
+        try {
+            assertSame(failure, assertThrows(IllegalStateException.class, () -> manager.register(ConfigMap.class)));
+            assertTrue(Thread.currentThread().isInterrupted());
+        } finally {
+            Thread.interrupted();
+        }
+        assertTrue(manager.schemes().isEmpty());
+        assertThrows(
+                IllegalArgumentException.class, () -> engine.getIndicesManager().get(ConfigMap.class));
+        assertEquals(1, removals.get());
+        manager.register(ConfigMap.class);
+        assertEquals(2, attempts.get());
+        assertEquals(1, manager.size());
+        org.assertj.core.api.Assertions.assertThat(engine.retrieveAll(ConfigMap.class, null, null))
+                .containsExactly("existing");
+    }
+
+    @Test
+    void registrationMustPreserveOriginalFailureIfRemovalListenerFails() {
+        var failure = new IllegalStateException("registration failed");
+        var cleanupFailure = new IllegalArgumentException("listener cleanup failed");
+        org.mockito.Mockito.doThrow(failure).when(eventPublisher).publishEvent(isA(SchemeAddedEvent.class));
+        org.mockito.Mockito.doThrow(cleanupFailure).when(eventPublisher).publishEvent(isA(SchemeRemovedEvent.class));
+        assertSame(
+                failure, assertThrows(IllegalStateException.class, () -> schemeManager.register(FakeExtension.class)));
+        assertArrayEquals(new Throwable[] {cleanupFailure}, failure.getSuppressed());
+        assertTrue(schemeManager.schemes().isEmpty());
+        verify(indicesManager).remove(FakeExtension.class);
     }
 
     @GVK(group = "fake.halo.run", version = "v1alpha1", kind = "Foo", plural = "foos", singular = "foo")
