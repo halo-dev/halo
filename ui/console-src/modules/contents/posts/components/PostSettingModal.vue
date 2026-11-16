@@ -465,6 +465,15 @@ const showCancelPublishButton = computed(() => {
               type="checkbox"
             ></FormKit>
             <FormKit
+              v-if="formState.spec.pinned"
+              v-model="formState.spec.priority"
+              :label="$t('core.post.settings.fields.priority.label')"
+              :help="$t('core.post.settings.fields.priority.help')"
+              name="priority"
+              type="number"
+              validation="required"
+            ></FormKit>
+            <FormKit
               v-model="formState.spec.visible"
               :options="[
                 { label: $t('core.common.select.public'), value: 'PUBLIC' },

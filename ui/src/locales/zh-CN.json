@@ -143,6 +143,8 @@
   "core.post.settings.fields.raw_excerpt.label": "自定义摘要",
   "core.post.settings.fields.allow_comment.label": "允许评论",
   "core.post.settings.fields.pinned.label": "是否置顶",
+  "core.post.settings.fields.priority.label": "置顶优先级",
+  "core.post.settings.fields.priority.help": "数值越大，排序越靠前",
   "core.post.settings.fields.visible.label": "可见性",
   "core.post.settings.fields.publish_time.label": "发表时间",
   "core.post.settings.fields.publish_time.help.schedule_publish": "将设置定时任务，并于 {datetime} 发布",
