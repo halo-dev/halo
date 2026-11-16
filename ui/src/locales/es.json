@@ -125,6 +125,8 @@
   "core.post.settings.fields.raw_excerpt.label": "Extracto",
   "core.post.settings.fields.allow_comment.label": "Permitir Comentarios",
   "core.post.settings.fields.pinned.label": "Fijado",
+  "core.post.settings.fields.priority.label": "Prioridad de fijado",
+  "core.post.settings.fields.priority.help": "Los valores más altos aparecen antes",
   "core.post.settings.fields.visible.label": "Visibilidad",
   "core.post.settings.fields.publish_time.label": "Hora de Publicación",
   "core.post.settings.fields.publish_time.help.schedule_publish": "Programa una tarea y publícala el {datetime}",

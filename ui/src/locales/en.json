@@ -143,6 +143,8 @@
   "core.post.settings.fields.raw_excerpt.label": "Excerpt",
   "core.post.settings.fields.allow_comment.label": "Allow Comment",
   "core.post.settings.fields.pinned.label": "Pinned",
+  "core.post.settings.fields.priority.label": "Pin Priority",
+  "core.post.settings.fields.priority.help": "Higher values appear earlier",
   "core.post.settings.fields.visible.label": "Visible",
   "core.post.settings.fields.publish_time.label": "Publish Time",
   "core.post.settings.fields.publish_time.help.schedule_publish": "Schedule a timed task and publish it at {datetime}",

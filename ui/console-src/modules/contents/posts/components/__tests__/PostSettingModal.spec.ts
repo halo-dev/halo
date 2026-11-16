@@ -6,7 +6,7 @@ import { VueQueryPlugin } from "@tanstack/vue-query";
 import { mount } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
 import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
-import { defineComponent, h } from "vue";
+import { defineComponent, h, nextTick } from "vue";
 import { createI18n } from "vue-i18n";
 import PostSettingModal from "../PostSettingModal.vue";
 
@@ -75,8 +75,16 @@ function createAnnotationsFormStub(handleSubmit: () => void) {
 
 const FormKitStub = defineComponent({
   name: "FormKit",
-  setup(_, { slots }) {
-    return () => h("div", slots.default?.());
+  setup(_, { attrs, slots }) {
+    return () =>
+      h(
+        "div",
+        {
+          "data-name": attrs.name,
+          "data-model-value": attrs.modelValue,
+        },
+        slots.default?.()
+      );
   },
 });
 
@@ -99,6 +107,28 @@ const VButtonStub = defineComponent({
   },
 });
 
+function mountSettingModal(post: Post) {
+  return mount(PostSettingModal, {
+    props: {
+      post,
+      onlyEmit: true,
+    },
+    global: {
+      plugins,
+      stubs: {
+        AnnotationsForm: createAnnotationsFormStub(vi.fn()),
+        FormKit: FormKitStub,
+        IconRefreshLine: true,
+        VButton: VButtonStub,
+        VModal: VModalStub,
+        VSpace: {
+          template: "<div><slot /></div>",
+        },
+      },
+    },
+  });
+}
+
 describe("PostSettingModal", () => {
   beforeEach(() => {
     setActivePinia(createPinia());
@@ -120,6 +150,24 @@ describe("PostSettingModal", () => {
       }
     );
     expect(wrapper).toBeDefined();
+  });
+
+  it("shows the priority input only when the post is pinned", async () => {
+    utils.permission.setUserPermissions([]);
+
+    const post = createPost();
+    post.spec.priority = 5;
+
+    const wrapper = mountSettingModal(post);
+
+    expect(wrapper.find('[data-name="priority"]').exists()).toBe(false);
+
+    wrapper.vm.$.setupState.formState.spec.pinned = true;
+    await nextTick();
+
+    const priorityInput = wrapper.find('[data-name="priority"]');
+    expect(priorityInput.exists()).toBe(true);
+    expect(priorityInput.attributes("data-model-value")).toBe("5");
   });
 
   it("merges annotation form state before emitting direct publish", async () => {
