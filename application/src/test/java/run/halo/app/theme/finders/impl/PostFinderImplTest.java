@@ -18,6 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Sort;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import run.halo.app.content.PostService;
@@ -238,6 +239,59 @@ class PostFinderImplTest {
             query.setPinned(true);
 
             assertThat(query.toListOptions().toCondition().toString()).isEqualTo("spec.pinned = true");
+        }
+    }
+
+    @Nested
+    class QueryCursorTest {
+
+        @Test
+        void readsOnlyAdjacentPosts() {
+            when(postPredicateResolver.getListOptions()).thenReturn(Mono.just(new ListOptions()));
+            when(client.listAllNames(eq(Post.class), any(), any()))
+                    .thenReturn(Flux.just("post-1", "post-2", "post-3", "post-4"));
+            when(client.fetch(Post.class, "post-3")).thenReturn(Mono.just(post(3)));
+            when(client.fetch(Post.class, "post-1")).thenReturn(Mono.just(post(1)));
+
+            var result = postFinder.cursor("post-2", Map.of()).block();
+
+            assertThat(result).isNotNull();
+            assertThat(result.previous().getMetadata().getName()).isEqualTo("post-3");
+            assertThat(result.next().getMetadata().getName()).isEqualTo("post-1");
+            verify(client).listAllNames(eq(Post.class), any(), any());
+            verify(client).fetch(Post.class, "post-3");
+            verify(client).fetch(Post.class, "post-1");
+            verifyNoMoreInteractions(client);
+            verifyNoInteractions(publicQueryService);
+        }
+
+        @Test
+        void missingNeighborDoesNotDiscardOtherNeighbor() {
+            when(postPredicateResolver.getListOptions()).thenReturn(Mono.just(new ListOptions()));
+            when(client.listAllNames(eq(Post.class), any(), any())).thenReturn(Flux.just("post-1", "post-2", "post-3"));
+            when(client.fetch(Post.class, "post-3")).thenReturn(Mono.empty());
+            when(client.fetch(Post.class, "post-1")).thenReturn(Mono.just(post(1)));
+
+            var result = postFinder.cursor("post-2", Map.of()).block();
+
+            assertThat(result).isNotNull();
+            assertThat(result.previous()).isNull();
+            assertThat(result.next().getMetadata().getName()).isEqualTo("post-1");
+        }
+
+        @Test
+        void propagatesQueryErrorsWithoutFetchingPosts() {
+            var error = new IllegalStateException("Query failed");
+            when(postPredicateResolver.getListOptions()).thenReturn(Mono.just(new ListOptions()));
+            when(client.listAllNames(eq(Post.class), any(), any())).thenReturn(Flux.error(error));
+
+            postFinder
+                    .cursor("post-2", Map.of())
+                    .as(StepVerifier::create)
+                    .expectErrorMatches(actual -> actual == error)
+                    .verify();
+
+            verify(client, never()).fetch(eq(Post.class), anyString());
         }
     }
 
