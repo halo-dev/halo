@@ -3,13 +3,18 @@ import { provide } from "vue";
 
 const props = defineProps<{
   openIds?: string[];
+  ariaLabel?: string;
 }>();
 
 provide<string[] | undefined>("openIds", props.openIds);
 </script>
 
 <template>
-  <div class="menu-container w-full p-3">
+  <div
+    :aria-label="ariaLabel"
+    class="menu-container w-full p-3"
+    role="navigation"
+  >
     <ul>
       <slot />
     </ul>

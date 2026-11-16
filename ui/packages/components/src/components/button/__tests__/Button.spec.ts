@@ -131,6 +131,17 @@ describe("Button", () => {
     expect(wrapper.find(".btn-icon").exists()).toBe(false);
   });
 
+  it("should expose the loading state to assistive technology", async () => {
+    const wrapper = mount(VButton, { props: { loading: true } });
+
+    expect(wrapper.get("button").attributes("aria-busy")).toBe("true");
+    expect(wrapper.get("svg").attributes("aria-hidden")).toBe("true");
+
+    await wrapper.setProps({ loading: false });
+
+    expect(wrapper.get("button").attributes("aria-busy")).toBeUndefined();
+  });
+
   it("should work with loading prop and icon slot", async function () {
     const wrapper = mount({
       data() {

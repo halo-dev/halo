@@ -114,21 +114,37 @@ defineExpose({ close });
     leave-to-class="opacity-0"
   >
     <div
+      :aria-atomic="true"
+      :aria-live="type === 'error' ? 'assertive' : 'polite'"
+      :role="type === 'error' ? 'alert' : 'status'"
       class="toast-wrapper"
       @mouseenter="handleMouseEnter"
       @mouseleave="handleMouseLeave"
     >
       <div class="toast-body">
         <div class="toast-icon">
-          <component :is="icons[type].icon" :class="icons[type].color" />
+          <component
+            :is="icons[type].icon"
+            :class="icons[type].color"
+            aria-hidden="true"
+          />
         </div>
         <div class="toast-content">
           <div class="toast-description">
             <slot>{{ content }}</slot>
           </div>
         </div>
-        <div v-if="closable" class="toast-control">
-          <IconClose class="" @click="close" />
+        <div
+          v-if="closable"
+          aria-label="Close"
+          class="toast-control"
+          role="button"
+          tabindex="0"
+          @click="close"
+          @keydown.enter.prevent="close"
+          @keydown.space.prevent="close"
+        >
+          <IconClose aria-hidden="true" class="" />
         </div>
       </div>
       <div v-if="count" class="toast-count">
