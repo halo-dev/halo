@@ -9,6 +9,7 @@ import org.springframework.security.core.context.SecurityContext;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.SinglePage;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.PageRequestImpl;
@@ -37,14 +38,17 @@ public class SinglePageFinderImpl implements SinglePageFinder {
 
     @Override
     public Mono<SinglePageVo> getByName(String pageName) {
-        return client.get(SinglePage.class, pageName)
-                .filterWhen(page -> queryPredicate().map(predicate -> predicate.test(page)))
-                .flatMap(singlePagePublicQueryService::convertToVo);
+        return readablePage(pageName).flatMap(singlePagePublicQueryService::convertToVo);
     }
 
     @Override
     public Mono<ContentVo> content(String pageName) {
-        return singlePagePublicQueryService.getContent(pageName);
+        return readablePage(pageName).flatMap(singlePagePublicQueryService::getContent);
+    }
+
+    private Mono<SinglePage> readablePage(String pageName) {
+        return client.get(SinglePage.class, pageName)
+                .filterWhen(page -> queryPredicate().map(predicate -> predicate.test(page)));
     }
 
     @Override
@@ -53,8 +57,9 @@ public class SinglePageFinderImpl implements SinglePageFinder {
     }
 
     Mono<Predicate<SinglePage>> queryPredicate() {
-        Predicate<SinglePage> predicate = page ->
-                page.isPublished() && Objects.equals(false, page.getSpec().getDeleted());
+        Predicate<SinglePage> predicate = page -> !ExtensionUtil.isDeleted(page)
+                && page.isPublished()
+                && Objects.equals(false, page.getSpec().getDeleted());
         Predicate<SinglePage> visiblePredicate =
                 page -> Post.VisibleEnum.PUBLIC.equals(page.getSpec().getVisible());
         return currentUserName()

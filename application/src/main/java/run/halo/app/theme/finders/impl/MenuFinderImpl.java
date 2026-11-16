@@ -17,6 +17,8 @@ import run.halo.app.extension.index.query.Queries;
 import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.exception.NotFoundException;
+import run.halo.app.localization.PublicLocalization;
+import run.halo.app.localization.ResourceLocalizationService;
 import run.halo.app.theme.finders.Finder;
 import run.halo.app.theme.finders.MenuFinder;
 import run.halo.app.theme.finders.vo.MenuItemVo;
@@ -33,6 +35,8 @@ import run.halo.app.theme.finders.vo.MenuVo;
 public class MenuFinderImpl implements MenuFinder {
 
     private final ReactiveExtensionClient client;
+
+    private final ResourceLocalizationService localizationService;
     private final SystemConfigFetcher environmentFetcher;
 
     @Override
@@ -52,6 +56,7 @@ public class MenuFinderImpl implements MenuFinder {
                 .andQuery(Queries.in("metadata.name", menuNames))
                 .build();
         var menus = client.listAll(Menu.class, menuOptions, Sort.unsorted())
+                .transform(resources -> PublicLocalization.project(resources, localizationService))
                 .collectMap(menu -> menu.getMetadata().getName());
         var menuItems = listMenuItemsByMenuNames(menuNames)
                 .collectMultimap(menuItem -> menuItem.getSpec().getMenuName());
@@ -88,7 +93,7 @@ public class MenuFinderImpl implements MenuFinder {
     }
 
     Flux<MenuVo> listAll() {
-        return listAllMenus().map(MenuVo::from);
+        return PublicLocalization.project(listAllMenus(), localizationService).map(MenuVo::from);
     }
 
     Flux<MenuVo> listAsTree() {
@@ -99,7 +104,8 @@ public class MenuFinderImpl implements MenuFinder {
         return listMenuItemsByMenuName(menu.getMetadata().getName())
                 .collectList()
                 .map(MenuFinderImpl::listToTree)
-                .map(menuItems -> MenuVo.from(menu).withMenuItems(menuItems));
+                .flatMap(menuItems -> PublicLocalization.project(menu, localizationService)
+                        .map(projected -> MenuVo.from(projected).withMenuItems(menuItems)));
     }
 
     static List<MenuItemVo> listToTree(Collection<MenuItemVo> list) {
@@ -151,14 +157,18 @@ public class MenuFinderImpl implements MenuFinder {
         var listOptions = ListOptions.builder()
                 .andQuery(Queries.equal("spec.menuName", menuName))
                 .build();
-        return client.listAll(MenuItem.class, listOptions, Sort.unsorted()).map(MenuItemVo::from);
+        return PublicLocalization.project(
+                        client.listAll(MenuItem.class, listOptions, Sort.unsorted()), localizationService)
+                .map(MenuItemVo::from);
     }
 
     Flux<MenuItemVo> listMenuItemsByMenuNames(Collection<String> menuNames) {
         var listOptions = ListOptions.builder()
                 .andQuery(Queries.in("spec.menuName", menuNames))
                 .build();
-        return client.listAll(MenuItem.class, listOptions, Sort.unsorted()).map(MenuItemVo::from);
+        return PublicLocalization.project(
+                        client.listAll(MenuItem.class, listOptions, Sort.unsorted()), localizationService)
+                .map(MenuItemVo::from);
     }
 
     static Comparator<MenuItemVo> defaultTreeNodeComparator() {

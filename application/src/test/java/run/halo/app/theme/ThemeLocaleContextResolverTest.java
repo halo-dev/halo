@@ -17,6 +17,7 @@ import static run.halo.app.theme.ThemeLocaleContextResolver.TIME_ZONE_COOKIE_NAM
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 import org.junit.jupiter.api.Test;
@@ -26,6 +27,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
 import org.springframework.mock.web.server.MockServerWebExchange;
 import org.springframework.web.server.ServerWebExchange;
+import run.halo.app.localization.LocalizationContext;
+import run.halo.app.localization.LocalizationScope;
 
 /**
  * Test for {@link ThemeLocaleContextResolver}.
@@ -35,6 +38,16 @@ import org.springframework.web.server.ServerWebExchange;
  */
 class ThemeLocaleContextResolverTest {
     private final ThemeLocaleContextResolver resolver = new ThemeLocaleContextResolver();
+
+    @Test
+    void contentLocaleTakesPrecedenceOverUiLanguageAndCookie() {
+        var exchange = MockServerWebExchange.from(MockServerHttpRequest.get("/?language=ja")
+                .cookie(new HttpCookie(LANGUAGE_COOKIE_NAME, "de"))
+                .header(HttpHeaders.ACCEPT_LANGUAGE, "zh-CN"));
+        var context = new LocalizationContext(CHINA, ENGLISH, List.of(), LocalizationScope.PUBLIC_PAGE);
+        exchange.getAttributes().put(LocalizationContext.class.getName(), context);
+        assertThat(resolver.resolveLocaleContext(exchange).getLocale()).isEqualTo(ENGLISH);
+    }
 
     @Test
     public void resolveTimeZone() {

@@ -6,6 +6,7 @@ import static run.halo.app.core.extension.content.Comment.CommentOwner.ownerIden
 import static run.halo.app.extension.index.query.Queries.*;
 
 import com.google.common.hash.Hashing;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.Optional;
@@ -34,6 +35,12 @@ import run.halo.app.extension.*;
 import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.localization.LocalizationContext;
+import run.halo.app.localization.LocalizationScope;
+import run.halo.app.localization.PublicLocalization;
+import run.halo.app.localization.ResourceLocalizationProvider;
+import run.halo.app.localization.ResourceLocalizationService;
+import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 import run.halo.app.theme.finders.CommentPublicQueryService;
 import run.halo.app.theme.finders.vo.*;
 
@@ -54,6 +61,8 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
     private final UserService userService;
     private final CounterService counterService;
     private final CommentPermalinkService permalinkService;
+    private final ResourceLocalizationService localizationService;
+    private final ExtensionGetter extensionGetter;
 
     @Override
     public Mono<CommentVo> getByName(String name) {
@@ -64,8 +73,28 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
         return toCommentVo(comment)
                 .flatMap(vo -> permalinkService
                         .getPermalink(comment)
+                        .flatMap(this::localizePermalink)
                         .doOnNext(vo::setPermalink)
                         .thenReturn(vo));
+    }
+
+    /**
+     * Localizes a display link only at the public query boundary, retaining source links for administrative reads and
+     * provider failures. The provider preserves query parameters and fragments.
+     *
+     * @since 2.28.0
+     */
+    private Mono<String> localizePermalink(String url) {
+        return LocalizationContext.current()
+                .filter(LocalizationContext::enabled)
+                .filter(context -> context.scope() == LocalizationScope.PUBLIC_PAGE
+                        || context.scope() == LocalizationScope.PUBLIC_API)
+                .flatMap(context -> extensionGetter
+                        .getEnabledExtension(ResourceLocalizationProvider.class)
+                        .flatMap(provider -> Mono.fromSupplier(() -> provider.localizeUrl(url, context))))
+                .timeout(Duration.ofSeconds(2))
+                .defaultIfEmpty(url)
+                .onErrorReturn(url);
     }
 
     private Mono<Comment> getVisibleComment(String name) {
@@ -88,6 +117,7 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
                         .flatMap(this::toReplyVo)
                         .flatMap(vo -> permalinkService
                                 .getSubjectUrl(comment.getSpec().getSubjectRef())
+                                .flatMap(this::localizePermalink)
                                 .doOnNext(url -> vo.setPermalink(
                                         CommentPermalinkService.getPermalink(url, commentName, replyName)))
                                 .thenReturn(vo)));
@@ -107,6 +137,7 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
                 .flatMap(listOptions -> client.listBy(Comment.class, listOptions, pageRequest))
                 .flatMap(listResult -> permalinkService
                         .getSubjectUrl(ref)
+                        .flatMap(this::localizePermalink)
                         .defaultIfEmpty("")
                         .flatMap(subjectUrl -> Flux.fromStream(listResult.get())
                                 .map(comment -> ref == null ? toCommentVoWithPermalink(comment) : toCommentVo(comment))
@@ -154,6 +185,7 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
                     return client.listBy(Reply.class, listOptions, pageRequest)
                             .flatMap(list -> permalinkService
                                     .getSubjectUrl(comment.getSpec().getSubjectRef())
+                                    .flatMap(this::localizePermalink)
                                     .defaultIfEmpty("")
                                     .flatMap(subjectUrl -> Flux.fromStream(
                                                     list.get().map(this::toReplyVo))
@@ -171,7 +203,8 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
 
     Mono<CommentVo> toCommentVo(Comment comment) {
         Comment.CommentOwner owner = comment.getSpec().getOwner();
-        return Mono.just(CommentVo.from(JsonUtils.deepCopy(comment)))
+        return PublicLocalization.project(comment, localizationService)
+                .map(projected -> CommentVo.from(JsonUtils.deepCopy(projected)))
                 .flatMap(commentVo -> populateStats(Comment.class, commentVo)
                         .doOnNext(commentVo::setStats)
                         .thenReturn(commentVo))
@@ -228,7 +261,8 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
     // @formatter:on
 
     Mono<ReplyVo> toReplyVo(Reply reply) {
-        return Mono.just(ReplyVo.from(JsonUtils.deepCopy(reply)))
+        return PublicLocalization.project(reply, localizationService)
+                .map(projected -> ReplyVo.from(JsonUtils.deepCopy(projected)))
                 .flatMap(replyVo -> populateStats(Reply.class, replyVo)
                         .doOnNext(replyVo::setStats)
                         .thenReturn(replyVo))
@@ -270,7 +304,10 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
         if (Comment.CommentOwner.KIND_EMAIL.equals(owner.getKind())) {
             return Mono.just(OwnerInfo.from(owner));
         }
-        return userService.getUserOrGhost(owner.getName()).map(OwnerInfo::from);
+        return userService
+                .getUserOrGhost(owner.getName())
+                .flatMap(user -> PublicLocalization.project(user, localizationService))
+                .map(OwnerInfo::from);
     }
 
     private Mono<ListOptions> populateCommentListOptions(@Nullable Ref ref) {

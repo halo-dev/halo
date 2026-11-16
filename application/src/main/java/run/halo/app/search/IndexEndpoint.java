@@ -38,7 +38,8 @@ public class IndexEndpoint implements CustomEndpoint {
                                         .implementation(SearchOption.class)
                                         .description("""
                             Please note that the "filterPublished", "filterExposed" and \
-                            "filterRecycled" fields are ignored in this endpoint.\
+                            "filterRecycled" fields are ignored in this endpoint. The search \
+                            language follows the current localization context.\
                             """))
                                 .response(responseBuilder().implementation(SearchResult.class)))
                 .build();

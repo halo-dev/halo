@@ -262,3 +262,36 @@ spec:
   displayName: "用户创建后处理器"
   type: MULTI_INSTANCE
   description: "提供在用户创建之后执行自定义逻辑的扩展方式"
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionPointDefinition
+metadata:
+  name: resource-localization-provider
+spec:
+  className: run.halo.app.localization.ResourceLocalizationProvider
+  displayName: "资源本地化提供者"
+  type: SINGLETON
+  description: "为公开展示提供受控的资源本地化投影"
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionPointDefinition
+metadata:
+  name: resource-localization-descriptor
+spec:
+  className: run.halo.app.localization.ResourceLocalizationDescriptor
+  displayName: "资源本地化字段描述器"
+  type: MULTI_INSTANCE
+  description: "为公开展示提供受控的资源本地化投影"
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionPointDefinition
+metadata:
+  name: halo-document-variant-provider
+spec:
+  className: run.halo.app.search.HaloDocumentVariantProvider
+  displayName: "搜索文档语言变体"
+  type: SINGLETON
+  description: "为支持语言隔离的搜索引擎提供译文，保留源文权限与生命周期"

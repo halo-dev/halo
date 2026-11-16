@@ -16,6 +16,8 @@ import run.halo.app.extension.PageRequest;
 import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.index.query.Queries;
+import run.halo.app.localization.PublicLocalization;
+import run.halo.app.localization.ResourceLocalizationService;
 import run.halo.app.theme.finders.Finder;
 import run.halo.app.theme.finders.TagFinder;
 import run.halo.app.theme.finders.vo.TagVo;
@@ -34,13 +36,18 @@ public class TagFinderImpl implements TagFinder {
 
     private final ReactiveExtensionClient client;
 
-    public TagFinderImpl(ReactiveExtensionClient client) {
+    private final ResourceLocalizationService localizationService;
+
+    public TagFinderImpl(ReactiveExtensionClient client, ResourceLocalizationService localizationService) {
+        this.localizationService = localizationService;
         this.client = client;
     }
 
     @Override
     public Mono<TagVo> getByName(String name) {
-        return client.fetch(Tag.class, name).map(TagVo::from);
+        return client.fetch(Tag.class, name)
+                .flatMap(tag -> PublicLocalization.project(tag, localizationService))
+                .map(TagVo::from);
     }
 
     @Override
@@ -52,6 +59,7 @@ public class TagFinderImpl implements TagFinder {
                 .andQuery(Queries.in("metadata.name", names))
                 .build();
         return client.listAll(Tag.class, options, Sort.unsorted())
+                .transform(tags -> PublicLocalization.project(tags, localizationService))
                 .map(TagVo::from)
                 .collectMap(t -> t.getMetadata().getName())
                 .flatMapIterable(map -> names.stream()
@@ -77,14 +85,18 @@ public class TagFinderImpl implements TagFinder {
     @Override
     public Flux<TagVo> listAll() {
         return client.listAll(Tag.class, new ListOptions(), Sort.by(Sort.Order.desc("metadata.creationTimestamp")))
+                .transform(tags -> PublicLocalization.project(tags, localizationService))
                 .map(TagVo::from);
     }
 
     private Mono<ListResult<TagVo>> listBy(ListOptions listOptions, PageRequest pageRequest) {
-        return client.listBy(Tag.class, listOptions, pageRequest).map(result -> {
-            List<TagVo> tagVos = result.get().map(TagVo::from).collect(Collectors.toList());
-            return new ListResult<>(result.getPage(), result.getSize(), result.getTotal(), tagVos);
-        });
+        return client.listBy(Tag.class, listOptions, pageRequest)
+                .flatMap(result -> PublicLocalization.project(result.getItems(), localizationService)
+                        .map(items -> new ListResult<>(
+                                result.getPage(),
+                                result.getSize(),
+                                result.getTotal(),
+                                items.stream().map(TagVo::from).toList())));
     }
 
     int pageNullSafe(Integer page) {

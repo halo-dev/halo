@@ -32,7 +32,7 @@ export const IndexV1alpha1PublicApiAxiosParamCreator = function (configuration?:
     return {
         /**
          * Search indices.
-         * @param {SearchOption} [searchOption] Please note that the \&quot;filterPublished\&quot;, \&quot;filterExposed\&quot; and \&quot;filterRecycled\&quot; fields are ignored in this endpoint.
+         * @param {SearchOption} [searchOption] Please note that the \&quot;filterPublished\&quot;, \&quot;filterExposed\&quot; and \&quot;filterRecycled\&quot; fields are ignored in this endpoint. The search language follows the current localization context.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -81,7 +81,7 @@ export const IndexV1alpha1PublicApiFp = function(configuration?: Configuration) 
     return {
         /**
          * Search indices.
-         * @param {SearchOption} [searchOption] Please note that the \&quot;filterPublished\&quot;, \&quot;filterExposed\&quot; and \&quot;filterRecycled\&quot; fields are ignored in this endpoint.
+         * @param {SearchOption} [searchOption] Please note that the \&quot;filterPublished\&quot;, \&quot;filterExposed\&quot; and \&quot;filterRecycled\&quot; fields are ignored in this endpoint. The search language follows the current localization context.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -117,7 +117,7 @@ export const IndexV1alpha1PublicApiFactory = function (configuration?: Configura
  */
 export interface IndexV1alpha1PublicApiIndicesSearchRequest {
     /**
-     * Please note that the \&quot;filterPublished\&quot;, \&quot;filterExposed\&quot; and \&quot;filterRecycled\&quot; fields are ignored in this endpoint.
+     * Please note that the \&quot;filterPublished\&quot;, \&quot;filterExposed\&quot; and \&quot;filterRecycled\&quot; fields are ignored in this endpoint. The search language follows the current localization context.
      */
     readonly searchOption?: SearchOption
 }

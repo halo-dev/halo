@@ -16,6 +16,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 import run.halo.app.search.HaloDocument;
 import run.halo.app.search.SearchOption;
@@ -166,6 +168,53 @@ class LuceneSearchEngineTest {
         CompletableFuture.allOf(futures).get(10, TimeUnit.SECONDS);
         executorService.shutdownNow();
         assertTrue(executorService.awaitTermination(10, TimeUnit.SECONDS));
+    }
+
+    @Test
+    void isolatesLocalesAndRemovesVariantsWithTheirSource() {
+        var source = createFakeHaloDoc();
+        source.setTitle("Shared source");
+        var variant = createFakeHaloDoc();
+        variant.setId(source.getId() + ":locale:en");
+        variant.setSourceId(source.getId());
+        variant.setLocale("en");
+        variant.setTitle("Shared translation");
+        searchEngine.addOrUpdate(List.of(source, variant));
+        var option = new SearchOption();
+        option.setKeyword("Shared");
+        assertEquals(1, searchEngine.search(option).getTotal());
+        assertEquals(
+                source.getId(), searchEngine.search(option).getHits().getFirst().getId());
+        option.setLocale("en");
+        assertEquals(
+                variant.getId(),
+                searchEngine.search(option).getHits().getFirst().getId());
+        searchEngine.addOrUpdate(List.of(source));
+        assertEquals(0, searchEngine.search(option).getTotal());
+        searchEngine.addOrUpdate(List.of(source, variant));
+        searchEngine.deleteDocument(List.of(source.getId()));
+        assertEquals(0, searchEngine.search(option).getTotal());
+    }
+
+    @ParameterizedTest
+    @CsvSource({"en-us,en-US", "EN,en", "zh-hant,zh-Hant"})
+    void normalizesDocumentLocalesWithoutChangingSubmittedValues(String submitted, String normalized) {
+        var document = createFakeHaloDoc();
+        document.setLocale(submitted);
+        document.setSourceId("source");
+        searchEngine.addOrUpdate(List.of(document));
+
+        var option = new SearchOption();
+        option.setKeyword("fake");
+        option.setLocale(submitted);
+        assertEquals(1, searchEngine.search(option).getTotal());
+        assertEquals(
+                normalized, searchEngine.search(option).getHits().getFirst().getLocale());
+        option.setLocale(normalized);
+        assertEquals(1, searchEngine.search(option).getTotal());
+        assertEquals(submitted, document.getLocale());
+        option.setLocale(null);
+        assertEquals(0, searchEngine.search(option).getTotal());
     }
 
     HaloDocument createFakeHaloDoc() {

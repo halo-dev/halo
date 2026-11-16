@@ -63,6 +63,11 @@ public class LuceneSearchEngine implements SearchEngine, InitializingBean, Dispo
     }
 
     @Override
+    public boolean supportsLocalizedDocuments() {
+        return true;
+    }
+
+    @Override
     public boolean available() {
         return true;
     }
@@ -76,7 +81,10 @@ public class LuceneSearchEngine implements SearchEngine, InitializingBean, Dispo
             terms.add(new BytesRef(haloDoc.getId()));
             docs.add(doc);
         });
-        var deleteQuery = new TermInSetQuery("id", terms);
+        var deleteQuery = new BooleanQuery.Builder()
+                .add(new TermInSetQuery("id", terms), BooleanClause.Occur.SHOULD)
+                .add(new TermInSetQuery("sourceId", terms), BooleanClause.Occur.SHOULD)
+                .build();
 
         var writerConfig = new IndexWriterConfig(this.analyzer).setOpenMode(CREATE_OR_APPEND);
         synchronized (this) {
@@ -94,7 +102,10 @@ public class LuceneSearchEngine implements SearchEngine, InitializingBean, Dispo
     public void deleteDocument(Iterable<String> haloDocIds) {
         var terms = new LinkedList<BytesRef>();
         haloDocIds.forEach(haloDocId -> terms.add(new BytesRef(haloDocId)));
-        var deleteQuery = new TermInSetQuery("id", terms);
+        var deleteQuery = new BooleanQuery.Builder()
+                .add(new TermInSetQuery("id", terms), BooleanClause.Occur.SHOULD)
+                .add(new TermInSetQuery("sourceId", terms), BooleanClause.Occur.SHOULD)
+                .build();
         var writerConfig = new IndexWriterConfig(this.analyzer).setOpenMode(CREATE_OR_APPEND);
         synchronized (this) {
             try (var indexWriter = new IndexWriter(this.directory, writerConfig)) {
@@ -147,6 +158,15 @@ public class LuceneSearchEngine implements SearchEngine, InitializingBean, Dispo
             var query = queryParser.parse(escapedKeyword, null);
             var queryBuilder = new BooleanQuery.Builder().add(query, MUST);
 
+            if (StringUtils.hasText(option.getLocale())) {
+                queryBuilder.add(
+                        new TermQuery(new Term(
+                                "locale",
+                                Locale.forLanguageTag(option.getLocale()).toLanguageTag())),
+                        FILTER);
+            } else {
+                queryBuilder.add(new TermQuery(new Term("localized", "true")), BooleanClause.Occur.MUST_NOT);
+            }
             var filterExposed = option.getFilterExposed();
             if (filterExposed != null) {
                 queryBuilder.add(new TermQuery(new Term("exposed", filterExposed.toString())), FILTER);
@@ -345,6 +365,14 @@ public class LuceneSearchEngine implements SearchEngine, InitializingBean, Dispo
         public Document convert(HaloDocument haloDoc) {
             var doc = new Document();
             doc.add(new StringField("id", haloDoc.getId(), YES));
+            if (haloDoc.getLocale() != null) {
+                doc.add(new StringField(
+                        "locale", Locale.forLanguageTag(haloDoc.getLocale()).toLanguageTag(), YES));
+                doc.add(new StringField("localized", "true", YES));
+            }
+            if (haloDoc.getSourceId() != null) {
+                doc.add(new StringField("sourceId", haloDoc.getSourceId(), YES));
+            }
             doc.add(new StringField("name", haloDoc.getMetadataName(), YES));
             doc.add(new StringField("type", haloDoc.getType(), YES));
             doc.add(new StringField("ownerName", haloDoc.getOwnerName(), YES));
@@ -399,6 +427,8 @@ public class LuceneSearchEngine implements SearchEngine, InitializingBean, Dispo
         public HaloDocument convert(Document doc) {
             var haloDoc = new HaloDocument();
             haloDoc.setId(doc.get("id"));
+            haloDoc.setLocale(doc.get("locale"));
+            haloDoc.setSourceId(doc.get("sourceId"));
             haloDoc.setType(doc.get("type"));
             haloDoc.setMetadataName(doc.get("name"));
             haloDoc.setTitle(doc.get("title"));

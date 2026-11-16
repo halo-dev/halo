@@ -1,35 +1,40 @@
 package run.halo.app.search.post;
 
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.assertArg;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import java.time.Instant;
-import org.junit.jupiter.api.Nested;
+import java.util.List;
+import java.util.function.Supplier;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import run.halo.app.content.ContentWrapper;
 import run.halo.app.content.PostService;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.event.post.PostDeletedEvent;
+import run.halo.app.event.post.PostUnpublishedEvent;
 import run.halo.app.event.post.PostUpdatedEvent;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.search.event.HaloDocumentAddRequestEvent;
-import run.halo.app.search.event.HaloDocumentDeleteRequestEvent;
+import run.halo.app.search.HaloDocument;
+import run.halo.app.search.HaloDocumentEventsListener;
 
 @ExtendWith(MockitoExtension.class)
 class PostEventsListenerTest {
 
+    private static final String POST_NAME = "post";
+    private static final String DOCUMENT_ID = PostHaloDocumentsProvider.POST_DOCUMENT_TYPE + "-" + POST_NAME;
+
     @Mock
-    ApplicationEventPublisher publisher;
+    HaloDocumentEventsListener indices;
 
     @Mock
     PostService postService;
@@ -40,68 +45,65 @@ class PostEventsListenerTest {
     @InjectMocks
     PostEventsListener listener;
 
-    @Nested
-    class PostUpdatedEventTest {
+    @Captor
+    ArgumentCaptor<Supplier<Mono<HaloDocument>>> load;
 
-        @Test
-        void shouldDoNothingIfPostIsDeleted() {
-            when(client.fetch(Post.class, "fake-post")).thenReturn(Mono.empty());
-            var event = new PostUpdatedEvent(this, "fake-post");
-            listener.onApplicationEvent(event).as(StepVerifier::create).verifyComplete();
+    @Test
+    void readsCurrentPostOnlyWhenTheQueuedRefreshRuns() {
+        listener.onApplicationEvent(new PostUpdatedEvent(this, POST_NAME));
+        verify(indices).refreshDocument(eq(DOCUMENT_ID), load.capture());
+        verifyNoInteractions(client, postService);
 
-            verify(publisher, never()).publishEvent(any());
-        }
-
-        @Test
-        void shouldRequestDeleteWhilePostIsDeleting() {
-            var post = new Post();
-            var metadata = new Metadata();
-            metadata.setName("fake-post");
-            metadata.setDeletionTimestamp(Instant.now());
-            post.setMetadata(metadata);
-            when(client.fetch(Post.class, "fake-post")).thenReturn(Mono.just(post));
-            var event = new PostUpdatedEvent(this, "fake-post");
-            listener.onApplicationEvent(event).as(StepVerifier::create).verifyComplete();
-
-            verify(publisher).publishEvent(assertArg(e -> assertInstanceOf(HaloDocumentDeleteRequestEvent.class, e)));
-        }
-
-        @Test
-        void shouldRequestAddWhilePostIsNotDeleted() {
-            var post = new Post();
-            var metadata = new Metadata();
-            metadata.setName("fake-post");
-            post.setMetadata(metadata);
-            var spec = new Post.PostSpec();
-            post.setSpec(spec);
-            var status = new Post.PostStatus();
-            post.setStatus(status);
-            when(client.fetch(Post.class, "fake-post")).thenReturn(Mono.just(post));
-            var content = ContentWrapper.builder()
-                    .content("fake-content")
-                    .raw("fake-content")
-                    .build();
-            when(postService.getReleaseContent(post)).thenReturn(Mono.just(content));
-            var event = new PostUpdatedEvent(this, "fake-post");
-            listener.onApplicationEvent(event).as(StepVerifier::create).verifyComplete();
-
-            verify(publisher).publishEvent(assertArg(e -> assertInstanceOf(HaloDocumentAddRequestEvent.class, e)));
-        }
+        var post = post();
+        when(client.fetch(Post.class, POST_NAME)).thenReturn(Mono.just(post));
+        when(postService.getReleaseContent(post))
+                .thenReturn(
+                        Mono.just(ContentWrapper.builder().content("release").build()));
+        StepVerifier.create(load.getValue().get())
+                .assertNext(document -> {
+                    assertThat(document.getId()).isEqualTo(DOCUMENT_ID);
+                    assertThat(document.getContent()).isEqualTo("release");
+                })
+                .verifyComplete();
     }
 
-    @Nested
-    class PostDeleteEventTest {
+    @Test
+    void omitsDeletingPostAndNeverLoadsItsRelease() {
+        listener.onApplicationEvent(new PostUpdatedEvent(this, POST_NAME));
+        verify(indices).refreshDocument(eq(DOCUMENT_ID), load.capture());
+        var post = post();
+        post.getMetadata().setDeletionTimestamp(Instant.now());
+        when(client.fetch(Post.class, POST_NAME)).thenReturn(Mono.just(post));
 
-        @Test
-        void shouldRequestDelete() {
-            var post = new Post();
-            var metadata = new Metadata();
-            metadata.setName("fake-post");
-            post.setMetadata(metadata);
-            var event = new PostDeletedEvent(this, post);
-            listener.onApplicationEvent(event);
+        StepVerifier.create(load.getValue().get()).verifyComplete();
+        verifyNoInteractions(postService);
+    }
 
-            verify(publisher).publishEvent(assertArg(e -> assertInstanceOf(HaloDocumentDeleteRequestEvent.class, e)));
-        }
+    @Test
+    void missingReleaseRemovesPreviousIndexedDocument() {
+        listener.onApplicationEvent(new PostUnpublishedEvent(this, POST_NAME));
+        verify(indices).refreshDocument(eq(DOCUMENT_ID), load.capture());
+        var post = post();
+        when(client.fetch(Post.class, POST_NAME)).thenReturn(Mono.just(post));
+        when(postService.getReleaseContent(post)).thenReturn(Mono.empty());
+
+        StepVerifier.create(load.getValue().get()).verifyComplete();
+    }
+
+    @Test
+    void deletionQueuesRemovalWithoutReadingStorage() {
+        listener.onApplicationEvent(new PostDeletedEvent(this, post()));
+        verify(indices).deleteDocuments(List.of(DOCUMENT_ID));
+        verifyNoInteractions(client, postService);
+    }
+
+    private static Post post() {
+        var post = new Post();
+        var metadata = new Metadata();
+        metadata.setName(POST_NAME);
+        post.setMetadata(metadata);
+        post.setSpec(new Post.PostSpec());
+        post.setStatus(new Post.PostStatus());
+        return post;
     }
 }

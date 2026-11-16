@@ -22,6 +22,8 @@ import run.halo.app.core.extension.content.Category;
 import run.halo.app.extension.*;
 import run.halo.app.extension.index.query.Queries;
 import run.halo.app.extension.router.selector.FieldSelector;
+import run.halo.app.localization.PublicLocalization;
+import run.halo.app.localization.ResourceLocalizationService;
 import run.halo.app.theme.finders.CategoryFinder;
 import run.halo.app.theme.finders.Finder;
 import run.halo.app.theme.finders.vo.CategoryTreeVo;
@@ -38,11 +40,15 @@ import run.halo.app.theme.finders.vo.CategoryVo;
 @RequiredArgsConstructor
 public class CategoryFinderImpl implements CategoryFinder {
     private final ReactiveExtensionClient client;
+
+    private final ResourceLocalizationService localizationService;
     private final CategoryService categoryService;
 
     @Override
     public Mono<CategoryVo> getByName(String name) {
-        return client.fetch(Category.class, name).map(CategoryVo::from);
+        return client.fetch(Category.class, name)
+                .flatMap(category -> PublicLocalization.project(category, localizationService))
+                .map(CategoryVo::from);
     }
 
     @Override
@@ -54,6 +60,7 @@ public class CategoryFinderImpl implements CategoryFinder {
                 .andQuery(Queries.in("metadata.name", names))
                 .build();
         return client.listAll(Category.class, options, Sort.unsorted())
+                .transform(categories -> PublicLocalization.project(categories, localizationService))
                 .map(CategoryVo::from)
                 .collectMap(c -> c.getMetadata().getName())
                 .flatMapIterable(map -> names.stream()
@@ -78,11 +85,12 @@ public class CategoryFinderImpl implements CategoryFinder {
                         Category.class,
                         listOptions,
                         PageRequestImpl.of(pageNullSafe(page), sizeNullSafe(size), defaultSort()))
-                .map(list -> {
-                    List<CategoryVo> categoryVos =
-                            list.get().map(CategoryVo::from).collect(Collectors.toList());
-                    return new ListResult<>(list.getPage(), list.getSize(), list.getTotal(), categoryVos);
-                })
+                .flatMap(list -> PublicLocalization.project(list.getItems(), localizationService)
+                        .map(items -> new ListResult<>(
+                                list.getPage(),
+                                list.getSize(),
+                                list.getTotal(),
+                                items.stream().map(CategoryVo::from).toList())))
                 .defaultIfEmpty(new ListResult<>(page, size, 0L, List.of()));
     }
 
@@ -100,7 +108,9 @@ public class CategoryFinderImpl implements CategoryFinder {
     public Flux<CategoryVo> listAll() {
         var listOptions = new ListOptions();
         listOptions.setFieldSelector(FieldSelector.of(notEqual("spec.hideFromList", BooleanUtils.TRUE)));
-        return client.listAll(Category.class, listOptions, defaultSort()).map(CategoryVo::from);
+        return client.listAll(Category.class, listOptions, defaultSort())
+                .transform(categories -> PublicLocalization.project(categories, localizationService))
+                .map(CategoryVo::from);
     }
 
     private Flux<CategoryVo> listAllFor(String parentName) {
@@ -113,6 +123,7 @@ public class CategoryFinderImpl implements CategoryFinder {
                 .flatMapMany(isHidden -> {
                     if (isHidden) {
                         return client.listAll(Category.class, new ListOptions(), defaultSort())
+                                .transform(categories -> PublicLocalization.project(categories, localizationService))
                                 .map(CategoryVo::from);
                     }
                     return listAll();
@@ -251,7 +262,10 @@ public class CategoryFinderImpl implements CategoryFinder {
 
     @Override
     public Mono<CategoryVo> getParentByName(String name) {
-        return categoryService.getParentByName(name).map(CategoryVo::from);
+        return categoryService
+                .getParentByName(name)
+                .transform(categories -> PublicLocalization.project(categories, localizationService))
+                .map(CategoryVo::from);
     }
 
     @Override

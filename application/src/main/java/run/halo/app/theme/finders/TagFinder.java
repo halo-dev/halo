@@ -23,6 +23,15 @@ public interface TagFinder {
 
     Mono<ListResult<TagVo>> list(@Nullable Integer page, @Nullable Integer size);
 
+    /**
+     * Converts already resolved tags to display values without fetching translations.
+     *
+     * <p>Public read boundaries must project source tags before calling this synchronous converter. Use the reactive
+     * finder methods when loading tags for a theme.
+     *
+     * @param tags source or previously localized tags
+     * @return tag values in the input order
+     */
     List<TagVo> convertToVo(List<Tag> tags);
 
     Flux<TagVo> listAll();

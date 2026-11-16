@@ -15,6 +15,30 @@ public final class HaloDocument {
     @NotBlank
     private String id;
 
+    /**
+     * Content language of a localized search variant, expressed as a BCP 47 tag such as {@code en} or {@code zh-Hant}.
+     * A null value identifies an original document, regardless of the language in which its content was written.
+     *
+     * <p>Core sets this field when expanding {@link HaloDocumentVariantProvider.Variant} values. Locale-aware search
+     * engines use it to isolate translated results from original-document searches. It does not change resource
+     * ownership or visibility.
+     *
+     * @since 2.28.0
+     */
+    private String locale;
+
+    /**
+     * Index ID of the original document from which this language variant was derived, or null for an original document.
+     * It refers to the original document's {@link #id}, not its resource's {@link #metadataName}.
+     *
+     * <p>Core assigns this relationship during variant expansion. Search engines that support localized documents
+     * remove existing variants referencing this ID when the source is replaced or deleted, preventing stale
+     * translations from remaining searchable.
+     *
+     * @since 2.28.0
+     */
+    private String sourceId;
+
     /** Metadata name of the corresponding extension. */
     @NotBlank
     private String metadataName;

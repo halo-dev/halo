@@ -42,7 +42,8 @@ class TagFinderImplTest {
 
     @BeforeEach
     void setUp() {
-        tagFinder = new TagFinderImpl(client);
+        tagFinder = new TagFinderImpl(
+                client, org.mockito.Mockito.mock(run.halo.app.localization.ResourceLocalizationService.class));
     }
 
     @Test

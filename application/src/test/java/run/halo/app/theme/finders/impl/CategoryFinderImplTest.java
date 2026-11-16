@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.time.Instant;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
@@ -35,6 +36,9 @@ import run.halo.app.content.CategoryService;
 import run.halo.app.core.extension.content.Category;
 import run.halo.app.extension.*;
 import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.localization.LocalizationContext;
+import run.halo.app.localization.LocalizationScope;
+import run.halo.app.localization.ResourceLocalizationService;
 import run.halo.app.theme.finders.vo.CategoryTreeVo;
 import run.halo.app.theme.finders.vo.CategoryVo;
 
@@ -53,11 +57,14 @@ class CategoryFinderImplTest {
     @Mock
     private CategoryService categoryService;
 
+    @Mock
+    private ResourceLocalizationService localizationService;
+
     private CategoryFinderImpl categoryFinder;
 
     @BeforeEach
     void setUp() {
-        categoryFinder = new CategoryFinderImpl(client, categoryService);
+        categoryFinder = new CategoryFinderImpl(client, localizationService, categoryService);
         lenient().when(categoryService.isCategoryHidden(any())).thenReturn(Mono.just(false));
     }
 
@@ -145,6 +152,59 @@ class CategoryFinderImplTest {
         assertThat(optionsCaptor.getAllValues())
                 .extracting(options -> options.toCondition().toString())
                 .containsExactly("spec.hideFromList != true", "spec.hideFromList != true", "EMPTY");
+    }
+
+    @Test
+    void listAllProjectsIndexedResultsInOrderWithoutChangingSource() {
+        var sources = List.of(category("first", null), category("second", null));
+        var translated = sources.stream().map(JsonUtils::deepCopy).toList();
+        translated.getFirst().getSpec().setDisplayName("First category");
+        translated.getLast().getSpec().setDisplayName("Second category");
+        var context = new LocalizationContext(Locale.CHINA, Locale.ENGLISH, List.of(), LocalizationScope.PUBLIC_PAGE);
+        when(client.listAll(eq(Category.class), any(ListOptions.class), any(Sort.class)))
+                .thenReturn(Flux.fromIterable(sources));
+        when(localizationService.localizeAll(sources, context)).thenReturn(Mono.just(translated));
+
+        categoryFinder
+                .listAll()
+                .collectList()
+                .contextWrite(reactorContext -> reactorContext.put(LocalizationContext.class, context))
+                .as(StepVerifier::create)
+                .assertNext(items -> assertThat(items)
+                        .extracting(item -> item.getSpec().getDisplayName())
+                        .containsExactly("First category", "Second category"))
+                .verifyComplete();
+
+        var options = ArgumentCaptor.forClass(ListOptions.class);
+        verify(client).listAll(eq(Category.class), options.capture(), any(Sort.class));
+        assertThat(options.getValue().toCondition().toString()).isEqualTo("spec.hideFromList != true");
+        assertThat(sources.getFirst().getSpec().getDisplayName()).isNotEqualTo("First category");
+        verify(localizationService).localizeAll(sources, context);
+    }
+
+    @Test
+    void explicitlySelectedHiddenCategoryTreeRemainsLocalized() {
+        var source = category("hidden", null);
+        source.getSpec().setHideFromList(true);
+        var translated = JsonUtils.deepCopy(source);
+        translated.getSpec().setDisplayName("Hidden category");
+        var context = new LocalizationContext(Locale.CHINA, Locale.ENGLISH, List.of(), LocalizationScope.PUBLIC_PAGE);
+        when(categoryService.isCategoryHidden("hidden")).thenReturn(Mono.just(true));
+        when(client.listAll(eq(Category.class), any(ListOptions.class), any(Sort.class)))
+                .thenReturn(Flux.just(source));
+        when(localizationService.localizeAll(List.of(source), context)).thenReturn(Mono.just(List.of(translated)));
+
+        categoryFinder
+                .listAsTree("hidden")
+                .contextWrite(reactorContext -> reactorContext.put(LocalizationContext.class, context))
+                .as(StepVerifier::create)
+                .assertNext(item -> assertThat(item.getSpec().getDisplayName()).isEqualTo("Hidden category"))
+                .verifyComplete();
+
+        var options = ArgumentCaptor.forClass(ListOptions.class);
+        verify(client).listAll(eq(Category.class), options.capture(), any(Sort.class));
+        assertThat(options.getValue().toCondition().toString()).isEqualTo("EMPTY");
+        verify(localizationService).localizeAll(List.of(source), context);
     }
 
     @Test

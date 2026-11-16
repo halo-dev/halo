@@ -7,6 +7,7 @@ import static run.halo.app.core.extension.content.SinglePage.PUBLISHED_LABEL;
 import static run.halo.app.extension.ExtensionUtil.notDeleting;
 import static run.halo.app.extension.index.query.Queries.equal;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ import run.halo.app.core.counter.CounterService;
 import run.halo.app.core.counter.MeterUtils;
 import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.extension.*;
+import run.halo.app.localization.*;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 import run.halo.app.theme.ReactiveSinglePageContentHandler;
 import run.halo.app.theme.ReactiveSinglePageContentHandler.SinglePageContentContext;
@@ -52,6 +54,8 @@ public class SinglePageConversionServiceImpl implements SinglePageConversionServ
 
     private final ExtensionGetter extensionGetter;
 
+    private final ResourceLocalizationService localizationService;
+
     @Override
     public Mono<SinglePageVo> convertToVo(SinglePage singlePage, String snapshotName) {
         return convert(singlePage, snapshotName);
@@ -65,41 +69,59 @@ public class SinglePageConversionServiceImpl implements SinglePageConversionServ
     protected Mono<ContentVo> extendPageContent(SinglePage singlePage, ContentWrapper wrapper) {
         Assert.notNull(singlePage, "SinglePage must not be null");
         Assert.notNull(wrapper, "SinglePage content must not be null");
-        return extensionGetter
-                .getEnabledExtensions(ReactiveSinglePageContentHandler.class)
-                .reduce(
-                        Mono.fromSupplier(() -> SinglePageContentContext.builder()
-                                .singlePage(singlePage)
-                                .content(wrapper.getContent())
-                                .raw(wrapper.getRaw())
-                                .rawType(wrapper.getRawType())
-                                .build()),
-                        (contentMono, handler) -> contentMono.flatMap(handler::handle))
-                .flatMap(Function.identity())
-                .map(pageContent -> ContentVo.builder()
-                        .content(pageContent.getContent())
-                        .raw(pageContent.getRaw())
-                        .build());
+        return PublicLocalization.project(singlePage, localizationService)
+                .flatMap(projected -> extendProjectedPageContent(projected, wrapper));
+    }
+
+    private Mono<ContentVo> extendProjectedPageContent(SinglePage singlePage, ContentWrapper wrapper) {
+        var fields = new LinkedHashMap<String, String>();
+        fields.put("content.html", wrapper.getContent());
+        fields.put("content.raw", wrapper.getRaw());
+        return LocalizationContext.current()
+                .filter(LocalizationContext::enabled)
+                .flatMap(context -> Mono.justOrEmpty(wrapper.getRawType())
+                        .map(rawType -> new LocalizableDocument("content.html", "content.raw", rawType, null))
+                        .onErrorResume(IllegalArgumentException.class, error -> Mono.empty())
+                        .flatMap(document -> localizationService.localizeFields(
+                                ResourceReference.from(singlePage), fields, List.of(document), context)))
+                .defaultIfEmpty(fields)
+                .flatMap(localized -> extensionGetter
+                        .getEnabledExtensions(ReactiveSinglePageContentHandler.class)
+                        .reduce(
+                                Mono.fromSupplier(() -> SinglePageContentContext.builder()
+                                        .singlePage(singlePage)
+                                        .content(localized.get("content.html"))
+                                        .raw(localized.get("content.raw"))
+                                        .rawType(wrapper.getRawType())
+                                        .build()),
+                                (contentMono, handler) -> contentMono.flatMap(handler::handle))
+                        .flatMap(Function.identity())
+                        .map(pageContent -> ContentVo.builder()
+                                .content(pageContent.getContent())
+                                .raw(pageContent.getRaw())
+                                .build()));
     }
 
     @Override
     public Mono<ContentVo> getContent(String pageName) {
-        return client.get(SinglePage.class, pageName)
-                .flatMap(singlePage -> {
-                    String releaseSnapshot = singlePage.getSpec().getReleaseSnapshot();
-                    String baseSnapshot = singlePage.getSpec().getBaseSnapshot();
-                    return singlePageService
-                            .getContent(releaseSnapshot, baseSnapshot)
-                            .flatMap(wrapper -> extendPageContent(singlePage, wrapper));
-                })
-                .map(wrapper -> ContentVo.builder()
-                        .content(wrapper.getContent())
-                        .raw(wrapper.getRaw())
-                        .build());
+        return client.get(SinglePage.class, pageName).flatMap(this::getContent);
+    }
+
+    @Override
+    public Mono<ContentVo> getContent(SinglePage singlePage) {
+        String releaseSnapshot = singlePage.getSpec().getReleaseSnapshot();
+        String baseSnapshot = singlePage.getSpec().getBaseSnapshot();
+        return singlePageService
+                .getContent(releaseSnapshot, baseSnapshot)
+                .flatMap(wrapper -> extendPageContent(singlePage, wrapper));
     }
 
     @Override
     public Mono<ListedSinglePageVo> convertToListedVo(SinglePage singlePage) {
+        return PublicLocalization.project(singlePage, localizationService).flatMap(this::convertProjectedToListedVo);
+    }
+
+    private Mono<ListedSinglePageVo> convertProjectedToListedVo(SinglePage singlePage) {
         return Mono.fromSupplier(() -> {
                     ListedSinglePageVo pageVo = ListedSinglePageVo.from(singlePage);
                     pageVo.setContributors(List.of());
@@ -128,8 +150,8 @@ public class SinglePageConversionServiceImpl implements SinglePageConversionServ
                 PageRequestImpl.of(pageRequest.getPageNumber(), pageRequest.getPageSize(), rewroteSort);
 
         return client.listBy(SinglePage.class, rewroteListOptions, rewrotePageRequest)
-                .flatMap(list -> Flux.fromStream(list.get())
-                        .flatMapSequential(this::convertToListedVo)
+                .flatMap(list -> PublicLocalization.project(Flux.fromStream(list.get()), localizationService)
+                        .flatMapSequential(this::convertProjectedToListedVo)
                         .collectList()
                         .map(pageVos -> new ListResult<>(list.getPage(), list.getSize(), list.getTotal(), pageVos)));
     }
@@ -137,6 +159,11 @@ public class SinglePageConversionServiceImpl implements SinglePageConversionServ
     Mono<SinglePageVo> convert(SinglePage singlePage, String snapshotName) {
         Assert.notNull(singlePage, "Single page must not be null");
         Assert.hasText(snapshotName, "Snapshot name must not be empty");
+        return PublicLocalization.project(singlePage, localizationService)
+                .flatMap(projected -> convertProjected(projected, snapshotName));
+    }
+
+    private Mono<SinglePageVo> convertProjected(SinglePage singlePage, String snapshotName) {
         return Mono.just(singlePage)
                 .map(page -> {
                     SinglePageVo pageVo = SinglePageVo.from(page);
@@ -150,7 +177,7 @@ public class SinglePageConversionServiceImpl implements SinglePageConversionServ
                     String baseSnapshot = page.getSpec().getBaseSnapshot();
                     return singlePageService
                             .getContent(snapshotName, baseSnapshot)
-                            .flatMap(wrapper -> extendPageContent(singlePage, wrapper))
+                            .flatMap(wrapper -> extendProjectedPageContent(singlePage, wrapper))
                             .doOnNext(page::setContent)
                             .thenReturn(page);
                 })

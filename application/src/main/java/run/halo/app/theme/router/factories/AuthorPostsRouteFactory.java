@@ -18,6 +18,8 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.exception.NotFoundException;
+import run.halo.app.localization.PublicLocalization;
+import run.halo.app.localization.ResourceLocalizationService;
 import run.halo.app.security.authorization.AuthorityUtils;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.PostFinder;
@@ -41,6 +43,7 @@ public class AuthorPostsRouteFactory implements RouteFactory {
 
     private final PostFinder postFinder;
     private final ReactiveExtensionClient client;
+    private final ResourceLocalizationService localizationService;
     private final RoleService roleService;
     private SystemConfigFetcher environmentFetcher;
 
@@ -112,9 +115,10 @@ public class AuthorPostsRouteFactory implements RouteFactory {
                         .build());
     }
 
-    private Mono<UserVo> getByName(String name) {
+    Mono<UserVo> getByName(String name) {
         return client.fetch(User.class, name)
                 .switchIfEmpty(Mono.error(() -> new NotFoundException("Author page not found.")))
+                .flatMap(user -> PublicLocalization.project(user, localizationService))
                 .map(UserVo::from);
     }
 }

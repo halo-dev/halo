@@ -11,6 +11,8 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.localization.LocalizationContext;
+import run.halo.app.localization.ResourceLocalizationService;
 import run.halo.app.theme.finders.Finder;
 import run.halo.app.theme.finders.ThemeFinder;
 import run.halo.app.theme.finders.vo.ThemeVo;
@@ -26,10 +28,15 @@ public class ThemeFinderImpl implements ThemeFinder {
 
     private final ReactiveExtensionClient client;
     private final SystemConfigFetcher environmentFetcher;
+    private final ResourceLocalizationService localizationService;
 
-    public ThemeFinderImpl(ReactiveExtensionClient client, SystemConfigFetcher environmentFetcher) {
+    public ThemeFinderImpl(
+            ReactiveExtensionClient client,
+            SystemConfigFetcher environmentFetcher,
+            ResourceLocalizationService localizationService) {
         this.client = client;
         this.environmentFetcher = environmentFetcher;
+        this.localizationService = localizationService;
     }
 
     @Override
@@ -51,6 +58,9 @@ public class ThemeFinderImpl implements ThemeFinder {
             return Mono.just(themeVo);
         }
         return client.fetch(ConfigMap.class, themeVo.getSpec().getConfigMapName())
+                .flatMap(config -> LocalizationContext.current()
+                        .flatMap(context -> localizationService.localizeSettings(config, context))
+                        .defaultIfEmpty(config))
                 .map(configMap -> {
                     Map<String, JsonNode> config = new HashMap<>();
                     configMap.getData().forEach((k, v) -> {

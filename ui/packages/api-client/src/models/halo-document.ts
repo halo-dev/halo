@@ -47,6 +47,10 @@ export interface HaloDocument {
      */
     'id': string;
     /**
+     * Content language of a localized search variant, expressed as a BCP 47 tag such as <code>en</code> or <code>zh-Hant</code>.  A null value identifies an original document, regardless of the language in which its content was written.   <p>Core sets this field when expanding {@link HaloDocumentVariantProvider.Variant HaloDocumentVariantProvider.Variant} values. Locale-aware search  engines use it to isolate translated results from original-document searches. It does not change resource  ownership or visibility.
+     */
+    'locale'?: string;
+    /**
      * Metadata name of the corresponding extension.
      */
     'metadataName': string;
@@ -66,6 +70,10 @@ export interface HaloDocument {
      * Whether the document is recycled.
      */
     'recycled'?: boolean;
+    /**
+     * Index ID of the original document from which this language variant was derived, or null for an original document.  It refers to the original document\'s {@link run.halo.app.search.HaloDocument#id #id}, not its resource\'s {@link run.halo.app.search.HaloDocument#metadataName #metadataName}.   <p>Core assigns this relationship during variant expansion. Search engines that support localized documents  remove existing variants referencing this ID when the source is replaced or deleted, preventing stale  translations from remaining searchable.
+     */
+    'sourceId'?: string;
     /**
      * Document tags. The item in the list is the tag metadata name.
      */

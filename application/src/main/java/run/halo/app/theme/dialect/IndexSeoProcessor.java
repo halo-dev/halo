@@ -14,6 +14,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.theme.DefaultTemplateEnum;
+import run.halo.app.theme.finders.vo.SiteSettingVo;
 import run.halo.app.theme.router.ModelConst;
 
 /**
@@ -32,31 +33,34 @@ class IndexSeoProcessor implements TemplateHeadProcessor {
         if (!isIndexTemplate(context)) {
             return Mono.empty();
         }
-        return environmentFetcher
-                .fetch(SystemSetting.Seo.GROUP, SystemSetting.Seo.class)
+        return seoSettings(context)
                 .doOnNext(seo -> {
-                    IModelFactory modelFactory = context.getModelFactory();
-
-                    String keywords = seo.getKeywords();
-                    if (StringUtils.isNotBlank(keywords)) {
-                        var attributes = LinkedHashMap.<String, String>newLinkedHashMap(2);
-                        attributes.put("name", "keywords");
-                        attributes.put("content", HtmlUtils.htmlEscape(keywords));
-                        model.add(modelFactory.createStandaloneElementTag(
-                                "meta", attributes, AttributeValueQuotes.DOUBLE, false, true));
-                        model.add(modelFactory.createText("\n"));
-                    }
-
-                    if (StringUtils.isNotBlank(seo.getDescription())) {
-                        var attributes = LinkedHashMap.<String, String>newLinkedHashMap(2);
-                        attributes.put("name", "description");
-                        attributes.put("content", HtmlUtils.htmlEscape(seo.getDescription()));
-                        model.add(modelFactory.createStandaloneElementTag(
-                                "meta", attributes, AttributeValueQuotes.DOUBLE, false, true));
-                        model.add(modelFactory.createText("\n"));
-                    }
+                    var factory = context.getModelFactory();
+                    addMeta(model, factory, "keywords", seo.keywords());
+                    addMeta(model, factory, "description", seo.description());
                 })
                 .then();
+    }
+
+    private Mono<SiteSettingVo.SeoSetting> seoSettings(ITemplateContext context) {
+        if (context.getVariable("site") instanceof SiteSettingVo site) {
+            return Mono.justOrEmpty(site.seo());
+        }
+        return environmentFetcher
+                .fetch(SystemSetting.Seo.GROUP, SystemSetting.Seo.class)
+                .map(seo ->
+                        new SiteSettingVo.SeoSetting(seo.getBlockSpiders(), seo.getKeywords(), seo.getDescription()));
+    }
+
+    private void addMeta(IModel model, IModelFactory factory, String name, String content) {
+        if (StringUtils.isBlank(content)) {
+            return;
+        }
+        var attributes = new LinkedHashMap<String, String>();
+        attributes.put("name", name);
+        attributes.put("content", HtmlUtils.htmlEscape(content));
+        model.add(factory.createStandaloneElementTag("meta", attributes, AttributeValueQuotes.DOUBLE, false, true));
+        model.add(factory.createText("\n"));
     }
 
     private boolean isIndexTemplate(ITemplateContext context) {

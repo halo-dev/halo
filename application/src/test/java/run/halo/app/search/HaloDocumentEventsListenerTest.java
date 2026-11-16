@@ -1,10 +1,10 @@
 package run.halo.app.search;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import java.util.List;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -26,6 +26,11 @@ class HaloDocumentEventsListenerTest {
     @InjectMocks
     HaloDocumentEventsListener listener;
 
+    @AfterEach
+    void close() {
+        listener.shutdown();
+    }
+
     @Test
     void shouldRebuildIndicesWhenReceivingRebuildRequestEvent() {
         listener.setBufferSize(1);
@@ -39,7 +44,7 @@ class HaloDocumentEventsListenerTest {
         when(docsProvider.fetchAll()).thenReturn(Flux.fromIterable(docs));
         when(extensionGetter.getExtensions(HaloDocumentsProvider.class)).thenReturn(Flux.just(docsProvider));
         listener.onApplicationEvent(new HaloDocumentRebuildRequestEvent(this));
-        verify(searchEngine, times(3)).addOrUpdate(any());
+        verify(searchEngine, timeout(3000).times(3)).addOrUpdate(any());
     }
 
     @Test
@@ -49,7 +54,7 @@ class HaloDocumentEventsListenerTest {
         when(extensionGetter.getEnabledExtension(SearchEngine.class)).thenReturn(Mono.just(searchEngine));
         var docs = List.of(new HaloDocument());
         listener.onApplicationEvent(new HaloDocumentAddRequestEvent(this, docs));
-        verify(searchEngine).addOrUpdate(docs);
+        verify(searchEngine, timeout(3000)).addOrUpdate(docs);
     }
 
     @Test
@@ -59,16 +64,29 @@ class HaloDocumentEventsListenerTest {
         when(extensionGetter.getEnabledExtension(SearchEngine.class)).thenReturn(Mono.just(searchEngine));
         var docIds = List.of("1", "2", "3");
         listener.onApplicationEvent(new HaloDocumentDeleteRequestEvent(this, docIds));
-        verify(searchEngine).deleteDocument(docIds);
+        verify(searchEngine, timeout(3000)).deleteDocument(docIds);
     }
 
     @Test
-    void shouldFailWhenSearchEngineIsUnavailable() {
+    void shouldContinueAfterSearchEngineIsUnavailable() {
         var searchEngine = mock(SearchEngine.class);
-        when(searchEngine.available()).thenReturn(false);
+        when(searchEngine.available()).thenReturn(false, true);
         when(extensionGetter.getEnabledExtension(SearchEngine.class)).thenReturn(Mono.just(searchEngine));
-        assertThrows(
-                SearchEngineUnavailableException.class,
-                () -> listener.onApplicationEvent(new HaloDocumentRebuildRequestEvent(this)));
+        listener.onApplicationEvent(new HaloDocumentRebuildRequestEvent(this));
+        listener.onApplicationEvent(new HaloDocumentDeleteRequestEvent(this, List.of("post")));
+        verify(searchEngine, timeout(3000)).deleteDocument(List.of("post"));
+        verify(searchEngine, never()).deleteAll();
+    }
+
+    @Test
+    void variantProviderRebuildShouldNotClearLegacyIndices() {
+        var searchEngine = mock(SearchEngine.class);
+        when(searchEngine.available()).thenReturn(true);
+        when(extensionGetter.getEnabledExtension(SearchEngine.class)).thenReturn(Mono.just(searchEngine));
+        var provider = mock(HaloDocumentVariantProvider.class);
+        listener.onApplicationEvent(new HaloDocumentRebuildRequestEvent(provider));
+        listener.onApplicationEvent(new HaloDocumentDeleteRequestEvent(this, List.of("post")));
+        verify(searchEngine, timeout(3000)).deleteDocument(List.of("post"));
+        verify(searchEngine, never()).deleteAll();
     }
 }

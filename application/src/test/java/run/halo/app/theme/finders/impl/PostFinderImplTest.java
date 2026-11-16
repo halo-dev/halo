@@ -8,11 +8,14 @@ import static org.mockito.Mockito.*;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Predicate;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -24,6 +27,9 @@ import run.halo.app.content.PostService;
 import run.halo.app.core.counter.CounterService;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.*;
+import run.halo.app.localization.LocalizationContext;
+import run.halo.app.localization.LocalizationScope;
+import run.halo.app.localization.ResourceLocalizationService;
 import run.halo.app.theme.finders.CategoryFinder;
 import run.halo.app.theme.finders.ContributorFinder;
 import run.halo.app.theme.finders.PostPublicQueryService;
@@ -66,6 +72,9 @@ class PostFinderImplTest {
 
     @Mock
     ReactiveQueryPostPredicateResolver postPredicateResolver;
+
+    @Mock
+    private ResourceLocalizationService localizationService;
 
     @InjectMocks
     private PostFinderImpl postFinder;
@@ -132,6 +141,60 @@ class PostFinderImplTest {
         verify(publicQueryService).convertToListedVos(assertArg(items -> {
             assertTrue(items.containsAll(posts));
         }));
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void navigationPreservesSourceWithoutLoadingRelations(boolean byCategory) {
+        var source = stubNavigation();
+        var navigation = byCategory ? postFinder.cursorByCategory("post-1") : postFinder.cursor("post-1");
+
+        navigation
+                .as(StepVerifier::create)
+                .assertNext(result -> {
+                    assertThat(result.previous().getSpec().getTitle())
+                            .isEqualTo(source.getSpec().getTitle());
+                    assertThat(result.next().getStatus().getPermalink()).isEqualTo("/post-2");
+                })
+                .verifyComplete();
+
+        verifyNoInteractions(localizationService, publicQueryService);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void navigationProjectsDisplayFieldsWithoutLoadingRelations(boolean byCategory) {
+        var source = stubNavigation();
+        var translated = post(2);
+        translated.getSpec().setTitle("Translated title");
+        translated.getStatus().setPermalink("/en/post-2");
+        var context = new LocalizationContext(Locale.CHINA, Locale.ENGLISH, List.of(), LocalizationScope.PUBLIC_PAGE);
+        when(localizationService.localize(source, context)).thenReturn(Mono.just(translated));
+        var navigation = byCategory ? postFinder.cursorByCategory("post-1") : postFinder.cursor("post-1");
+
+        navigation
+                .contextWrite(ctx -> ctx.put(LocalizationContext.class, context))
+                .as(StepVerifier::create)
+                .assertNext(result -> {
+                    assertThat(result.previous().getSpec().getTitle()).isEqualTo("Translated title");
+                    assertThat(result.next().getStatus().getPermalink()).isEqualTo("/en/post-2");
+                })
+                .verifyComplete();
+
+        verifyNoInteractions(publicQueryService);
+        assertThat(source.getSpec().getTitle()).isEqualTo("title-2");
+        assertThat(source.getStatus().getPermalink()).isEqualTo("/post-2");
+    }
+
+    private Post stubNavigation() {
+        var current = post(1);
+        current.getSpec().setCategories(List.of("category"));
+        var adjacent = post(2);
+        when(client.fetch(Post.class, "post-1")).thenReturn(Mono.just(current));
+        when(postPredicateResolver.getListOptions()).thenReturn(Mono.just(new ListOptions()));
+        when(client.listBy(eq(Post.class), any(ListOptions.class), any(PageRequest.class)))
+                .thenReturn(Mono.just(new ListResult<>(1, 1, 1, List.of(adjacent))));
+        return adjacent;
     }
 
     List<Post> postsForArchives() {

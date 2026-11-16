@@ -2,7 +2,6 @@ package run.halo.app.core.endpoint.theme;
 
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
-import static run.halo.app.core.endpoint.theme.PublicApiUtils.toAnotherListResult;
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +21,8 @@ import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.index.query.Queries;
 import run.halo.app.extension.router.SortableRequest;
+import run.halo.app.localization.PublicLocalization;
+import run.halo.app.localization.ResourceLocalizationService;
 import run.halo.app.theme.finders.PostPublicQueryService;
 import run.halo.app.theme.finders.vo.CategoryVo;
 import run.halo.app.theme.finders.vo.ListedPostVo;
@@ -37,6 +38,7 @@ import run.halo.app.theme.finders.vo.ListedPostVo;
 public class CategoryQueryEndpoint implements CustomEndpoint {
 
     private final ReactiveExtensionClient client;
+    private final ResourceLocalizationService localizationService;
     private final PostPublicQueryService postPublicQueryService;
 
     @Override
@@ -95,6 +97,7 @@ public class CategoryQueryEndpoint implements CustomEndpoint {
     private Mono<ServerResponse> getByName(ServerRequest request) {
         String name = request.pathVariable("name");
         return client.get(Category.class, name)
+                .flatMap(category -> PublicLocalization.project(category, localizationService))
                 .map(CategoryVo::from)
                 .flatMap(categoryVo -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
@@ -104,7 +107,12 @@ public class CategoryQueryEndpoint implements CustomEndpoint {
     private Mono<ServerResponse> listCategories(ServerRequest request) {
         CategoryPublicQuery query = new CategoryPublicQuery(request.exchange());
         return client.listBy(Category.class, query.toListOptions(), query.toPageRequest())
-                .map(listResult -> toAnotherListResult(listResult, CategoryVo::from))
+                .flatMap(result -> PublicLocalization.project(result.getItems(), localizationService)
+                        .map(items -> new ListResult<>(
+                                result.getPage(),
+                                result.getSize(),
+                                result.getTotal(),
+                                items.stream().map(CategoryVo::from).toList())))
                 .flatMap(result -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(result));

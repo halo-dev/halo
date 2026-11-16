@@ -27,6 +27,8 @@ import run.halo.app.extension.router.selector.LabelSelector;
 import run.halo.app.infra.utils.HaloUtils;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.infra.utils.SortUtils;
+import run.halo.app.localization.PublicLocalization;
+import run.halo.app.localization.ResourceLocalizationService;
 import run.halo.app.theme.finders.Finder;
 import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.PostPublicQueryService;
@@ -50,6 +52,8 @@ class PostFinderImpl implements PostFinder {
     private final ReactiveQueryPostPredicateResolver postPredicateResolver;
 
     private final CategoryService categoryService;
+
+    private final ResourceLocalizationService localizationService;
 
     @Override
     public Mono<PostVo> getByName(String postName) {
@@ -85,16 +89,20 @@ class PostFinderImpl implements PostFinder {
                 .filter(p -> Post.isPublished(p.getMetadata()))
                 .filter(p -> p.getSpec() != null && p.getSpec().getPublishTime() != null)
                 .flatMap(currentPost -> {
-                    var findPreviousPost =
-                            findPreviousPost(currentPost).map(Optional::of).defaultIfEmpty(Optional.empty());
-                    var findNextPost =
-                            findNextPost(currentPost).map(Optional::of).defaultIfEmpty(Optional.empty());
+                    var findPreviousPost = findPreviousPost(currentPost)
+                            .flatMap(this::toNavigationPost)
+                            .map(Optional::of)
+                            .defaultIfEmpty(Optional.empty());
+                    var findNextPost = findNextPost(currentPost)
+                            .flatMap(this::toNavigationPost)
+                            .map(Optional::of)
+                            .defaultIfEmpty(Optional.empty());
                     return Mono.zip(
                             findPreviousPost,
                             findNextPost,
                             (previous, next) -> NavigationPostVo.builder()
-                                    .previous(previous.map(ListedPostVo::from).orElse(null))
-                                    .next(next.map(ListedPostVo::from).orElse(null))
+                                    .previous(previous.orElse(null))
+                                    .next(next.orElse(null))
                                     .build());
                 })
                 .switchIfEmpty(Mono.fromSupplier(NavigationPostVo::empty));
@@ -112,20 +120,26 @@ class PostFinderImpl implements PostFinder {
                     }
                     var primaryCategory = categories.get(0);
                     var findPreviousPost = findPreviousPostByCategory(currentPost, primaryCategory)
+                            .flatMap(this::toNavigationPost)
                             .map(Optional::of)
                             .defaultIfEmpty(Optional.empty());
                     var findNextPost = findNextPostByCategory(currentPost, primaryCategory)
+                            .flatMap(this::toNavigationPost)
                             .map(Optional::of)
                             .defaultIfEmpty(Optional.empty());
                     return Mono.zip(
                             findPreviousPost,
                             findNextPost,
                             (previous, next) -> NavigationPostVo.builder()
-                                    .previous(previous.map(ListedPostVo::from).orElse(null))
-                                    .next(next.map(ListedPostVo::from).orElse(null))
+                                    .previous(previous.orElse(null))
+                                    .next(next.orElse(null))
                                     .build());
                 })
                 .switchIfEmpty(Mono.fromSupplier(NavigationPostVo::empty));
+    }
+
+    private Mono<ListedPostVo> toNavigationPost(Post post) {
+        return PublicLocalization.project(post, localizationService).map(ListedPostVo::from);
     }
 
     private Mono<Post> findPreviousPost(Post currentPost) {

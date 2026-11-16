@@ -21,6 +21,8 @@ import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.index.query.Queries;
 import run.halo.app.extension.router.SortableRequest;
+import run.halo.app.localization.PublicLocalization;
+import run.halo.app.localization.ResourceLocalizationService;
 import run.halo.app.theme.finders.PostPublicQueryService;
 import run.halo.app.theme.finders.TagFinder;
 import run.halo.app.theme.finders.vo.ListedPostVo;
@@ -37,6 +39,7 @@ import run.halo.app.theme.finders.vo.TagVo;
 public class TagQueryEndpoint implements CustomEndpoint {
 
     private final ReactiveExtensionClient client;
+    private final ResourceLocalizationService localizationService;
     private final TagFinder tagFinder;
     private final PostPublicQueryService postPublicQueryService;
 
@@ -104,10 +107,9 @@ public class TagQueryEndpoint implements CustomEndpoint {
     private Mono<ServerResponse> listTags(ServerRequest request) {
         var query = new TagPublicQuery(request.exchange());
         return client.listBy(Tag.class, query.toListOptions(), query.toPageRequest())
-                .map(result -> {
-                    var tagVos = tagFinder.convertToVo(result.getItems());
-                    return new ListResult<>(result.getPage(), result.getSize(), result.getTotal(), tagVos);
-                })
+                .flatMap(result -> PublicLocalization.project(result.getItems(), localizationService)
+                        .map(items -> new ListResult<>(
+                                result.getPage(), result.getSize(), result.getTotal(), tagFinder.convertToVo(items))))
                 .flatMap(result -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(result));

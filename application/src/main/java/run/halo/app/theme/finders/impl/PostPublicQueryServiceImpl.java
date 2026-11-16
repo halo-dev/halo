@@ -6,6 +6,7 @@ import static run.halo.app.core.counter.MeterUtils.nameOf;
 import static run.halo.app.core.user.service.UserService.GHOST_USER_NAME;
 
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
@@ -22,6 +23,11 @@ import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.PageRequest;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.localization.LocalizableDocument;
+import run.halo.app.localization.LocalizationContext;
+import run.halo.app.localization.PublicLocalization;
+import run.halo.app.localization.ResourceLocalizationService;
+import run.halo.app.localization.ResourceReference;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 import run.halo.app.theme.ReactivePostContentHandler;
 import run.halo.app.theme.finders.CategoryFinder;
@@ -36,6 +42,8 @@ import run.halo.app.theme.router.ReactiveQueryPostPredicateResolver;
 public class PostPublicQueryServiceImpl implements PostPublicQueryService {
 
     private final ReactiveExtensionClient client;
+
+    private final ResourceLocalizationService localizationService;
 
     private final TagFinder tagFinder;
 
@@ -75,6 +83,13 @@ public class PostPublicQueryServiceImpl implements PostPublicQueryService {
     @Override
     public Mono<ListedPostVo> convertToListedVo(Post post) {
         Assert.notNull(post, "Post must not be null");
+        return LocalizationContext.current()
+                .flatMap(context -> localizationService.localize(post, context))
+                .defaultIfEmpty(post)
+                .flatMap(this::convertProjectedToListedVo);
+    }
+
+    private Mono<ListedPostVo> convertProjectedToListedVo(Post post) {
         ListedPostVo postVo = ListedPostVo.from(post);
         postVo.setCategories(List.of());
         postVo.setTags(List.of());
@@ -121,6 +136,13 @@ public class PostPublicQueryServiceImpl implements PostPublicQueryService {
 
     @Override
     public Mono<List<ListedPostVo>> convertToListedVos(List<Post> posts) {
+        return LocalizationContext.current()
+                .flatMap(context -> localizationService.localizeAll(posts, context))
+                .defaultIfEmpty(posts)
+                .flatMap(this::convertProjectedToListedVos);
+    }
+
+    private Mono<List<ListedPostVo>> convertProjectedToListedVos(List<Post> posts) {
         var counterNames = new HashSet<String>(posts.size());
         var userNames = new HashSet<String>();
         var tagNames = new HashSet<String>();
@@ -208,13 +230,14 @@ public class PostPublicQueryServiceImpl implements PostPublicQueryService {
     @Override
     public Mono<PostVo> convertToVo(Post post, String snapshotName) {
         final String baseSnapshotName = post.getSpec().getBaseSnapshot();
-        return convertToListedVo(post)
-                .map(PostVo::from)
-                .flatMap(postVo -> postService
-                        .getContent(snapshotName, baseSnapshotName)
-                        .flatMap(wrapper -> extendPostContent(post, wrapper))
-                        .doOnNext(postVo::setContent)
-                        .thenReturn(postVo));
+        return PublicLocalization.project(post, localizationService)
+                .flatMap(projected -> convertProjectedToListedVo(projected)
+                        .map(PostVo::from)
+                        .flatMap(postVo -> postService
+                                .getContent(snapshotName, baseSnapshotName)
+                                .flatMap(wrapper -> extendProjectedPostContent(projected, wrapper))
+                                .doOnNext(postVo::setContent)
+                                .thenReturn(postVo)));
     }
 
     @Override
@@ -233,21 +256,37 @@ public class PostPublicQueryServiceImpl implements PostPublicQueryService {
     protected Mono<ContentVo> extendPostContent(Post post, ContentWrapper wrapper) {
         Assert.notNull(post, "Post name must not be null");
         Assert.notNull(wrapper, "Post content must not be null");
-        return extensionGetter
-                .getEnabledExtensions(ReactivePostContentHandler.class)
-                .reduce(
-                        Mono.fromSupplier(() -> ReactivePostContentHandler.PostContentContext.builder()
-                                .post(post)
-                                .content(wrapper.getContent())
-                                .raw(wrapper.getRaw())
-                                .rawType(wrapper.getRawType())
-                                .build()),
-                        (contentMono, handler) -> contentMono.flatMap(handler::handle))
-                .flatMap(Function.identity())
-                .map(postContent -> ContentVo.builder()
-                        .content(postContent.getContent())
-                        .raw(postContent.getRaw())
-                        .build());
+        return PublicLocalization.project(post, localizationService)
+                .flatMap(projected -> extendProjectedPostContent(projected, wrapper));
+    }
+
+    private Mono<ContentVo> extendProjectedPostContent(Post post, ContentWrapper wrapper) {
+        var fields = new LinkedHashMap<String, String>();
+        fields.put("content.html", wrapper.getContent());
+        fields.put("content.raw", wrapper.getRaw());
+        return LocalizationContext.current()
+                .filter(LocalizationContext::enabled)
+                .flatMap(context -> Mono.justOrEmpty(wrapper.getRawType())
+                        .map(rawType -> new LocalizableDocument("content.html", "content.raw", rawType, null))
+                        .onErrorResume(IllegalArgumentException.class, error -> Mono.empty())
+                        .flatMap(document -> localizationService.localizeFields(
+                                ResourceReference.from(post), fields, List.of(document), context)))
+                .defaultIfEmpty(fields)
+                .flatMap(localized -> extensionGetter
+                        .getEnabledExtensions(ReactivePostContentHandler.class)
+                        .reduce(
+                                Mono.fromSupplier(() -> ReactivePostContentHandler.PostContentContext.builder()
+                                        .post(post)
+                                        .content(localized.get("content.html"))
+                                        .raw(localized.get("content.raw"))
+                                        .rawType(wrapper.getRawType())
+                                        .build()),
+                                (contentMono, handler) -> contentMono.flatMap(handler::handle))
+                        .flatMap(Function.identity())
+                        .map(postContent -> ContentVo.builder()
+                                .content(postContent.getContent())
+                                .raw(postContent.getRaw())
+                                .build()));
     }
 
     private <T extends ListedPostVo> Mono<StatsVo> populateStats(T postVo) {

@@ -23,6 +23,8 @@ import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.infra.utils.PathUtils;
+import run.halo.app.localization.PublicLocalization;
+import run.halo.app.localization.ResourceLocalizationService;
 import run.halo.app.theme.Constant;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.ViewNameResolver;
@@ -49,6 +51,7 @@ public class CategoryPostRouteFactory implements RouteFactory {
 
     private final SystemConfigFetcher environmentFetcher;
     private final ReactiveExtensionClient client;
+    private final ResourceLocalizationService localizationService;
     private final ViewNameResolver viewNameResolver;
 
     private final TitleVisibilityIdentifyCalculator titleVisibilityIdentifyCalculator;
@@ -93,8 +96,9 @@ public class CategoryPostRouteFactory implements RouteFactory {
         listOptions.setFieldSelector(
                 FieldSelector.of(and(equal("spec.slug", slug), isNull("metadata.deletionTimestamp"))));
         return client.listBy(Category.class, listOptions, PageRequestImpl.ofSize(1))
-                .mapNotNull(
-                        result -> ListResult.first(result).map(CategoryVo::from).orElse(null));
+                .mapNotNull(result -> ListResult.first(result).orElse(null))
+                .flatMap(category -> PublicLocalization.project(category, localizationService))
+                .map(CategoryVo::from);
     }
 
     private Mono<UrlContextListResult<ListedPostVo>> postListByCategoryName(String name, ServerRequest request) {
