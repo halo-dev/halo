@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.json.JSONException;
 import org.junit.jupiter.api.AfterEach;
@@ -26,6 +27,11 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring6.SpringTemplateEngine;
+import org.thymeleaf.spring6.dialect.SpringStandardDialect;
+import org.thymeleaf.standard.expression.IStandardVariableExpressionEvaluator;
+import org.thymeleaf.templateresolver.StringTemplateResolver;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -38,6 +44,8 @@ import run.halo.app.extension.store.ReactiveExtensionStoreClient;
 import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.infra.exception.DuplicateNameException;
 import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.theme.ReactiveSpelVariableExpressionEvaluator;
+import run.halo.app.theme.finders.CommentFinder;
 
 @DirtiesContext
 @SpringBootTest
@@ -61,6 +69,133 @@ class CommentPublicQueryServiceIntegrationTest {
         return storeClient
                 .delete(storeName, extension.getMetadata().getVersion())
                 .thenReturn(extension);
+    }
+
+    @Nested
+    class FinderTemplateTest {
+        @Autowired
+        private CommentFinder finder;
+
+        private List<Comment> comments;
+        private List<Reply> replies;
+        private SpringTemplateEngine engine;
+        private Context context;
+
+        @BeforeEach
+        void setUp() {
+            var pinned = comment("finder-pinned", "2030-01-01T00:00:00Z", true);
+            var latest = comment("finder-latest", "2030-01-02T00:00:00Z", false);
+            var hidden = comment("finder-hidden", "2030-01-03T00:00:00Z", false);
+            hidden.getSpec().setHidden(true);
+            var pending = comment("finder-pending", "2030-01-04T00:00:00Z", false);
+            pending.getSpec().setApproved(false);
+            var other = comment("finder-other", "2029-01-01T00:00:00Z", false);
+            other.getSpec().getSubjectRef().setName("finder-other-post");
+            comments = List.of(pinned, latest, hidden, pending, other);
+            replies = comments.stream()
+                    .map(comment -> {
+                        var reply = new Reply();
+                        reply.setMetadata(new Metadata());
+                        reply.getMetadata().setName(comment.getMetadata().getName());
+                        var spec = new Reply.ReplySpec();
+                        spec.setCommentName(comment == other ? "finder-other" : "finder-pinned");
+                        spec.setOwner(comment.getSpec().getOwner());
+                        spec.setRaw("reply");
+                        spec.setContent("reply");
+                        spec.setAllowNotification(false);
+                        spec.setApproved(comment.getSpec().getApproved());
+                        spec.setHidden(comment.getSpec().getHidden());
+                        spec.setTop(comment.getSpec().getTop());
+                        spec.setPriority(0);
+                        spec.setCreationTime(comment.getSpec().getCreationTime());
+                        reply.setSpec(spec);
+                        return reply;
+                    })
+                    .toList();
+            Flux.fromIterable(comments).concatMap(client::create).blockLast();
+            Flux.fromIterable(replies).concatMap(client::create).blockLast();
+
+            engine = new SpringTemplateEngine();
+            engine.setDialect(new SpringStandardDialect() {
+                @Override
+                public IStandardVariableExpressionEvaluator getVariableExpressionEvaluator() {
+                    return ReactiveSpelVariableExpressionEvaluator.INSTANCE;
+                }
+            });
+            engine.setTemplateResolver(new StringTemplateResolver());
+            context = new Context();
+            context.setVariable("commentFinder", finder);
+            context.setVariable(
+                    "ref",
+                    Map.of(
+                            "group",
+                            "content.halo.run",
+                            "version",
+                            "v1alpha1",
+                            "kind",
+                            "SinglePage",
+                            "name",
+                            "finder-post"));
+        }
+
+        @AfterEach
+        void tearDown() {
+            Flux.fromIterable(replies)
+                    .concatMap(CommentPublicQueryServiceIntegrationTest.this::deleteImmediately)
+                    .blockLast();
+            Flux.fromIterable(comments)
+                    .concatMap(CommentPublicQueryServiceIntegrationTest.this::deleteImmediately)
+                    .blockLast();
+        }
+
+        @Test
+        void listWithCustomSortAndPagination() {
+            assertThat(render("commentFinder.list({ref: ref, sort: {'spec.creationTime,desc'}})"))
+                    .isEqualTo("<span>finder-latest</span><span>finder-pinned</span>");
+            assertThat(render("commentFinder.list({ref: ref, page: 2, size: 1, sort: {'spec.creationTime,desc'}})"))
+                    .isEqualTo("<span>finder-pinned</span>");
+            assertThat(render("commentFinder.list({size: 1, sort: {'spec.creationTime,desc'}})"))
+                    .isEqualTo("<span>finder-latest</span>");
+        }
+
+        @Test
+        void listReplyWithCustomSortAndPagination() {
+            assertThat(render("commentFinder.listReply('finder-pinned', {sort: {'spec.creationTime,desc'}})"))
+                    .isEqualTo("<span>finder-latest</span><span>finder-pinned</span>");
+            assertThat(
+                            render(
+                                    "commentFinder.listReply('finder-pinned', {page: 2, size: 1, sort: {'spec.creationTime,desc'}})"))
+                    .isEqualTo("<span>finder-pinned</span>");
+        }
+
+        @Test
+        void defaultOptionsPreserveLegacyOrdering() {
+            var expected = "<span>finder-pinned</span><span>finder-latest</span>";
+            assertThat(render("commentFinder.list(ref, null, null)")).isEqualTo(expected);
+            assertThat(render("commentFinder.list({ref: ref})")).isEqualTo(expected);
+            assertThat(render("commentFinder.listReply('finder-pinned', null, null)"))
+                    .isEqualTo(expected);
+            assertThat(render("commentFinder.listReply('finder-pinned', {})")).isEqualTo(expected);
+            assertThat(render("commentFinder.listReply('finder-pinned', null)")).isEqualTo(expected);
+            var global = render("commentFinder.list(null, null, null)");
+            assertThat(render("commentFinder.list({})")).isEqualTo(global);
+            assertThat(render("commentFinder.list(null)")).isEqualTo(global);
+        }
+
+        private String render(String expression) {
+            return engine.process(
+                    "<span th:each=\"item : ${" + expression + "}\" th:text=\"${item.metadata.name}\"></span>",
+                    context);
+        }
+
+        private Comment comment(String name, String time, boolean top) {
+            var comment = createComment();
+            comment.getMetadata().setName(name);
+            comment.getSpec().getSubjectRef().setName("finder-post");
+            comment.getSpec().setCreationTime(Instant.parse(time));
+            comment.getSpec().setTop(top);
+            return comment;
+        }
     }
 
     @Nested
