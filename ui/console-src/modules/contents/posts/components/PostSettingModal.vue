@@ -471,6 +471,7 @@ const showCancelPublishButton = computed(() => {
               :help="$t('core.post.settings.fields.priority.help')"
               name="priority"
               type="number"
+              number="integer"
               validation="required"
             ></FormKit>
             <FormKit
