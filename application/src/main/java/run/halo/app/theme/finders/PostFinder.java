@@ -29,6 +29,16 @@ public interface PostFinder {
 
     Mono<NavigationPostVo> cursor(String current);
 
+    /**
+     * Gets adjacent posts using the filters and sort of {@link #list(Map)}. The previous post follows the current post
+     * in the sorted list; the next post precedes it. Returns empty navigation if the current post is outside the query
+     * results.
+     *
+     * @param current current post name
+     * @param params list query parameters; page and size are ignored
+     */
+    Mono<NavigationPostVo> cursor(String current, Map<String, Object> params);
+
     Mono<NavigationPostVo> cursorByCategory(String current);
 
     Flux<ListedPostVo> listAll();

@@ -9,8 +9,10 @@ import org.jspecify.annotations.Nullable;
 /**
  * Post navigation vo to hold previous and next item.
  *
- * @param previous Previous post. It's publishing time is earlier than current post.
- * @param next Next post. It's publishing time is later than current post.
+ * @param previous Previous post. For query-based navigation, it follows the current post in the sorted list. For
+ *     publish-time navigation, its publishing time is earlier than the current post.
+ * @param next Next post. For query-based navigation, it precedes the current post in the sorted list. For publish-time
+ *     navigation, its publishing time is later than the current post.
  * @author guqing
  * @author johnniang
  * @since 2.0.0

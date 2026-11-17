@@ -101,6 +101,45 @@ class PostFinderImpl implements PostFinder {
     }
 
     @Override
+    public Mono<NavigationPostVo> cursor(String currentName, Map<String, Object> params) {
+        var query = Optional.ofNullable(params)
+                .map(map -> JsonUtils.mapToObject(map, PostQuery.class))
+                .orElseGet(PostQuery::new);
+        return queryListOptions(query)
+                .flatMap(queryOptions -> postPredicateResolver
+                        .getListOptions()
+                        .map(options -> ListOptions.builder(options)
+                                .andQuery(queryOptions.toCondition())
+                                .build()))
+                .flatMapMany(options -> client.listAllNames(
+                        Post.class, options, query.toPageRequest().getSort()))
+                .collectList()
+                .flatMap(names -> {
+                    var index = names.indexOf(currentName);
+                    if (index < 0) {
+                        return Mono.just(NavigationPostVo.empty());
+                    }
+                    return Mono.zip(
+                            navigationPostAt(names, index + 1),
+                            navigationPostAt(names, index - 1),
+                            (previous, next) -> NavigationPostVo.builder()
+                                    .previous(previous.orElse(null))
+                                    .next(next.orElse(null))
+                                    .build());
+                });
+    }
+
+    private Mono<Optional<ListedPostVo>> navigationPostAt(List<String> names, int index) {
+        if (index < 0 || index >= names.size()) {
+            return Mono.just(Optional.empty());
+        }
+        return client.fetch(Post.class, names.get(index))
+                .map(ListedPostVo::from)
+                .map(Optional::of)
+                .defaultIfEmpty(Optional.empty());
+    }
+
+    @Override
     public Mono<NavigationPostVo> cursorByCategory(String currentName) {
         return client.fetch(Post.class, currentName)
                 .filter(p -> Post.isPublished(p.getMetadata()))
@@ -201,16 +240,20 @@ class PostFinderImpl implements PostFinder {
         var query = Optional.ofNullable(params)
                 .map(map -> JsonUtils.mapToObject(map, PostQuery.class))
                 .orElseGet(PostQuery::new);
+        return queryListOptions(query)
+                .flatMap(listOptions -> postPublicQueryService.list(listOptions, query.toPageRequest()));
+    }
+
+    private Mono<ListOptions> queryListOptions(PostQuery query) {
         if (StringUtils.isNotBlank(query.getCategoryName())) {
             return listChildrenCategories(query.getCategoryName())
                     .map(category -> category.getMetadata().getName())
                     .collectList()
                     .map(categoryNames -> ListOptions.builder(query.toListOptions())
                             .andQuery(in("spec.categories", categoryNames))
-                            .build())
-                    .flatMap(listOptions -> postPublicQueryService.list(listOptions, query.toPageRequest()));
+                            .build());
         }
-        return postPublicQueryService.list(query.toListOptions(), query.toPageRequest());
+        return Mono.just(query.toListOptions());
     }
 
     @Override
