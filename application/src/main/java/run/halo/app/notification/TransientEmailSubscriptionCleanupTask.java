@@ -56,6 +56,9 @@ public class TransientEmailSubscriptionCleanupTask {
             return cleanUpSubscriptions()
                     .doOnNext(deleted -> log.info("Deleted {} unused transient email subscription(s)", deleted))
                     .then()
+                    // Release before completion reaches subscribers so a follow-up run is not skipped.
+                    .doOnSuccess(ignored -> running.set(false))
+                    .doOnError(error -> running.set(false))
                     .doFinally(signal -> running.set(false));
         });
     }
