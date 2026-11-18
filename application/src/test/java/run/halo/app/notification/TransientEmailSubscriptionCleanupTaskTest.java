@@ -10,6 +10,8 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,6 +58,27 @@ class TransientEmailSubscriptionCleanupTaskTest {
         StepVerifier.create(cleanup).verifyComplete();
         StepVerifier.create(cleanup).verifyComplete();
         verify(client, times(2)).listTopNames(eq(Subscription.class), any(), any(), anyInt());
+    }
+
+    @Test
+    void releasesGuardBeforePropagatingCompletion() {
+        var calls = new AtomicInteger();
+        when(client.listTopNames(eq(Subscription.class), any(), any(), anyInt()))
+                .thenAnswer(invocation -> {
+                    calls.incrementAndGet();
+                    return Flux.empty();
+                });
+        var rerun = new AtomicBoolean();
+
+        task.cleanUp()
+                .doOnSuccess(ignored -> {
+                    var before = calls.get();
+                    task.cleanUp().block();
+                    rerun.set(calls.get() > before);
+                })
+                .block();
+
+        assertThat(rerun).isTrue();
     }
 
     @Test
