@@ -27,13 +27,20 @@ public class TransientEmailNotificationCoordinator {
                     if (current != null) {
                         return wait ? current.asMono().then(execute(key, operation, true)) : Mono.<T>empty();
                     }
-                    return Mono.defer(operation).doFinally(signal -> {
-                        operations.remove(key, completion);
-                        completion.tryEmitEmpty();
-                    });
+                    return Mono.defer(operation)
+                            // Release before completion reaches subscribers so an immediate
+                            // follow-up operation is not skipped; doFinally still covers cancellation.
+                            .doOnSuccess(ignored -> release(key, completion))
+                            .doOnError(ignored -> release(key, completion))
+                            .doFinally(signal -> release(key, completion));
                 })
                 // A cancelled HTTP request must not release the guard while its writes are still in flight.
                 .cache();
+    }
+
+    private void release(Key key, Sinks.One<Void> completion) {
+        operations.remove(key, completion);
+        completion.tryEmitEmpty();
     }
 
     private record Key(String reasonType, String subscriber) {}
