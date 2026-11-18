@@ -45,7 +45,7 @@ public class IndexSnapshotManager implements ApplicationContextAware, SmartLifec
     private final IndexEngine engine;
     private final ObjectProvider<SchemeManager> schemes;
     private ApplicationContext applicationContext;
-    private boolean ready;
+    private volatile boolean ready;
     private volatile boolean running;
 
     public IndexSnapshotManager(

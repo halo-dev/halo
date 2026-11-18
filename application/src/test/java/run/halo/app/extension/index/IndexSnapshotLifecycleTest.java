@@ -3,6 +3,7 @@ package run.halo.app.extension.index;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
+import java.lang.reflect.Modifier;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -22,6 +23,12 @@ import run.halo.app.plugin.SpringPluginManager;
 class IndexSnapshotLifecycleTest {
     @TempDir
     Path workDir;
+
+    @Test
+    void applicationReadyStateMustBeVolatileForShutdownHookVisibility() throws Exception {
+        var ready = IndexSnapshotManager.class.getDeclaredField("ready");
+        assertThat(Modifier.isVolatile(ready.getModifiers())).isTrue();
+    }
 
     @Test
     void actualSpringDependencyGraphMustStopPluginsThenControllersThenSnapshotsThenSchemes() {
