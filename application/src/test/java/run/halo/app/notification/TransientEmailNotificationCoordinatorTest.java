@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
@@ -14,6 +15,24 @@ import run.halo.app.core.extension.notification.Subscription;
 
 class TransientEmailNotificationCoordinatorTest {
     private final TransientEmailNotificationCoordinator coordinator = new TransientEmailNotificationCoordinator();
+
+    @Test
+    void releasesGuardBeforePropagatingCompletion() {
+        var subscription = new Subscription();
+        var rerun = new AtomicBoolean();
+
+        coordinator
+                .tryCleanup("email-verification", "subscriber", Mono::empty)
+                .doOnSuccess(ignored -> {
+                    var result = coordinator
+                            .tryCleanup("email-verification", "subscriber", () -> Mono.just(subscription))
+                            .block();
+                    rerun.set(result == subscription);
+                })
+                .block();
+
+        assertThat(rerun).isTrue();
+    }
 
     @Test
     void skipsCleanupUntilPublicationCompletesEvenAfterCallerCancels() {
