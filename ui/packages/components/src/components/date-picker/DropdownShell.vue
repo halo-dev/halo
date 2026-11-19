@@ -75,7 +75,9 @@ defineExpose({
     :placement="placement"
     :distance="4"
     :no-auto-focus="true"
-    popper-class="[&_.v-popper__inner]:!overflow-hidden [&_.v-popper__inner]:!p-0"
+    :auto-boundary-max-size="true"
+    :overflow-padding="8"
+    popper-class="[&_.v-popper__inner]:!overflow-y-auto [&_.v-popper__inner]:!overflow-x-hidden [&_.v-popper__inner]:!p-0"
     @update:shown="onShownUpdate"
   >
     <slot :open="isOpen" :show="show" :hide="hide" />

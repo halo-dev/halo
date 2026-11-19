@@ -64,6 +64,19 @@ describe("DatePickerPanel", () => {
       "data-disabled"
     );
   });
+
+  it("keeps the selected day highlighted on hover", () => {
+    const wrapper = mount(VDatePickerPanel, {
+      props: {
+        modelValue: "2026-11-10",
+        defaultPickerValue: "2026-11-01",
+      },
+    });
+
+    expect(wrapper.get(cellSelector("2026-11-10")).classes()).toContain(
+      "data-[selected]:hover:bg-primary"
+    );
+  });
 });
 
 describe("DateRangePickerPanel", () => {
@@ -120,6 +133,25 @@ describe("DateRangePickerPanel", () => {
     expect(wrapper.emitted("update:modelValue")?.[1]).toEqual([
       { start: "2026-11-01", end: "2026-11-19" },
     ]);
+  });
+
+  it("keeps selected range days highlighted on hover", () => {
+    const wrapper = mount(VDateRangePickerPanel, {
+      props: {
+        modelValue: { start: "2026-11-10", end: "2026-11-15" },
+        defaultPickerValue: "2026-11-01",
+      },
+    });
+
+    expect(wrapper.get(cellSelector("2026-11-10")).classes()).toContain(
+      "data-[selection-start]:hover:bg-primary"
+    );
+    expect(wrapper.get(cellSelector("2026-11-12")).classes()).toContain(
+      "data-[selected]:hover:bg-primary/10"
+    );
+    expect(wrapper.get(cellSelector("2026-11-15")).classes()).toContain(
+      "data-[selection-end]:hover:bg-primary"
+    );
   });
 });
 
