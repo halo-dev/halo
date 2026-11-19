@@ -3,6 +3,7 @@ import { computed, ref } from "vue";
 import {
   VTable,
   createTableColumnHelper,
+  type ColumnPinningState,
   type RowSelectionState,
   type SortingState,
 } from ".";
@@ -417,6 +418,102 @@ export const MultiLevelHeader: Story = {
     template: `
       <div class="max-w-5xl rounded border border-gray-100 bg-white">
         <VTable :columns="groupedColumns" :data="posts" row-key="id" />
+      </div>
+    `,
+  }),
+};
+
+const manyPosts: Post[] = Array.from({ length: 1000 }, (_, index) => {
+  const post = posts[index % posts.length];
+  return {
+    ...post,
+    id: `post-${index + 1}`,
+    title: `${post.title} #${index + 1}`,
+  };
+});
+
+export const Resizable: Story = {
+  render: () => ({
+    components: { VTable },
+    setup() {
+      return { columns, posts };
+    },
+    template: `
+      <div class="max-w-5xl rounded border border-gray-100 bg-white">
+        <VTable
+          :columns="columns"
+          :data="posts"
+          header-menu
+          resizable
+          row-key="id"
+        />
+      </div>
+    `,
+  }),
+};
+
+export const PinnedColumns: Story = {
+  render: () => ({
+    components: { VTable },
+    setup() {
+      const columnPinning = ref<ColumnPinningState>({
+        start: ["title"],
+        end: ["views"],
+      });
+      return { columns, posts, columnPinning };
+    },
+    template: `
+      <div class="max-w-5xl rounded border border-gray-100 bg-white">
+        <VTable
+          v-model:column-pinning="columnPinning"
+          :columns="columns"
+          :data="posts"
+          header-menu
+          pinnable
+          resizable
+          row-key="id"
+        />
+      </div>
+    `,
+  }),
+};
+
+export const HeaderMenu: Story = {
+  render: () => ({
+    components: { VTable },
+    setup() {
+      return { columns, posts };
+    },
+    template: `
+      <div class="max-w-5xl rounded border border-gray-100 bg-white">
+        <VTable
+          :columns="columns"
+          :data="posts"
+          header-menu
+          pinnable
+          row-key="id"
+        />
+      </div>
+    `,
+  }),
+};
+
+export const Virtualized: Story = {
+  render: () => ({
+    components: { VTable },
+    setup() {
+      return { columns, manyPosts };
+    },
+    template: `
+      <div class="max-w-5xl rounded border border-gray-100 bg-white">
+        <VTable
+          :columns="columns"
+          :data="manyPosts"
+          :ui="{ root: 'max-h-96' }"
+          :virtualize="{ estimateSize: 45 }"
+          row-key="id"
+          sticky
+        />
       </div>
     `,
   }),

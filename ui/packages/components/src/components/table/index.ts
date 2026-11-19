@@ -3,6 +3,8 @@ export { createTableColumnHelper } from "./features";
 export type { TableColumnMeta, VTableFeatures } from "./features";
 export * from "./types";
 export type {
+  ColumnPinningState,
+  ColumnSizingState,
   ColumnVisibilityState,
   ExpandedState,
   RowSelectionState,

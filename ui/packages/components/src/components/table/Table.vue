@@ -4,9 +4,14 @@ import {
   functionalUpdate,
   useTable,
   type CellContext,
+  type Column,
+  type ColumnPinningState,
+  type ColumnSizingState,
   type ColumnVisibilityState,
+  type columnResizingState,
   type ExpandedState,
   type Header,
+  type Row,
   type RowData,
   type RowSelectionState,
   type SortDirection,
@@ -14,6 +19,7 @@ import {
   type Table,
   type Updater,
 } from "@tanstack/vue-table";
+import { useVirtualizer } from "@tanstack/vue-virtual";
 import {
   computed,
   h,
@@ -27,7 +33,9 @@ import {
   IconArrowRight,
   IconArrowUpDownLine,
   IconArrowUpLine,
+  IconMore,
 } from "../../icons/icons";
+import { VDropdown, VDropdownDivider, VDropdownItem } from "../dropdown";
 import { VLoading } from "../loading";
 import {
   vTableFeatures,
@@ -38,8 +46,10 @@ import type {
   TableCellSlotProps,
   TableColumn,
   TableExpandedSlotProps,
+  TableHeaderMenuLabels,
   TableHeaderSlotProps,
   TableUi,
+  TableVirtualizeOptions,
 } from "./types";
 
 const props = withDefaults(
@@ -101,6 +111,39 @@ const props = withDefaults(
      */
     columnVisibility?: ColumnVisibilityState;
     /**
+     * Whether columns can be resized by dragging the header edge.
+     */
+    resizable?: boolean;
+    /**
+     * Controlled column sizing state, keyed by column id.
+     */
+    columnSizing?: ColumnSizingState;
+    /**
+     * Whether columns can be pinned to the start or end of the table.
+     */
+    pinnable?: boolean;
+    /**
+     * Controlled column pinning state.
+     */
+    columnPinning?: ColumnPinningState;
+    /**
+     * Whether to render the header column menu with sorting, hiding, and
+     * pinning actions. The menu reserves 40px on the right of the header cell,
+     * so columns with a menu need a few extra pixels of width (about 80px
+     * minimum for short headers).
+     */
+    headerMenu?: boolean;
+    /**
+     * Labels used by the header column menu and the resize handle.
+     */
+    headerMenuLabels?: Partial<TableHeaderMenuLabels>;
+    /**
+     * Whether to virtualize the rows. Requires a height constraint on the
+     * table wrapper, a uniform row height, and is intended to be used together
+     * with `sticky`. Cannot be combined with `expandable`.
+     */
+    virtualize?: boolean | TableVirtualizeOptions;
+    /**
      * Class overrides appended to the table elements.
      */
     ui?: TableUi;
@@ -129,6 +172,13 @@ const props = withDefaults(
     rowSelection: undefined,
     expanded: undefined,
     columnVisibility: undefined,
+    resizable: false,
+    columnSizing: undefined,
+    pinnable: false,
+    columnPinning: undefined,
+    headerMenu: false,
+    headerMenuLabels: () => ({}),
+    virtualize: false,
     ui: () => ({}),
     caption: undefined,
     selectAllLabel: "选择全部",
@@ -141,6 +191,8 @@ const emit = defineEmits<{
   (event: "update:rowSelection", value: RowSelectionState): void;
   (event: "update:expanded", value: ExpandedState): void;
   (event: "update:columnVisibility", value: ColumnVisibilityState): void;
+  (event: "update:columnSizing", value: ColumnSizingState): void;
+  (event: "update:columnPinning", value: ColumnPinningState): void;
   (event: "row-click", row: TData): void;
 }>();
 
@@ -161,6 +213,18 @@ const rowSelection = ref<RowSelectionState>(props.rowSelection ?? {});
 const expanded = ref<ExpandedState>(props.expanded ?? {});
 const columnVisibility = ref<ColumnVisibilityState>(
   props.columnVisibility ?? {}
+);
+const columnSizing = ref<ColumnSizingState>(props.columnSizing ?? {});
+const columnResizing = ref<columnResizingState>({
+  columnSizingStart: [],
+  deltaOffset: null,
+  deltaPercentage: null,
+  isResizingColumn: false,
+  startOffset: null,
+  startSize: null,
+});
+const columnPinning = ref<ColumnPinningState>(
+  props.columnPinning ?? { start: [], end: [] }
 );
 
 watch(
@@ -203,10 +267,31 @@ watch(
   { deep: true }
 );
 
+watch(
+  () => props.columnSizing,
+  (value) => {
+    if (value !== undefined) {
+      columnSizing.value = value;
+    }
+  },
+  { deep: true }
+);
+
+watch(
+  () => props.columnPinning,
+  (value) => {
+    if (value !== undefined) {
+      columnPinning.value = value;
+    }
+  },
+  { deep: true }
+);
+
 const selectColumn: TableColumn<TData> = {
   id: "__select",
   enableSorting: false,
   enableHiding: false,
+  enablePinning: false,
   meta: { width: 48 },
   header: ({ table }) =>
     h("input", {
@@ -231,6 +316,7 @@ const expandColumn: TableColumn<TData> = {
   id: "__expand",
   enableSorting: false,
   enableHiding: false,
+  enablePinning: false,
   meta: { width: 48 },
   header: () => null,
   cell: ({ row }) =>
@@ -256,6 +342,42 @@ const expandColumn: TableColumn<TData> = {
       : null,
 };
 
+function withColumnSize(column: TableColumn<TData>): TableColumn<TData> {
+  const meta = column.meta;
+  const size =
+    column.size ?? (typeof meta?.width === "number" ? meta.width : undefined);
+  const minSize =
+    column.minSize ??
+    (typeof meta?.minWidth === "number" ? meta.minWidth : undefined);
+  const children = (column as { columns?: TableColumn<TData>[] }).columns;
+
+  if (
+    size === column.size &&
+    minSize === column.minSize &&
+    children === undefined
+  ) {
+    return column;
+  }
+
+  const next = {
+    ...column,
+  } as TableColumn<TData> & { columns?: TableColumn<TData>[] };
+
+  if (size !== undefined) {
+    next.size = size;
+  }
+
+  if (minSize !== undefined) {
+    next.minSize = minSize;
+  }
+
+  if (children) {
+    next.columns = children.map(withColumnSize);
+  }
+
+  return next;
+}
+
 const resolvedColumns = computed<TableColumn<TData>[]>(() => {
   const result = [...props.columns];
 
@@ -267,7 +389,7 @@ const resolvedColumns = computed<TableColumn<TData>[]>(() => {
     result.unshift(selectColumn);
   }
 
-  return result;
+  return result.map(withColumnSize);
 });
 
 const getRowId = computed(() => (row: TData, index: number): string => {
@@ -311,8 +433,20 @@ const table: Table<VTableFeatures, TData> = useTable({
     get columnVisibility() {
       return columnVisibility.value;
     },
+    get columnSizing() {
+      return columnSizing.value;
+    },
+    get columnResizing() {
+      return columnResizing.value;
+    },
+    get columnPinning() {
+      return columnPinning.value;
+    },
   },
   enableRowSelection: computed<boolean>(() => props.selectable),
+  enableColumnResizing: computed<boolean>(() => props.resizable),
+  enableColumnPinning: computed<boolean>(() => props.pinnable),
+  columnResizeMode: "onChange",
   manualSorting: computed<boolean>(() => props.manualSorting),
   getRowCanExpand: () => props.expandable,
   onSortingChange: (updater: Updater<SortingState>) => {
@@ -331,15 +465,107 @@ const table: Table<VTableFeatures, TData> = useTable({
     columnVisibility.value = functionalUpdate(updater, columnVisibility.value);
     emit("update:columnVisibility", columnVisibility.value);
   },
+  onColumnSizingChange: (updater: Updater<ColumnSizingState>) => {
+    columnSizing.value = functionalUpdate(updater, columnSizing.value);
+    emit("update:columnSizing", columnSizing.value);
+  },
+  onColumnResizingChange: (updater: Updater<columnResizingState>) => {
+    columnResizing.value = functionalUpdate(updater, columnResizing.value);
+  },
+  onColumnPinningChange: (updater: Updater<ColumnPinningState>) => {
+    columnPinning.value = functionalUpdate(updater, columnPinning.value);
+    emit("update:columnPinning", columnPinning.value);
+  },
 });
 
 const tableRef = ref<HTMLTableElement | null>(null);
+const rootRef = ref<HTMLDivElement | null>(null);
 
 const headerGroups = computed(() => table.getHeaderGroups());
 const rows = computed(() => table.getRowModel().rows);
+const visibleLeafColumns = computed(() => [
+  ...table.getStartVisibleLeafColumns(),
+  ...table.getCenterVisibleLeafColumns(),
+  ...table.getEndVisibleLeafColumns(),
+]);
 const visibleColumnCount = computed(() =>
-  Math.max(1, table.getVisibleLeafColumns().length)
+  Math.max(1, visibleLeafColumns.value.length)
 );
+
+const defaultHeaderMenuLabels: TableHeaderMenuLabels = {
+  columnMenu: "列操作",
+  sortAsc: "升序",
+  sortDesc: "降序",
+  clearSorting: "清除排序",
+  hideColumn: "隐藏列",
+  pinStart: "固定在左侧",
+  pinEnd: "固定在右侧",
+  unpin: "取消固定",
+  resizeColumn: "调整列宽",
+};
+
+const headerMenuLabels = computed<TableHeaderMenuLabels>(() => ({
+  ...defaultHeaderMenuLabels,
+  ...props.headerMenuLabels,
+}));
+
+const sizingEnabled = computed(
+  () =>
+    props.resizable ||
+    props.pinnable ||
+    Object.keys(columnSizing.value).length > 0 ||
+    columnPinning.value.start.length > 0 ||
+    columnPinning.value.end.length > 0
+);
+
+const virtualizeOptions = computed<TableVirtualizeOptions | null>(() => {
+  if (!props.virtualize) {
+    return null;
+  }
+
+  return props.virtualize === true ? {} : props.virtualize;
+});
+
+const virtualizeEnabled = computed(() => virtualizeOptions.value !== null);
+
+const virtualizer = useVirtualizer(
+  computed(() => ({
+    count: rows.value.length,
+    getScrollElement: () => rootRef.value,
+    estimateSize: () => virtualizeOptions.value?.estimateSize ?? 45,
+    overscan: virtualizeOptions.value?.overscan ?? 8,
+    enabled: virtualizeEnabled.value,
+  }))
+);
+
+const virtualRows = computed(() => virtualizer.value.getVirtualItems());
+
+const virtualPaddingTop = computed(() =>
+  virtualizeEnabled.value ? (virtualRows.value[0]?.start ?? 0) : 0
+);
+
+const virtualPaddingBottom = computed(() => {
+  const items = virtualRows.value;
+
+  if (!virtualizeEnabled.value || items.length === 0) {
+    return 0;
+  }
+
+  return Math.max(
+    0,
+    virtualizer.value.getTotalSize() - items[items.length - 1].end
+  );
+});
+
+const renderedRows = computed<Row<VTableFeatures, TData>[]>(() => {
+  if (!virtualizeEnabled.value) {
+    return rows.value;
+  }
+
+  return virtualRows.value
+    .map((item) => rows.value[item.index])
+    .filter((row): row is Row<VTableFeatures, TData> => row !== undefined);
+});
 
 const interactiveSelector = "a,button,input,label,select,textarea";
 
@@ -361,7 +587,7 @@ function resolveSize(value: string | number | undefined) {
   return typeof value === "number" ? `${value}px` : value;
 }
 
-function getSizeStyle(meta?: TableColumnMeta): CSSProperties | undefined {
+function getMetaSizeStyle(meta?: TableColumnMeta): CSSProperties | undefined {
   const width = resolveSize(meta?.width);
   const minWidth = resolveSize(meta?.minWidth);
 
@@ -370,6 +596,92 @@ function getSizeStyle(meta?: TableColumnMeta): CSSProperties | undefined {
   }
 
   return { width, minWidth };
+}
+
+function getColumnStyle(
+  column: Column<VTableFeatures, TData>
+): CSSProperties | undefined {
+  const style: CSSProperties = {};
+
+  if (sizingEnabled.value) {
+    style.width = `${column.getSize()}px`;
+  } else {
+    Object.assign(style, getMetaSizeStyle(column.columnDef.meta));
+  }
+
+  const pinned = column.getIsPinned();
+
+  if (pinned === "start") {
+    style.position = "sticky";
+    style.left = `${column.getStart("start")}px`;
+  } else if (pinned === "end") {
+    style.position = "sticky";
+    style.right = `${column.getAfter("end")}px`;
+  }
+
+  return Object.keys(style).length > 0 ? style : undefined;
+}
+
+function getHeaderStyle(
+  header: Header<VTableFeatures, TData, unknown>
+): CSSProperties | undefined {
+  const style: CSSProperties = {};
+
+  if (shouldRenderHeaderMenu(header)) {
+    // Reserve room for the absolutely positioned header menu button.
+    style.paddingRight = "2.5rem";
+  }
+
+  if (sizingEnabled.value) {
+    style.width = `${header.getSize()}px`;
+  } else {
+    Object.assign(style, getMetaSizeStyle(header.column.columnDef.meta));
+  }
+
+  const pinned = header.column.getIsPinned();
+
+  if (pinned === "start") {
+    style.position = "sticky";
+    style.left = `${header.getStart("start")}px`;
+  } else if (pinned === "end") {
+    const leafHeaders = header.getLeafHeaders();
+    const lastLeaf = leafHeaders[leafHeaders.length - 1];
+
+    style.position = "sticky";
+    style.right = `${lastLeaf?.column.getAfter("end") ?? 0}px`;
+  }
+
+  return Object.keys(style).length > 0 ? style : undefined;
+}
+
+function getPinBorderClass(column: Column<VTableFeatures, TData>) {
+  const pinned = column.getIsPinned();
+
+  if (pinned === "start") {
+    return "border-r border-gray-100";
+  }
+
+  if (pinned === "end") {
+    return "border-l border-gray-100";
+  }
+
+  return undefined;
+}
+
+function shouldRenderHeaderMenu(
+  header: Header<VTableFeatures, TData, unknown>
+) {
+  if (!props.headerMenu || !shouldRenderHeaderContent(header)) {
+    return false;
+  }
+
+  const column = header.column;
+
+  return (
+    column.getCanSort() ||
+    column.getCanHide() ||
+    (props.pinnable && column.getCanPin())
+  );
 }
 
 function getAlignClass(meta?: TableColumnMeta) {
@@ -444,11 +756,11 @@ defineExpose({
 </script>
 
 <template>
-  <div class="relative w-full overflow-x-auto" :class="ui.root">
+  <div ref="rootRef" class="relative w-full overflow-x-auto" :class="ui.root">
     <table
       ref="tableRef"
       class="w-full border-spacing-0 text-sm"
-      :class="ui.table"
+      :class="[sizingEnabled ? 'table-fixed' : undefined, ui.table]"
       :aria-busy="loading ? 'true' : undefined"
     >
       <caption
@@ -457,6 +769,13 @@ defineExpose({
       >
         <slot name="caption">{{ caption }}</slot>
       </caption>
+      <colgroup v-if="sizingEnabled">
+        <col
+          v-for="column in visibleLeafColumns"
+          :key="column.id"
+          :style="{ width: `${column.getSize()}px` }"
+        />
+      </colgroup>
       <thead
         class="bg-gray-50"
         :class="[ui.thead, sticky ? 'sticky top-0 z-10' : undefined]"
@@ -469,11 +788,13 @@ defineExpose({
               :colspan="header.colSpan"
               :rowspan="header.rowSpan > 1 ? header.rowSpan : undefined"
               :aria-sort="getAriaSort(header)"
-              :style="getSizeStyle(header.column.columnDef.meta)"
+              :style="getHeaderStyle(header)"
               :class="[
-                'whitespace-nowrap px-4 py-3 text-sm font-semibold text-gray-900',
+                'relative whitespace-nowrap px-4 py-3 text-sm font-semibold text-gray-900',
                 getAlignClass(header.column.columnDef.meta),
                 header.column.columnDef.meta?.thClass,
+                header.column.getIsPinned() ? 'z-20 bg-gray-50' : undefined,
+                getPinBorderClass(header.column),
                 ui.th,
               ]"
             >
@@ -508,6 +829,98 @@ defineExpose({
                 />
                 <FlexRender v-else :header="header" />
               </template>
+
+              <VDropdown
+                v-if="shouldRenderHeaderMenu(header)"
+                class="absolute right-2 top-1/2 z-10 -translate-y-1/2"
+              >
+                <button
+                  type="button"
+                  class="inline-flex cursor-pointer rounded p-1 text-gray-400 transition-colors hover:bg-gray-200 hover:text-gray-900"
+                  :aria-label="headerMenuLabels.columnMenu"
+                >
+                  <IconMore class="h-4 w-4" />
+                </button>
+                <template #popper>
+                  <VDropdownItem
+                    v-if="header.column.getCanSort()"
+                    :selected="header.column.getIsSorted() === 'asc'"
+                    @click="header.column.toggleSorting(false)"
+                  >
+                    {{ headerMenuLabels.sortAsc }}
+                  </VDropdownItem>
+                  <VDropdownItem
+                    v-if="header.column.getCanSort()"
+                    :selected="header.column.getIsSorted() === 'desc'"
+                    @click="header.column.toggleSorting(true)"
+                  >
+                    {{ headerMenuLabels.sortDesc }}
+                  </VDropdownItem>
+                  <VDropdownItem
+                    v-if="
+                      header.column.getCanSort() && header.column.getIsSorted()
+                    "
+                    @click="header.column.clearSorting()"
+                  >
+                    {{ headerMenuLabels.clearSorting }}
+                  </VDropdownItem>
+                  <VDropdownDivider
+                    v-if="
+                      header.column.getCanSort() &&
+                      (header.column.getCanHide() ||
+                        (pinnable && header.column.getCanPin()))
+                    "
+                  />
+                  <VDropdownItem
+                    v-if="header.column.getCanHide()"
+                    @click="header.column.toggleVisibility(false)"
+                  >
+                    {{ headerMenuLabels.hideColumn }}
+                  </VDropdownItem>
+                  <VDropdownDivider
+                    v-if="
+                      pinnable &&
+                      header.column.getCanPin() &&
+                      (header.column.getCanSort() || header.column.getCanHide())
+                    "
+                  />
+                  <template v-if="pinnable && header.column.getCanPin()">
+                    <VDropdownItem
+                      v-if="header.column.getIsPinned() !== 'start'"
+                      @click="header.column.pin('start')"
+                    >
+                      {{ headerMenuLabels.pinStart }}
+                    </VDropdownItem>
+                    <VDropdownItem
+                      v-if="header.column.getIsPinned() !== 'end'"
+                      @click="header.column.pin('end')"
+                    >
+                      {{ headerMenuLabels.pinEnd }}
+                    </VDropdownItem>
+                    <VDropdownItem
+                      v-if="header.column.getIsPinned()"
+                      @click="header.column.pin(false)"
+                    >
+                      {{ headerMenuLabels.unpin }}
+                    </VDropdownItem>
+                  </template>
+                </template>
+              </VDropdown>
+
+              <div
+                v-if="resizable && header.column.getCanResize()"
+                role="separator"
+                aria-orientation="vertical"
+                :aria-label="headerMenuLabels.resizeColumn"
+                class="absolute right-0 top-0 z-10 h-full w-1 cursor-col-resize touch-none select-none"
+                :class="
+                  header.column.getIsResizing()
+                    ? 'bg-primary'
+                    : 'bg-transparent hover:bg-primary/30'
+                "
+                @mousedown="header.getResizeHandler()($event)"
+                @touchstart="header.getResizeHandler()($event)"
+              />
             </th>
           </template>
         </tr>
@@ -528,8 +941,19 @@ defineExpose({
           </tr>
         </template>
         <template v-else>
-          <template v-for="row in rows" :key="row.id">
+          <tr
+            v-if="virtualizeEnabled && virtualPaddingTop > 0"
+            aria-hidden="true"
+          >
+            <td
+              :colspan="visibleColumnCount"
+              class="p-0"
+              :style="{ height: `${virtualPaddingTop}px` }"
+            />
+          </tr>
+          <template v-for="row in renderedRows" :key="row.id">
             <tr
+              class="group"
               :class="[
                 row.getIsSelected() ? 'bg-gray-100' : 'hover:bg-gray-50',
                 ui.tr,
@@ -539,11 +963,20 @@ defineExpose({
               <td
                 v-for="cell in row.getVisibleCells()"
                 :key="cell.id"
-                :style="getSizeStyle(cell.column.columnDef.meta)"
+                :style="getColumnStyle(cell.column)"
                 :class="[
                   'whitespace-nowrap px-4 py-3 align-middle text-sm text-gray-500',
                   getAlignClass(cell.column.columnDef.meta),
                   cell.column.columnDef.meta?.tdClass,
+                  cell.column.getIsPinned()
+                    ? [
+                        'sticky z-[1]',
+                        row.getIsSelected()
+                          ? 'bg-gray-100'
+                          : 'bg-white group-hover:bg-gray-50',
+                      ]
+                    : undefined,
+                  getPinBorderClass(cell.column),
                   ui.td,
                 ]"
               >
@@ -573,6 +1006,16 @@ defineExpose({
               </td>
             </tr>
           </template>
+          <tr
+            v-if="virtualizeEnabled && virtualPaddingBottom > 0"
+            aria-hidden="true"
+          >
+            <td
+              :colspan="visibleColumnCount"
+              class="p-0"
+              :style="{ height: `${virtualPaddingBottom}px` }"
+            />
+          </tr>
         </template>
       </tbody>
     </table>

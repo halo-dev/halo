@@ -31,9 +31,12 @@ const columns = [
 interface ExposedTable {
   getRowModel: () => { rows: unknown[] };
   getVisibleLeafColumns: () => unknown[];
-  getColumn: (
-    id: string
-  ) => { toggleVisibility: (visible: boolean) => void } | undefined;
+  getColumn: (id: string) =>
+    | {
+        toggleVisibility: (visible: boolean) => void;
+        pin: (position: "start" | "end" | false) => void;
+      }
+    | undefined;
 }
 
 function mountTable(
@@ -433,5 +436,143 @@ describe("Table", () => {
 
     expect(wrapper.findAll("thead th")).toHaveLength(2);
     expect(wrapper.emitted("update:columnVisibility")).toBeTruthy();
+  });
+
+  it("renders resize handles and applies fixed column sizes", async () => {
+    const wrapper = mountTable({ resizable: true });
+
+    expect(wrapper.find("table").classes()).toContain("table-fixed");
+    expect(wrapper.findAll("colgroup col")).toHaveLength(2);
+    expect(wrapper.findAll("thead th")[0].attributes("style")).toContain(
+      "width: 150px"
+    );
+    expect(wrapper.findAll("tbody td")[0].attributes("style")).toContain(
+      "width: 150px"
+    );
+
+    const handles = wrapper.findAll("[role='separator']");
+    expect(handles).toHaveLength(2);
+    expect(handles[0].attributes("aria-label")).toBe("调整列宽");
+
+    handles[0].element.dispatchEvent(
+      new MouseEvent("mousedown", { bubbles: true, clientX: 150 })
+    );
+    document.dispatchEvent(
+      new MouseEvent("mousemove", { bubbles: true, clientX: 100 })
+    );
+    document.dispatchEvent(
+      new MouseEvent("mouseup", { bubbles: true, clientX: 100 })
+    );
+    await settle();
+
+    expect(wrapper.emitted("update:columnSizing")?.[0]?.[0]).toEqual({
+      name: 100,
+    });
+    expect(wrapper.findAll("thead th")[0].attributes("style")).toContain(
+      "width: 100px"
+    );
+  });
+
+  it("pins columns and emits pinning changes", async () => {
+    const wrapper = mountTable({
+      pinnable: true,
+      columnPinning: { start: [], end: ["age"] },
+    });
+
+    expect(wrapper.find("table").classes()).toContain("table-fixed");
+    expect(wrapper.findAll("thead th")[1].attributes("style")).toContain(
+      "right: 0px"
+    );
+    expect(wrapper.findAll("tbody td")[1].attributes("style")).toContain(
+      "right: 0px"
+    );
+    expect(wrapper.findAll("tbody td")[1].classes()).toContain("sticky");
+
+    const vm = wrapper.vm as unknown as { tableApi: ExposedTable };
+    vm.tableApi.getColumn("name")?.pin("start");
+    await settle();
+
+    expect(wrapper.emitted("update:columnPinning")?.[0]?.[0]).toEqual({
+      start: ["name"],
+      end: ["age"],
+    });
+    expect(wrapper.findAll("thead th")[0].attributes("style")).toContain(
+      "left: 0px"
+    );
+  });
+
+  it("does not render a header menu for utility columns", () => {
+    const wrapper = mountTable({
+      selectable: true,
+      expandable: true,
+      headerMenu: true,
+      pinnable: true,
+    });
+
+    expect(wrapper.findAll("thead button[aria-label='列操作']")).toHaveLength(
+      2
+    );
+    expect(wrapper.findAll("thead th")[0].attributes("style")).not.toContain(
+      "padding-right"
+    );
+  });
+
+  it("renders a header menu for sortable and hideable columns", async () => {
+    const wrapper = mountTable(
+      { headerMenu: true },
+      { attachTo: document.body }
+    );
+
+    const menuButtons = wrapper.findAll("thead button[aria-label='列操作']");
+    expect(menuButtons).toHaveLength(2);
+    expect(wrapper.findAll("thead th")[0].attributes("style")).toContain(
+      "padding-right: 2.5rem"
+    );
+
+    await menuButtons[0].trigger("click");
+    await settle();
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    const labels = Array.from(
+      document.body.querySelectorAll(".dropdown-item-wrapper")
+    ).map((item) => item.textContent?.trim());
+
+    expect(labels).toContain("升序");
+    expect(labels).toContain("降序");
+    expect(labels).toContain("隐藏列");
+    expect(labels).not.toContain("固定在左侧");
+
+    wrapper.unmount();
+  });
+
+  it("virtualizes rows when enabled", async () => {
+    const manyRows = Array.from({ length: 100 }, (_, index) => ({
+      id: index + 1,
+      name: `name-${index + 1}`,
+      age: index,
+    }));
+
+    const heightSpy = vi
+      .spyOn(HTMLElement.prototype, "offsetHeight", "get")
+      .mockReturnValue(400);
+    const widthSpy = vi
+      .spyOn(HTMLElement.prototype, "offsetWidth", "get")
+      .mockReturnValue(800);
+
+    try {
+      const wrapper = mountTable({
+        data: manyRows,
+        virtualize: true,
+        sticky: true,
+      });
+      await settle();
+
+      const renderedRows = wrapper.findAll("tbody tr").length;
+      expect(renderedRows).toBeGreaterThan(0);
+      expect(renderedRows).toBeLessThan(manyRows.length);
+    } finally {
+      heightSpy.mockRestore();
+      widthSpy.mockRestore();
+    }
   });
 });

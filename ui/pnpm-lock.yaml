@@ -729,6 +729,9 @@ importers:
       '@tanstack/vue-table':
         specifier: ^9.3.1
         version: 9.3.1(vue@3.5.41)
+      '@tanstack/vue-virtual':
+        specifier: ^3.13.35
+        version: 3.13.35(vue@3.5.41)
       floating-vue:
         specifier: ^5.2.2
         version: 5.2.2(vue@3.5.41)

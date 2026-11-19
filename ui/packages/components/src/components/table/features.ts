@@ -1,4 +1,7 @@
 import {
+  columnPinningFeature,
+  columnResizingFeature,
+  columnSizingFeature,
   columnVisibilityFeature,
   createColumnHelper,
   createExpandedRowModel,
@@ -24,7 +27,8 @@ export interface TableColumnMeta {
    */
   align?: "left" | "center" | "right";
   /**
-   * Column width. Numbers are treated as pixels.
+   * Column width. Numbers are treated as pixels. Percentage widths are ignored
+   * when column resizing or pinning is enabled, so use numbers in those modes.
    */
   width?: string | number;
   /**
@@ -50,6 +54,9 @@ export const vTableFeatures = tableFeatures({
   rowSelectionFeature,
   rowExpandingFeature,
   columnVisibilityFeature,
+  columnSizingFeature,
+  columnResizingFeature,
+  columnPinningFeature,
   sortedRowModel: createSortedRowModel(),
   expandedRowModel: createExpandedRowModel(),
   sortFns: {

@@ -54,6 +54,36 @@ export interface TableExpandedSlotProps<TData extends RowData> {
 }
 
 /**
+ * Options for virtualized rendering.
+ */
+export interface TableVirtualizeOptions {
+  /**
+   * Estimated height of each row in pixels. Rows are expected to have a
+   * uniform height for virtualization to align correctly.
+   */
+  estimateSize?: number;
+  /**
+   * Number of rows rendered outside the visible range.
+   */
+  overscan?: number;
+}
+
+/**
+ * Labels used by the header column menu and the resize handle.
+ */
+export interface TableHeaderMenuLabels {
+  columnMenu: string;
+  sortAsc: string;
+  sortDesc: string;
+  clearSorting: string;
+  hideColumn: string;
+  pinStart: string;
+  pinEnd: string;
+  unpin: string;
+  resizeColumn: string;
+}
+
+/**
  * Class overrides appended to the corresponding table elements.
  */
 export interface TableUi {
