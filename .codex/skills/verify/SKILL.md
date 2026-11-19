@@ -1,11 +1,19 @@
 ---
 name: verify
-description: Layered post-change verification for the Halo core repo (halo-dev/halo: Java 21 / Spring Boot WebFlux + R2DBC + Vue 3 monorepo): T0 scope the change → T1 static gates (Spotless, Gradle compile and api/application tests, pnpm typecheck/lint/test/build/i18n/format, OpenAPI sync) → T2 regression and blast radius (callers, extension indexes, events, RBAC, migrations, plugins/themes, UI contracts, OpenSpec) → T3 end-to-end (temp workdir, free port, setup, API probes/browser). Use whenever api, application, ui, configuration, migrations, dependencies, or CI change; after fixing a bug, refactoring, or completing an OpenSpec change; or when the user says "verify this", "don't introduce regressions", "test it end-to-end", or "did you test it". Even small changes must pass the gates at the matching depth. Claiming "done, no problems" without running commands is wrong.
+description: Layered post-change verification for the Halo core repo (halo-dev/halo — Java 21 / Spring Boot WebFlux + R2DBC + Vue 3 monorepo) — T0 scope the change → T1 static gates (Spotless, Gradle compile and api/application tests, pnpm typecheck/lint/test/build/i18n/format, OpenAPI sync) → T2 regression and blast radius (callers, extension indexes, events, RBAC, migrations, plugins/themes, UI contracts, OpenSpec) → T3 end-to-end (temp workdir, free port, setup, API probes/browser). Use whenever api, application, ui, configuration, migrations, dependencies, or CI change; after fixing a bug, refactoring, or completing an OpenSpec change; or when the user says "verify this", "don't introduce regressions", "test it end-to-end", or "did you test it". Even small changes must pass the gates at the matching depth. Claiming "done, no problems" without running commands is wrong. If the repository ships a more specific Pro/enterprise verification skill (for example, `verify-halo-pro`), that skill takes precedence; this skill is the shared baseline.
 ---
 
 # verify — layered verification after changes in Halo core
 
 This skill guards against two failure modes: **verifying by feel** (claiming things work without running gates, tests, or a server) and **guessing the blast radius** (services, endpoints, reconcilers, extension indexes, Spring events, RBAC, generated contracts, and UI evolve together, so a change in one place often touches another). Conclusions must come from actual command and probe output; static analysis is only inference.
+
+## Relationship to a Pro/enterprise `verify` variant
+
+Some repositories ship a more specific verification skill alongside this one (for example, `verify-halo-pro`).
+
+- **Single entry point**: when the repository provides such a variant, start verification from that skill; this skill is the shared baseline and is not run as a separate pass. When trigger phrases overlap, the repository-specific variant wins.
+- **Baseline here**: generic Halo core work (shared `api/` and `application/`, shared `ui/`, static gates) follows the steps in this skill; commands duplicated in both skills are run once.
+- **Deltas there**: repository-specific modules, configuration, and safety rules always follow the more specific variant.
 
 ## Read first
 
