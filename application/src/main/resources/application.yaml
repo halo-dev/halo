@@ -18,6 +18,11 @@ spring:
   http:
     codecs:
       max-in-memory-size: 10MB
+  webflux:
+    multipart:
+      # Spring Boot 4.2 lowered the default per-part disk limit to 1MB,
+      # which is too small for attachment and theme/plugin uploads.
+      max-disk-usage-per-part: -1
   messages:
     basename: config.i18n.messages
   web:
