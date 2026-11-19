@@ -756,7 +756,11 @@ defineExpose({
 </script>
 
 <template>
-  <div ref="rootRef" class="relative w-full overflow-x-auto" :class="ui.root">
+  <div
+    ref="rootRef"
+    class="relative isolate w-full overflow-x-auto"
+    :class="ui.root"
+  >
     <table
       ref="tableRef"
       class="w-full border-spacing-0 text-sm"

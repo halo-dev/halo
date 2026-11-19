@@ -311,6 +311,12 @@ describe("Table", () => {
     expect(wrapper.find("thead").classes()).toContain("top-0");
   });
 
+  it("isolates pinned and sticky z-indexes from the page stacking context", () => {
+    const wrapper = mountTable({ sticky: true, pinnable: true });
+
+    expect(wrapper.classes()).toContain("isolate");
+  });
+
   it("emits row-click only for non-interactive content", async () => {
     const onRowClick = vi.fn();
     const interactiveColumns = [
