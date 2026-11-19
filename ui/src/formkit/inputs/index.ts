@@ -9,6 +9,8 @@ import { categoryCheckbox } from "./category-checkbox";
 import { categorySelect } from "./category-select";
 import { code } from "./code";
 import { color } from "./color";
+import { datepicker } from "./datepicker";
+import { datetimepicker } from "./datetimepicker";
 import { form } from "./form";
 import { group } from "./group";
 import { iconify } from "./iconify";
@@ -38,6 +40,8 @@ export const builtinFormKitInputs: FormKitLibrary = {
   categoryCheckbox,
   categorySelect,
   code,
+  datepicker,
+  datetimepicker,
   form,
   group,
   list,

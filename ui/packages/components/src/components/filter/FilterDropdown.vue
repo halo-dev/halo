@@ -18,6 +18,7 @@ import {
 import { VDropdown, type VDropdownPlacement } from "../dropdown";
 import { VLoading } from "../loading";
 import { filterDropdownGroupKey } from "./group";
+import { getFilterTriggerClasses } from "./trigger";
 import type {
   FilterDropdownGroup,
   FilterDropdownItem,
@@ -187,29 +188,13 @@ const keyword = ref("");
 const activeKey = ref<string>();
 const collapsedKeys = ref(new Set<string>());
 
-const triggerClasses = computed(() => {
-  const isSelected = props.modelValue !== undefined;
-  const highlighted = isSelected || isOpen.value;
-
-  return [
-    "inline-flex h-8 cursor-pointer select-none items-center whitespace-nowrap rounded-md text-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-60",
-    highlighted ? "text-gray-900" : "text-gray-700",
-    isSelected ? "font-semibold" : "",
-    props.variant === "outline"
-      ? [
-          "border bg-white px-3",
-          isOpen.value
-            ? "border-primary"
-            : "border-gray-300 hover:border-gray-400 hover:text-gray-900",
-        ]
-      : [
-          "px-2 active:bg-gray-200",
-          isOpen.value
-            ? "bg-gray-100"
-            : "hover:bg-gray-100 hover:text-gray-900",
-        ],
-  ];
-});
+const triggerClasses = computed(() =>
+  getFilterTriggerClasses({
+    selected: props.modelValue !== undefined,
+    open: isOpen.value,
+    variant: props.variant,
+  })
+);
 
 const showSearch = computed(() => props.searchable || props.remoteSearch);
 const normalizedKeyword = computed(() => keyword.value.trim().toLowerCase());
