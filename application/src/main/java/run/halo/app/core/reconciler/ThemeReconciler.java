@@ -66,8 +66,9 @@ import run.halo.app.theme.service.ThemeUtils;
 class ThemeReconciler implements Reconciler<Request> {
     private static final Duration BLOCKING_TIMEOUT = ReactiveUtils.DEFAULT_TIMEOUT;
     private static final String FINALIZER_NAME = "theme-protection";
-    private static final List<String> LOCAL_DEVELOPMENT_INDICATORS =
-            List.of(".git", "package.json", "pnpm-lock.yaml", "yarn.lock", "package-lock.json", "node_modules");
+    // Only markers that packaged themes are unlikely to contain. Build files such as
+    // package.json and lockfiles are commonly shipped in distributed theme archives.
+    private static final List<String> LOCAL_DEVELOPMENT_INDICATORS = List.of(".git", "node_modules");
 
     private final ExtensionClient client;
 
