@@ -495,9 +495,11 @@
         "VSwitch",
         "VTabItem",
         "VTabbar",
+        "VTable",
         "VTabs",
         "VTag",
         "VTooltipComponent",
+        "createTableColumnHelper",
         "vClosePopper",
         "vTooltip"
       ],
