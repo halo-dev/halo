@@ -523,6 +523,33 @@ class ThemeReconcilerTest {
         assertThat(theme.getStatus().getPageLayout().getState()).isEqualTo(Theme.PageLayoutState.SUPPORTED);
     }
 
+    @Test
+    void shouldOnlyMarkThemeInDevelopmentForWorkspaceIndicators() throws IOException {
+        var testWorkDir = tempDirectory.resolve("reconcile-development-status");
+        var themePath = testWorkDir.resolve("theme-test");
+        Files.createDirectories(themePath);
+        when(themeRoot.get()).thenReturn(testWorkDir);
+        var theme = fakeTheme();
+        theme.setStatus(null);
+
+        // Build files shipped by packaged themes must not be treated as development indicators.
+        Files.writeString(themePath.resolve("package.json"), "{}");
+        Files.writeString(themePath.resolve("pnpm-lock.yaml"), "");
+        Files.writeString(themePath.resolve("yarn.lock"), "");
+        Files.writeString(themePath.resolve("package-lock.json"), "{}");
+        themeReconciler.reconcileStatus(theme);
+        assertThat(theme.getStatus().getInDevelopment()).isFalse();
+
+        Files.createDirectories(themePath.resolve(".git"));
+        themeReconciler.reconcileStatus(theme);
+        assertThat(theme.getStatus().getInDevelopment()).isTrue();
+
+        FileSystemUtils.deleteRecursively(themePath.resolve(".git"));
+        Files.createDirectories(themePath.resolve("node_modules"));
+        themeReconciler.reconcileStatus(theme);
+        assertThat(theme.getStatus().getInDevelopment()).isTrue();
+    }
+
     private Theme fakeTheme() {
         Theme theme = new Theme();
         Metadata metadata = new Metadata();
