@@ -51,9 +51,11 @@
     "prepublishOnly": "vp run build"
   },
   "dependencies": {
+    "@internationalized/date": "catalog:",
     "@tanstack/vue-table": "^9.3.1",
     "@tanstack/vue-virtual": "^3.13.35",
-    "floating-vue": "^5.2.2"
+    "floating-vue": "^5.2.2",
+    "reka-ui": "catalog:"
   },
   "devDependencies": {
     "@storybook/addon-docs": "^10.5.7",

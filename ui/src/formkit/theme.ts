@@ -92,6 +92,16 @@ const theme: Record<string, Record<string, string>> = {
   email: textClassification,
   date: textClassification,
   "datetime-local": textClassification,
+  datepicker: {
+    ...textClassification,
+    input:
+      "flex h-full w-full items-center justify-between px-3 text-sm text-black transition-all",
+  },
+  datetimepicker: {
+    ...textClassification,
+    input:
+      "flex h-full w-full items-center justify-between px-3 text-sm text-black transition-all",
+  },
   textarea: {
     ...textClassification,
     inner: textClassification.inner.replace("h-9", "h-full"),

@@ -2,6 +2,7 @@ export * from "./components/alert";
 export * from "./components/avatar";
 export * from "./components/button";
 export * from "./components/card";
+export * from "./components/date-picker";
 export * from "./components/description";
 export * from "./components/dialog";
 export * from "./components/dropdown";

@@ -4,6 +4,7 @@ import {
   type Role,
   type RoleV1alpha1ApiListRoleRequest,
 } from "@halo-dev/api-client";
+import { utils } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
 import { roleLabels } from "@/constants/labels";
 
@@ -19,6 +20,7 @@ export function useFetchRoles() {
         }
       );
     },
+    enabled: utils.permission.has(["system:roles:view"]),
     refetchInterval(data) {
       const hasDeletingRole = data?.some(
         (item) => !!item.metadata.deletionTimestamp

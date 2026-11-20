@@ -435,10 +435,8 @@ async function slugUniqueValidation(node: FormKitNode) {
             <FormKit
               v-model="publishTime"
               :label="$t('core.page.settings.fields.publish_time.label')"
-              type="datetime-local"
+              type="datetimepicker"
               name="publishTime"
-              min="0000-01-01T00:00"
-              max="9999-12-31T23:59"
             ></FormKit>
             <FormKit
               v-model="formState.spec.template"

@@ -318,6 +318,7 @@ function onCreationModalClose() {
                 :clear-label="$t('core.common.buttons.reset')"
               >
                 <VFilterDropdown
+                  v-if="utils.permission.has(['system:roles:view'])"
                   v-model="selectedRoleValue"
                   :label="$t('core.user.filters.role.label')"
                   show-clear-option

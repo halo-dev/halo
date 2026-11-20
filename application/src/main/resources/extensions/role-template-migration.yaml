@@ -1,24 +1,12 @@
 apiVersion: v1alpha1
 kind: "Role"
+# Retired into a hidden, empty tombstone: backup/restore exposes all extension data
+# and can overwrite the workdir (including plugin jars), so this capability must
+# stay super-admin-only. Keep the resource so upgrades overwrite legacy rules;
+# do not add rules back. See https://github.com/halo-dev/halo/issues/10477.
 metadata:
   name: role-template-manage-migration
   labels:
     halo.run/role-template: "true"
-  annotations:
-    rbac.authorization.halo.run/module: "Migration Management"
-    rbac.authorization.halo.run/display-name: "Migration Manage"
-    rbac.authorization.halo.run/ui-permissions: |
-      ["system:migrations:manage"]
-rules:
-  - apiGroups: ["console.api.migration.halo.run"]
-    resources: ["restorations"]
-    verbs: ["create"]
-  - apiGroups: ["console.api.migration.halo.run"]
-    resources: ["backup-files"]
-    verbs: ["list"]
-  - apiGroups: ["console.api.migration.halo.run"]
-    resources: ["backups/files"]
-    verbs: ["get"]
-  - apiGroups: ["migration.halo.run"]
-    resources: ["backups"]
-    verbs: ["list", "get", "create", "update", "delete", "patch"]
+    halo.run/hidden: "true"
+rules: []
