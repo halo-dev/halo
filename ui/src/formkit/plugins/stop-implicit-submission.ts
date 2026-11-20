@@ -27,6 +27,8 @@ const implicitSubmissionType = [
   "week",
   "time",
   "datetime-local",
+  "datepicker",
+  "datetimepicker",
   "number",
 ];
 

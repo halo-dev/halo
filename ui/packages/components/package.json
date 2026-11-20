@@ -51,7 +51,9 @@
     "prepublishOnly": "vp run build"
   },
   "dependencies": {
-    "floating-vue": "^5.2.2"
+    "@internationalized/date": "catalog:",
+    "floating-vue": "^5.2.2",
+    "reka-ui": "catalog:"
   },
   "devDependencies": {
     "@storybook/addon-docs": "^10.5.7",

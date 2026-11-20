@@ -185,7 +185,7 @@ function onSubmit() {
               "
             ></FormKit>
             <FormKit
-              type="datetime-local"
+              type="datetimepicker"
               name="expiresAt"
               :label="
                 $t('core.uc_profile.pat.creation_modal.fields.expiresAt.label')
