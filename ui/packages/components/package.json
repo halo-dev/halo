@@ -52,6 +52,8 @@
   },
   "dependencies": {
     "@internationalized/date": "catalog:",
+    "@tanstack/vue-table": "^9.3.1",
+    "@tanstack/vue-virtual": "^3.13.35",
     "floating-vue": "^5.2.2",
     "reka-ui": "catalog:"
   },
