@@ -277,10 +277,7 @@ function onCreationModalClose() {
           <div
             class="relative flex flex-col flex-wrap items-start gap-4 sm:flex-row sm:items-center"
           >
-            <div
-              v-permission="['system:users:manage']"
-              class="hidden items-center sm:flex"
-            >
+            <div v-permission="['*']" class="hidden items-center sm:flex">
               <input
                 v-model="checkedAll"
                 type="checkbox"
@@ -290,10 +287,16 @@ function onCreationModalClose() {
             <div class="flex w-full flex-1 items-center sm:w-auto">
               <SearchInput v-if="!selectedUserNames.length" v-model="keyword" />
               <VSpace v-else>
-                <VButton @click="handleEnableOrDisableInBatch('disable')">
+                <VButton
+                  v-permission="['*']"
+                  @click="handleEnableOrDisableInBatch('disable')"
+                >
                   {{ $t("core.common.buttons.disable") }}
                 </VButton>
-                <VButton @click="handleEnableOrDisableInBatch('enable')">
+                <VButton
+                  v-permission="['*']"
+                  @click="handleEnableOrDisableInBatch('enable')"
+                >
                   {{ $t("core.common.buttons.enable") }}
                 </VButton>
                 <VButton
@@ -400,10 +403,7 @@ function onCreationModalClose() {
             :user="user"
             :is-selected="checkSelection(user.user)"
           >
-            <template
-              v-if="utils.permission.has(['system:users:manage'])"
-              #checkbox
-            >
+            <template v-if="utils.permission.has(['*'])" #checkbox>
               <input
                 v-model="selectedUserNames"
                 :value="user.user.metadata.name"

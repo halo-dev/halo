@@ -8,12 +8,17 @@ import {
   VTag,
 } from "@halo-dev/components";
 import { utils } from "@halo-dev/ui-shared";
+import { computed } from "vue";
 import RiVerifiedBadgeLine from "~icons/ri/verified-badge-line";
 import { rbacAnnotations } from "@/constants/annotations";
 
 withDefaults(defineProps<{ user?: DetailedUser }>(), {
   user: undefined,
 });
+
+const canViewRoles = computed(() =>
+  utils.permission.has(["system:roles:view"])
+);
 </script>
 <template>
   <div class="border-t border-gray-100">
@@ -59,7 +64,9 @@ withDefaults(defineProps<{ user?: DetailedUser }>(), {
           <VTag
             v-for="role in user?.roles"
             :key="role.metadata.name"
+            :class="{ '!cursor-default': !canViewRoles }"
             @click="
+              canViewRoles &&
               $router.push({
                 name: 'RoleDetail',
                 params: { name: role.metadata.name },
