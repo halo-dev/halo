@@ -1,32 +1,22 @@
 apiVersion: v1alpha1
 kind: "Role"
+# Granting roles is already restricted to super administrators on the server;
+# this template is retired so permissions cannot be delegated. Retired into a
+# hidden, empty tombstone; keep the resources so upgrades overwrite legacy
+# rules. Do not add rules back. See https://github.com/halo-dev/halo/issues/10477.
 metadata:
   name: role-template-manage-permissions
   labels:
     halo.run/role-template: "true"
-  annotations:
-    rbac.authorization.halo.run/dependencies: '[ "role-template-view-permissions" ]'
-    rbac.authorization.halo.run/module: "Permissions Management"
-    rbac.authorization.halo.run/display-name: "Permissions Manage"
-    rbac.authorization.halo.run/ui-permissions: |
-      ["system:permissions:manage"]
-rules:
-  - apiGroups: ["api.console.halo.run"]
-    resources: ["users/permissions"]
-    verbs: ["create", "patch", "update", "delete", "deletecollection"]
+    halo.run/hidden: "true"
+rules: []
 ---
 apiVersion: v1alpha1
 kind: "Role"
+# Retired together with permission management. See #10477.
 metadata:
   name: role-template-view-permissions
   labels:
     halo.run/role-template: "true"
-  annotations:
-    rbac.authorization.halo.run/module: "Permissions Management"
-    rbac.authorization.halo.run/display-name: "Permissions View"
-    rbac.authorization.halo.run/ui-permissions: |
-      ["system:permissions:view"]
-rules:
-  - apiGroups: ["api.console.halo.run"]
-    resources: ["users/permissions"]
-    verbs: ["get", "list"]
+    halo.run/hidden: "true"
+rules: []
