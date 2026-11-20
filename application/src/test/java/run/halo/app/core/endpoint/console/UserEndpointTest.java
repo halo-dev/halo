@@ -182,6 +182,29 @@ class UserEndpointTest {
         }
 
         @Test
+        void shouldRedactSecretsWhenListingUsers() {
+            var user = createUser("fake-user-1");
+            user.getSpec().setPassword("fake-password");
+            user.getSpec().setTotpEncryptedSecret("encrypted-secret");
+            when(roleService.getRolesByUsernames(any())).thenReturn(Mono.just(Map.of()));
+            when(roleService.list(anySet())).thenReturn(Flux.empty());
+            when(client.listBy(same(User.class), any(), any(PageRequest.class)))
+                    .thenReturn(Mono.just(new ListResult<>(List.of(user))));
+
+            webClient
+                    .get()
+                    .uri("/users")
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .jsonPath("$.items[0].user.spec.password")
+                    .doesNotExist()
+                    .jsonPath("$.items[0].user.spec.totpEncryptedSecret")
+                    .doesNotExist();
+        }
+
+        @Test
         void shouldFilterUsersWhenRoleProvided() {
             var expectUser = JsonUtils.jsonToObject("""
                     {
@@ -272,10 +295,38 @@ class UserEndpointTest {
                     .expectHeader()
                     .contentType(MediaType.APPLICATION_JSON)
                     .expectBody(UserEndpoint.DetailedUser.class)
-                    .isEqualTo(new UserEndpoint.DetailedUser(user, List.of(role), null, true));
+                    .value(detail -> {
+                        assertEquals(List.of(role), detail.roles());
+                        assertEquals(true, detail.passwordSet());
+                        assertEquals("fake-user", detail.user().getMetadata().getName());
+                        assertNull(detail.user().getSpec().getPassword());
+                        assertNull(detail.user().getSpec().getTotpEncryptedSecret());
+                    });
+        }
 
-            assertNull(user.getSpec().getPassword());
-            assertNull(user.getSpec().getTotpEncryptedSecret());
+        @Test
+        void shouldRedactSecretsWhenGettingAnotherUserDetail() {
+            var metadata = new Metadata();
+            metadata.setName("target");
+            var user = new User();
+            user.setMetadata(metadata);
+            user.getSpec().setPassword("fake-encoded-password");
+            user.getSpec().setTotpEncryptedSecret("encrypted-secret");
+            when(userService.getUser("target")).thenReturn(Mono.just(user));
+            when(roleService.getRolesByUsername("target")).thenReturn(Flux.empty());
+            when(roleService.list(anySet(), eq(true))).thenReturn(Flux.empty());
+
+            webClient
+                    .get()
+                    .uri("/users/target")
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .jsonPath("$.user.spec.password")
+                    .doesNotExist()
+                    .jsonPath("$.user.spec.totpEncryptedSecret")
+                    .doesNotExist();
         }
 
         @Test
@@ -333,7 +384,16 @@ class UserEndpointTest {
                     .expectStatus()
                     .isOk()
                     .expectBody(User.class)
-                    .isEqualTo(updatedUser);
+                    .value(user -> {
+                        assertEquals("fake-user", user.getMetadata().getName());
+                        assertEquals(
+                                updatedUser.getSpec().getDisplayName(),
+                                user.getSpec().getDisplayName());
+                        assertEquals(
+                                updatedUser.getSpec().getBio(), user.getSpec().getBio());
+                        assertNull(user.getSpec().getPassword());
+                        assertNull(user.getSpec().getTotpEncryptedSecret());
+                    });
 
             verify(client).get(User.class, "fake-user");
             verify(client).update(currentUser);
@@ -687,6 +747,54 @@ class UserEndpointTest {
     }
 
     @Test
+    void shouldRedactSecretsWhenRespondingToUserUpdates() {
+        var user = new User();
+        user.setMetadata(new Metadata());
+        user.getMetadata().setName("target");
+        user.getSpec().setEmail("target@example.com");
+        user.getSpec().setPassword("fake-encoded-password");
+        user.getSpec().setTotpEncryptedSecret("encrypted-secret");
+        when(client.get(User.class, "target")).thenReturn(Mono.just(user));
+        when(client.update(user)).thenReturn(Mono.just(user));
+
+        webClient
+                .put()
+                .uri("/users/target")
+                .bodyValue(Map.of("displayName", "Updated", "email", "target@example.com", "bio", "Biography"))
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.spec.password")
+                .doesNotExist()
+                .jsonPath("$.spec.totpEncryptedSecret")
+                .doesNotExist();
+    }
+
+    @Test
+    void shouldRedactSecretsWhenChangingAnyonePasswordForAdmin() {
+        var user = new User();
+        user.setMetadata(new Metadata());
+        user.getMetadata().setName("target");
+        user.getSpec().setPassword("fake-encoded-password");
+        user.getSpec().setTotpEncryptedSecret("encrypted-secret");
+        when(userService.updateWithRawPassword("target", "new-password")).thenReturn(Mono.just(user));
+
+        webClient
+                .put()
+                .uri("/users/target/password")
+                .bodyValue(Map.of("password", "new-password"))
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.spec.password")
+                .doesNotExist()
+                .jsonPath("$.spec.totpEncryptedSecret")
+                .doesNotExist();
+    }
+
+    @Test
     void shouldAllowOnlySuperAdministratorToChangeEmail() {
         var user = new User();
         user.setMetadata(new Metadata());
@@ -774,8 +882,15 @@ class UserEndpointTest {
                     .exchange()
                     .expectStatus()
                     .isOk()
-                    .expectBody(User.class)
-                    .isEqualTo(currentUser);
+                    .expectBody()
+                    .jsonPath("$.spec.avatar")
+                    .isEqualTo("fake-avatar.png")
+                    .jsonPath("$.metadata.annotations['halo.run/avatar-attachment-name']")
+                    .isEqualTo("fake-attachment")
+                    .jsonPath("$.spec.password")
+                    .doesNotExist()
+                    .jsonPath("$.spec.totpEncryptedSecret")
+                    .doesNotExist();
 
             verify(client).get(User.class, "fake-user");
             verify(client).update(currentUser);
@@ -815,8 +930,15 @@ class UserEndpointTest {
                     .exchange()
                     .expectStatus()
                     .isOk()
-                    .expectBody(User.class)
-                    .isEqualTo(currentUser);
+                    .expectBody()
+                    .jsonPath("$.spec.avatar")
+                    .isEqualTo("fake-avatar.png")
+                    .jsonPath("$.metadata.annotations['halo.run/avatar-attachment-name']")
+                    .isEqualTo("fake-attachment")
+                    .jsonPath("$.spec.password")
+                    .doesNotExist()
+                    .jsonPath("$.spec.totpEncryptedSecret")
+                    .doesNotExist();
 
             verify(client).get(User.class, "fake-user");
             verify(client).update(currentUser);
@@ -863,8 +985,15 @@ class UserEndpointTest {
                     .exchange()
                     .expectStatus()
                     .isOk()
-                    .expectBody(User.class)
-                    .isEqualTo(currentUser);
+                    .expectBody()
+                    .jsonPath("$.spec.avatar")
+                    .isEqualTo("fake-avatar.png")
+                    .jsonPath("$.metadata.annotations['halo.run/avatar-attachment-name']")
+                    .isEqualTo("fake-attachment")
+                    .jsonPath("$.spec.password")
+                    .doesNotExist()
+                    .jsonPath("$.spec.totpEncryptedSecret")
+                    .doesNotExist();
 
             verify(client).get(User.class, "fake-user");
             verify(client).update(currentUser);
