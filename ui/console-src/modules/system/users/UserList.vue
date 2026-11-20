@@ -311,6 +311,7 @@ function onCreationModalClose() {
                 @click="handleClearFilters"
               />
               <FilterDropdown
+                v-if="utils.permission.has(['system:roles:view'])"
                 v-model="selectedRoleValue"
                 :label="$t('core.user.filters.role.label')"
                 :items="[
