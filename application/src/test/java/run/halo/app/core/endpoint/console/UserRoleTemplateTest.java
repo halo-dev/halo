@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.mock.http.server.reactive.MockServerHttpRequest.method;
 
 import java.util.List;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.core.io.ClassPathResource;
@@ -34,12 +35,10 @@ class UserRoleTemplateTest {
         "PUT, /apis/api.console.halo.run/v1alpha1/users/target/password, false"
     })
     void delegatesOnlyConsoleUserOperations(HttpMethod method, String path, boolean allowed) {
-        var roles = new YamlUnstructuredLoader(new ClassPathResource("extensions/role-template-user.yaml"))
-                .load().stream()
-                        .map(value -> Unstructured.OBJECT_MAPPER.convertValue(value.getData(), Role.class))
-                        .filter(role -> List.of("role-template-manage-users", "role-template-view-users")
-                                .contains(role.getMetadata().getName()))
-                        .toList();
+        var roles = loadRoles().stream()
+                .filter(role -> List.of("role-template-manage-users", "role-template-view-users")
+                        .contains(role.getMetadata().getName()))
+                .toList();
         var manager = roles.stream()
                 .filter(role -> role.getMetadata().getName().equals("role-template-manage-users"))
                 .findFirst()
@@ -51,5 +50,25 @@ class UserRoleTemplateTest {
                 RequestInfoFactory.INSTANCE.newRequestInfo(method(method, path).build());
         assertThat(new RbacRequestEvaluation().rulesAllow(new AttributesRecord(requestInfo), rules))
                 .isEqualTo(allowed);
+    }
+
+    @Test
+    void shouldRetireChangePasswordTemplate() {
+        var role = loadRoles().stream()
+                .filter(value -> "role-template-change-password"
+                        .equals(value.getMetadata().getName()))
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(role.getMetadata().getLabels()).containsEntry(Role.HIDDEN_LABEL_NAME, Boolean.TRUE.toString());
+        assertThat(role.getMetadata().getAnnotations()).isNullOrEmpty();
+        assertThat(role.getRules()).isEmpty();
+    }
+
+    private static List<Role> loadRoles() {
+        return new YamlUnstructuredLoader(new ClassPathResource("extensions/role-template-user.yaml"))
+                .load().stream()
+                        .map(value -> Unstructured.OBJECT_MAPPER.convertValue(value.getData(), Role.class))
+                        .toList();
     }
 }
