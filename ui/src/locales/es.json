@@ -828,8 +828,6 @@
   "core.rbac.Users Management": "Usuarios",
   "core.rbac.User manage": "Gestor de usuarios",
   "core.rbac.User View": "Vista de usuarios",
-  "core.rbac.Migration Management": "Copia de seguridad y restauración",
-  "core.rbac.Migration Manage": "Gestor de copia de seguridad y restauración",
   "core.rbac.role-template-view-users": "Vista de usuarios",
   "core.rbac.role-template-change-password": "Cambiar contraseña",
   "core.rbac.role-template-manage-posts": "Gestión de publicaciones",

@@ -1024,8 +1024,6 @@
   "core.rbac.Users Management": "用戶",
   "core.rbac.User manage": "用戶管理",
   "core.rbac.User View": "用戶查看",
-  "core.rbac.Migration Management": "備份與還原",
-  "core.rbac.Migration Manage": "備份與還原管理",
   "core.rbac.role-template-view-users": "用戶查看",
   "core.rbac.role-template-change-password": "修改密碼",
   "core.rbac.Actuator Management": "系統指標",
