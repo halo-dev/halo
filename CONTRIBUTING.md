@@ -116,22 +116,6 @@ If you used AI tools, please follow these rules:
 
 In short: AI assistance is allowed, but unreviewed AI output is not acceptable.
 
-### OpenSpec Workflow for Feature and API Changes
-
-For **functional changes** or **API changes** (new endpoints, breaking changes, or behavioral modifications), you **must** use [OpenSpec](https://github.com/Fission-AI/OpenSpec) to create a proposal before implementation.
-
-OpenSpec is a spec-driven development workflow that helps align design intent between humans and AI before coding begins.
-
-For detailed documentation, visit: https://github.com/Fission-AI/OpenSpec/tree/main/docs
-
-#### Why OpenSpec?
-
-- **Design alignment**: Forces upfront design thinking before coding, reducing rework.
-- **Clear scope**: The proposal serves as a contract between the contributor, reviewers, and AI tools.
-- **Traceability**: Every change has a documented rationale and decision history.
-- **Consistency**: Ensures AI-generated implementations follow the project's agreed-upon design.
-- **Review efficiency**: Reviewers can focus on high-level design before line-by-line code review.
-
 ## Testing Expectations
 
 - Add or update tests whenever you change behavior.
