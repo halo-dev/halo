@@ -107,7 +107,7 @@
     "@iconify-json/ri": "^1.2.10",
     "@iconify-json/vscode-icons": "^1.2.72",
     "@iconify/types": "^2.0.0",
-    "@intlify/unplugin-vue-i18n": "^11.2.4",
+    "@intlify/unplugin-vue-i18n": "^11.2.8",
     "@tailwindcss/aspect-ratio": "^0.4.2",
     "@tailwindcss/container-queries": "^0.1.1",
     "@tailwindcss/forms": "^0.5.11",
