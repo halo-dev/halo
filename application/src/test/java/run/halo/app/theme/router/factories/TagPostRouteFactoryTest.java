@@ -16,7 +16,7 @@ import run.halo.app.core.extension.content.Tag;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.PageRequest;
-import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.ReactivePresentationExtensionClient;
 import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.TagFinder;
 import run.halo.app.theme.finders.vo.TagVo;
@@ -30,7 +30,7 @@ import run.halo.app.theme.finders.vo.TagVo;
 @ExtendWith(MockitoExtension.class)
 class TagPostRouteFactoryTest extends RouteFactoryTestSuite {
     @Mock
-    private ReactiveExtensionClient client;
+    private ReactivePresentationExtensionClient client;
 
     @Mock
     private TagFinder tagFinder;

@@ -66,5 +66,9 @@ export interface SearchOption {
      * Limit of result.
      */
     'limit'?: number;
+    /**
+     * BCP 47 content locale derived from the trusted localization context. The public search endpoint ignores locale in the request body. A null value searches original documents only.
+     */
+    'locale'?: string;
 }
 

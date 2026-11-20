@@ -14,7 +14,7 @@ import org.springframework.web.server.i18n.LocaleContextResolver;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.user.service.RoleService;
-import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.ReactivePresentationExtensionClient;
 import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.exception.NotFoundException;
@@ -40,7 +40,7 @@ import run.halo.app.theme.router.UrlContextListResult;
 public class AuthorPostsRouteFactory implements RouteFactory {
 
     private final PostFinder postFinder;
-    private final ReactiveExtensionClient client;
+    private final ReactivePresentationExtensionClient client;
     private final RoleService roleService;
     private SystemConfigFetcher environmentFetcher;
 

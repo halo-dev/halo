@@ -12,18 +12,24 @@ import lombok.ToString;
 import org.jspecify.annotations.Nullable;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
+import run.halo.app.localization.Localizable;
+import run.halo.app.localization.LocalizableNested;
+import run.halo.app.localization.LocalizableResource;
+import run.halo.app.localization.LocalizableSearchTitle;
 
 /** Attachment extension that describes an uploaded file and its resolved access URLs. */
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @GVK(group = Constant.GROUP, version = Constant.VERSION, kind = KIND, plural = "attachments", singular = "attachment")
+@LocalizableResource(label = "core.attachment.title")
 public class Attachment extends AbstractExtension {
 
     public static final String KIND = "Attachment";
 
     /** Desired attachment metadata, storage references, and classification fields. */
     @Schema(requiredMode = REQUIRED)
+    @LocalizableNested
     private AttachmentSpec spec;
 
     /** Observed attachment access URLs and generated thumbnails. */
@@ -34,6 +40,8 @@ public class Attachment extends AbstractExtension {
     public static class AttachmentSpec {
 
         /** Display name shown for the attachment. */
+        @LocalizableSearchTitle
+        @Localizable(key = "displayName", label = "core.localization.field.displayName", required = true)
         private String displayName;
 
         /** Attachment group metadata.name this attachment belongs to. */

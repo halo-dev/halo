@@ -14,12 +14,17 @@ import org.jspecify.annotations.Nullable;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
 import run.halo.app.extension.Ref;
+import run.halo.app.localization.Localizable;
+import run.halo.app.localization.LocalizableNested;
+import run.halo.app.localization.LocalizableResource;
+import run.halo.app.localization.LocalizableSearchTitle;
 
 /** Menu item extension that describes a navigable item and its resolved rendering state. */
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @GVK(group = "", version = "v1alpha1", kind = "MenuItem", plural = "menuitems", singular = "menuitem")
+@LocalizableResource(label = "core.menu_item.title")
 public class MenuItem extends AbstractExtension {
 
     public static final String REQUEST_TO_UPDATE_ANNO = "halo.run/request-to-update";
@@ -36,6 +41,7 @@ public class MenuItem extends AbstractExtension {
 
     /** Resolved display values calculated from the desired configuration and target resource. */
     @Nullable
+    @LocalizableNested
     private MenuItemStatus status;
 
     /** HTML anchor target used when opening this menu item. */
@@ -134,6 +140,8 @@ public class MenuItem extends AbstractExtension {
 
         /** Calculated display name after resolving targetRef, falling back to spec.displayName. */
         @Nullable
+        @LocalizableSearchTitle
+        @Localizable(key = "displayName", label = "core.localization.field.displayName")
         private String displayName;
 
         /** Calculated href after resolving targetRef, falling back to spec.href. */

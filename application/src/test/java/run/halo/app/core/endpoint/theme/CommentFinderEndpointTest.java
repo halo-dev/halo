@@ -13,7 +13,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Sort;
@@ -29,6 +28,7 @@ import run.halo.app.extension.ListResult;
 import run.halo.app.extension.PageRequest;
 import run.halo.app.extension.Ref;
 import run.halo.app.infra.SystemConfigFetcher;
+import run.halo.app.localization.PublicApiLocalizationFilter;
 import run.halo.app.theme.finders.CommentFinder;
 import run.halo.app.theme.finders.CommentPublicQueryService;
 import run.halo.app.theme.finders.vo.CommentVo;
@@ -60,7 +60,6 @@ class CommentFinderEndpointTest {
     @Mock
     private RateLimiterRegistry rateLimiterRegistry;
 
-    @InjectMocks
     private CommentFinderEndpoint commentFinderEndpoint;
 
     private WebTestClient webTestClient;
@@ -68,6 +67,14 @@ class CommentFinderEndpointTest {
     @BeforeEach
     void setUp() {
         lenient().when(environmentFetcher.fetchComment()).thenReturn(Mono.empty());
+        PublicApiLocalizationFilter localizationFilter = (request, next) -> next.handle(request);
+        commentFinderEndpoint = new CommentFinderEndpoint(
+                commentPublicQueryService,
+                commentService,
+                replyService,
+                environmentFetcher,
+                rateLimiterRegistry,
+                localizationFilter);
         webTestClient = WebTestClient.bindToRouterFunction(commentFinderEndpoint.endpoint())
                 .build();
     }

@@ -15,6 +15,11 @@ import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.MetadataUtil;
+import run.halo.app.localization.Localizable;
+import run.halo.app.localization.LocalizableNested;
+import run.halo.app.localization.LocalizableResource;
+import run.halo.app.localization.LocalizableSchema;
+import run.halo.app.localization.LocalizableSearchTitle;
 
 /**
  * Single page extension that stores standalone page metadata, publication settings, and derived status.
@@ -31,6 +36,7 @@ import run.halo.app.extension.MetadataUtil;
         plural = "singlepages",
         singular = "singlepage")
 @EqualsAndHashCode(callSuper = true)
+@LocalizableResource(label = "core.page.title")
 public class SinglePage extends AbstractExtension {
 
     public static final String KIND = "SinglePage";
@@ -45,10 +51,12 @@ public class SinglePage extends AbstractExtension {
     /** Desired state of the single page, including content snapshots, publishing options, and theme hints. */
     @Schema(requiredMode = REQUIRED)
     @Nullable
+    @LocalizableNested
     private SinglePageSpec spec;
 
     /** Observed state of the single page, populated by reconcilers and other internal controllers. */
     @Nullable
+    @LocalizableNested
     private SinglePageStatus status;
 
     @JsonIgnore
@@ -70,6 +78,8 @@ public class SinglePage extends AbstractExtension {
     public static class SinglePageSpec {
         /** Display title of the single page. */
         @Schema(requiredMode = REQUIRED, minLength = 1)
+        @LocalizableSearchTitle
+        @Localizable(key = "title", label = "core.localization.field.title", required = true)
         private String title;
 
         /** URL slug used to build the single page permalink. */
@@ -92,6 +102,7 @@ public class SinglePage extends AbstractExtension {
         private String template;
 
         /** Cover image URL or attachment URI of the single page. */
+        @Localizable(key = "cover", label = "core.localization.field.cover", type = LocalizableSchema.Type.IMAGE)
         private String cover;
 
         /** Whether the single page is logically deleted and should be treated as recycled. */

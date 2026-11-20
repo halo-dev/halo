@@ -35,10 +35,11 @@ export const PostV1alpha1PublicApiAxiosParamCreator = function (configuration?: 
         /**
          * Gets a post by metadata.name.
          * @param {string} name Post metadata.name
+         * @param {string} [locale] BCP 47 content language tag.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        queryPostByName: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        queryPostByName: async (name: string, locale?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
             assertParamExists('queryPostByName', 'name', name)
             const localVarPath = `/apis/api.content.halo.run/v1alpha1/posts/{name}`
@@ -62,6 +63,10 @@ export const PostV1alpha1PublicApiAxiosParamCreator = function (configuration?: 
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            if (locale !== undefined) {
+                localVarQueryParameter['locale'] = locale;
+            }
+
             localVarHeaderParameter['Accept'] = '*/*';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -77,10 +82,11 @@ export const PostV1alpha1PublicApiAxiosParamCreator = function (configuration?: 
          * Gets a post navigation by metadata.name.
          * @param {string} name Post metadata.name
          * @param {string} [scope] Scope of navigation. Use \&#39;category\&#39; to limit navigation to the post\&#39;s primary category. Defaults to global scope.
+         * @param {string} [locale] BCP 47 content language tag.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        queryPostNavigationByName: async (name: string, scope?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        queryPostNavigationByName: async (name: string, scope?: string, locale?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
             assertParamExists('queryPostNavigationByName', 'name', name)
             const localVarPath = `/apis/api.content.halo.run/v1alpha1/posts/{name}/navigation`
@@ -108,6 +114,10 @@ export const PostV1alpha1PublicApiAxiosParamCreator = function (configuration?: 
                 localVarQueryParameter['scope'] = scope;
             }
 
+            if (locale !== undefined) {
+                localVarQueryParameter['locale'] = locale;
+            }
+
             localVarHeaderParameter['Accept'] = '*/*';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -126,10 +136,11 @@ export const PostV1alpha1PublicApiAxiosParamCreator = function (configuration?: 
          * @param {Array<string>} [labelSelector] Label selector. e.g.: hidden!&#x3D;true
          * @param {Array<string>} [fieldSelector] Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
          * @param {Array<string>} [sort] Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+         * @param {string} [locale] BCP 47 content language tag.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        queryPosts: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        queryPosts: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, locale?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/api.content.halo.run/v1alpha1/posts`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -170,6 +181,10 @@ export const PostV1alpha1PublicApiAxiosParamCreator = function (configuration?: 
                 localVarQueryParameter['sort'] = sort;
             }
 
+            if (locale !== undefined) {
+                localVarQueryParameter['locale'] = locale;
+            }
+
             localVarHeaderParameter['Accept'] = '*/*';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -193,11 +208,12 @@ export const PostV1alpha1PublicApiFp = function(configuration?: Configuration) {
         /**
          * Gets a post by metadata.name.
          * @param {string} name Post metadata.name
+         * @param {string} [locale] BCP 47 content language tag.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async queryPostByName(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PostVo>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.queryPostByName(name, options);
+        async queryPostByName(name: string, locale?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PostVo>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.queryPostByName(name, locale, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['PostV1alpha1PublicApi.queryPostByName']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -206,11 +222,12 @@ export const PostV1alpha1PublicApiFp = function(configuration?: Configuration) {
          * Gets a post navigation by metadata.name.
          * @param {string} name Post metadata.name
          * @param {string} [scope] Scope of navigation. Use \&#39;category\&#39; to limit navigation to the post\&#39;s primary category. Defaults to global scope.
+         * @param {string} [locale] BCP 47 content language tag.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async queryPostNavigationByName(name: string, scope?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<NavigationPostVo>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.queryPostNavigationByName(name, scope, options);
+        async queryPostNavigationByName(name: string, scope?: string, locale?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<NavigationPostVo>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.queryPostNavigationByName(name, scope, locale, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['PostV1alpha1PublicApi.queryPostNavigationByName']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -222,11 +239,12 @@ export const PostV1alpha1PublicApiFp = function(configuration?: Configuration) {
          * @param {Array<string>} [labelSelector] Label selector. e.g.: hidden!&#x3D;true
          * @param {Array<string>} [fieldSelector] Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
          * @param {Array<string>} [sort] Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+         * @param {string} [locale] BCP 47 content language tag.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async queryPosts(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListedPostVoList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.queryPosts(page, size, labelSelector, fieldSelector, sort, options);
+        async queryPosts(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, locale?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListedPostVoList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.queryPosts(page, size, labelSelector, fieldSelector, sort, locale, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['PostV1alpha1PublicApi.queryPosts']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -247,7 +265,7 @@ export const PostV1alpha1PublicApiFactory = function (configuration?: Configurat
          * @throws {RequiredError}
          */
         queryPostByName(requestParameters: PostV1alpha1PublicApiQueryPostByNameRequest, options?: RawAxiosRequestConfig): AxiosPromise<PostVo> {
-            return localVarFp.queryPostByName(requestParameters.name, options).then((request) => request(axios, basePath));
+            return localVarFp.queryPostByName(requestParameters.name, requestParameters.locale, options).then((request) => request(axios, basePath));
         },
         /**
          * Gets a post navigation by metadata.name.
@@ -256,7 +274,7 @@ export const PostV1alpha1PublicApiFactory = function (configuration?: Configurat
          * @throws {RequiredError}
          */
         queryPostNavigationByName(requestParameters: PostV1alpha1PublicApiQueryPostNavigationByNameRequest, options?: RawAxiosRequestConfig): AxiosPromise<NavigationPostVo> {
-            return localVarFp.queryPostNavigationByName(requestParameters.name, requestParameters.scope, options).then((request) => request(axios, basePath));
+            return localVarFp.queryPostNavigationByName(requestParameters.name, requestParameters.scope, requestParameters.locale, options).then((request) => request(axios, basePath));
         },
         /**
          * Lists posts.
@@ -265,7 +283,7 @@ export const PostV1alpha1PublicApiFactory = function (configuration?: Configurat
          * @throws {RequiredError}
          */
         queryPosts(requestParameters: PostV1alpha1PublicApiQueryPostsRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ListedPostVoList> {
-            return localVarFp.queryPosts(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+            return localVarFp.queryPosts(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.locale, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -278,6 +296,11 @@ export interface PostV1alpha1PublicApiQueryPostByNameRequest {
      * Post metadata.name
      */
     readonly name: string
+
+    /**
+     * BCP 47 content language tag.
+     */
+    readonly locale?: string
 }
 
 /**
@@ -293,6 +316,11 @@ export interface PostV1alpha1PublicApiQueryPostNavigationByNameRequest {
      * Scope of navigation. Use \&#39;category\&#39; to limit navigation to the post\&#39;s primary category. Defaults to global scope.
      */
     readonly scope?: string
+
+    /**
+     * BCP 47 content language tag.
+     */
+    readonly locale?: string
 }
 
 /**
@@ -323,6 +351,11 @@ export interface PostV1alpha1PublicApiQueryPostsRequest {
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
      */
     readonly sort?: Array<string>
+
+    /**
+     * BCP 47 content language tag.
+     */
+    readonly locale?: string
 }
 
 /**
@@ -336,7 +369,7 @@ export class PostV1alpha1PublicApi extends BaseAPI {
      * @throws {RequiredError}
      */
     public queryPostByName(requestParameters: PostV1alpha1PublicApiQueryPostByNameRequest, options?: RawAxiosRequestConfig) {
-        return PostV1alpha1PublicApiFp(this.configuration).queryPostByName(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+        return PostV1alpha1PublicApiFp(this.configuration).queryPostByName(requestParameters.name, requestParameters.locale, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -346,7 +379,7 @@ export class PostV1alpha1PublicApi extends BaseAPI {
      * @throws {RequiredError}
      */
     public queryPostNavigationByName(requestParameters: PostV1alpha1PublicApiQueryPostNavigationByNameRequest, options?: RawAxiosRequestConfig) {
-        return PostV1alpha1PublicApiFp(this.configuration).queryPostNavigationByName(requestParameters.name, requestParameters.scope, options).then((request) => request(this.axios, this.basePath));
+        return PostV1alpha1PublicApiFp(this.configuration).queryPostNavigationByName(requestParameters.name, requestParameters.scope, requestParameters.locale, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -356,7 +389,7 @@ export class PostV1alpha1PublicApi extends BaseAPI {
      * @throws {RequiredError}
      */
     public queryPosts(requestParameters: PostV1alpha1PublicApiQueryPostsRequest = {}, options?: RawAxiosRequestConfig) {
-        return PostV1alpha1PublicApiFp(this.configuration).queryPosts(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+        return PostV1alpha1PublicApiFp(this.configuration).queryPosts(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.locale, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

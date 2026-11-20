@@ -8,7 +8,6 @@ import static org.mockito.Mockito.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -17,6 +16,7 @@ import org.springframework.web.reactive.function.server.HandlerStrategies;
 import org.springframework.web.server.handler.ResponseStatusExceptionHandler;
 import reactor.core.publisher.Mono;
 import run.halo.app.infra.exception.RequestBodyValidationException;
+import run.halo.app.localization.PublicApiLocalizationFilter;
 
 @ExtendWith(MockitoExtension.class)
 class IndexEndpointTest {
@@ -24,13 +24,14 @@ class IndexEndpointTest {
     @Mock
     SearchService searchService;
 
-    @InjectMocks
     IndexEndpoint endpoint;
 
     WebTestClient client;
 
     @BeforeEach
     void setUp() {
+        PublicApiLocalizationFilter passthrough = (request, next) -> next.handle(request);
+        endpoint = new IndexEndpoint(searchService, passthrough);
         client = WebTestClient.bindToRouterFunction(endpoint.endpoint())
                 .handlerStrategies(HandlerStrategies.builder()
                         .exceptionHandler(new ResponseStatusExceptionHandler())

@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.content.PostService;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.MetadataUtil;
-import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.ReactivePresentationExtensionClient;
 import run.halo.app.extension.index.query.Queries;
 import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.infra.utils.JsonUtils;
@@ -49,7 +49,7 @@ public class PostRouteFactory implements RouteFactory {
 
     private final PostViewNameResolver postViewNameResolver;
 
-    private final ReactiveExtensionClient client;
+    private final ReactivePresentationExtensionClient client;
 
     private final ReactiveQueryPostPredicateResolver queryPostPredicateResolver;
 

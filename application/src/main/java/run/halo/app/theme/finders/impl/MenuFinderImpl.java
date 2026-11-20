@@ -12,7 +12,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Menu;
 import run.halo.app.core.extension.MenuItem;
 import run.halo.app.extension.ListOptions;
-import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.ReactivePresentationExtensionClient;
 import run.halo.app.extension.index.query.Queries;
 import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
@@ -32,7 +32,8 @@ import run.halo.app.theme.finders.vo.MenuVo;
 @AllArgsConstructor
 public class MenuFinderImpl implements MenuFinder {
 
-    private final ReactiveExtensionClient client;
+    private final ReactivePresentationExtensionClient client;
+
     private final SystemConfigFetcher environmentFetcher;
 
     @Override

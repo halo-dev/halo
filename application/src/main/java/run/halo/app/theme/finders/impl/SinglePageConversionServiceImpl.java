@@ -22,6 +22,8 @@ import run.halo.app.core.counter.CounterService;
 import run.halo.app.core.counter.MeterUtils;
 import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.extension.*;
+import run.halo.app.localization.ContentLocalizationTransformer;
+import run.halo.app.localization.ResourceReference;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 import run.halo.app.theme.ReactiveSinglePageContentHandler;
 import run.halo.app.theme.ReactiveSinglePageContentHandler.SinglePageContentContext;
@@ -42,9 +44,11 @@ import run.halo.app.theme.finders.vo.StatsVo;
 @RequiredArgsConstructor
 public class SinglePageConversionServiceImpl implements SinglePageConversionService {
 
-    private final ReactiveExtensionClient client;
+    private final ReactivePresentationExtensionClient client;
 
     private final SinglePageService singlePageService;
+
+    private final ContentLocalizationTransformer contentLocalization;
 
     private final ContributorFinder contributorFinder;
 
@@ -90,6 +94,8 @@ public class SinglePageConversionServiceImpl implements SinglePageConversionServ
                     String baseSnapshot = singlePage.getSpec().getBaseSnapshot();
                     return singlePageService
                             .getContent(releaseSnapshot, baseSnapshot)
+                            .flatMap(wrapper ->
+                                    contentLocalization.transform(ResourceReference.from(singlePage), wrapper))
                             .flatMap(wrapper -> extendPageContent(singlePage, wrapper));
                 })
                 .map(wrapper -> ContentVo.builder()
@@ -150,6 +156,8 @@ public class SinglePageConversionServiceImpl implements SinglePageConversionServ
                     String baseSnapshot = page.getSpec().getBaseSnapshot();
                     return singlePageService
                             .getContent(snapshotName, baseSnapshot)
+                            .flatMap(wrapper ->
+                                    contentLocalization.transform(ResourceReference.from(singlePage), wrapper))
                             .flatMap(wrapper -> extendPageContent(singlePage, wrapper))
                             .doOnNext(page::setContent)
                             .thenReturn(page);

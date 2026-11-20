@@ -20,25 +20,25 @@ import run.halo.app.infra.utils.JsonUtils;
  */
 @Builder
 public record SiteSettingVo(
-        String title,
+        @With String title,
 
         @With URL url,
 
         @With String version,
 
-        String subtitle,
+        @With String subtitle,
 
         String logo,
 
         String favicon,
 
-        String language,
+        @With String language,
 
         Boolean allowRegistration,
 
         PostSetting post,
 
-        SeoSetting seo,
+        @With SeoSetting seo,
 
         Routes routes,
 

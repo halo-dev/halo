@@ -22,7 +22,7 @@ import run.halo.app.core.extension.content.Tag;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.PageRequestImpl;
-import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.ReactivePresentationExtensionClient;
 import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
@@ -49,7 +49,7 @@ import run.halo.app.theme.router.UrlContextListResult;
 @AllArgsConstructor
 public class TagPostRouteFactory implements RouteFactory {
 
-    private final ReactiveExtensionClient client;
+    private final ReactivePresentationExtensionClient client;
     private final SystemConfigFetcher environmentFetcher;
     private final TagFinder tagFinder;
     private final PostFinder postFinder;

@@ -24,6 +24,7 @@ import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.localization.PresentationTestSupport;
 import run.halo.app.theme.finders.vo.TagVo;
 
 /**
@@ -42,7 +43,7 @@ class TagFinderImplTest {
 
     @BeforeEach
     void setUp() {
-        tagFinder = new TagFinderImpl(client);
+        tagFinder = new TagFinderImpl(PresentationTestSupport.client(client));
     }
 
     @Test

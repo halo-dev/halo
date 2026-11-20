@@ -18,6 +18,12 @@ import run.halo.app.extension.GVK;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.MetadataOperator;
 import run.halo.app.infra.ConditionList;
+import run.halo.app.localization.Localizable;
+import run.halo.app.localization.LocalizableNested;
+import run.halo.app.localization.LocalizableResource;
+import run.halo.app.localization.LocalizableSchema;
+import run.halo.app.localization.LocalizableSearchSummary;
+import run.halo.app.localization.LocalizableSearchTitle;
 
 /**
  * Post extension that stores article metadata, publication settings, taxonomy, and derived status.
@@ -30,6 +36,7 @@ import run.halo.app.infra.ConditionList;
 @ToString(callSuper = true)
 @GVK(group = Constant.GROUP, version = Constant.VERSION, kind = Post.KIND, plural = "posts", singular = "post")
 @EqualsAndHashCode(callSuper = true)
+@LocalizableResource(label = "core.post.title")
 public class Post extends AbstractExtension {
 
     public static final String KIND = "Post";
@@ -65,10 +72,12 @@ public class Post extends AbstractExtension {
     /** Desired state of the post, including content snapshots, publishing options, taxonomy, and theme hints. */
     @Schema(requiredMode = RequiredMode.REQUIRED)
     @Nullable
+    @LocalizableNested
     private PostSpec spec;
 
     /** Observed state of the post, populated by reconcilers and other internal controllers. */
     @Nullable
+    @LocalizableNested
     private PostStatus status;
 
     @JsonIgnore
@@ -108,6 +117,8 @@ public class Post extends AbstractExtension {
     public static class PostSpec {
         /** Display title of the post. */
         @Schema(requiredMode = RequiredMode.REQUIRED, minLength = 1)
+        @LocalizableSearchTitle
+        @Localizable(key = "title", label = "core.localization.field.title", required = true)
         private String title;
 
         /** URL slug used to build the post permalink. */
@@ -130,6 +141,7 @@ public class Post extends AbstractExtension {
         private String template;
 
         /** Cover image URL or attachment URI of the post. */
+        @Localizable(key = "cover", label = "core.localization.field.cover", type = LocalizableSchema.Type.IMAGE)
         private String cover;
 
         /** Whether the post is logically deleted and should be treated as recycled. */
@@ -186,6 +198,8 @@ public class Post extends AbstractExtension {
         private String permalink;
 
         /** Excerpt text resolved from the content excerpt configuration. */
+        @LocalizableSearchSummary
+        @Localizable(key = "excerpt", label = "core.localization.field.excerpt", multiline = true)
         private String excerpt;
 
         /** Whether the latest draft snapshot differs from the released snapshot. */

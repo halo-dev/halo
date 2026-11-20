@@ -1,8 +1,10 @@
 package run.halo.app.search;
 
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
+import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -12,6 +14,7 @@ import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.extension.GroupVersion;
+import run.halo.app.localization.PublicApiLocalizationFilter;
 
 @Component
 public class IndexEndpoint implements CustomEndpoint {
@@ -19,9 +22,11 @@ public class IndexEndpoint implements CustomEndpoint {
     private static final String API_VERSION = "api.halo.run/v1alpha1";
 
     private final SearchService searchService;
+    private final PublicApiLocalizationFilter publicApiLocalizationFilter;
 
-    public IndexEndpoint(SearchService searchService) {
+    public IndexEndpoint(SearchService searchService, PublicApiLocalizationFilter publicApiLocalizationFilter) {
         this.searchService = searchService;
+        this.publicApiLocalizationFilter = publicApiLocalizationFilter;
     }
 
     @Override
@@ -34,13 +39,21 @@ public class IndexEndpoint implements CustomEndpoint {
                         builder -> builder.operationId("IndicesSearch")
                                 .tag(tag)
                                 .description("Search indices.")
+                                .parameter(parameterBuilder()
+                                        .in(ParameterIn.QUERY)
+                                        .name("locale")
+                                        .description("BCP 47 content language tag.")
+                                        .implementation(String.class)
+                                        .required(false))
                                 .requestBody(requestBodyBuilder()
                                         .implementation(SearchOption.class)
                                         .description("""
                             Please note that the "filterPublished", "filterExposed" and \
-                            "filterRecycled" fields are ignored in this endpoint.\
+                            "filterRecycled" fields are ignored in this endpoint. The search \
+                            language follows the current localization context.\
                             """))
                                 .response(responseBuilder().implementation(SearchResult.class)))
+                .filter(publicApiLocalizationFilter)
                 .build();
     }
 

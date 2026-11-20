@@ -19,6 +19,7 @@ import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.extension.GroupVersion;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.router.SortableRequest;
+import run.halo.app.localization.PublicApiLocalizationFilter;
 import run.halo.app.theme.finders.SinglePageConversionService;
 import run.halo.app.theme.finders.SinglePageFinder;
 import run.halo.app.theme.finders.vo.ListedSinglePageVo;
@@ -37,6 +38,7 @@ public class SinglePageQueryEndpoint implements CustomEndpoint {
     private final SinglePageFinder singlePageFinder;
 
     private final SinglePageConversionService singlePageConversionService;
+    private final PublicApiLocalizationFilter publicApiLocalizationFilter;
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
@@ -61,7 +63,9 @@ public class SinglePageQueryEndpoint implements CustomEndpoint {
                                         .name("name")
                                         .description("SinglePage metadata.name")
                                         .required(true))
+                                .parameter(PublicApiUtils.localeParameter())
                                 .response(responseBuilder().implementation(SinglePageVo.class)))
+                .filter(publicApiLocalizationFilter)
                 .build();
     }
 
@@ -89,6 +93,7 @@ public class SinglePageQueryEndpoint implements CustomEndpoint {
 
         public static void buildParameters(Builder builder) {
             SortableRequest.buildParameters(builder);
+            builder.parameter(PublicApiUtils.localeParameter());
         }
     }
 

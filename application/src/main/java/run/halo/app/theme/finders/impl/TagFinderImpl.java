@@ -14,7 +14,7 @@ import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.PageRequest;
 import run.halo.app.extension.PageRequestImpl;
-import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.ReactivePresentationExtensionClient;
 import run.halo.app.extension.index.query.Queries;
 import run.halo.app.theme.finders.Finder;
 import run.halo.app.theme.finders.TagFinder;
@@ -32,9 +32,9 @@ public class TagFinderImpl implements TagFinder {
     public static final Comparator<Tag> DEFAULT_COMPARATOR =
             Comparator.comparing(tag -> tag.getMetadata().getCreationTimestamp());
 
-    private final ReactiveExtensionClient client;
+    private final ReactivePresentationExtensionClient client;
 
-    public TagFinderImpl(ReactiveExtensionClient client) {
+    public TagFinderImpl(ReactivePresentationExtensionClient client) {
         this.client = client;
     }
 

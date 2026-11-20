@@ -11,7 +11,6 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -23,8 +22,11 @@ import run.halo.app.core.extension.MenuItem;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.Ref;
 import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
+import run.halo.app.localization.PresentationTestSupport;
+import run.halo.app.theme.finders.vo.MenuItemVo;
 import run.halo.app.theme.finders.vo.MenuVo;
 
 /**
@@ -42,11 +44,11 @@ class MenuFinderImplTest {
     @Mock
     private SystemConfigFetcher environmentFetcher;
 
-    @InjectMocks
     private MenuFinderImpl menuFinder;
 
     @BeforeEach
     void setUp() {
+        menuFinder = new MenuFinderImpl(PresentationTestSupport.client(client), environmentFetcher);
         Mockito.lenient()
                 .when(client.listAll(eq(MenuItem.class), any(ListOptions.class), eq(Sort.unsorted())))
                 .thenAnswer(invocation -> {
@@ -156,6 +158,59 @@ class MenuFinderImplTest {
         MenuVo menuVo = menuFinder.getByName("legacy").block();
 
         assertThat(menuVo.getMenuItems()).isEmpty();
+    }
+
+    @Test
+    void usesLocalizedResolvedDisplayNameForDirectMenuItems() {
+        var menuItem = menuItem("direct", "primary", null, 0);
+        menuItem.getSpec().setDisplayName("Source label");
+        menuItem.getStatus().setDisplayName("Localized label");
+
+        var menuItemVo = MenuItemVo.from(menuItem);
+
+        assertThat(menuItemVo.getDisplayName()).isEqualTo("Localized label");
+        assertThat(menuItemVo.getStatus().getDisplayName()).isEqualTo("Localized label");
+        assertThat(menuItemVo.getStatus().getHref())
+                .isEqualTo(menuItem.getStatus().getHref());
+    }
+
+    @Test
+    void usesLocalizedResolvedDisplayNameForRouteMenuItems() {
+        var menuItem = menuItem("route", "primary", null, 0);
+        menuItem.getSpec().setRouteRef(MenuItem.RouteRef.ARCHIVES);
+        menuItem.getSpec().setDisplayName("Source route label");
+        menuItem.getStatus().setDisplayName("Localized route label");
+        menuItem.getStatus().setHref("/en/archives");
+
+        var menuItemVo = MenuItemVo.from(menuItem);
+
+        assertThat(menuItemVo.getDisplayName()).isEqualTo("Localized route label");
+        assertThat(menuItemVo.getStatus().getDisplayName()).isEqualTo("Localized route label");
+        assertThat(menuItemVo.getStatus().getHref()).isEqualTo("/en/archives");
+    }
+
+    @Test
+    void retainsResolvedDisplayNameForTargetReferencedMenuItems() {
+        var menuItem = menuItem("target", "primary", null, 0);
+        menuItem.getSpec().setDisplayName("Configured label");
+        menuItem.getSpec().setTargetRef(Ref.of("target-resource"));
+        menuItem.getStatus().setDisplayName("Localized target title");
+
+        var menuItemVo = MenuItemVo.from(menuItem);
+
+        assertThat(menuItemVo.getDisplayName()).isEqualTo("Localized target title");
+        assertThat(menuItemVo.getStatus().getDisplayName()).isEqualTo("Localized target title");
+    }
+
+    @Test
+    void fallsBackToConfiguredDisplayNameWhenResolvedDisplayNameIsBlank() {
+        var menuItem = menuItem("fallback", "primary", null, 0);
+        menuItem.getSpec().setDisplayName("Configured label");
+        menuItem.getStatus().setDisplayName(null);
+
+        var menuItemVo = MenuItemVo.from(menuItem);
+
+        assertThat(menuItemVo.getDisplayName()).isEqualTo("Configured label");
     }
 
     /** Visualize a tree. */

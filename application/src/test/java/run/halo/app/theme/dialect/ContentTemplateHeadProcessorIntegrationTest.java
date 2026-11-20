@@ -10,6 +10,8 @@ import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.ObjectProvider;
@@ -350,6 +352,95 @@ class ContentTemplateHeadProcessorIntegrationTest {
         assertThat(actual.select("meta[name=description]")).singleElement().satisfies(meta -> {
             assertThat(meta.attr("content")).isEqualTo("new description");
         });
+    }
+
+    @ParameterizedTest
+    @EnumSource(
+            value = DefaultTemplateEnum.class,
+            names = {"POST", "SINGLE_PAGE"})
+    void escapesMetadataDuringRenderingWithoutChangingSourceValues(DefaultTemplateEnum template) {
+        String text = "你好 \"quoted\" & <tag> 'text' &amp; \"><script>window.seoInjected = true</script>";
+        String property = "og:title";
+        String media = "(width < 600px) & \"custom\"";
+        var description = Map.of("name", "description", "content", text);
+        var socialTitle = Map.of("property", property, "content", text);
+        var themeColor = Map.of("name", "theme-color", "content", "cyan", "media", media);
+        var metas = List.of(description, socialTitle, themeColor);
+        mockContent(template, metas, "Unused excerpt");
+
+        String result = templateEngine.process("post", contentContext(template));
+
+        var document = Jsoup.parse(result);
+        assertThat(document.select("meta[name=description]").attr("content")).isEqualTo(text);
+        assertThat(document.select("meta[property='og:title']").attr("content")).isEqualTo(text);
+        assertThat(document.select("meta[name=theme-color]").attr("media")).isEqualTo(media);
+        assertThat(document.select("script, tag")).isEmpty();
+        assertThat(result).contains("&quot;", "&amp;", "&lt;", "&gt;");
+        assertThat(description).containsEntry("content", text);
+        assertThat(socialTitle).containsEntry("property", property).containsEntry("content", text);
+        assertThat(themeColor).containsEntry("media", media);
+    }
+
+    @ParameterizedTest
+    @EnumSource(
+            value = DefaultTemplateEnum.class,
+            names = {"POST", "SINGLE_PAGE"})
+    void escapesExcerptExactlyOnceAndPreservesBlankSourceDescription(DefaultTemplateEnum template) {
+        String excerpt = "An \"excerpt\" & <text> with literal &amp;";
+        var description = Map.of("name", "description", "content", "");
+        var metas = List.of(description);
+        mockContent(template, metas, excerpt);
+
+        String result = templateEngine.process("post", contentContext(template));
+
+        var document = Jsoup.parse(result);
+        assertThat(document.select("meta[name=description]")).singleElement().satisfies(meta -> {
+            assertThat(meta.attr("content")).isEqualTo(excerpt);
+        });
+        assertThat(document.select("text")).isEmpty();
+        assertThat(description).containsEntry("content", "");
+    }
+
+    @ParameterizedTest
+    @EnumSource(
+            value = DefaultTemplateEnum.class,
+            names = {"POST", "SINGLE_PAGE"})
+    void createsEscapedExcerptDescriptionWhenSourceHasNoMetadata(DefaultTemplateEnum template) {
+        String excerpt = "An \"excerpt\" & <text>";
+        mockContent(template, List.of(), excerpt);
+
+        String result = templateEngine.process("post", contentContext(template));
+
+        var document = Jsoup.parse(result);
+        assertThat(document.select("meta[name=description]")).singleElement().satisfies(meta -> {
+            assertThat(meta.attr("content")).isEqualTo(excerpt);
+        });
+        assertThat(document.select("text")).isEmpty();
+    }
+
+    private Context contentContext(DefaultTemplateEnum template) {
+        var context = getContext();
+        context.setVariable("name", "escaping-content");
+        context.setVariable(ModelConst.TEMPLATE_ID, template.getValue());
+        return context;
+    }
+
+    private void mockContent(DefaultTemplateEnum template, List<Map<String, String>> metas, String excerpt) {
+        if (template == DefaultTemplateEnum.POST) {
+            var spec = new Post.PostSpec();
+            spec.setHtmlMetas(metas);
+            var status = new Post.PostStatus();
+            status.setExcerpt(excerpt);
+            var post = PostVo.builder().spec(spec).status(status).build();
+            when(postFinder.getByName("escaping-content")).thenReturn(Mono.just(post));
+            return;
+        }
+        var spec = new SinglePage.SinglePageSpec();
+        spec.setHtmlMetas(metas);
+        var status = new SinglePage.SinglePageStatus();
+        status.setExcerpt(excerpt);
+        var page = SinglePageVo.builder().spec(spec).status(status).build();
+        when(singlePageFinder.getByName("escaping-content")).thenReturn(Mono.just(page));
     }
 
     Map<String, String> mutableMetaMap(String nameValue, String contentValue) {

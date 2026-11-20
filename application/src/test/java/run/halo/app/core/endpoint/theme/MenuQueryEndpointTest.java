@@ -6,10 +6,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
@@ -21,6 +21,12 @@ import run.halo.app.extension.GroupVersion;
 import run.halo.app.extension.Metadata;
 import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
+import run.halo.app.localization.DefaultPublicApiLocalizationFilter;
+import run.halo.app.localization.LocalizationContext;
+import run.halo.app.localization.LocalizationScope;
+import run.halo.app.localization.PublicApiLocalizationFilter;
+import run.halo.app.localization.ResourceLocalizationProvider;
+import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 import run.halo.app.theme.finders.MenuFinder;
 import run.halo.app.theme.finders.vo.MenuItemVo;
 import run.halo.app.theme.finders.vo.MenuVo;
@@ -40,13 +46,20 @@ class MenuQueryEndpointTest {
     @Mock
     private SystemConfigFetcher environmentFetcher;
 
-    @InjectMocks
+    @Mock
+    private ExtensionGetter extensions;
+
+    @Mock
+    private ResourceLocalizationProvider localizationProvider;
+
     private MenuQueryEndpoint endpoint;
 
     private WebTestClient webClient;
 
     @BeforeEach
     void setUp() {
+        PublicApiLocalizationFilter passthrough = (request, next) -> next.handle(request);
+        endpoint = new MenuQueryEndpoint(menuFinder, environmentFetcher, passthrough);
         webClient = WebTestClient.bindToRouterFunction(endpoint.endpoint()).build();
     }
 
@@ -125,5 +138,42 @@ class MenuQueryEndpointTest {
     void groupVersion() {
         GroupVersion groupVersion = endpoint.groupVersion();
         assertThat(groupVersion.toString()).isEqualTo("api.halo.run/v1alpha1");
+    }
+
+    @Test
+    void appliesQueryLocaleBeforeResolvingMenu() {
+        var context = new LocalizationContext(Locale.CHINA, Locale.ENGLISH, List.of(), LocalizationScope.PUBLIC_API);
+        when(extensions.getEnabledExtension(ResourceLocalizationProvider.class))
+                .thenReturn(Mono.just(localizationProvider));
+        when(localizationProvider.resolveContext(Locale.ENGLISH, LocalizationScope.PUBLIC_API))
+                .thenReturn(Mono.just(context));
+        var filteredEndpoint = new MenuQueryEndpoint(
+                menuFinder, environmentFetcher, new DefaultPublicApiLocalizationFilter(extensions));
+        var source = MenuVo.builder()
+                .metadata(new Metadata())
+                .spec(new Menu.Spec())
+                .menuItems(List.of())
+                .build();
+        source.getMetadata().setName("source");
+        var localized = MenuVo.builder()
+                .metadata(new Metadata())
+                .spec(new Menu.Spec())
+                .menuItems(List.of())
+                .build();
+        localized.getMetadata().setName("localized");
+        when(menuFinder.getByName("test-menu"))
+                .thenReturn(Mono.defer(() ->
+                        LocalizationContext.current().map(current -> localized).defaultIfEmpty(source)));
+
+        WebTestClient.bindToRouterFunction(filteredEndpoint.endpoint())
+                .build()
+                .get()
+                .uri("/menus/test-menu?locale=en")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.metadata.name")
+                .isEqualTo("localized");
     }
 }

@@ -5,6 +5,7 @@ import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.fn.builders.parameter.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -18,6 +19,7 @@ import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.extension.GroupVersion;
 import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
+import run.halo.app.localization.PublicApiLocalizationFilter;
 import run.halo.app.theme.finders.MenuFinder;
 import run.halo.app.theme.finders.vo.MenuVo;
 
@@ -33,6 +35,7 @@ public class MenuQueryEndpoint implements CustomEndpoint {
 
     private final MenuFinder menuFinder;
     private final SystemConfigFetcher environmentFetcher;
+    private final PublicApiLocalizationFilter publicApiLocalizationFilter;
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
@@ -44,6 +47,7 @@ public class MenuQueryEndpoint implements CustomEndpoint {
                         builder -> builder.operationId("queryPrimaryMenu")
                                 .description("Gets primary menu.")
                                 .tag(tag)
+                                .parameter(localeParameter())
                                 .response(responseBuilder().implementation(MenuVo.class)))
                 .GET(
                         "menus/{name}",
@@ -56,8 +60,18 @@ public class MenuQueryEndpoint implements CustomEndpoint {
                                         .name("name")
                                         .description("Menu metadata.name")
                                         .required(true))
+                                .parameter(localeParameter())
                                 .response(responseBuilder().implementation(MenuVo.class)))
+                .filter(publicApiLocalizationFilter)
                 .build();
+    }
+
+    private static Builder localeParameter() {
+        return parameterBuilder()
+                .in(ParameterIn.QUERY)
+                .name("locale")
+                .description("BCP 47 content language tag.")
+                .required(false);
     }
 
     private Mono<ServerResponse> getByName(ServerRequest request) {

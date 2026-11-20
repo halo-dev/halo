@@ -10,7 +10,6 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
@@ -20,6 +19,7 @@ import run.halo.app.extension.GroupVersion;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.PageRequest;
+import run.halo.app.localization.PublicApiLocalizationFilter;
 import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.PostPublicQueryService;
 import run.halo.app.theme.finders.vo.ListedPostVo;
@@ -43,11 +43,12 @@ class PostQueryEndpointTest {
     @Mock
     private PostPublicQueryService postPublicQueryService;
 
-    @InjectMocks
     private PostQueryEndpoint endpoint;
 
     @BeforeEach
     public void setUp() {
+        PublicApiLocalizationFilter localizationFilter = (request, next) -> next.handle(request);
+        endpoint = new PostQueryEndpoint(postFinder, postPublicQueryService, localizationFilter);
         webClient = WebTestClient.bindToRouterFunction(endpoint.endpoint()).build();
     }
 
