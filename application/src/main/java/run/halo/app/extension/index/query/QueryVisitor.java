@@ -134,9 +134,22 @@ public class QueryVisitor<E extends Extension> implements Visitor {
                 left.visit(this);
                 return;
             }
+            // Evaluate the positive side first, then refine it with the negated leaf, so that the negated side does
+            // not build a complement over the whole index.
+            if (isNegatedLeaf(left) && !isNegatedLeaf(right)) {
+                right.visit(this);
+                if (!result.isEmpty()) {
+                    refineCandidates(result, left);
+                }
+                return;
+            }
             left.visit(this);
             // fail fast if left result is empty
             if (result.isEmpty()) {
+                return;
+            }
+            if (isNegatedLeaf(right)) {
+                refineCandidates(result, right);
                 return;
             }
             var rightVisitor = new ConditionVisitor();
@@ -182,6 +195,96 @@ public class QueryVisitor<E extends Extension> implements Visitor {
                 rightResult.addAll(result);
                 setResult(rightResult);
             }
+        }
+
+        /**
+         * Checks whether the condition can refine an existing candidate set instead of building a complement.
+         *
+         * <p>Label conditions are excluded because the label index does not expose per-entity lookups.
+         */
+        private static boolean isNegatedLeaf(Condition condition) {
+            var effective = unwrap(condition);
+            return effective instanceof NotEqualCondition
+                    || effective instanceof NotInCondition
+                    || effective instanceof NotBetweenCondition
+                    || effective instanceof IsNotNullCondition
+                    || effective instanceof StringNotContainsCondition
+                    || effective instanceof StringNotStartsWithCondition
+                    || effective instanceof StringNotEndsWithCondition;
+        }
+
+        /** Strips a {@link NotCondition}, so that {@code NOT (a)} is treated as the counterpart of {@code a}. */
+        private static Condition unwrap(Condition condition) {
+            return condition instanceof NotCondition(var inner) ? inner.not() : condition;
+        }
+
+        /**
+         * Removes the candidates that do not match the negated condition, keeping the result in place.
+         *
+         * <p>Building the complement traverses the whole index, while refining touches only the candidates.
+         */
+        private void refineCandidates(Set<String> candidates, Condition condition) {
+            switch (unwrap(condition)) {
+                case NotEqualCondition(var indexName, var key) -> refineNotEqual(candidates, indexName, key);
+                case NotInCondition(var indexName, var keys) -> refineNotIn(candidates, indexName, keys);
+                case NotBetweenCondition bc -> refineNotBetween(candidates, bc);
+                case IsNotNullCondition(var indexName) -> refineIsNotNull(candidates, indexName);
+                case StringNotContainsCondition(var indexName, var keyword) ->
+                    refineStringNotContains(candidates, indexName, keyword);
+                case StringNotStartsWithCondition(var indexName, var prefix) ->
+                    refineStringNotStartsWith(candidates, indexName, prefix);
+                case StringNotEndsWithCondition(var indexName, var suffix) ->
+                    refineStringNotEndsWith(candidates, indexName, suffix);
+                default -> throw new IllegalArgumentException("Unsupported condition to refine: " + condition);
+            }
+        }
+
+        private <K extends Comparable<K>> void refineNotEqual(Set<String> candidates, String indexName, Object key) {
+            var index = this.<K>getValueIndexQuery(indexName);
+            index.notEqual(candidates, convertKey(index, key));
+        }
+
+        private <K extends Comparable<K>> void refineNotIn(
+                Set<String> candidates, String indexName, Collection<Object> keys) {
+            var index = this.<K>getValueIndexQuery(indexName);
+            index.notIn(
+                    candidates, keys.stream().map(key -> convertKey(index, key)).toList());
+        }
+
+        private <K extends Comparable<K>> void refineNotBetween(Set<String> candidates, NotBetweenCondition condition) {
+            var index = this.<K>getValueIndexQuery(condition.indexName());
+            index.notBetween(
+                    candidates,
+                    convertKey(index, condition.fromKey()),
+                    condition.fromInclusive(),
+                    convertKey(index, condition.toKey()),
+                    condition.toInclusive());
+        }
+
+        private <K extends Comparable<K>> void refineIsNotNull(Set<String> candidates, String indexName) {
+            this.<K>getValueIndexQuery(indexName).isNotNull(candidates);
+        }
+
+        private <K extends Comparable<K>> void refineStringNotContains(
+                Set<String> candidates, String indexName, String keyword) {
+            this.<K>getValueIndexQuery(indexName).stringNotContains(candidates, keyword);
+        }
+
+        private <K extends Comparable<K>> void refineStringNotStartsWith(
+                Set<String> candidates, String indexName, String prefix) {
+            this.<K>getValueIndexQuery(indexName).stringNotStartsWith(candidates, prefix);
+        }
+
+        private <K extends Comparable<K>> void refineStringNotEndsWith(
+                Set<String> candidates, String indexName, String suffix) {
+            this.<K>getValueIndexQuery(indexName).stringNotEndsWith(candidates, suffix);
+        }
+
+        private <K extends Comparable<K>> K convertKey(ValueIndexQuery<K> index, Object key) {
+            if (!conversionService.canConvert(key.getClass(), index.getKeyType())) {
+                throw new IllegalArgumentException("Cannot convert key: " + key + " to type: " + index.getKeyType());
+            }
+            return conversionService.convert(key, index.getKeyType());
         }
 
         private Set<String> labelInQuery(String labelKey, Collection<String> labelValues, boolean negated) {

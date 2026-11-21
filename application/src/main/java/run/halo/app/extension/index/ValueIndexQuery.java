@@ -37,6 +37,16 @@ public interface ValueIndexQuery<K extends Comparable<K>> {
     Set<String> notEqual(K key);
 
     /**
+     * Removes the candidates that match the given key from the candidates instead of building the complement over the
+     * whole index, and returns the remaining candidates.
+     *
+     * @param candidates the candidates to refine; must be mutable and owned by the caller
+     * @param key the key to compare
+     * @return the same candidate set
+     */
+    Set<String> notEqual(Set<String> candidates, K key);
+
+    /**
      * Gets all entity IDs in the index.
      *
      * @return the set of all entity IDs
@@ -66,6 +76,14 @@ public interface ValueIndexQuery<K extends Comparable<K>> {
     Set<String> notBetween(K fromKey, boolean fromInclusive, K toKey, boolean toInclusive);
 
     /**
+     * Refines the candidates with the negated range check instead of building the complement over the whole index.
+     *
+     * @param candidates the candidates to refine; must be mutable and owned by the caller
+     * @return the same candidate set
+     */
+    Set<String> notBetween(Set<String> candidates, K fromKey, boolean fromInclusive, K toKey, boolean toInclusive);
+
+    /**
      * Gets entity IDs with keys in the specified collection.
      *
      * @param keys the collection of keys
@@ -80,6 +98,14 @@ public interface ValueIndexQuery<K extends Comparable<K>> {
      * @return the set of entity IDs with keys not in the collection
      */
     Set<String> notIn(Collection<K> keys);
+
+    /**
+     * Refines the candidates with the negated membership check instead of building the complement over the whole index.
+     *
+     * @param candidates the candidates to refine; must be mutable and owned by the caller
+     * @return the same candidate set
+     */
+    Set<String> notIn(Set<String> candidates, Collection<K> keys);
 
     /**
      * Gets entity IDs with keys less than the specified key.
@@ -115,6 +141,14 @@ public interface ValueIndexQuery<K extends Comparable<K>> {
     Set<String> isNotNull();
 
     /**
+     * Removes the candidates without a key from the candidates instead of collecting every non-null key in the index.
+     *
+     * @param candidates the candidates to refine; must be mutable and owned by the caller
+     * @return the same candidate set
+     */
+    Set<String> isNotNull(Set<String> candidates);
+
+    /**
      * Gets entity IDs where the string representation of the key contains the specified keyword.
      *
      * @param keyword the keyword to search for
@@ -131,6 +165,15 @@ public interface ValueIndexQuery<K extends Comparable<K>> {
      * @throws IllegalArgumentException if the key type is not String
      */
     Set<String> stringNotContains(String keyword);
+
+    /**
+     * Refines the candidates with the negated "contains" check instead of scanning the whole index.
+     *
+     * @param candidates the candidates to refine; must be mutable and owned by the caller
+     * @param keyword the keyword to search for
+     * @return the same candidate set
+     */
+    Set<String> stringNotContains(Set<String> candidates, String keyword);
 
     /**
      * Gets entity IDs where the string representation of the key starts with the specified prefix.
@@ -151,6 +194,15 @@ public interface ValueIndexQuery<K extends Comparable<K>> {
     Set<String> stringNotStartsWith(String prefix);
 
     /**
+     * Refines the candidates with the negated "starts with" check instead of collecting the complement in the index.
+     *
+     * @param candidates the candidates to refine; must be mutable and owned by the caller
+     * @param prefix the prefix to search for
+     * @return the same candidate set
+     */
+    Set<String> stringNotStartsWith(Set<String> candidates, String prefix);
+
+    /**
      * Gets entity IDs where the string representation of the key ends with the specified suffix.
      *
      * @param suffix the suffix to search for
@@ -167,4 +219,13 @@ public interface ValueIndexQuery<K extends Comparable<K>> {
      * @throws IllegalArgumentException if the key type is not String
      */
     Set<String> stringNotEndsWith(String suffix);
+
+    /**
+     * Refines the candidates with the negated "ends with" check instead of scanning the whole index.
+     *
+     * @param candidates the candidates to refine; must be mutable and owned by the caller
+     * @param suffix the suffix to search for
+     * @return the same candidate set
+     */
+    Set<String> stringNotEndsWith(Set<String> candidates, String suffix);
 }
