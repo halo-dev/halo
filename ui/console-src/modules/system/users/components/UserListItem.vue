@@ -208,7 +208,10 @@ function handleSwitchUser() {
         v-if="currentUser?.user.metadata.name !== user.user.metadata.name"
       />
       <VDropdownItem
-        v-if="currentUser?.user.metadata.name !== user.user.metadata.name"
+        v-if="
+          currentUser?.user.metadata.name !== user.user.metadata.name &&
+          utils.permission.has(['*'])
+        "
         type="danger"
         @click="
           handleEnableOrDisableUser({
