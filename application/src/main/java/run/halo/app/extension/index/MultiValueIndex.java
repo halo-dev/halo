@@ -24,7 +24,8 @@ import run.halo.app.extension.Extension;
  * @since 2.22.0
  */
 @Slf4j
-class MultiValueIndex<E extends Extension, K extends Comparable<K>> implements ValueIndexQuery<K>, Index<E, K> {
+class MultiValueIndex<E extends Extension, K extends Comparable<K>>
+        implements ValueIndexQuery<K>, Index<E, K>, SortableIndex {
 
     private final ConcurrentNavigableMap<K, Set<String>> index;
 
@@ -130,6 +131,13 @@ class MultiValueIndex<E extends Extension, K extends Comparable<K>> implements V
     @Override
     public Set<String> between(K fromKey, boolean fromInclusive, K toKey, boolean toInclusive) {
         throw new UnsupportedOperationException("Multi-value index does not support between operation");
+    }
+
+    @Override
+    public Stream<String> sortedStream(Set<String> candidates, boolean descending, Comparator<String> tieBreaker) {
+        // How many buckets a candidate belongs to is not tracked cheaply, so group the candidates by key instead of
+        // walking the index.
+        return SortedCandidates.order(candidates, index, this::getSortKey, Long.MAX_VALUE, descending, tieBreaker);
     }
 
     @Override

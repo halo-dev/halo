@@ -201,8 +201,8 @@ public class QueryVisitor<E extends Extension> implements Visitor {
          * Checks whether the condition can refine an existing candidate set instead of evaluating itself over the whole
          * index.
          *
-         * <p>These leaves either build a complement (negated conditions) or scan every key (string matchers). Label
-         * conditions are excluded because the label index does not expose per-entity lookups.
+         * <p>These leaves either build a complement (negated conditions) or materialize their matches over the index
+         * (string matchers). Label conditions are excluded because the label index does not expose per-entity lookups.
          */
         private static boolean isRefinableLeaf(Condition condition) {
             var effective = unwrap(condition);
