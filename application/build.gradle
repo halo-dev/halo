@@ -79,6 +79,7 @@ tasks.named('jar') {
 dependencies {
     implementation project(':api')
     implementation libs.r2dbc.migrate.starter
+    implementation libs.json.schema.validator
     annotationProcessor platform(project(':platform:application'))
 
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
