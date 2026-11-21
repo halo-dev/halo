@@ -747,6 +747,15 @@ class SingleValueIndexTest {
                         index.notBetween(candidates, "string1", true, "string2", false));
 
                 candidates = candidateSet();
+                assertEquals(index.stringContains("ing2"), index.stringContains(candidates, "ing2"));
+
+                candidates = candidateSet();
+                assertEquals(index.stringStartsWith("string2"), index.stringStartsWith(candidates, "string2"));
+
+                candidates = candidateSet();
+                assertEquals(index.stringEndsWith("ing2"), index.stringEndsWith(candidates, "ing2"));
+
+                candidates = candidateSet();
                 assertEquals(index.isNotNull(), index.isNotNull(candidates));
 
                 candidates = candidateSet();
