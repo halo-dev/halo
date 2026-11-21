@@ -437,6 +437,142 @@ class QueryVisitorTest {
     }
 
     @Test
+    void shouldRefineAndConditionWithNegatedRightCondition() {
+        var index = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
+        var query = (ValueIndexQuery) index;
+        when(indices.getIndex("metadata.name")).thenReturn(index);
+        when(query.equal("name1")).thenReturn(mutableSet("a", "b", "c"));
+        when(index.getKeyType()).thenReturn(String.class);
+        when(query.notEqual(anySet(), eq("name2"))).thenAnswer(invocation -> {
+            Set<String> candidates = invocation.getArgument(0);
+            candidates.remove("c");
+            return candidates;
+        });
+        var condition = Queries.equal("metadata.name", "name1").and(Queries.notEqual("metadata.name", "name2"));
+        condition.visit(visitor);
+        assertEquals(Set.of("a", "b"), visitor.getResult());
+        verify(query, never()).notEqual("name2");
+    }
+
+    @Test
+    void shouldRefineAndConditionWithNegatedLeftCondition() {
+        var index = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
+        var query = (ValueIndexQuery) index;
+        when(indices.getIndex("metadata.name")).thenReturn(index);
+        when(query.equal("name1")).thenReturn(mutableSet("a", "b"));
+        when(index.getKeyType()).thenReturn(String.class);
+        when(query.notEqual(anySet(), eq("name2"))).thenAnswer(invocation -> {
+            Set<String> candidates = invocation.getArgument(0);
+            candidates.remove("b");
+            return candidates;
+        });
+        // The positive side is evaluated first, then refined by the negated side, so that no complement is built.
+        var condition = Queries.notEqual("metadata.name", "name2").and(Queries.equal("metadata.name", "name1"));
+        condition.visit(visitor);
+        assertEquals(Set.of("a"), visitor.getResult());
+        verify(query, never()).notEqual("name2");
+    }
+
+    @Test
+    void shouldRefineAndConditionWithNestedNotCondition() {
+        var index = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
+        var query = (ValueIndexQuery) index;
+        when(indices.getIndex("metadata.name")).thenReturn(index);
+        when(query.equal("name1")).thenReturn(mutableSet("a", "b"));
+        when(index.getKeyType()).thenReturn(String.class);
+        when(query.notEqual(anySet(), eq("name2"))).thenAnswer(invocation -> {
+            Set<String> candidates = invocation.getArgument(0);
+            candidates.remove("b");
+            return candidates;
+        });
+        var condition =
+                Queries.equal("metadata.name", "name1").and(new NotCondition(Queries.equal("metadata.name", "name2")));
+        condition.visit(visitor);
+        assertEquals(Set.of("a"), visitor.getResult());
+        verify(query, never()).notEqual("name2");
+    }
+
+    @Test
+    void shouldRefineAndConditionWithNegatedInCondition() {
+        var index = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
+        var query = (ValueIndexQuery) index;
+        when(indices.getIndex("metadata.name")).thenReturn(index);
+        when(query.equal("name1")).thenReturn(mutableSet("a", "b", "c"));
+        when(index.getKeyType()).thenReturn(String.class);
+        when(query.notIn(anySet(), anyCollection())).thenAnswer(invocation -> {
+            Set<String> candidates = invocation.getArgument(0);
+            candidates.removeAll(List.of("b", "c"));
+            return candidates;
+        });
+        var condition = Queries.equal("metadata.name", "name1")
+                .and(Queries.in("metadata.name", Set.<String>of("name2", "name3"))
+                        .not());
+        condition.visit(visitor);
+        assertEquals(Set.of("a"), visitor.getResult());
+        verify(conversionService).convert("name2", String.class);
+        verify(conversionService).convert("name3", String.class);
+    }
+
+    @Test
+    void shouldRefineAndConditionWithNotBetweenCondition() {
+        var index = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
+        var query = (ValueIndexQuery) index;
+        when(indices.getIndex("metadata.age")).thenReturn(index);
+        when(query.equal(18)).thenReturn(mutableSet("a", "b", "c"));
+        when(index.getKeyType()).thenReturn(Integer.class);
+        when(query.notBetween(anySet(), eq(18), eq(false), eq(65), eq(true))).thenAnswer(invocation -> {
+            Set<String> candidates = invocation.getArgument(0);
+            candidates.remove("b");
+            return candidates;
+        });
+        var condition = Queries.equal("metadata.age", 18)
+                .and(Queries.between("metadata.age", 18, true, 65, false).not());
+        condition.visit(visitor);
+        assertEquals(Set.of("a", "c"), visitor.getResult());
+        verify(query, never()).notBetween(18, false, 65, true);
+    }
+
+    @Test
+    void shouldRefineAndConditionWithIsNotNullCondition() {
+        var index = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
+        var query = (ValueIndexQuery) index;
+        when(indices.getIndex("metadata.name")).thenReturn(index);
+        when(query.equal("name1")).thenReturn(mutableSet("a", "b"));
+        when(index.getKeyType()).thenReturn(String.class);
+        when(indices.getIndex("metadata.optionalField")).thenReturn(index);
+        when(query.isNotNull(anySet())).thenAnswer(invocation -> {
+            Set<String> candidates = invocation.getArgument(0);
+            candidates.remove("b");
+            return candidates;
+        });
+        var condition = Queries.equal("metadata.name", "name1")
+                .and(Queries.isNull("metadata.optionalField").not());
+        condition.visit(visitor);
+        assertEquals(Set.of("a"), visitor.getResult());
+        verify(query, never()).isNotNull();
+    }
+
+    @Test
+    void shouldRefineAndConditionWithStringNotContainsCondition() {
+        var index = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
+        var query = (ValueIndexQuery) index;
+        when(indices.getIndex("metadata.description")).thenReturn(index);
+        when(query.equal("name1")).thenReturn(mutableSet("a", "b", "c"));
+        when(index.getKeyType()).thenReturn(String.class);
+        when(query.stringNotContains(anySet(), eq("keyword"))).thenAnswer(invocation -> {
+            Set<String> candidates = invocation.getArgument(0);
+            candidates.remove("c");
+            return candidates;
+        });
+        var condition = Queries.equal("metadata.description", "name1")
+                .and(Queries.contains("metadata.description", "keyword").not());
+        condition.visit(visitor);
+        assertEquals(Set.of("a", "b"), visitor.getResult());
+        verify(query, never()).stringNotContains("keyword");
+        verify(conversionService, never()).convert("keyword", String.class);
+    }
+
+    @Test
     void shouldVisitNestedAndOrCondition() {
         var index = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
         var query = (ValueIndexQuery) index;

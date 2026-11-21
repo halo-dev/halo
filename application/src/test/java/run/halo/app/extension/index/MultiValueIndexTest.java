@@ -6,6 +6,7 @@ import static org.mockito.Mockito.lenient;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -749,6 +750,43 @@ class MultiValueIndexTest {
             @Test
             void stringNotEndsWithQuery() {
                 assertThrows(UnsupportedOperationException.class, () -> index.stringNotEndsWith("ing"));
+            }
+
+            @Test
+            void shouldRefineCandidatesLikeQueryOverWholeIndex() {
+                assertEquals(index.notEqual("string2"), index.notEqual(candidateSet(), "string2"));
+
+                assertEquals(
+                        index.notIn(Set.of("string1", "string3")),
+                        index.notIn(candidateSet(), Set.of("string1", "string3")));
+
+                assertEquals(index.notIn(Set.<String>of()), index.notIn(candidateSet(), Set.<String>of()));
+
+                assertEquals(index.isNotNull(), index.isNotNull(candidateSet()));
+            }
+
+            @Test
+            void shouldRemoveCandidatesMissingInIndexWhenRefining() {
+                var candidates = new HashSet<>(Set.of("fake1", "fake2", "fake3", "missing"));
+                assertEquals(Set.of("fake2", "fake3"), index.notEqual(candidates, "string1"));
+            }
+
+            @Test
+            void shouldRejectUnsupportedRefinements() {
+                assertThrows(
+                        UnsupportedOperationException.class,
+                        () -> index.notBetween(new HashSet<>(), "string1", true, "string2", false));
+                assertThrows(
+                        UnsupportedOperationException.class, () -> index.stringNotContains(new HashSet<>(), "ing"));
+                assertThrows(
+                        UnsupportedOperationException.class,
+                        () -> index.stringNotStartsWith(new HashSet<>(), "string"));
+                assertThrows(
+                        UnsupportedOperationException.class, () -> index.stringNotEndsWith(new HashSet<>(), "ing"));
+            }
+
+            private Set<String> candidateSet() {
+                return new HashSet<>(Set.of("fake1", "fake2", "fake3", "fakenull"));
             }
         }
     }

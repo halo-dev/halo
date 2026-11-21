@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
@@ -352,6 +353,7 @@ class SingleValueIndexTest {
             @Test
             void isNotNullQuery() {
                 assertThrows(IllegalArgumentException.class, () -> index.isNotNull());
+                assertThrows(IllegalArgumentException.class, () -> index.isNotNull(new HashSet<>()));
             }
 
             @Test
@@ -727,6 +729,44 @@ class SingleValueIndexTest {
             void stringNotEndsWithQuery() {
                 assertEquals(Set.of("fake2", "fake3"), index.stringNotEndsWith("ing1"));
                 assertEquals(Set.of("fake1", "fake2"), index.stringNotEndsWith("ing3"));
+            }
+
+            @Test
+            void shouldRefineCandidatesLikeQueryOverWholeIndex() {
+                var candidates = candidateSet();
+                assertEquals(index.notEqual("string2"), index.notEqual(candidates, "string2"));
+
+                candidates = candidateSet();
+                assertEquals(
+                        index.notIn(Set.of("string1", "string3")),
+                        index.notIn(candidates, Set.of("string1", "string3")));
+
+                candidates = candidateSet();
+                assertEquals(
+                        index.notBetween("string1", true, "string2", false),
+                        index.notBetween(candidates, "string1", true, "string2", false));
+
+                candidates = candidateSet();
+                assertEquals(index.isNotNull(), index.isNotNull(candidates));
+
+                candidates = candidateSet();
+                assertEquals(index.stringNotContains("ing2"), index.stringNotContains(candidates, "ing2"));
+
+                candidates = candidateSet();
+                assertEquals(index.stringNotStartsWith("string2"), index.stringNotStartsWith(candidates, "string2"));
+
+                candidates = candidateSet();
+                assertEquals(index.stringNotEndsWith("ing1"), index.stringNotEndsWith(candidates, "ing1"));
+            }
+
+            @Test
+            void shouldRemoveCandidatesMissingInIndexWhenRefining() {
+                var candidates = new HashSet<>(Set.of("fake1", "missing"));
+                assertEquals(Set.of("fake1"), index.notEqual(candidates, "string2"));
+            }
+
+            private Set<String> candidateSet() {
+                return new HashSet<>(Set.of("fake1", "fake2", "fake3", "fakenull"));
             }
         }
     }

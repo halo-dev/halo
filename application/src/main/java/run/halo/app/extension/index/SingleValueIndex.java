@@ -73,6 +73,15 @@ class SingleValueIndex<E extends Extension, K extends Comparable<K>> implements 
     }
 
     @Override
+    public Set<String> notEqual(Set<String> candidates, K key) {
+        candidates.removeIf(primaryKey -> {
+            var currentKey = invertedIndex.get(primaryKey);
+            return currentKey == null || currentKey.equals(key);
+        });
+        return candidates;
+    }
+
+    @Override
     public Set<String> between(K fromKey, boolean fromInclusive, K toKey, boolean toInclusive) {
         Assert.notNull(fromKey, "From key must not be null");
         Assert.notNull(toKey, "To key must not be null");
@@ -108,6 +117,24 @@ class SingleValueIndex<E extends Extension, K extends Comparable<K>> implements 
     }
 
     @Override
+    public Set<String> notBetween(
+            Set<String> candidates, K fromKey, boolean fromInclusive, K toKey, boolean toInclusive) {
+        Assert.notNull(fromKey, "From key must not be null");
+        Assert.notNull(toKey, "To key must not be null");
+        Assert.isTrue(fromKey.compareTo(toKey) <= 0, "From key must be less than or equal to to key");
+        candidates.removeIf(primaryKey -> {
+            var currentKey = invertedIndex.get(primaryKey);
+            if (currentKey == null) {
+                return true;
+            }
+            var belowFrom = fromInclusive ? currentKey.compareTo(fromKey) < 0 : currentKey.compareTo(fromKey) <= 0;
+            var aboveTo = toInclusive ? currentKey.compareTo(toKey) > 0 : currentKey.compareTo(toKey) >= 0;
+            return !belowFrom && !aboveTo;
+        });
+        return candidates;
+    }
+
+    @Override
     public Set<String> notIn(Collection<K> keys) {
         if (CollectionUtils.isEmpty(keys)) {
             return new HashSet<>();
@@ -119,6 +146,21 @@ class SingleValueIndex<E extends Extension, K extends Comparable<K>> implements 
                 .map(Map.Entry::getValue)
                 .flatMap(Set::stream)
                 .collect(Collectors.toCollection(HashSet::new));
+    }
+
+    @Override
+    public Set<String> notIn(Set<String> candidates, Collection<K> keys) {
+        if (CollectionUtils.isEmpty(keys)) {
+            // Keep in sync with notIn(Collection), which returns an empty set for empty keys.
+            candidates.clear();
+            return candidates;
+        }
+        var keySet = keys instanceof Set<K> set ? set : new HashSet<>(keys);
+        candidates.removeIf(primaryKey -> {
+            var currentKey = invertedIndex.get(primaryKey);
+            return currentKey == null || keySet.contains(currentKey);
+        });
+        return candidates;
     }
 
     @Override
@@ -150,6 +192,13 @@ class SingleValueIndex<E extends Extension, K extends Comparable<K>> implements 
     }
 
     @Override
+    public Set<String> isNotNull(Set<String> candidates) {
+        Assert.isTrue(spec.isNullable(), "Index is not nullable");
+        candidates.removeIf(primaryKey -> invertedIndex.get(primaryKey) == null);
+        return candidates;
+    }
+
+    @Override
     public Set<String> stringContains(String keyword) {
         ensureStringKeyType();
         return index.entrySet().stream()
@@ -167,6 +216,16 @@ class SingleValueIndex<E extends Extension, K extends Comparable<K>> implements 
                 .map(Map.Entry::getValue)
                 .flatMap(Set::stream)
                 .collect(Collectors.toCollection(HashSet::new));
+    }
+
+    @Override
+    public Set<String> stringNotContains(Set<String> candidates, String keyword) {
+        ensureStringKeyType();
+        candidates.removeIf(primaryKey -> {
+            var currentKey = invertedIndex.get(primaryKey);
+            return currentKey == null || StringUtils.containsIgnoreCase(currentKey.toString(), keyword);
+        });
+        return candidates;
     }
 
     @Override
@@ -190,6 +249,21 @@ class SingleValueIndex<E extends Extension, K extends Comparable<K>> implements 
     }
 
     @Override
+    public Set<String> stringNotStartsWith(Set<String> candidates, String prefix) {
+        ensureStringKeyType();
+        var toKey = prefix + Character.MAX_VALUE;
+        candidates.removeIf(primaryKey -> {
+            var currentKey = invertedIndex.get(primaryKey);
+            if (currentKey == null) {
+                return true;
+            }
+            var keyString = currentKey.toString();
+            return keyString.compareTo(prefix) >= 0 && keyString.compareTo(toKey) < 0;
+        });
+        return candidates;
+    }
+
+    @Override
     public Set<String> stringEndsWith(String suffix) {
         ensureStringKeyType();
         return index.entrySet().stream()
@@ -207,6 +281,16 @@ class SingleValueIndex<E extends Extension, K extends Comparable<K>> implements 
                 .map(Map.Entry::getValue)
                 .flatMap(Set::stream)
                 .collect(Collectors.toCollection(HashSet::new));
+    }
+
+    @Override
+    public Set<String> stringNotEndsWith(Set<String> candidates, String suffix) {
+        ensureStringKeyType();
+        candidates.removeIf(primaryKey -> {
+            var currentKey = invertedIndex.get(primaryKey);
+            return currentKey == null || StringUtils.endsWithIgnoreCase(currentKey.toString(), suffix);
+        });
+        return candidates;
     }
 
     @Override
