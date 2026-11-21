@@ -825,6 +825,43 @@ class UserEndpointTest {
     }
 
     @Nested
+    class AvatarDeleteTest {
+
+        @Test
+        void shouldDeleteAvatarAndRedactSecrets() {
+            var metadata = new Metadata();
+            metadata.setName("fake-user");
+            metadata.setAnnotations(new HashMap<>(Map.of(User.AVATAR_ATTACHMENT_NAME_ANNO, "fake-attachment")));
+            var user = new User();
+            user.setMetadata(metadata);
+            user.getSpec().setAvatar("fake-avatar.png");
+            user.getSpec().setPassword("fake-password");
+            user.getSpec().setTotpEncryptedSecret("encrypted-secret");
+
+            when(client.get(User.class, "fake-user")).thenReturn(Mono.just(user));
+            when(client.update(user)).thenReturn(Mono.just(user));
+
+            webClient
+                    .delete()
+                    .uri("/users/-/avatar")
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .jsonPath("$.spec.avatar")
+                    .doesNotExist()
+                    .jsonPath("$.metadata.annotations['halo.run/avatar-attachment-name']")
+                    .doesNotExist()
+                    .jsonPath("$.spec.password")
+                    .doesNotExist()
+                    .jsonPath("$.spec.totpEncryptedSecret")
+                    .doesNotExist();
+
+            verify(client).update(user);
+        }
+    }
+
+    @Nested
     class AvatarUploadTest {
         @Test
         void respondWithErrorIfExtensionNotAllowed() {
