@@ -34,6 +34,7 @@ import run.halo.app.extension.*;
 import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.localization.ResourcePresentationService;
 import run.halo.app.theme.finders.CommentPublicQueryService;
 import run.halo.app.theme.finders.vo.*;
 
@@ -50,10 +51,11 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
 
     private static final String COMMENT_VIEW_PERMISSION = "role-template-view-comments";
 
-    private final ReactiveExtensionClient client;
+    private final ReactivePresentationExtensionClient client;
     private final UserService userService;
     private final CounterService counterService;
     private final CommentPermalinkService permalinkService;
+    private final ResourcePresentationService presentation;
 
     @Override
     public Mono<CommentVo> getByName(String name) {
@@ -64,6 +66,7 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
         return toCommentVo(comment)
                 .flatMap(vo -> permalinkService
                         .getPermalink(comment)
+                        .flatMap(presentation::presentUrl)
                         .doOnNext(vo::setPermalink)
                         .thenReturn(vo));
     }
@@ -88,6 +91,7 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
                         .flatMap(this::toReplyVo)
                         .flatMap(vo -> permalinkService
                                 .getSubjectUrl(comment.getSpec().getSubjectRef())
+                                .flatMap(presentation::presentUrl)
                                 .doOnNext(url -> vo.setPermalink(
                                         CommentPermalinkService.getPermalink(url, commentName, replyName)))
                                 .thenReturn(vo)));
@@ -107,6 +111,7 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
                 .flatMap(listOptions -> client.listBy(Comment.class, listOptions, pageRequest))
                 .flatMap(listResult -> permalinkService
                         .getSubjectUrl(ref)
+                        .flatMap(presentation::presentUrl)
                         .defaultIfEmpty("")
                         .flatMap(subjectUrl -> Flux.fromStream(listResult.get())
                                 .map(comment -> ref == null ? toCommentVoWithPermalink(comment) : toCommentVo(comment))
@@ -154,6 +159,7 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
                     return client.listBy(Reply.class, listOptions, pageRequest)
                             .flatMap(list -> permalinkService
                                     .getSubjectUrl(comment.getSpec().getSubjectRef())
+                                    .flatMap(presentation::presentUrl)
                                     .defaultIfEmpty("")
                                     .flatMap(subjectUrl -> Flux.fromStream(
                                                     list.get().map(this::toReplyVo))
@@ -270,7 +276,10 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
         if (Comment.CommentOwner.KIND_EMAIL.equals(owner.getKind())) {
             return Mono.just(OwnerInfo.from(owner));
         }
-        return userService.getUserOrGhost(owner.getName()).map(OwnerInfo::from);
+        return userService
+                .getUserOrGhost(owner.getName())
+                .flatMap(presentation::present)
+                .map(OwnerInfo::from);
     }
 
     private Mono<ListOptions> populateCommentListOptions(@Nullable Ref ref) {

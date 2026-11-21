@@ -19,9 +19,10 @@ import run.halo.app.core.extension.content.Category;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.extension.GroupVersion;
 import run.halo.app.extension.ListResult;
-import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.ReactivePresentationExtensionClient;
 import run.halo.app.extension.index.query.Queries;
 import run.halo.app.extension.router.SortableRequest;
+import run.halo.app.localization.PublicApiLocalizationFilter;
 import run.halo.app.theme.finders.PostPublicQueryService;
 import run.halo.app.theme.finders.vo.CategoryVo;
 import run.halo.app.theme.finders.vo.ListedPostVo;
@@ -36,8 +37,9 @@ import run.halo.app.theme.finders.vo.ListedPostVo;
 @RequiredArgsConstructor
 public class CategoryQueryEndpoint implements CustomEndpoint {
 
-    private final ReactiveExtensionClient client;
+    private final ReactivePresentationExtensionClient client;
     private final PostPublicQueryService postPublicQueryService;
+    private final PublicApiLocalizationFilter publicApiLocalizationFilter;
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
@@ -62,6 +64,7 @@ public class CategoryQueryEndpoint implements CustomEndpoint {
                                         .name("name")
                                         .description("Category metadata.name")
                                         .required(true))
+                                .parameter(PublicApiUtils.localeParameter())
                                 .response(responseBuilder().implementation(CategoryVo.class)))
                 .GET("categories/{name}/posts", this::listPostsByCategoryName, builder -> {
                     builder.operationId("queryPostsByCategoryName")
@@ -76,6 +79,7 @@ public class CategoryQueryEndpoint implements CustomEndpoint {
                                     .implementation(ListResult.generateGenericClass(ListedPostVo.class)));
                     PostPublicQuery.buildParameters(builder);
                 })
+                .filter(publicApiLocalizationFilter)
                 .build();
     }
 
@@ -117,6 +121,7 @@ public class CategoryQueryEndpoint implements CustomEndpoint {
 
         public static void buildParameters(Builder builder) {
             SortableRequest.buildParameters(builder);
+            builder.parameter(PublicApiUtils.localeParameter());
         }
     }
 

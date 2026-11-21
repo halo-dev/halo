@@ -28,6 +28,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.reactive.function.server.HandlerFunction;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -50,6 +51,7 @@ import run.halo.app.infra.exception.AccessDeniedException;
 import run.halo.app.infra.exception.RateLimitExceededException;
 import run.halo.app.infra.utils.HaloUtils;
 import run.halo.app.infra.utils.IpAddressUtils;
+import run.halo.app.localization.PublicApiLocalizationFilter;
 import run.halo.app.theme.finders.CommentFinder;
 import run.halo.app.theme.finders.CommentPublicQueryService;
 import run.halo.app.theme.finders.vo.CommentVo;
@@ -66,6 +68,7 @@ public class CommentFinderEndpoint implements CustomEndpoint {
     private final ReplyService replyService;
     private final SystemConfigFetcher environmentFetcher;
     private final RateLimiterRegistry rateLimiterRegistry;
+    private final PublicApiLocalizationFilter publicApiLocalizationFilter;
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
@@ -101,15 +104,16 @@ public class CommentFinderEndpoint implements CustomEndpoint {
                                                 .mediaType(MediaType.APPLICATION_JSON_VALUE)
                                                 .schema(schemaBuilder().implementation(ReplyRequest.class))))
                                 .response(responseBuilder().implementation(Reply.class)))
-                .GET("comments", this::listComments, builder -> {
+                .GET("comments", localized(this::listComments), builder -> {
                     builder.operationId("ListComments_1")
                             .description("List comments.")
                             .tag(tag)
                             .response(responseBuilder()
                                     .implementation(ListResult.generateGenericClass(CommentWithReplyVo.class)));
                     CommentQuery.buildParameters(builder);
+                    builder.parameter(PublicApiUtils.localeParameter());
                 })
-                .GET("comments/{name}", this::getComment, builder -> {
+                .GET("comments/{name}", localized(this::getComment), builder -> {
                     builder.operationId("GetComment")
                             .description("Get a comment.")
                             .tag(tag)
@@ -119,11 +123,12 @@ public class CommentFinderEndpoint implements CustomEndpoint {
                                     .in(ParameterIn.PATH)
                                     .required(true)
                                     .implementation(String.class))
+                            .parameter(PublicApiUtils.localeParameter())
                             .response(responseBuilder().implementation(CommentVo.class));
                 })
                 .GET(
                         "comments/{name}/reply/{replyName}",
-                        this::getCommentReply,
+                        localized(this::getCommentReply),
                         builder -> builder.operationId("GetCommentReply")
                                 .description("Get a visible reply under a comment.")
                                 .tag(tag)
@@ -137,11 +142,12 @@ public class CommentFinderEndpoint implements CustomEndpoint {
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
+                                .parameter(PublicApiUtils.localeParameter())
                                 .response(responseBuilder().responseCode("200").implementation(ReplyVo.class))
                                 .response(responseBuilder()
                                         .responseCode("404")
                                         .description("Comment or reply is unavailable.")))
-                .GET("comments/{name}/reply", this::listCommentReplies, builder -> {
+                .GET("comments/{name}/reply", localized(this::listCommentReplies), builder -> {
                     builder.operationId("ListCommentReplies")
                             .description("List comment replies.")
                             .tag(tag)
@@ -151,10 +157,15 @@ public class CommentFinderEndpoint implements CustomEndpoint {
                                     .in(ParameterIn.PATH)
                                     .required(true)
                                     .implementation(String.class))
+                            .parameter(PublicApiUtils.localeParameter())
                             .response(responseBuilder().implementation(ListResult.generateGenericClass(ReplyVo.class)));
                     PageableRequest.buildParameters(builder);
                 })
                 .build();
+    }
+
+    private HandlerFunction<ServerResponse> localized(HandlerFunction<ServerResponse> handler) {
+        return request -> publicApiLocalizationFilter.filter(request, handler);
     }
 
     @Override

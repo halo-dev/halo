@@ -14,6 +14,11 @@ import org.jspecify.annotations.Nullable;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
 import run.halo.app.extension.GroupVersionKind;
+import run.halo.app.localization.Localizable;
+import run.halo.app.localization.LocalizableNested;
+import run.halo.app.localization.LocalizableResource;
+import run.halo.app.localization.LocalizableSchema;
+import run.halo.app.localization.LocalizableSearchTitle;
 
 /**
  * Category extension for grouping posts and building category archives.
@@ -27,6 +32,7 @@ import run.halo.app.extension.GroupVersionKind;
 @ToString(callSuper = true)
 @GVK(group = Constant.GROUP, version = Constant.VERSION, kind = KIND, plural = "categories", singular = "category")
 @EqualsAndHashCode(callSuper = true)
+@LocalizableResource(label = "core.post_category.title")
 public class Category extends AbstractExtension {
 
     public static final String KIND = "Category";
@@ -38,6 +44,7 @@ public class Category extends AbstractExtension {
     /** Desired state of the category, including display information, hierarchy, and theme templates. */
     @Schema(requiredMode = REQUIRED)
     @Nullable
+    @LocalizableNested
     private CategorySpec spec;
 
     /** Observed state of the category, including permalink and post counters. */
@@ -55,6 +62,8 @@ public class Category extends AbstractExtension {
 
         /** Display name of the category. */
         @Schema(requiredMode = REQUIRED, minLength = 1)
+        @LocalizableSearchTitle
+        @Localizable(key = "displayName", label = "core.localization.field.displayName", required = true)
         private String displayName;
 
         /** URL slug used to build the category permalink. */
@@ -62,9 +71,11 @@ public class Category extends AbstractExtension {
         private String slug;
 
         /** Human-readable description of the category. */
+        @Localizable(key = "description", label = "core.localization.field.description", multiline = true)
         private String description;
 
         /** Cover image URL or attachment URI of the category. */
+        @Localizable(key = "cover", label = "core.localization.field.cover", type = LocalizableSchema.Type.IMAGE)
         private String cover;
 
         /** Theme template used to render the category archive page. */

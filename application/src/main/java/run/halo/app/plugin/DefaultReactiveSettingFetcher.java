@@ -26,6 +26,8 @@ import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.infra.utils.ReactiveUtils;
 import run.halo.app.infra.utils.SystemConfigUtils;
+import run.halo.app.localization.LocalizationContext;
+import run.halo.app.localization.ResourceLocalizationService;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -46,6 +48,7 @@ class DefaultReactiveSettingFetcher
     private final ObjectMapper v2Mapper = JsonUtils.mapper();
 
     private final ReactiveExtensionClient client;
+    private final ResourceLocalizationService localizationService;
 
     private final Mono<ConfigMap> configMapCache;
 
@@ -58,8 +61,12 @@ class DefaultReactiveSettingFetcher
 
     private final String configMapName;
 
-    public DefaultReactiveSettingFetcher(PluginContext pluginContext, ReactiveExtensionClient client) {
+    public DefaultReactiveSettingFetcher(
+            PluginContext pluginContext,
+            ReactiveExtensionClient client,
+            ResourceLocalizationService localizationService) {
         this.client = client;
+        this.localizationService = localizationService;
         this.pluginName = pluginContext.getName();
         this.configMapName = pluginContext.getConfigMapName();
         this.configMapCache = Mono.defer(() -> {
@@ -88,7 +95,7 @@ class DefaultReactiveSettingFetcher
 
     @Override
     public Mono<Map<String, JsonNode>> getValues() {
-        return configMapCache
+        return displayConfig()
                 .mapNotNull(ConfigMap::getData)
                 .map(this::toJackson2JsonNodeMap)
                 .defaultIfEmpty(Map.of());
@@ -96,10 +103,16 @@ class DefaultReactiveSettingFetcher
 
     @Override
     public Mono<Map<String, tools.jackson.databind.JsonNode>> getSettingValues() {
-        return configMapCache
+        return displayConfig()
                 .mapNotNull(ConfigMap::getData)
                 .map(this::toJackson3JsonNodeMap)
                 .defaultIfEmpty(Map.of());
+    }
+
+    private Mono<ConfigMap> displayConfig() {
+        return configMapCache.flatMap(config -> LocalizationContext.current()
+                .flatMap(context -> localizationService.localizeSettings(config, context))
+                .defaultIfEmpty(config));
     }
 
     private Map<String, tools.jackson.databind.JsonNode> toJackson3JsonNodeMap(@Nullable Map<String, String> data) {

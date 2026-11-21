@@ -10,7 +10,7 @@ import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.PageRequestImpl;
-import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.ReactivePresentationExtensionClient;
 import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.extension.router.selector.LabelSelector;
 import run.halo.app.theme.finders.Finder;
@@ -26,7 +26,7 @@ import run.halo.app.theme.finders.vo.SiteStatsVo;
 @AllArgsConstructor
 @Finder("siteStatsFinder")
 public class SiteStatsFinderImpl implements SiteStatsFinder {
-    private final ReactiveExtensionClient client;
+    private final ReactivePresentationExtensionClient client;
     private final CounterService counterService;
 
     @Override

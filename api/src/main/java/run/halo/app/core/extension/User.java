@@ -12,6 +12,10 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
+import run.halo.app.localization.Localizable;
+import run.halo.app.localization.LocalizableNested;
+import run.halo.app.localization.LocalizableResource;
+import run.halo.app.localization.LocalizableSearchTitle;
 
 /**
  * User extension that stores profile, authentication, and account state for a Halo user.
@@ -22,6 +26,7 @@ import run.halo.app.extension.GVK;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @GVK(group = GROUP, version = VERSION, kind = KIND, singular = "user", plural = "users")
+@LocalizableResource(label = "core.author.title")
 public class User extends AbstractExtension {
 
     public static final String GROUP = "";
@@ -44,6 +49,7 @@ public class User extends AbstractExtension {
 
     /** Desired user profile and authentication settings. */
     @Schema(requiredMode = REQUIRED)
+    @LocalizableNested
     private UserSpec spec = new UserSpec();
 
     /** Observed user state derived by the application. */
@@ -55,6 +61,8 @@ public class User extends AbstractExtension {
 
         /** Display name shown for the user. */
         @Schema(requiredMode = REQUIRED)
+        @LocalizableSearchTitle
+        @Localizable(key = "displayName", label = "core.localization.field.displayName", required = true)
         private String displayName;
 
         /** Avatar URL or attachment URI for the user. */
@@ -73,6 +81,7 @@ public class User extends AbstractExtension {
         private String password;
 
         /** User biography shown on profile surfaces. */
+        @Localizable(key = "bio", label = "core.localization.field.bio", multiline = true)
         private String bio;
 
         /** Time when the user registered. */

@@ -133,10 +133,11 @@ export const CommentV1alpha1PublicApiAxiosParamCreator = function (configuration
         /**
          * Get a comment.
          * @param {string} name metadata.name of the comment to fetch.
+         * @param {string} [locale] BCP 47 content language tag.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getComment: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getComment: async (name: string, locale?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
             assertParamExists('getComment', 'name', name)
             const localVarPath = `/apis/api.halo.run/v1alpha1/comments/{name}`
@@ -160,6 +161,10 @@ export const CommentV1alpha1PublicApiAxiosParamCreator = function (configuration
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            if (locale !== undefined) {
+                localVarQueryParameter['locale'] = locale;
+            }
+
             localVarHeaderParameter['Accept'] = '*/*';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -175,10 +180,11 @@ export const CommentV1alpha1PublicApiAxiosParamCreator = function (configuration
          * Get a visible reply under a comment.
          * @param {string} name 
          * @param {string} replyName 
+         * @param {string} [locale] BCP 47 content language tag.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getCommentReply: async (name: string, replyName: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getCommentReply: async (name: string, replyName: string, locale?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
             assertParamExists('getCommentReply', 'name', name)
             // verify required parameter 'replyName' is not null or undefined
@@ -205,6 +211,10 @@ export const CommentV1alpha1PublicApiAxiosParamCreator = function (configuration
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            if (locale !== undefined) {
+                localVarQueryParameter['locale'] = locale;
+            }
+
             localVarHeaderParameter['Accept'] = '*/*';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -219,12 +229,13 @@ export const CommentV1alpha1PublicApiAxiosParamCreator = function (configuration
         /**
          * List comment replies.
          * @param {string} name metadata.name of the comment whose replies will be listed.
+         * @param {string} [locale] BCP 47 content language tag.
          * @param {number} [page] Page number. Default is 0.
          * @param {number} [size] Size number. Default is 0.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listCommentReplies: async (name: string, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listCommentReplies: async (name: string, locale?: string, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
             assertParamExists('listCommentReplies', 'name', name)
             const localVarPath = `/apis/api.halo.run/v1alpha1/comments/{name}/reply`
@@ -247,6 +258,10 @@ export const CommentV1alpha1PublicApiAxiosParamCreator = function (configuration
             // authentication bearerAuth required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (locale !== undefined) {
+                localVarQueryParameter['locale'] = locale;
+            }
 
             if (page !== undefined) {
                 localVarQueryParameter['page'] = page;
@@ -278,10 +293,11 @@ export const CommentV1alpha1PublicApiAxiosParamCreator = function (configuration
          * @param {string} [group] The comment subject group.
          * @param {boolean} [withReplies] Whether to include replies. Default is false.
          * @param {number} [replySize] Reply size of the comment, default is 10, only works when withReplies is true.
+         * @param {string} [locale] BCP 47 content language tag.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listComments1: async (version: string, kind: string, name: string, page?: number, size?: number, sort?: Array<string>, group?: string, withReplies?: boolean, replySize?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listComments1: async (version: string, kind: string, name: string, page?: number, size?: number, sort?: Array<string>, group?: string, withReplies?: boolean, replySize?: number, locale?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'version' is not null or undefined
             assertParamExists('listComments1', 'version', version)
             // verify required parameter 'kind' is not null or undefined
@@ -344,6 +360,10 @@ export const CommentV1alpha1PublicApiAxiosParamCreator = function (configuration
                 localVarQueryParameter['replySize'] = replySize;
             }
 
+            if (locale !== undefined) {
+                localVarQueryParameter['locale'] = locale;
+            }
+
             localVarHeaderParameter['Accept'] = '*/*';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -392,11 +412,12 @@ export const CommentV1alpha1PublicApiFp = function(configuration?: Configuration
         /**
          * Get a comment.
          * @param {string} name metadata.name of the comment to fetch.
+         * @param {string} [locale] BCP 47 content language tag.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getComment(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CommentVo>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getComment(name, options);
+        async getComment(name: string, locale?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CommentVo>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getComment(name, locale, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CommentV1alpha1PublicApi.getComment']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -405,11 +426,12 @@ export const CommentV1alpha1PublicApiFp = function(configuration?: Configuration
          * Get a visible reply under a comment.
          * @param {string} name 
          * @param {string} replyName 
+         * @param {string} [locale] BCP 47 content language tag.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getCommentReply(name: string, replyName: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ReplyVo>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getCommentReply(name, replyName, options);
+        async getCommentReply(name: string, replyName: string, locale?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ReplyVo>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getCommentReply(name, replyName, locale, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CommentV1alpha1PublicApi.getCommentReply']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -417,13 +439,14 @@ export const CommentV1alpha1PublicApiFp = function(configuration?: Configuration
         /**
          * List comment replies.
          * @param {string} name metadata.name of the comment whose replies will be listed.
+         * @param {string} [locale] BCP 47 content language tag.
          * @param {number} [page] Page number. Default is 0.
          * @param {number} [size] Size number. Default is 0.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listCommentReplies(name: string, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ReplyVoList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listCommentReplies(name, page, size, options);
+        async listCommentReplies(name: string, locale?: string, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ReplyVoList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listCommentReplies(name, locale, page, size, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CommentV1alpha1PublicApi.listCommentReplies']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -439,11 +462,12 @@ export const CommentV1alpha1PublicApiFp = function(configuration?: Configuration
          * @param {string} [group] The comment subject group.
          * @param {boolean} [withReplies] Whether to include replies. Default is false.
          * @param {number} [replySize] Reply size of the comment, default is 10, only works when withReplies is true.
+         * @param {string} [locale] BCP 47 content language tag.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listComments1(version: string, kind: string, name: string, page?: number, size?: number, sort?: Array<string>, group?: string, withReplies?: boolean, replySize?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CommentWithReplyVoList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listComments1(version, kind, name, page, size, sort, group, withReplies, replySize, options);
+        async listComments1(version: string, kind: string, name: string, page?: number, size?: number, sort?: Array<string>, group?: string, withReplies?: boolean, replySize?: number, locale?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CommentWithReplyVoList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listComments1(version, kind, name, page, size, sort, group, withReplies, replySize, locale, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CommentV1alpha1PublicApi.listComments1']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -482,7 +506,7 @@ export const CommentV1alpha1PublicApiFactory = function (configuration?: Configu
          * @throws {RequiredError}
          */
         getComment(requestParameters: CommentV1alpha1PublicApiGetCommentRequest, options?: RawAxiosRequestConfig): AxiosPromise<CommentVo> {
-            return localVarFp.getComment(requestParameters.name, options).then((request) => request(axios, basePath));
+            return localVarFp.getComment(requestParameters.name, requestParameters.locale, options).then((request) => request(axios, basePath));
         },
         /**
          * Get a visible reply under a comment.
@@ -491,7 +515,7 @@ export const CommentV1alpha1PublicApiFactory = function (configuration?: Configu
          * @throws {RequiredError}
          */
         getCommentReply(requestParameters: CommentV1alpha1PublicApiGetCommentReplyRequest, options?: RawAxiosRequestConfig): AxiosPromise<ReplyVo> {
-            return localVarFp.getCommentReply(requestParameters.name, requestParameters.replyName, options).then((request) => request(axios, basePath));
+            return localVarFp.getCommentReply(requestParameters.name, requestParameters.replyName, requestParameters.locale, options).then((request) => request(axios, basePath));
         },
         /**
          * List comment replies.
@@ -500,7 +524,7 @@ export const CommentV1alpha1PublicApiFactory = function (configuration?: Configu
          * @throws {RequiredError}
          */
         listCommentReplies(requestParameters: CommentV1alpha1PublicApiListCommentRepliesRequest, options?: RawAxiosRequestConfig): AxiosPromise<ReplyVoList> {
-            return localVarFp.listCommentReplies(requestParameters.name, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
+            return localVarFp.listCommentReplies(requestParameters.name, requestParameters.locale, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
          * List comments.
@@ -509,7 +533,7 @@ export const CommentV1alpha1PublicApiFactory = function (configuration?: Configu
          * @throws {RequiredError}
          */
         listComments1(requestParameters: CommentV1alpha1PublicApiListComments1Request, options?: RawAxiosRequestConfig): AxiosPromise<CommentWithReplyVoList> {
-            return localVarFp.listComments1(requestParameters.version, requestParameters.kind, requestParameters.name, requestParameters.page, requestParameters.size, requestParameters.sort, requestParameters.group, requestParameters.withReplies, requestParameters.replySize, options).then((request) => request(axios, basePath));
+            return localVarFp.listComments1(requestParameters.version, requestParameters.kind, requestParameters.name, requestParameters.page, requestParameters.size, requestParameters.sort, requestParameters.group, requestParameters.withReplies, requestParameters.replySize, requestParameters.locale, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -541,6 +565,11 @@ export interface CommentV1alpha1PublicApiGetCommentRequest {
      * metadata.name of the comment to fetch.
      */
     readonly name: string
+
+    /**
+     * BCP 47 content language tag.
+     */
+    readonly locale?: string
 }
 
 /**
@@ -550,6 +579,11 @@ export interface CommentV1alpha1PublicApiGetCommentReplyRequest {
     readonly name: string
 
     readonly replyName: string
+
+    /**
+     * BCP 47 content language tag.
+     */
+    readonly locale?: string
 }
 
 /**
@@ -560,6 +594,11 @@ export interface CommentV1alpha1PublicApiListCommentRepliesRequest {
      * metadata.name of the comment whose replies will be listed.
      */
     readonly name: string
+
+    /**
+     * BCP 47 content language tag.
+     */
+    readonly locale?: string
 
     /**
      * Page number. Default is 0.
@@ -620,6 +659,11 @@ export interface CommentV1alpha1PublicApiListComments1Request {
      * Reply size of the comment, default is 10, only works when withReplies is true.
      */
     readonly replySize?: number
+
+    /**
+     * BCP 47 content language tag.
+     */
+    readonly locale?: string
 }
 
 /**
@@ -653,7 +697,7 @@ export class CommentV1alpha1PublicApi extends BaseAPI {
      * @throws {RequiredError}
      */
     public getComment(requestParameters: CommentV1alpha1PublicApiGetCommentRequest, options?: RawAxiosRequestConfig) {
-        return CommentV1alpha1PublicApiFp(this.configuration).getComment(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+        return CommentV1alpha1PublicApiFp(this.configuration).getComment(requestParameters.name, requestParameters.locale, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -663,7 +707,7 @@ export class CommentV1alpha1PublicApi extends BaseAPI {
      * @throws {RequiredError}
      */
     public getCommentReply(requestParameters: CommentV1alpha1PublicApiGetCommentReplyRequest, options?: RawAxiosRequestConfig) {
-        return CommentV1alpha1PublicApiFp(this.configuration).getCommentReply(requestParameters.name, requestParameters.replyName, options).then((request) => request(this.axios, this.basePath));
+        return CommentV1alpha1PublicApiFp(this.configuration).getCommentReply(requestParameters.name, requestParameters.replyName, requestParameters.locale, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -673,7 +717,7 @@ export class CommentV1alpha1PublicApi extends BaseAPI {
      * @throws {RequiredError}
      */
     public listCommentReplies(requestParameters: CommentV1alpha1PublicApiListCommentRepliesRequest, options?: RawAxiosRequestConfig) {
-        return CommentV1alpha1PublicApiFp(this.configuration).listCommentReplies(requestParameters.name, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
+        return CommentV1alpha1PublicApiFp(this.configuration).listCommentReplies(requestParameters.name, requestParameters.locale, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -683,7 +727,7 @@ export class CommentV1alpha1PublicApi extends BaseAPI {
      * @throws {RequiredError}
      */
     public listComments1(requestParameters: CommentV1alpha1PublicApiListComments1Request, options?: RawAxiosRequestConfig) {
-        return CommentV1alpha1PublicApiFp(this.configuration).listComments1(requestParameters.version, requestParameters.kind, requestParameters.name, requestParameters.page, requestParameters.size, requestParameters.sort, requestParameters.group, requestParameters.withReplies, requestParameters.replySize, options).then((request) => request(this.axios, this.basePath));
+        return CommentV1alpha1PublicApiFp(this.configuration).listComments1(requestParameters.version, requestParameters.kind, requestParameters.name, requestParameters.page, requestParameters.size, requestParameters.sort, requestParameters.group, requestParameters.withReplies, requestParameters.replySize, requestParameters.locale, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

@@ -43,7 +43,7 @@ import run.halo.app.theme.router.ReactiveQueryPostPredicateResolver;
 @AllArgsConstructor
 class PostFinderImpl implements PostFinder {
 
-    private final ReactiveExtensionClient client;
+    private final ReactivePresentationExtensionClient client;
 
     private final PostPublicQueryService postPublicQueryService;
 

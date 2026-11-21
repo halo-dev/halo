@@ -9,6 +9,8 @@ import lombok.ToString;
 import org.jspecify.annotations.Nullable;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
+import run.halo.app.localization.LocalizableNested;
+import run.halo.app.localization.LocalizableResource;
 
 /**
  * Reply extension that belongs to a top-level {@link Comment}.
@@ -21,6 +23,7 @@ import run.halo.app.extension.GVK;
 @ToString(callSuper = true)
 @GVK(group = Constant.GROUP, version = Constant.VERSION, kind = Reply.KIND, plural = "replies", singular = "reply")
 @EqualsAndHashCode(callSuper = true)
+@LocalizableResource(label = "core.reply.title")
 public class Reply extends AbstractExtension {
 
     public static final String KIND = "Reply";
@@ -29,6 +32,7 @@ public class Reply extends AbstractExtension {
 
     /** Desired state of the reply, including the parent comment, optional quoted reply, owner, and body. */
     @Schema(requiredMode = REQUIRED)
+    @LocalizableNested
     private ReplySpec spec;
 
     /** Observed state of the reply. */

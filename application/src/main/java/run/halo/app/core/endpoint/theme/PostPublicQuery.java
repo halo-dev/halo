@@ -18,5 +18,6 @@ public class PostPublicQuery extends SortableRequest {
 
     public static void buildParameters(Builder builder) {
         SortableRequest.buildParameters(builder);
+        builder.parameter(PublicApiUtils.localeParameter());
     }
 }

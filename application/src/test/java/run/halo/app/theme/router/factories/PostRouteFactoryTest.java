@@ -26,7 +26,7 @@ import run.halo.app.content.TestPost;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.MetadataUtil;
-import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.ReactivePresentationExtensionClient;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.vo.PostVo;
@@ -48,7 +48,7 @@ class PostRouteFactoryTest extends RouteFactoryTestSuite {
     private PostViewNameResolver postViewNameResolver;
 
     @Mock
-    private ReactiveExtensionClient client;
+    private ReactivePresentationExtensionClient client;
 
     @Mock
     private ReactiveQueryPostPredicateResolver predicateResolver;

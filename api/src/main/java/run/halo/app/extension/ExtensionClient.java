@@ -1,72 +1,16 @@
 package run.halo.app.extension;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Predicate;
-import org.springframework.data.domain.Sort;
 import run.halo.app.extension.index.IndexedQueryEngine;
 
 /**
- * ExtensionClient is an interface which contains some operations on Extension instead of ExtensionStore. <br>
- * <br>
- * Please note that this client can only use in non-reactive environment. If you want to use Extension client in
- * reactive environment, please use {@link ReactiveExtensionClient} instead.
+ * Blocking extension client for non-reactive environments.
+ *
+ * <p>Read operations belong to {@link ExtensionReadClient}. This interface adds source mutation and lifecycle
+ * operations. Reactive code should use {@link ReactiveExtensionClient} instead.
  *
  * @author johnniang
  */
-public interface ExtensionClient {
-
-    /**
-     * Lists Extensions by Extension type, filter and sorter.
-     *
-     * @param type is the class type of Extension.
-     * @param predicate filters the reEnqueue.
-     * @param comparator sorts the reEnqueue.
-     * @param <E> is Extension type.
-     * @return all filtered and sorted Extensions.
-     */
-    <E extends Extension> List<E> list(Class<E> type, Predicate<E> predicate, Comparator<E> comparator);
-
-    /**
-     * Lists Extensions by Extension type, filter, sorter and page info.
-     *
-     * @param type is the class type of Extension.
-     * @param predicate filters the reEnqueue.
-     * @param comparator sorts the reEnqueue.
-     * @param page is page number which starts from 0.
-     * @param size is page size.
-     * @param <E> is Extension type.
-     * @return a list of Extensions.
-     * @deprecated use {@link #listAll(Class, ListOptions, Sort)} instead.
-     */
-    @Deprecated
-    <E extends Extension> ListResult<E> list(
-            Class<E> type, Predicate<E> predicate, Comparator<E> comparator, int page, int size);
-
-    <E extends Extension> List<E> listAll(Class<E> type, ListOptions options, Sort sort);
-
-    <E extends Extension> List<String> listAllNames(Class<E> type, ListOptions options, Sort sort);
-
-    <E extends Extension> List<String> listTopNames(Class<E> type, ListOptions options, Sort sort, int topN);
-
-    <E extends Extension> ListResult<E> listBy(Class<E> type, ListOptions options, PageRequest page);
-
-    <E extends Extension> ListResult<String> listNamesBy(Class<E> type, ListOptions options, PageRequest page);
-
-    <E extends Extension> long countBy(Class<E> type, ListOptions options);
-
-    /**
-     * Fetches Extension by its type and name.
-     *
-     * @param type is Extension type.
-     * @param name is Extension name.
-     * @param <E> is Extension type.
-     * @return an optional Extension.
-     */
-    <E extends Extension> Optional<E> fetch(Class<E> type, String name);
-
-    Optional<Unstructured> fetch(GroupVersionKind gvk, String name);
+public interface ExtensionClient extends ExtensionReadClient {
 
     /**
      * Creates an Extension.

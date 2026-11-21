@@ -31,10 +31,11 @@ export const MenuV1alpha1PublicApiAxiosParamCreator = function (configuration?: 
         /**
          * Gets menu by metadata.name.
          * @param {string} name Menu metadata.name
+         * @param {string} [locale] BCP 47 content language tag.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        queryMenuByName: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        queryMenuByName: async (name: string, locale?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
             assertParamExists('queryMenuByName', 'name', name)
             const localVarPath = `/apis/api.halo.run/v1alpha1/menus/{name}`
@@ -58,6 +59,10 @@ export const MenuV1alpha1PublicApiAxiosParamCreator = function (configuration?: 
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            if (locale !== undefined) {
+                localVarQueryParameter['locale'] = locale;
+            }
+
             localVarHeaderParameter['Accept'] = '*/*';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -71,10 +76,11 @@ export const MenuV1alpha1PublicApiAxiosParamCreator = function (configuration?: 
         },
         /**
          * Gets primary menu.
+         * @param {string} [locale] BCP 47 content language tag.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        queryPrimaryMenu: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        queryPrimaryMenu: async (locale?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/api.halo.run/v1alpha1/menus/-`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -94,6 +100,10 @@ export const MenuV1alpha1PublicApiAxiosParamCreator = function (configuration?: 
             // authentication bearerAuth required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (locale !== undefined) {
+                localVarQueryParameter['locale'] = locale;
+            }
 
             localVarHeaderParameter['Accept'] = '*/*';
 
@@ -118,22 +128,24 @@ export const MenuV1alpha1PublicApiFp = function(configuration?: Configuration) {
         /**
          * Gets menu by metadata.name.
          * @param {string} name Menu metadata.name
+         * @param {string} [locale] BCP 47 content language tag.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async queryMenuByName(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<MenuVo>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.queryMenuByName(name, options);
+        async queryMenuByName(name: string, locale?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<MenuVo>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.queryMenuByName(name, locale, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['MenuV1alpha1PublicApi.queryMenuByName']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * Gets primary menu.
+         * @param {string} [locale] BCP 47 content language tag.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async queryPrimaryMenu(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<MenuVo>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.queryPrimaryMenu(options);
+        async queryPrimaryMenu(locale?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<MenuVo>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.queryPrimaryMenu(locale, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['MenuV1alpha1PublicApi.queryPrimaryMenu']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -154,15 +166,16 @@ export const MenuV1alpha1PublicApiFactory = function (configuration?: Configurat
          * @throws {RequiredError}
          */
         queryMenuByName(requestParameters: MenuV1alpha1PublicApiQueryMenuByNameRequest, options?: RawAxiosRequestConfig): AxiosPromise<MenuVo> {
-            return localVarFp.queryMenuByName(requestParameters.name, options).then((request) => request(axios, basePath));
+            return localVarFp.queryMenuByName(requestParameters.name, requestParameters.locale, options).then((request) => request(axios, basePath));
         },
         /**
          * Gets primary menu.
+         * @param {MenuV1alpha1PublicApiQueryPrimaryMenuRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        queryPrimaryMenu(options?: RawAxiosRequestConfig): AxiosPromise<MenuVo> {
-            return localVarFp.queryPrimaryMenu(options).then((request) => request(axios, basePath));
+        queryPrimaryMenu(requestParameters: MenuV1alpha1PublicApiQueryPrimaryMenuRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<MenuVo> {
+            return localVarFp.queryPrimaryMenu(requestParameters.locale, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -175,6 +188,21 @@ export interface MenuV1alpha1PublicApiQueryMenuByNameRequest {
      * Menu metadata.name
      */
     readonly name: string
+
+    /**
+     * BCP 47 content language tag.
+     */
+    readonly locale?: string
+}
+
+/**
+ * Request parameters for queryPrimaryMenu operation in MenuV1alpha1PublicApi.
+ */
+export interface MenuV1alpha1PublicApiQueryPrimaryMenuRequest {
+    /**
+     * BCP 47 content language tag.
+     */
+    readonly locale?: string
 }
 
 /**
@@ -188,16 +216,17 @@ export class MenuV1alpha1PublicApi extends BaseAPI {
      * @throws {RequiredError}
      */
     public queryMenuByName(requestParameters: MenuV1alpha1PublicApiQueryMenuByNameRequest, options?: RawAxiosRequestConfig) {
-        return MenuV1alpha1PublicApiFp(this.configuration).queryMenuByName(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+        return MenuV1alpha1PublicApiFp(this.configuration).queryMenuByName(requestParameters.name, requestParameters.locale, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Gets primary menu.
+     * @param {MenuV1alpha1PublicApiQueryPrimaryMenuRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    public queryPrimaryMenu(options?: RawAxiosRequestConfig) {
-        return MenuV1alpha1PublicApiFp(this.configuration).queryPrimaryMenu(options).then((request) => request(this.axios, this.basePath));
+    public queryPrimaryMenu(requestParameters: MenuV1alpha1PublicApiQueryPrimaryMenuRequest = {}, options?: RawAxiosRequestConfig) {
+        return MenuV1alpha1PublicApiFp(this.configuration).queryPrimaryMenu(requestParameters.locale, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

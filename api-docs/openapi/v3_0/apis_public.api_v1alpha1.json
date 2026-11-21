@@ -72,6 +72,14 @@
                 "type": "string"
               }
             }
+          },
+          {
+            "description": "BCP 47 content language tag.",
+            "in": "query",
+            "name": "locale",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -101,6 +109,14 @@
             "in": "path",
             "name": "name",
             "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "BCP 47 content language tag.",
+            "in": "query",
+            "name": "locale",
             "schema": {
               "type": "string"
             }
@@ -187,6 +203,14 @@
                 "type": "string"
               }
             }
+          },
+          {
+            "description": "BCP 47 content language tag.",
+            "in": "query",
+            "name": "locale",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -261,6 +285,14 @@
                 "type": "string"
               }
             }
+          },
+          {
+            "description": "BCP 47 content language tag.",
+            "in": "query",
+            "name": "locale",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -290,6 +322,14 @@
             "in": "path",
             "name": "name",
             "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "BCP 47 content language tag.",
+            "in": "query",
+            "name": "locale",
             "schema": {
               "type": "string"
             }
@@ -330,6 +370,14 @@
             "description": "Scope of navigation. Use \u0027category\u0027 to limit navigation to the post\u0027s primary category. Defaults to global scope.",
             "in": "query",
             "name": "scope",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "BCP 47 content language tag.",
+            "in": "query",
+            "name": "locale",
             "schema": {
               "type": "string"
             }
@@ -407,6 +455,14 @@
                 "type": "string"
               }
             }
+          },
+          {
+            "description": "BCP 47 content language tag.",
+            "in": "query",
+            "name": "locale",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -436,6 +492,14 @@
             "in": "path",
             "name": "name",
             "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "BCP 47 content language tag.",
+            "in": "query",
+            "name": "locale",
             "schema": {
               "type": "string"
             }
@@ -513,6 +577,14 @@
                 "type": "string"
               }
             }
+          },
+          {
+            "description": "BCP 47 content language tag.",
+            "in": "query",
+            "name": "locale",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -542,6 +614,14 @@
             "in": "path",
             "name": "name",
             "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "BCP 47 content language tag.",
+            "in": "query",
+            "name": "locale",
             "schema": {
               "type": "string"
             }
@@ -627,6 +707,14 @@
               "items": {
                 "type": "string"
               }
+            }
+          },
+          {
+            "description": "BCP 47 content language tag.",
+            "in": "query",
+            "name": "locale",
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -732,6 +820,14 @@
               "type": "integer",
               "format": "int32"
             }
+          },
+          {
+            "description": "BCP 47 content language tag.",
+            "in": "query",
+            "name": "locale",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -793,6 +889,14 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "description": "BCP 47 content language tag.",
+            "in": "query",
+            "name": "locale",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -822,6 +926,14 @@
             "in": "path",
             "name": "name",
             "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "BCP 47 content language tag.",
+            "in": "query",
+            "name": "locale",
             "schema": {
               "type": "string"
             }
@@ -922,6 +1034,14 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "description": "BCP 47 content language tag.",
+            "in": "query",
+            "name": "locale",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -948,6 +1068,16 @@
       "post": {
         "description": "Search indices.",
         "operationId": "IndicesSearch",
+        "parameters": [
+          {
+            "description": "BCP 47 content language tag.",
+            "in": "query",
+            "name": "locale",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "*/*": {
@@ -956,7 +1086,7 @@
               }
             }
           },
-          "description": "Please note that the \"filterPublished\", \"filterExposed\" and \"filterRecycled\" fields are ignored in this endpoint."
+          "description": "Please note that the \"filterPublished\", \"filterExposed\" and \"filterRecycled\" fields are ignored in this endpoint. The search language follows the current localization context."
         },
         "responses": {
           "default": {
@@ -979,6 +1109,16 @@
       "get": {
         "description": "Gets primary menu.",
         "operationId": "queryPrimaryMenu",
+        "parameters": [
+          {
+            "description": "BCP 47 content language tag.",
+            "in": "query",
+            "name": "locale",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "default": {
             "content": {
@@ -1006,6 +1146,14 @@
             "in": "path",
             "name": "name",
             "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "BCP 47 content language tag.",
+            "in": "query",
+            "name": "locale",
             "schema": {
               "type": "string"
             }
@@ -2048,6 +2196,10 @@
             "type": "string",
             "description": "Document ID. It should be unique globally."
           },
+          "locale": {
+            "type": "string",
+            "description": "Content language of a localized search variant, expressed as a BCP 47 tag such as \u003ccode\u003een\u003c/code\u003e or \u003ccode\u003ezh-Hant\u003c/code\u003e.\n A null value identifies an original document, regardless of the language in which its content was written.\n\n \u003cp\u003eCore sets this field when expanding {@link HaloDocumentVariantProvider.Variant HaloDocumentVariantProvider.Variant} values. Locale-aware search\n engines use it to isolate translated results from original-document searches. It does not change resource\n ownership or visibility."
+          },
           "metadataName": {
             "minLength": 1,
             "type": "string",
@@ -2070,6 +2222,10 @@
           "recycled": {
             "type": "boolean",
             "description": "Whether the document is recycled."
+          },
+          "sourceId": {
+            "type": "string",
+            "description": "Index ID of the original document from which this language variant was derived, or null for an original document.\n It refers to the original document\u0027s {@link run.halo.app.search.HaloDocument#id #id}, not its resource\u0027s {@link run.halo.app.search.HaloDocument#metadataName #metadataName}.\n\n \u003cp\u003eCore assigns this relationship during variant expansion. Search engines that support localized documents\n remove existing variants referencing this ID when the source is replaced or deleted, preventing stale\n translations from remaining searchable."
           },
           "tags": {
             "type": "array",
@@ -3261,6 +3417,11 @@
             "type": "integer",
             "description": "Limit of result.",
             "format": "int32"
+          },
+          "locale": {
+            "pattern": "[a-zA-Z]{2,8}(-[a-zA-Z0-9]{1,8})*",
+            "type": "string",
+            "description": "BCP 47 content locale derived from the trusted localization context. The public search endpoint ignores locale in the request body. A null value searches original documents only."
           }
         },
         "description": "Search option. It is used to control search behavior."

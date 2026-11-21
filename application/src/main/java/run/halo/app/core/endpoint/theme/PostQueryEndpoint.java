@@ -17,6 +17,7 @@ import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.extension.GroupVersion;
 import run.halo.app.extension.ListResult;
 import run.halo.app.infra.exception.NotFoundException;
+import run.halo.app.localization.PublicApiLocalizationFilter;
 import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.PostPublicQueryService;
 import run.halo.app.theme.finders.vo.ListedPostVo;
@@ -35,6 +36,7 @@ public class PostQueryEndpoint implements CustomEndpoint {
 
     private final PostFinder postFinder;
     private final PostPublicQueryService postPublicQueryService;
+    private final PublicApiLocalizationFilter publicApiLocalizationFilter;
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
@@ -59,6 +61,7 @@ public class PostQueryEndpoint implements CustomEndpoint {
                                         .name("name")
                                         .description("Post metadata.name")
                                         .required(true))
+                                .parameter(PublicApiUtils.localeParameter())
                                 .response(responseBuilder().implementation(PostVo.class)))
                 .GET(
                         "posts/{name}/navigation",
@@ -78,7 +81,9 @@ public class PostQueryEndpoint implements CustomEndpoint {
                                                 + "limit navigation to the post's primary category."
                                                 + " Defaults to global scope.")
                                         .required(false))
+                                .parameter(PublicApiUtils.localeParameter())
                                 .response(responseBuilder().implementation(NavigationPostVo.class)))
+                .filter(publicApiLocalizationFilter)
                 .build();
     }
 

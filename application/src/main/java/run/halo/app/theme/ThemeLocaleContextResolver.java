@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.adapter.WebHttpHandlerBuilder;
 import org.springframework.web.server.i18n.AcceptHeaderLocaleContextResolver;
+import run.halo.app.localization.LocalizationContext;
 
 /**
  * @author guqing
@@ -32,7 +33,10 @@ public class ThemeLocaleContextResolver extends AcceptHeaderLocaleContextResolve
     @Override
     public LocaleContext resolveLocaleContext(ServerWebExchange exchange) {
         var request = exchange.getRequest();
-        var locale = getLocaleFromQueryParameter(request)
+        var locale = Optional.ofNullable(
+                        (LocalizationContext) exchange.getAttribute(LocalizationContext.class.getName()))
+                .map(LocalizationContext::targetLocale)
+                .or(() -> getLocaleFromQueryParameter(request))
                 .or(() -> getLocaleFromCookie(request))
                 .or(() -> UserLocaleRequestAttributeWriteFilter.getUserLocale(request))
                 .orElseGet(() -> super.resolveLocaleContext(exchange).getLocale());

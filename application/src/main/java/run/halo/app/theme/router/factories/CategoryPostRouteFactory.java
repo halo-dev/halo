@@ -17,7 +17,7 @@ import run.halo.app.core.extension.content.Category;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.PageRequestImpl;
-import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.ReactivePresentationExtensionClient;
 import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
@@ -48,7 +48,7 @@ public class CategoryPostRouteFactory implements RouteFactory {
     private final PostFinder postFinder;
 
     private final SystemConfigFetcher environmentFetcher;
-    private final ReactiveExtensionClient client;
+    private final ReactivePresentationExtensionClient client;
     private final ViewNameResolver viewNameResolver;
 
     private final TitleVisibilityIdentifyCalculator titleVisibilityIdentifyCalculator;

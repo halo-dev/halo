@@ -76,6 +76,21 @@ class ContentTemplateHeadProcessorTest {
             assertThat(result.get(1)).containsEntry("name", "description").containsEntry("content", "test description");
         }
 
+        @Test
+        void fillsExcerptWithoutEscapingOrChangingSourceMetadata() {
+            String excerpt = "An \"excerpt\" & <text>";
+            var description = Map.of("name", "description", "content", "");
+            var original = List.of(description);
+
+            var result = ContentTemplateHeadProcessor.excerptToMetaDescriptionIfAbsent(original, excerpt);
+
+            assertThat(result).singleElement().satisfies(meta -> {
+                assertThat(meta).containsEntry("content", excerpt);
+                assertThat(meta).isNotSameAs(description);
+            });
+            assertThat(description).containsEntry("content", "");
+        }
+
         Map<String, String> createMetaMap(String nameValue, String contentValue) {
             Map<String, String> metaMap = new HashMap<>();
             metaMap.put("name", nameValue);
