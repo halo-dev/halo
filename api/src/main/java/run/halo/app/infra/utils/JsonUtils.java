@@ -1,10 +1,13 @@
 package run.halo.app.infra.utils;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import io.swagger.v3.core.util.Json;
 import java.util.Map;
 import org.springframework.util.Assert;
 
@@ -18,7 +21,22 @@ import org.springframework.util.Assert;
  */
 @Deprecated(forRemoval = true, since = "2.23.0")
 public class JsonUtils {
-    public static final ObjectMapper DEFAULT_JSON_MAPPER = Json.mapper();
+    /**
+     * Jackson 2 mapper used for extension JSON.
+     *
+     * <p>The configuration mirrors the one swagger-core 2.x applied to its mapper, because that is the configuration
+     * the persisted extension JSON was written with before Halo upgraded to springdoc-openapi 3.2.1. Keep it in sync
+     * with the JSON in the extension store when changing it.
+     */
+    public static final ObjectMapper DEFAULT_JSON_MAPPER = new ObjectMapper()
+            .registerModule(new JavaTimeModule())
+            .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
+            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+            .configure(SerializationFeature.WRITE_ENUMS_USING_TO_STRING, true)
+            .configure(SerializationFeature.WRITE_BIGDECIMAL_AS_PLAIN, true)
+            .configure(SerializationFeature.WRITE_NULL_MAP_VALUES, false)
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .setSerializationInclusion(NON_NULL);
 
     private JsonUtils() {}
 
