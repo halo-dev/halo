@@ -6,8 +6,8 @@
   },
   "servers": [
     {
-      "url": "http://localhost:8091",
-      "description": "Generated server url"
+      "description": "Generated server url",
+      "url": "http://localhost:8091"
     }
   ],
   "security": [
@@ -1879,11 +1879,6 @@
   "components": {
     "schemas": {
       "AddOperation": {
-        "required": [
-          "op",
-          "path",
-          "value"
-        ],
         "type": "object",
         "properties": {
           "op": {
@@ -1893,24 +1888,24 @@
             ]
           },
           "path": {
-            "pattern": "^(/[^/~]*(~[01][^/~]*)*)*$",
             "type": "string",
             "description": "A JSON Pointer path pointing to the location to move/copy from.",
-            "example": "/a/b/c"
+            "example": "/a/b/c",
+            "pattern": "^(/[^/~]*(~[01][^/~]*)*)*$"
           },
           "value": {
             "description": "Value can be any JSON value"
           }
-        }
+        },
+        "required": [
+          "op",
+          "path",
+          "value"
+        ]
       },
       "AnnotationSetting": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata",
-          "spec"
-        ],
         "type": "object",
+        "description": "Annotation setting extension that defines dynamic annotation forms for a target extension kind.",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -1925,38 +1920,38 @@
             "$ref": "#/components/schemas/AnnotationSettingSpec"
           }
         },
-        "description": "Annotation setting extension that defines dynamic annotation forms for a target extension kind."
-      },
-      "AnnotationSettingSpec": {
-        "required": [
-          "formSchema",
-          "targetRef"
-        ],
-        "type": "object",
-        "properties": {
-          "formSchema": {
-            "minLength": 1,
-            "type": "array",
-            "description": "FormKit-compatible schema used to render annotation fields.",
-            "items": {
-              "minLength": 1,
-              "type": "object"
-            }
-          },
-          "targetRef": {
-            "$ref": "#/components/schemas/GroupKind"
-          }
-        },
-        "description": "Desired annotation form configuration for a target resource kind."
-      },
-      "Attachment": {
         "required": [
           "apiVersion",
           "kind",
           "metadata",
           "spec"
-        ],
+        ]
+      },
+      "AnnotationSettingSpec": {
         "type": "object",
+        "description": "Desired annotation form configuration for a target resource kind.",
+        "properties": {
+          "formSchema": {
+            "type": "array",
+            "description": "FormKit-compatible schema used to render annotation fields.",
+            "items": {
+              "type": "object",
+              "minLength": 1
+            },
+            "minLength": 1
+          },
+          "targetRef": {
+            "$ref": "#/components/schemas/GroupKind"
+          }
+        },
+        "required": [
+          "formSchema",
+          "targetRef"
+        ]
+      },
+      "Attachment": {
+        "type": "object",
+        "description": "Attachment extension that describes an uploaded file and its resolved access URLs.",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -1974,20 +1969,14 @@
             "$ref": "#/components/schemas/AttachmentStatus"
           }
         },
-        "description": "Attachment extension that describes an uploaded file and its resolved access URLs."
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec"
+        ]
       },
       "AttachmentList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
         "type": "object",
         "properties": {
           "first": {
@@ -2015,28 +2004,40 @@
           },
           "page": {
             "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination."
           },
           "size": {
             "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination."
           },
           "total": {
             "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Total elements."
           },
           "totalPages": {
             "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Indicates total pages."
           }
-        }
+        },
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ]
       },
       "AttachmentPermalinkMatchList": {
         "type": "object",
+        "description": "Ordered Attachment permalink match results.",
         "properties": {
           "items": {
             "type": "array",
@@ -2044,14 +2045,11 @@
               "$ref": "#/components/schemas/AttachmentPermalinkMatchResult"
             }
           }
-        },
-        "description": "Ordered Attachment permalink match results."
+        }
       },
       "AttachmentPermalinkMatchRequest": {
-        "required": [
-          "urls"
-        ],
         "type": "object",
+        "description": "Request payload for matching URL strings against Attachment permalinks.",
         "properties": {
           "urls": {
             "type": "array",
@@ -2060,10 +2058,13 @@
             }
           }
         },
-        "description": "Request payload for matching URL strings against Attachment permalinks."
+        "required": [
+          "urls"
+        ]
       },
       "AttachmentPermalinkMatchResult": {
         "type": "object",
+        "description": "Result for one Attachment permalink match input.",
         "properties": {
           "matched": {
             "type": "boolean"
@@ -2071,11 +2072,11 @@
           "url": {
             "type": "string"
           }
-        },
-        "description": "Result for one Attachment permalink match input."
+        }
       },
       "AttachmentSpec": {
         "type": "object",
+        "description": "Desired attachment metadata and storage placement.",
         "properties": {
           "displayName": {
             "type": "string",
@@ -2098,24 +2099,24 @@
             "description": "Storage policy metadata.name used to store this attachment."
           },
           "size": {
-            "minimum": 0,
             "type": "integer",
+            "format": "int64",
             "description": "Size of the attachment in bytes.",
-            "format": "int64"
+            "minimum": 0
           },
           "tags": {
-            "uniqueItems": true,
             "type": "array",
             "description": "Free-form tags assigned to the attachment.",
             "items": {
               "type": "string"
-            }
+            },
+            "uniqueItems": true
           }
-        },
-        "description": "Desired attachment metadata and storage placement."
+        }
       },
       "AttachmentStatus": {
         "type": "object",
+        "description": "Observed attachment access state.",
         "properties": {
           "permalink": {
             "type": "string",
@@ -2128,17 +2129,11 @@
             },
             "description": "Generated thumbnail URLs keyed by thumbnail size name."
           }
-        },
-        "description": "Observed attachment access state."
+        }
       },
       "Category": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata",
-          "spec"
-        ],
         "type": "object",
+        "description": "Category extension for grouping posts and building category archives.",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -2156,24 +2151,25 @@
             "$ref": "#/components/schemas/CategoryStatus"
           }
         },
-        "description": "Category extension for grouping posts and building category archives."
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec"
+        ]
       },
       "CategorySpec": {
-        "required": [
-          "displayName",
-          "priority",
-          "slug"
-        ],
         "type": "object",
+        "description": "Desired category display, hierarchy, and rendering configuration.",
         "properties": {
           "children": {
             "type": "array",
-            "description": "Legacy child Category metadata.name values. Category hierarchy is now sourced from Category.spec.parent.",
             "deprecated": true,
+            "description": "Legacy child Category metadata.name values. Category hierarchy is now sourced from Category.spec.parent.",
             "items": {
               "type": "string",
-              "description": "Legacy child Category metadata.name values. Category hierarchy is now sourced from Category.spec.parent.",
-              "deprecated": true
+              "deprecated": true,
+              "description": "Legacy child Category metadata.name values. Category hierarchy is now sourced from Category.spec.parent."
             }
           },
           "cover": {
@@ -2185,9 +2181,9 @@
             "description": "Human-readable description of the category."
           },
           "displayName": {
-            "minLength": 1,
             "type": "string",
-            "description": "Display name of the category."
+            "description": "Display name of the category.",
+            "minLength": 1
           },
           "hideFromList": {
             "type": "boolean",
@@ -2198,9 +2194,9 @@
             "description": "Parent Category metadata.name. Root categories leave this unset."
           },
           "postTemplate": {
-            "maxLength": 255,
             "type": "string",
-            "description": "Theme template used for posts in this category when the post does not specify its own spec.template."
+            "description": "Theme template used for posts in this category when the post does not specify its own spec.template.",
+            "maxLength": 255
           },
           "preventParentPostCascadeQuery": {
             "type": "boolean",
@@ -2208,25 +2204,30 @@
           },
           "priority": {
             "type": "integer",
-            "description": "Sorting priority. Higher values sort before lower values where priority ordering is applied.",
             "format": "int32",
-            "default": 0
+            "default": 0,
+            "description": "Sorting priority. Higher values sort before lower values where priority ordering is applied."
           },
           "slug": {
-            "minLength": 1,
             "type": "string",
-            "description": "URL slug used to build the category permalink."
+            "description": "URL slug used to build the category permalink.",
+            "minLength": 1
           },
           "template": {
-            "maxLength": 255,
             "type": "string",
-            "description": "Theme template used to render the category archive page."
+            "description": "Theme template used to render the category archive page.",
+            "maxLength": 255
           }
         },
-        "description": "Desired category display, hierarchy, and rendering configuration."
+        "required": [
+          "displayName",
+          "priority",
+          "slug"
+        ]
       },
       "CategoryStatus": {
         "type": "object",
+        "description": "Observed category state derived by content reconcilers.",
         "properties": {
           "permalink": {
             "type": "string",
@@ -2234,59 +2235,54 @@
           },
           "postCount": {
             "type": "integer",
-            "description": "Total number of posts in this category and all descendant categories.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Total number of posts in this category and all descendant categories."
           },
           "visiblePostCount": {
             "type": "integer",
-            "description": "Total number of published and public posts in this category and all descendant categories.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Total number of published and public posts in this category and all descendant categories."
           }
-        },
-        "description": "Observed category state derived by content reconcilers."
+        }
       },
       "ChangeMyPasswordRequest": {
-        "required": [
-          "password"
-        ],
         "type": "object",
+        "description": "Payload for setting or changing the current user\u0027s password.",
         "properties": {
           "oldPassword": {
             "type": "string",
             "description": "Old password. Required and verified only when the current user has a password; ignored otherwise."
           },
           "password": {
-            "maxLength": 257,
-            "minLength": 5,
             "type": "string",
-            "description": "new password of the current user"
+            "description": "new password of the current user",
+            "maxLength": 257,
+            "minLength": 5
           }
         },
-        "description": "Payload for setting or changing the current user\u0027s password."
+        "required": [
+          "password"
+        ]
       },
       "Condition": {
-        "required": [
-          "lastTransitionTime",
-          "status",
-          "type"
-        ],
         "type": "object",
+        "description": "EqualsAndHashCode 排除了lastTransitionTime否则失败时，lastTransitionTime 会被更新 导致 equals 为 false，一直被加入队列.",
         "properties": {
           "lastTransitionTime": {
             "type": "string",
-            "description": "Last time the condition transitioned from one status to another.",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "Last time the condition transitioned from one status to another."
           },
           "message": {
-            "maxLength": 32768,
             "type": "string",
-            "description": "Human-readable message indicating details about last transition. This may be an empty string."
+            "description": "Human-readable message indicating details about last transition. This may be an empty string.",
+            "maxLength": 32768
           },
           "reason": {
-            "maxLength": 1024,
-            "pattern": "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$",
             "type": "string",
-            "description": "Unique, one-word, CamelCase reason for the condition\u0027s last transition."
+            "description": "Unique, one-word, CamelCase reason for the condition\u0027s last transition.",
+            "maxLength": 1024,
+            "pattern": "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$"
           },
           "status": {
             "type": "string",
@@ -2298,16 +2294,21 @@
             ]
           },
           "type": {
-            "maxLength": 316,
-            "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$",
             "type": "string",
-            "description": "type of condition in CamelCase or in foo.example.com/CamelCase. example: Ready, Initialized. maxLength: 316."
+            "description": "type of condition in CamelCase or in foo.example.com/CamelCase. example: Ready, Initialized. maxLength: 316.",
+            "maxLength": 316,
+            "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$"
           }
         },
-        "description": "EqualsAndHashCode 排除了lastTransitionTime否则失败时，lastTransitionTime 会被更新 导致 equals 为 false，一直被加入队列."
+        "required": [
+          "lastTransitionTime",
+          "status",
+          "type"
+        ]
       },
       "Contributor": {
         "type": "object",
+        "description": "User summary for a content owner or contributor.",
         "properties": {
           "avatar": {
             "type": "string",
@@ -2321,22 +2322,16 @@
             "type": "string",
             "description": "User metadata name."
           }
-        },
-        "description": "User summary for a content owner or contributor."
+        }
       },
       "CopyOperation": {
-        "required": [
-          "from",
-          "op",
-          "path"
-        ],
         "type": "object",
         "properties": {
           "from": {
-            "pattern": "^(/[^/~]*(~[01][^/~]*)*)*$",
             "type": "string",
             "description": "A JSON Pointer path pointing to the location to move/copy from.",
-            "example": "/a/b/c"
+            "example": "/a/b/c",
+            "pattern": "^(/[^/~]*(~[01][^/~]*)*)*$"
           },
           "op": {
             "type": "string",
@@ -2345,19 +2340,21 @@
             ]
           },
           "path": {
-            "pattern": "^(/[^/~]*(~[01][^/~]*)*)*$",
             "type": "string",
             "description": "A JSON Pointer path pointing to the location to move/copy from.",
-            "example": "/a/b/c"
+            "example": "/a/b/c",
+            "pattern": "^(/[^/~]*(~[01][^/~]*)*)*$"
           }
-        }
+        },
+        "required": [
+          "from",
+          "op",
+          "path"
+        ]
       },
       "DetailedUser": {
-        "required": [
-          "roles",
-          "user"
-        ],
         "type": "object",
+        "description": "User detail response with resolved roles.",
         "properties": {
           "impersonator": {
             "type": "string",
@@ -2378,17 +2375,14 @@
             "$ref": "#/components/schemas/User"
           }
         },
-        "description": "User detail response with resolved roles."
+        "required": [
+          "roles",
+          "user"
+        ]
       },
       "Device": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata",
-          "spec",
-          "status"
-        ],
         "type": "object",
+        "description": "Device extension that records an authenticated browser session for account security visibility.",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -2406,55 +2400,62 @@
             "$ref": "#/components/schemas/DeviceStatus"
           }
         },
-        "description": "Device extension that records an authenticated browser session for account security visibility."
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec",
+          "status"
+        ]
       },
       "DeviceSpec": {
-        "required": [
-          "ipAddress",
-          "principalName",
-          "sessionId"
-        ],
         "type": "object",
+        "description": "Session identity and request metadata captured for a device.",
         "properties": {
           "ipAddress": {
-            "maxLength": 129,
             "type": "string",
-            "description": "Client IP address observed for the session."
+            "description": "Client IP address observed for the session.",
+            "maxLength": 129
           },
           "lastAccessedTime": {
             "type": "string",
-            "description": "Last time this session accessed Halo.",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "Last time this session accessed Halo."
           },
           "lastAuthenticatedTime": {
             "type": "string",
-            "description": "Last time the user authenticated for this session.",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "Last time the user authenticated for this session."
           },
           "principalName": {
-            "minLength": 1,
             "type": "string",
-            "description": "Principal name of the authenticated user."
+            "description": "Principal name of the authenticated user.",
+            "minLength": 1
           },
           "rememberMeSeriesId": {
             "type": "string",
             "description": "Remember-me series id associated with the session, if any."
           },
           "sessionId": {
-            "minLength": 1,
             "type": "string",
-            "description": "Web session identifier associated with the device."
+            "description": "Web session identifier associated with the device.",
+            "minLength": 1
           },
           "userAgent": {
-            "maxLength": 500,
             "type": "string",
-            "description": "Client user-agent header captured for the session."
+            "description": "Client user-agent header captured for the session.",
+            "maxLength": 500
           }
         },
-        "description": "Session identity and request metadata captured for a device."
+        "required": [
+          "ipAddress",
+          "principalName",
+          "sessionId"
+        ]
       },
       "DeviceStatus": {
         "type": "object",
+        "description": "Parsed browser and operating system details for display.",
         "properties": {
           "browser": {
             "type": "string",
@@ -2464,14 +2465,11 @@
             "type": "string",
             "description": "Operating system name parsed from the user agent."
           }
-        },
-        "description": "Parsed browser and operating system details for display."
+        }
       },
       "EmailVerifyRequest": {
-        "required": [
-          "email"
-        ],
         "type": "object",
+        "description": "Payload for sending an email verification code.",
         "properties": {
           "email": {
             "type": "string",
@@ -2480,28 +2478,31 @@
             "minLength": 1
           }
         },
-        "description": "Payload for sending an email verification code."
+        "required": [
+          "email"
+        ]
       },
       "Excerpt": {
-        "required": [
-          "autoGenerate"
-        ],
         "type": "object",
+        "description": "Excerpt generation configuration for a post or single page.",
         "properties": {
           "autoGenerate": {
             "type": "boolean",
-            "description": "Whether Halo should generate the excerpt from the released content automatically.",
-            "default": true
+            "default": true,
+            "description": "Whether Halo should generate the excerpt from the released content automatically."
           },
           "raw": {
             "type": "string",
             "description": "Manual excerpt text used when autoGenerate is false."
           }
         },
-        "description": "Excerpt generation configuration for a post or single page."
+        "required": [
+          "autoGenerate"
+        ]
       },
       "GroupKind": {
         "type": "object",
+        "description": "GroupKind contains group and kind data only.",
         "properties": {
           "group": {
             "type": "string",
@@ -2511,26 +2512,23 @@
             "type": "string",
             "description": "is kind name of Extension."
           }
-        },
-        "description": "GroupKind contains group and kind data only."
+        }
       },
       "IAvatarUploadRequest": {
-        "required": [
-          "file"
-        ],
         "type": "object",
+        "description": "Multipart payload for uploading a user avatar.",
         "properties": {
           "file": {
             "type": "string",
-            "description": "Avatar file.",
-            "format": "binary"
+            "format": "binary",
+            "description": "Avatar file."
           }
         },
-        "description": "Multipart payload for uploading a user avatar."
+        "required": [
+          "file"
+        ]
       },
       "JsonPatch": {
-        "minItems": 1,
-        "uniqueItems": true,
         "type": "array",
         "description": "JSON schema for JSONPatch operations",
         "items": {
@@ -2554,18 +2552,13 @@
               "$ref": "#/components/schemas/CopyOperation"
             }
           ]
-        }
+        },
+        "minItems": 1,
+        "uniqueItems": true
       },
       "ListedPost": {
-        "required": [
-          "categories",
-          "contributors",
-          "owner",
-          "post",
-          "stats",
-          "tags"
-        ],
         "type": "object",
+        "description": "Post list item with resolved categories, tags, contributors, owner, and counters.",
         "properties": {
           "categories": {
             "type": "array",
@@ -2598,20 +2591,16 @@
             }
           }
         },
-        "description": "Post list item with resolved categories, tags, contributors, owner, and counters."
+        "required": [
+          "categories",
+          "contributors",
+          "owner",
+          "post",
+          "stats",
+          "tags"
+        ]
       },
       "ListedPostList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
         "type": "object",
         "properties": {
           "first": {
@@ -2639,31 +2628,40 @@
           },
           "page": {
             "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination."
           },
           "size": {
             "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination."
           },
           "total": {
             "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Total elements."
           },
           "totalPages": {
             "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Indicates total pages."
           }
-        }
+        },
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ]
       },
       "MarkSpecifiedRequest": {
-        "required": [
-          "names"
-        ],
         "type": "object",
+        "description": "Payload for marking multiple notifications as read.",
         "properties": {
           "names": {
             "type": "array",
@@ -2673,13 +2671,13 @@
             }
           }
         },
-        "description": "Payload for marking multiple notifications as read."
+        "required": [
+          "names"
+        ]
       },
       "Metadata": {
-        "required": [
-          "name"
-        ],
         "type": "object",
+        "description": "Metadata of Extension.",
         "properties": {
           "annotations": {
             "type": "object",
@@ -2690,24 +2688,24 @@
           },
           "creationTimestamp": {
             "type": "string",
-            "description": "Creation timestamp of the Extension.",
             "format": "date-time",
+            "description": "Creation timestamp of the Extension.",
             "nullable": true
           },
           "deletionTimestamp": {
             "type": "string",
-            "description": "Deletion timestamp of the Extension.",
             "format": "date-time",
+            "description": "Deletion timestamp of the Extension.",
             "nullable": true
           },
           "finalizers": {
-            "uniqueItems": true,
             "type": "array",
-            "nullable": true,
             "items": {
               "type": "string",
               "nullable": true
-            }
+            },
+            "nullable": true,
+            "uniqueItems": true
           },
           "generateName": {
             "type": "string",
@@ -2726,26 +2724,23 @@
           },
           "version": {
             "type": "integer",
-            "description": "Current version of the Extension. It will be bumped up every update.",
             "format": "int64",
+            "description": "Current version of the Extension. It will be bumped up every update.",
             "nullable": true
           }
         },
-        "description": "Metadata of Extension."
+        "required": [
+          "name"
+        ]
       },
       "MoveOperation": {
-        "required": [
-          "from",
-          "op",
-          "path"
-        ],
         "type": "object",
         "properties": {
           "from": {
-            "pattern": "^(/[^/~]*(~[01][^/~]*)*)*$",
             "type": "string",
             "description": "A JSON Pointer path pointing to the location to move/copy from.",
-            "example": "/a/b/c"
+            "example": "/a/b/c",
+            "pattern": "^(/[^/~]*(~[01][^/~]*)*)*$"
           },
           "op": {
             "type": "string",
@@ -2754,20 +2749,21 @@
             ]
           },
           "path": {
-            "pattern": "^(/[^/~]*(~[01][^/~]*)*)*$",
             "type": "string",
             "description": "A JSON Pointer path pointing to the location to move/copy from.",
-            "example": "/a/b/c"
+            "example": "/a/b/c",
+            "pattern": "^(/[^/~]*(~[01][^/~]*)*)*$"
           }
-        }
+        },
+        "required": [
+          "from",
+          "op",
+          "path"
+        ]
       },
       "Notification": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata"
-        ],
         "type": "object",
+        "description": "Notification extension that stores an on-site notification delivered to a Halo user.\n\n \u003cp\u003eSupports the following operations:\n\n \u003cul\u003e\n   \u003cli\u003eMarked as read: {@link NotificationSpec#setUnread(boolean) NotificationSpec#setUnread(boolean)}\n   \u003cli\u003eGet the last read time: {@link NotificationSpec#getLastReadAt NotificationSpec#getLastReadAt()}\n   \u003cli\u003eFilter by recipient: {@link NotificationSpec#getRecipient NotificationSpec#getRecipient()}\n \u003c/ul\u003e",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -2782,20 +2778,13 @@
             "$ref": "#/components/schemas/NotificationSpec"
           }
         },
-        "description": "Notification extension that stores an on-site notification delivered to a Halo user.\n\n \u003cp\u003eSupports the following operations:\n\n \u003cul\u003e\n   \u003cli\u003eMarked as read: {@link NotificationSpec#setUnread(boolean) NotificationSpec#setUnread(boolean)}\n   \u003cli\u003eGet the last read time: {@link NotificationSpec#getLastReadAt NotificationSpec#getLastReadAt()}\n   \u003cli\u003eFilter by recipient: {@link NotificationSpec#getRecipient NotificationSpec#getRecipient()}\n \u003c/ul\u003e"
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata"
+        ]
       },
       "NotificationList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
         "type": "object",
         "properties": {
           "first": {
@@ -2823,35 +2812,40 @@
           },
           "page": {
             "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination."
           },
           "size": {
             "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination."
           },
           "total": {
             "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Total elements."
           },
           "totalPages": {
             "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Indicates total pages."
           }
-        }
+        },
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ]
       },
       "NotificationSpec": {
-        "required": [
-          "htmlContent",
-          "rawContent",
-          "reason",
-          "recipient",
-          "title"
-        ],
         "type": "object",
+        "description": "Notification content and read state for one recipient.",
         "properties": {
           "htmlContent": {
             "type": "string",
@@ -2859,40 +2853,44 @@
           },
           "lastReadAt": {
             "type": "string",
-            "description": "Last time the recipient marked this notification as read.",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "Last time the recipient marked this notification as read."
           },
           "rawContent": {
             "type": "string",
             "description": "Plain text or source notification content."
           },
           "reason": {
-            "minLength": 1,
             "type": "string",
-            "description": "Reason metadata.name that generated this notification."
+            "description": "Reason metadata.name that generated this notification.",
+            "minLength": 1
           },
           "recipient": {
-            "minLength": 1,
             "type": "string",
-            "description": "User metadata.name that receives the notification."
+            "description": "User metadata.name that receives the notification.",
+            "minLength": 1
           },
           "title": {
-            "minLength": 1,
             "type": "string",
-            "description": "Notification title shown in the notification center."
+            "description": "Notification title shown in the notification center.",
+            "minLength": 1
           },
           "unread": {
             "type": "boolean",
             "description": "Whether the recipient has not read the notification yet."
           }
         },
-        "description": "Notification content and read state for one recipient."
+        "required": [
+          "htmlContent",
+          "rawContent",
+          "reason",
+          "recipient",
+          "title"
+        ]
       },
       "NotifierInfo": {
-        "required": [
-          "name"
-        ],
         "type": "object",
+        "description": "Notifier metadata used by notification preference UI.",
         "properties": {
           "description": {
             "type": "string",
@@ -2907,33 +2905,31 @@
             "description": "notifier \u003ccode\u003emetadata.name\u003c/code\u003e"
           }
         },
-        "description": "Notifier metadata used by notification preference UI."
+        "required": [
+          "name"
+        ]
       },
       "PasswordRequest": {
-        "required": [
-          "password"
-        ],
         "type": "object",
+        "description": "Password verification payload for changing two-factor authentication settings.",
         "properties": {
           "password": {
-            "minLength": 1,
             "type": "string",
-            "description": "Current password of the authenticated user."
+            "description": "Current password of the authenticated user.",
+            "minLength": 1
           },
           "totpCode": {
             "type": "string",
             "description": "Current TOTP code, required when TOTP has already been configured."
           }
         },
-        "description": "Password verification payload for changing two-factor authentication settings."
+        "required": [
+          "password"
+        ]
       },
       "PatSpec": {
-        "required": [
-          "name",
-          "tokenId",
-          "username"
-        ],
         "type": "object",
+        "description": "Desired personal access token settings and lifecycle flags.",
         "properties": {
           "description": {
             "type": "string",
@@ -2941,13 +2937,13 @@
           },
           "expiresAt": {
             "type": "string",
-            "description": "Time when the token expires. A null value means the token does not expire by time.",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "Time when the token expires. A null value means the token does not expire by time."
           },
           "lastUsed": {
             "type": "string",
-            "description": "Last time the token was used successfully.",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "Last time the token was used successfully."
           },
           "name": {
             "type": "string",
@@ -2959,8 +2955,8 @@
           },
           "revokesAt": {
             "type": "string",
-            "description": "Time when the token was revoked.",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "Time when the token was revoked."
           },
           "roles": {
             "type": "array",
@@ -2985,15 +2981,15 @@
             "description": "User metadata.name that owns this token."
           }
         },
-        "description": "Desired personal access token settings and lifecycle flags."
+        "required": [
+          "name",
+          "tokenId",
+          "username"
+        ]
       },
       "PersonalAccessToken": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata"
-        ],
         "type": "object",
+        "description": "Personal access token extension used for non-interactive API authentication on behalf of a Halo user.",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -3008,10 +3004,15 @@
             "$ref": "#/components/schemas/PatSpec"
           }
         },
-        "description": "Personal access token extension used for non-interactive API authentication on behalf of a Halo user."
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata"
+        ]
       },
       "PolicyRule": {
         "type": "object",
+        "description": "PolicyRule holds information that describes a policy rule, but does not contain information about whom the rule\n applies to or which namespace the rule applies to.",
         "properties": {
           "apiGroups": {
             "type": "array",
@@ -3048,17 +3049,11 @@
               "type": "string"
             }
           }
-        },
-        "description": "PolicyRule holds information that describes a policy rule, but does not contain information about whom the rule\n applies to or which namespace the rule applies to."
+        }
       },
       "Post": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata",
-          "spec"
-        ],
         "type": "object",
+        "description": "Post extension that stores article metadata, publication settings, taxonomy, and derived status.",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -3076,18 +3071,21 @@
             "$ref": "#/components/schemas/PostStatus"
           }
         },
-        "description": "Post extension that stores article metadata, publication settings, taxonomy, and derived status."
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec"
+        ]
       },
       "PostAttachmentRequest": {
-        "required": [
-          "file"
-        ],
         "type": "object",
+        "description": "Multipart payload for uploading a post attachment.",
         "properties": {
           "file": {
             "type": "string",
-            "description": "attachment data",
-            "format": "binary"
+            "format": "binary",
+            "description": "attachment data"
           },
           "postName": {
             "type": "string",
@@ -3098,26 +3096,18 @@
             "description": "single page \u003ccode\u003emetadata.name\u003c/code\u003e"
           }
         },
-        "description": "Multipart payload for uploading a post attachment."
+        "required": [
+          "file"
+        ]
       },
       "PostSpec": {
-        "required": [
-          "allowComment",
-          "deleted",
-          "excerpt",
-          "pinned",
-          "priority",
-          "publish",
-          "slug",
-          "title",
-          "visible"
-        ],
         "type": "object",
+        "description": "Desired post content, publication, taxonomy, and rendering configuration.",
         "properties": {
           "allowComment": {
             "type": "boolean",
-            "description": "Whether new comments are allowed for this post.",
-            "default": true
+            "default": true,
+            "description": "Whether new comments are allowed for this post."
           },
           "baseSnapshot": {
             "type": "string",
@@ -3136,8 +3126,8 @@
           },
           "deleted": {
             "type": "boolean",
-            "description": "Whether the post is logically deleted and should be treated as recycled.",
-            "default": false
+            "default": false,
+            "description": "Whether the post is logically deleted and should be treated as recycled."
           },
           "excerpt": {
             "$ref": "#/components/schemas/Excerpt"
@@ -3162,33 +3152,33 @@
           },
           "pinned": {
             "type": "boolean",
-            "description": "Whether the post should be pinned ahead of normal post ordering.",
-            "default": false
+            "default": false,
+            "description": "Whether the post should be pinned ahead of normal post ordering."
           },
           "priority": {
             "type": "integer",
-            "description": "Sorting priority. Higher values sort before lower values where priority ordering is applied.",
             "format": "int32",
-            "default": 0
+            "default": 0,
+            "description": "Sorting priority. Higher values sort before lower values where priority ordering is applied."
           },
           "publish": {
             "type": "boolean",
-            "description": "Desired publish state. False keeps the post as a draft or moves it back to draft.",
-            "default": false
+            "default": false,
+            "description": "Desired publish state. False keeps the post as a draft or moves it back to draft."
           },
           "publishTime": {
             "type": "string",
-            "description": "Time when the post was published or is scheduled to be published.",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "Time when the post was published or is scheduled to be published."
           },
           "releaseSnapshot": {
             "type": "string",
             "description": "Snapshot metadata.name selected as the published content version."
           },
           "slug": {
-            "minLength": 1,
             "type": "string",
-            "description": "URL slug used to build the post permalink."
+            "description": "URL slug used to build the post permalink.",
+            "minLength": 1
           },
           "tags": {
             "type": "array",
@@ -3202,9 +3192,9 @@
             "description": "Theme template used to render this post."
           },
           "title": {
-            "minLength": 1,
             "type": "string",
-            "description": "Display title of the post."
+            "description": "Display title of the post.",
+            "minLength": 1
           },
           "visible": {
             "type": "string",
@@ -3216,26 +3206,37 @@
             ]
           }
         },
-        "description": "Desired post content, publication, taxonomy, and rendering configuration."
+        "required": [
+          "allowComment",
+          "deleted",
+          "excerpt",
+          "pinned",
+          "priority",
+          "publish",
+          "slug",
+          "title",
+          "visible"
+        ]
       },
       "PostStatus": {
         "type": "object",
+        "description": "Observed post state derived by content reconcilers.",
         "properties": {
           "commentsCount": {
             "type": "integer",
-            "description": "Total number of comments associated with the content item.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Total number of comments associated with the content item."
           },
           "conditions": {
             "type": "array",
+            "description": "Reconciliation conditions reported by controllers for this content item.",
+            "items": {
+              "$ref": "#/components/schemas/Condition"
+            },
             "properties": {
               "empty": {
                 "type": "boolean"
               }
-            },
-            "description": "Reconciliation conditions reported by controllers for this content item.",
-            "items": {
-              "$ref": "#/components/schemas/Condition"
             }
           },
           "contributors": {
@@ -3259,13 +3260,13 @@
           },
           "lastModifyTime": {
             "type": "string",
-            "description": "Last modification time of the released snapshot.",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "Last modification time of the released snapshot."
           },
           "observedVersion": {
             "type": "integer",
-            "description": "Metadata version observed by the last successful reconciliation.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Metadata version observed by the last successful reconciliation."
           },
           "permalink": {
             "type": "string",
@@ -3275,14 +3276,11 @@
             "type": "string",
             "description": "Current publishing phase, such as DRAFT, PENDING_APPROVAL, PUBLISHED, or FAILED."
           }
-        },
-        "description": "Observed post state derived by content reconcilers."
+        }
       },
       "ReasonTypeInfo": {
-        "required": [
-          "name"
-        ],
         "type": "object",
+        "description": "Reason type metadata used by notification preference UI.",
         "properties": {
           "description": {
             "type": "string",
@@ -3297,21 +3295,21 @@
             "description": "reason type \u003ccode\u003emetadata.name\u003c/code\u003e"
           },
           "uiPermissions": {
-            "uniqueItems": true,
             "type": "array",
             "description": "UI permissions required to manage this reason type",
             "items": {
               "type": "string"
-            }
+            },
+            "uniqueItems": true
           }
         },
-        "description": "Reason type metadata used by notification preference UI."
+        "required": [
+          "name"
+        ]
       },
       "ReasonTypeNotifierCollectionRequest": {
-        "required": [
-          "reasonTypeNotifiers"
-        ],
         "type": "object",
+        "description": "Payload for saving notifier selections by reason type.",
         "properties": {
           "reasonTypeNotifiers": {
             "type": "array",
@@ -3321,15 +3319,13 @@
             }
           }
         },
-        "description": "Payload for saving notifier selections by reason type."
+        "required": [
+          "reasonTypeNotifiers"
+        ]
       },
       "ReasonTypeNotifierMatrix": {
-        "required": [
-          "notifiers",
-          "reasonTypes",
-          "stateMatrix"
-        ],
         "type": "object",
+        "description": "Matrix describing which notifiers are enabled for each reason type.",
         "properties": {
           "notifiers": {
             "type": "array",
@@ -3356,14 +3352,15 @@
             }
           }
         },
-        "description": "Matrix describing which notifiers are enabled for each reason type."
-      },
-      "ReasonTypeNotifierRequest": {
         "required": [
           "notifiers",
-          "reasonType"
-        ],
+          "reasonTypes",
+          "stateMatrix"
+        ]
+      },
+      "ReasonTypeNotifierRequest": {
         "type": "object",
+        "description": "Notifier selection for one reason type.",
         "properties": {
           "notifiers": {
             "type": "array",
@@ -3377,15 +3374,14 @@
             "description": "\u003ccode\u003emetadata.name\u003c/code\u003e of the reason type."
           }
         },
-        "description": "Notifier selection for one reason type."
+        "required": [
+          "notifiers",
+          "reasonType"
+        ]
       },
       "Ref": {
-        "required": [
-          "group",
-          "kind",
-          "name"
-        ],
         "type": "object",
+        "description": "Extension reference object. The name is mandatory",
         "properties": {
           "group": {
             "type": "string",
@@ -3404,13 +3400,13 @@
             "description": "Extension version"
           }
         },
-        "description": "Extension reference object. The name is mandatory"
+        "required": [
+          "group",
+          "kind",
+          "name"
+        ]
       },
       "RemoveOperation": {
-        "required": [
-          "op",
-          "path"
-        ],
         "type": "object",
         "properties": {
           "op": {
@@ -3420,19 +3416,18 @@
             ]
           },
           "path": {
-            "pattern": "^(/[^/~]*(~[01][^/~]*)*)*$",
             "type": "string",
             "description": "A JSON Pointer path pointing to the location to move/copy from.",
-            "example": "/a/b/c"
+            "example": "/a/b/c",
+            "pattern": "^(/[^/~]*(~[01][^/~]*)*)*$"
           }
-        }
-      },
-      "ReplaceOperation": {
+        },
         "required": [
           "op",
-          "path",
-          "value"
-        ],
+          "path"
+        ]
+      },
+      "ReplaceOperation": {
         "type": "object",
         "properties": {
           "op": {
@@ -3442,24 +3437,24 @@
             ]
           },
           "path": {
-            "pattern": "^(/[^/~]*(~[01][^/~]*)*)*$",
             "type": "string",
             "description": "A JSON Pointer path pointing to the location to move/copy from.",
-            "example": "/a/b/c"
+            "example": "/a/b/c",
+            "pattern": "^(/[^/~]*(~[01][^/~]*)*)*$"
           },
           "value": {
             "description": "Value can be any JSON value"
           }
-        }
+        },
+        "required": [
+          "op",
+          "path",
+          "value"
+        ]
       },
       "Role": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata",
-          "rules"
-        ],
         "type": "object",
+        "description": "Role extension that defines RBAC policy rules for users and other subjects.",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -3478,37 +3473,38 @@
             }
           }
         },
-        "description": "Role extension that defines RBAC policy rules for users and other subjects."
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "rules"
+        ]
       },
       "SnapShotSpec": {
-        "required": [
-          "owner",
-          "rawType",
-          "subjectRef"
-        ],
         "type": "object",
+        "description": "Content snapshot payload and metadata.",
         "properties": {
           "contentPatch": {
             "type": "string",
             "description": "Full rendered content for a base snapshot, or a JSON-encoded line diff from the base rendered content."
           },
           "contributors": {
-            "uniqueItems": true,
             "type": "array",
             "description": "User metadata.name values that contributed to this snapshot.",
             "items": {
               "type": "string"
-            }
+            },
+            "uniqueItems": true
           },
           "lastModifyTime": {
             "type": "string",
-            "description": "Last time the snapshot content was modified.",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "Last time the snapshot content was modified."
           },
           "owner": {
-            "minLength": 1,
             "type": "string",
-            "description": "User metadata.name of the snapshot owner."
+            "description": "User metadata.name of the snapshot owner.",
+            "minLength": 1
           },
           "parentSnapshotName": {
             "type": "string",
@@ -3519,25 +3515,24 @@
             "description": "Full raw source content for a base snapshot, or a JSON-encoded line diff from the base raw content."
           },
           "rawType": {
-            "maxLength": 50,
-            "minLength": 1,
             "type": "string",
-            "description": "Source format of the raw content, such as markdown, html, json, asciidoc, or latex."
+            "description": "Source format of the raw content, such as markdown, html, json, asciidoc, or latex.",
+            "maxLength": 50,
+            "minLength": 1
           },
           "subjectRef": {
             "$ref": "#/components/schemas/Ref"
           }
         },
-        "description": "Content snapshot payload and metadata."
+        "required": [
+          "owner",
+          "rawType",
+          "subjectRef"
+        ]
       },
       "Snapshot": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata",
-          "spec"
-        ],
         "type": "object",
+        "description": "Snapshot extension that stores a version of post or single page content.",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -3552,42 +3547,42 @@
             "$ref": "#/components/schemas/SnapShotSpec"
           }
         },
-        "description": "Snapshot extension that stores a version of post or single page content."
-      },
-      "Stats": {
-        "type": "object",
-        "properties": {
-          "approvedComment": {
-            "type": "integer",
-            "description": "Total approved comment count.",
-            "format": "int32"
-          },
-          "totalComment": {
-            "type": "integer",
-            "description": "Total comment count, including comments that may not be approved.",
-            "format": "int32"
-          },
-          "upvote": {
-            "type": "integer",
-            "description": "Total upvote count.",
-            "format": "int32"
-          },
-          "visit": {
-            "type": "integer",
-            "description": "Total visit count.",
-            "format": "int32"
-          }
-        },
-        "description": "Aggregated visit, upvote, and comment counters for a content resource."
-      },
-      "Tag": {
         "required": [
           "apiVersion",
           "kind",
           "metadata",
           "spec"
-        ],
+        ]
+      },
+      "Stats": {
         "type": "object",
+        "description": "Aggregated visit, upvote, and comment counters for a content resource.",
+        "properties": {
+          "approvedComment": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Total approved comment count."
+          },
+          "totalComment": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Total comment count, including comments that may not be approved."
+          },
+          "upvote": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Total upvote count."
+          },
+          "visit": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Total visit count."
+          }
+        }
+      },
+      "Tag": {
+        "type": "object",
+        "description": "Tag extension for grouping posts by free-form labels.",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -3605,19 +3600,21 @@
             "$ref": "#/components/schemas/TagStatus"
           }
         },
-        "description": "Tag extension for grouping posts by free-form labels."
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec"
+        ]
       },
       "TagSpec": {
-        "required": [
-          "displayName",
-          "slug"
-        ],
         "type": "object",
+        "description": "Desired tag display and rendering configuration.",
         "properties": {
           "color": {
-            "pattern": "^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$",
             "type": "string",
-            "description": "Display color of the tag in 3- or 6-digit hex notation, such as #fff or #ffffff."
+            "description": "Display color of the tag in 3- or 6-digit hex notation, such as #fff or #ffffff.",
+            "pattern": "^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$"
           },
           "cover": {
             "type": "string",
@@ -3628,25 +3625,29 @@
             "description": "Human-readable description of the tag."
           },
           "displayName": {
-            "minLength": 1,
             "type": "string",
-            "description": "Display name of the tag."
+            "description": "Display name of the tag.",
+            "minLength": 1
           },
           "slug": {
-            "minLength": 1,
             "type": "string",
-            "description": "URL slug used to build the tag permalink."
+            "description": "URL slug used to build the tag permalink.",
+            "minLength": 1
           }
         },
-        "description": "Desired tag display and rendering configuration."
+        "required": [
+          "displayName",
+          "slug"
+        ]
       },
       "TagStatus": {
         "type": "object",
+        "description": "Observed tag state derived by content reconcilers.",
         "properties": {
           "observedVersion": {
             "type": "integer",
-            "description": "Metadata version observed by the last successful reconciliation.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Metadata version observed by the last successful reconciliation."
           },
           "permalink": {
             "type": "string",
@@ -3654,23 +3655,17 @@
           },
           "postCount": {
             "type": "integer",
-            "description": "Total number of posts associated with the tag.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Total number of posts associated with the tag."
           },
           "visiblePostCount": {
             "type": "integer",
-            "description": "Total number of published and public posts associated with the tag.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Total number of published and public posts associated with the tag."
           }
-        },
-        "description": "Observed tag state derived by content reconcilers."
+        }
       },
       "TestOperation": {
-        "required": [
-          "op",
-          "path",
-          "value"
-        ],
         "type": "object",
         "properties": {
           "op": {
@@ -3680,42 +3675,43 @@
             ]
           },
           "path": {
-            "pattern": "^(/[^/~]*(~[01][^/~]*)*)*$",
             "type": "string",
             "description": "A JSON Pointer path pointing to the location to move/copy from.",
-            "example": "/a/b/c"
+            "example": "/a/b/c",
+            "pattern": "^(/[^/~]*(~[01][^/~]*)*)*$"
           },
           "value": {
             "description": "Value can be any JSON value"
           }
-        }
+        },
+        "required": [
+          "op",
+          "path",
+          "value"
+        ]
       },
       "TotpAuthLinkResponse": {
-        "required": [
-          "authLink",
-          "rawSecret"
-        ],
         "type": "object",
+        "description": "TOTP provisioning data for configuring an authenticator app.",
         "properties": {
           "authLink": {
             "type": "string",
-            "description": "otpauth URI that can be encoded as a QR code.",
-            "format": "uri"
+            "format": "uri",
+            "description": "otpauth URI that can be encoded as a QR code."
           },
           "rawSecret": {
             "type": "string",
             "description": "Raw TOTP secret for manual authenticator setup."
           }
         },
-        "description": "TOTP provisioning data for configuring an authenticator app."
+        "required": [
+          "authLink",
+          "rawSecret"
+        ]
       },
       "TotpRequest": {
-        "required": [
-          "code",
-          "password",
-          "secret"
-        ],
         "type": "object",
+        "description": "TOTP configuration payload.",
         "properties": {
           "code": {
             "type": "string",
@@ -3726,26 +3722,25 @@
             "description": "Current TOTP code, required when replacing an existing TOTP authenticator."
           },
           "password": {
-            "minLength": 1,
             "type": "string",
-            "description": "Current password of the authenticated user."
+            "description": "Current password of the authenticated user.",
+            "minLength": 1
           },
           "secret": {
-            "minLength": 1,
             "type": "string",
-            "description": "Raw TOTP secret returned by the auth-link endpoint."
+            "description": "Raw TOTP secret returned by the auth-link endpoint.",
+            "minLength": 1
           }
         },
-        "description": "TOTP configuration payload."
+        "required": [
+          "code",
+          "password",
+          "secret"
+        ]
       },
       "TwoFactorAuthSettings": {
-        "required": [
-          "available",
-          "emailVerified",
-          "enabled",
-          "totpConfigured"
-        ],
         "type": "object",
+        "description": "Two-factor authentication settings for the current user.",
         "properties": {
           "available": {
             "type": "boolean",
@@ -3764,13 +3759,16 @@
             "description": "Whether a TOTP authenticator has been configured."
           }
         },
-        "description": "Two-factor authentication settings for the current user."
+        "required": [
+          "available",
+          "emailVerified",
+          "enabled",
+          "totpConfigured"
+        ]
       },
       "UcUploadFromUrlRequest": {
-        "required": [
-          "url"
-        ],
         "type": "object",
+        "description": "User-center request payload for uploading from a URL.",
         "properties": {
           "filename": {
             "type": "string",
@@ -3778,18 +3776,17 @@
           },
           "url": {
             "type": "string",
-            "description": "remote file URL to transfer into user-center storage",
-            "format": "url"
+            "format": "url",
+            "description": "remote file URL to transfer into user-center storage"
           }
         },
-        "description": "User-center request payload for uploading from a URL."
+        "required": [
+          "url"
+        ]
       },
       "UcUserVo": {
-        "required": [
-          "name",
-          "passwordSet"
-        ],
         "type": "object",
+        "description": "Masked current user profile. The password hash is never exposed.",
         "properties": {
           "avatar": {
             "type": "string",
@@ -3808,13 +3805,14 @@
             "description": "whether the current user has a password set"
           }
         },
-        "description": "Masked current user profile. The password hash is never exposed."
+        "required": [
+          "name",
+          "passwordSet"
+        ]
       },
       "UpdateMyProfileRequest": {
-        "required": [
-          "displayName"
-        ],
         "type": "object",
+        "description": "Payload for updating the current user\u0027s editable profile fields.",
         "properties": {
           "bio": {
             "type": "string",
@@ -3825,15 +3823,18 @@
             "description": "display name shown in the console and theme"
           }
         },
-        "description": "Payload for updating the current user\u0027s editable profile fields."
+        "required": [
+          "displayName"
+        ]
       },
       "UploadForm": {
         "type": "object",
+        "description": "Upload form from console. The file and url are mutually exclusive. If both are provided, the file will be used.",
         "properties": {
           "file": {
             "type": "string",
-            "description": "The file to upload. If not provided, the url will be used.",
-            "format": "binary"
+            "format": "binary",
+            "description": "The file to upload. If not provided, the url will be used."
           },
           "filename": {
             "type": "string",
@@ -3843,17 +3844,11 @@
             "type": "string",
             "description": "The url to upload from. If not provided, the file will be used."
           }
-        },
-        "description": "Upload form from console. The file and url are mutually exclusive. If both are provided, the file will be used."
+        }
       },
       "User": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata",
-          "spec"
-        ],
         "type": "object",
+        "description": "User extension that stores profile, authentication, and account state for a Halo user.",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -3871,16 +3866,16 @@
             "$ref": "#/components/schemas/UserStatus"
           }
         },
-        "description": "User extension that stores profile, authentication, and account state for a Halo user."
-      },
-      "UserConnection": {
         "required": [
           "apiVersion",
           "kind",
           "metadata",
           "spec"
-        ],
+        ]
+      },
+      "UserConnection": {
         "type": "object",
+        "description": "User connection extension that links a Halo user to an external OAuth2 account.",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -3895,15 +3890,16 @@
             "$ref": "#/components/schemas/UserConnectionSpec"
           }
         },
-        "description": "User connection extension that links a Halo user to an external OAuth2 account."
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec"
+        ]
       },
       "UserConnectionSpec": {
-        "required": [
-          "providerUserId",
-          "registrationId",
-          "username"
-        ],
         "type": "object",
+        "description": "External OAuth2 account binding for a Halo user.",
         "properties": {
           "providerUserId": {
             "type": "string",
@@ -3915,23 +3911,23 @@
           },
           "updatedAt": {
             "type": "string",
-            "description": "The time when the user connection was last updated.",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "The time when the user connection was last updated."
           },
           "username": {
             "type": "string",
             "description": "The {@link Metadata#getName Metadata#getName()} of the user associated with the OAuth connection."
           }
         },
-        "description": "External OAuth2 account binding for a Halo user."
+        "required": [
+          "providerUserId",
+          "registrationId",
+          "username"
+        ]
       },
       "UserDevice": {
-        "required": [
-          "active",
-          "currentDevice",
-          "device"
-        ],
         "type": "object",
+        "description": "User device entry with session state.",
         "properties": {
           "active": {
             "type": "boolean",
@@ -3945,15 +3941,15 @@
             "$ref": "#/components/schemas/Device"
           }
         },
-        "description": "User device entry with session state."
+        "required": [
+          "active",
+          "currentDevice",
+          "device"
+        ]
       },
       "UserPermission": {
-        "required": [
-          "permissions",
-          "roles",
-          "uiPermissions"
-        ],
         "type": "object",
+        "description": "Resolved role and permission information for a user.",
         "properties": {
           "permissions": {
             "type": "array",
@@ -3977,13 +3973,15 @@
             }
           }
         },
-        "description": "Resolved role and permission information for a user."
+        "required": [
+          "permissions",
+          "roles",
+          "uiPermissions"
+        ]
       },
       "UserSpec": {
-        "required": [
-          "displayName"
-        ],
         "type": "object",
+        "description": "Desired user profile and authentication settings.",
         "properties": {
           "avatar": {
             "type": "string",
@@ -4011,8 +4009,8 @@
           },
           "loginHistoryLimit": {
             "type": "integer",
-            "description": "Maximum number of login history entries retained for this user.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Maximum number of login history entries retained for this user."
           },
           "password": {
             "type": "string",
@@ -4024,8 +4022,8 @@
           },
           "registeredAt": {
             "type": "string",
-            "description": "Time when the user registered.",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "Time when the user registered."
           },
           "totpEncryptedSecret": {
             "type": "string",
@@ -4036,36 +4034,38 @@
             "description": "Whether two-factor authentication is enabled for this user."
           }
         },
-        "description": "Desired user profile and authentication settings."
+        "required": [
+          "displayName"
+        ]
       },
       "UserStatus": {
         "type": "object",
+        "description": "Observed user state derived by the application.",
         "properties": {
           "permalink": {
             "type": "string",
             "description": "Public permalink of the user\u0027s profile or author page."
           }
-        },
-        "description": "Observed user state derived by the application."
+        }
       },
       "VerifyCodeRequest": {
-        "required": [
-          "code",
-          "password"
-        ],
         "type": "object",
+        "description": "Payload for verifying an email address by code.",
         "properties": {
           "code": {
-            "minLength": 1,
             "type": "string",
-            "description": "email verification code"
+            "description": "email verification code",
+            "minLength": 1
           },
           "password": {
             "type": "string",
             "description": "current password of the authenticated user"
           }
         },
-        "description": "Payload for verifying an email address by code."
+        "required": [
+          "code",
+          "password"
+        ]
       }
     },
     "securitySchemes": {

@@ -10,7 +10,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.swagger.v3.core.util.Json;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Arrays;
@@ -23,6 +22,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
+import run.halo.app.infra.utils.Jackson2ObjectMappers;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.SerializationContext;
 import tools.jackson.databind.ValueDeserializer;
@@ -41,8 +41,7 @@ import tools.jackson.databind.ValueSerializer;
 @SuppressWarnings("rawtypes")
 public class Unstructured implements Extension {
 
-    @SuppressWarnings("deprecation")
-    public static final ObjectMapper OBJECT_MAPPER = Json.mapper()
+    public static final ObjectMapper OBJECT_MAPPER = Jackson2ObjectMappers.shared()
             // We don't want to change the default mapper
             // so we copy a new one and configure it
             .copy()
