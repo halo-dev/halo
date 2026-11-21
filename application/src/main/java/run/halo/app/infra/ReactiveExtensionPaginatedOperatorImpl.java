@@ -71,44 +71,30 @@ public class ReactiveExtensionPaginatedOperatorImpl implements ReactiveExtension
 
     @Override
     public <E extends Extension> Flux<E> list(Class<E> type, ListOptions listOptions) {
-        var pageRequest = createPageRequest();
-        return list(type, listOptions, pageRequest);
+        return list(type, listOptions, defaultSort());
     }
 
     /**
-     * Paginated list all items to avoid memory overflow.
+     * Streams all matching items with a single indexed query.
      *
-     * <pre>
-     * 1. Retrieve data multiple times until all data is consumed.
-     * 2. Fetch next page if current page has more data and consumed records is less than total
-     * records.
-     * 3. Take while consumed records is less than total records.
-     * 4. totalRecords from first page to ensure new inserted data will not be counted in during
-     * querying to avoid infinite loop.
-     * </pre>
+     * <p>Paging with offsets would re-run the whole indexed query and sort once per page, which becomes quadratic for
+     * large data sets. The names are resolved once and fetched in batches by
+     * {@link ReactiveExtensionClient#listAll(Class, ListOptions, Sort)} instead.
+     *
+     * <p>Items created after {@code now} are not returned, even if they were indexed before the query ran, because the
+     * results are ordered by creation timestamp.
      */
-    private <E extends Extension> Flux<E> list(Class<E> type, ListOptions listOptions, PageRequest pageRequest) {
+    private <E extends Extension> Flux<E> list(Class<E> type, ListOptions listOptions, Sort sort) {
         final var now = Instant.now();
-        return pageBy(type, listOptions, pageRequest)
-                .expand(result -> {
-                    if (result.hasNext()) {
-                        // fetch next page
-                        var nextPage = nextPage(result, pageRequest.getSort());
-                        return pageBy(type, listOptions, nextPage);
-                    } else {
-                        return Mono.empty();
-                    }
-                })
-                .flatMap(page -> Flux.fromIterable(page.getItems()))
-                .takeWhile(item -> shouldTakeNext(item, now));
+        return client.listAll(type, listOptions, sort).takeWhile(item -> shouldTakeNext(item, now));
     }
 
-    static <E extends Extension> PageRequest nextPage(ListResult<E> result, Sort sort) {
-        return PageRequestImpl.of(result.getPage() + 1, result.getSize(), sort);
+    private static Sort defaultSort() {
+        return Sort.by("metadata.creationTimestamp", "metadata.name");
     }
 
     private PageRequest createPageRequest() {
-        return PageRequestImpl.of(1, DEFAULT_PAGE_SIZE, Sort.by("metadata.creationTimestamp", "metadata.name"));
+        return PageRequestImpl.of(1, DEFAULT_PAGE_SIZE, defaultSort());
     }
 
     private <E extends Extension> Mono<ListResult<E>> pageBy(
