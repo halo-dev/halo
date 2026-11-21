@@ -134,9 +134,9 @@ public class QueryVisitor<E extends Extension> implements Visitor {
                 left.visit(this);
                 return;
             }
-            // Evaluate the positive side first, then refine it with the negated leaf, so that the negated side does
-            // not build a complement over the whole index.
-            if (isNegatedLeaf(left) && !isNegatedLeaf(right)) {
+            // Evaluate the structural side first, then refine it with the leaf that would otherwise scan or
+            // complement the whole index.
+            if (isRefinableLeaf(left) && !isRefinableLeaf(right)) {
                 right.visit(this);
                 if (!result.isEmpty()) {
                     refineCandidates(result, left);
@@ -148,7 +148,7 @@ public class QueryVisitor<E extends Extension> implements Visitor {
             if (result.isEmpty()) {
                 return;
             }
-            if (isNegatedLeaf(right)) {
+            if (isRefinableLeaf(right)) {
                 refineCandidates(result, right);
                 return;
             }
@@ -198,16 +198,21 @@ public class QueryVisitor<E extends Extension> implements Visitor {
         }
 
         /**
-         * Checks whether the condition can refine an existing candidate set instead of building a complement.
+         * Checks whether the condition can refine an existing candidate set instead of evaluating itself over the whole
+         * index.
          *
-         * <p>Label conditions are excluded because the label index does not expose per-entity lookups.
+         * <p>These leaves either build a complement (negated conditions) or scan every key (string matchers). Label
+         * conditions are excluded because the label index does not expose per-entity lookups.
          */
-        private static boolean isNegatedLeaf(Condition condition) {
+        private static boolean isRefinableLeaf(Condition condition) {
             var effective = unwrap(condition);
             return effective instanceof NotEqualCondition
                     || effective instanceof NotInCondition
                     || effective instanceof NotBetweenCondition
                     || effective instanceof IsNotNullCondition
+                    || effective instanceof StringContainsCondition
+                    || effective instanceof StringStartsWithCondition
+                    || effective instanceof StringEndsWithCondition
                     || effective instanceof StringNotContainsCondition
                     || effective instanceof StringNotStartsWithCondition
                     || effective instanceof StringNotEndsWithCondition;
@@ -229,6 +234,12 @@ public class QueryVisitor<E extends Extension> implements Visitor {
                 case NotInCondition(var indexName, var keys) -> refineNotIn(candidates, indexName, keys);
                 case NotBetweenCondition bc -> refineNotBetween(candidates, bc);
                 case IsNotNullCondition(var indexName) -> refineIsNotNull(candidates, indexName);
+                case StringContainsCondition(var indexName, var keyword) ->
+                    refineStringContains(candidates, indexName, keyword);
+                case StringStartsWithCondition(var indexName, var prefix) ->
+                    refineStringStartsWith(candidates, indexName, prefix);
+                case StringEndsWithCondition(var indexName, var suffix) ->
+                    refineStringEndsWith(candidates, indexName, suffix);
                 case StringNotContainsCondition(var indexName, var keyword) ->
                     refineStringNotContains(candidates, indexName, keyword);
                 case StringNotStartsWithCondition(var indexName, var prefix) ->
@@ -263,6 +274,21 @@ public class QueryVisitor<E extends Extension> implements Visitor {
 
         private <K extends Comparable<K>> void refineIsNotNull(Set<String> candidates, String indexName) {
             this.<K>getValueIndexQuery(indexName).isNotNull(candidates);
+        }
+
+        private <K extends Comparable<K>> void refineStringContains(
+                Set<String> candidates, String indexName, String keyword) {
+            this.<K>getValueIndexQuery(indexName).stringContains(candidates, keyword);
+        }
+
+        private <K extends Comparable<K>> void refineStringStartsWith(
+                Set<String> candidates, String indexName, String prefix) {
+            this.<K>getValueIndexQuery(indexName).stringStartsWith(candidates, prefix);
+        }
+
+        private <K extends Comparable<K>> void refineStringEndsWith(
+                Set<String> candidates, String indexName, String suffix) {
+            this.<K>getValueIndexQuery(indexName).stringEndsWith(candidates, suffix);
         }
 
         private <K extends Comparable<K>> void refineStringNotContains(

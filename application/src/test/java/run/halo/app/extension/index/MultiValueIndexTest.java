@@ -778,6 +778,10 @@ class MultiValueIndexTest {
                         () -> index.notBetween(new HashSet<>(), "string1", true, "string2", false));
                 assertThrows(
                         UnsupportedOperationException.class, () -> index.stringNotContains(new HashSet<>(), "ing"));
+                assertThrows(UnsupportedOperationException.class, () -> index.stringContains(new HashSet<>(), "ing"));
+                assertThrows(
+                        UnsupportedOperationException.class, () -> index.stringStartsWith(new HashSet<>(), "string"));
+                assertThrows(UnsupportedOperationException.class, () -> index.stringEndsWith(new HashSet<>(), "ing"));
                 assertThrows(
                         UnsupportedOperationException.class,
                         () -> index.stringNotStartsWith(new HashSet<>(), "string"));

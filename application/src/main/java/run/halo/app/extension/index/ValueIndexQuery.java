@@ -158,6 +158,15 @@ public interface ValueIndexQuery<K extends Comparable<K>> {
     Set<String> stringContains(String keyword);
 
     /**
+     * Refines the candidates with the "contains" check instead of scanning the whole index.
+     *
+     * @param candidates the candidates to refine; must be mutable and owned by the caller
+     * @param keyword the keyword to search for
+     * @return the same candidate set
+     */
+    Set<String> stringContains(Set<String> candidates, String keyword);
+
+    /**
      * Gets entity IDs where the string representation of the key does not contain the specified keyword.
      *
      * @param keyword the keyword to search for
@@ -185,6 +194,15 @@ public interface ValueIndexQuery<K extends Comparable<K>> {
     Set<String> stringStartsWith(String prefix);
 
     /**
+     * Refines the candidates with the "starts with" check instead of collecting the matching range in the index.
+     *
+     * @param candidates the candidates to refine; must be mutable and owned by the caller
+     * @param prefix the prefix to search for
+     * @return the same candidate set
+     */
+    Set<String> stringStartsWith(Set<String> candidates, String prefix);
+
+    /**
      * Gets entity IDs where the string representation of the key does not start with the specified prefix.
      *
      * @param prefix the prefix to search for
@@ -210,6 +228,15 @@ public interface ValueIndexQuery<K extends Comparable<K>> {
      * @throws IllegalArgumentException if the key type is not String
      */
     Set<String> stringEndsWith(String suffix);
+
+    /**
+     * Refines the candidates with the "ends with" check instead of scanning the whole index.
+     *
+     * @param candidates the candidates to refine; must be mutable and owned by the caller
+     * @param suffix the suffix to search for
+     * @return the same candidate set
+     */
+    Set<String> stringEndsWith(Set<String> candidates, String suffix);
 
     /**
      * Gets entity IDs where the string representation of the key does not end with the specified suffix.

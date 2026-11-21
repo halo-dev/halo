@@ -219,6 +219,11 @@ class MultiValueIndex<E extends Extension, K extends Comparable<K>> implements V
     }
 
     @Override
+    public Set<String> stringContains(Set<String> candidates, String keyword) {
+        throw new UnsupportedOperationException("Multi-value index does not support stringContains operation");
+    }
+
+    @Override
     public Set<String> stringNotContains(String keyword) {
         throw new UnsupportedOperationException("Multi-value index does not support stringNotContains operation");
     }
@@ -234,6 +239,11 @@ class MultiValueIndex<E extends Extension, K extends Comparable<K>> implements V
     }
 
     @Override
+    public Set<String> stringStartsWith(Set<String> candidates, String prefix) {
+        throw new UnsupportedOperationException("Multi-value index does not support stringStartsWith operation");
+    }
+
+    @Override
     public Set<String> stringNotStartsWith(String prefix) {
         throw new UnsupportedOperationException("Multi-value index does not support stringNotStartsWith operation");
     }
@@ -245,6 +255,11 @@ class MultiValueIndex<E extends Extension, K extends Comparable<K>> implements V
 
     @Override
     public Set<String> stringEndsWith(String suffix) {
+        throw new UnsupportedOperationException("Multi-value index does not support stringEndsWith operation");
+    }
+
+    @Override
+    public Set<String> stringEndsWith(Set<String> candidates, String suffix) {
         throw new UnsupportedOperationException("Multi-value index does not support stringEndsWith operation");
     }
 
