@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import io.swagger.v3.core.util.Json;
 import java.util.Map;
 import org.springframework.util.Assert;
 
@@ -18,7 +17,7 @@ import org.springframework.util.Assert;
  */
 @Deprecated(forRemoval = true, since = "2.23.0")
 public class JsonUtils {
-    public static final ObjectMapper DEFAULT_JSON_MAPPER = Json.mapper();
+    public static final ObjectMapper DEFAULT_JSON_MAPPER = Jackson2ObjectMappers.shared();
 
     private JsonUtils() {}
 

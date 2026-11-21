@@ -10,7 +10,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.zafarkhaja.semver.Version;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
-import io.swagger.v3.core.util.Json;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -66,6 +65,7 @@ import run.halo.app.infra.exception.PluginDependentsNotDisabledException;
 import run.halo.app.infra.exception.PluginInstallationException;
 import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.infra.utils.FileUtils;
+import run.halo.app.infra.utils.Jackson2ObjectMappers;
 import run.halo.app.infra.utils.VersionUtils;
 import run.halo.app.plugin.resources.BundleResourceUtils;
 
@@ -538,7 +538,7 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
             return Map.of();
         }
         var json = resource.getContentAsString(StandardCharsets.UTF_8);
-        return Json.mapper().readValue(json, new TypeReference<>() {});
+        return Jackson2ObjectMappers.shared().readValue(json, new TypeReference<>() {});
     }
 
     private record PresetPlugin(Path path, boolean autoEnable) {}
