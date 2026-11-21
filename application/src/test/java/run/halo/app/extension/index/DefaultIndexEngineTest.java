@@ -1,23 +1,27 @@
 package run.halo.app.extension.index;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 import static org.springframework.data.domain.Sort.Direction.ASC;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -148,9 +152,7 @@ class DefaultIndexEngineTest {
         when(singleValueIndex.getKey("a")).thenReturn("a");
         when(singleValueIndex.getKey("b")).thenReturn("b");
         when(singleValueIndex.getKey("c")).thenReturn("c");
-        when(creationTimestampIndex.getKey("a")).thenReturn(Instant.ofEpochSecond(2));
-        when(creationTimestampIndex.getKey("b")).thenReturn(Instant.ofEpochSecond(1));
-        when(creationTimestampIndex.getKey("c")).thenReturn(Instant.ofEpochSecond(2));
+        when(creationTimestampIndex.sortedStream(anySet(), eq(true), any())).thenReturn(Stream.of("a", "c", "b"));
 
         var options =
                 ListOptions.builder().andQuery(Queries.all("metadata.name")).build();
@@ -158,9 +160,13 @@ class DefaultIndexEngineTest {
         var result = engine.retrieve(Fake.class, options, PageRequestImpl.of(1, 3, sort));
 
         assertEquals(List.of("a", "c", "b"), result.getItems());
-        // sort keys are resolved once per candidate instead of once per comparison
-        verify(singleValueIndex, times(3)).getKey(anyString());
-        verify(creationTimestampIndex, times(3)).getKey(anyString());
+        // The remaining sort orders are passed to the index as the tie breaker for equal keys.
+        var tieBreaker = ArgumentCaptor.forClass(Comparator.class);
+        verify(creationTimestampIndex).sortedStream(eq(Set.of("a", "b", "c")), eq(true), tieBreaker.capture());
+        @SuppressWarnings("unchecked")
+        var comparator = (Comparator<String>) tieBreaker.getValue();
+        assertTrue(comparator.compare("a", "b") < 0);
+        assertTrue(comparator.compare("b", "c") < 0);
     }
 
     @Test
@@ -168,7 +174,9 @@ class DefaultIndexEngineTest {
         when(indices.<String>getIndex("metadata.name")).thenReturn(singleValueIndex);
         when(indices.<Instant>getIndex("metadata.creationTimestamp")).thenReturn(creationTimestampIndex);
         when(singleValueIndex.all()).thenReturn(mutableSet("a", "b", "c", "d", "e", "f"));
-        when(creationTimestampIndex.getKey(anyString())).thenReturn(Instant.EPOCH);
+        // Equal sort keys are tie-broken by the index itself, so every page sees the same order.
+        when(creationTimestampIndex.sortedStream(anySet(), eq(false), any()))
+                .thenAnswer(invocation -> Stream.of("a", "b", "c", "d", "e", "f"));
 
         var options =
                 ListOptions.builder().andQuery(Queries.all("metadata.name")).build();
@@ -183,14 +191,11 @@ class DefaultIndexEngineTest {
     }
 
     @Test
-    void shouldSortByMultiValueIndexAndTreatEmptyKeysAsNull() {
+    void shouldSortByMultiValueIndex() {
         when(indices.<String>getIndex("metadata.name")).thenReturn(singleValueIndex);
         when(indices.<String>getIndex("spec.tags")).thenReturn(multiValueIndex);
         when(singleValueIndex.all()).thenReturn(mutableSet("a", "b", "c"));
-        when(multiValueIndex.getSortKey(anyString())).thenCallRealMethod();
-        when(multiValueIndex.getKeys("a")).thenReturn(Set.of("z"));
-        when(multiValueIndex.getKeys("b")).thenReturn(Set.of());
-        when(multiValueIndex.getKeys("c")).thenReturn(Set.of("m"));
+        when(multiValueIndex.sortedStream(anySet(), eq(false), any())).thenReturn(Stream.of("b", "c", "a"));
 
         var options =
                 ListOptions.builder().andQuery(Queries.all("metadata.name")).build();
@@ -199,7 +204,6 @@ class DefaultIndexEngineTest {
         assertEquals(
                 List.of("b", "c", "a"),
                 StreamSupport.stream(result.spliterator(), false).toList());
-        verify(multiValueIndex, times(3)).getKeys(anyString());
     }
 
     @ParameterizedTest
@@ -232,7 +236,7 @@ class DefaultIndexEngineTest {
                     .getIndex(anyString());
             var options =
                     ListOptions.builder().andQuery(Queries.all("metadata.name")).build();
-            var sort = Sort.by(ASC, "metadata.name", "stringValues");
+            var sort = Sort.by(ASC, "stringValues", "metadata.name");
 
             Iterable<String> result =
                     switch (retrieval) {
@@ -260,7 +264,9 @@ class DefaultIndexEngineTest {
                 .collect(Collectors.toSet());
         when(indices.<String>getIndex("metadata.name")).thenReturn(singleValueIndex);
         when(singleValueIndex.all()).thenReturn(allResult);
-        when(singleValueIndex.getKey(anyString())).thenAnswer(invocation -> invocation.getArgument(0));
+        when(singleValueIndex.sortedStream(anySet(), eq(false), any()))
+                .thenAnswer(invocation ->
+                        invocation.<Set<String>>getArgument(0).stream().sorted());
 
         var options =
                 ListOptions.builder().andQuery(Queries.all("metadata.name")).build();
@@ -310,9 +316,7 @@ class DefaultIndexEngineTest {
                 ListOptions.builder().andQuery(Queries.all("metadata.name")).build();
         when(indices.<String>getIndex("metadata.name")).thenReturn(singleValueIndex);
         when(singleValueIndex.all()).thenReturn(mutableSet("1", "2", "3"));
-        when(singleValueIndex.getKey("1")).thenReturn("1");
-        when(singleValueIndex.getKey("2")).thenReturn("2");
-        when(singleValueIndex.getKey("3")).thenReturn("3");
+        when(singleValueIndex.sortedStream(anySet(), eq(true), any())).thenReturn(Stream.of("3", "2", "1"));
         var result = engine.retrieveAll(Fake.class, options, Sort.by(DESC, "metadata.name"));
         assertEquals(
                 List.of("3", "2", "1"),
@@ -325,11 +329,8 @@ class DefaultIndexEngineTest {
                 ListOptions.builder().andQuery(Queries.all("metadata.name")).build();
         when(indices.<String>getIndex("metadata.name")).thenReturn(singleValueIndex);
         when(singleValueIndex.all()).thenReturn(mutableSet("1", "2", "3", "4", "5"));
-        when(singleValueIndex.getKey("1")).thenReturn("1");
-        when(singleValueIndex.getKey("2")).thenReturn("2");
-        when(singleValueIndex.getKey("3")).thenReturn("3");
-        when(singleValueIndex.getKey("4")).thenReturn("4");
-        when(singleValueIndex.getKey("5")).thenReturn("5");
+        when(singleValueIndex.sortedStream(anySet(), eq(true), any())).thenReturn(Stream.of("5", "4", "3", "2", "1"));
+        when(singleValueIndex.sortedStream(anySet(), eq(false), any())).thenReturn(Stream.of("1", "2", "3", "4", "5"));
         var result = engine.retrieveTopN(Fake.class, options, Sort.by(DESC, "metadata.name"), 3);
         assertEquals(
                 List.of("5", "4", "3"),
