@@ -37,15 +37,13 @@ rules:
 ---
 apiVersion: v1alpha1
 kind: "Role"
+# Changing another user's password requires a super administrator, so this
+# template no longer grants a usable capability. Retired into a hidden, empty
+# tombstone; keep the resource so upgrades overwrite legacy rules. Do not add
+# rules back. See https://github.com/halo-dev/halo/issues/10477.
 metadata:
   name: role-template-change-password
   labels:
     halo.run/role-template: "true"
     halo.run/hidden: "true"
-  annotations:
-    rbac.authorization.halo.run/module: "Users Management"
-    rbac.authorization.halo.run/display-name: "User Password Change"
-rules:
-  - apiGroups: ["api.console.halo.run"]
-    resources: ["users/password"]
-    verbs: ["update"]
+rules: []

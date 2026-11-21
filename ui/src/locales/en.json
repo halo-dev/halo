@@ -996,7 +996,6 @@
   "core.rbac.User manage": "User Manage",
   "core.rbac.User View": "User View",
   "core.rbac.role-template-view-users": "User View",
-  "core.rbac.role-template-change-password": "Change Password",
   "core.rbac.Actuator Management": "System Information",
   "core.rbac.Actuator Manage": "Access System Information",
   "core.rbac.Cache Management": "Cache",
