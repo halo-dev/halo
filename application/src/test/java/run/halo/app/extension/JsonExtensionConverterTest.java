@@ -1,12 +1,18 @@
 package run.halo.app.extension;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.lenient;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -79,9 +85,50 @@ class JsonExtensionConverterTest {
         fake.setKind("Fake");
         var error = assertThrows(SchemaViolationException.class, () -> converter.convertTo(fake));
         assertEquals(1, error.getErrors().size());
-        var result = error.getErrors().items().get(0);
-        assertEquals(1026, result.code());
-        assertEquals("Field 'name' is required.", result.message());
+        var result = error.getErrors().get(0);
+        assertEquals("required", result.getKeyword());
+        assertEquals("/metadata", result.getInstanceLocation().toString());
+        assertTrue(result.getMessage().contains("name"));
+    }
+
+    @Test
+    void shouldAllowNullValueForNullableField() {
+        var scheme = Scheme.buildFromType(NullableExtension.class);
+        lenient().when(schemeManager.get(scheme.groupVersionKind())).thenReturn(scheme);
+
+        var extension = new NullableExtension();
+        extension.setApiVersion("fake.halo.run/v1alpha1");
+        extension.setKind("Nullable");
+        var metadata = new Metadata();
+        metadata.setName("nullable");
+        metadata.setGenerateName("nullable");
+        metadata.setLabels(Map.of());
+        metadata.setAnnotations(Map.of());
+        extension.setMetadata(metadata);
+        extension.setOptional(null);
+
+        // Ensure the null field is serialized instead of omitted, so that the validator has to
+        // accept it according to the nullable keyword.
+        converter.setObjectMapper(
+                Unstructured.OBJECT_MAPPER.copy().setSerializationInclusion(JsonInclude.Include.ALWAYS));
+
+        var store = assertDoesNotThrow(() -> converter.convertTo(extension));
+        assertTrue(new String(store.getData(), StandardCharsets.UTF_8).contains("\"optional\":null"));
+    }
+
+    @GVK(group = "fake.halo.run", version = "v1alpha1", kind = "Nullable", plural = "nullables", singular = "nullable")
+    static class NullableExtension extends AbstractExtension {
+
+        private String optional;
+
+        @Schema(nullable = true)
+        public String getOptional() {
+            return optional;
+        }
+
+        public void setOptional(String optional) {
+            this.optional = optional;
+        }
     }
 
     FakeExtension createFakeExtension(String name, Long version) {
