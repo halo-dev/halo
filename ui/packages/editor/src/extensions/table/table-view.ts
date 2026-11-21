@@ -1,4 +1,7 @@
-import { TableView as TiptapTableView } from "@tiptap/extension-table";
+import {
+  TableView as TiptapTableView,
+  updateColumns,
+} from "@tiptap/extension-table";
 import type { EditorView, Node as ProseMirrorNode } from "@/tiptap/pm";
 import { normalizeTableLayoutMode, type TableLayoutMode } from "./attributes";
 import { applyAutoColumnWidths, getTableColumnWidths } from "./column-widths";
@@ -59,9 +62,14 @@ export class HaloTableView extends TiptapTableView {
   }
 
   update(node: ProseMirrorNode) {
-    if (!super.update(node)) {
+    // TableView.update rejects any attribute change, which would leave the
+    // reused table node with stale column widths. Apply the attributes here.
+    if (node.type !== this.node.type) {
       return false;
     }
+
+    this.node = node;
+    updateColumns(node, this.colgroup, this.table, this.cellMinWidth);
 
     this.applyLayout(node);
     this.scheduleShadowUpdate();
@@ -88,6 +96,13 @@ export class HaloTableView extends TiptapTableView {
     this.table.dataset.tableLayout = layoutMode;
     this.table.style.display = "table";
     this.table.style.tableLayout = layoutMode;
+
+    // Indentation is applied to the scroll wrapper by the indent decoration,
+    // so keep the table itself from inheriting the rendered indent styles.
+    if (Number(node.attrs.indent) > 0) {
+      this.table.style.removeProperty("margin-left");
+      this.table.style.removeProperty("max-width");
+    }
 
     if (layoutMode === "auto") {
       applyAutoColumnWidths(
