@@ -1,6 +1,6 @@
 ---
 name: verify
-description: Layered post-change verification for the Halo core repo (halo-dev/halo — Java 21 / Spring Boot WebFlux + R2DBC + Vue 3 monorepo) — T0 scope the change → T1 static gates (Spotless, Gradle compile and api/application tests, pnpm typecheck/lint/test/build/i18n/format, OpenAPI sync) → T2 regression and blast radius (callers, extension indexes, events, RBAC, migrations, plugins/themes, UI contracts, OpenSpec) → T3 end-to-end (temp workdir, free port, setup, API probes/browser). Use whenever api, application, ui, configuration, migrations, dependencies, or CI change; after fixing a bug, refactoring, or completing an OpenSpec change; or when the user says "verify this", "don't introduce regressions", "test it end-to-end", or "did you test it". Even small changes must pass the gates at the matching depth. Claiming "done, no problems" without running commands is wrong. A more specific Pro/enterprise verification skill such as `verify-halo-pro` takes precedence; this is the shared baseline.
+description: Layered post-change verification for the Halo core repo (halo-dev/halo — Java 21 / Spring Boot WebFlux + R2DBC + Vue 3 monorepo) — T0 scope the change → T1 static gates (Spotless, Gradle compile and api/application tests, pnpm typecheck/lint/test/build/i18n/format, OpenAPI sync) → T2 regression and blast radius (callers, extension indexes, events, RBAC, migrations, plugins/themes, UI contracts, OpenSpec) → T3 end-to-end (temp workdir, free port, setup, API probes, and a mandatory real-browser screenshot pass for any `ui/` change). Use whenever api, application, ui, configuration, migrations, dependencies, or CI change; after fixing a bug, refactoring, or completing an OpenSpec change; or when the user says "verify this", "don't introduce regressions", "test it end-to-end", or "did you test it". Even small changes must pass the gates at the matching depth. Claiming "done, no problems" without running commands is wrong. A more specific Pro/enterprise verification skill such as `verify-halo-pro` takes precedence; this is the shared baseline.
 ---
 
 # verify — layered verification after changes in Halo core
@@ -48,8 +48,8 @@ Pick the depth from this table (take the union when multiple rows match):
 | Change | Depth |
 |---|---|
 | Docs/comments only | T0; if Markdown/JSON/properties/XML changed, run `./gradlew spotlessCheck` |
-| `ui` styles/display copy/template tweaks (no type or logic changes) | T1 (lint/typecheck/build; optional browser check if visual behavior is in doubt) |
-| `ui` component logic/composables/routing/permissions/api types | T1 + relevant Vitest; T3 for core flows or when the user asks |
+| `ui` styles/display copy/template tweaks (no type or logic changes) | T1 + T3 browser check (real page, before/after states, screenshots shown to the user) |
+| `ui` component logic/composables/routing/permissions/api types | T1 + relevant Vitest + T3 browser check (drive the affected flow, screenshot every relevant state, show the user) |
 | Java with no behavior change (rename/format) | T1 compile + Spotless |
 | Java logic/endpoints/services/reconcilers | T1 + T2 |
 | Core paths: content publishing/comments, auth/session/2FA/sudo, RBAC, plugin lifecycle, theme rendering, search, migrations, snapshots/backups | T1 + T2 + T3 |
@@ -58,7 +58,7 @@ Pick the depth from this table (take the union when multiple rows match):
 | Dependency/version upgrades | T1 + relevant tests + `./gradlew clean check`; use the `gradle-dependency-updates` skill for upgrades; versions live only in `gradle/libs.versions.toml`, `gradle.properties`, `ui/package.json`/workspace catalog |
 | CI workflows | T1 + manual review of CI semantics; GitHub Actions cannot run locally — say so in the report |
 
-**T3 boundary**: run T3 only for backend contracts/core paths or when the user explicitly asks for end-to-end verification. Pure frontend style/display changes stop at T1; pure frontend logic stops at T1 + Vitest, with T3 optional. Do not spin up a Halo instance for a CSS change.
+**T3 boundary**: any change under `ui/` (Console, UC, workspace packages, styles, templates, copy, or logic) always includes T3 with a real browser. Start an isolated instance, open the affected page, exercise the change, capture screenshots of every relevant state (for example empty vs. filled, success vs. error), and show those screenshots to the user. T1 + Vitest prove the code compiles and units pass; they say nothing about whether the page renders or the flow actually works, so they never substitute for the browser pass. Never downgrade a UI change to "T1 only" because it is "just CSS" or "just copy". If a browser pass is genuinely blocked (no automation, missing login, environment broken), report the change as unverified/FAIL rather than PASS, and say exactly what blocked it. Backend-only changes follow the rows above.
 
 ## T1 — static gates
 
@@ -166,10 +166,11 @@ Wait until `http://127.0.0.1:$PORT/actuator/health` is UP; first startup/migrati
 
 3. Initialize a temporary admin via `POST /system/setup` (form) and keep the one-time password. The `dev` profile has `halo.security.basic-auth.disabled: false`, so Basic Auth works and `curl -u` can perform writes; whether Basic Auth is enabled depends on the current profile's `application-*.yaml`. `/apis/**`, `/actuator/**`, `/system/setup`, and `/sudo/**` are CSRF-exempt.
 4. Choose probes from the OpenAPI paths relevant to the change (`api-docs/openapi/v3_0/aggregated.json` and `apis_{console,uc,public,extension}.api_v1alpha1.json`); do not invent request bodies from memory. Use admin for management APIs, and admin or a disposable user for UC (`POST /apis/api.console.halo.run/v1alpha1/users`, flat body `{name,email,password,displayName}`). A normal user hitting management APIs should usually get 403 (depending on role configuration).
-5. UI verification, choose one:
+5. UI verification — **mandatory whenever the change touches `ui/`**, choose one way to serve the UI:
    - **Build into the backend**: `./gradlew :ui:doBuild :application:copyUiDist` (`copyUiDist` only `mustRunAfter :ui:doBuild`; it does not trigger the UI build, so run both explicitly). Start with `--halo.ui.proxy.enabled=false` and open `http://127.0.0.1:$PORT/console` (unauthenticated requests redirect with 302 to `/login`).
    - **Vite dev server**: `pnpm -C ui dev`. The Vite port is hard-coded to 3000 in `ui/vite.config.ts`; do not change repo config. If 3000 is occupied, prefer the build-into-backend path. Vite has no API proxy of its own; the backend proxies UI requests to Vite, so the entry point is still the backend port's `/console`.
-   - For real rendering, use browser automation (e.g. `agent-browser`) to log in, screenshot, and inspect Network. If you cannot, write "component tests/static inference only; no real browser".
+   - Then use real browser automation (e.g. `agent-browser`) to log in, navigate to the affected page, and exercise the change. At minimum: capture the page with the change visible (and the empty/filled, success/error states the change affects), save the screenshots under `/tmp/verify-*`, and attach/show them to the user in the final reply. Check the Network panel for failed requests and console errors.
+   - "No real browser" is a blocked verification, not a valid stopping point: report FAIL/unverified with the blocker instead of claiming the UI works.
 6. Persist all evidence under `/tmp/verify-*`; cleanup: kill only the port processes you started, remove the temporary workdir, confirm the port is free, and check `git status` for stray files. Test data lives in the temporary workdir and is removed with it.
 
 Items that cannot be verified locally (list them honestly in the report): MySQL/MariaDB/PostgreSQL dialect startup matrix (tests run only on H2; this repo's CI has no database matrix), real email/SMS delivery (SMTP/notifications), plugin-market install/upgrade and legacy plugin/theme compatibility, third-party login providers, reverse proxies/multi-node/session sharing, performance/load, and GitHub Actions/container image/Maven Central publishing.
@@ -180,6 +181,7 @@ Items that cannot be verified locally (list them honestly in the report): MySQL/
 Verdict: PASS / PASS_WITH_NOTES / FAIL
 Evidence: /tmp/verify-<slug>-<rand>/
 Verified: ... (commands/probes run and their results)
+UI screenshots: ... (paths for every UI change; required, not optional)
 Static inference only: ...
 Cannot verify locally: ... (reason)
 Pre-existing baseline failures: ... (e.g. existing ui typecheck / i18n:check errors; not caused by this change)
