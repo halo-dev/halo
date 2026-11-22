@@ -14,6 +14,7 @@ export * from "./components/loading";
 export * from "./components/menu";
 export * from "./components/modal";
 export * from "./components/pagination";
+export * from "./components/popover";
 export * from "./components/space";
 export * from "./components/status";
 export * from "./components/switch";
