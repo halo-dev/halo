@@ -32,7 +32,9 @@ class UserRoleTemplateTest {
         "DELETE, /api/v1alpha1/users, false",
         "DELETE, /apis/api.console.halo.run/v1alpha1/users/target/avatar, true",
         "POST, /apis/api.console.halo.run/v1alpha1/users/target/permissions, false",
-        "PUT, /apis/api.console.halo.run/v1alpha1/users/target/password, false"
+        "PUT, /apis/api.console.halo.run/v1alpha1/users/target/password, false",
+        "POST, /apis/console.api.security.halo.run/v1alpha1/users/target/disable, false",
+        "POST, /apis/console.api.security.halo.run/v1alpha1/users/target/enable, false"
     })
     void delegatesOnlyConsoleUserOperations(HttpMethod method, String path, boolean allowed) {
         var roles = loadRoles().stream()

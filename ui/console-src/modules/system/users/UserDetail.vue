@@ -225,7 +225,9 @@ const { handleEnableOrDisableUser } = useUserEnableDisable();
               <VDropdownItem
                 v-if="
                   !!user &&
-                  currentUser?.user.metadata.name !== user?.user.metadata.name
+                  currentUser?.user.metadata.name !==
+                    user?.user.metadata.name &&
+                  utils.permission.has(['*'])
                 "
                 type="danger"
                 @click="
