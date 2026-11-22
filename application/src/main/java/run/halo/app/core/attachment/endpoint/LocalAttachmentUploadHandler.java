@@ -58,7 +58,7 @@ import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.utils.FileNameUtils;
 import run.halo.app.infra.utils.FileTypeDetectUtils;
 import run.halo.app.infra.utils.HaloUtils;
-import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.infra.utils.JacksonUtils;
 
 @Slf4j
 @Component
@@ -94,7 +94,7 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
                     var setting = Optional.ofNullable(configMap)
                             .map(ConfigMap::getData)
                             .map(data -> data.get("default"))
-                            .map(json -> JsonUtils.jsonToObject(json, PolicySetting.class))
+                            .map(json -> JacksonUtils.jsonToObject(json, PolicySetting.class))
                             .orElseGet(PolicySetting::new);
 
                     final var attachmentsRoot = attachmentDirGetter.get();

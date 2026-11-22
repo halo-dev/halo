@@ -50,7 +50,7 @@ import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.ThemeRootGetter;
 import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
-import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.infra.utils.JacksonUtils;
 import run.halo.app.theme.TemplateEngineManager;
 import run.halo.app.theme.service.ThemeService;
 import run.halo.app.theme.service.ThemeUtils;
@@ -349,7 +349,7 @@ public class ThemeEndpoint implements CustomEndpoint {
                                     .getConfigMap()
                                     .filter(configMap -> configMap.getData() != null)
                                     .map(configMap -> {
-                                        var themeConfigJson = JsonUtils.objectToJson(themeSetting);
+                                        var themeConfigJson = JacksonUtils.objectToJson(themeSetting);
                                         configMap.getData().put(SystemSetting.Theme.GROUP, themeConfigJson);
                                         return configMap;
                                     });

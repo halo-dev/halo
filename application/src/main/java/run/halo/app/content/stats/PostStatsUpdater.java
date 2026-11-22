@@ -12,7 +12,7 @@ import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.controller.*;
 import run.halo.app.infra.InitializationPhase;
-import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.infra.utils.JacksonUtils;
 
 @Component
 public class PostStatsUpdater implements Reconciler<PostStatsUpdater.StatsRequest>, SmartLifecycle {
@@ -33,7 +33,7 @@ public class PostStatsUpdater implements Reconciler<PostStatsUpdater.StatsReques
     public Result reconcile(StatsRequest request) {
         client.fetch(Post.class, request.postName()).ifPresent(post -> {
             var annotations = MetadataUtil.nullSafeAnnotations(post);
-            annotations.put(Post.STATS_ANNO, JsonUtils.objectToJson(request.stats()));
+            annotations.put(Post.STATS_ANNO, JacksonUtils.objectToJson(request.stats()));
             client.update(post);
         });
         return Result.doNotRetry();

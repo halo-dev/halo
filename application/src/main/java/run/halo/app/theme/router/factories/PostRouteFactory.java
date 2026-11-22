@@ -27,7 +27,7 @@ import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.index.query.Queries;
 import run.halo.app.infra.exception.NotFoundException;
-import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.infra.utils.JacksonUtils;
 import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.vo.PostVo;
 import run.halo.app.theme.router.ModelMapUtils;
@@ -185,7 +185,7 @@ public class PostRouteFactory implements RouteFactory {
 
         static PostPatternVariable from(ServerRequest request) {
             Map<String, String> variables = mergedVariables(request);
-            return JsonUtils.mapToObject(variables, PostPatternVariable.class);
+            return JacksonUtils.mapToObject(variables, PostPatternVariable.class);
         }
     }
 

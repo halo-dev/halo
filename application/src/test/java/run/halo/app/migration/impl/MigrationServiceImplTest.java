@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -42,6 +41,7 @@ import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.migration.Backup;
+import tools.jackson.core.type.TypeReference;
 
 @ExtendWith(MockitoExtension.class)
 class MigrationServiceImplTest {

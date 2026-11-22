@@ -10,7 +10,7 @@ import org.springframework.util.Assert;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.SystemSetting.ThemeRouteRules;
-import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.infra.utils.JacksonUtils;
 
 /**
  * Site setting value object for theme.
@@ -104,7 +104,7 @@ public record SiteSettingVo(
             // empty object
             json = "{}";
         }
-        return JsonUtils.jsonToObject(json, type);
+        return JacksonUtils.jsonToObject(json, type);
     }
 
     @Builder

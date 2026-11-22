@@ -10,10 +10,6 @@ import static run.halo.app.infra.utils.FileUtils.createTempDir;
 import static run.halo.app.infra.utils.FileUtils.deleteRecursivelyAndSilently;
 import static run.halo.app.infra.utils.FileUtils.unzip;
 
-import com.fasterxml.jackson.core.util.MinimalPrettyPrinter;
-import com.fasterxml.jackson.databind.MappingIterator;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -58,6 +54,10 @@ import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.migration.Backup;
 import run.halo.app.migration.BackupFile;
 import run.halo.app.migration.MigrationService;
+import tools.jackson.core.util.MinimalPrettyPrinter;
+import tools.jackson.databind.MappingIterator;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 @Slf4j
 @Service

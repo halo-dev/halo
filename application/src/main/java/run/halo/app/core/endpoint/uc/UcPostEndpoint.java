@@ -37,7 +37,7 @@ import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.Ref;
 import run.halo.app.infra.exception.NotFoundException;
-import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.infra.utils.JacksonUtils;
 
 /**
  * User-center endpoint for managing posts owned by the current user.
@@ -249,7 +249,7 @@ public class UcPostEndpoint implements CustomEndpoint {
                 })
                 .map(metadata -> {
                     var contentJson = metadata.getAnnotations().remove(CONTENT_JSON_ANNO);
-                    return JsonUtils.jsonToObject(contentJson, Content.class);
+                    return JacksonUtils.jsonToObject(contentJson, Content.class);
                 })
                 .cache();
 
@@ -401,7 +401,7 @@ public class UcPostEndpoint implements CustomEndpoint {
         var annotations = post.getMetadata().getAnnotations();
         if (annotations != null && annotations.containsKey(CONTENT_JSON_ANNO)) {
             var contentJson = annotations.remove(CONTENT_JSON_ANNO);
-            content = JsonUtils.jsonToObject(contentJson, Content.class);
+            content = JacksonUtils.jsonToObject(contentJson, Content.class);
         }
         return content;
     }

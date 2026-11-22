@@ -7,7 +7,6 @@ import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuil
 import static org.springframework.data.domain.Sort.Order.asc;
 import static org.springframework.data.domain.Sort.Order.desc;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.HashMap;
@@ -39,9 +38,11 @@ import run.halo.app.extension.GroupVersion;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.infra.utils.JacksonUtils;
 import run.halo.app.notification.UserNotificationPreference;
 import run.halo.app.notification.UserNotificationPreferenceService;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Endpoint for user notification preferences.
@@ -52,6 +53,8 @@ import run.halo.app.notification.UserNotificationPreferenceService;
 @Component
 @RequiredArgsConstructor
 public class UserNotificationPreferencesEndpoint implements CustomEndpoint {
+
+    private static final JsonMapper JSON_MAPPER = JacksonUtils.MAPPER;
 
     private final ReactiveExtensionClient client;
     private final UserNotificationPreferenceService userNotificationPreferenceService;
@@ -225,8 +228,7 @@ public class UserNotificationPreferencesEndpoint implements CustomEndpoint {
             var uiPermissions = Optional.of(MetadataUtil.nullSafeAnnotations(reasonType))
                     .map(annotations -> annotations.get(Role.UI_PERMISSIONS_ANNO))
                     .filter(StringUtils::isNotBlank)
-                    .map(uiPermissionStr ->
-                            JsonUtils.jsonToObject(uiPermissionStr, new TypeReference<Set<String>>() {}))
+                    .map(uiPermissionStr -> JSON_MAPPER.readValue(uiPermissionStr, new TypeReference<Set<String>>() {}))
                     .orElse(Set.of());
             return new ReasonTypeInfo(
                     reasonType.getMetadata().getName(),

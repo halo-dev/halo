@@ -4,7 +4,6 @@ import static run.halo.app.extension.ExtensionUtil.defaultSort;
 import static run.halo.app.extension.ExtensionUtil.notDeleting;
 import static run.halo.app.security.authorization.AuthorityUtils.containsSuperRole;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -24,8 +23,10 @@ import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.index.query.Queries;
-import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.infra.utils.JacksonUtils;
 import run.halo.app.security.SuperAdminInitializer;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author guqing
@@ -34,6 +35,8 @@ import run.halo.app.security.SuperAdminInitializer;
 @Slf4j
 @Service
 public class DefaultRoleService implements RoleService {
+
+    private static final JsonMapper JSON_MAPPER = JacksonUtils.MAPPER;
 
     private final ReactiveExtensionClient client;
 
@@ -231,6 +234,6 @@ public class DefaultRoleService implements RoleService {
         if (StringUtils.isBlank(str)) {
             return Collections.emptyList();
         }
-        return JsonUtils.jsonToObject(str, new TypeReference<>() {});
+        return JSON_MAPPER.readValue(str, new TypeReference<>() {});
     }
 }

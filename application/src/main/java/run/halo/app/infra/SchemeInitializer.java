@@ -4,7 +4,6 @@ import static java.util.Objects.requireNonNullElse;
 import static run.halo.app.core.extension.Role.ROLE_AGGREGATE_LABEL_PREFIX;
 import static run.halo.app.core.extension.content.Comment.CommentOwner.ownerIdentity;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.Set;
@@ -37,14 +36,18 @@ import run.halo.app.core.extension.notification.Notification.NotificationSpec;
 import run.halo.app.core.extension.notification.Subscription.InterestReason;
 import run.halo.app.extension.*;
 import run.halo.app.extension.index.IndexSpecs;
-import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.infra.utils.JacksonUtils;
 import run.halo.app.migration.Backup;
 import run.halo.app.plugin.extensionpoint.ExtensionDefinition;
 import run.halo.app.plugin.extensionpoint.ExtensionPointDefinition;
 import run.halo.app.security.PersonalAccessToken;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.json.JsonMapper;
 
 @Component
 class SchemeInitializer implements SmartLifecycle {
+
+    private static final JsonMapper JSON_MAPPER = JacksonUtils.MAPPER;
 
     private final SchemeManager schemeManager;
 
@@ -117,7 +120,7 @@ class SchemeInitializer implements SmartLifecycle {
                             .map(MetadataOperator::getAnnotations)
                             .map(annotations -> annotations.get(User.ROLE_NAMES_ANNO))
                             .filter(StringUtils::isNotBlank)
-                            .map(rolesJson -> JsonUtils.jsonToObject(rolesJson, new TypeReference<Set<String>>() {}))
+                            .map(rolesJson -> JSON_MAPPER.readValue(rolesJson, new TypeReference<Set<String>>() {}))
                             .orElseGet(Set::of)));
             indexSpecs.add(IndexSpecs.<User, Boolean>single("spec.disabled", Boolean.class)
                     .indexFunc(user -> requireNonNullElse(user.getSpec().getDisabled(), Boolean.FALSE))
@@ -236,7 +239,7 @@ class SchemeInitializer implements SmartLifecycle {
                     .indexFunc(post -> Optional.ofNullable(post.getMetadata().getAnnotations())
                             .map(a -> a.get(Post.STATS_ANNO))
                             .filter(StringUtils::isNotBlank)
-                            .map(json -> JsonUtils.jsonToObject(json, Stats.class))
+                            .map(json -> JSON_MAPPER.readValue(json, Stats.class))
                             .map(Stats::getVisit)
                             .map(i -> (long) i)
                             .orElse(0L))
@@ -245,7 +248,7 @@ class SchemeInitializer implements SmartLifecycle {
                     .indexFunc(post -> Optional.ofNullable(post.getMetadata().getAnnotations())
                             .map(a -> a.get(Post.STATS_ANNO))
                             .filter(StringUtils::isNotBlank)
-                            .map(json -> JsonUtils.jsonToObject(json, Stats.class))
+                            .map(json -> JSON_MAPPER.readValue(json, Stats.class))
                             .map(Stats::getTotalComment)
                             .map(i -> (long) i)
                             .orElse(0L))
