@@ -1,5 +1,8 @@
 // @vitest-environment jsdom
 
+import Document from "@tiptap/extension-document";
+import Paragraph from "@tiptap/extension-paragraph";
+import Text from "@tiptap/extension-text";
 import {
   afterEach,
   beforeEach,
@@ -8,9 +11,35 @@ import {
   it,
   vi,
 } from "vite-plus/test";
-import type { Editor } from "@/tiptap";
+import { Editor } from "@/tiptap";
+import { ExtensionIndent } from "../indent";
+import { ExtensionTable } from "./index";
 import { HaloTableView } from "./table-view";
 import { createTableEditor, getTableNode, insertTable } from "./test-editor";
+
+function createIndentedTableEditor() {
+  return new Editor({
+    element: document.createElement("div"),
+    extensions: [Document, Paragraph, Text, ExtensionTable, ExtensionIndent],
+    content: {
+      type: "doc",
+      content: [
+        {
+          type: "table",
+          attrs: { indent: 24 },
+          content: [
+            {
+              type: "tableRow",
+              content: [
+                { type: "tableCell", content: [{ type: "paragraph" }] },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  });
+}
 
 describe("HaloTableView", () => {
   let editor: Editor | undefined;
@@ -60,6 +89,25 @@ describe("HaloTableView", () => {
     view.destroy();
     expect(resizeDisconnect).toHaveBeenCalledTimes(1);
     expect(cancelAnimationFrame).toHaveBeenCalledTimes(canceledFrames + 1);
+  });
+
+  it("leaves rendered indentation on the wrapper instead of the table", () => {
+    const indentedEditor = createIndentedTableEditor();
+    try {
+      const node = getTableNode(indentedEditor).node;
+      const view = new HaloTableView(node, 25, indentedEditor.view, {
+        "data-indent": "24",
+        style:
+          "margin-left: 24px!important;max-width: calc(100% - 24px)!important;",
+      });
+
+      expect(view.table.style.marginLeft).toBe("");
+      expect(view.table.style.maxWidth).toBe("");
+      expect(view.table.style.width).toBe("100%");
+      view.destroy();
+    } finally {
+      indentedEditor.destroy();
+    }
   });
 
   it("contains horizontal wheel scrolling only while the table can move", () => {

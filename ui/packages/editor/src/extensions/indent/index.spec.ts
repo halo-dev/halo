@@ -784,6 +784,15 @@ describe("ExtensionIndent", () => {
       ],
     });
 
+    const runtimeWrapper = editor.view.dom.querySelector<HTMLElement>(
+      ".halo-table-wrapper"
+    );
+    const runtimeTable =
+      editor.view.dom.querySelector<HTMLTableElement>("table");
+    expect(runtimeWrapper?.style.marginLeft).toBe("24px");
+    expect(runtimeTable?.style.marginLeft).toBe("");
+    expect(runtimeTable?.style.maxWidth).toBe("");
+
     const html = editor.getHTML();
     const container = document.createElement("div");
     container.innerHTML = html;
