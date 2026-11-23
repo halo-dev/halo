@@ -1,5 +1,6 @@
 package run.halo.app.extension;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.v3.core.converter.ModelConverters;
 import io.swagger.v3.core.util.Json;
@@ -46,10 +47,21 @@ public record Scheme(
         // TODO Move the generation logic outside.
         // generate OpenAPI schema
         var resolvedSchema = ModelConverters.getInstance().readAllAsResolvedSchema(type);
-        var mapper = Json.mapper();
-        var schema = (ObjectNode) mapper.valueToTree(resolvedSchema.schema);
-        // for schema validation.
-        schema.set("components", mapper.valueToTree(Map.of("schemas", resolvedSchema.referencedSchemas)));
+        // swagger-core 3.0 serializes with Jackson 3, while the schema is validated as a Jackson 2
+        // tree, so bridge the resolved schema by round-tripping it through JSON.
+        var swaggerMapper = Json.mapper();
+        var mapper = Unstructured.OBJECT_MAPPER;
+        final ObjectNode schema;
+        try {
+            schema = (ObjectNode) mapper.readTree(swaggerMapper.writeValueAsString(resolvedSchema.schema));
+            // for schema validation.
+            schema.set(
+                    "components",
+                    mapper.readTree(
+                            swaggerMapper.writeValueAsString(Map.of("schemas", resolvedSchema.referencedSchemas))));
+        } catch (JsonProcessingException e) {
+            throw new ExtensionException("Failed to generate JSON schema of " + type.getName(), e);
+        }
 
         return new Scheme(
                 type,

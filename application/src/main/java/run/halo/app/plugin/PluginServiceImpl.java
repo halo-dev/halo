@@ -10,7 +10,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.zafarkhaja.semver.Version;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
-import io.swagger.v3.core.util.Json;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -57,6 +56,7 @@ import reactor.core.scheduler.Schedulers;
 import reactor.util.retry.Retry;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.Unstructured;
 import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.infra.exception.DuplicateNameException;
 import run.halo.app.infra.exception.PluginAlreadyExistsException;
@@ -538,7 +538,7 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
             return Map.of();
         }
         var json = resource.getContentAsString(StandardCharsets.UTF_8);
-        return Json.mapper().readValue(json, new TypeReference<>() {});
+        return Unstructured.OBJECT_MAPPER.readValue(json, new TypeReference<>() {});
     }
 
     private record PresetPlugin(Path path, boolean autoEnable) {}

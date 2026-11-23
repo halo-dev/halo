@@ -3,12 +3,12 @@ package run.halo.app.extension;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import java.util.Map;
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import run.halo.app.infra.utils.JsonUtils;
+import tools.jackson.dataformat.yaml.YAMLMapper;
 
 /**
  * Tests for {@link Secret}.
@@ -48,7 +48,7 @@ class SecretTest {
     }
 
     @Test
-    void deserializeYamlWithStringData() throws JsonProcessingException {
+    void deserializeYamlWithStringData() {
         String s = """
             apiVersion: v1alpha1
             kind: Secret
