@@ -14,8 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Sort;
-import reactor.core.publisher.Mono;
+import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 import run.halo.app.extension.*;
 
@@ -43,13 +42,7 @@ class ReactiveExtensionPaginatedOperatorImplTest {
             Instant otherNow = now.plusSeconds(1000);
             items.addAll(generateItems(90, otherNow));
 
-            when(client.listBy(any(), any(), any())).thenAnswer(invocation -> {
-                PageRequest pageRequest = invocation.getArgument(2);
-                int pageNumber = pageRequest.getPageNumber();
-                var list = ListResult.subList(items, pageNumber, pageRequest.getPageSize());
-                var result = new ListResult<>(pageNumber, pageRequest.getPageSize(), items.size(), list);
-                return Mono.just(result);
-            });
+            when(client.listAll(any(), any(), any())).thenAnswer(invocation -> Flux.fromIterable(items));
         }
 
         @Test
@@ -58,16 +51,6 @@ class ReactiveExtensionPaginatedOperatorImplTest {
                     .expectNextCount(900)
                     .verifyComplete();
         }
-    }
-
-    @Test
-    void nextPageTest() {
-        var result = new ListResult<FakeExtension>(1, 10, 30, List.of());
-        var sort = Sort.by("metadata.creationTimestamp");
-        var nextPage = ReactiveExtensionPaginatedOperatorImpl.nextPage(result, sort);
-        assertThat(nextPage.getPageNumber()).isEqualTo(2);
-        assertThat(nextPage.getPageSize()).isEqualTo(10);
-        assertThat(nextPage.getSort()).isEqualTo(sort);
     }
 
     @Test
