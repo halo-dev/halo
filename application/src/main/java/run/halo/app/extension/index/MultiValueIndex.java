@@ -138,6 +138,12 @@ class MultiValueIndex<E extends Extension, K extends Comparable<K>> implements V
     }
 
     @Override
+    public Set<String> notBetween(
+            Set<String> candidates, K fromKey, boolean fromInclusive, K toKey, boolean toInclusive) {
+        throw new UnsupportedOperationException("Multi-value index does not support notBetween operation");
+    }
+
+    @Override
     public Set<String> in(Collection<K> keys) {
         if (CollectionUtils.isEmpty(keys)) {
             return new HashSet<>();
@@ -163,6 +169,25 @@ class MultiValueIndex<E extends Extension, K extends Comparable<K>> implements V
     }
 
     @Override
+    public Set<String> notIn(Set<String> candidates, Collection<K> keys) {
+        if (CollectionUtils.isEmpty(keys)) {
+            // Keep in sync with notIn(Collection), which returns every indexed entity here.
+            candidates.removeIf(primaryKey -> {
+                var keysOfPrimaryKey = invertedIndex.get(primaryKey);
+                return CollectionUtils.isEmpty(keysOfPrimaryKey) && !nullKeyValues.contains(primaryKey);
+            });
+            return candidates;
+        }
+        var keySet = keys instanceof Set<K> set ? set : new HashSet<>(keys);
+        candidates.removeIf(primaryKey -> {
+            var keysOfPrimaryKey = invertedIndex.get(primaryKey);
+            return CollectionUtils.isEmpty(keysOfPrimaryKey)
+                    || keysOfPrimaryKey.stream().anyMatch(keySet::contains);
+        });
+        return candidates;
+    }
+
+    @Override
     public Set<String> lessThan(K key, boolean inclusive) {
         throw new UnsupportedOperationException("Multi-value index does not support lessThan operation");
     }
@@ -183,12 +208,23 @@ class MultiValueIndex<E extends Extension, K extends Comparable<K>> implements V
     }
 
     @Override
+    public Set<String> isNotNull(Set<String> candidates) {
+        candidates.removeIf(primaryKey -> CollectionUtils.isEmpty(invertedIndex.get(primaryKey)));
+        return candidates;
+    }
+
+    @Override
     public Set<String> stringContains(String keyword) {
         throw new UnsupportedOperationException("Multi-value index does not support stringContains operation");
     }
 
     @Override
     public Set<String> stringNotContains(String keyword) {
+        throw new UnsupportedOperationException("Multi-value index does not support stringNotContains operation");
+    }
+
+    @Override
+    public Set<String> stringNotContains(Set<String> candidates, String keyword) {
         throw new UnsupportedOperationException("Multi-value index does not support stringNotContains operation");
     }
 
@@ -203,6 +239,11 @@ class MultiValueIndex<E extends Extension, K extends Comparable<K>> implements V
     }
 
     @Override
+    public Set<String> stringNotStartsWith(Set<String> candidates, String prefix) {
+        throw new UnsupportedOperationException("Multi-value index does not support stringNotStartsWith operation");
+    }
+
+    @Override
     public Set<String> stringEndsWith(String suffix) {
         throw new UnsupportedOperationException("Multi-value index does not support stringEndsWith operation");
     }
@@ -213,8 +254,18 @@ class MultiValueIndex<E extends Extension, K extends Comparable<K>> implements V
     }
 
     @Override
+    public Set<String> stringNotEndsWith(Set<String> candidates, String suffix) {
+        throw new UnsupportedOperationException("Multi-value index does not support stringNotEndsWith operation");
+    }
+
+    @Override
     public Set<String> notEqual(K key) {
         return notIn(Collections.singleton(key));
+    }
+
+    @Override
+    public Set<String> notEqual(Set<String> candidates, K key) {
+        return notIn(candidates, Collections.singleton(key));
     }
 
     @Override
