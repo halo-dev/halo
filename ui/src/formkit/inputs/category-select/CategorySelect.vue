@@ -42,6 +42,11 @@ const categoryPermissions = [
   "uc:posts:manage",
 ];
 
+const categoryManagePermissions = [
+  "system:categories:manage",
+  "uc:categories:manage",
+];
+
 const props = defineProps({
   context: {
     type: Object as PropType<FormKitFrameworkContext>,
@@ -310,7 +315,7 @@ const scrollToSelected = () => {
 const uid = new ShortUniqueId();
 
 const handleCreateCategory = async () => {
-  if (!allowCreate.value || !utils.permission.has(["system:posts:manage"])) {
+  if (!allowCreate.value || !utils.permission.has(categoryManagePermissions)) {
     return;
   }
 
@@ -420,7 +425,7 @@ const handleDelete = () => {
         <ul class="p-1">
           <HasPermission
             v-if="allowCreate && text.trim()"
-            :permissions="['system:posts:manage']"
+            :permissions="categoryManagePermissions"
           >
             <li
               id="category-create"
