@@ -103,7 +103,7 @@ public enum SettingUtils {
     }
 
     /**
-     * Applies an RFC 7386 JSON Merge Patch built from {@code modified} to {@code source}.
+     * Applies an RFC 7396 JSON Merge Patch built from {@code modified} to {@code source}.
      *
      * @param modified the modified object
      * @param source the source object

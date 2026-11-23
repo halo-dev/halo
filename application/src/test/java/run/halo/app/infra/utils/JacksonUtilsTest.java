@@ -44,7 +44,7 @@ class JacksonUtilsTest {
     }
 
     static Stream<Arguments> mergePatchCases() {
-        // Cases from RFC 7386, section 3, plus some regression cases.
+        // Cases from RFC 7396, section 3, plus some regression cases.
         return Stream.of(
                 Arguments.of("{\"a\":\"b\"}", "{\"a\":\"c\"}", "{\"a\":\"c\"}"),
                 Arguments.of("{\"a\":\"b\"}", "{\"b\":\"c\"}", "{\"a\":\"b\",\"b\":\"c\"}"),

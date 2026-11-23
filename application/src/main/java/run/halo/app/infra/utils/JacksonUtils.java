@@ -99,7 +99,7 @@ public enum JacksonUtils {
     }
 
     /**
-     * Applies an RFC 7386 JSON Merge Patch to the given target.
+     * Applies an RFC 7396 JSON Merge Patch to the given target.
      *
      * <p>Object members are merged recursively, {@code null} removes the member and any other value replaces the target
      * member. The target is not modified.
@@ -107,7 +107,7 @@ public enum JacksonUtils {
      * @param target the document to patch, may be null
      * @param patch the merge patch
      * @return the patched document
-     * @see <a href="https://datatracker.ietf.org/doc/html/rfc7386">RFC 7386</a>
+     * @see <a href="https://datatracker.ietf.org/doc/html/rfc7396">RFC 7396</a>
      */
     public static JsonNode mergePatch(@Nullable JsonNode target, JsonNode patch) {
         if (!patch.isObject()) {
