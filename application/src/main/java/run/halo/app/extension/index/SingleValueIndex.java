@@ -23,7 +23,8 @@ import run.halo.app.extension.Extension;
  * @author johnniang
  * @since 2.22.0
  */
-class SingleValueIndex<E extends Extension, K extends Comparable<K>> implements ValueIndexQuery<K>, Index<E, K> {
+class SingleValueIndex<E extends Extension, K extends Comparable<K>>
+        implements ValueIndexQuery<K>, Index<E, K>, SortableIndex {
 
     private final ConcurrentNavigableMap<K, Set<String>> index;
 
@@ -70,6 +71,11 @@ class SingleValueIndex<E extends Extension, K extends Comparable<K>> implements 
     @Override
     public Set<String> all() {
         return new HashSet<>(invertedIndex.keySet());
+    }
+
+    @Override
+    public Stream<String> sortedStream(Set<String> candidates, boolean descending, Comparator<String> tieBreaker) {
+        return SortedCandidates.order(candidates, index, this::getKey, invertedIndex.size(), descending, tieBreaker);
     }
 
     @Override
