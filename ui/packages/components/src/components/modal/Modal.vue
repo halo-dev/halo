@@ -14,6 +14,7 @@ import {
   watch,
 } from "vue";
 import { IconClose } from "../../icons/icons";
+import { useComponentsI18n } from "../../locales";
 
 const props = withDefaults(
   defineProps<{
@@ -44,6 +45,8 @@ const emit = defineEmits<{
   (event: "update:visible", value: boolean): void;
   (event: "close"): void;
 }>();
+
+const { t } = useComponentsI18n();
 
 const internalVisible = ref<boolean | undefined>(false);
 const rootVisible = ref(false);
@@ -275,7 +278,7 @@ watch(
               <div class="modal-header-actions">
                 <slot name="actions"></slot>
                 <span
-                  aria-label="Close"
+                  :aria-label="t('common.close')"
                   class="bg-gray-50"
                   role="button"
                   tabindex="0"

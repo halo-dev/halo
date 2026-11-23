@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { TimeFieldInput, TimeFieldRoot, type TimeValue } from "reka-ui";
 import { computed } from "vue";
+import { useComponentsI18n } from "../../locales";
 import { formatTimeString, resolveTime } from "./date-utils";
 
 const props = withDefaults(
@@ -13,7 +14,7 @@ const props = withDefaults(
   }>(),
   {
     modelValue: undefined,
-    locale: "en",
+    locale: undefined,
     hourCycle: 24,
     disabled: false,
     readonly: false,
@@ -23,6 +24,10 @@ const props = withDefaults(
 const emit = defineEmits<{
   (event: "update:modelValue", value?: string): void;
 }>();
+
+const { locale: componentsLocale } = useComponentsI18n();
+
+const resolvedLocale = computed(() => props.locale ?? componentsLocale.value);
 
 const timeValue = computed(() => resolveTime(props.modelValue));
 
@@ -42,7 +47,7 @@ const segmentClasses =
     <TimeFieldRoot
       v-slot="{ segments }"
       :model-value="timeValue"
-      :locale="locale"
+      :locale="resolvedLocale"
       :hour-cycle="hourCycle"
       granularity="minute"
       :disabled="disabled"

@@ -20,7 +20,7 @@ const props = withDefaults(
   >(),
   {
     modelValue: undefined,
-    locale: "en",
+    locale: undefined,
     weekStartsOn: undefined,
     numberOfMonths: 2,
     fixedWeeks: true,
@@ -28,7 +28,6 @@ const props = withDefaults(
     maxValue: undefined,
     isDateDisabled: undefined,
     defaultPickerValue: undefined,
-    calendarLabel: "Calendar",
     disabled: false,
     readonly: false,
     maximumDays: undefined,

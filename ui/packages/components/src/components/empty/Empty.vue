@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { useComponentsI18n } from "../../locales";
 import Empty from "./Empty.svg";
 
 defineProps<{
@@ -6,12 +7,14 @@ defineProps<{
   message?: string;
   image?: string;
 }>();
+
+const { t } = useComponentsI18n();
 </script>
 <template>
   <div class="empty-wrapper">
     <div class="empty-image h-32 w-32">
       <slot name="image">
-        <img :src="image || Empty" alt="Empty" />
+        <img :src="image || Empty" :alt="t('empty.image')" />
       </slot>
     </div>
     <div class="empty-title">{{ title }}</div>

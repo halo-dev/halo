@@ -20,7 +20,7 @@ describe("Pagination", () => {
     );
 
     const selects = wrapper.findAll("select");
-    expect(selects[0].attributes("aria-label")).toBe("页");
-    expect(selects[1].attributes("aria-label")).toBe("条 / 页");
+    expect(selects[0].attributes("aria-label")).toBe("Page");
+    expect(selects[1].attributes("aria-label")).toBe("Items per page");
   });
 });

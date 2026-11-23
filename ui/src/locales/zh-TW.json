@@ -1047,8 +1047,6 @@
   "core.components.global_search.states.initial": "輸入關鍵字開始搜尋",
   "core.components.global_search.states.loading": "正在搜尋…",
   "core.components.global_search.states.partial_failure": "部分搜尋結果暫時不可用",
-  "core.components.pagination.page_label": "頁",
-  "core.components.pagination.size_label": "條 / 頁",
   "core.components.pagination.total_label": "共 {total} 項資料",
   "core.components.uppy_upload.fields.file_name": "檔案名稱",
   "core.components.user_avatar.toast_upload_failed": "上傳頭像失敗",

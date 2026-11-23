@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import type { CalendarDate } from "@internationalized/date";
 import { computed, ref, shallowRef, watch } from "vue";
+import { useComponentsI18n } from "../../locales";
 import {
   normalizeTimeString,
   parseDateTimeRange,
@@ -25,7 +26,7 @@ const props = withDefaults(
   >(),
   {
     modelValue: undefined,
-    locale: "en",
+    locale: undefined,
     weekStartsOn: undefined,
     numberOfMonths: 2,
     fixedWeeks: true,
@@ -33,7 +34,6 @@ const props = withDefaults(
     maxValue: undefined,
     isDateDisabled: undefined,
     defaultPickerValue: undefined,
-    calendarLabel: "Calendar",
     disabled: false,
     readonly: false,
     maximumDays: undefined,
@@ -42,9 +42,17 @@ const props = withDefaults(
     defaultStartTime: "00:00",
     defaultEndTime: "23:59",
     hourCycle: 24,
-    startTimeLabel: "Start",
-    endTimeLabel: "End",
   }
+);
+
+const { t } = useComponentsI18n();
+
+const startTimeLabelText = computed(
+  () => props.startTimeLabel ?? t("date_picker.start")
+);
+
+const endTimeLabelText = computed(
+  () => props.endTimeLabel ?? t("date_picker.end")
 );
 
 const emit = defineEmits<{
@@ -189,7 +197,7 @@ function onPreset(value: DateRangeValue) {
       />
       <div class="mt-2 space-y-2 border-t border-gray-100 pt-3">
         <div class="flex items-center justify-between gap-4">
-          <span class="text-sm text-gray-500">{{ startTimeLabel }}</span>
+          <span class="text-sm text-gray-500">{{ startTimeLabelText }}</span>
           <TimeField
             :model-value="startTime"
             :locale="locale"
@@ -200,7 +208,7 @@ function onPreset(value: DateRangeValue) {
           />
         </div>
         <div class="flex items-center justify-between gap-4">
-          <span class="text-sm text-gray-500">{{ endTimeLabel }}</span>
+          <span class="text-sm text-gray-500">{{ endTimeLabelText }}</span>
           <TimeField
             :model-value="endTime"
             :locale="locale"

@@ -14,6 +14,7 @@ import {
   IconForbidLine,
   IconInformation,
 } from "@/icons/icons";
+import { useComponentsI18n } from "../../locales";
 import type { ToastType } from "./types";
 
 const props = withDefaults(
@@ -42,6 +43,8 @@ const timer = ref();
 const emit = defineEmits<{
   (event: "close"): void;
 }>();
+
+const { t } = useComponentsI18n();
 
 const icons: Record<ToastType, { icon: Raw<Component>; color: string }> = {
   success: {
@@ -136,7 +139,7 @@ defineExpose({ close });
         </div>
         <div
           v-if="closable"
-          aria-label="Close"
+          :aria-label="t('common.close')"
           class="toast-control"
           role="button"
           tabindex="0"

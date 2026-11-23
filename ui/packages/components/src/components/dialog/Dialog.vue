@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { markRaw, ref, type Component, type Raw } from "vue";
+import { computed, markRaw, ref, type Component, type Raw } from "vue";
 import type { DialogProps, DialogType } from "@/components/dialog/types";
 import {
   IconCheckboxCircle,
@@ -8,17 +8,18 @@ import {
   IconForbidLine,
   IconInformation,
 } from "../../icons/icons";
+import { useComponentsI18n } from "../../locales";
 import { VButton } from "../button";
 import { VModal } from "../modal";
 
 const props = withDefaults(defineProps<DialogProps>(), {
   type: "info",
-  title: "提示",
+  title: undefined,
   description: "",
-  confirmText: "确定",
+  confirmText: undefined,
   confirmType: "primary",
   showCancel: true,
-  cancelText: "取消",
+  cancelText: undefined,
   visible: false,
   onConfirm: () => {
     return;
@@ -32,6 +33,14 @@ const emit = defineEmits<{
   (event: "update:visible", visible: boolean): void;
   (event: "close"): void;
 }>();
+
+const { t } = useComponentsI18n();
+
+const titleText = computed(() => props.title ?? t("dialog.title"));
+
+const confirmText = computed(() => props.confirmText ?? t("common.confirm"));
+
+const cancelText = computed(() => props.cancelText ?? t("common.cancel"));
 
 const icons: Record<DialogType, { icon: Raw<Component>; color: string }> = {
   success: {
@@ -85,7 +94,7 @@ const handleClose = () => {
 <template>
   <VModal
     :visible="visible"
-    :aria-label="title"
+    :aria-label="titleText"
     :width="450"
     :layer-closable="false"
     :data-unique-id="uniqueId"
@@ -99,10 +108,10 @@ const handleClose = () => {
           aria-hidden="true"
           class="h-6 w-6 flex-none"
         ></component>
-        <div class="text-base font-bold text-gray-900">{{ title }}</div>
+        <div class="text-base font-bold text-gray-900">{{ titleText }}</div>
       </div>
       <div
-        aria-label="Close"
+        :aria-label="t('common.close')"
         role="button"
         tabindex="0"
         @click="handleCancel"

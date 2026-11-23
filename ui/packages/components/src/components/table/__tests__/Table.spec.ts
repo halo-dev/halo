@@ -192,8 +192,8 @@ describe("Table", () => {
     const rowCheckboxes = wrapper.findAll("tbody input[type='checkbox']");
 
     expect(rowCheckboxes).toHaveLength(3);
-    expect(headerCheckbox.attributes("aria-label")).toBe("选择全部");
-    expect(rowCheckboxes[0].attributes("aria-label")).toBe("选择 1");
+    expect(headerCheckbox.attributes("aria-label")).toBe("Select all");
+    expect(rowCheckboxes[0].attributes("aria-label")).toBe("Select 1");
 
     await rowCheckboxes[0].trigger("click");
     await settle();
@@ -250,10 +250,12 @@ describe("Table", () => {
       }
     );
 
-    expect(wrapper.findAll("tbody button[aria-label='展开']")).toHaveLength(3);
+    expect(wrapper.findAll("tbody button[aria-label='Expand']")).toHaveLength(
+      3
+    );
 
     await wrapper
-      .findAll("tbody button[aria-label='展开']")[0]
+      .findAll("tbody button[aria-label='Expand']")[0]
       .trigger("click");
     await settle();
 
@@ -265,10 +267,12 @@ describe("Table", () => {
     expect(
       wrapper.findAll("tbody tr")[1].find("td").attributes("colspan")
     ).toBe("3");
-    expect(wrapper.find("tbody button[aria-label='收起']").exists()).toBe(true);
+    expect(wrapper.find("tbody button[aria-label='Collapse']").exists()).toBe(
+      true
+    );
 
     await wrapper
-      .findAll("tbody button[aria-label='收起']")[0]
+      .findAll("tbody button[aria-label='Collapse']")[0]
       .trigger("click");
     await settle();
 
@@ -277,7 +281,7 @@ describe("Table", () => {
 
   it("renders empty and loading states", () => {
     const emptyWrapper = mountTable({ data: [] });
-    expect(emptyWrapper.find("tbody td").text()).toBe("暂无数据");
+    expect(emptyWrapper.find("tbody td").text()).toBe("No data");
     expect(emptyWrapper.find("tbody td").attributes("colspan")).toBe("2");
 
     const emptySlotWrapper = mountTable(
@@ -458,7 +462,7 @@ describe("Table", () => {
 
     const handles = wrapper.findAll("[role='separator']");
     expect(handles).toHaveLength(2);
-    expect(handles[0].attributes("aria-label")).toBe("调整列宽");
+    expect(handles[0].attributes("aria-label")).toBe("Resize column");
 
     handles[0].element.dispatchEvent(
       new MouseEvent("mousedown", { bubbles: true, clientX: 150 })
@@ -515,9 +519,9 @@ describe("Table", () => {
       pinnable: true,
     });
 
-    expect(wrapper.findAll("thead button[aria-label='列操作']")).toHaveLength(
-      2
-    );
+    expect(
+      wrapper.findAll("thead button[aria-label='Column actions']")
+    ).toHaveLength(2);
     expect(wrapper.findAll("thead th")[0].attributes("style")).not.toContain(
       "padding-right"
     );
@@ -529,7 +533,9 @@ describe("Table", () => {
       { attachTo: document.body }
     );
 
-    const menuButtons = wrapper.findAll("thead button[aria-label='列操作']");
+    const menuButtons = wrapper.findAll(
+      "thead button[aria-label='Column actions']"
+    );
     expect(menuButtons).toHaveLength(2);
     expect(wrapper.findAll("thead th")[0].attributes("style")).toContain(
       "padding-right: 2.5rem"
@@ -543,10 +549,10 @@ describe("Table", () => {
       document.body.querySelectorAll(".dropdown-item-wrapper")
     ).map((item) => item.textContent?.trim());
 
-    expect(labels).toContain("升序");
-    expect(labels).toContain("降序");
-    expect(labels).toContain("隐藏列");
-    expect(labels).not.toContain("固定在左侧");
+    expect(labels).toContain("Sort ascending");
+    expect(labels).toContain("Sort descending");
+    expect(labels).toContain("Hide column");
+    expect(labels).not.toContain("Pin to start");
 
     wrapper.unmount();
   });

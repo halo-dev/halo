@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { computed } from "vue";
 import { IconArrowLeft, IconArrowRight } from "../../icons/icons";
+import { useComponentsI18n } from "../../locales";
 
 const props = withDefaults(
   defineProps<{
@@ -21,13 +22,15 @@ const props = withDefaults(
     total: 0,
     sizeOptions: () => [10],
     showTotal: true,
-    pageLabel: "页",
-    sizeLabel: "条 / 页",
+    pageLabel: undefined,
+    sizeLabel: undefined,
     totalLabel: undefined,
-    prevLabel: "Previous page",
-    nextLabel: "Next page",
+    prevLabel: undefined,
+    nextLabel: undefined,
   }
 );
+
+const { t } = useComponentsI18n();
 
 const emit = defineEmits<{
   (event: "update:page", page: number): void;
@@ -41,12 +44,17 @@ const hasNext = computed(() => props.page < totalPages.value);
 
 const hasPrevious = computed(() => props.page > 1);
 
-const totalLabelText = computed(() => {
-  if (props.totalLabel) {
-    return props.totalLabel;
-  }
-  return `共 ${props.total} 项数据`;
-});
+const pageLabelText = computed(() => props.pageLabel ?? t("pagination.page"));
+
+const sizeLabelText = computed(() => props.sizeLabel ?? t("pagination.size"));
+
+const prevLabelText = computed(() => props.prevLabel ?? t("common.previous"));
+
+const nextLabelText = computed(() => props.nextLabel ?? t("common.next"));
+
+const totalLabelText = computed(
+  () => props.totalLabel ?? t("pagination.total", { total: props.total })
+);
 
 const onPageChange = (event: Event) => {
   const target = event.target as HTMLSelectElement;
@@ -87,9 +95,9 @@ const next = () => {
       {{ totalLabelText }}
     </div>
     <div class="pagination__controller">
-      <nav aria-label="Pagination" class="pagination__nav">
+      <nav :aria-label="t('pagination.navigation')" class="pagination__nav">
         <button
-          :aria-label="prevLabel"
+          :aria-label="prevLabelText"
           :disabled="!hasPrevious"
           class="pagination__btn pagination__btn--prev"
           @click="previous"
@@ -97,7 +105,7 @@ const next = () => {
           <IconArrowLeft aria-hidden="true" />
         </button>
         <button
-          :aria-label="nextLabel"
+          :aria-label="nextLabelText"
           :disabled="!hasNext"
           class="pagination__btn pagination__btn--next"
           @click="next"
@@ -107,7 +115,7 @@ const next = () => {
       </nav>
       <div class="pagination__select-wrap">
         <select
-          :aria-label="pageLabel"
+          :aria-label="pageLabelText"
           :value="page"
           :disabled="totalPages === 0"
           class="pagination__select"
@@ -119,12 +127,12 @@ const next = () => {
           </option>
         </select>
         <span class="pagination__select-label">
-          {{ pageLabel }}
+          {{ pageLabelText }}
         </span>
       </div>
       <div class="pagination__select-wrap">
         <select
-          :aria-label="sizeLabel"
+          :aria-label="sizeLabelText"
           :value="size"
           class="pagination__select"
           @change="onSizeChange"
@@ -138,7 +146,7 @@ const next = () => {
           </option>
         </select>
         <span class="pagination__select-label">
-          {{ sizeLabel }}
+          {{ sizeLabelText }}
         </span>
       </div>
     </div>

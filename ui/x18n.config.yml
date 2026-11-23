@@ -13,7 +13,6 @@ usage:
     - uc-src/**/*.{vue,ts,tsx,js,jsx}
     - packages/console-shared/src/**/*.{vue,ts,tsx,js,jsx}
     - packages/shared/src/**/*.{vue,ts,tsx,js,jsx}
-    - packages/components/src/**/*.{vue,ts,tsx,js,jsx}
   exclude:
     - "**/node_modules/**"
     - "**/*.d.ts"

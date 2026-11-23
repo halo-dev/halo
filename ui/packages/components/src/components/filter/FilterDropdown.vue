@@ -15,6 +15,7 @@ import {
   IconCheck,
   IconSearch,
 } from "../../icons/icons";
+import { useComponentsI18n } from "../../locales";
 import { VDropdown, type VDropdownPlacement } from "../dropdown";
 import { VLoading } from "../loading";
 import { filterDropdownGroupKey } from "./group";
@@ -113,14 +114,14 @@ const props = withDefaults(
     title: undefined,
     searchable: false,
     remoteSearch: false,
-    searchPlaceholder: "Search...",
-    emptyText: "No results",
+    searchPlaceholder: undefined,
+    emptyText: undefined,
     searchDelay: 300,
     loading: false,
     hasMore: false,
     disabled: false,
     showClearOption: false,
-    clearLabel: "All",
+    clearLabel: undefined,
     selectedLabel: undefined,
     placement: "bottom-start",
     panelWidth: undefined,
@@ -134,6 +135,16 @@ const emit = defineEmits<{
   (event: "search", keyword: string): void;
   (event: "load-more"): void;
 }>();
+
+const { t } = useComponentsI18n();
+
+const searchPlaceholderText = computed(
+  () => props.searchPlaceholder ?? t("filter.search_placeholder")
+);
+
+const emptyLabel = computed(() => props.emptyText ?? t("filter.empty"));
+
+const clearLabelText = computed(() => props.clearLabel ?? t("filter.all"));
 
 defineSlots<{
   trigger?: (props: {
@@ -299,7 +310,7 @@ const visibleRows = computed<Row[]>(() => {
       kind: "option",
       key: "clear",
       id: `${listboxId}-option-clear`,
-      option: { label: props.clearLabel },
+      option: { label: clearLabelText.value },
       depth: 0,
       hasChildren: false,
       expanded: false,
@@ -420,7 +431,7 @@ function findOptionByValue(
 
 const selectedOption = computed<FilterDropdownOption | undefined>(() => {
   if (props.modelValue === undefined) {
-    return props.showClearOption ? { label: props.clearLabel } : undefined;
+    return props.showClearOption ? { label: clearLabelText.value } : undefined;
   }
 
   const option = findOptionByValue(props.options, props.modelValue);
@@ -890,8 +901,8 @@ defineExpose({
               v-model="keyword"
               type="text"
               class="h-full w-full bg-transparent pl-8 pr-3 text-sm text-gray-900 outline-none"
-              :placeholder="searchPlaceholder"
-              :aria-label="searchPlaceholder"
+              :placeholder="searchPlaceholderText"
+              :aria-label="searchPlaceholderText"
               role="combobox"
               aria-autocomplete="list"
               aria-expanded="true"
@@ -1014,7 +1025,7 @@ defineExpose({
             v-else-if="!dataOptionRows.length"
             class="px-3 py-8 text-center text-sm text-gray-500"
           >
-            <slot name="empty">{{ emptyText }}</slot>
+            <slot name="empty">{{ emptyLabel }}</slot>
           </div>
         </div>
       </div>
