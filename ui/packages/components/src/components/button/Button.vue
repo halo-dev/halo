@@ -32,7 +32,7 @@
       </svg>
       <slot v-else name="icon" />
     </span>
-    <span class="btn-content">
+    <span v-if="$slots.default" class="btn-content">
       <slot />
     </span>
   </button>
@@ -100,28 +100,28 @@ $btn-sizes: (
     padding-x: theme("spacing.2"),
     font-size: theme("fontSize.xs"),
     icon-size: theme("spacing.3"),
-    icon-margin: theme("spacing.2"),
+    icon-gap: theme("spacing.1.5"),
   ),
   sm: (
-    height: theme("spacing.7"),
-    padding-x: theme("spacing.3"),
-    font-size: theme("fontSize.xs"),
-    icon-size: theme("spacing.3"),
-    icon-margin: theme("spacing.2"),
+    height: theme("spacing.8"),
+    padding-x: theme("spacing.2.5"),
+    font-size: theme("fontSize.sm"),
+    icon-size: theme("spacing.4"),
+    icon-gap: theme("spacing.1.5"),
   ),
   md: (
     height: theme("spacing.9"),
-    padding-x: theme("spacing.4"),
+    padding-x: theme("spacing.3"),
     font-size: theme("fontSize.sm"),
-    icon-size: theme("spacing.5"),
-    icon-margin: theme("spacing.3"),
+    icon-size: theme("spacing.4"),
+    icon-gap: theme("spacing.2"),
   ),
   lg: (
     height: theme("spacing.11"),
-    padding-x: theme("spacing.5"),
-    font-size: theme("fontSize.lg"),
-    icon-size: theme("spacing.5"),
-    icon-margin: theme("spacing.3"),
+    padding-x: theme("spacing.4"),
+    font-size: theme("fontSize.base"),
+    icon-size: 18px,
+    icon-gap: theme("spacing.2"),
   ),
 );
 
@@ -181,7 +181,6 @@ $btn-themes: (
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  flex-wrap: wrap;
   cursor: pointer;
   user-select: none;
   appearance: none;
@@ -189,14 +188,17 @@ $btn-themes: (
   transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
   text-align: center;
   text-decoration: none;
+  white-space: nowrap;
   vertical-align: middle;
   outline-width: 0;
   border-style: none;
   $md-config: map.get($btn-sizes, md);
-  height: map.get($md-config, height);
+  min-height: map.get($md-config, height);
   padding-left: map.get($md-config, padding-x);
   padding-right: map.get($md-config, padding-x);
   font-size: map.get($md-config, font-size);
+  font-weight: 500;
+  gap: map.get($md-config, icon-gap);
 
   &:hover {
     opacity: 0.9;
@@ -232,7 +234,6 @@ $btn-themes: (
   .btn-icon {
     height: map.get($md-config, icon-size);
     width: map.get($md-config, icon-size);
-    margin-right: map.get($md-config, icon-margin);
     color: #fff;
     display: inline-flex;
     align-items: center;
@@ -247,15 +248,15 @@ $btn-themes: (
 
 @each $size, $config in $btn-sizes {
   .btn-#{$size} {
-    height: map.get($config, height);
+    min-height: map.get($config, height);
     padding-left: map.get($config, padding-x);
     padding-right: map.get($config, padding-x);
     font-size: map.get($config, font-size);
+    gap: map.get($config, icon-gap);
 
     .btn-icon {
       height: map.get($config, icon-size);
       width: map.get($config, icon-size);
-      margin-right: map.get($config, icon-margin);
     }
 
     &.btn-circle {
