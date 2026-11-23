@@ -77,6 +77,29 @@ describe("Popover", () => {
     wrapper.unmount();
   }, 15_000);
 
+  it("renders the arrow by default and allows hiding it", async () => {
+    const wrapper = mountPopover();
+
+    await wrapper.get("button").trigger("click");
+    await settle();
+
+    expect(document.body.querySelector(".v-popover-arrow")).not.toBeNull();
+    expect(
+      document.body.querySelector(".v-popover-content[data-state='open']")
+    ).not.toBeNull();
+
+    wrapper.unmount();
+
+    const withoutArrow = mountPopover({ arrow: false });
+
+    await withoutArrow.get("button").trigger("click");
+    await settle();
+
+    expect(document.body.querySelector(".v-popover-arrow")).toBeNull();
+
+    withoutArrow.unmount();
+  });
+
   it("reflects a controlled open prop", async () => {
     const wrapper = mountPopover({ open: false });
 

@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import {
+  PopoverArrow,
   PopoverContent,
   PopoverPortal,
   PopoverRoot,
@@ -27,13 +28,18 @@ const props = withDefaults(
      */
     placement?: VPopoverPlacement;
     /**
-     * Distance in pixels between the trigger and the panel.
+     * Distance in pixels between the trigger and the arrow tip, or the panel
+     * when the arrow is disabled.
      */
     offset?: number;
     /**
      * Whether the popover behaves as a modal dialog.
      */
     modal?: boolean;
+    /**
+     * Whether to render the arrow pointing at the trigger.
+     */
+    arrow?: boolean;
     /**
      * Whether the panel width follows the trigger width.
      */
@@ -50,6 +56,7 @@ const props = withDefaults(
     placement: "bottom-start",
     offset: 4,
     modal: false,
+    arrow: true,
     matchTriggerWidth: false,
     contentClass: undefined,
   }
@@ -128,7 +135,50 @@ defineExpose({
         ]"
       >
         <slot name="content" :open="isOpen" :close="hide" />
+        <!-- The SVG is scaled from a 12x6 viewBox, so widen the stroke to keep it at 1px. -->
+        <PopoverArrow
+          v-if="arrow"
+          class="v-popover-arrow"
+          :stroke-width="1.2"
+        />
       </PopoverContent>
     </PopoverPortal>
   </PopoverRoot>
 </template>
+
+<style lang="scss">
+.v-popover-content {
+  &[data-state="open"] {
+    animation: v-popover-fade-in 150ms ease-out;
+  }
+
+  &[data-state="closed"] {
+    pointer-events: none;
+    animation: v-popover-fade-out 150ms ease-in;
+  }
+}
+
+.v-popover-arrow {
+  @apply fill-white stroke-gray-200;
+}
+
+@keyframes v-popover-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes v-popover-fade-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+</style>
