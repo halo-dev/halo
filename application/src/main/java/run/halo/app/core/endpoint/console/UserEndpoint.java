@@ -403,7 +403,7 @@ public class UserEndpoint implements CustomEndpoint {
                     user.getSpec().setAvatar(null);
                     return client.update(user);
                 })
-                .flatMap(user -> ServerResponse.ok().bodyValue(user));
+                .flatMap(user -> ServerResponse.ok().bodyValue(redactUserSecrets(user)));
     }
 
     private Mono<User> getUserOrSelf(String name) {
@@ -435,7 +435,7 @@ public class UserEndpoint implements CustomEndpoint {
                         })
                         .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
                                 .filter(OptimisticLockingFailureException.class::isInstance)))
-                .flatMap(user -> ServerResponse.ok().bodyValue(user));
+                .flatMap(user -> ServerResponse.ok().bodyValue(redactUserSecrets(user)));
     }
 
     /** Multipart payload for uploading a user avatar. */
@@ -523,7 +523,7 @@ public class UserEndpoint implements CustomEndpoint {
                 })
                 .flatMap(user -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
-                        .bodyValue(user));
+                        .bodyValue(redactUserSecrets(user)));
     }
 
     private Mono<ServerResponse> updateUserProfile(ServerRequest request) {
@@ -562,7 +562,7 @@ public class UserEndpoint implements CustomEndpoint {
                         return client.update(user);
                     }));
                 }))
-                .flatMap(user -> ServerResponse.ok().bodyValue(user));
+                .flatMap(user -> ServerResponse.ok().bodyValue(redactUserSecrets(user)));
     }
 
     record UpdateUserProfileRequest(
@@ -593,6 +593,11 @@ public class UserEndpoint implements CustomEndpoint {
                                 .list(new HashSet<>(roleNames), true)
                                 .collectList()
                                 .map(roles -> new DetailedUser(user, roles, null))))
+                .map(detailedUser -> new DetailedUser(
+                        redactUserSecrets(detailedUser.user()),
+                        detailedUser.roles(),
+                        detailedUser.impersonator(),
+                        detailedUser.passwordSet()))
                 .flatMap(detailedUser -> ServerResponse.ok().bodyValue(detailedUser));
     }
 
@@ -690,7 +695,7 @@ public class UserEndpoint implements CustomEndpoint {
                             return currentUser;
                         }))
                 .flatMap(client::update)
-                .flatMap(updatedUser -> ServerResponse.ok().bodyValue(updatedUser));
+                .flatMap(updatedUser -> ServerResponse.ok().bodyValue(redactUserSecrets(updatedUser)));
     }
 
     private static Mono<String> getAuthenticatedUserName() {
@@ -715,7 +720,7 @@ public class UserEndpoint implements CustomEndpoint {
                         }))
                 .flatMap(updatedUser -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
-                        .bodyValue(updatedUser));
+                        .bodyValue(redactUserSecrets(updatedUser)));
     }
 
     Mono<ServerResponse> changeOwnPassword(ServerRequest request) {
@@ -742,7 +747,7 @@ public class UserEndpoint implements CustomEndpoint {
                         }))
                 .flatMap(updatedUser -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
-                        .bodyValue(updatedUser));
+                        .bodyValue(redactUserSecrets(updatedUser)));
     }
 
     /**
@@ -821,9 +826,16 @@ public class UserEndpoint implements CustomEndpoint {
         var user = detailedUser.user();
         var passwordSet =
                 org.springframework.util.StringUtils.hasText(user.getSpec().getPassword());
-        user.getSpec().setPassword(null);
-        user.getSpec().setTotpEncryptedSecret(null);
-        return new DetailedUser(user, detailedUser.roles(), detailedUser.impersonator(), passwordSet);
+        return new DetailedUser(
+                redactUserSecrets(user), detailedUser.roles(), detailedUser.impersonator(), passwordSet);
+    }
+
+    private static User redactUserSecrets(User user) {
+        // Redact a copy so that the response never mutates the extension handed out by the client.
+        var redacted = JsonUtils.DEFAULT_JSON_MAPPER.convertValue(user, User.class);
+        redacted.getSpec().setPassword(null);
+        redacted.getSpec().setTotpEncryptedSecret(null);
+        return redacted;
     }
 
     Mono<ServerResponse> grantPermission(ServerRequest request) {
@@ -1001,7 +1013,7 @@ public class UserEndpoint implements CustomEndpoint {
                                                     .filter(Objects::nonNull)
                                                     .toList())
                                             .orElseGet(List::of);
-                                    return new ListedUser(user, roles);
+                                    return new ListedUser(redactUserSecrets(user), roles);
                                 })
                                 .toList();
                         return convertFrom(listResult, listedUsers);

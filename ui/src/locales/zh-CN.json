@@ -1003,7 +1003,6 @@
   "core.rbac.User manage": "用户管理",
   "core.rbac.User View": "用户查看",
   "core.rbac.role-template-view-users": "用户查看",
-  "core.rbac.role-template-change-password": "修改密码",
   "core.rbac.Actuator Management": "系统指标",
   "core.rbac.Actuator Manage": "访问系统指标",
   "core.rbac.Cache Management": "缓存",

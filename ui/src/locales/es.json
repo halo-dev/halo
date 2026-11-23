@@ -804,7 +804,6 @@
   "core.rbac.User manage": "Gestor de usuarios",
   "core.rbac.User View": "Vista de usuarios",
   "core.rbac.role-template-view-users": "Vista de usuarios",
-  "core.rbac.role-template-change-password": "Cambiar contraseña",
   "core.rbac.role-template-manage-posts": "Gestión de publicaciones",
   "core.rbac.role-template-post-author": "Te permite gestionar tus propias publicaciones",
   "core.rbac.role-template-post-contributor": "Contribuciones permitidas",

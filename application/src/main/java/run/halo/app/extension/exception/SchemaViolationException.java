@@ -1,6 +1,7 @@
 package run.halo.app.extension.exception;
 
-import org.openapi4j.core.validation.ValidationResults;
+import com.networknt.schema.Error;
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import run.halo.app.extension.GroupVersionKind;
 
@@ -12,14 +13,14 @@ import run.halo.app.extension.GroupVersionKind;
 public class SchemaViolationException extends ExtensionException {
 
     /** Validation errors. */
-    private final ValidationResults errors;
+    private final List<Error> errors;
 
-    public SchemaViolationException(GroupVersionKind gvk, ValidationResults errors) {
+    public SchemaViolationException(GroupVersionKind gvk, List<Error> errors) {
         super(HttpStatus.BAD_REQUEST, "Failed to validate " + gvk, null, null, new Object[] {gvk, errors});
-        this.errors = errors;
+        this.errors = List.copyOf(errors);
     }
 
-    public ValidationResults getErrors() {
+    public List<Error> getErrors() {
         return errors;
     }
 }

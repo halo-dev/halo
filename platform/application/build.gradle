@@ -21,7 +21,6 @@ dependencies {
         api libs.bundles.apache
         api libs.bundles.therapi
         api libs.springdoc.openapi
-        api libs.openapi.schema.validator
         api libs.bouncycastle.bcpkix
         api libs.encoding.base62
         api libs.pf4j
