@@ -45,18 +45,19 @@ const canClear = computed(
       v-bind="triggerAttrs"
       :class="[
         inputClass,
-        canClear ? 'pr-9' : 'pr-3',
-        'flex h-full w-full items-center justify-between gap-2 bg-transparent text-left text-sm text-gray-900 transition-colors focus:outline-none disabled:cursor-not-allowed disabled:text-gray-400',
+        'flex h-full w-full items-center justify-between gap-2 bg-transparent pr-3 text-left text-sm text-gray-900 transition-colors focus:outline-none disabled:cursor-not-allowed disabled:text-gray-400',
       ]"
       :disabled="disabled"
       aria-haspopup="dialog"
       :aria-expanded="open"
     >
-      <span class="truncate" :class="hasValue ? '' : 'text-gray-400'">
+      <span
+        class="truncate"
+        :class="{ 'text-gray-400': !hasValue, 'pr-5': canClear }"
+      >
         {{ displayValue ?? placeholder }}
       </span>
       <span
-        v-if="!canClear"
         class="pointer-events-none flex h-4 w-4 shrink-0 items-center justify-center text-gray-400"
       >
         <IconCalendar />
@@ -65,7 +66,7 @@ const canClear = computed(
     <button
       v-if="canClear"
       type="button"
-      class="absolute inset-y-0 right-2 my-auto flex h-4 w-4 items-center justify-center rounded text-gray-400 transition-colors hover:text-gray-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+      class="absolute inset-y-0 right-8 my-auto flex h-4 w-4 items-center justify-center rounded text-gray-400 transition-colors hover:text-gray-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
       :aria-label="clearLabel"
       @click.stop="emit('clear')"
     >
