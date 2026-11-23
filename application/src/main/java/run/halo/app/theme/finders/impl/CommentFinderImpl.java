@@ -11,7 +11,7 @@ import run.halo.app.extension.ListResult;
 import run.halo.app.extension.PageRequest;
 import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.Ref;
-import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.infra.utils.JacksonUtils;
 import run.halo.app.infra.utils.SortUtils;
 import run.halo.app.theme.finders.CommentFinder;
 import run.halo.app.theme.finders.CommentPublicQueryService;
@@ -57,7 +57,7 @@ public class CommentFinderImpl implements CommentFinder {
     @Override
     public Mono<ListResult<CommentVo>> list(Map<String, Object> params) {
         var query = Optional.ofNullable(params)
-                .map(map -> JsonUtils.mapToObject(map, CommentQuery.class))
+                .map(map -> JacksonUtils.mapToObject(map, CommentQuery.class))
                 .orElseGet(CommentQuery::new);
         return commentPublicQueryService.list(query.getRef(), query.toPageRequest());
     }
@@ -65,7 +65,7 @@ public class CommentFinderImpl implements CommentFinder {
     @Override
     public Mono<ListResult<ReplyVo>> listReply(String commentName, Map<String, Object> params) {
         var query = Optional.ofNullable(params)
-                .map(map -> JsonUtils.mapToObject(map, ReplyQuery.class))
+                .map(map -> JacksonUtils.mapToObject(map, ReplyQuery.class))
                 .orElseGet(ReplyQuery::new);
         return commentPublicQueryService.listReply(commentName, query.toPageRequest());
     }

@@ -3,7 +3,6 @@ package run.halo.app.core.reconciler;
 import static java.util.Objects.requireNonNullElse;
 import static run.halo.app.infra.utils.SystemConfigUtils.mergeMap;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import java.time.Instant;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -69,7 +68,7 @@ class MenuItemReconciler implements Reconciler<Request> {
                 }
                 try {
                     handleRouteRef(menuItem, resolveRouteRules());
-                } catch (JsonProcessingException | RuntimeException e) {
+                } catch (RuntimeException e) {
                     log.error("Failed to resolve routeRef for MenuItem {}", request.name(), e);
                     return;
                 }
@@ -116,7 +115,7 @@ class MenuItemReconciler implements Reconciler<Request> {
         menuItem.getStatus().setDisplayName(spec.getDisplayName());
     }
 
-    private ThemeRouteRules resolveRouteRules() throws JsonProcessingException {
+    private ThemeRouteRules resolveRouteRules() {
         var defaultData = client.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG_DEFAULT)
                 .map(ConfigMap::getData)
                 .map(data -> requireNonNullElse(data, Map.<String, String>of()))

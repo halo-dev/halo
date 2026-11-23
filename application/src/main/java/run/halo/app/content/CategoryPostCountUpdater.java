@@ -24,7 +24,7 @@ import run.halo.app.extension.index.query.Condition;
 import run.halo.app.extension.index.query.Queries;
 import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.extension.router.selector.LabelSelector;
-import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.infra.utils.JacksonUtils;
 
 /**
  * A class used to update the post count of the category when the post changes.
@@ -53,7 +53,7 @@ public class CategoryPostCountUpdater extends AbstractEventReconciler<CategoryPo
         client.fetch(Post.class, request.postName()).ifPresent(post -> {
             var categories = defaultIfNull(post.getSpec().getCategories(), List.<String>of());
             var annotations = MetadataUtil.nullSafeAnnotations(post);
-            var categoryAnno = JsonUtils.objectToJson(categories);
+            var categoryAnno = JacksonUtils.objectToJson(categories);
             var oldCategoryAnno = annotations.get(Post.LAST_ASSOCIATED_CATEGORIES_ANNO);
 
             if (!categoryAnno.equals(oldCategoryAnno)) {
@@ -137,7 +137,7 @@ public class CategoryPostCountUpdater extends AbstractEventReconciler<CategoryPo
                     var annotations = MetadataUtil.nullSafeAnnotations(post);
                     var oldCategories = Optional.ofNullable(annotations.get(Post.LAST_ASSOCIATED_CATEGORIES_ANNO))
                             .filter(StringUtils::isNotBlank)
-                            .map(categoriesJson -> JsonUtils.jsonToObject(categoriesJson, String[].class))
+                            .map(categoriesJson -> JacksonUtils.jsonToObject(categoriesJson, String[].class))
                             .orElse(new String[0]);
 
                     Set<String> categoriesToUpdate = Sets.newHashSet(oldCategories);

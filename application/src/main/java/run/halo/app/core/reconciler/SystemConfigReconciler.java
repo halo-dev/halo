@@ -4,7 +4,6 @@ import static java.util.Objects.requireNonNullElse;
 import static run.halo.app.extension.index.query.Queries.equal;
 import static run.halo.app.infra.utils.SystemConfigUtils.mergeMap;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.Map;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +23,7 @@ import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.SystemConfigChangedEvent;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.utils.SystemConfigUtils;
+import tools.jackson.core.JacksonException;
 
 @Slf4j
 @Component
@@ -81,7 +81,7 @@ class SystemConfigReconciler implements Reconciler<Reconciler.Request> {
                         var mergedOldData = mergeMap(defaultData, requireNonNullElse(oldData, Map.of()));
                         var mergedNewData = mergeMap(defaultData, requireNonNullElse(configMap.getData(), Map.of()));
                         return new SystemConfigChangedEvent(this, mergedOldData, mergedNewData);
-                    } catch (JsonProcessingException e) {
+                    } catch (JacksonException e) {
                         throw new RuntimeException(e);
                     }
                 })

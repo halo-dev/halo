@@ -40,7 +40,7 @@ import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionList;
 import run.halo.app.infra.ConditionStatus;
 import run.halo.app.infra.ExternalUrlSupplier;
-import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.infra.utils.JacksonUtils;
 import run.halo.app.infra.utils.ReactiveUtils;
 import run.halo.app.notification.NotificationCenter;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
@@ -202,7 +202,7 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
 
     private void unPublish(String name) {
         client.fetch(SinglePage.class, name).ifPresent(page -> {
-            final SinglePage oldPage = JsonUtils.deepCopy(page);
+            final SinglePage oldPage = JacksonUtils.deepCopy(page);
 
             SinglePage.changePublishedState(page, false);
             final SinglePage.SinglePageStatus status = page.getStatusOrDefault();
@@ -226,7 +226,7 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
         Assert.notNull(name, "Name must not be null");
         Assert.notNull(error, "Error must not be null");
         client.fetch(SinglePage.class, name).ifPresent(page -> {
-            final SinglePage oldPage = JsonUtils.deepCopy(page);
+            final SinglePage oldPage = JacksonUtils.deepCopy(page);
 
             SinglePage.SinglePageStatus status = page.getStatusOrDefault();
             Post.PostPhase phase = Post.PostPhase.FAILED;
@@ -277,7 +277,7 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
 
     private void reconcileMetadata(String name) {
         client.fetch(SinglePage.class, name).ifPresent(singlePage -> {
-            final SinglePage oldPage = JsonUtils.deepCopy(singlePage);
+            final SinglePage oldPage = JacksonUtils.deepCopy(singlePage);
 
             SinglePage.SinglePageSpec spec = singlePage.getSpec();
             // handle logic delete
@@ -309,7 +309,7 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
 
     private void reconcileStatus(String name) {
         client.fetch(SinglePage.class, name).ifPresent(singlePage -> {
-            final SinglePage oldPage = JsonUtils.deepCopy(singlePage);
+            final SinglePage oldPage = JacksonUtils.deepCopy(singlePage);
 
             singlePage.getStatusOrDefault().setPermalink(createPermalink(singlePage));
 

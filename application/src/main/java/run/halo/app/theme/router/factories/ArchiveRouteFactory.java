@@ -15,7 +15,7 @@ import org.springframework.web.server.i18n.LocaleContextResolver;
 import reactor.core.publisher.Mono;
 import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
-import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.infra.utils.JacksonUtils;
 import run.halo.app.infra.utils.PathUtils;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.PostFinder;
@@ -104,7 +104,7 @@ public class ArchiveRouteFactory implements RouteFactory {
 
         static ArchivePathVariables from(ServerRequest request) {
             Map<String, String> variables = request.pathVariables();
-            return JsonUtils.mapToObject(variables, ArchivePathVariables.class);
+            return JacksonUtils.mapToObject(variables, ArchivePathVariables.class);
         }
     }
 }

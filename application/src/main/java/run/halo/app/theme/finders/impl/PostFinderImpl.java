@@ -25,7 +25,7 @@ import run.halo.app.extension.index.query.Queries;
 import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.extension.router.selector.LabelSelector;
 import run.halo.app.infra.utils.HaloUtils;
-import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.infra.utils.JacksonUtils;
 import run.halo.app.infra.utils.SortUtils;
 import run.halo.app.theme.finders.Finder;
 import run.halo.app.theme.finders.PostFinder;
@@ -103,7 +103,7 @@ class PostFinderImpl implements PostFinder {
     @Override
     public Mono<NavigationPostVo> cursor(String currentName, Map<String, Object> params) {
         var query = Optional.ofNullable(params)
-                .map(map -> JsonUtils.mapToObject(map, PostQuery.class))
+                .map(map -> JacksonUtils.mapToObject(map, PostQuery.class))
                 .orElseGet(PostQuery::new);
         return queryListOptions(query)
                 .flatMap(queryOptions -> postPredicateResolver
@@ -238,7 +238,7 @@ class PostFinderImpl implements PostFinder {
     @Override
     public Mono<ListResult<ListedPostVo>> list(Map<String, Object> params) {
         var query = Optional.ofNullable(params)
-                .map(map -> JsonUtils.mapToObject(map, PostQuery.class))
+                .map(map -> JacksonUtils.mapToObject(map, PostQuery.class))
                 .orElseGet(PostQuery::new);
         return queryListOptions(query)
                 .flatMap(listOptions -> postPublicQueryService.list(listOptions, query.toPageRequest()));

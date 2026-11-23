@@ -498,6 +498,7 @@
         "VModal",
         "VPageHeader",
         "VPagination",
+        "VPopover",
         "VSpace",
         "VStatusDot",
         "VSwitch",
