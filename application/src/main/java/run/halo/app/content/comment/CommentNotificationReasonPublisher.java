@@ -3,7 +3,6 @@ package run.halo.app.content.comment;
 import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 import static run.halo.app.content.comment.ReplyNotificationSubscriptionHelper.identityFrom;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
@@ -33,10 +32,12 @@ import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.Ref;
 import run.halo.app.infra.ExternalLinkProcessor;
-import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.infra.utils.JacksonUtils;
 import run.halo.app.infra.utils.ReactiveUtils;
 import run.halo.app.notification.NotificationReasonEmitter;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Notification reason publisher for {@link Comment} and {@link Reply}.
@@ -47,6 +48,7 @@ import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 @Component
 @RequiredArgsConstructor
 public class CommentNotificationReasonPublisher {
+    private static final JsonMapper JSON_MAPPER = JacksonUtils.MAPPER;
     private static final Duration BLOCKING_TIMEOUT = ReactiveUtils.DEFAULT_TIMEOUT;
     private static final GroupVersionKind POST_GVK = GroupVersionKind.fromExtension(Post.class);
     private static final GroupVersionKind PAGE_GVK = GroupVersionKind.fromExtension(SinglePage.class);
@@ -288,7 +290,7 @@ public class CommentNotificationReasonPublisher {
     static class ReasonDataConverter {
         public static <T> Map<String, Object> toAttributeMap(T data) {
             Assert.notNull(data, "Reason attributes must not be null");
-            return JsonUtils.mapper().convertValue(data, new TypeReference<>() {});
+            return JSON_MAPPER.convertValue(data, new TypeReference<>() {});
         }
     }
 

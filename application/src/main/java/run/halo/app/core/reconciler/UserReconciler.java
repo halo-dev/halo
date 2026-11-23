@@ -41,7 +41,7 @@ import run.halo.app.extension.controller.Reconciler.Request;
 import run.halo.app.extension.controller.RequeueException;
 import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.infra.ExternalUrlSupplier;
-import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.infra.utils.JacksonUtils;
 import run.halo.app.infra.utils.ReactiveUtils;
 import run.halo.app.security.PersonalAccessToken;
 import run.halo.app.security.device.DeviceService;
@@ -172,7 +172,7 @@ public class UserReconciler implements Reconciler<Request>, UserPreCreatingHandl
         roleService
                 .getRolesByUsername(user.getMetadata().getName())
                 .collectList()
-                .map(JsonUtils::objectToJson)
+                .map(JacksonUtils::objectToJson)
                 .doOnNext(roleNamesJson -> {
                     var annotations = Optional.ofNullable(user.getMetadata().getAnnotations())
                             .orElseGet(HashMap::new);

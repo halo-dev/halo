@@ -8,7 +8,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.infra.utils.JacksonUtils;
 
 /**
  * User notification preference service implementation.
@@ -34,7 +34,7 @@ public class UserNotificationPreferenceServiceImpl implements UserNotificationPr
                     }
                     String s = config.getData().get(NOTIFICATION_PREFERENCE);
                     if (StringUtils.isNotBlank(s)) {
-                        return JsonUtils.jsonToObject(s, UserNotificationPreference.class);
+                        return JacksonUtils.jsonToObject(s, UserNotificationPreference.class);
                     }
                     return new UserNotificationPreference();
                 })
@@ -55,7 +55,8 @@ public class UserNotificationPreferenceServiceImpl implements UserNotificationPr
                     if (config.getData() == null) {
                         config.setData(new HashMap<>());
                     }
-                    config.getData().put(NOTIFICATION_PREFERENCE, JsonUtils.objectToJson(userNotificationPreference));
+                    config.getData()
+                            .put(NOTIFICATION_PREFERENCE, JacksonUtils.objectToJson(userNotificationPreference));
                     return client.update(config);
                 })
                 .then();

@@ -6,7 +6,6 @@ import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 import static org.pf4j.PluginState.STARTED;
 import static run.halo.app.plugin.PluginConst.RELOAD_ANNO;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.zafarkhaja.semver.Version;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
@@ -56,7 +55,6 @@ import reactor.core.scheduler.Schedulers;
 import reactor.util.retry.Retry;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.extension.Unstructured;
 import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.infra.exception.DuplicateNameException;
 import run.halo.app.infra.exception.PluginAlreadyExistsException;
@@ -66,12 +64,17 @@ import run.halo.app.infra.exception.PluginDependentsNotDisabledException;
 import run.halo.app.infra.exception.PluginInstallationException;
 import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.infra.utils.FileUtils;
+import run.halo.app.infra.utils.JacksonUtils;
 import run.halo.app.infra.utils.VersionUtils;
 import run.halo.app.plugin.resources.BundleResourceUtils;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.json.JsonMapper;
 
 @Slf4j
 @Component
 public class PluginServiceImpl implements PluginService, InitializingBean, DisposableBean {
+
+    private static final JsonMapper JSON_MAPPER = JacksonUtils.MAPPER;
 
     private static final String PRESET_LOCATION_PREFIX = "classpath:/presets/plugins/";
     private static final String PRESETS_LOCATION_PATTERN = PRESET_LOCATION_PREFIX + "*.jar";
@@ -538,7 +541,7 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
             return Map.of();
         }
         var json = resource.getContentAsString(StandardCharsets.UTF_8);
-        return Unstructured.OBJECT_MAPPER.readValue(json, new TypeReference<>() {});
+        return JSON_MAPPER.readValue(json, new TypeReference<>() {});
     }
 
     private record PresetPlugin(Path path, boolean autoEnable) {}

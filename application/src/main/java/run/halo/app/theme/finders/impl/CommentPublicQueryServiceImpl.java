@@ -33,7 +33,7 @@ import run.halo.app.core.user.service.UserService;
 import run.halo.app.extension.*;
 import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
-import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.infra.utils.JacksonUtils;
 import run.halo.app.theme.finders.CommentPublicQueryService;
 import run.halo.app.theme.finders.vo.*;
 
@@ -171,7 +171,7 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
 
     Mono<CommentVo> toCommentVo(Comment comment) {
         Comment.CommentOwner owner = comment.getSpec().getOwner();
-        return Mono.just(CommentVo.from(JsonUtils.deepCopy(comment)))
+        return Mono.just(CommentVo.from(JacksonUtils.deepCopy(comment)))
                 .flatMap(commentVo -> populateStats(Comment.class, commentVo)
                         .doOnNext(commentVo::setStats)
                         .thenReturn(commentVo))
@@ -228,7 +228,7 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
     // @formatter:on
 
     Mono<ReplyVo> toReplyVo(Reply reply) {
-        return Mono.just(ReplyVo.from(JsonUtils.deepCopy(reply)))
+        return Mono.just(ReplyVo.from(JacksonUtils.deepCopy(reply)))
                 .flatMap(replyVo -> populateStats(Reply.class, replyVo)
                         .doOnNext(replyVo::setStats)
                         .thenReturn(replyVo))

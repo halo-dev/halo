@@ -4,10 +4,12 @@ import static run.halo.app.extension.ExtensionStoreUtil.buildStoreName;
 import static run.halo.app.extension.Unstructured.OBJECT_MAPPER;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.networknt.schema.InputFormat;
 import com.networknt.schema.Schema;
 import com.networknt.schema.SchemaRegistry;
 import com.networknt.schema.dialect.OpenApi30;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -73,9 +75,9 @@ class JSONExtensionConverter implements ExtensionConverter {
                             : objectMapper.convertValue(item, scheme.type()))
                     .orElseThrow();
 
-            var extensionJsonNode = objectMapper.valueToTree(convertedExtension);
+            var extensionJson = objectMapper.writeValueAsString(convertedExtension);
             var validator = getValidator(scheme);
-            var errors = validator.validate(extensionJsonNode);
+            var errors = validator.validate(extensionJson, InputFormat.JSON);
             if (!errors.isEmpty()) {
                 log.debug("Failed to validate Extension: {}, and errors were: {}", extension.getClass(), errors);
                 throw new SchemaViolationException(extension.groupVersionKind(), errors);
@@ -83,7 +85,7 @@ class JSONExtensionConverter implements ExtensionConverter {
 
             var version = extension.getMetadata().getVersion();
             var storeName = buildStoreName(scheme, extension.getMetadata().getName());
-            var data = objectMapper.writeValueAsBytes(extensionJsonNode);
+            var data = extensionJson.getBytes(StandardCharsets.UTF_8);
             return new ExtensionStore(storeName, data, version);
         } catch (IOException e) {
             throw new ExtensionConvertException("Failed write Extension as bytes", e);
@@ -120,7 +122,9 @@ class JSONExtensionConverter implements ExtensionConverter {
 
     private Schema getValidator(Scheme scheme) {
         return validatorMap.computeIfAbsent(scheme, s -> {
-            var validator = schemaRegistry.getSchema(s.openApiSchema());
+            // The schema is a Jackson 2 tree owned by the public plugin API, while the validator works
+            // with Jackson 3, so hand it over as JSON instead of converting the tree.
+            var validator = schemaRegistry.getSchema(s.openApiSchema().toString(), InputFormat.JSON);
             if (log.isDebugEnabled()) {
                 log.debug("Created schema validator {} for scheme: {}", validator, scheme.groupVersionKind());
             }

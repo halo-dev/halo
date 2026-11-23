@@ -43,7 +43,7 @@ public class YamlUnstructuredLoader extends YamlProcessor {
     public List<Unstructured> load() {
         List<Unstructured> unstructuredList = new ArrayList<>();
         process((properties, map) -> {
-            Unstructured unstructured = JsonUtils.mapToObject(map, Unstructured.class);
+            Unstructured unstructured = JacksonUtils.mapToObject(map, Unstructured.class);
             unstructuredList.add(unstructured);
         });
         return unstructuredList;

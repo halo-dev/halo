@@ -33,7 +33,7 @@ import run.halo.app.extension.Metadata;
 import run.halo.app.extension.MetadataOperator;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.ExtensionInitializedEvent;
-import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.infra.utils.JacksonUtils;
 
 @Slf4j
 @Component
@@ -182,7 +182,7 @@ class MenuItemHierarchyMigration {
     }
 
     private MenuItem cloneMenuItem(MenuItem original, LegacyPath path) {
-        var clone = JsonUtils.deepCopy(original);
+        var clone = JacksonUtils.deepCopy(original);
         var metadata = new Metadata();
         metadata.setName("");
         metadata.setGenerateName(CLONE_GENERATE_NAME);
@@ -327,7 +327,7 @@ class MenuItemHierarchyMigration {
         }
 
         String pathAsJson() {
-            return JsonUtils.objectToJson(originalPath);
+            return JacksonUtils.objectToJson(originalPath);
         }
     }
 

@@ -25,7 +25,7 @@ import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.extension.router.selector.LabelSelector;
-import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.infra.utils.JacksonUtils;
 
 /**
  * Update {@link TagStatus#postCount} when post related to tag is updated.
@@ -52,7 +52,7 @@ public class TagPostCountUpdater extends AbstractEventReconciler<TagPostCountUpd
         client.fetch(Post.class, postRelatedTags.postName()).ifPresent(post -> {
             var tags = defaultIfNull(post.getSpec().getTags(), List.<String>of());
             var annotations = MetadataUtil.nullSafeAnnotations(post);
-            var tagAnno = JsonUtils.objectToJson(tags);
+            var tagAnno = JacksonUtils.objectToJson(tags);
             var oldTagAnno = annotations.get(Post.LAST_ASSOCIATED_TAGS_ANNO);
 
             if (!tagAnno.equals(oldTagAnno)) {
@@ -84,7 +84,7 @@ public class TagPostCountUpdater extends AbstractEventReconciler<TagPostCountUpd
         var annotations = MetadataUtil.nullSafeAnnotations(post);
         var oldTags = Optional.ofNullable(annotations.get(Post.LAST_ASSOCIATED_TAGS_ANNO))
                 .filter(StringUtils::isNotBlank)
-                .map(tagsJson -> JsonUtils.jsonToObject(tagsJson, String[].class))
+                .map(tagsJson -> JacksonUtils.jsonToObject(tagsJson, String[].class))
                 .orElse(new String[0]);
 
         var tagsToUpdate = Sets.newHashSet(oldTags);

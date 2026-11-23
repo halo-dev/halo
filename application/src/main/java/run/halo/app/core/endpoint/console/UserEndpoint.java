@@ -17,7 +17,6 @@ import static run.halo.app.extension.index.query.Queries.or;
 import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToListOptions;
 import static run.halo.app.security.authorization.AuthorityUtils.authoritiesToRoles;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.io.Files;
 import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
@@ -93,12 +92,16 @@ import run.halo.app.infra.ValidationUtils;
 import run.halo.app.infra.exception.RateLimitExceededException;
 import run.halo.app.infra.exception.RestrictedNameException;
 import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
-import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.infra.utils.JacksonUtils;
 import run.halo.app.security.authorization.AuthorityUtils;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.json.JsonMapper;
 
 @Component
 @RequiredArgsConstructor
 public class UserEndpoint implements CustomEndpoint {
+
+    private static final JsonMapper JSON_MAPPER = JacksonUtils.MAPPER;
 
     private static final String[] ALLOWED_AVATAR_EXTENSIONS = new String[] {"png", "jpg", "jpeg", "gif"};
     private static final String SELF_USER = "-";
@@ -832,7 +835,7 @@ public class UserEndpoint implements CustomEndpoint {
 
     private static User redactUserSecrets(User user) {
         // Redact a copy so that the response never mutates the extension handed out by the client.
-        var redacted = JsonUtils.DEFAULT_JSON_MAPPER.convertValue(user, User.class);
+        var redacted = JSON_MAPPER.convertValue(user, User.class);
         redacted.getSpec().setPassword(null);
         redacted.getSpec().setTotpEncryptedSecret(null);
         return redacted;
@@ -904,7 +907,7 @@ public class UserEndpoint implements CustomEndpoint {
         roles.forEach(role -> Optional.ofNullable(role.getMetadata().getAnnotations())
                 .map(annotations -> annotations.get(Role.UI_PERMISSIONS_ANNO))
                 .filter(StringUtils::isNotBlank)
-                .map(json -> JsonUtils.jsonToObject(json, new TypeReference<Set<String>>() {}))
+                .map(json -> JSON_MAPPER.readValue(json, new TypeReference<Set<String>>() {}))
                 .ifPresent(uiPerms::addAll));
         return uiPerms.stream().distinct().sorted().toList();
     }

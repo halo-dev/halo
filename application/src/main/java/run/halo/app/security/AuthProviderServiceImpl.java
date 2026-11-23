@@ -22,7 +22,7 @@ import run.halo.app.extension.*;
 import run.halo.app.extension.index.query.Queries;
 import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
-import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.infra.utils.JacksonUtils;
 
 /**
  * A default implementation of {@link AuthProviderService}.
@@ -185,7 +185,7 @@ public class AuthProviderServiceImpl implements AuthProviderService {
         if (StringUtils.isBlank(providerGroup)) {
             authProvider = new SystemSetting.AuthProvider();
         } else {
-            authProvider = JsonUtils.jsonToObject(providerGroup, SystemSetting.AuthProvider.class);
+            authProvider = JacksonUtils.jsonToObject(providerGroup, SystemSetting.AuthProvider.class);
         }
         if (authProvider.getStates() == null) {
             authProvider.setStates(new ArrayList<>());
@@ -209,7 +209,9 @@ public class AuthProviderServiceImpl implements AuthProviderService {
                         stateToFoundOpt.get().setEnabled(enabled);
                     }
 
-                    configMap.getData().put(SystemSetting.AuthProvider.GROUP, JsonUtils.objectToJson(providerConfig));
+                    configMap
+                            .getData()
+                            .put(SystemSetting.AuthProvider.GROUP, JacksonUtils.objectToJson(providerConfig));
 
                     return client.update(configMap);
                 }))

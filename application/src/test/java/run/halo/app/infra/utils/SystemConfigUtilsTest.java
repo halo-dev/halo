@@ -6,21 +6,21 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.Metadata;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 class SystemConfigUtilsTest {
 
-    private final ObjectMapper mapper = JsonUtils.mapper();
+    private final JsonMapper mapper = JacksonUtils.MAPPER;
 
     @Test
-    void mergeMapShouldMergeEmptyMaps() throws JsonProcessingException {
+    void mergeMapShouldMergeEmptyMaps() {
         Map<String, String> defaultMap = new HashMap<>();
         Map<String, String> overrideMap = new HashMap<>();
 
@@ -31,7 +31,7 @@ class SystemConfigUtilsTest {
     }
 
     @Test
-    void mergeMapShouldReturnDefaultMapWhenOverrideIsEmpty() throws JsonProcessingException {
+    void mergeMapShouldReturnDefaultMapWhenOverrideIsEmpty() {
         Map<String, String> defaultMap = new HashMap<>();
         defaultMap.put("group1", "{\"key1\":\"value1\"}");
         Map<String, String> overrideMap = new HashMap<>();
@@ -43,7 +43,7 @@ class SystemConfigUtilsTest {
     }
 
     @Test
-    void mergeMapShouldAddNewKeysFromOverrideMap() throws JsonProcessingException {
+    void mergeMapShouldAddNewKeysFromOverrideMap() {
         Map<String, String> defaultMap = new HashMap<>();
         defaultMap.put("group1", "{\"key1\":\"value1\"}");
         Map<String, String> overrideMap = new HashMap<>();
@@ -57,7 +57,7 @@ class SystemConfigUtilsTest {
     }
 
     @Test
-    void mergeMapShouldDeepMergeJsonObjects() throws JsonProcessingException {
+    void mergeMapShouldDeepMergeJsonObjects() {
         Map<String, String> defaultMap = new HashMap<>();
         defaultMap.put("group1", "{\"key1\":\"value1\",\"nested\":{\"a\":\"1\"}}");
         Map<String, String> overrideMap = new HashMap<>();
@@ -67,14 +67,14 @@ class SystemConfigUtilsTest {
 
         assertEquals(1, result.size());
         JsonNode resultNode = mapper.readTree(result.get("group1"));
-        assertEquals("value1", resultNode.get("key1").asText());
-        assertEquals("value2", resultNode.get("key2").asText());
-        assertEquals("1", resultNode.get("nested").get("a").asText());
-        assertEquals("2", resultNode.get("nested").get("b").asText());
+        assertEquals("value1", resultNode.get("key1").asString());
+        assertEquals("value2", resultNode.get("key2").asString());
+        assertEquals("1", resultNode.get("nested").get("a").asString());
+        assertEquals("2", resultNode.get("nested").get("b").asString());
     }
 
     @Test
-    void mergeMapShouldOverrideExistingValues() throws JsonProcessingException {
+    void mergeMapShouldOverrideExistingValues() {
         Map<String, String> defaultMap = new HashMap<>();
         defaultMap.put("group1", "{\"key1\":\"oldValue\"}");
         Map<String, String> overrideMap = new HashMap<>();
@@ -84,11 +84,11 @@ class SystemConfigUtilsTest {
 
         assertEquals(1, result.size());
         JsonNode resultNode = mapper.readTree(result.get("group1"));
-        assertEquals("newValue", resultNode.get("key1").asText());
+        assertEquals("newValue", resultNode.get("key1").asString());
     }
 
     @Test
-    void mergeMapShouldHandleComplexNestedStructures() throws JsonProcessingException {
+    void mergeMapShouldHandleComplexNestedStructures() {
         Map<String, String> defaultMap = new HashMap<>();
         defaultMap.put("config", "{\"server\":{\"port\":8080,\"host\":\"localhost\"},\"features\":{\"auth\":true}}");
         Map<String, String> overrideMap = new HashMap<>();
@@ -98,13 +98,13 @@ class SystemConfigUtilsTest {
 
         JsonNode resultNode = mapper.readTree(result.get("config"));
         assertEquals(9090, resultNode.get("server").get("port").asInt());
-        assertEquals("localhost", resultNode.get("server").get("host").asText());
+        assertEquals("localhost", resultNode.get("server").get("host").asString());
         assertTrue(resultNode.get("features").get("auth").asBoolean());
         assertTrue(resultNode.get("features").get("logging").asBoolean());
     }
 
     @Test
-    void mergeMapShouldHandleArrayReplacement() throws JsonProcessingException {
+    void mergeMapShouldHandleArrayReplacement() {
         Map<String, String> defaultMap = new HashMap<>();
         defaultMap.put("group1", "{\"items\":[1,2,3]}");
         Map<String, String> overrideMap = new HashMap<>();
@@ -121,7 +121,7 @@ class SystemConfigUtilsTest {
     }
 
     @Test
-    void mergeMapShouldHandleNullValues() throws JsonProcessingException {
+    void mergeMapShouldHandleNullValues() {
         Map<String, String> defaultMap = new HashMap<>();
         defaultMap.put("group1", "{\"key1\":\"value1\"}");
         Map<String, String> overrideMap = new HashMap<>();
@@ -140,11 +140,11 @@ class SystemConfigUtilsTest {
         Map<String, String> overrideMap = new HashMap<>();
         overrideMap.put("group1", "{\"key1\":\"value1\"}");
 
-        assertThrows(JsonProcessingException.class, () -> SystemConfigUtils.mergeMap(defaultMap, overrideMap));
+        assertThrows(JacksonException.class, () -> SystemConfigUtils.mergeMap(defaultMap, overrideMap));
     }
 
     @Test
-    void mergeConfigMapShouldMergeConfigMaps() throws JsonProcessingException {
+    void mergeConfigMapShouldMergeConfigMaps() {
         ConfigMap defaultConfigMap = new ConfigMap();
         Metadata defaultMetadata = new Metadata();
         defaultMetadata.setName("default-config");
@@ -168,12 +168,12 @@ class SystemConfigUtilsTest {
         assertNotNull(result.getData());
         assertEquals(1, result.getData().size());
         JsonNode resultNode = mapper.readTree(result.getData().get("group1"));
-        assertEquals("value1", resultNode.get("key1").asText());
-        assertEquals("value2", resultNode.get("key2").asText());
+        assertEquals("value1", resultNode.get("key1").asString());
+        assertEquals("value2", resultNode.get("key2").asString());
     }
 
     @Test
-    void mergeConfigMapShouldHandleNullData() throws JsonProcessingException {
+    void mergeConfigMapShouldHandleNullData() {
         ConfigMap defaultConfigMap = new ConfigMap();
         Metadata defaultMetadata = new Metadata();
         defaultMetadata.setName("default-config");
@@ -197,7 +197,7 @@ class SystemConfigUtilsTest {
     }
 
     @Test
-    void mergeConfigMapShouldHandleBothNullData() throws JsonProcessingException {
+    void mergeConfigMapShouldHandleBothNullData() {
         ConfigMap defaultConfigMap = new ConfigMap();
         Metadata defaultMetadata = new Metadata();
         defaultMetadata.setName("default-config");
@@ -218,7 +218,7 @@ class SystemConfigUtilsTest {
     }
 
     @Test
-    void mergeConfigMapShouldUseOverrideMetadata() throws JsonProcessingException {
+    void mergeConfigMapShouldUseOverrideMetadata() {
         ConfigMap defaultConfigMap = new ConfigMap();
         Metadata defaultMetadata = new Metadata();
         defaultMetadata.setName("default-config");
@@ -237,7 +237,7 @@ class SystemConfigUtilsTest {
     }
 
     @Test
-    void mergeMapShouldHandlePrimitiveValueReplacement() throws JsonProcessingException {
+    void mergeMapShouldHandlePrimitiveValueReplacement() {
         Map<String, String> defaultMap = new HashMap<>();
         defaultMap.put("group1", "{\"number\":42,\"boolean\":true,\"string\":\"old\"}");
         Map<String, String> overrideMap = new HashMap<>();
@@ -248,11 +248,11 @@ class SystemConfigUtilsTest {
         JsonNode resultNode = mapper.readTree(result.get("group1"));
         assertEquals(99, resultNode.get("number").asInt());
         assertFalse(resultNode.get("boolean").asBoolean());
-        assertEquals("new", resultNode.get("string").asText());
+        assertEquals("new", resultNode.get("string").asString());
     }
 
     @Test
-    void mergeMapShouldHandleEmptyJsonObjects() throws JsonProcessingException {
+    void mergeMapShouldHandleEmptyJsonObjects() {
         Map<String, String> defaultMap = new HashMap<>();
         defaultMap.put("group1", "{}");
         Map<String, String> overrideMap = new HashMap<>();
@@ -261,11 +261,11 @@ class SystemConfigUtilsTest {
         Map<String, String> result = SystemConfigUtils.mergeMap(defaultMap, overrideMap);
 
         JsonNode resultNode = mapper.readTree(result.get("group1"));
-        assertEquals("value1", resultNode.get("key1").asText());
+        assertEquals("value1", resultNode.get("key1").asString());
     }
 
     @Test
-    void mergeMapShouldHandleDeepNesting() throws JsonProcessingException {
+    void mergeMapShouldHandleDeepNesting() {
         Map<String, String> defaultMap = new HashMap<>();
         defaultMap.put("group1", "{\"level1\":{\"level2\":{\"level3\":{\"key\":\"value1\"}}}}");
         Map<String, String> overrideMap = new HashMap<>();
@@ -275,7 +275,7 @@ class SystemConfigUtilsTest {
 
         JsonNode resultNode = mapper.readTree(result.get("group1"));
         JsonNode level3 = resultNode.get("level1").get("level2").get("level3");
-        assertEquals("value1", level3.get("key").asText());
-        assertEquals("value2", level3.get("newKey").asText());
+        assertEquals("value1", level3.get("key").asString());
+        assertEquals("value2", level3.get("newKey").asString());
     }
 }

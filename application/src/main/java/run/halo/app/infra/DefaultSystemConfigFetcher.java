@@ -3,7 +3,6 @@ package run.halo.app.infra;
 import static run.halo.app.infra.SystemSetting.SYSTEM_CONFIG;
 import static run.halo.app.infra.SystemSetting.SYSTEM_CONFIG_DEFAULT;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
@@ -20,6 +19,7 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.utils.JsonParseException;
 import run.halo.app.infra.utils.ReactiveUtils;
 import run.halo.app.infra.utils.SystemConfigUtils;
+import tools.jackson.core.JacksonException;
 import tools.jackson.databind.json.JsonMapper;
 
 @Component
@@ -139,7 +139,7 @@ class DefaultSystemConfigFetcher implements SystemConfigFetcher, ApplicationList
         return Mono.zip(getDefaultConfigMap, getOverrideConfigMap, (defaultConfigMap, overrideConfigMap) -> {
             try {
                 return SystemConfigUtils.mergeConfigMap(defaultConfigMap, overrideConfigMap);
-            } catch (JsonProcessingException e) {
+            } catch (JacksonException e) {
                 throw new JsonParseException(e);
             }
         });

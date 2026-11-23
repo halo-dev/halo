@@ -8,7 +8,7 @@ import lombok.Value;
 import org.apache.commons.lang3.ObjectUtils;
 import run.halo.app.core.extension.User;
 import run.halo.app.extension.MetadataOperator;
-import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.infra.utils.JacksonUtils;
 
 @Value
 @Builder
@@ -29,9 +29,9 @@ public class UserVo implements ExtensionVoOperator {
      */
     public static UserVo from(User user) {
         User.UserStatus statusCopy =
-                JsonUtils.deepCopy(ObjectUtils.defaultIfNull(user.getStatus(), new User.UserStatus()));
+                JacksonUtils.deepCopy(ObjectUtils.defaultIfNull(user.getStatus(), new User.UserStatus()));
 
-        User.UserSpec userSpecCopy = JsonUtils.deepCopy(user.getSpec());
+        User.UserSpec userSpecCopy = JacksonUtils.deepCopy(user.getSpec());
         userSpecCopy.setPassword("[PROTECTED]");
         return UserVo.builder()
                 .metadata(user.getMetadata())

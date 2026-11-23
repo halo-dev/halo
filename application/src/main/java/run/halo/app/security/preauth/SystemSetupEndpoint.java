@@ -74,7 +74,7 @@ import run.halo.app.infra.ValidationUtils;
 import run.halo.app.infra.exception.DuplicateNameException;
 import run.halo.app.infra.exception.RequestBodyValidationException;
 import run.halo.app.infra.utils.HaloUtils;
-import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.infra.utils.JacksonUtils;
 import run.halo.app.infra.utils.YamlUnstructuredLoader;
 import run.halo.app.plugin.PluginService;
 import run.halo.app.security.SuperAdminInitializer;
@@ -314,7 +314,7 @@ public class SystemSetupEndpoint {
             configMap.setData(data);
         }
         String basic = data.getOrDefault(SystemSetting.Basic.GROUP, "{}");
-        var basicSetting = JsonUtils.jsonToObject(basic, SystemSetting.Basic.class);
+        var basicSetting = JacksonUtils.jsonToObject(basic, SystemSetting.Basic.class);
         // Do not overwrite the settings of a previous setup attempt. The external URL in particular
         // is used to build external links such as password recovery links.
         if (!StringUtils.hasText(basicSetting.getTitle())) {
@@ -326,7 +326,7 @@ public class SystemSetupEndpoint {
         if (!StringUtils.hasText(basicSetting.getExternalUrl())) {
             basicSetting.setExternalUrl(body.getExternalUrl());
         }
-        data.put(SystemSetting.Basic.GROUP, JsonUtils.objectToJson(basicSetting));
+        data.put(SystemSetting.Basic.GROUP, JacksonUtils.objectToJson(basicSetting));
         return basicSetting.getExternalUrl();
     }
 

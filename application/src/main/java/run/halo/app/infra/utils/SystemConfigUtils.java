@@ -1,10 +1,5 @@
 package run.halo.app.infra.utils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.hash.Hashing;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -15,6 +10,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.core.extension.content.Constant;
 import run.halo.app.extension.ConfigMap;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Utility class for merging configuration maps containing JSON strings.
@@ -26,8 +24,6 @@ import run.halo.app.extension.ConfigMap;
 public enum SystemConfigUtils {
     ;
 
-    private static final ObjectMapper mapper = JsonUtils.mapper();
-
     private static final String DATA_SNAPSHOT_ANNO = "halo.run/data-snapshot";
 
     /**
@@ -36,10 +32,8 @@ public enum SystemConfigUtils {
      * @param defaultMap the default configuration map
      * @param overrideMap the override configuration map
      * @return the merged configuration map
-     * @throws JsonProcessingException if JSON processing fails
      */
-    public static Map<String, String> mergeMap(Map<String, String> defaultMap, Map<String, String> overrideMap)
-            throws JsonProcessingException {
+    public static Map<String, String> mergeMap(Map<String, String> defaultMap, Map<String, String> overrideMap) {
         if (CollectionUtils.isEmpty(defaultMap)) {
             return overrideMap;
         }
@@ -68,10 +62,8 @@ public enum SystemConfigUtils {
      * @param defaultConfigMap the default ConfigMap
      * @param overrideConfigMap the override ConfigMap
      * @return the merged ConfigMap
-     * @throws JsonProcessingException if JSON processing fails
      */
-    public static ConfigMap mergeConfigMap(ConfigMap defaultConfigMap, ConfigMap overrideConfigMap)
-            throws JsonProcessingException {
+    public static ConfigMap mergeConfigMap(ConfigMap defaultConfigMap, ConfigMap overrideConfigMap) {
         var mergedData = mergeMap(
                 defaultConfigMap.getData() != null ? defaultConfigMap.getData() : Map.of(),
                 overrideConfigMap.getData() != null ? overrideConfigMap.getData() : Map.of());
@@ -81,14 +73,14 @@ public enum SystemConfigUtils {
         return merged;
     }
 
-    private static String mergeJsonStrings(String mainJson, String updateJson) throws JsonProcessingException {
-        var mainNode = mapper.readTree(mainJson);
-        var updateNode = mapper.readTree(updateJson);
+    private static String mergeJsonStrings(String mainJson, String updateJson) {
+        var mainNode = JacksonUtils.MAPPER.readTree(mainJson);
+        var updateNode = JacksonUtils.MAPPER.readTree(updateJson);
 
         // This performs a deep merge into the mainNode
         var mergedNode = deepMerge(mainNode, updateNode);
 
-        return mapper.writeValueAsString(mergedNode);
+        return JacksonUtils.MAPPER.writeValueAsString(mergedNode);
     }
 
     private static JsonNode deepMerge(JsonNode mainNode, JsonNode updateNode) {
@@ -147,13 +139,15 @@ public enum SystemConfigUtils {
      * @param configMap the ConfigMap
      */
     public static void updateDataSnapshot(ConfigMap configMap) {
-        Optional.ofNullable(configMap.getData()).map(JsonUtils::objectToJson).ifPresent(dataJson -> {
-            var metadata = configMap.getMetadata();
-            if (metadata.getAnnotations() == null) {
-                metadata.setAnnotations(new HashMap<>());
-            }
-            metadata.getAnnotations().put(DATA_SNAPSHOT_ANNO, dataJson);
-        });
+        Optional.ofNullable(configMap.getData())
+                .map(JacksonUtils.MAPPER::writeValueAsString)
+                .ifPresent(dataJson -> {
+                    var metadata = configMap.getMetadata();
+                    if (metadata.getAnnotations() == null) {
+                        metadata.setAnnotations(new HashMap<>());
+                    }
+                    metadata.getAnnotations().put(DATA_SNAPSHOT_ANNO, dataJson);
+                });
     }
 
     /**
@@ -165,7 +159,7 @@ public enum SystemConfigUtils {
     public static Map<String, String> getDataSnapshot(ConfigMap configMap) {
         return Optional.ofNullable(configMap.getMetadata().getAnnotations())
                 .map(annotations -> annotations.get(DATA_SNAPSHOT_ANNO))
-                .map(dataJson -> JsonUtils.jsonToObject(dataJson, new TypeReference<Map<String, String>>() {}))
+                .map(dataJson -> JacksonUtils.MAPPER.readValue(dataJson, new TypeReference<Map<String, String>>() {}))
                 .orElse(Map.of());
     }
 }
