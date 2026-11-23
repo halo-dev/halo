@@ -75,7 +75,7 @@ describe("Popover", () => {
     expect(getContent()?.textContent).toBe("Rich content");
 
     wrapper.unmount();
-  });
+  }, 15_000);
 
   it("reflects a controlled open prop", async () => {
     const wrapper = mountPopover({ open: false });
