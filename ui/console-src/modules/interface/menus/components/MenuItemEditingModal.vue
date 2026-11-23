@@ -371,7 +371,9 @@ onMounted(() => {
               </span>
             </div>
           </div>
-          <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">
+          <div
+            class="formkit-stack mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0"
+          >
             <FormKit
               v-model="selectedParentMenuItem"
               :label="

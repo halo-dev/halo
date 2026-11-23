@@ -1,8 +1,8 @@
 const textClassification = {
   label: "block text-sm font-medium text-gray-700 formkit-invalid:text-red-500",
-  wrapper: "flex flex-col gap-4",
+  wrapper: "flex flex-col gap-1.5",
   inner:
-    "bg-white inline-flex items-center w-full relative box-border border border-gray-300 formkit-invalid:border-red-500 h-9 rounded-base overflow-hidden focus-within:border-primary focus-within:shadow-sm w-full sm:max-w-lg transition-all",
+    "bg-white inline-flex items-center w-full relative box-border border border-gray-300 formkit-invalid:border-red-500 h-9 rounded-base overflow-hidden focus-within:border-primary focus-within:shadow-sm sm:max-w-lg transition-all",
   input: "resize-none w-full text-black block transition-all px-3 text-sm",
 };
 
@@ -28,18 +28,19 @@ const selectClassification = {
   label: textClassification.label,
   wrapper: textClassification.wrapper,
   inner:
-    "group/select py-0.5 min-h-[36px] inline-flex items-center w-full relative box-border border border-gray-300 formkit-invalid:border-red-500 rounded-base overflow-hidden focus-within:border-primary focus-within:shadow-sm w-full sm:max-w-lg transition-all",
+    "group/select py-0.5 min-h-[36px] inline-flex items-center w-full relative box-border border border-gray-300 formkit-invalid:border-red-500 rounded-base overflow-hidden focus-within:border-primary focus-within:shadow-sm sm:max-w-lg transition-all",
 };
 
 const theme: Record<string, Record<string, string>> = {
   global: {
-    form: "divide-y divide-gray-100",
+    form: "formkit-stack divide-y divide-gray-100",
     outer:
-      "formkit-disabled:opacity-70 formkit-disabled:cursor-not-allowed formkit-disabled:pointer-events-none py-4 first:pt-0 last:pb-0 transition-all",
-    help: "text-xs mt-2 text-gray-500",
-    messages: "list-none p-0 mt-1.5 mb-0 transition-all",
-    message: "text-red-500 mt-2 text-xs",
-    verificationForm: "pt-4 divide-y divide-gray-100",
+      "formkit-disabled:opacity-70 formkit-disabled:cursor-not-allowed formkit-disabled:pointer-events-none min-w-0 transition-all",
+    help: "text-xs mt-1 text-gray-500",
+    messages:
+      "formkit-messages list-none p-0 mt-1.5 mb-0 space-y-1 transition-all",
+    message: "text-red-500 text-xs",
+    verificationForm: "formkit-stack pt-4 divide-y divide-gray-100",
   },
   button: buttonClassification,
   color: {
@@ -117,7 +118,7 @@ const theme: Record<string, Record<string, string>> = {
     inner: "flex flex-col gap-4",
     items: "flex flex-col w-full gap-2 rounded-base",
     item: "border rounded-base grid grid-cols-12 focus-within:border-primary transition-all overflow-visible focus-within:shadow-sm",
-    content: "flex-1 p-2 col-span-11 divide-y divide-gray-100",
+    content: "formkit-stack flex-1 p-2 col-span-11 divide-y divide-gray-100",
     controls:
       "flex flex-col items-center justify-center gap-1.5 py-2 bg-gray-200 col-span-1 flex items-center justify-center",
     control:
@@ -137,7 +138,7 @@ const theme: Record<string, Record<string, string>> = {
   attachment: {
     label: textClassification.label,
     inner: "inline-flex w-full",
-    wrapper: "flex flex-col gap-4 w-full",
+    wrapper: "flex flex-col gap-1.5 w-full",
   },
   list: {
     label: textClassification.label,
@@ -148,7 +149,7 @@ const theme: Record<string, Record<string, string>> = {
     inner: "flex flex-col gap-4",
     items: "flex flex-col w-full gap-2 rounded-base",
     item: "grid grid-cols-12 focus-within:border-primary transition-all gap-1.5 overflow-visible",
-    content: "flex-1 col-span-9 divide-y divide-gray-100",
+    content: "formkit-stack flex-1 col-span-9 divide-y divide-gray-100",
     controls: "flex items-center justify-center gap-1 col-span-3",
     control:
       "cursor-pointer text-gray-500 transition-all hover:text-primary disabled:!cursor-not-allowed disabled:opacity-50 disabled:hover:!text-gray-500",
@@ -163,7 +164,7 @@ const theme: Record<string, Record<string, string>> = {
     fieldset: boxClassification.fieldset,
     wrapper: boxClassification.wrapper,
     help: `${boxClassification.wrapper} mb-2`,
-    inner: "flex flex-col px-2 divide-y divide-gray-100",
+    inner: "formkit-stack flex flex-col px-2 divide-y divide-gray-100",
   },
   tagSelect: {
     ...textClassification,

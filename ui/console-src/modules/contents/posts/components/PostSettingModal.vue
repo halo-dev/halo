@@ -352,7 +352,9 @@ const showCancelPublishButton = computed(() => {
               </span>
             </div>
           </div>
-          <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">
+          <div
+            class="formkit-stack mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0"
+          >
             <FormKit
               v-model="formState.spec.title"
               :label="$t('core.post.settings.fields.title.label')"
@@ -446,7 +448,9 @@ const showCancelPublishButton = computed(() => {
               </span>
             </div>
           </div>
-          <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">
+          <div
+            class="formkit-stack mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0"
+          >
             <FormKit
               v-if="utils.permission.has(['system:users:view'])"
               v-model="formState.spec.owner"

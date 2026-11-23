@@ -115,7 +115,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div :class="context.classes.submit" class="py-4" @click="handleVerification">
+  <div :class="context.classes.submit" @click="handleVerification">
     <VButton
       v-tooltip="stateMessage.message"
       :disabled="context.node.props.buttonAttrs.disabled"

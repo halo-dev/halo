@@ -43,7 +43,7 @@ function onInput(value?: unknown) {
 <template>
   <FormKit
     :id="id"
-    outer-class="!p-0 w-full sm:w-auto"
+    outer-class="w-full sm:w-auto"
     :placeholder="placeholder || $t('core.common.placeholder.search')"
     type="text"
     name="keyword"
