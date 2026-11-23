@@ -50,8 +50,6 @@ const handleDelete = () => {
     title: t("core.attachment.group_list.operations.delete.title"),
     description: t("core.attachment.group_list.operations.delete.description"),
     confirmType: "danger",
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       if (!props.group) {
         return;
@@ -115,8 +113,6 @@ const handleDeleteWithAttachments = () => {
       "core.attachment.group_list.operations.delete_with_attachments.description"
     ),
     confirmType: "danger",
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       if (!props.group) {
         return;

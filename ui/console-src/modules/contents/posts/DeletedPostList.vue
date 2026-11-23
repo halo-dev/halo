@@ -92,8 +92,6 @@ const handleDeletePermanently = async (post: Post) => {
     title: t("core.deleted_post.operations.delete.title"),
     description: t("core.deleted_post.operations.delete.description"),
     confirmType: "danger",
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       await coreApiClient.content.post.deletePost({
         name: post.metadata.name,
@@ -110,8 +108,6 @@ const handleDeletePermanentlyInBatch = async () => {
     title: t("core.deleted_post.operations.delete_in_batch.title"),
     description: t("core.deleted_post.operations.delete_in_batch.description"),
     confirmType: "danger",
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       const chunks = chunk(selectedPostNames.value, 5);
 
@@ -137,8 +133,6 @@ const handleRecovery = async (post: Post) => {
   Dialog.warning({
     title: t("core.deleted_post.operations.recovery.title"),
     description: t("core.deleted_post.operations.recovery.description"),
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       await coreApiClient.content.post.patchPost({
         name: post.metadata.name,
@@ -164,8 +158,6 @@ const handleRecoveryInBatch = async () => {
     description: t(
       "core.deleted_post.operations.recovery_in_batch.description"
     ),
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       const chunks = chunk(selectedPostNames.value, 5);
 

@@ -69,8 +69,6 @@ const confirmDevelopmentThemeUninstall = (deleteExtensions?: boolean) => {
     description: t(
       "core.theme.operations.uninstall.possible_development_description"
     ),
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     confirmType: "danger",
     onConfirm: async () => {
       try {
@@ -91,8 +89,6 @@ const handleUninstall = async (deleteExtensions?: boolean) => {
       ? t("core.theme.operations.uninstall_and_delete_config.title")
       : t("core.theme.operations.uninstall.title"),
     description: t("core.common.dialog.descriptions.cannot_be_recovered"),
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     confirmType: "danger",
     onConfirm: async () => {
       if (isDevelopmentTheme) {

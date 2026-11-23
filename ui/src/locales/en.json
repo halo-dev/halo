@@ -1049,6 +1049,8 @@
   "core.components.global_search.states.initial": "Enter keywords to start searching",
   "core.components.global_search.states.loading": "Searching…",
   "core.components.global_search.states.partial_failure": "Some search results are temporarily unavailable",
+  "core.components.pagination.page_label": "page",
+  "core.components.pagination.size_label": "items per page",
   "core.components.pagination.total_label": "Total {total} items",
   "core.components.uppy_upload.fields.file_name": "File name",
   "core.components.user_avatar.toast_upload_failed": "Failed to upload avatar",

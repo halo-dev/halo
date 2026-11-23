@@ -211,8 +211,6 @@ const handleDeleteInBatch = async () => {
     title: t("core.page.operations.delete_in_batch.title"),
     description: t("core.page.operations.delete_in_batch.description"),
     confirmType: "danger",
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       await Promise.all(
         selectedPageNames.value.map((name) => {

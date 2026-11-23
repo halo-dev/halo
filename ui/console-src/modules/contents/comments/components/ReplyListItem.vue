@@ -77,8 +77,6 @@ const handleDelete = async () => {
     title: t("core.comment.operations.delete_reply.title"),
     description: t("core.common.dialog.descriptions.cannot_be_recovered"),
     confirmType: "danger",
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
         await coreApiClient.content.reply.deleteReply({

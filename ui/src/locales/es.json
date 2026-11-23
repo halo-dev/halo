@@ -862,6 +862,8 @@
   "core.components.global_search.states.initial": "Ingresa palabras clave para comenzar a buscar",
   "core.components.global_search.states.loading": "Buscando…",
   "core.components.global_search.states.partial_failure": "Algunos resultados de búsqueda no están disponibles temporalmente",
+  "core.components.pagination.page_label": "página",
+  "core.components.pagination.size_label": "elementos por página",
   "core.components.pagination.total_label": "Total de {total} elementos",
   "core.components.uppy_upload.fields.file_name": "Nombre del archivo",
   "core.components.user_avatar.toast_upload_failed": "Error al cargar el avatar",

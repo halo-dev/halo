@@ -48,8 +48,6 @@ const handleCatchExistsException = async (
     description: t(
       "core.theme.operations.existed_during_installation.description"
     ),
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       if (!file) {
         throw new Error("File is required");

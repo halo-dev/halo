@@ -71,8 +71,6 @@ const handleShowActiveModalAfterInstall = (plugin: Plugin) => {
     description: t(
       "core.plugin.upload_modal.operations.active_after_install.description"
     ),
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
         await consoleApiClient.plugin.plugin.changePluginRunningState({
@@ -100,8 +98,6 @@ const handleCatchExistsException = async (
     description: t(
       "core.plugin.upload_modal.operations.existed_during_installation.description"
     ),
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       await consoleApiClient.plugin.plugin.upgradePluginFromUri({
         name: error.pluginName,

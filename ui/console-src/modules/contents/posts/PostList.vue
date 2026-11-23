@@ -247,8 +247,6 @@ const handleDeleteInBatch = async () => {
     title: t("core.post.operations.delete_in_batch.title"),
     description: t("core.post.operations.delete_in_batch.description"),
     confirmType: "danger",
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       const chunks = chunk(selectedPostNames.value, 5);
 
@@ -274,8 +272,6 @@ const handlePublishInBatch = async () => {
   Dialog.info({
     title: t("core.post.operations.publish_in_batch.title"),
     description: t("core.post.operations.publish_in_batch.description"),
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       const chunks = chunk(selectedPostNames.value, 5);
 
@@ -299,8 +295,6 @@ const handleCancelPublishInBatch = async () => {
   Dialog.warning({
     title: t("core.post.operations.cancel_publish_in_batch.title"),
     description: t("core.post.operations.cancel_publish_in_batch.description"),
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       const chunks = chunk(selectedPostNames.value, 5);
 

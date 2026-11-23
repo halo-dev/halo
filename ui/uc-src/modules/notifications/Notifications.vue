@@ -379,8 +379,6 @@ function handleDeleteNotification(notification: Notification) {
   Dialog.warning({
     title: t("core.uc_notification.operations.delete.title"),
     description: t("core.uc_notification.operations.delete.description"),
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     confirmType: "danger",
     async onConfirm() {
       await deleteNotificationMutation.mutateAsync({
@@ -676,8 +674,6 @@ function handleDeleteSelected() {
     description: t(
       "core.uc_notification.operations.delete_selected.description"
     ),
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     confirmType: "danger",
     onConfirm: async () => {
       await deleteSelectedMutation.mutateAsync({
@@ -696,8 +692,6 @@ function handleDeleteNotifications() {
   Dialog.warning({
     title: t("core.uc_notification.operations.delete_all.title"),
     description: t("core.uc_notification.operations.delete_all.description"),
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     confirmType: "danger",
     onConfirm: async () => {
       await deleteAllMutation.mutateAsync(activeTab.value);
@@ -712,8 +706,6 @@ function handleMarkAllAsRead() {
     description: t(
       "core.uc_notification.operations.mark_all_as_read.description"
     ),
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       await markAllAsReadMutation.mutateAsync();
     },

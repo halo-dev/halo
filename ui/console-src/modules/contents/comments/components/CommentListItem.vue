@@ -95,8 +95,6 @@ const handleDelete = async () => {
     title: t("core.comment.operations.delete_comment.title"),
     description: t("core.comment.operations.delete_comment.description"),
     confirmType: "danger",
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
         await coreApiClient.content.comment.deleteComment({
@@ -116,8 +114,6 @@ const handleDelete = async () => {
 const handleApproveReplyInBatch = async () => {
   Dialog.warning({
     title: t("core.comment.operations.approve_applies_in_batch.title"),
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
         const repliesToUpdate = replies.value?.filter((reply) => {

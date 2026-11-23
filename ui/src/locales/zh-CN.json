@@ -1056,6 +1056,8 @@
   "core.components.global_search.states.initial": "输入关键词开始搜索",
   "core.components.global_search.states.loading": "正在搜索…",
   "core.components.global_search.states.partial_failure": "部分搜索结果暂时不可用",
+  "core.components.pagination.page_label": "页",
+  "core.components.pagination.size_label": "条 / 页",
   "core.components.pagination.total_label": "共 {total} 项数据",
   "core.components.uppy_upload.fields.file_name": "文件名",
   "core.components.user_avatar.toast_upload_failed": "上传头像失败",

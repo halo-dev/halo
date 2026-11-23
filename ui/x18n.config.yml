@@ -6,6 +6,9 @@ presets:
 resources:
   - pattern: src/locales/{locale}.json
 keyStyle: flat
+ignoreKeys:
+  - core.components.pagination.page_label
+  - core.components.pagination.size_label
 usage:
   include:
     - src/**/*.{vue,ts,tsx,js,jsx}

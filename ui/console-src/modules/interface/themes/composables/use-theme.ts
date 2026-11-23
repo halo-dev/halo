@@ -53,8 +53,6 @@ export function useThemeLifeCycle(
     Dialog.info({
       title: t("core.theme.operations.active.title"),
       description: theme.value?.spec.displayName,
-      confirmText: t("core.common.buttons.confirm"),
-      cancelText: t("core.common.buttons.cancel"),
       onConfirm: async () => {
         try {
           if (!theme.value) return;
@@ -86,8 +84,6 @@ export function useThemeLifeCycle(
       title: t("core.theme.operations.reset.title"),
       description: t("core.theme.operations.reset.description"),
       confirmType: "danger",
-      confirmText: t("core.common.buttons.confirm"),
-      cancelText: t("core.common.buttons.cancel"),
       onConfirm: async () => {
         try {
           if (!theme?.value) {
@@ -256,8 +252,6 @@ export function useThemeConfigFile(theme: Ref<Theme | undefined>) {
         description: t(
           "core.theme.operations.import_configuration.version_mismatch.description"
         ),
-        confirmText: t("core.common.buttons.confirm"),
-        cancelText: t("core.common.buttons.cancel"),
         onConfirm: () => {
           handleSaveConfigMap(configJson.configs);
         },

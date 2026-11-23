@@ -30,8 +30,6 @@ const handleLogout = () => {
   Dialog.warning({
     title: t("core.sidebar.operations.logout.title"),
     description: t("core.sidebar.operations.logout.description"),
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       window.location.href = "/logout";
     },

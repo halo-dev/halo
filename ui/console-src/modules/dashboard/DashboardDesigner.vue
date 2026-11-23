@@ -283,7 +283,6 @@ function handleShowLeaveWarning(next: () => void) {
     description: t("core.dashboard_designer.operations.back.description"),
     confirmText: t("core.dashboard_designer.operations.back.confirm_text"),
     confirmType: "danger",
-    cancelText: t("core.common.buttons.cancel"),
     onConfirm: () => {
       next();
     },

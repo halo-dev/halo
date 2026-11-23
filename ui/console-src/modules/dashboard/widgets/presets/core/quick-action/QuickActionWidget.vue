@@ -146,8 +146,6 @@ const presetItems: DashboardWidgetQuickActionItem[] = [
         description: t(
           "core.dashboard.widgets.presets.quickaction.actions.refresh_search_engine.dialog_content"
         ),
-        confirmText: t("core.common.buttons.confirm"),
-        cancelText: t("core.common.buttons.cancel"),
         onConfirm: async () => {
           await consoleApiClient.content.indices.rebuildAllIndices();
           Toast.success(

@@ -148,8 +148,6 @@ const handleCloneMenu = async (menu: Menu) => {
     description: t("core.menu.operations.clone.description", {
       name: menu.spec.displayName,
     }),
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
         const originalItems = await listMenuItemsByMenuName(menu.metadata.name);
@@ -231,8 +229,6 @@ const handleDeleteMenu = async (menu: Menu) => {
     title: t("core.menu.operations.delete_menu.title"),
     description: t("core.menu.operations.delete_menu.description"),
     confirmType: "danger",
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       let deleted = false;
       try {
