@@ -3,13 +3,16 @@ package run.halo.app.infra.utils;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 import tools.jackson.core.StreamWriteFeature;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.MapperFeature;
 import tools.jackson.databind.SerializationFeature;
 import tools.jackson.databind.cfg.EnumFeature;
 import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Jackson 3 JSON utilities for Halo internals.
@@ -93,5 +96,37 @@ public enum JacksonUtils {
     @SuppressWarnings("unchecked")
     public static <T> T deepCopy(T source) {
         return (T) MAPPER.readValue(objectToJson(source), source.getClass());
+    }
+
+    /**
+     * Applies an RFC 7386 JSON Merge Patch to the given target.
+     *
+     * <p>Object members are merged recursively, {@code null} removes the member and any other value replaces the target
+     * member. The target is not modified.
+     *
+     * @param target the document to patch, may be null
+     * @param patch the merge patch
+     * @return the patched document
+     * @see <a href="https://datatracker.ietf.org/doc/html/rfc7386">RFC 7386</a>
+     */
+    public static JsonNode mergePatch(@Nullable JsonNode target, JsonNode patch) {
+        if (!patch.isObject()) {
+            return patch.deepCopy();
+        }
+        var result = target != null && target.isObject() ? ((ObjectNode) target).deepCopy() : MAPPER.createObjectNode();
+        patch.properties().forEach(entry -> {
+            var name = entry.getKey();
+            var value = entry.getValue();
+            if (value.isNull()) {
+                result.remove(name);
+                return;
+            }
+            if (value.isObject()) {
+                result.set(name, mergePatch(result.get(name), value));
+                return;
+            }
+            result.set(name, value.deepCopy());
+        });
+        return result;
     }
 }

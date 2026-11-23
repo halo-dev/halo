@@ -87,6 +87,8 @@ dependencies {
     api "org.jsoup:jsoup"
     api "io.github.java-diff-utils:java-diff-utils"
     api "org.springframework.integration:spring-integration-core"
+    // Keep the Jackson 2 based json-patch for plugins that may use it transitively. Halo itself
+    // handles JSON Merge Patch with Jackson 3.
     api "com.github.java-json-tools:json-patch"
     api "org.thymeleaf.extras:thymeleaf-extras-springsecurity6"
     api 'org.apache.tika:tika-core'
