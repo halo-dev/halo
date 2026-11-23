@@ -1,32 +1,24 @@
 apiVersion: v1alpha1
 kind: "Role"
+# ConfigMap holds the system configuration (`system` / `system-default`), plugin
+# and theme settings, and storage policy configuration, so read or write access
+# is equivalent to full system configuration control and secret access. Keep
+# this capability super-admin-only. Retired into a hidden, empty tombstone; keep
+# the resource so upgrades overwrite legacy rules. Do not add rules back.
+# See https://github.com/halo-dev/halo/issues/10477.
 metadata:
   name: role-template-manage-configmaps
   labels:
     halo.run/role-template: "true"
-  annotations:
-    rbac.authorization.halo.run/dependencies: '[ "role-template-view-configmaps" ]'
-    rbac.authorization.halo.run/module: "ConfigMaps Management"
-    rbac.authorization.halo.run/display-name: "ConfigMap Manage"
-    rbac.authorization.halo.run/ui-permissions: |
-      ["system:configmaps:manage"]
-rules:
-  - apiGroups: [""]
-    resources: ["configmaps"]
-    verbs: ["create", "patch", "update", "delete", "deletecollection"]
+    halo.run/hidden: "true"
+rules: []
 ---
 apiVersion: v1alpha1
 kind: "Role"
+# Retired together with ConfigMap read access. See #10477.
 metadata:
   name: role-template-view-configmaps
   labels:
     halo.run/role-template: "true"
-  annotations:
-    rbac.authorization.halo.run/module: "ConfigMaps Management"
-    rbac.authorization.halo.run/display-name: "ConfigMap View"
-    rbac.authorization.halo.run/ui-permissions: |
-      ["system:configmaps:view"]
-rules:
-  - apiGroups: [""]
-    resources: ["configmaps"]
-    verbs: ["get", "list"]
+    halo.run/hidden: "true"
+rules: []

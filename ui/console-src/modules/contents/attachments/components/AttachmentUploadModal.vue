@@ -106,7 +106,7 @@ const onGroupEditingModalClose = async () => {
           @click="selectedPolicyName = policy.metadata.name"
         />
 
-        <VDropdown>
+        <VDropdown v-permission="['*']">
           <AttachmentPolicyBadge>
             <template #text>
               <span>{{ $t("core.common.buttons.new") }}</span>

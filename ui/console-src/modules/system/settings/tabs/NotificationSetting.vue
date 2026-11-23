@@ -88,7 +88,7 @@ const { isLoading: isMutating, mutate } = useMutation({
       </FormKit>
 
       <StickyBlock
-        v-permission="['system:configmaps:manage']"
+        v-permission="['*']"
         class="-mx-4 -mb-4 rounded-b-base rounded-t-lg bg-white p-4 pt-5"
         position="bottom"
       >

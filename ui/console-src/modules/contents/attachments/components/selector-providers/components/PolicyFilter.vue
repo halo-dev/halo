@@ -61,7 +61,7 @@ function handleOpenCreationModal(policyTemplate: PolicyTemplate) {
         @click="modelValue = policy.metadata.name"
       />
 
-      <HasPermission :permissions="['system:attachments:manage']">
+      <HasPermission :permissions="['*']">
         <VDropdown>
           <AttachmentPolicyBadge>
             <template #text>

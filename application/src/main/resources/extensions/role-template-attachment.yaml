@@ -12,17 +12,21 @@ metadata:
       ["system:attachments:manage"]
 rules:
   - apiGroups: ["storage.halo.run"]
-    resources: ["attachments", "policies", "policytemplates", "groups"]
+    resources: ["attachments", "groups"]
     verbs: ["*"]
+  # Storage policy settings, including their ConfigMap-backed configuration,
+  # are super-admin-only for now. Managers keep read access to resolve policy
+  # names in the console.
+  # See https://github.com/halo-dev/halo/issues/10477.
+  - apiGroups: ["storage.halo.run"]
+    resources: ["policies", "policytemplates"]
+    verbs: ["get", "list"]
   - apiGroups: ["api.console.halo.run"]
     resources: ["attachments"]
     verbs: ["*"]
   - apiGroups: ["api.console.halo.run"]
     resources: ["attachments/upload-from-url"]
     verbs: ["create"]
-  - apiGroups: [""]
-    resources: ["settings"]
-    verbs: ["get"]
   - nonResourceURLs: ["/apis/api.console.halo.run/v1alpha1/attachments/upload"]
     verbs: ["create"]
   - apiGroups: ["console.api.storage.halo.run"]
