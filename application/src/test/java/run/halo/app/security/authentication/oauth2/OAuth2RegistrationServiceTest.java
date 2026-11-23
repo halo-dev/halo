@@ -53,6 +53,7 @@ import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
+import run.halo.app.infra.ValidationUtils;
 import run.halo.app.infra.exception.AgreementNotAcceptedException;
 
 @ExtendWith(MockitoExtension.class)
@@ -316,6 +317,18 @@ class OAuth2RegistrationServiceTest {
                 .verifyComplete();
 
         assertThat(users.get("alice").getSpec().getDisplayName()).isEqualTo("alice");
+    }
+
+    @Test
+    void shouldTruncateDisplayNameToMaxLength() {
+        var longName = "a".repeat(ValidationUtils.DISPLAY_NAME_MAX_LENGTH + 10);
+
+        StepVerifier.create(service.register(
+                        token(Map.of("sub", "provider-user-id", "login", "alice", "name", longName)), false))
+                .expectNextCount(1)
+                .verifyComplete();
+
+        assertThat(users.get("alice").getSpec().getDisplayName()).hasSize(ValidationUtils.DISPLAY_NAME_MAX_LENGTH);
     }
 
     @Test
