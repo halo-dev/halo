@@ -106,8 +106,6 @@ export function usePluginLifeCycle(plugin?: Ref<Plugin | undefined>) {
       title: t("core.plugin.operations.reload.title"),
       description: t("core.plugin.operations.reload.description"),
       confirmType: "danger",
-      confirmText: t("core.common.buttons.confirm"),
-      cancelText: t("core.common.buttons.cancel"),
       onConfirm: async () => {
         if (!plugin?.value) {
           return;
@@ -134,8 +132,6 @@ export function usePluginLifeCycle(plugin?: Ref<Plugin | undefined>) {
       title: t("core.plugin.operations.reset.title"),
       description: t("core.plugin.operations.reset.description"),
       confirmType: "danger",
-      confirmText: t("core.common.buttons.confirm"),
-      cancelText: t("core.common.buttons.cancel"),
       onConfirm: async () => {
         if (!plugin?.value) {
           return;
@@ -179,7 +175,6 @@ export function usePluginLifeCycle(plugin?: Ref<Plugin | undefined>) {
           ? t("core.plugin.operations.uninstall_when_enabled.confirm_text")
           : t("core.common.buttons.uninstall")
       }`,
-      cancelText: t("core.common.buttons.cancel"),
       onConfirm: async () => {
         if (!plugin.value) return;
 
@@ -255,7 +250,6 @@ export function usePluginBatchOperations(names: Ref<string[]>) {
       description: t("core.common.dialog.descriptions.cannot_be_recovered"),
       confirmType: "danger",
       confirmText: t("core.common.buttons.uninstall"),
-      cancelText: t("core.common.buttons.cancel"),
       onConfirm: async () => {
         try {
           for (let i = 0; i < names.value.length; i++) {
@@ -308,8 +302,6 @@ export function usePluginBatchOperations(names: Ref<string[]>) {
       title: enabled
         ? t("core.plugin.operations.change_status_in_batch.activate_title")
         : t("core.plugin.operations.change_status_in_batch.inactivate_title"),
-      confirmText: t("core.common.buttons.confirm"),
-      cancelText: t("core.common.buttons.cancel"),
       onConfirm: async () => {
         try {
           for (let i = 0; i < names.value.length; i++) {

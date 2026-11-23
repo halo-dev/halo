@@ -302,7 +302,6 @@ const handleFetchContent = async () => {
         description: t("core.common.dialog.descriptions.editor_not_found", {
           raw_type: data.rawType,
         }),
-        confirmText: t("core.common.buttons.confirm"),
         showCancel: false,
         onConfirm: () => {
           router.back();

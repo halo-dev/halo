@@ -57,7 +57,6 @@ const handleDelete = async () => {
       description: t(
         "core.attachment.policies_modal.operations.can_not_delete.description"
       ),
-      confirmText: t("core.common.buttons.confirm"),
       showCancel: false,
     });
     return;
@@ -69,8 +68,6 @@ const handleDelete = async () => {
       "core.attachment.policies_modal.operations.delete.description"
     ),
     confirmType: "danger",
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       await coreApiClient.storage.policy.deletePolicy({
         name: props.policy.metadata.name,

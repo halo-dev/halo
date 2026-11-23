@@ -48,12 +48,12 @@ const props = withDefaults(
     panelWidth: undefined,
     labelSeparator: ": ",
     rangeSeparator: " ~ ",
-    confirmLabel: "Confirm",
-    clearLabel: "Clear",
+    confirmLabel: undefined,
+    clearLabel: undefined,
     hourCycle: 24,
-    startTimeLabel: "Start",
-    endTimeLabel: "End",
-    locale: "en",
+    startTimeLabel: undefined,
+    endTimeLabel: undefined,
+    locale: undefined,
   }
 );
 

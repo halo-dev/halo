@@ -54,8 +54,6 @@ export function useBackup() {
     Dialog.info({
       title: t("core.backup.operations.create.title"),
       description: t("core.backup.operations.create.description"),
-      confirmText: t("core.common.buttons.confirm"),
-      cancelText: t("core.common.buttons.cancel"),
       async onConfirm() {
         await coreApiClient.migration.backup.createBackup({
           backup: {

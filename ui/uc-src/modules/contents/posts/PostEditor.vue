@@ -282,7 +282,6 @@ async function handleSetEditorProviderFromRemote() {
       description: t("core.common.dialog.descriptions.editor_not_found", {
         raw_type: content.value.rawType,
       }),
-      confirmText: t("core.common.buttons.confirm"),
       showCancel: false,
       onConfirm: () => {
         router.back();

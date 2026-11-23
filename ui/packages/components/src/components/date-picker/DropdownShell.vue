@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
+import { useComponentsI18n } from "../../locales";
 import { VDropdown, type VDropdownPlacement } from "../dropdown";
 
 const props = withDefaults(
@@ -25,8 +26,14 @@ const props = withDefaults(
     disabled: false,
     placement: "bottom-start",
     panelWidth: undefined,
-    panelLabel: "Date picker",
+    panelLabel: undefined,
   }
+);
+
+const { t } = useComponentsI18n();
+
+const panelLabelText = computed(
+  () => props.panelLabel ?? t("date_picker.panel")
 );
 
 const emit = defineEmits<{
@@ -85,7 +92,7 @@ defineExpose({
       <div
         role="dialog"
         aria-modal="false"
-        :aria-label="panelLabel"
+        :aria-label="panelLabelText"
         class="max-w-[calc(100vw-2rem)] bg-white"
         :style="panelWidth ? { width: panelWidth } : undefined"
       >

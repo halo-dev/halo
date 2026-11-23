@@ -8,6 +8,7 @@ import {
   IconErrorWarning,
   IconInformation,
 } from "../../icons/icons";
+import { useComponentsI18n } from "../../locales";
 import type { AlertType } from "./types";
 
 const TypeIcons: Record<AlertType, Raw<FunctionalComponent<SVGAttributes>>> = {
@@ -37,6 +38,8 @@ const emit = defineEmits<{
   (event: "close"): void;
 }>();
 
+const { t } = useComponentsI18n();
+
 const classes = computed(() => {
   return [`alert-${props.type}`];
 });
@@ -62,7 +65,7 @@ const handleClose = () => {
         </div>
         <div
           v-if="closable"
-          aria-label="Close"
+          :aria-label="t('common.close')"
           class="alert-close"
           role="button"
           tabindex="0"

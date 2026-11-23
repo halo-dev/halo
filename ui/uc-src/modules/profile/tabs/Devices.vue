@@ -45,8 +45,6 @@ function handleRevokeOtherDevices() {
       "core.uc_profile.device.operations.revoke_others.description"
     ),
     confirmType: "danger",
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     async onConfirm() {
       for (const device of otherDevices.value) {
         await ucApiClient.security.device.revokeDevice({

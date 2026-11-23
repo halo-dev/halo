@@ -37,8 +37,6 @@ export function useUserEnableDisable() {
       title: operationConfig.title,
       description: operationConfig.description,
       confirmType: "danger",
-      confirmText: t("core.common.buttons.confirm"),
-      cancelText: t("core.common.buttons.cancel"),
       onConfirm: async () => {
         try {
           await operationConfig.request(name);

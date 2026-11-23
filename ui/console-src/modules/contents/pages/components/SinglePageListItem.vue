@@ -57,8 +57,6 @@ const handleDelete = async () => {
     title: t("core.page.operations.delete.title"),
     description: t("core.page.operations.delete.description"),
     confirmType: "danger",
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       await coreApiClient.content.singlePage.patchSinglePage({
         name: props.singlePage.page.metadata.name,

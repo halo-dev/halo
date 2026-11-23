@@ -30,8 +30,6 @@ const handleUnbindAuth = (authProvider: ListedAuthProvider) => {
     title: t("core.uc_profile.auth_providers.operations.unbind.title", {
       display_name: authProvider.displayName,
     }),
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     confirmType: "danger",
     onConfirm: async () => {
       await axios.put(`${authProvider.unbindingUrl}`, {

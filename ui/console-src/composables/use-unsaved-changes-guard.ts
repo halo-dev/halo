@@ -144,7 +144,6 @@ export function useUnsavedChangesGuard(formId: MaybeRef<string>) {
       description: t("core.common.unsaved_changes_guard.description"),
       confirmText: t("core.common.unsaved_changes_guard.confirm_text"),
       confirmType: "danger",
-      cancelText: t("core.common.buttons.cancel"),
       onConfirm: () => {
         next();
       },

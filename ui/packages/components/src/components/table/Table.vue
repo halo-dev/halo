@@ -35,6 +35,7 @@ import {
   IconArrowUpLine,
   IconMore,
 } from "../../icons/icons";
+import { useComponentsI18n } from "../../locales";
 import { VDropdown, VDropdownDivider, VDropdownItem } from "../dropdown";
 import { VLoading } from "../loading";
 import {
@@ -163,7 +164,7 @@ const props = withDefaults(
   {
     rowKey: undefined,
     loading: false,
-    emptyText: "暂无数据",
+    emptyText: undefined,
     sticky: false,
     selectable: false,
     expandable: false,
@@ -181,10 +182,12 @@ const props = withDefaults(
     virtualize: false,
     ui: () => ({}),
     caption: undefined,
-    selectAllLabel: "选择全部",
-    selectRowLabel: "选择",
+    selectAllLabel: undefined,
+    selectRowLabel: undefined,
   }
 );
+
+const { t } = useComponentsI18n();
 
 const emit = defineEmits<{
   (event: "update:sorting", value: SortingState): void;
@@ -299,7 +302,7 @@ const selectColumn: TableColumn<TData> = {
       checked: table.getIsAllPageRowsSelected(),
       indeterminate:
         table.getIsSomePageRowsSelected() && !table.getIsAllPageRowsSelected(),
-      "aria-label": props.selectAllLabel,
+      "aria-label": props.selectAllLabel ?? t("table.select_all"),
       onClick: table.getToggleAllPageRowsSelectedHandler(),
     }),
   cell: ({ row }) =>
@@ -307,7 +310,9 @@ const selectColumn: TableColumn<TData> = {
       type: "checkbox",
       checked: row.getIsSelected(),
       disabled: !row.getCanSelect(),
-      "aria-label": `${props.selectRowLabel} ${row.index + 1}`,
+      "aria-label": `${props.selectRowLabel ?? t("table.select_row")} ${
+        row.index + 1
+      }`,
       onClick: row.getToggleSelectedHandler(),
     }),
 };
@@ -327,7 +332,9 @@ const expandColumn: TableColumn<TData> = {
             type: "button",
             class:
               "inline-flex h-6 w-6 cursor-pointer items-center justify-center rounded text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900",
-            "aria-label": row.getIsExpanded() ? "收起" : "展开",
+            "aria-label": row.getIsExpanded()
+              ? t("common.collapse")
+              : t("common.expand"),
             "aria-expanded": row.getIsExpanded() ? "true" : "false",
             onClick: row.getToggleExpandedHandler(),
           },
@@ -492,20 +499,20 @@ const visibleColumnCount = computed(() =>
   Math.max(1, visibleLeafColumns.value.length)
 );
 
-const defaultHeaderMenuLabels: TableHeaderMenuLabels = {
-  columnMenu: "列操作",
-  sortAsc: "升序",
-  sortDesc: "降序",
-  clearSorting: "清除排序",
-  hideColumn: "隐藏列",
-  pinStart: "固定在左侧",
-  pinEnd: "固定在右侧",
-  unpin: "取消固定",
-  resizeColumn: "调整列宽",
-};
+const defaultHeaderMenuLabels = computed<TableHeaderMenuLabels>(() => ({
+  columnMenu: t("table.column_menu"),
+  sortAsc: t("table.sort_asc"),
+  sortDesc: t("table.sort_desc"),
+  clearSorting: t("table.clear_sorting"),
+  hideColumn: t("table.hide_column"),
+  pinStart: t("table.pin_start"),
+  pinEnd: t("table.pin_end"),
+  unpin: t("table.unpin"),
+  resizeColumn: t("table.resize_column"),
+}));
 
 const headerMenuLabels = computed<TableHeaderMenuLabels>(() => ({
-  ...defaultHeaderMenuLabels,
+  ...defaultHeaderMenuLabels.value,
   ...props.headerMenuLabels,
 }));
 
@@ -940,7 +947,9 @@ defineExpose({
               <slot v-if="loading" name="loading">
                 <VLoading />
               </slot>
-              <slot v-else name="empty">{{ emptyText }}</slot>
+              <slot v-else name="empty">{{
+                emptyText ?? t("table.empty")
+              }}</slot>
             </td>
           </tr>
         </template>

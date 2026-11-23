@@ -159,8 +159,6 @@ export function useAttachmentControl(filterOptions: {
       title: t("core.attachment.operations.delete_in_batch.title"),
       description: t("core.common.dialog.descriptions.cannot_be_recovered"),
       confirmType: "danger",
-      confirmText: t("core.common.buttons.confirm"),
-      cancelText: t("core.common.buttons.cancel"),
       onConfirm: async () => {
         try {
           const promises = Array.from(selectedAttachmentNames.value).map(

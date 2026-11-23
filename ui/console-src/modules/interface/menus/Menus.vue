@@ -166,8 +166,6 @@ const handleDelete = async (node: MenuItemTreeNode) => {
     title: t("core.menu.operations.delete_menu_item.title"),
     description: t("core.menu.operations.delete_menu_item.description"),
     confirmType: "danger",
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       await coreApiClient.menuItem.deleteMenuItem({
         name: node.menuItem.metadata.name,

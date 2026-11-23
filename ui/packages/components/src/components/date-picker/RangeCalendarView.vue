@@ -17,6 +17,7 @@ import {
 } from "reka-ui";
 import { computed, shallowRef, watch } from "vue";
 import { IconArrowLeft, IconArrowRight } from "../../icons/icons";
+import { useComponentsI18n } from "../../locales";
 import {
   parseDateString,
   resolveDefaultPickerDate,
@@ -33,7 +34,7 @@ const props = withDefaults(
   >(),
   {
     modelValue: undefined,
-    locale: "en",
+    locale: undefined,
     weekStartsOn: undefined,
     numberOfMonths: 2,
     fixedWeeks: true,
@@ -41,13 +42,20 @@ const props = withDefaults(
     maxValue: undefined,
     isDateDisabled: undefined,
     defaultPickerValue: undefined,
-    calendarLabel: "Calendar",
     disabled: false,
     readonly: false,
     maximumDays: undefined,
     allowNonContiguousRanges: undefined,
     presets: undefined,
   }
+);
+
+const { locale: componentsLocale, t } = useComponentsI18n();
+
+const resolvedLocale = computed(() => props.locale ?? componentsLocale.value);
+
+const calendarLabelText = computed(
+  () => props.calendarLabel ?? t("date_picker.calendar")
 );
 
 const emit = defineEmits<{
@@ -109,7 +117,7 @@ const dayClasses =
     v-slot="{ grid, weekDays }"
     :model-value="calendarRange"
     :placeholder="placeholder"
-    :locale="locale"
+    :locale="resolvedLocale"
     :week-starts-on="weekStartsOn"
     :number-of-months="numberOfMonths"
     :fixed-weeks="fixedWeeks"
@@ -122,18 +130,24 @@ const dayClasses =
     :disabled="disabled"
     :readonly="readonly"
     :initial-focus="true"
-    :calendar-label="calendarLabel"
+    :calendar-label="calendarLabelText"
     weekday-format="narrow"
     class="select-none"
     @update:model-value="onUpdate"
     @update:placeholder="onPlaceholderUpdate"
   >
     <RangeCalendarHeader class="mb-2 flex items-center justify-between">
-      <RangeCalendarPrev :class="navButtonClasses">
+      <RangeCalendarPrev
+        :aria-label="t('common.previous')"
+        :class="navButtonClasses"
+      >
         <IconArrowLeft />
       </RangeCalendarPrev>
       <RangeCalendarHeading class="text-sm font-medium text-gray-900" />
-      <RangeCalendarNext :class="navButtonClasses">
+      <RangeCalendarNext
+        :aria-label="t('common.next')"
+        :class="navButtonClasses"
+      >
         <IconArrowRight />
       </RangeCalendarNext>
     </RangeCalendarHeader>

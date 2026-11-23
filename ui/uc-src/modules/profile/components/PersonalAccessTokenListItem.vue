@@ -31,8 +31,6 @@ function handleDelete() {
     title: t("core.uc_profile.pat.operations.delete.title"),
     description: t("core.uc_profile.pat.operations.delete.description"),
     confirmType: "danger",
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     async onConfirm() {
       await ucApiClient.security.personalAccessToken.deletePat({
         name: props.token.metadata.name,
@@ -49,8 +47,6 @@ function handleRevoke() {
     title: t("core.uc_profile.pat.operations.revoke.title"),
     description: t("core.uc_profile.pat.operations.revoke.description"),
     confirmType: "danger",
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     async onConfirm() {
       await ucApiClient.security.personalAccessToken.revokePat({
         name: props.token.metadata.name,

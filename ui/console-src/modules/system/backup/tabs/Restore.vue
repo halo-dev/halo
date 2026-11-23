@@ -31,7 +31,6 @@ const onProcessCompleted = () => {
   Dialog.success({
     title: t("core.backup.operations.restore.title"),
     description: t("core.backup.operations.restore.description"),
-    confirmText: t("core.common.buttons.confirm"),
     showCancel: false,
     async onConfirm() {
       await handleShutdown();
@@ -83,8 +82,6 @@ function handleRestoreFromBackup(backupFile: BackupFile) {
     description: t("core.backup.operations.restore_by_backup.description", {
       filename: backupFile.filename,
     }),
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     async onConfirm() {
       await consoleApiClient.migration.restoreBackup({
         filename: backupFile.filename,

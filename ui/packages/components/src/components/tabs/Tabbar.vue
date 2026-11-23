@@ -9,6 +9,7 @@ import {
   watch,
 } from "vue";
 import { IconArrowLeft, IconArrowRight } from "../../icons/icons";
+import { useComponentsI18n } from "../../locales";
 import type { TabsDirection, TabsType } from "./types";
 
 const props = withDefaults(
@@ -34,6 +35,8 @@ const emit = defineEmits<{
   (event: "update:activeId", value: number | string): void;
   (event: "change", value: number | string): void;
 }>();
+
+const { t } = useComponentsI18n();
 
 const classes = computed(() => {
   return [`tabbar-${props.type}`, `tabbar-direction-${props.direction}`];
@@ -246,9 +249,9 @@ useEventListener(tabbarItemsRef, "wheel", handleHorizontalWheel, {
       <button
         ref="leftArrowRef"
         :disabled="!canScrollLeft"
-        aria-label="Scroll tabs left"
+        :aria-label="t('tabs.scroll_left')"
         class="tabbar-arrow"
-        title="向左滚动标签"
+        :title="t('tabs.scroll_left')"
         type="button"
         @click="handleClickArrow(true)"
       >
@@ -266,9 +269,9 @@ useEventListener(tabbarItemsRef, "wheel", handleHorizontalWheel, {
       <button
         ref="rightArrowRef"
         :disabled="!canScrollRight"
-        aria-label="Scroll tabs right"
+        :aria-label="t('tabs.scroll_right')"
         class="tabbar-arrow"
-        title="向右滚动标签"
+        :title="t('tabs.scroll_right')"
         type="button"
         @click="handleClickArrow(false)"
       >
@@ -278,7 +281,7 @@ useEventListener(tabbarItemsRef, "wheel", handleHorizontalWheel, {
     <div
       ref="tabbarItemsRef"
       :tabindex="maxScrollLeft > 0 ? 0 : undefined"
-      aria-label="Tab list"
+      :aria-label="t('tabs.list')"
       class="tabbar-items"
       role="group"
     >
