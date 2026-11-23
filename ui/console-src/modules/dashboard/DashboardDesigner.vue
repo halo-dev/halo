@@ -332,7 +332,7 @@ function handleCopyFromLayout(breakpoint: string) {
     >
       <VTabbar
         :active-id="selectBreakpoint"
-        :items="deviceOptions as any"
+        :items="deviceOptions"
         type="outline"
         @change="handleBreakpointChange"
       ></VTabbar>
