@@ -5,6 +5,7 @@ export * from "./components/card";
 export * from "./components/date-picker";
 export * from "./components/description";
 export * from "./components/dialog";
+export * from "./components/drawer";
 export * from "./components/dropdown";
 export * from "./components/empty";
 export * from "./components/entity";
