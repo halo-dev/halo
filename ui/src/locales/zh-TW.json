@@ -1066,6 +1066,7 @@
   "core.components.h2_warning_alert.description": "H2 資料庫僅適用於開發環境和測試環境，不建議在生產環境中使用，H2 非常容易因為操作不當而導致資料檔案損壞。如果必須要使用，請按時進行資料備份。",
   "core.composables.content_cache.toast_recovered": "已從緩存中恢復未保存的內容",
   "core.formkit.select.no_data": "暫無數據",
+  "core.formkit.permission.no_permission": "無權限載入選項",
   "core.formkit.category_select.creation_label": "創建 {text} 分類",
   "core.formkit.tag_select.creation_label": "創建 {text} 標籤",
   "core.formkit.validation.password": "密碼只能使用大小寫字母 (A-Z, a-z)、數字 (0-9)，以及以下特殊字符: !{'@'}#$%^&*",

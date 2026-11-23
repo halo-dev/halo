@@ -16,6 +16,16 @@ import Fuse from "fuse.js";
 import ShortUniqueId from "short-unique-id";
 import { slugify } from "transliteration";
 import { computed, ref, useTemplateRef, watch, type PropType } from "vue";
+import {
+  applyDataPermissionGuard,
+  noPermissionMessage,
+} from "@/formkit/utils/permission";
+
+const tagPermissions = [
+  "system:posts:view",
+  "system:posts:manage",
+  "uc:posts:manage",
+];
 
 const props = defineProps({
   context: {
@@ -59,7 +69,14 @@ onClickOutside(
   }
 );
 
-const { data: postTags, refetch: handleFetchTags } = useAllPostTagsQuery();
+const canViewTags = applyDataPermissionGuard(
+  props.context.node,
+  tagPermissions
+);
+
+const { data: postTags, refetch: handleFetchTags } = useAllPostTagsQuery({
+  enabled: canViewTags,
+});
 
 // search
 let fuse: Fuse<Tag> | undefined = undefined;
@@ -310,15 +327,20 @@ const handleDelete = () => {
           :value="text"
           :class="context.classes.input"
           type="text"
+          :disabled="!canViewTags"
+          :placeholder="canViewTags ? undefined : noPermissionMessage()"
           @input="onTextInput"
-          @focus="dropdownVisible = true"
+          @focus="canViewTags && (dropdownVisible = true)"
           @keydown.delete="handleDelete"
         />
       </div>
 
       <div
-        :class="context.classes['post-tags-button']"
-        @click="dropdownVisible = !dropdownVisible"
+        :class="[
+          context.classes['post-tags-button'],
+          { 'cursor-not-allowed opacity-60': !canViewTags },
+        ]"
+        @click="canViewTags && (dropdownVisible = !dropdownVisible)"
       >
         <IconArrowRight class="rotate-90 text-gray-500 hover:text-gray-700" />
       </div>

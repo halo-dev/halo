@@ -72,6 +72,10 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits<{
@@ -119,6 +123,9 @@ const observer = new ResizeObserver(() => {
 });
 
 const handleOptionSelect = (option: SelectOption) => {
+  if (props.disabled) {
+    return;
+  }
   if (!props.multiple) {
     selectedOptions.value = [option];
     isDropdownVisible.value = false;
@@ -157,11 +164,17 @@ const handleSearchFocusout = (event: FocusEvent) => {
 };
 
 const handleDeleteSelectItem = (index: number) => {
+  if (props.disabled) {
+    return;
+  }
   selectedOptions.value.splice(index, 1);
   selectedOptions.value = [...selectedOptions.value];
 };
 
 const handleSearchClick = () => {
+  if (props.disabled) {
+    return;
+  }
   if (!isDropdownVisible.value && inputRef.value) {
     inputRef.value.focus();
     isDropdownVisible.value = true;
@@ -174,6 +187,9 @@ const handleSearchClick = () => {
 };
 
 const handleSearch = (value: string, event?: Event) => {
+  if (props.disabled) {
+    return;
+  }
   searchKeyword.value = value;
   if (!isDropdownVisible.value && !!value) {
     isDropdownVisible.value = true;
@@ -192,6 +208,9 @@ const clearInputValue = () => {
 };
 
 const handleKeyDown = (event: KeyboardEvent) => {
+  if (props.disabled) {
+    return;
+  }
   const key = event.key;
   if (key === "Enter" || key.startsWith("Arrow")) {
     if (!isDropdownVisible.value) {
@@ -207,7 +226,7 @@ const handleKeyDown = (event: KeyboardEvent) => {
 };
 
 const clearAllSelectedOptions = () => {
-  if (!hasClearable.value) {
+  if (props.disabled || !hasClearable.value) {
     return;
   }
 
@@ -235,6 +254,7 @@ const handleSortSelectedOptions = (options: SelectOption[]) => {
       ref="selectContainerRef"
       tabindex="-1"
       class="select-container relative items-center"
+      :class="{ 'pointer-events-none opacity-60': disabled }"
       @focusout.stop="handleSearchFocusout"
       @click.stop="handleSearchClick"
     >

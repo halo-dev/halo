@@ -11,9 +11,25 @@ import {
   type Category,
   type CategoryV1alpha1ApiListCategoryRequest,
 } from "@halo-dev/api-client";
+import { applyDataPermissionGuard } from "@/formkit/utils/permission";
+
+const requiredPermissions = [
+  "system:categories:view",
+  "system:categories:manage",
+  "uc:categories:view",
+  "uc:categories:manage",
+  "system:posts:view",
+  "system:posts:manage",
+  "uc:posts:manage",
+];
 
 function optionsHandler(node: FormKitNode) {
   node.on("created", async () => {
+    if (!applyDataPermissionGuard(node, requiredPermissions)) {
+      node.props.options = [];
+      return;
+    }
+
     const categories = await paginate<
       CategoryV1alpha1ApiListCategoryRequest,
       Category

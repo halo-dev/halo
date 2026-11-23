@@ -20,6 +20,7 @@ import {
   type GroupV1alpha1ApiListGroupRequest,
 } from "@halo-dev/api-client";
 import { defineAsyncComponent } from "vue";
+import { applyDataPermissionGuard } from "@/formkit/utils/permission";
 import { select } from "./select";
 import { SelectSection } from "./select/sections";
 
@@ -34,8 +35,17 @@ const GroupSettingsSuffix = createSection("GroupSettingsSuffix", () => ({
   },
 }));
 
+const requiredPermissions = [
+  "system:attachments:view",
+  "system:attachments:manage",
+];
+
 function optionsHandler(node: FormKitNode) {
   node.on("created", async () => {
+    if (!applyDataPermissionGuard(node, requiredPermissions)) {
+      return;
+    }
+
     const groups = await paginate<GroupV1alpha1ApiListGroupRequest, Group>(
       (params) => coreApiClient.storage.group.listGroup(params),
       {

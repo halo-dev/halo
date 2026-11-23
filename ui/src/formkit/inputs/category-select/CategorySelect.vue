@@ -24,9 +24,23 @@ import {
   type PropType,
   type Ref,
 } from "vue";
+import {
+  applyDataPermissionGuard,
+  noPermissionMessage,
+} from "@/formkit/utils/permission";
 import CategoryListItem from "./components/CategoryListItem.vue";
 import CategoryTag from "./components/CategoryTag.vue";
 import SearchResultListItem from "./components/SearchResultListItem.vue";
+
+const categoryPermissions = [
+  "system:categories:view",
+  "system:categories:manage",
+  "uc:categories:view",
+  "uc:categories:manage",
+  "system:posts:view",
+  "system:posts:manage",
+  "uc:posts:manage",
+];
 
 const props = defineProps({
   context: {
@@ -46,7 +60,14 @@ const multiple = computed(() => {
   return multiple === "true";
 });
 
-const { categories, categoriesTree, handleFetchCategories } = usePostCategory();
+const canViewCategories = applyDataPermissionGuard(
+  props.context.node,
+  categoryPermissions
+);
+
+const { categories, categoriesTree, handleFetchCategories } = usePostCategory({
+  enabled: canViewCategories,
+});
 
 const excludedNames = computed(() => {
   const names = props.context.excludedNames;
@@ -375,16 +396,21 @@ const handleDelete = () => {
           :value="text"
           :class="context.classes.input"
           type="text"
+          :disabled="!canViewCategories"
+          :placeholder="canViewCategories ? undefined : noPermissionMessage()"
           @input="onTextInput"
-          @focus="dropdownVisible = true"
+          @focus="canViewCategories && (dropdownVisible = true)"
           @keydown="handleKeydown"
           @keydown.delete="handleDelete"
         />
       </div>
 
       <div
-        :class="context.classes['post-categories-button']"
-        @click="dropdownVisible = !dropdownVisible"
+        :class="[
+          context.classes['post-categories-button'],
+          { 'cursor-not-allowed opacity-60': !canViewCategories },
+        ]"
+        @click="canViewCategories && (dropdownVisible = !dropdownVisible)"
       >
         <IconArrowRight class="rotate-90 text-gray-500 hover:text-gray-700" />
       </div>

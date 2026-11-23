@@ -1074,6 +1074,7 @@
   "core.formkit.datetimepicker.placeholder": "Select date and time",
   "core.formkit.datetimepicker.time": "Time",
   "core.formkit.select.no_data": "No data",
+  "core.formkit.permission.no_permission": "No permission to load options",
   "core.formkit.category_select.creation_label": "Create {text} category",
   "core.formkit.tag_select.creation_label": "Create {text} tag",
   "core.formkit.validation.password": "The password can only use uppercase and lowercase letters (A-Z, a-z), numbers (0-9), and the following special characters: !{'@'}#$%^&*",

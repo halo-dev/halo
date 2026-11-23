@@ -8,10 +8,17 @@ import {
 } from "@halo-dev/api-client";
 import { rbacAnnotations } from "@/constants/annotations";
 import { roleLabels } from "@/constants/labels";
+import { applyDataPermissionGuard } from "@/formkit/utils/permission";
 import { select } from "./select";
+
+const requiredPermissions = ["system:roles:view", "system:roles:manage"];
 
 function optionsHandler(node: FormKitNode) {
   node.on("created", async () => {
+    if (!applyDataPermissionGuard(node, requiredPermissions)) {
+      return;
+    }
+
     const roles = await paginate<RoleV1alpha1ApiListRoleRequest, Role>(
       (params) => coreApiClient.role.listRole(params),
       {
