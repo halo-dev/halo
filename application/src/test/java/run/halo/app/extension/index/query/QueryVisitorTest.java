@@ -573,6 +573,44 @@ class QueryVisitorTest {
     }
 
     @Test
+    void shouldRefineAndConditionWithStringContainsCondition() {
+        var index = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
+        var query = (ValueIndexQuery) index;
+        when(indices.getIndex("metadata.description")).thenReturn(index);
+        when(query.equal("name1")).thenReturn(mutableSet("a", "b", "c"));
+        when(index.getKeyType()).thenReturn(String.class);
+        when(query.stringContains(anySet(), eq("keyword"))).thenAnswer(invocation -> {
+            Set<String> candidates = invocation.getArgument(0);
+            candidates.remove("c");
+            return candidates;
+        });
+        var condition =
+                Queries.equal("metadata.description", "name1").and(Queries.contains("metadata.description", "keyword"));
+        condition.visit(visitor);
+        assertEquals(Set.of("a", "b"), visitor.getResult());
+        verify(query, never()).stringContains("keyword");
+    }
+
+    @Test
+    void shouldRefineAndConditionWithStringEndsWithOnLeft() {
+        var index = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
+        var query = (ValueIndexQuery) index;
+        when(indices.getIndex("metadata.name")).thenReturn(index);
+        when(query.equal("name1")).thenReturn(mutableSet("a", "b", "c"));
+        when(index.getKeyType()).thenReturn(String.class);
+        when(query.stringEndsWith(anySet(), eq("suffix"))).thenAnswer(invocation -> {
+            Set<String> candidates = invocation.getArgument(0);
+            candidates.remove("a");
+            return candidates;
+        });
+        // The structural side is evaluated first, then the full-scan matcher only checks the candidates.
+        var condition = Queries.endsWith("metadata.name", "suffix").and(Queries.equal("metadata.name", "name1"));
+        condition.visit(visitor);
+        assertEquals(Set.of("b", "c"), visitor.getResult());
+        verify(query, never()).stringEndsWith("suffix");
+    }
+
+    @Test
     void shouldVisitNestedAndOrCondition() {
         var index = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
         var query = (ValueIndexQuery) index;

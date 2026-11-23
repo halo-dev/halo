@@ -229,6 +229,16 @@ class SingleValueIndex<E extends Extension, K extends Comparable<K>> implements 
     }
 
     @Override
+    public Set<String> stringContains(Set<String> candidates, String keyword) {
+        ensureStringKeyType();
+        candidates.removeIf(primaryKey -> {
+            var currentKey = invertedIndex.get(primaryKey);
+            return currentKey == null || !StringUtils.containsIgnoreCase(currentKey.toString(), keyword);
+        });
+        return candidates;
+    }
+
+    @Override
     public Set<String> stringStartsWith(String prefix) {
         ensureStringKeyType();
         var toKey = prefix + Character.MAX_VALUE;
@@ -264,6 +274,21 @@ class SingleValueIndex<E extends Extension, K extends Comparable<K>> implements 
     }
 
     @Override
+    public Set<String> stringStartsWith(Set<String> candidates, String prefix) {
+        ensureStringKeyType();
+        var toKey = prefix + Character.MAX_VALUE;
+        candidates.removeIf(primaryKey -> {
+            var currentKey = invertedIndex.get(primaryKey);
+            if (currentKey == null) {
+                return true;
+            }
+            var keyString = currentKey.toString();
+            return keyString.compareTo(prefix) < 0 || keyString.compareTo(toKey) > 0;
+        });
+        return candidates;
+    }
+
+    @Override
     public Set<String> stringEndsWith(String suffix) {
         ensureStringKeyType();
         return index.entrySet().stream()
@@ -289,6 +314,16 @@ class SingleValueIndex<E extends Extension, K extends Comparable<K>> implements 
         candidates.removeIf(primaryKey -> {
             var currentKey = invertedIndex.get(primaryKey);
             return currentKey == null || StringUtils.endsWithIgnoreCase(currentKey.toString(), suffix);
+        });
+        return candidates;
+    }
+
+    @Override
+    public Set<String> stringEndsWith(Set<String> candidates, String suffix) {
+        ensureStringKeyType();
+        candidates.removeIf(primaryKey -> {
+            var currentKey = invertedIndex.get(primaryKey);
+            return currentKey == null || !StringUtils.endsWithIgnoreCase(currentKey.toString(), suffix);
         });
         return candidates;
     }
