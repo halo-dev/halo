@@ -106,7 +106,9 @@ jq '.paths["<path>"].post.requestBody' api-docs/openapi/v3_0/apis_console.api_v1
 - Native extension APIs `/apis/<group>/<version>/<plural>` (admin auth) are useful for diagnostics and data setup.
 - Persist every raw response; save failure responses in full.
 
-## UI verification
+## UI verification (required for any `ui/` change)
+
+Every change under `ui/` — including CSS, copy, or template-only tweaks — gets this pass. T1 and Vitest do not replace it: they prove the code compiles and units pass, not that the page renders or the flow works.
 
 ### Option A: Build into the backend (recommended, self-contained)
 
@@ -131,10 +133,11 @@ pnpm -C ui dev
 - Vite has no API proxy; the Halo backend proxies UI requests to Vite. The entry point is still the backend port's `/console`.
 - Vite hot-reloads UI changes; Java changes require restarting the backend.
 
-### Browser
+### Browser (mandatory)
 
-- Use `agent-browser` when available: navigate, log in, screenshot, inspect Network; save screenshots in `$WORK/`.
-- If automation is not possible, write "component tests/static inference only; no real browser". Never imply pages were clicked.
+- Use `agent-browser`: log in, navigate to the affected page, drive the changed flow, and screenshot every relevant state (empty/filled, success/error).
+- Save screenshots in `$WORK/` (under `/tmp/verify-*`) and show them to the user in the final reply. Also inspect the Network panel for failed requests and the console for errors.
+- Never imply pages were clicked or flows were exercised if you did not do it. A blocked browser pass is an unverified/FAIL result, not a pass: report the blocker.
 - Only the Console/UC after login show real rendering; `curl` proves HTTP behavior only.
 
 ## Cleanup

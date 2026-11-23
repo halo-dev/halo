@@ -185,4 +185,12 @@ describe("datepicker", () => {
 
     expect(wrapper.find('button[aria-label="Clear"]').exists()).toBe(false);
   });
+
+  it("keeps the calendar icon visible alongside the clear button", () => {
+    const { wrapper } = mountInput();
+
+    const trigger = wrapper.get('button[aria-haspopup="dialog"]');
+    expect(trigger.find("span.pointer-events-none svg").exists()).toBe(true);
+    expect(wrapper.find('button[aria-label="Clear"]').exists()).toBe(true);
+  });
 });
