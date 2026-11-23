@@ -159,6 +159,11 @@ defineExpose({
 }
 
 .v-popover-arrow {
+  // The arrow sits flush with the panel edge, leaving the panel border visible
+  // across its base. Nudge it inward so the fill covers the border and the
+  // arrow opens into the panel. Every placement rotates the wrapper, so a
+  // local -Y shift always points at the panel.
+  transform: translateY(-1px);
   @apply fill-white stroke-gray-200;
 }
 
