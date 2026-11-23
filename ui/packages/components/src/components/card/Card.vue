@@ -127,7 +127,7 @@ const bodyClasses = computed(() => [
     }
 
     .card-header-actions {
-      @apply flex flex-none items-center gap-2 self-center;
+      @apply ml-auto flex flex-none items-center gap-2 self-center;
       padding-right: var(--v-card-padding-x);
     }
   }
