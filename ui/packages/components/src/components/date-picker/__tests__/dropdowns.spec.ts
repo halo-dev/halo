@@ -1,4 +1,4 @@
-/* eslint-disable vue/require-default-prop -- Test stub props mirror VDropdown without defaults. */
+/* eslint-disable vue/require-default-prop -- Test stub props mirror VPopover without defaults. */
 /* eslint-disable vue/one-component-per-file -- Test-local host and dropdown stubs keep these integration tests isolated. */
 import { mount } from "@vue/test-utils";
 import { describe, expect, it, vi } from "vite-plus/test";
@@ -7,24 +7,24 @@ import { VDatePickerDropdown, VDateRangePickerDropdown } from "..";
 import { VFilterDateRangeDropdown, VFilterDropdownGroup } from "../../filter";
 import type { DateRangeValue } from "../types";
 
-const VDropdownStub = defineComponent({
-  name: "VDropdown",
+const VPopoverStub = defineComponent({
+  name: "VPopover",
   props: {
-    shown: Boolean,
+    open: Boolean,
     disabled: Boolean,
     placement: String,
-    distance: [String, Number],
-    noAutoFocus: Boolean,
-    popperClass: [String, Object, Array],
+    offset: [String, Number],
+    arrow: Boolean,
+    contentClass: [String, Object, Array],
   },
-  emits: ["update:shown"],
+  emits: ["update:open"],
   setup(_, { slots, expose, emit }) {
     expose({
-      show: () => emit("update:shown", true),
-      hide: () => emit("update:shown", false),
+      show: () => emit("update:open", true),
+      hide: () => emit("update:open", false),
     });
 
-    return () => h("div", [slots.default?.(), slots.popper?.()]);
+    return () => h("div", [slots.default?.(), slots.content?.()]);
   },
 });
 
@@ -34,12 +34,13 @@ function cellSelector(value: string) {
 
 const global = {
   stubs: {
-    VDropdown: VDropdownStub,
+    // VPopover's component name is inferred from its file name.
+    Popover: VPopoverStub,
   },
 };
 
 async function openDropdown(wrapper: ReturnType<typeof mount>) {
-  wrapper.findComponent(VDropdownStub).vm.$emit("update:shown", true);
+  wrapper.findComponent(VPopoverStub).vm.$emit("update:open", true);
   await nextTick();
 }
 
@@ -236,7 +237,7 @@ describe("FilterDateRangeDropdown", () => {
     await wrapper.get(cellSelector("2026-11-10")).trigger("click");
     await nextTick();
 
-    wrapper.findComponent(VDropdownStub).vm.$emit("update:shown", false);
+    wrapper.findComponent(VPopoverStub).vm.$emit("update:open", false);
     await nextTick();
     await openDropdown(wrapper);
 
