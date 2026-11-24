@@ -151,7 +151,20 @@ const bodyClasses = computed(() => [
   .card-body {
     overflow: clip;
     padding: var(--v-card-padding-y) var(--v-card-padding-x);
-    border-radius: var(--v-card-radius);
+    border-radius: 0;
+
+    // Only the card's outer corners are rounded. An interior edge does not
+    // need it, and it clips the first or last row: a selected row's left
+    // indicator under a toolbar would get a rounded end.
+    &:first-child {
+      border-top-left-radius: var(--v-card-radius);
+      border-top-right-radius: var(--v-card-radius);
+    }
+
+    &:last-child {
+      border-bottom-left-radius: var(--v-card-radius);
+      border-bottom-right-radius: var(--v-card-radius);
+    }
 
     &.card-body-flush {
       padding: 0;
