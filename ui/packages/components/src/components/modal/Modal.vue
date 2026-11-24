@@ -184,6 +184,11 @@ const modalBody = useTemplateRef<HTMLElement>("modalBody");
 const modalViewport = useTemplateRef<HTMLElement>("modalViewport");
 const reactiveParams = reactive<UseOverlayScrollbarsParams>({
   options: {
+    // OverlayScrollbars moves the padding of the scroll host to the custom
+    // viewport element, but does not reset it when destroyed. That makes the
+    // modal content jump as soon as the closing animation starts, so keep the
+    // host padding in place instead.
+    paddingAbsolute: true,
     scrollbars: {
       autoHide: "scroll",
       autoHideDelay: 600,
@@ -240,10 +245,10 @@ watch(
       @keyup.esc.stop="handleClose()"
     >
       <transition
-        enter-active-class="ease-out duration-200"
+        enter-active-class="ease-out !duration-200"
         enter-from-class="opacity-0"
         enter-to-class="opacity-100"
-        leave-active-class="ease-in duration-100"
+        leave-active-class="ease-in !duration-100"
         leave-from-class="opacity-100"
         leave-to-class="opacity-0"
         @before-enter="rootVisible = true"
@@ -256,17 +261,17 @@ watch(
         />
       </transition>
       <transition
-        enter-active-class="ease-out duration-200"
+        enter-active-class="ease-out !duration-200"
         enter-from-class="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
         enter-to-class="opacity-100 translate-y-0 sm:scale-100"
-        leave-active-class="ease-in duration-100"
+        leave-active-class="ease-in !duration-100"
         leave-from-class="opacity-100 translate-y-0 sm:scale-100"
         leave-to-class="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
       >
         <div
           v-show="internalVisible"
           :style="contentStyles"
-          class="modal-content transition-all duration-300"
+          class="modal-content transition-all"
           :class="{ 'modal-focus': focus }"
         >
           <div v-if="$slots.header || title" class="modal-header group">
@@ -320,7 +325,7 @@ watch(
     max-height: calc(100vh - 5rem);
 
     &.modal-focus {
-      @apply scale-[1.02];
+      @apply scale-[1.02] duration-300;
     }
 
     .modal-header {
