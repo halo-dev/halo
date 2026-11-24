@@ -142,7 +142,7 @@ const theme: Record<string, Record<string, string>> = {
     fieldset: boxClassification.fieldset,
     wrapper: boxClassification.wrapper,
     help: "px-2 mb-2",
-    inner: "flex flex-col gap-4",
+    inner: "flex flex-col gap-4 px-2",
     items: "flex flex-col w-full gap-2 rounded-base",
     item: "grid grid-cols-12 focus-within:border-primary transition-all gap-1.5 overflow-visible",
     content: "formkit-stack flex-1 col-span-9 divide-y divide-gray-100",
