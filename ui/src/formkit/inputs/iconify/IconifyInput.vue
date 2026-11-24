@@ -3,8 +3,8 @@ import type { FormKitFrameworkContext } from "@formkit/core";
 import {
   IconClose,
   VButton,
-  VDropdown,
-  type VDropdownPlacement,
+  type VPopoverPlacement,
+  VPopover,
 } from "@halo-dev/components";
 import { utils } from "@halo-dev/ui-shared";
 import { Icon } from "@iconify/vue";
@@ -58,11 +58,19 @@ provide<Ref<IconifyValue | undefined>>(
   currentIconifyValue
 );
 
-const popperPlacement = computed(
-  () => props.context.popperPlacement as VDropdownPlacement
-);
+const popperPlacement = computed<VPopoverPlacement | undefined>(() => {
+  const placement = props.context.popperPlacement as string | undefined;
 
-const dropdown = useTemplateRef<InstanceType<typeof VDropdown>>("dropdown");
+  // `auto`/`auto-*` ask floating-vue to pick a side; Reka already flips and
+  // shifts its panel, so leave the placement unset and use its default.
+  if (!placement || placement.startsWith("auto")) {
+    return undefined;
+  }
+
+  return placement as VPopoverPlacement;
+});
+
+const dropdown = useTemplateRef<InstanceType<typeof VPopover>>("dropdown");
 
 const onSelect = (icon: IconifyValue) => {
   if (format.value === "svg") {
@@ -77,7 +85,7 @@ const onSelect = (icon: IconifyValue) => {
 };
 
 const editFormDropdown =
-  useTemplateRef<InstanceType<typeof VDropdown>>("editFormDropdown");
+  useTemplateRef<InstanceType<typeof VPopover>>("editFormDropdown");
 
 function onEditFormSubmit({ value: iconValue }: { value: string }) {
   if (format.value === "svg") {
@@ -105,15 +113,14 @@ function onEditFormSubmit({ value: iconValue }: { value: string }) {
 }
 
 const editFormId = `icon-edit-form-${utils.id.uuid()}`;
-const editFormContainer = useTemplateRef<HTMLElement>("editFormContainer");
 </script>
 
 <template>
   <div class="group/iconify-input inline-flex items-center gap-2">
-    <VDropdown
+    <VPopover
       ref="dropdown"
       class="inline-flex"
-      popper-class="w-full sm:w-auto"
+      content-class="w-full sm:w-auto"
       :placement="popperPlacement"
     >
       <button
@@ -144,31 +151,24 @@ const editFormContainer = useTemplateRef<HTMLElement>("editFormContainer");
           {{ $t("core.formkit.iconify.placeholder") }}
         </div>
       </button>
-      <template #popper>
+      <template #content>
         <IconifyPicker @select="onSelect" />
       </template>
-    </VDropdown>
-    <div ref="editFormContainer" class="inline-flex items-center gap-1.5">
-      <!-- @vue-ignore -->
-      <VDropdown
-        ref="editFormDropdown"
-        class="inline-flex"
-        :dispose-timeout="null"
-        :auto-hide="false"
-        :container="editFormContainer"
-      >
-        <template #default="{ shown }">
+    </VPopover>
+    <div class="inline-flex items-center gap-1.5">
+      <VPopover ref="editFormDropdown" class="inline-flex">
+        <template #default="{ open }">
           <button
             v-tooltip="$t('core.formkit.iconify.operations.edit')"
             type="button"
             :aria-label="$t('core.formkit.iconify.operations.edit')"
             class="text-gray-500 opacity-0 transition-all hover:text-gray-900 group-hover/iconify-input:opacity-100"
-            :class="{ '!text-gray-900 !opacity-100': shown }"
+            :class="{ '!text-gray-900 !opacity-100': open }"
           >
             <RiCodeSSlashLine />
           </button>
         </template>
-        <template #popper>
+        <template #content>
           <div class="w-96">
             <FormKit
               :id="editFormId"
@@ -205,7 +205,7 @@ const editFormContainer = useTemplateRef<HTMLElement>("editFormContainer");
             </div>
           </div>
         </template>
-      </VDropdown>
+      </VPopover>
       <button
         v-if="currentIconifyValue"
         v-tooltip="$t('core.common.buttons.delete')"
