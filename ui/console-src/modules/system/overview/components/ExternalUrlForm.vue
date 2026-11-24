@@ -86,7 +86,6 @@ useQuery({
         name="externalUrl"
         validation="url|required"
         :validation-label="$t('core.overview.fields.external_url')"
-        :classes="{ outer: '!pb-0' }"
       ></FormKit>
     </FormKit>
     <VSpace class="mt-4">

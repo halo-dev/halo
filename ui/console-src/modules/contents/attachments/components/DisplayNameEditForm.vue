@@ -64,7 +64,6 @@ async function onSubmit({ displayName }: { displayName: string }) {
       type="text"
       name="displayName"
       validation="required:trim"
-      :classes="{ outer: '!pb-0' }"
       :help="$t('core.attachment.detail_modal.display_name_form.help')"
     ></FormKit>
   </FormKit>

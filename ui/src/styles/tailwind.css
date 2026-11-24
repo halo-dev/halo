@@ -24,3 +24,21 @@ textarea {
 input[type="checkbox"] {
   @apply rounded-sm border-gray-500 checked:border-transparent disabled:cursor-not-allowed disabled:border-gray-400 disabled:opacity-50 disabled:checked:border-none;
 }
+
+/* Vertical rhythm for a stack of FormKit fields.
+   The spacing belongs to the container instead of every field's `outer` section,
+   so fields stay layout-neutral and can be reused in flex/grid rows. */
+@layer components {
+  .formkit-stack > *:not(.formkit-messages) {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+
+  .formkit-stack > *:not(.formkit-messages):first-child {
+    padding-top: 0;
+  }
+
+  .formkit-stack > *:not(.formkit-messages):last-child {
+    padding-bottom: 0;
+  }
+}
