@@ -13,9 +13,9 @@ vi.mock("@halo-dev/ui-shared", () => ({
 vi.mock("@halo-dev/components", () => ({
   IconClose: { template: "<span />" },
   VButton: { template: "<button><slot /></button>" },
-  VDropdown: {
+  VPopover: {
     methods: { hide: vi.fn() },
-    template: '<div><slot :shown="true" /><slot name="popper" /></div>',
+    template: '<div><slot :open="true" /><slot name="content" /></div>',
   },
 }));
 
