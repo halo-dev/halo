@@ -1,6 +1,7 @@
 <script lang="ts" setup>
-import { computed, inject, ref, useSlots } from "vue";
+import { inject, ref, useSlots, watch } from "vue";
 import { IconArrowRight } from "../../icons/icons";
+import { menuContextKey } from "./context";
 
 const props = withDefaults(
   defineProps<{
@@ -23,15 +24,17 @@ const slots = useSlots();
 
 const open = ref(false);
 
-const openIds = inject<string[] | undefined>("openIds");
+const menu = inject(menuContextKey, undefined);
 
-if (openIds?.includes(props.id)) {
-  open.value = true;
-}
-
-const hasSubmenus = computed(() => {
-  return slots.default && slots.default().length > 0;
-});
+watch(
+  () => menu?.openIds.value?.includes(props.id) ?? false,
+  (matched) => {
+    if (matched) {
+      open.value = true;
+    }
+  },
+  { immediate: true }
+);
 
 function handleClick() {
   if (!open.value) {
@@ -41,7 +44,7 @@ function handleClick() {
 }
 
 function handleExpand() {
-  if (hasSubmenus.value) {
+  if (slots.default) {
     open.value = !open.value;
   }
 }
@@ -49,9 +52,9 @@ function handleExpand() {
 
 <template>
   <li
-    :aria-current="active ? 'page' : undefined"
-    :aria-expanded="hasSubmenus ? open : undefined"
-    :class="{ 'has-submenus': hasSubmenus }"
+    :aria-current="active && !$slots.default ? 'page' : undefined"
+    :aria-expanded="$slots.default ? open : undefined"
+    :class="{ 'has-submenus': !!$slots.default }"
     class="menu-item group"
     tabindex="0"
     @click.stop="handleClick"
@@ -59,10 +62,13 @@ function handleExpand() {
     @keydown.space.stop.prevent="handleClick"
   >
     <div :class="{ active }" class="menu-item-title">
-      <span v-if="$slots.icon" class="menu-icon mr-3 self-center">
+      <span v-if="$slots.icon" class="menu-icon mr-2.5 self-center">
         <slot name="icon" />
       </span>
-      <span class="menu-title flex-1 self-center">
+      <span
+        :title="title || undefined"
+        class="menu-title flex-1 self-center truncate"
+      >
         {{ title }}
       </span>
       <span
@@ -76,7 +82,7 @@ function handleExpand() {
     </div>
 
     <Transition name="submenus-show">
-      <ul v-show="$slots.default && open" class="sub-menu-items transition-all">
+      <ul v-show="$slots.default && open" class="sub-menu-items">
         <slot />
       </ul>
     </Transition>
@@ -103,7 +109,7 @@ function handleExpand() {
     width: 3px;
     height: 26px;
     content: "";
-    background: #242e41;
+    background: theme("colors.secondary");
     border-radius: 6px;
   }
 }
@@ -119,16 +125,32 @@ function handleExpand() {
 
 .submenus-show-enter-active,
 .submenus-show-leave-active {
-  transition: all 0.1s ease;
+  transition: opacity 0.1s ease;
 }
 
 .submenus-show-enter-from,
-.submenus-show-enter-to {
+.submenus-show-leave-to {
   opacity: 0;
 }
 
+.submenus-show-enter-to,
+.submenus-show-leave-from {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .submenus-show-enter-active,
+  .submenus-show-leave-active {
+    transition: none;
+  }
+}
+
 .sub-menu-items {
-  @apply my-1 pl-5;
+  @apply my-1;
+
+  // Align child labels with the parent label text: px-2 + icon (1.2em) + mr-2.5,
+  // minus this row's own p-1.5.
+  padding-left: calc(0.5rem + 1.2rem + 0.625rem - 0.375rem);
 
   .menu-item-title {
     @apply p-1.5 text-sm;
