@@ -1,6 +1,12 @@
 <script setup lang="ts">
-import { VDropdown } from "@halo-dev/components";
-import { nextTick, onBeforeUnmount, shallowRef, useTemplateRef } from "vue";
+import { VPopover } from "@halo-dev/components";
+import {
+  nextTick,
+  onBeforeUnmount,
+  shallowRef,
+  useTemplateRef,
+  watch,
+} from "vue";
 import type { ToolboxItemComponentProps } from "@/types";
 import TableInsertGrid from "./TableInsertGrid.vue";
 
@@ -32,6 +38,12 @@ function focusGrid() {
   });
 }
 
+watch(dropdownShown, (shown) => {
+  if (shown) {
+    focusGrid();
+  }
+});
+
 async function cancel() {
   restoreEditorOnUnmount = true;
   dropdownShown.value = false;
@@ -50,15 +62,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <VDropdown
-    v-model:shown="dropdownShown"
-    :triggers="['click']"
-    :distance="10"
-    :no-auto-focus="true"
-    placement="right-start"
-    @show="focusGrid"
-    @apply-show="focusGrid"
-  >
+  <VPopover v-model:open="dropdownShown" :offset="10" placement="right-start">
     <button
       ref="trigger"
       type="button"
@@ -66,6 +70,7 @@ onBeforeUnmount(() => {
       class="group flex w-full cursor-pointer items-center gap-3 rounded p-1.5 text-left hover:bg-gray-100 focus-visible:bg-gray-100 focus-visible:outline-none"
       :aria-label="title"
       :title="title"
+      @click.stop
     >
       <span
         class="size-7 flex-none rounded bg-gray-100 p-1.5 group-hover:bg-white"
@@ -83,8 +88,8 @@ onBeforeUnmount(() => {
       </span>
     </button>
 
-    <template #popper>
+    <template #content>
       <TableInsertGrid ref="grid" @select="insertTable" @cancel="cancel" />
     </template>
-  </VDropdown>
+  </VPopover>
 </template>

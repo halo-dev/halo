@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import MingcuteCloseLine from "~icons/mingcute/close-line";
-import { BubbleItem } from "@/components";
+import { BubbleButton } from "@/components";
 import ColorPickerDropdown from "@/components/common/ColorPickerDropdown.vue";
 import { i18n } from "@/locales";
 import type { BubbleItemComponentProps } from "@/types";
@@ -27,7 +27,15 @@ function handleUnsetColor() {
 
 <template>
   <ColorPickerDropdown @update:model-value="handleSetColor">
-    <BubbleItem v-bind="props" @click="handleSetColor()" />
+    <BubbleButton
+      v-if="!visible || visible({ editor })"
+      :title="i18n.global.t('editor.common.highlight')"
+      :is-active="isActive?.({ editor })"
+    >
+      <template #icon>
+        <component :is="icon" :style="iconStyle" />
+      </template>
+    </BubbleButton>
     <template #prefix>
       <div class="p-1">
         <div

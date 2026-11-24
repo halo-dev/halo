@@ -27,7 +27,7 @@ function handleUnsetColor() {
 
 <template>
   <ColorPickerDropdown @update:model-value="handleSetColor">
-    <ToolbarItem v-bind="props" @click="handleSetColor()" />
+    <ToolbarItem v-bind="props" />
     <template #prefix>
       <div class="p-1">
         <div

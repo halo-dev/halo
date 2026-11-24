@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { VDropdown } from "@halo-dev/components";
+import { VPopover } from "@halo-dev/components";
 import { shallowRef, type Component } from "vue";
 import { useHaloKeyboardShortcut } from "@/composables/use-halo-keyboard-shortcut";
 import type { Editor } from "@/tiptap";
@@ -23,38 +23,43 @@ const handleBubbleItemClick = (editor: Editor) => {
     componentRef.value = callback;
   }
 };
+
+function onOpenUpdate(value: boolean) {
+  if (!value) {
+    componentRef.value = undefined;
+  }
+}
 </script>
 
 <template>
-  <VDropdown
+  <VPopover
     v-if="visible({ editor })"
-    class="inline-flex"
-    :triggers="[]"
-    :auto-hide="true"
-    :shown="!!componentRef"
-    :distance="10"
-    @hide="componentRef = undefined"
+    :open="!!componentRef"
+    :offset="10"
+    @update:open="onOpenUpdate"
   >
-    <KeyboardShortcutTooltip
-      v-slot="tooltipProps"
-      :title="title"
-      :shortcut="shortcut?.keys[0]"
-    >
-      <BubbleButton
-        :title="tooltipProps.ariaLabel"
-        :is-active="isActive({ editor })"
-        custom-tooltip
-        @click="handleBubbleItemClick(editor)"
+    <div class="inline-flex">
+      <KeyboardShortcutTooltip
+        v-slot="tooltipProps"
+        :title="title"
+        :shortcut="shortcut?.keys[0]"
       >
-        <template #icon>
-          <component :is="icon" :style="iconStyle" class="size-5" />
-        </template>
-      </BubbleButton>
-    </KeyboardShortcutTooltip>
-    <template #popper>
+        <BubbleButton
+          :title="tooltipProps.ariaLabel"
+          :is-active="isActive({ editor })"
+          custom-tooltip
+          @click.stop="handleBubbleItemClick(editor)"
+        >
+          <template #icon>
+            <component :is="icon" :style="iconStyle" class="size-5" />
+          </template>
+        </BubbleButton>
+      </KeyboardShortcutTooltip>
+    </div>
+    <template #content>
       <KeepAlive>
         <component :is="componentRef" v-bind="props"></component>
       </KeepAlive>
     </template>
-  </VDropdown>
+  </VPopover>
 </template>
