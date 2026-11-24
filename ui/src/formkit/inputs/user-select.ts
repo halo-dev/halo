@@ -6,7 +6,10 @@ import {
   type ListedUser,
   type UserV1alpha1ConsoleApiListUsersRequest,
 } from "@halo-dev/api-client";
+import { applyDataPermissionGuard } from "@/formkit/utils/permission";
 import { select } from "./select";
+
+const requiredPermissions = ["system:users:view", "system:users:manage"];
 
 const ANONYMOUSUSER_NAME = "anonymousUser";
 const DELETEDUSER_NAME = "ghost";
@@ -54,6 +57,10 @@ const findOptionsByValues = async (values: string[]) => {
 
 function optionsHandler(node: FormKitNode) {
   node.on("created", async () => {
+    if (!applyDataPermissionGuard(node, requiredPermissions)) {
+      return;
+    }
+
     node.props = {
       ...node.props,
       remote: true,

@@ -890,6 +890,7 @@
   "core.formkit.datetimepicker.placeholder": "Seleccionar fecha y hora",
   "core.formkit.datetimepicker.time": "Hora",
   "core.formkit.select.no_data": "Sin datos",
+  "core.formkit.permission.no_permission": "Sin permiso para cargar las opciones",
   "core.formkit.verification_form.no_action_defined": "Interfaz {label} no definida",
   "core.formkit.verification_form.verify_success": "{label} exitosa",
   "core.formkit.secret.creation_modal.title": "Crear secreto",

@@ -66,6 +66,10 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits<{
@@ -111,6 +115,9 @@ watch(isDropdownVisible, async (visible) => {
 });
 
 const handleOptionSelect = (option: SelectOption) => {
+  if (props.disabled) {
+    return;
+  }
   if (!props.multiple) {
     selectedOptions.value = [option];
     isDropdownVisible.value = false;
@@ -132,11 +139,17 @@ const handleOptionSelect = (option: SelectOption) => {
 };
 
 const handleDeleteSelectItem = (index: number) => {
+  if (props.disabled) {
+    return;
+  }
   selectedOptions.value.splice(index, 1);
   selectedOptions.value = [...selectedOptions.value];
 };
 
 const handleSearch = (value: string, event?: Event) => {
+  if (props.disabled) {
+    return;
+  }
   searchKeyword.value = value;
   if (!isDropdownVisible.value && !!value) {
     isDropdownVisible.value = true;
@@ -184,6 +197,9 @@ useEventListener(
 );
 
 const handleKeyDown = (event: KeyboardEvent) => {
+  if (props.disabled) {
+    return;
+  }
   const key = event.key;
   if (key === "Escape") {
     if (isDropdownVisible.value) {
@@ -201,7 +217,7 @@ const handleKeyDown = (event: KeyboardEvent) => {
 };
 
 const clearAllSelectedOptions = () => {
-  if (!hasClearable.value) {
+  if (props.disabled || !hasClearable.value) {
     return;
   }
 
@@ -217,6 +233,7 @@ const handleSortSelectedOptions = (options: SelectOption[]) => {
 <template>
   <VPopover
     v-model:open="isDropdownVisible"
+    :disabled="disabled"
     :arrow="false"
     match-trigger-width
     :offset="10"
@@ -225,6 +242,7 @@ const handleSortSelectedOptions = (options: SelectOption[]) => {
     <div
       ref="selectContainerRef"
       class="select-container relative w-full items-center"
+      :class="{ 'pointer-events-none opacity-60': disabled }"
     >
       <div class="relative h-full items-center rounded-md pe-7 ps-3 text-sm">
         <component

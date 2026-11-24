@@ -7,7 +7,13 @@ import {
   type SinglePageV1alpha1ConsoleApiListSinglePagesRequest,
 } from "@halo-dev/api-client";
 import { singlePageLabels } from "@/constants/labels";
+import { applyDataPermissionGuard } from "@/formkit/utils/permission";
 import { select } from "./select";
+
+const requiredPermissions = [
+  "system:singlepages:view",
+  "system:singlepages:manage",
+];
 
 async function search({ page, size, keyword }) {
   const { data } = await consoleApiClient.content.singlePage.listSinglePages({
@@ -56,6 +62,10 @@ async function findOptionsByValues(values: string[]) {
 
 function optionsHandler(node: FormKitNode) {
   node.on("created", async () => {
+    if (!applyDataPermissionGuard(node, requiredPermissions)) {
+      return;
+    }
+
     node.props = {
       ...node.props,
       remote: true,
