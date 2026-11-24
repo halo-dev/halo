@@ -8,7 +8,12 @@ import {
   vi,
 } from "vite-plus/test";
 import { nextTick } from "vue";
-import { VTabbar, type TabsDirection, type TabsType } from "../index";
+import {
+  VTabbar,
+  type TabbarItem,
+  type TabsDirection,
+  type TabsType,
+} from "../index";
 
 const items = Array.from({ length: 6 }, (_, index) => ({
   id: `tab-${index + 1}`,
@@ -61,6 +66,8 @@ async function mountTabbar(
   props: {
     activeId?: string;
     direction?: TabsDirection;
+    flush?: boolean;
+    items?: TabbarItem[];
     type?: TabsType;
   } = {}
 ) {
@@ -89,8 +96,16 @@ async function setScrollLeft(scroller: HTMLElement, value: number) {
   await nextTick();
 }
 
-function dispatchWheel(scroller: HTMLElement, deltaY: number): WheelEvent {
-  const event = new WheelEvent("wheel", { cancelable: true, deltaY });
+function dispatchWheel(
+  scroller: HTMLElement,
+  deltaY: number,
+  init: WheelEventInit = {}
+): WheelEvent {
+  const event = new WheelEvent("wheel", {
+    cancelable: true,
+    deltaY,
+    ...init,
+  });
   scroller.dispatchEvent(event);
   return event;
 }
@@ -374,21 +389,163 @@ describe("Tabbar", () => {
     expect(scrollBy).not.toHaveBeenCalled();
   });
 
-  it("handles wheel scrolling only away from the boundaries", async () => {
+  it("handles shift + wheel scrolling only away from the boundaries", async () => {
     const { scroller, scrollBy } = await mountTabbar();
     await flushPromises();
 
     await setScrollLeft(scroller, 200);
-    expect(dispatchWheel(scroller, 100).defaultPrevented).toBe(true);
+    expect(
+      dispatchWheel(scroller, 100, { shiftKey: true }).defaultPrevented
+    ).toBe(true);
     expect(scrollBy).toHaveBeenLastCalledWith({ left: 100 });
 
     scrollBy.mockClear();
     await setScrollLeft(scroller, 0);
-    expect(dispatchWheel(scroller, -100).defaultPrevented).toBe(false);
+    expect(
+      dispatchWheel(scroller, -100, { shiftKey: true }).defaultPrevented
+    ).toBe(false);
     expect(scrollBy).not.toHaveBeenCalled();
 
     await setScrollLeft(scroller, 400);
+    expect(
+      dispatchWheel(scroller, 100, { shiftKey: true }).defaultPrevented
+    ).toBe(false);
+    expect(scrollBy).not.toHaveBeenCalled();
+  });
+
+  it("keeps vertical wheel scrolling the page", async () => {
+    const { scroller, scrollBy } = await mountTabbar();
+    await flushPromises();
+
+    await setScrollLeft(scroller, 200);
+    scrollBy.mockClear();
+
     expect(dispatchWheel(scroller, 100).defaultPrevented).toBe(false);
     expect(scrollBy).not.toHaveBeenCalled();
+  });
+
+  it("normalizes line-based wheel deltas", async () => {
+    const { scroller, scrollBy } = await mountTabbar();
+    await flushPromises();
+
+    await setScrollLeft(scroller, 200);
+
+    expect(
+      dispatchWheel(scroller, 1, { deltaMode: 1, shiftKey: true })
+        .defaultPrevented
+    ).toBe(true);
+    expect(scrollBy).toHaveBeenLastCalledWith({ left: 16 });
+  });
+
+  it("skips disabled tabs during keyboard navigation", async () => {
+    const { wrapper } = await mountTabbar({
+      items: [
+        { id: "tab-1", label: "Tab 1" },
+        { id: "tab-2", label: "Tab 2", disabled: true },
+        { id: "tab-3", label: "Tab 3" },
+      ],
+    });
+    await flushPromises();
+
+    const items = wrapper.findAll(".tabbar-item");
+    expect(items[1].attributes("aria-disabled")).toBe("true");
+    expect(items[1].attributes("tabindex")).toBe("-1");
+
+    await items[0].trigger("keydown", { key: "ArrowRight" });
+
+    expect(wrapper.emitted("update:activeId")?.at(-1)).toEqual(["tab-3"]);
+    expect(document.activeElement).toBe(items[2].element);
+  });
+
+  it("does not activate a disabled tab", async () => {
+    const { wrapper, scrollBy } = await mountTabbar({
+      items: [
+        { id: "tab-1", label: "Tab 1" },
+        { id: "tab-2", label: "Tab 2", disabled: true },
+      ],
+    });
+    await flushPromises();
+    scrollBy.mockClear();
+    const emitted = wrapper.emitted("update:activeId")?.length ?? 0;
+
+    await wrapper.findAll(".tabbar-item")[1].trigger("click");
+
+    expect(wrapper.emitted("update:activeId")?.length ?? 0).toBe(emitted);
+    expect(scrollBy).not.toHaveBeenCalled();
+  });
+
+  it("activates the focused tab with Enter and Space", async () => {
+    const { wrapper } = await mountTabbar({ activeId: "missing" });
+    await flushPromises();
+
+    const items = wrapper.findAll(".tabbar-item");
+
+    await items[1].trigger("keydown", { key: "Enter" });
+    expect(wrapper.emitted("update:activeId")?.at(-1)).toEqual(["tab-2"]);
+
+    await items[2].trigger("keydown", { key: " " });
+    expect(wrapper.emitted("update:activeId")?.at(-1)).toEqual(["tab-3"]);
+  });
+
+  it("falls back to the first enabled tab and emits the change", async () => {
+    const { wrapper } = await mountTabbar({
+      activeId: "missing",
+      items: [
+        { id: "tab-1", label: "Tab 1", disabled: true },
+        { id: "tab-2", label: "Tab 2" },
+      ],
+    });
+    await flushPromises();
+
+    expect(wrapper.emitted("update:activeId")?.at(-1)).toEqual(["tab-2"]);
+    expect(wrapper.findAll(".tabbar-item")[1].attributes("aria-selected")).toBe(
+      "true"
+    );
+  });
+
+  it("renders icons, badges and accessible names", async () => {
+    const icon = { render: () => null };
+    const { wrapper } = await mountTabbar({
+      items: [
+        { id: "tab-1", icon, ariaLabel: "Icon tab" },
+        { id: "tab-2", label: "Tab 2", badge: 3 },
+        { id: "tab-3", label: "Tab 3", badge: 0 },
+      ],
+    });
+    await flushPromises();
+
+    const items = wrapper.findAll(".tabbar-item");
+    expect(items[0].find(".tabbar-item-icon").exists()).toBe(true);
+    expect(items[0].attributes("aria-label")).toBe("Icon tab");
+    expect(items[1].find(".tabbar-item-badge").text()).toBe("3");
+    expect(items[2].find(".tabbar-item-badge").text()).toBe("0");
+  });
+
+  it("applies the flush form without changing keyboard behavior", async () => {
+    const { wrapper } = await mountTabbar({ flush: true, type: "outline" });
+    await flushPromises();
+
+    expect(wrapper.classes()).toContain("is-flush");
+    expect(wrapper.get('[role="tablist"]').attributes("aria-label")).toBe(
+      "Tab list"
+    );
+
+    await wrapper.findAll(".tabbar-item")[0].trigger("keydown", {
+      key: "ArrowRight",
+    });
+
+    expect(wrapper.emitted("update:activeId")?.at(-1)).toEqual(["tab-2"]);
+  });
+
+  it("labels the tab list and scroller with the built-in text", async () => {
+    const { wrapper } = await mountTabbar();
+    await flushPromises();
+
+    expect(wrapper.get('[role="tablist"]').attributes("aria-label")).toBe(
+      "Tab list"
+    );
+    expect(wrapper.get(".tabbar-items").attributes("aria-label")).toBe(
+      "Tab list"
+    );
   });
 });
