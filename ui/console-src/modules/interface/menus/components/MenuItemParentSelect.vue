@@ -1,9 +1,8 @@
 <script lang="ts" setup>
 import type { FormKitFrameworkContext } from "@formkit/core";
 import type { MenuItem, MenuItemTreeNode } from "@halo-dev/api-client";
-import { IconArrowRight, VDropdown } from "@halo-dev/components";
-import { onClickOutside, useResizeObserver } from "@vueuse/core";
-import { computed, shallowRef, useTemplateRef } from "vue";
+import { IconArrowRight, VPopover } from "@halo-dev/components";
+import { computed, shallowRef } from "vue";
 import { filterMenuItemTreeNodes } from "../utils";
 import MenuItemParentSelectNode from "./MenuItemParentSelectNode.vue";
 
@@ -12,22 +11,6 @@ const props = defineProps<{
 }>();
 
 const dropdownVisible = shallowRef(false);
-const wrapperRef = useTemplateRef<HTMLElement>("wrapperRef");
-const popperRef = useTemplateRef<HTMLElement>("popperRef");
-
-useResizeObserver(wrapperRef, () => {
-  window.dispatchEvent(new Event("resize"));
-});
-
-onClickOutside(
-  wrapperRef,
-  () => {
-    dropdownVisible.value = false;
-  },
-  {
-    ignore: [popperRef],
-  }
-);
 
 const menuItemTree = computed<MenuItemTreeNode[]>(() => {
   const tree = props.context.node.props.menuItemTree;
@@ -122,17 +105,18 @@ function getMenuItemLabel(menuItem: MenuItem) {
 </script>
 
 <template>
-  <VDropdown
-    :triggers="[]"
-    :shown="dropdownVisible"
-    auto-size
-    :auto-hide="false"
-    container="body"
-    :distance="10"
-    class="w-full"
-    popper-class="menu-item-parent-select-dropdown"
+  <VPopover
+    v-model:open="dropdownVisible"
+    :disabled="disabled"
+    :arrow="false"
+    :offset="10"
+    match-trigger-width
+    content-class="!p-0"
   >
-    <div ref="wrapperRef" class="flex w-full items-center">
+    <div
+      class="flex w-full items-center"
+      :class="{ 'pointer-events-none': disabled }"
+    >
       <input
         :id="context.id"
         :value="selectedLabel"
@@ -143,21 +127,17 @@ function getMenuItemLabel(menuItem: MenuItem) {
         :aria-expanded="dropdownVisible"
         class="block w-0 flex-grow cursor-pointer bg-transparent px-3 py-1 text-sm text-black caret-transparent transition-all focus:outline-none focus:ring-0"
         @blur="context.handlers.blur()"
-        @click="toggleDropdown"
         @keydown.delete="handleDelete"
         @keydown.enter.prevent="toggleDropdown"
         @keydown.space.prevent="toggleDropdown"
       />
-      <div
-        class="inline-flex h-full cursor-pointer items-center px-1"
-        @click="toggleDropdown"
-      >
+      <div class="inline-flex h-full cursor-pointer items-center px-1">
         <IconArrowRight class="rotate-90 text-gray-500 hover:text-gray-700" />
       </div>
     </div>
 
-    <template #popper>
-      <div ref="popperRef" class="max-h-96 w-full overflow-auto bg-white">
+    <template #content>
+      <div class="max-h-96 w-full overflow-auto">
         <ul class="p-1" role="listbox">
           <MenuItemParentSelectNode
             v-for="node in filteredMenuItemTree"
@@ -169,16 +149,5 @@ function getMenuItemLabel(menuItem: MenuItem) {
         </ul>
       </div>
     </template>
-  </VDropdown>
+  </VPopover>
 </template>
-
-<style lang="scss">
-.menu-item-parent-select-dropdown {
-  .v-popper__arrow-container {
-    display: none;
-  }
-  .v-popper__inner {
-    padding: 0 !important;
-  }
-}
-</style>

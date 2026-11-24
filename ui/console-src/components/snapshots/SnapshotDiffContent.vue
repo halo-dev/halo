@@ -3,8 +3,8 @@ import { type ContentWrapper } from "@halo-dev/api-client";
 import {
   IconInformation,
   Toast,
-  VDropdown,
   VLoading,
+  VTooltipComponent,
 } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 import { useLocalStorage } from "@vueuse/core";
@@ -284,7 +284,7 @@ const handleDiffScroll = () => {
           class="sticky top-0 flex items-center gap-2 border-b bg-white px-4 py-3"
         >
           <span>{{ $t("core.snapshots.diff_mode.diff") }}</span>
-          <VDropdown :triggers="['hover']">
+          <VTooltipComponent theme="dropdown" :triggers="['hover']">
             <IconInformation class="size-4" />
             <template #popper>
               <div class="w-52">
@@ -301,7 +301,7 @@ const handleDiffScroll = () => {
                 </ul>
               </div>
             </template>
-          </VDropdown>
+          </VTooltipComponent>
         </div>
         <div class="snapshot-content markdown-body" v-html="diffContent"></div>
       </OverlayScrollbarsComponent>
