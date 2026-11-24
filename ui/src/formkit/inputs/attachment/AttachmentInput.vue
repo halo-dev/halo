@@ -7,7 +7,7 @@ import {
   VDropdownItem,
 } from "@halo-dev/components";
 import { utils, type AttachmentLike } from "@halo-dev/ui-shared";
-import { computed, useTemplateRef, type PropType } from "vue";
+import { computed, ref, useTemplateRef, type PropType } from "vue";
 import { useDraggable } from "vue-draggable-plus";
 import MingcuteMore2Line from "~icons/mingcute/more-2-line";
 import AttachmentDropdownItem from "./AttachmentDropdownItem.vue";
@@ -87,12 +87,26 @@ const handleRemove = (index: number) => {
   }
 };
 
+// The custom link panel is portaled, so only the menu that owns the open panel
+// may stay open; otherwise the menu closes as usual.
+const openCustomLinkKey = ref<number | "add" | null>(null);
+const itemDropdowns =
+  useTemplateRef<InstanceType<typeof VDropdown>[]>("itemDropdown");
+const addDropdown =
+  useTemplateRef<InstanceType<typeof VDropdown>>("addDropdown");
+
+function setCustomLinkOpen(key: number | "add", open: boolean) {
+  openCustomLinkKey.value = open ? key : null;
+}
+
 function onCustomLinkSubmit(url: string) {
   if (multiple.value) {
     props.context.node.input([...currentValue.value, url]);
   } else {
     props.context.node.input(url);
   }
+
+  addDropdown.value?.hide();
 }
 
 function onLinkReplace(index: number, url: string) {
@@ -103,6 +117,8 @@ function onLinkReplace(index: number, url: string) {
   } else {
     props.context.node.input(url);
   }
+
+  itemDropdowns.value?.[index]?.hide();
 }
 
 // Drag
@@ -141,8 +157,10 @@ const canViewAttachment = computed(() => {
 
       <!-- @vue-ignore -->
       <VDropdown
+        ref="itemDropdown"
         class="absolute right-1 top-1 inline-flex"
         :dispose-timeout="null"
+        :auto-hide="openCustomLinkKey !== index"
       >
         <template #default="{ shown }">
           <button
@@ -172,6 +190,8 @@ const canViewAttachment = computed(() => {
           />
           <CustomLinkDropdownItem
             :url="item"
+            :open="openCustomLinkKey === index"
+            @update:open="(open) => setCustomLinkOpen(index, open)"
             @submit="(url) => onLinkReplace(index, url)"
           />
           <VDropdownDivider />
@@ -185,9 +205,11 @@ const canViewAttachment = computed(() => {
     <!-- @vue-ignore -->
     <VDropdown
       v-if="multiple || currentValue.length === 0"
+      ref="addDropdown"
       class="inline-flex"
       :style="{ width: width, aspectRatio: aspectRatio }"
       :dispose-timeout="null"
+      :auto-hide="openCustomLinkKey !== 'add'"
     >
       <button
         type="button"
@@ -210,7 +232,11 @@ const canViewAttachment = computed(() => {
           :accepts="accepts"
           @selected="onAttachmentsSelect"
         />
-        <CustomLinkDropdownItem @submit="onCustomLinkSubmit" />
+        <CustomLinkDropdownItem
+          :open="openCustomLinkKey === 'add'"
+          @update:open="(open) => setCustomLinkOpen('add', open)"
+          @submit="onCustomLinkSubmit"
+        />
       </template>
     </VDropdown>
   </div>
