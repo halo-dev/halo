@@ -27,8 +27,6 @@ function onSubmit({ externalUrl }: { externalUrl: string }) {
       "core.overview.external_url_form.operations.save.description"
     ),
     confirmType: "danger",
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       const { data: basicConfig } =
         await consoleApiClient.configMap.system.getSystemConfigByGroup({

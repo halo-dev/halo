@@ -2,16 +2,10 @@
 import {
   IconArrowDownLine,
   IconCloseCircle,
-  VDropdown,
+  VPopover,
 } from "@halo-dev/components";
-import {
-  computed,
-  nextTick,
-  onMounted,
-  onUnmounted,
-  ref,
-  type PropType,
-} from "vue";
+import { useEventListener } from "@vueuse/core";
+import { computed, nextTick, onMounted, ref, watch, type PropType } from "vue";
 import MultipleSelectSelector from "./MultipleSelectSelector.vue";
 import SelectDropdownContainer from "./SelectDropdownContainer.vue";
 import SelectSelector from "./SelectSelector.vue";
@@ -107,19 +101,17 @@ const getInputHTMLRef = () => {
 
 onMounted(() => {
   getInputHTMLRef();
-  if (selectContainerRef.value) {
-    observer.observe(selectContainerRef.value);
+});
+
+// The non-modal popover moves focus to its content when it mounts, so return
+// the focus to the search input after the panel has rendered.
+watch(isDropdownVisible, async (visible) => {
+  if (!visible) {
+    return;
   }
-});
-
-onUnmounted(() => {
-  observer.disconnect();
-});
-
-// resolve the issue of the dropdown position when the container size changes
-// https://github.com/Akryum/floating-vue/issues/977#issuecomment-1651898070
-const observer = new ResizeObserver(() => {
-  window.dispatchEvent(new Event("resize"));
+  await nextTick();
+  await nextTick();
+  inputRef.value?.focus();
 });
 
 const handleOptionSelect = (option: SelectOption) => {
@@ -141,26 +133,9 @@ const handleOptionSelect = (option: SelectOption) => {
     selectedOptions.value = [...selectedOptions.value];
   }
   clearInputValue();
-};
-
-/**
- * When the search box loses focus due to option selection, check if the focus is on an option, and keep the focus if so.
- *
- * @param event FocusEvent
- */
-const handleSearchFocusout = (event: FocusEvent) => {
-  const target = event.relatedTarget as HTMLElement;
-  if (props.multiple && inputRef.value) {
-    if (
-      target &&
-      (target.closest("#select-option") || target.closest(".select-container"))
-    ) {
-      inputRef.value.focus();
-      return;
-    }
-  }
-  clearInputValue();
-  isDropdownVisible.value = false;
+  // Clicking an option moves the focus away from the search input, so put it
+  // back once the option has been selected.
+  nextTick(() => inputRef.value?.focus());
 };
 
 const handleDeleteSelectItem = (index: number) => {
@@ -169,21 +144,6 @@ const handleDeleteSelectItem = (index: number) => {
   }
   selectedOptions.value.splice(index, 1);
   selectedOptions.value = [...selectedOptions.value];
-};
-
-const handleSearchClick = () => {
-  if (props.disabled) {
-    return;
-  }
-  if (!isDropdownVisible.value && inputRef.value) {
-    inputRef.value.focus();
-    isDropdownVisible.value = true;
-    return;
-  }
-  if (isDropdownVisible.value) {
-    isDropdownVisible.value = false;
-    return;
-  }
 };
 
 const handleSearch = (value: string, event?: Event) => {
@@ -207,21 +167,52 @@ const clearInputValue = () => {
   inputRef.value.dispatchEvent(event);
 };
 
+let blockEscapeKeyup = false;
+
+// Escape closes the panel through the popover itself. The surrounding modal
+// also listens for Escape on keyup, so swallow that keyup once the panel has
+// handled the key.
+useEventListener(
+  window,
+  "keydown",
+  (event: KeyboardEvent) => {
+    if (event.key === "Escape" && isDropdownVisible.value) {
+      blockEscapeKeyup = true;
+    }
+  },
+  { capture: true }
+);
+
+useEventListener(
+  window,
+  "keyup",
+  (event: KeyboardEvent) => {
+    if (event.key !== "Escape" || !blockEscapeKeyup) {
+      return;
+    }
+    blockEscapeKeyup = false;
+    event.stopPropagation();
+  },
+  { capture: true }
+);
+
 const handleKeyDown = (event: KeyboardEvent) => {
   if (props.disabled) {
     return;
   }
   const key = event.key;
+  if (key === "Escape") {
+    if (isDropdownVisible.value) {
+      clearInputValue();
+    }
+    return;
+  }
+
   if (key === "Enter" || key.startsWith("Arrow")) {
     if (!isDropdownVisible.value) {
       isDropdownVisible.value = true;
       event.stopPropagation();
     }
-  }
-
-  if (key === "Escape" && isDropdownVisible.value) {
-    clearInputValue();
-    isDropdownVisible.value = false;
   }
 };
 
@@ -240,23 +231,18 @@ const handleSortSelectedOptions = (options: SelectOption[]) => {
 </script>
 
 <template>
-  <VDropdown
-    :triggers="[]"
-    :shown="isDropdownVisible"
-    auto-size
-    :auto-hide="false"
-    :distance="10"
-    container="body"
-    class="w-full"
-    popper-class="select-container-dropdown"
+  <VPopover
+    v-model:open="isDropdownVisible"
+    :disabled="disabled"
+    :arrow="false"
+    match-trigger-width
+    :offset="10"
+    content-class="!p-0 overflow-hidden"
   >
     <div
       ref="selectContainerRef"
-      tabindex="-1"
-      class="select-container relative items-center"
+      class="select-container relative w-full items-center"
       :class="{ 'pointer-events-none opacity-60': disabled }"
-      @focusout.stop="handleSearchFocusout"
-      @click.stop="handleSearchClick"
     >
       <div class="relative h-full items-center rounded-md pe-7 ps-3 text-sm">
         <component
@@ -292,9 +278,8 @@ const handleSortSelectedOptions = (options: SelectOption[]) => {
         />
       </span>
     </div>
-    <template #popper>
+    <template #content>
       <SelectDropdownContainer
-        v-if="isDropdownVisible"
         :loading="loading"
         :next-loading="nextLoading"
         :options="options"
@@ -308,15 +293,5 @@ const handleSortSelectedOptions = (options: SelectOption[]) => {
         @load-more="emit('loadMore')"
       />
     </template>
-  </VDropdown>
+  </VPopover>
 </template>
-<style lang="scss">
-.select-container-dropdown {
-  .v-popper__arrow-container {
-    display: none;
-  }
-  .v-popper__inner {
-    padding: 0 !important;
-  }
-}
-</style>

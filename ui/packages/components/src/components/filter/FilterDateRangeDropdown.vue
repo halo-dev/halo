@@ -7,7 +7,7 @@ import type {
   DateRangePickerDropdownMode,
   DateRangeValue,
 } from "../date-picker/types";
-import type { VDropdownPlacement } from "../dropdown";
+import type { VPopoverPlacement } from "../popover";
 import { filterDropdownGroupKey } from "./group";
 import { getFilterTriggerClasses } from "./trigger";
 import type { FilterDropdownVariant } from "./types";
@@ -27,7 +27,7 @@ const props = withDefaults(
     variant?: FilterDropdownVariant;
     presets?: DatePickerPreset<DateRangeValue>[];
     disabled?: boolean;
-    placement?: VDropdownPlacement;
+    placement?: VPopoverPlacement;
     panelWidth?: string;
     labelSeparator?: string;
     rangeSeparator?: string;
@@ -48,12 +48,12 @@ const props = withDefaults(
     panelWidth: undefined,
     labelSeparator: ": ",
     rangeSeparator: " ~ ",
-    confirmLabel: "Confirm",
-    clearLabel: "Clear",
+    confirmLabel: undefined,
+    clearLabel: undefined,
     hourCycle: 24,
-    startTimeLabel: "Start",
-    endTimeLabel: "End",
-    locale: "en",
+    startTimeLabel: undefined,
+    endTimeLabel: undefined,
+    locale: undefined,
   }
 );
 

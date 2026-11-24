@@ -44,8 +44,6 @@ const handleDelete = async () => {
     title: t("core.comment.operations.delete_comment.title"),
     description: t("core.comment.operations.delete_comment.description"),
     confirmType: "danger",
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
         await coreApiClient.content.comment.deleteComment({

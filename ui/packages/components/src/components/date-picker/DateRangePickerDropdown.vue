@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue";
-import type { VDropdownPlacement } from "../dropdown";
+import { useComponentsI18n } from "../../locales";
+import type { VPopoverPlacement } from "../popover";
 import DateRangePickerPanel from "./DateRangePickerPanel.vue";
 import DateTimeRangePickerPanel from "./DateTimeRangePickerPanel.vue";
 import DropdownShell from "./DropdownShell.vue";
@@ -16,7 +17,7 @@ const props = withDefaults(
     mode?: DateRangePickerDropdownMode;
     modelValue?: DateRangeValue;
     disabled?: boolean;
-    placement?: VDropdownPlacement;
+    placement?: VPopoverPlacement;
     panelWidth?: string;
     panelLabel?: string;
     open?: boolean;
@@ -46,11 +47,11 @@ const props = withDefaults(
     disabled: false,
     placement: "bottom-start",
     panelWidth: undefined,
-    panelLabel: "Date range picker",
+    panelLabel: undefined,
     open: undefined,
-    confirmLabel: "Confirm",
-    clearLabel: "Clear",
-    locale: "en",
+    confirmLabel: undefined,
+    clearLabel: undefined,
+    locale: undefined,
     weekStartsOn: undefined,
     numberOfMonths: 2,
     fixedWeeks: true,
@@ -58,16 +59,36 @@ const props = withDefaults(
     maxValue: undefined,
     isDateDisabled: undefined,
     defaultPickerValue: undefined,
-    calendarLabel: "Calendar",
+    calendarLabel: undefined,
     presets: undefined,
     maximumDays: undefined,
     allowNonContiguousRanges: undefined,
     defaultStartTime: "00:00",
     defaultEndTime: "23:59",
     hourCycle: 24,
-    startTimeLabel: "Start",
-    endTimeLabel: "End",
+    startTimeLabel: undefined,
+    endTimeLabel: undefined,
   }
+);
+
+const { t } = useComponentsI18n();
+
+const panelLabelText = computed(
+  () => props.panelLabel ?? t("date_picker.range_panel")
+);
+
+const confirmLabelText = computed(
+  () => props.confirmLabel ?? t("common.confirm")
+);
+
+const clearLabelText = computed(() => props.clearLabel ?? t("common.clear"));
+
+const startTimeLabelText = computed(
+  () => props.startTimeLabel ?? t("date_picker.start")
+);
+
+const endTimeLabelText = computed(
+  () => props.endTimeLabel ?? t("date_picker.end")
 );
 
 const emit = defineEmits<{
@@ -146,7 +167,7 @@ const footerButtonClasses =
     :disabled="disabled"
     :placement="placement"
     :panel-width="panelWidth"
-    :panel-label="panelLabel"
+    :panel-label="panelLabelText"
     @update:open="onOpenChange"
   >
     <template #default="{ open: isOpen, show, hide }">
@@ -189,8 +210,8 @@ const footerButtonClasses =
         :default-start-time="defaultStartTime"
         :default-end-time="defaultEndTime"
         :hour-cycle="hourCycle"
-        :start-time-label="startTimeLabel"
-        :end-time-label="endTimeLabel"
+        :start-time-label="startTimeLabelText"
+        :end-time-label="endTimeLabelText"
         :disabled="disabled"
         @update:model-value="onPanelUpdate"
       />
@@ -203,7 +224,7 @@ const footerButtonClasses =
           :class="footerButtonClasses"
           @click="onDraftClear"
         >
-          {{ clearLabel }}
+          {{ clearLabelText }}
         </button>
         <button
           type="button"
@@ -211,7 +232,7 @@ const footerButtonClasses =
           :disabled="hasPartialDraft"
           @click="onConfirm"
         >
-          {{ confirmLabel }}
+          {{ confirmLabelText }}
         </button>
       </div>
     </template>

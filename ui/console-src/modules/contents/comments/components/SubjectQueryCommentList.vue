@@ -169,13 +169,6 @@ watch(
       <VPagination
         v-model:page="page"
         v-model:size="size"
-        :page-label="$t('core.components.pagination.page_label')"
-        :size-label="$t('core.components.pagination.size_label')"
-        :total-label="
-          $t('core.components.pagination.total_label', {
-            total: comments?.total || 0,
-          })
-        "
         :total="comments?.total || 0"
         :size-options="[20, 30, 50, 100]"
       />

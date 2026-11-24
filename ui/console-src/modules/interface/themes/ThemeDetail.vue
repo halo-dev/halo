@@ -56,8 +56,6 @@ async function handleClearCache() {
   Dialog.warning({
     title: t("core.theme.operations.clear_templates_cache.title"),
     description: t("core.theme.operations.clear_templates_cache.description"),
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     async onConfirm() {
       if (!selectedTheme.value) {
         console.error("No selected or activated theme");
@@ -77,8 +75,6 @@ const handleReloadTheme = async () => {
   Dialog.warning({
     title: t("core.theme.operations.reload.title"),
     description: t("core.theme.operations.reload.description"),
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
         if (!selectedTheme?.value) {

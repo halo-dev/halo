@@ -199,7 +199,19 @@ public class OAuth2RegistrationService {
                         oauth2User instanceof OidcUser oidcUser ? oidcUser.getPreferredUsername() : null)
                 .map(String::trim)
                 .orElse(username);
-        return isProtected(setting, displayName) ? username : displayName;
+        var resolved = isProtected(setting, displayName) ? username : displayName;
+        return truncateDisplayName(resolved);
+    }
+
+    private static String truncateDisplayName(String displayName) {
+        if (displayName.length() <= ValidationUtils.DISPLAY_NAME_MAX_LENGTH) {
+            return displayName;
+        }
+        var end = ValidationUtils.DISPLAY_NAME_MAX_LENGTH;
+        if (Character.isHighSurrogate(displayName.charAt(end - 1))) {
+            end--;
+        }
+        return displayName.substring(0, end);
     }
 
     private Mono<EmailCandidate> resolveEmail(OAuth2User oauth2User) {

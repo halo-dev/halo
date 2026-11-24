@@ -58,8 +58,6 @@ const handleDelete = async () => {
     title: t("core.post.operations.delete.title"),
     description: t("core.post.operations.delete.description"),
     confirmType: "danger",
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       await consoleApiClient.content.post.recyclePost({
         name: props.post.post.metadata.name,

@@ -21,10 +21,23 @@ vi.mock(
   })
 );
 
-const DropdownStub = defineComponent({
-  name: "VDropdown",
+// Render the trigger and panel in place so the panel content is queryable
+// without teleporting, and expose the props the component passes to VPopover.
+const PopoverStub = defineComponent({
+  name: "Popover",
+  props: {
+    open: {
+      type: Boolean,
+      default: false,
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: ["update:open"],
   setup(_, { slots }) {
-    return () => h("div", [slots.default?.(), slots.popper?.()]);
+    return () => h("div", [slots.default?.(), slots.content?.()]);
   },
 });
 
@@ -55,7 +68,7 @@ function mountCategorySelect() {
   });
   context.node.context = context;
 
-  return mount(CategorySelect, {
+  const wrapper = mount(CategorySelect, {
     props: { context },
     global: {
       plugins: [
@@ -66,9 +79,16 @@ function mountCategorySelect() {
         }),
       ],
       components: { HasPermission },
-      stubs: { VDropdown: DropdownStub },
+      // VPopover resolves to its component name, so the stub key is `Popover`.
+      stubs: { Popover: PopoverStub },
     },
   });
+
+  return wrapper;
+}
+
+function popoverDisabled(wrapper: ReturnType<typeof mountCategorySelect>) {
+  return wrapper.findComponent(PopoverStub).props("disabled");
 }
 
 describe("CategorySelect", () => {
@@ -98,6 +118,7 @@ describe("CategorySelect", () => {
     await flushPromises();
 
     expect(wrapper.find("#category-create").exists()).toBe(true);
+    expect(popoverDisabled(wrapper)).toBe(false);
     wrapper.unmount();
   });
 
@@ -109,6 +130,7 @@ describe("CategorySelect", () => {
 
     expect(wrapper.find("input").attributes("disabled")).toBeDefined();
     expect(wrapper.find("input").attributes("placeholder")).toBeTruthy();
+    expect(popoverDisabled(wrapper)).toBe(true);
     wrapper.unmount();
   });
 });

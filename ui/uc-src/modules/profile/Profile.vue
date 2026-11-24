@@ -132,24 +132,24 @@ const activeTab = useRouteQuery<string>("tab", tabs.value[0].id, {
 
   <header class="bg-white">
     <div class="p-4">
-      <div class="flex items-center justify-between">
-        <div class="flex flex-row items-center gap-5">
-          <div class="group relative h-20 w-20">
+      <div class="flex items-center justify-between gap-4">
+        <div class="flex min-w-0 flex-row items-center gap-5">
+          <div class="group relative h-20 w-20 shrink-0">
             <UserAvatar
               :name="currentUser?.user.metadata.name"
               is-current-user
             />
           </div>
-          <div class="block">
+          <div class="min-w-0">
             <h1 class="truncate text-lg font-bold text-gray-900">
               {{ currentUser?.user.spec.displayName }}
             </h1>
-            <span class="text-sm text-gray-600">
+            <span class="block truncate text-sm text-gray-600">
               @{{ currentUser?.user.metadata.name }}
             </span>
           </div>
         </div>
-        <div>
+        <div class="shrink-0">
           <VDropdown>
             <VButton type="default">
               {{ $t("core.common.buttons.edit") }}

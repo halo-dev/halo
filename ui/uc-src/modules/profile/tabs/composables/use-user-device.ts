@@ -12,8 +12,6 @@ export function useUserDevice(device: UserDevice) {
       title: t("core.uc_profile.device.operations.revoke.title"),
       description: t("core.uc_profile.device.operations.revoke.description"),
       confirmType: "danger",
-      confirmText: t("core.common.buttons.confirm"),
-      cancelText: t("core.common.buttons.cancel"),
       async onConfirm() {
         await ucApiClient.security.device.revokeDevice({
           deviceId: device.device.metadata.name,

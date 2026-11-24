@@ -16,6 +16,7 @@ import {
 } from "reka-ui";
 import { computed, shallowRef, watch } from "vue";
 import { IconArrowLeft, IconArrowRight } from "../../icons/icons";
+import { useComponentsI18n } from "../../locales";
 import {
   parseDateString,
   resolveDefaultPickerDate,
@@ -28,7 +29,7 @@ const props = withDefaults(
   defineProps<DatePickerCommonProps & { modelValue?: CalendarDate }>(),
   {
     modelValue: undefined,
-    locale: "en",
+    locale: undefined,
     weekStartsOn: undefined,
     numberOfMonths: 1,
     fixedWeeks: true,
@@ -36,10 +37,17 @@ const props = withDefaults(
     maxValue: undefined,
     isDateDisabled: undefined,
     defaultPickerValue: undefined,
-    calendarLabel: "Calendar",
     disabled: false,
     readonly: false,
   }
+);
+
+const { locale: componentsLocale, t } = useComponentsI18n();
+
+const resolvedLocale = computed(() => props.locale ?? componentsLocale.value);
+
+const calendarLabelText = computed(
+  () => props.calendarLabel ?? t("date_picker.calendar")
 );
 
 const emit = defineEmits<{
@@ -90,7 +98,7 @@ const dayClasses =
     v-slot="{ grid, weekDays }"
     :model-value="modelValue"
     :placeholder="placeholder"
-    :locale="locale"
+    :locale="resolvedLocale"
     :week-starts-on="weekStartsOn"
     :number-of-months="numberOfMonths"
     :fixed-weeks="fixedWeeks"
@@ -101,17 +109,20 @@ const dayClasses =
     :readonly="readonly"
     :prevent-deselect="true"
     :initial-focus="true"
-    :calendar-label="calendarLabel"
+    :calendar-label="calendarLabelText"
     class="select-none"
     @update:model-value="onUpdate"
     @update:placeholder="onPlaceholderUpdate"
   >
     <CalendarHeader class="mb-2 flex items-center justify-between">
-      <CalendarPrev :class="navButtonClasses">
+      <CalendarPrev
+        :aria-label="t('common.previous')"
+        :class="navButtonClasses"
+      >
         <IconArrowLeft />
       </CalendarPrev>
       <CalendarHeading class="text-sm font-medium text-gray-900" />
-      <CalendarNext :class="navButtonClasses">
+      <CalendarNext :aria-label="t('common.next')" :class="navButtonClasses">
         <IconArrowRight />
       </CalendarNext>
     </CalendarHeader>

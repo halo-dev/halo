@@ -36,8 +36,6 @@ async function handleRestore() {
   Dialog.warning({
     title: t("core.snapshots.operations.revert.title"),
     description: t("core.snapshots.operations.revert.description"),
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     async onConfirm() {
       await props.revertApi(props.snapshot.metadata.name);
       await queryClient.invalidateQueries({
@@ -52,8 +50,6 @@ function handleDelete() {
   Dialog.warning({
     title: t("core.snapshots.operations.delete.title"),
     description: t("core.snapshots.operations.delete.description"),
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     confirmType: "danger",
     async onConfirm() {
       await props.deleteApi(props.snapshot.metadata.name);

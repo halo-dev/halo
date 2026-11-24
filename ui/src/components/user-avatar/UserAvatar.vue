@@ -124,8 +124,6 @@ const handleRemoveCurrentAvatar = () => {
     title: t("core.components.user_avatar.remove.title"),
     description: t("core.common.dialog.descriptions.cannot_be_recovered"),
     confirmType: "danger",
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       const deleteAvatar = props.isCurrentUser
         ? ucApiClient.user.currentUser.deleteMyAvatar()

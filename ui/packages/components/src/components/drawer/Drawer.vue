@@ -19,6 +19,7 @@ import {
   watch,
 } from "vue";
 import { IconClose } from "../../icons/icons";
+import { useComponentsI18n } from "../../locales";
 import {
   isHorizontalPlacement,
   normalizeSnapPoints,
@@ -47,7 +48,7 @@ const props = withDefaults(defineProps<DrawerProps>(), {
   closeOnEsc: true,
   beforeClose: undefined,
   showClose: true,
-  closeLabel: "Close",
+  closeLabel: undefined,
   showHandle: false,
   swipeToDismiss: true,
   handleOnly: false,
@@ -70,6 +71,8 @@ const emit = defineEmits<{
 }>();
 
 const slots = useSlots();
+
+const { t } = useComponentsI18n();
 
 const DETACH_THRESHOLD = 4;
 const SNAP_TRANSITION_MS = 220;
@@ -160,8 +163,10 @@ const hasHeader = computed(
 );
 
 const resolvedAriaLabel = computed(
-  () => props.ariaLabel || props.title || "Drawer"
+  () => props.ariaLabel || props.title || t("drawer.label")
 );
+
+const closeLabelText = computed(() => props.closeLabel ?? t("common.close"));
 
 const isDragging = ref(false);
 const isSnapping = ref(false);
@@ -769,7 +774,7 @@ defineExpose({
             </div>
             <DialogClose
               v-if="showClose"
-              :aria-label="closeLabel"
+              :aria-label="closeLabelText"
               class="drawer-close"
             >
               <IconClose aria-hidden="true" />

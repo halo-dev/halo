@@ -91,8 +91,6 @@ const handleDeletePermanently = async (singlePage: SinglePage) => {
     title: t("core.deleted_page.operations.delete.title"),
     description: t("core.deleted_page.operations.delete.description"),
     confirmType: "danger",
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       await coreApiClient.content.singlePage.deleteSinglePage({
         name: singlePage.metadata.name,
@@ -109,8 +107,6 @@ const handleDeletePermanentlyInBatch = async () => {
     title: t("core.deleted_page.operations.delete_in_batch.title"),
     description: t("core.deleted_page.operations.delete_in_batch.description"),
     confirmType: "danger",
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       await Promise.all(
         selectedPageNames.value.map((name) => {
@@ -131,8 +127,6 @@ const handleRecovery = async (singlePage: SinglePage) => {
   Dialog.warning({
     title: t("core.deleted_page.operations.recovery.title"),
     description: t("core.deleted_page.operations.recovery.description"),
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       await coreApiClient.content.singlePage.patchSinglePage({
         name: singlePage.metadata.name,
@@ -158,8 +152,6 @@ const handleRecoveryInBatch = async () => {
     description: t(
       "core.deleted_page.operations.recovery_in_batch.description"
     ),
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       await Promise.all(
         selectedPageNames.value.map((name) => {
@@ -411,11 +403,6 @@ watch(
         <VPagination
           v-model:page="page"
           v-model:size="size"
-          :page-label="$t('core.components.pagination.page_label')"
-          :size-label="$t('core.components.pagination.size_label')"
-          :total-label="
-            $t('core.components.pagination.total_label', { total: total })
-          "
           :total="total"
           :size-options="[20, 30, 50, 100]"
         />

@@ -8,6 +8,7 @@ import {
   IconErrorWarning,
   IconInformation,
 } from "../../icons/icons";
+import { useComponentsI18n } from "../../locales";
 import type { AlertType } from "./types";
 
 const TypeIcons: Record<AlertType, Raw<FunctionalComponent<SVGAttributes>>> = {
@@ -37,6 +38,8 @@ const emit = defineEmits<{
   (event: "close"): void;
 }>();
 
+const { t } = useComponentsI18n();
+
 const classes = computed(() => {
   return [`alert-${props.type}`];
 });
@@ -62,7 +65,7 @@ const handleClose = () => {
         </div>
         <div
           v-if="closable"
-          aria-label="Close"
+          :aria-label="t('common.close')"
           class="alert-close"
           role="button"
           tabindex="0"
@@ -91,7 +94,7 @@ const handleClose = () => {
   padding: 8px 12px;
 
   .alert-icon {
-    @apply mr-2 mt-0.5 flex flex-shrink-0 items-center text-base;
+    @apply mr-2 flex h-5 flex-shrink-0 items-center text-base;
   }
 
   .alert-content {
@@ -115,7 +118,11 @@ const handleClose = () => {
   }
 
   .alert-description {
-    @apply mt-0.5 text-sm leading-5;
+    @apply text-sm leading-5;
+  }
+
+  .alert-header + .alert-description {
+    @apply mt-0.5;
   }
 
   .alert-actions {

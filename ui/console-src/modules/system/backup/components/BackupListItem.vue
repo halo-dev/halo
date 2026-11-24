@@ -92,8 +92,6 @@ function handleDelete() {
     title: t("core.backup.operations.delete.title"),
     description: t("core.backup.operations.delete.description"),
     confirmType: "danger",
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     async onConfirm() {
       await coreApiClient.migration.backup.deleteBackup({
         name: props.backup.metadata.name,

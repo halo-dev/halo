@@ -1,19 +1,19 @@
 /* eslint-disable vue/one-component-per-file -- Test-local host and dropdown stubs keep this integration test isolated. */
 import { mount } from "@vue/test-utils";
-import { describe, expect, it, vi } from "vite-plus/test";
+import { describe, expect, it } from "vite-plus/test";
 import { defineComponent, h, nextTick, ref } from "vue";
 import { VFilterDropdown, VFilterDropdownGroup } from "..";
 
-const VDropdownStub = defineComponent({
-  name: "VDropdown",
-  emits: ["show", "hide"],
-  setup(_, { slots, expose }) {
+const VPopoverStub = defineComponent({
+  name: "VPopover",
+  emits: ["update:open"],
+  setup(_, { slots, expose, emit }) {
     expose({
-      show: vi.fn(),
-      hide: vi.fn(),
+      show: () => emit("update:open", true),
+      hide: () => emit("update:open", false),
     });
 
-    return () => h("div", [slots.default?.(), slots.popper?.()]);
+    return () => h("div", [slots.default?.(), slots.content?.()]);
   },
 });
 
@@ -52,7 +52,8 @@ function mountGroup(initial: { author?: string; status?: string } = {}) {
   const wrapper = mount(Host, {
     global: {
       stubs: {
-        VDropdown: VDropdownStub,
+        // VPopover's component name is inferred from its file name.
+        Popover: VPopoverStub,
       },
     },
   });
@@ -111,7 +112,7 @@ describe("FilterDropdownGroup", () => {
       },
       global: {
         stubs: {
-          VDropdown: VDropdownStub,
+          Popover: VPopoverStub,
         },
       },
     });

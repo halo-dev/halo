@@ -1,6 +1,7 @@
 <script lang="ts" setup>
-import { ref, watch } from "vue";
-import type { VDropdownPlacement } from "../dropdown";
+import { computed, ref, watch } from "vue";
+import { useComponentsI18n } from "../../locales";
+import type { VPopoverPlacement } from "../popover";
 import DatePickerPanel from "./DatePickerPanel.vue";
 import DateTimePickerPanel from "./DateTimePickerPanel.vue";
 import DropdownShell from "./DropdownShell.vue";
@@ -18,7 +19,7 @@ const props = withDefaults(
      */
     modelValue?: string;
     disabled?: boolean;
-    placement?: VDropdownPlacement;
+    placement?: VPopoverPlacement;
     panelWidth?: string;
     panelLabel?: string;
     /**
@@ -46,11 +47,11 @@ const props = withDefaults(
     disabled: false,
     placement: "bottom-start",
     panelWidth: undefined,
-    panelLabel: "Date picker",
+    panelLabel: undefined,
     open: undefined,
-    confirmLabel: "Confirm",
-    clearLabel: "Clear",
-    locale: "en",
+    confirmLabel: undefined,
+    clearLabel: undefined,
+    locale: undefined,
     weekStartsOn: undefined,
     numberOfMonths: 1,
     fixedWeeks: true,
@@ -58,12 +59,24 @@ const props = withDefaults(
     maxValue: undefined,
     isDateDisabled: undefined,
     defaultPickerValue: undefined,
-    calendarLabel: "Calendar",
+    calendarLabel: undefined,
     defaultTime: "00:00",
     hourCycle: 24,
-    timeLabel: "Time",
+    timeLabel: undefined,
   }
 );
+
+const { t } = useComponentsI18n();
+
+const panelLabelText = computed(
+  () => props.panelLabel ?? t("date_picker.panel")
+);
+
+const confirmLabelText = computed(
+  () => props.confirmLabel ?? t("common.confirm")
+);
+
+const clearLabelText = computed(() => props.clearLabel ?? t("common.clear"));
 
 const emit = defineEmits<{
   (event: "update:modelValue", value?: string): void;
@@ -130,7 +143,7 @@ const footerButtonClasses =
     :disabled="disabled"
     :placement="placement"
     :panel-width="panelWidth"
-    :panel-label="panelLabel"
+    :panel-label="panelLabelText"
     @update:open="onOpenChange"
   >
     <template #default="{ open: isOpen, show, hide }">
@@ -179,14 +192,14 @@ const footerButtonClasses =
           :class="footerButtonClasses"
           @click="onDraftClear"
         >
-          {{ clearLabel }}
+          {{ clearLabelText }}
         </button>
         <button
           type="button"
           class="rounded bg-primary px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           @click="onConfirm"
         >
-          {{ confirmLabel }}
+          {{ confirmLabelText }}
         </button>
       </div>
     </template>

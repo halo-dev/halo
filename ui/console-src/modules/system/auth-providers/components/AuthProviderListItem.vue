@@ -28,8 +28,6 @@ const handleChangeStatus = async () => {
     title: props.authProvider.enabled
       ? t("core.identity_authentication.operations.disable.title")
       : t("core.identity_authentication.operations.enable.title"),
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
         if (props.authProvider.enabled) {

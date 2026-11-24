@@ -32,8 +32,6 @@ const handleDelete = async () => {
     title: t("core.post_category.operations.delete.title"),
     description: t("core.post_category.operations.delete.description"),
     confirmType: "danger",
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
         await coreApiClient.content.category.deleteCategory({

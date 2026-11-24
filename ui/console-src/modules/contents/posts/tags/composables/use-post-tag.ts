@@ -74,8 +74,6 @@ export function usePostTag(filterOptions?: {
       title: t("core.post_tag.operations.delete.title"),
       description: t("core.post_tag.operations.delete.description"),
       confirmType: "danger",
-      confirmText: t("core.common.buttons.confirm"),
-      cancelText: t("core.common.buttons.cancel"),
       onConfirm: async () => {
         try {
           await coreApiClient.content.tag.deleteTag({
@@ -98,8 +96,6 @@ export function usePostTag(filterOptions?: {
         title: t("core.post_tag.operations.delete_in_batch.title"),
         description: t("core.common.dialog.descriptions.cannot_be_recovered"),
         confirmType: "danger",
-        confirmText: t("core.common.buttons.confirm"),
-        cancelText: t("core.common.buttons.cancel"),
         onConfirm: async () => {
           try {
             await Promise.all(

@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { computed, provide, shallowReactive } from "vue";
 import { IconClose } from "../../icons/icons";
+import { useComponentsI18n } from "../../locales";
 import { filterDropdownGroupKey, type FilterDropdownGroupEntry } from "./group";
 import type { FilterDropdownGroupSpacing } from "./types";
 
@@ -30,11 +31,15 @@ const props = withDefaults(
     spacing?: FilterDropdownGroupSpacing;
   }>(),
   {
-    clearLabel: "Reset filters",
+    clearLabel: undefined,
     hasExternalFilters: false,
     spacing: "sm",
   }
 );
+
+const { t } = useComponentsI18n();
+
+const clearLabelText = computed(() => props.clearLabel ?? t("filter.reset"));
 
 const gap = computed(() => spacingSize[props.spacing]);
 
@@ -90,7 +95,7 @@ defineExpose({
         v-if="hasFilters"
         type="button"
         class="inline-flex h-7 w-7 cursor-pointer items-center justify-center rounded text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-        :aria-label="clearLabel"
+        :aria-label="clearLabelText"
         @click="clearAll"
       >
         <IconClose class="h-4 w-4" aria-hidden="true" />

@@ -171,8 +171,6 @@ const handleDelete = async (role: Role) => {
     title: t("core.role.operations.delete.title"),
     description: t("core.role.operations.delete.description"),
     confirmType: "danger",
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
         await coreApiClient.role.deleteRole({

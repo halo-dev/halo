@@ -124,8 +124,6 @@ const handleDeleteInBatch = async () => {
     title: t("core.user.operations.delete_in_batch.title"),
     description: t("core.common.dialog.descriptions.cannot_be_recovered"),
     confirmType: "danger",
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       const userNamesToDelete = selectedUserNames.value.filter(
         (name) => name != currentUser?.user.metadata.name
@@ -170,8 +168,6 @@ function handleEnableOrDisableInBatch(operation: "enable" | "disable") {
     title: operationConfig.title,
     description: operationConfig.description,
     confirmType: "danger",
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       const filteredUserNames = selectedUserNames.value.filter((name) => {
         if (name === currentUser?.user.metadata.name) return false;
@@ -450,11 +446,6 @@ function onCreationModalClose() {
           v-model:page="page"
           v-model:size="size"
           :total="total"
-          :page-label="$t('core.components.pagination.page_label')"
-          :size-label="$t('core.components.pagination.size_label')"
-          :total-label="
-            $t('core.components.pagination.total_label', { total: total })
-          "
           :size-options="[20, 30, 50, 100]"
         />
       </template>

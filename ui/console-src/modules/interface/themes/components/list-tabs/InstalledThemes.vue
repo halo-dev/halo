@@ -144,8 +144,6 @@ const confirmDevelopmentThemesUninstall = (
     description: t(
       "core.theme.operations.uninstall_in_batch.possible_development_description"
     ),
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     confirmType: "danger",
     onConfirm: () =>
       uninstallSelectedThemes(themesToUninstall, deleteExtensions),
@@ -160,8 +158,6 @@ const handleUninstallInBatch = (deleteExtensions: boolean) => {
       ? t("core.theme.operations.uninstall_and_delete_config_in_batch.title")
       : t("core.theme.operations.uninstall_in_batch.title"),
     description: t("core.common.dialog.descriptions.cannot_be_recovered"),
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     confirmType: "danger",
     onConfirm: () => {
       if (

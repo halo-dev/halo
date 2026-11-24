@@ -84,8 +84,6 @@ function handleUnpublish() {
   Dialog.warning({
     title: t("core.uc_post.operations.cancel_publish.title"),
     description: t("core.uc_post.operations.cancel_publish.description"),
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     async onConfirm() {
       await ucApiClient.content.post.unpublishMyPost({
         name: props.post.post.metadata.name,
@@ -102,8 +100,6 @@ function handleDelete() {
     title: t("core.uc_post.operations.delete.title"),
     description: t("core.uc_post.operations.delete.description"),
     confirmType: "danger",
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     async onConfirm() {
       await ucApiClient.content.post.recycleMyPost({
         name: props.post.post.metadata.name,

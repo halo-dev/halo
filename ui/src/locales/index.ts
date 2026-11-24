@@ -1,3 +1,4 @@
+import { setComponentsLocale } from "@halo-dev/components";
 import { utils } from "@halo-dev/ui-shared";
 import type { App } from "vue";
 import { createI18n } from "vue-i18n";
@@ -79,6 +80,7 @@ export async function setLanguage(_language?: string): Promise<void> {
   }
 
   i18n.global.locale.value = language;
+  setComponentsLocale(language);
   utils.date.setLocale(language);
 
   await loadFallbackLocale();

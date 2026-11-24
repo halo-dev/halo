@@ -1,8 +1,16 @@
 <script lang="ts" setup>
-import type { ComputedRef } from "vue";
-import { computed, provide, useId, useSlots } from "vue";
+import type { Component, ComputedRef, VNode } from "vue";
+import {
+  Fragment,
+  computed,
+  onMounted,
+  provide,
+  useId,
+  useSlots,
+  watch,
+} from "vue";
 import { VTabbar } from "./index";
-import type { TabsDirection, TabsType } from "./types";
+import type { TabbarItem, TabsDirection, TabsType } from "./types";
 
 const props = withDefaults(
   defineProps<{
@@ -11,6 +19,7 @@ const props = withDefaults(
     direction?: TabsDirection;
     idKey?: string;
     labelKey?: string;
+    flush?: boolean;
   }>(),
   {
     activeId: undefined,
@@ -18,15 +27,9 @@ const props = withDefaults(
     direction: "row",
     idKey: "id",
     labelKey: "label",
+    flush: false,
   }
 );
-
-provide<ComputedRef<string | number | undefined>>(
-  "activeId",
-  computed(() => props.activeId)
-);
-
-provide<string>("tabsId", useId());
 
 const emit = defineEmits<{
   (event: "update:activeId", value: number | string): void;
@@ -35,17 +38,77 @@ const emit = defineEmits<{
 
 const slots = useSlots();
 
-const tabItems = computed(() => {
-  return slots
-    .default?.()
-    .map(({ props: slotProps }) => {
-      return {
-        id: slotProps?.[props.idKey],
-        label: slotProps?.[props.labelKey],
-      };
-    })
-    .filter((item) => item.id !== undefined && item.label !== undefined);
+function flattenVNodes(nodes: unknown[]): VNode[] {
+  const result: VNode[] = [];
+
+  for (const node of nodes) {
+    if (!node || typeof node !== "object") {
+      continue;
+    }
+
+    const vnode = node as VNode;
+
+    if (vnode.type === Fragment) {
+      if (Array.isArray(vnode.children)) {
+        result.push(...flattenVNodes(vnode.children));
+      }
+      continue;
+    }
+
+    result.push(vnode);
+  }
+
+  return result;
+}
+
+const tabItems = computed<TabbarItem[]>(() => {
+  return flattenVNodes(slots.default?.() ?? [])
+    .map((node) => node.props ?? {})
+    .map((slotProps) => ({
+      id: slotProps[props.idKey] as string | number | undefined,
+      label: slotProps[props.labelKey] as string | undefined,
+      icon: slotProps.icon as Component | undefined,
+      // A bare `disabled` attribute reaches the raw vnode props as "".
+      disabled: slotProps.disabled === true || slotProps.disabled === "",
+      badge: slotProps.badge as string | number | undefined,
+      ariaLabel: slotProps.ariaLabel as string | undefined,
+    }))
+    .filter(
+      (item) =>
+        item.id !== undefined &&
+        (item.label !== undefined || item.ariaLabel !== undefined)
+    );
 });
+
+const resolvedActiveId = computed<string | number | undefined>(() => {
+  const items = tabItems.value;
+
+  if (!items.length) {
+    return props.activeId;
+  }
+
+  if (items.some((item) => item.id === props.activeId && !item.disabled)) {
+    return props.activeId;
+  }
+
+  return items.find((item) => !item.disabled)?.id;
+});
+
+provide<ComputedRef<string | number | undefined>>("activeId", resolvedActiveId);
+
+provide<string>("tabsId", useId());
+
+function syncActiveId() {
+  const id = resolvedActiveId.value;
+
+  if (id !== undefined && id !== props.activeId) {
+    emit("update:activeId", id);
+  }
+}
+
+onMounted(syncActiveId);
+
+watch(resolvedActiveId, syncActiveId, { flush: "post" });
 
 const classes = computed(() => {
   return [`tabs-direction-${props.direction}`];
@@ -60,8 +123,9 @@ const handleChange = (id: string | number) => {
   <div :class="classes" class="tabs-wrapper">
     <div class="tabs-bar-wrapper">
       <VTabbar
-        :active-id="activeId"
+        :active-id="resolvedActiveId"
         :direction="direction"
+        :flush="flush"
         :items="tabItems"
         :type="type"
         @change="handleChange"

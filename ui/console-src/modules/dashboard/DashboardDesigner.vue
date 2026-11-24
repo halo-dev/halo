@@ -283,7 +283,6 @@ function handleShowLeaveWarning(next: () => void) {
     description: t("core.dashboard_designer.operations.back.description"),
     confirmText: t("core.dashboard_designer.operations.back.confirm_text"),
     confirmType: "danger",
-    cancelText: t("core.common.buttons.cancel"),
     onConfirm: () => {
       next();
     },
@@ -333,7 +332,7 @@ function handleCopyFromLayout(breakpoint: string) {
     >
       <VTabbar
         :active-id="selectBreakpoint"
-        :items="deviceOptions as any"
+        :items="deviceOptions"
         type="outline"
         @change="handleBreakpointChange"
       ></VTabbar>

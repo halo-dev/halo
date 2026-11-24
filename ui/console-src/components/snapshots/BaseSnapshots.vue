@@ -146,8 +146,6 @@ function handleCleanup() {
   Dialog.warning({
     title: t("core.snapshots.operations.cleanup.title"),
     description: t("core.snapshots.operations.cleanup.description"),
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     confirmType: "danger",
     async onConfirm() {
       const snapshotsToDelete = snapshots.value?.filter((snapshot) => {

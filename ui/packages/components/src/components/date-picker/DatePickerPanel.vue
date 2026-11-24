@@ -9,7 +9,7 @@ const props = withDefaults(
   defineProps<DatePickerCommonProps & { modelValue?: string }>(),
   {
     modelValue: undefined,
-    locale: "en",
+    locale: undefined,
     weekStartsOn: undefined,
     numberOfMonths: 1,
     fixedWeeks: true,
@@ -17,7 +17,6 @@ const props = withDefaults(
     maxValue: undefined,
     isDateDisabled: undefined,
     defaultPickerValue: undefined,
-    calendarLabel: "Calendar",
     disabled: false,
     readonly: false,
   }

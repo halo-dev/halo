@@ -101,8 +101,6 @@ const handleDeleteInBatch = async () => {
       "core.comment.operations.delete_comment_in_batch.description"
     ),
     confirmType: "danger",
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
         const commentChunk = chunk(selectedCommentNames.value, 5);
@@ -132,8 +130,6 @@ const handleDeleteInBatch = async () => {
 const handleApproveInBatch = async () => {
   Dialog.warning({
     title: t("core.comment.operations.approve_comment_in_batch.title"),
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
         const commentsToUpdate = comments.value?.items.filter((comment) => {
@@ -356,13 +352,6 @@ const handleApproveInBatch = async () => {
         <VPagination
           v-model:page="page"
           v-model:size="size"
-          :page-label="$t('core.components.pagination.page_label')"
-          :size-label="$t('core.components.pagination.size_label')"
-          :total-label="
-            $t('core.components.pagination.total_label', {
-              total: comments?.total || 0,
-            })
-          "
           :total="comments?.total || 0"
           :size-options="[20, 30, 50, 100]"
         />
