@@ -116,8 +116,12 @@ const bodyClasses = computed(() => [
     overflow: visible;
   }
 
+  // Every region clips to its own rounded box so full-bleed children (tab bars,
+  // opaque panels, tables) cannot paint over the card corners. `clip` applies the
+  // same clip as `hidden` without turning the region into a scroll container.
   .card-header {
-    @apply flex justify-between overflow-hidden;
+    @apply flex justify-between;
+    overflow: clip;
     border-bottom: 1px solid var(--v-card-border-color);
     border-radius: var(--v-card-radius) var(--v-card-radius) 0 0;
 
@@ -133,7 +137,8 @@ const bodyClasses = computed(() => [
   }
 
   .card-toolbar {
-    @apply block w-full overflow-hidden bg-gray-50 px-4 py-3;
+    @apply block w-full bg-gray-50 px-4 py-3;
+    overflow: clip;
     border-bottom: 1px solid var(--v-card-border-color);
     border-radius: var(--v-card-radius) var(--v-card-radius) 0 0;
   }
@@ -143,7 +148,7 @@ const bodyClasses = computed(() => [
   }
 
   .card-body {
-    @apply overflow-hidden;
+    overflow: clip;
     padding: var(--v-card-padding-y) var(--v-card-padding-x);
     border-radius: var(--v-card-radius);
 
@@ -157,7 +162,7 @@ const bodyClasses = computed(() => [
   }
 
   .card-footer {
-    @apply overflow-hidden;
+    overflow: clip;
     padding: var(--v-card-padding-y) var(--v-card-padding-x);
     border-top: 1px solid var(--v-card-border-color);
     border-radius: 0 0 var(--v-card-radius) var(--v-card-radius);
