@@ -1,3 +1,3 @@
 export { default as VDescription } from "./Description.vue";
 export { default as VDescriptionItem } from "./DescriptionItem.vue";
-export * from "./types";
+export type * from "./types";
