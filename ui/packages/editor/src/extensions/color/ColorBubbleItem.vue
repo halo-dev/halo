@@ -10,7 +10,9 @@ function handleSetColor(color?: string) {
   if (!color) {
     return;
   }
-  props.editor?.chain().focus().setColor(color).run();
+  // Applying a color must not refocus the editor: the picker stays open while
+  // the user drags, and stealing focus moves the caret and the floating panels.
+  props.editor?.chain().setColor(color).run();
 }
 
 function handleUnsetColor() {

@@ -9,13 +9,15 @@ import { ExtensionHighlight } from ".";
 const props = defineProps<BubbleItemComponentProps>();
 
 function handleSetColor(color?: string) {
+  // Applying a highlight must not refocus the editor: the picker stays open
+  // while the user drags, and stealing focus moves the caret and the floating
+  // panels.
   if (props.editor.isActive(ExtensionHighlight.name)) {
-    props.editor.chain().focus().unsetHighlight().run();
+    props.editor.chain().unsetHighlight().run();
   }
 
   props.editor
     ?.chain()
-    .focus()
     .setHighlight(color ? { color } : undefined)
     .run();
 }

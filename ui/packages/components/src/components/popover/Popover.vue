@@ -9,13 +9,61 @@ import {
 import { computed, ref, watch } from "vue";
 import type { VPopoverPlacement } from "./types";
 
+interface OpenPanel {
+  order: number;
+  trigger: HTMLElement | null;
+  hide: () => void;
+}
+
 /**
  * Panels are portaled to `body`, so a nested popover is not a DOM descendant of
  * the panel that opened it. Track the mount order of open panels to tell a
  * parent panel which clicks belong to a panel opened from inside it.
  */
 let panelOrderSeed = 0;
-const openPanels = new Map<HTMLElement, number>();
+const openPanels = new Map<HTMLElement, OpenPanel>();
+
+let panelObserver: MutationObserver | null = null;
+
+function disconnectPanelObserverWhenIdle() {
+  if (panelObserver && openPanels.size === 0) {
+    panelObserver.disconnect();
+    panelObserver = null;
+  }
+}
+
+/**
+ * A panel anchored to an element that leaves the document (a toolbar item that
+ * is re-rendered, or the row that opens a nested panel inside a closing one)
+ * has no position to follow, and the floating layer falls back to the page
+ * corner. Close it as soon as its trigger is gone instead of letting it jump.
+ */
+function observePanelAnchors() {
+  if (panelObserver || openPanels.size === 0) {
+    return;
+  }
+
+  panelObserver = new MutationObserver(() => {
+    for (const [element, panel] of openPanels) {
+      if (!panel.trigger || panel.trigger.isConnected) {
+        continue;
+      }
+
+      // The trigger may have been replaced rather than removed: reka binds the
+      // new element with `aria-controls`, and the panel keeps a valid anchor.
+      const currentTrigger = element.id
+        ? document.querySelector(`[aria-controls="${element.id}"]`)
+        : null;
+
+      if (!currentTrigger) {
+        panel.hide();
+      }
+    }
+
+    disconnectPanelObserverWhenIdle();
+  });
+  panelObserver.observe(document.body, { childList: true, subtree: true });
+}
 
 // The component renders a trigger and a teleported panel, so attributes belong
 // to the slotted trigger element instead of a root element.
@@ -118,6 +166,7 @@ function hide() {
 }
 
 const contentRef = ref<InstanceType<typeof PopoverContent> | null>(null);
+const triggerRef = ref<{ $el?: unknown } | null>(null);
 let panelElement: HTMLElement | null = null;
 let panelOrder = 0;
 
@@ -127,6 +176,7 @@ watch(
     if (panelElement) {
       openPanels.delete(panelElement);
       panelElement = null;
+      disconnectPanelObserverWhenIdle();
     }
 
     const element = (instance?.$el ?? null) as HTMLElement | null;
@@ -136,7 +186,11 @@ watch(
 
     panelElement = element;
     panelOrder = ++panelOrderSeed;
-    openPanels.set(element, panelOrder);
+
+    const trigger = (triggerRef.value?.$el ?? null) as HTMLElement | null;
+
+    openPanels.set(element, { order: panelOrder, trigger, hide });
+    observePanelAnchors();
   },
   { flush: "post" }
 );
@@ -164,8 +218,8 @@ function onInteractOutside(event: Event) {
     return;
   }
 
-  for (const [element, order] of openPanels) {
-    if (order > panelOrder && element.contains(target)) {
+  for (const [element, panel] of openPanels) {
+    if (panel.order > panelOrder && element.contains(target)) {
       event.preventDefault();
       return;
     }
@@ -186,6 +240,7 @@ defineExpose({
       the slotted element is rendered.
     -->
     <PopoverTrigger
+      ref="triggerRef"
       as-child
       as="div"
       :disabled="disabled"
@@ -225,9 +280,14 @@ defineExpose({
     animation: v-popover-fade-in 150ms ease-out;
   }
 
+  /**
+   * Closing unmounts the panel immediately. A closing animation would keep the
+   * panel mounted while its trigger is already gone (for example the row that
+   * opens a nested picker lives inside the parent panel that is unmounting),
+   * and the floating position then falls back to the page corner.
+   */
   &[data-state="closed"] {
     pointer-events: none;
-    animation: v-popover-fade-out 150ms ease-in;
   }
 }
 
@@ -247,16 +307,6 @@ defineExpose({
 
   to {
     opacity: 1;
-  }
-}
-
-@keyframes v-popover-fade-out {
-  from {
-    opacity: 1;
-  }
-
-  to {
-    opacity: 0;
   }
 }
 </style>
