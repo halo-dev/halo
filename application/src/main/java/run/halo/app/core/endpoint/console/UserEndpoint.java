@@ -507,6 +507,8 @@ public class UserEndpoint implements CustomEndpoint {
                     if (StringUtils.isBlank(createUserRequest.email())) {
                         throw new ServerWebInputException("Email is required");
                     }
+                    checkUsernameLength(createUserRequest.name());
+                    checkDisplayNameLength(defaultIfBlank(createUserRequest.displayName(), createUserRequest.name()));
                 })
                 .flatMap(userRequest -> {
                     User newUser = CreateUserRequest.from(userRequest);
@@ -537,6 +539,9 @@ public class UserEndpoint implements CustomEndpoint {
                 })
                 .flatMap(profile -> client.get(User.class, username).flatMap(user -> {
                     var spec = user.getSpec();
+                    if (!Objects.equals(spec.getDisplayName(), profile.displayName())) {
+                        checkDisplayNameLength(profile.displayName());
+                    }
                     var authorization = Objects.equals(spec.getEmail(), profile.email())
                             ? Mono.<Void>empty()
                             : requireSuperAdministrator();
@@ -672,6 +677,9 @@ public class UserEndpoint implements CustomEndpoint {
                         .doOnNext(profile -> {
                             if (StringUtils.isBlank(profile.displayName())) {
                                 throw new ServerWebInputException("Display name is required.");
+                            }
+                            if (!Objects.equals(currentUser.getSpec().getDisplayName(), profile.displayName())) {
+                                checkDisplayNameLength(profile.displayName());
                             }
                         })
                         .filterWhen(profile -> {
@@ -1025,6 +1033,24 @@ public class UserEndpoint implements CustomEndpoint {
         Assert.notNull(listResult, "listResult must not be null");
         Assert.notNull(items, "items must not be null");
         return new ListResult<>(listResult.getPage(), listResult.getSize(), listResult.getTotal(), items);
+    }
+
+    private static void checkUsernameLength(String username) {
+        if (username.length() > ValidationUtils.USERNAME_MAX_LENGTH) {
+            throw new UnsatisfiedAttributeValueException(
+                    "The username is too long.",
+                    "validation.error.username.size",
+                    new Object[] {ValidationUtils.USERNAME_MAX_LENGTH});
+        }
+    }
+
+    private static void checkDisplayNameLength(String displayName) {
+        if (displayName.length() > ValidationUtils.DISPLAY_NAME_MAX_LENGTH) {
+            throw new UnsatisfiedAttributeValueException(
+                    "The display name is too long.",
+                    "validation.error.displayName.size",
+                    new Object[] {ValidationUtils.DISPLAY_NAME_MAX_LENGTH});
+        }
     }
 
     private boolean isDisplayNameAllowed(SystemSetting.User setting, String displayName) {

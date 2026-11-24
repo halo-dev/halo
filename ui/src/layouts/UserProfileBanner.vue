@@ -174,6 +174,7 @@ const actions = computed(() => {
 
   &__avatar {
     display: flex;
+    flex-shrink: 0;
     align-items: center;
     align-self: center;
   }
@@ -185,7 +186,10 @@ const actions = computed(() => {
   }
 
   &__name {
-    display: flex;
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
     font-size: 0.875rem;
     font-weight: 500;
   }
