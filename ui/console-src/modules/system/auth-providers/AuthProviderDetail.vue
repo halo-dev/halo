@@ -204,7 +204,8 @@ const description = computed(() => {
         <VTabbar
           v-model:active-id="activeTab"
           :items="tabs"
-          class="w-full !rounded-none"
+          flush
+          class="w-full"
           type="outline"
         ></VTabbar>
       </template>

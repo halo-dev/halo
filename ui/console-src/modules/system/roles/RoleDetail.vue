@@ -110,7 +110,8 @@ const handleUpdateRole = async () => {
               label: $t('core.role.detail.tabs.permissions'),
             },
           ]"
-          class="w-full !rounded-none"
+          flush
+          class="w-full"
           type="outline"
         ></VTabbar>
       </template>

@@ -97,7 +97,8 @@ provide<Ref<Setting | undefined>>("setting", setting);
         <VTabbar
           v-model:active-id="activeTab"
           :items="tabs.map((item) => ({ id: item.id, label: item.label }))"
-          class="w-full !rounded-none"
+          flush
+          class="w-full"
           type="outline"
         ></VTabbar>
       </template>

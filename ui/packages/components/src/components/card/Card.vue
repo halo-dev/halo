@@ -116,12 +116,13 @@ const bodyClasses = computed(() => [
     overflow: visible;
   }
 
-  // Every region clips to its own rounded box so full-bleed children (tab bars,
-  // opaque panels, tables) cannot paint over the card corners. `clip` applies the
-  // same clip as `hidden` without turning the region into a scroll container.
+  // The toolbar, body and footer clip to their own rounded box so full-bleed
+  // children (opaque panels, tables) cannot paint over the card corners. `clip`
+  // applies the same clip as `hidden` without turning the region into a scroll
+  // container. The header does not clip: the only full-bleed child used there is
+  // a `VTabbar` with the `flush` variant, which carries the top corners itself.
   .card-header {
     @apply flex justify-between;
-    overflow: clip;
     border-bottom: 1px solid var(--v-card-border-color);
     border-radius: var(--v-card-radius) var(--v-card-radius) 0 0;
 

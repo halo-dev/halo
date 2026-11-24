@@ -47,7 +47,8 @@ async function handleTabChange(id: string | number) {
         <VTabbar
           :active-id="activeTab"
           :items="tabs.map((item) => ({ id: item.id, label: item.label }))"
-          class="w-full !rounded-none"
+          flush
+          class="w-full"
           type="outline"
           @change="handleTabChange"
         ></VTabbar>
