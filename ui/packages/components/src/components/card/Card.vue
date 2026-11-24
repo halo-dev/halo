@@ -82,6 +82,20 @@ const bodyClasses = computed(() => [
   @apply box-border flex flex-col bg-white shadow-sm ring-1 ring-[color:var(--v-card-border-color)];
   border-radius: var(--v-card-radius);
 
+  // Only the card's own outer corners are rounded; an interior edge stays
+  // square. A radius on an interior edge clips the first or last row for no
+  // visual gain: a selected row's left indicator under a toolbar would get a
+  // rounded end.
+  > :first-child {
+    border-top-left-radius: inherit;
+    border-top-right-radius: inherit;
+  }
+
+  > :last-child {
+    border-bottom-left-radius: inherit;
+    border-bottom-right-radius: inherit;
+  }
+
   &.card-shadow-hover {
     @apply shadow-none transition-shadow;
 
@@ -116,15 +130,15 @@ const bodyClasses = computed(() => [
     overflow: visible;
   }
 
-  // The toolbar, body and footer clip to their own rounded box so full-bleed
-  // children (opaque panels, tables) cannot paint over the card corners. `clip`
-  // applies the same clip as `hidden` without turning the region into a scroll
-  // container. The header does not clip: the only full-bleed child used there is
-  // a `VTabbar` with the `flush` variant, which carries the top corners itself.
+  // The toolbar, body and footer clip so full-bleed children (opaque panels,
+  // tables) cannot paint over the card corners; the clip follows the corner
+  // radius they inherit. `clip` applies the same clip as `hidden` without
+  // turning the region into a scroll container. The header does not clip: the
+  // only full-bleed child used there is a `VTabbar` with the `flush` variant,
+  // which carries the top corners itself.
   .card-header {
     @apply flex justify-between;
     border-bottom: 1px solid var(--v-card-border-color);
-    border-radius: var(--v-card-radius) var(--v-card-radius) 0 0;
 
     .card-header-title {
       @apply min-w-0 flex-1 self-center truncate text-base font-medium text-gray-900;
@@ -141,30 +155,11 @@ const bodyClasses = computed(() => [
     @apply block w-full bg-gray-50 px-4 py-3;
     overflow: clip;
     border-bottom: 1px solid var(--v-card-border-color);
-    border-radius: var(--v-card-radius) var(--v-card-radius) 0 0;
-  }
-
-  .card-header + .card-toolbar {
-    border-radius: 0;
   }
 
   .card-body {
     overflow: clip;
     padding: var(--v-card-padding-y) var(--v-card-padding-x);
-    border-radius: 0;
-
-    // Only the card's outer corners are rounded. An interior edge does not
-    // need it, and it clips the first or last row: a selected row's left
-    // indicator under a toolbar would get a rounded end.
-    &:first-child {
-      border-top-left-radius: var(--v-card-radius);
-      border-top-right-radius: var(--v-card-radius);
-    }
-
-    &:last-child {
-      border-bottom-left-radius: var(--v-card-radius);
-      border-bottom-right-radius: var(--v-card-radius);
-    }
 
     &.card-body-flush {
       padding: 0;
@@ -179,7 +174,6 @@ const bodyClasses = computed(() => [
     overflow: clip;
     padding: var(--v-card-padding-y) var(--v-card-padding-x);
     border-top: 1px solid var(--v-card-border-color);
-    border-radius: 0 0 var(--v-card-radius) var(--v-card-radius);
   }
 }
 </style>
