@@ -32,6 +32,7 @@ public class SignUpData {
     private String username;
 
     @NotBlank
+    @Size(max = ValidationUtils.DISPLAY_NAME_MAX_LENGTH)
     private String displayName;
 
     @Email

@@ -160,9 +160,9 @@ const { handleEnableOrDisableUser } = useUserEnableDisable();
 
   <header class="bg-white">
     <div class="p-4">
-      <div class="flex items-center justify-between">
-        <div class="flex flex-row items-center gap-5">
-          <div class="group relative h-20 w-20">
+      <div class="flex items-center justify-between gap-4">
+        <div class="flex min-w-0 flex-row items-center gap-5">
+          <div class="group relative h-20 w-20 shrink-0">
             <UserAvatar
               :name="user?.user.metadata.name"
               :is-current-user="
@@ -170,21 +170,24 @@ const { handleEnableOrDisableUser } = useUserEnableDisable();
               "
             />
           </div>
-          <div class="block">
-            <div class="flex items-center gap-2">
+          <div class="min-w-0">
+            <div class="flex min-w-0 items-center gap-2">
               <h1 class="truncate text-lg font-bold text-gray-900">
                 {{ user?.user.spec.displayName }}
               </h1>
-              <VTag v-if="user?.user.spec.disabled">
+              <VTag v-if="user?.user.spec.disabled" class="shrink-0">
                 {{ $t("core.user.fields.disabled") }}
               </VTag>
             </div>
-            <span v-if="!isLoading" class="text-sm text-gray-600">
+            <span
+              v-if="!isLoading"
+              class="block truncate text-sm text-gray-600"
+            >
               @{{ user?.user.metadata.name }}
             </span>
           </div>
         </div>
-        <div class="inline-flex items-center gap-2">
+        <div class="inline-flex shrink-0 items-center gap-2">
           <VButton
             v-if="currentUser?.user.metadata.name === user?.user.metadata.name"
             type="primary"
