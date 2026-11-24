@@ -62,10 +62,9 @@ const iframeClasses = computed(() => {
     @close="emit('close')"
   >
     <template #center>
-      <!-- TODO: Reactor VTabbar component to support icon prop -->
       <VTabbar
         v-model:active-id="deviceActiveId"
-        :items="mockDevices as any"
+        :items="mockDevices"
         type="outline"
       ></VTabbar>
     </template>

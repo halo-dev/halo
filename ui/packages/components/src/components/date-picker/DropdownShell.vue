@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue";
 import { useComponentsI18n } from "../../locales";
-import { VDropdown, type VDropdownPlacement } from "../dropdown";
+import { VPopover, type VPopoverPlacement } from "../popover";
 
 const props = withDefaults(
   defineProps<{
@@ -10,7 +10,7 @@ const props = withDefaults(
      */
     open?: boolean;
     disabled?: boolean;
-    placement?: VDropdownPlacement;
+    placement?: VPopoverPlacement;
     /**
      * Width of the panel, for example "20rem". By default the panel is sized
      * by its content.
@@ -40,32 +40,31 @@ const emit = defineEmits<{
   (event: "update:open", value: boolean): void;
 }>();
 
-const dropdown = ref<{ show: () => void; hide: () => void }>();
+const popover = ref<InstanceType<typeof VPopover>>();
 const isOpen = ref(props.open ?? false);
 
 watch(
   () => props.open,
   (value) => {
-    if (value === undefined || value === isOpen.value) {
+    if (value === undefined) {
       return;
     }
 
     isOpen.value = value;
-    emit("update:open", value);
   }
 );
 
-function onShownUpdate(value: boolean) {
+function onOpenUpdate(value: boolean) {
   isOpen.value = value;
   emit("update:open", value);
 }
 
 function show() {
-  dropdown.value?.show();
+  popover.value?.show();
 }
 
 function hide() {
-  dropdown.value?.hide();
+  popover.value?.hide();
 }
 
 defineExpose({
@@ -75,29 +74,25 @@ defineExpose({
 </script>
 
 <template>
-  <VDropdown
-    ref="dropdown"
-    :shown="isOpen"
+  <VPopover
+    ref="popover"
+    :open="isOpen"
     :disabled="disabled"
     :placement="placement"
-    :distance="4"
-    :no-auto-focus="true"
-    :auto-boundary-max-size="true"
-    :overflow-padding="8"
-    popper-class="[&_.v-popper__inner]:!overflow-y-auto [&_.v-popper__inner]:!overflow-x-hidden [&_.v-popper__inner]:!p-0"
-    @update:shown="onShownUpdate"
+    :offset="4"
+    content-class="!p-0"
+    @update:open="onOpenUpdate"
   >
     <slot :open="isOpen" :show="show" :hide="hide" />
-    <template #popper>
+    <template #content>
       <div
-        role="dialog"
-        aria-modal="false"
+        role="group"
         :aria-label="panelLabelText"
-        class="max-w-[calc(100vw-2rem)] bg-white"
+        class="max-h-[var(--reka-popper-available-height)] max-w-[calc(100vw-2rem)] overflow-y-auto rounded-[inherit] bg-white"
         :style="panelWidth ? { width: panelWidth } : undefined"
       >
         <slot name="panel" />
       </div>
     </template>
-  </VDropdown>
+  </VPopover>
 </template>

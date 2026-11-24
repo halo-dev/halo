@@ -9,7 +9,7 @@ import {
 import { getValidationMessages } from "@formkit/validation";
 import type { AnnotationSetting } from "@halo-dev/api-client";
 import { ucApiClient } from "@halo-dev/api-client";
-import { IconArrowRight } from "@halo-dev/components";
+import { VAccordion, VAccordionItem } from "@halo-dev/components";
 import { utils } from "@halo-dev/ui-shared";
 import { cloneDeep } from "es-toolkit";
 import { computed, nextTick, onMounted, ref, watch } from "vue";
@@ -188,9 +188,12 @@ defineExpose({
 
 const showCustomForm = ref(false);
 
-function onCustomFormToggle(e: Event) {
-  showCustomForm.value = (e.target as HTMLDetailsElement).open;
-}
+const customFormOpen = computed({
+  get: () => (showCustomForm.value ? "custom" : undefined),
+  set: (value: string | string[] | undefined) => {
+    showCustomForm.value = value === "custom";
+  },
+});
 </script>
 
 <template>
@@ -218,74 +221,54 @@ function onCustomFormToggle(e: Event) {
       </template>
     </FormKit>
 
-    <!-- @vue-ignore -->
-    <details
-      :open="showCustomForm"
-      class="flex cursor-pointer flex-col space-y-4 py-4 transition-all first:pt-0"
-      @toggle="onCustomFormToggle"
+    <VAccordion
+      v-model="customFormOpen"
+      type="single"
+      collapsible
+      variant="plain"
     >
-      <summary class="group flex items-center justify-between">
-        <div class="block text-sm font-medium text-gray-700">
-          {{
-            $t(
-              showCustomForm
-                ? "core.components.annotations_form.buttons.collapse"
-                : "core.components.annotations_form.buttons.expand"
-            )
-          }}
-        </div>
-        <div
-          class="-mr-1 inline-flex items-center justify-center rounded-full p-1 group-hover:bg-gray-100"
-          :class="{ 'bg-gray-100': showCustomForm }"
-        >
-          <IconArrowRight
-            :class="{ 'rotate-90 !text-gray-900': showCustomForm }"
-            class="text-gray-600 transition-all"
-          />
-        </div>
-      </summary>
-
-      <FormKit
-        v-if="annotations"
-        :id="customFormId"
-        type="form"
-        :preserve="true"
-        :form-class="`${annotationSettings.length ? 'py-4' : ''}`"
-        @submit-invalid="onCustomFormSubmitCheck"
-        @submit="customFormInvalid = false"
+      <VAccordionItem
+        value="custom"
+        header-as="div"
+        :title="
+          $t(
+            showCustomForm
+              ? 'core.components.annotations_form.buttons.collapse'
+              : 'core.components.annotations_form.buttons.expand'
+          )
+        "
       >
         <FormKit
-          v-model="customAnnotationsState"
-          type="array"
-          :label="$t('core.components.annotations_form.custom_fields.label')"
-          :item-labels="[{ type: 'text', label: '$value.key' }]"
+          v-if="annotations"
+          :id="customFormId"
+          type="form"
+          :preserve="true"
+          :form-class="`${annotationSettings.length ? 'py-4' : ''}`"
+          @submit-invalid="onCustomFormSubmitCheck"
+          @submit="customFormInvalid = false"
         >
           <FormKit
-            type="text"
-            label="Key"
-            name="key"
-            validation="required:trim|keyValidationRule"
-            :validation-rules="{ keyValidationRule }"
-            :validation-messages="{
-              keyValidationRule: $t(
-                'core.components.annotations_form.custom_fields.validation'
-              ),
-            }"
-          ></FormKit>
-          <FormKit type="text" label="Value" name="value" value=""></FormKit>
+            v-model="customAnnotationsState"
+            type="array"
+            :label="$t('core.components.annotations_form.custom_fields.label')"
+            :item-labels="[{ type: 'text', label: '$value.key' }]"
+          >
+            <FormKit
+              type="text"
+              label="Key"
+              name="key"
+              validation="required:trim|keyValidationRule"
+              :validation-rules="{ keyValidationRule }"
+              :validation-messages="{
+                keyValidationRule: $t(
+                  'core.components.annotations_form.custom_fields.validation'
+                ),
+              }"
+            ></FormKit>
+            <FormKit type="text" label="Value" name="value" value=""></FormKit>
+          </FormKit>
         </FormKit>
-      </FormKit>
-    </details>
+      </VAccordionItem>
+    </VAccordion>
   </div>
 </template>
-
-<style scoped>
-details > summary {
-  list-style: none;
-}
-
-/** Hide the default marker **/
-details > summary::-webkit-details-marker {
-  display: none;
-}
-</style>
