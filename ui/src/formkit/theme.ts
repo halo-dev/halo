@@ -68,7 +68,7 @@ const theme: Record<string, Record<string, string>> = {
   radio: {
     ...boxClassification,
     input: boxClassification.input.replace("rounded-sm", "rounded-full"),
-    help: "px-2",
+    help: "px-2 mb-2",
   },
   range: {
     ...textClassification,
@@ -112,6 +112,7 @@ const theme: Record<string, Record<string, string>> = {
     legend: `${textClassification.label} px-2`,
     fieldset: boxClassification.fieldset,
     wrapper: boxClassification.wrapper,
+    help: "px-2 mb-2",
     inner: "flex flex-col gap-4",
     items: "flex flex-col w-full gap-2 rounded-base",
     item: "border rounded-base grid grid-cols-12 focus-within:border-primary transition-all overflow-visible focus-within:shadow-sm",
@@ -140,6 +141,7 @@ const theme: Record<string, Record<string, string>> = {
     legend: `${textClassification.label} px-2`,
     fieldset: boxClassification.fieldset,
     wrapper: boxClassification.wrapper,
+    help: "px-2 mb-2",
     inner: "flex flex-col gap-4",
     items: "flex flex-col w-full gap-2 rounded-base",
     item: "grid grid-cols-12 focus-within:border-primary transition-all gap-1.5 overflow-visible",
@@ -157,6 +159,7 @@ const theme: Record<string, Record<string, string>> = {
     legend: `${textClassification.label} px-2`,
     fieldset: boxClassification.fieldset,
     wrapper: boxClassification.wrapper,
+    help: "px-2 mb-2",
     inner: "formkit-stack flex flex-col px-2 divide-y divide-gray-100",
   },
   tagSelect: {
