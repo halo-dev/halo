@@ -9,14 +9,15 @@ import {
 import type { FormKitFrameworkContext } from "@formkit/core";
 import type { Category } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
-import { IconArrowRight, VDropdown } from "@halo-dev/components";
+import { IconArrowRight, VPopover } from "@halo-dev/components";
 import { utils } from "@halo-dev/ui-shared";
-import { onClickOutside, useResizeObserver } from "@vueuse/core";
+import { useEventListener } from "@vueuse/core";
 import Fuse from "fuse.js";
 import ShortUniqueId from "short-unique-id";
 import { slugify } from "transliteration";
 import {
   computed,
+  nextTick,
   provide,
   ref,
   useTemplateRef,
@@ -93,24 +94,47 @@ provide<Ref<Category | CategoryTreeNode | undefined>>(
 
 const dropdownVisible = ref(false);
 const text = ref("");
-const wrapperRef = useTemplateRef<HTMLElement>("wrapperRef");
-const popperRef = useTemplateRef<HTMLElement>("popperRef");
+const inputRef = useTemplateRef<HTMLInputElement>("inputRef");
 
-// resolve the issue of the dropdown position when the container size changes
-// https://github.com/Akryum/floating-vue/issues/977#issuecomment-1651898070
-useResizeObserver(wrapperRef, () => {
-  window.dispatchEvent(new Event("resize"));
-});
+let blockEscapeKeyup = false;
 
-onClickOutside(
-  wrapperRef,
-  () => {
-    dropdownVisible.value = false;
+// Escape closes the panel through the popover itself. The surrounding modal
+// also listens for Escape on keyup, so swallow that keyup once the panel has
+// handled the key.
+useEventListener(
+  window,
+  "keydown",
+  (event: KeyboardEvent) => {
+    if (event.key === "Escape" && dropdownVisible.value) {
+      blockEscapeKeyup = true;
+    }
   },
-  {
-    ignore: [popperRef],
-  }
+  { capture: true }
 );
+
+useEventListener(
+  window,
+  "keyup",
+  (event: KeyboardEvent) => {
+    if (event.key !== "Escape" || !blockEscapeKeyup) {
+      return;
+    }
+    blockEscapeKeyup = false;
+    event.stopPropagation();
+  },
+  { capture: true }
+);
+
+// The non-modal popover moves focus to its content when it mounts, so return
+// the focus to the search input after the panel has rendered.
+watch(dropdownVisible, async (visible) => {
+  if (!visible) {
+    return;
+  }
+  await nextTick();
+  await nextTick();
+  inputRef.value?.focus();
+});
 
 // search
 let fuse: Fuse<Category> | undefined = undefined;
@@ -204,16 +228,30 @@ const handleSelect = (category: CategoryTreeNode | Category) => {
       props.context.node.input([...currentValue, categoryName]);
       text.value = "";
     }
-    return;
+  } else {
+    props.context.node.input(
+      categoryName === props.context._value ? "" : categoryName
+    );
   }
-
-  props.context.node.input(
-    categoryName === props.context._value ? "" : categoryName
-  );
+  // Selecting with the mouse moves the focus away from the input, so put it
+  // back once the category has been selected.
+  nextTick(() => inputRef.value?.focus());
 };
 
 const handleKeydown = (e: KeyboardEvent) => {
+  if (e.key === "Escape") {
+    return;
+  }
+
   if (!searchResults.value) return;
+
+  if (!dropdownVisible.value) {
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault();
+      dropdownVisible.value = true;
+    }
+    return;
+  }
 
   if (e.key === "ArrowDown") {
     e.preventDefault();
@@ -273,17 +311,22 @@ const handleKeydown = (e: KeyboardEvent) => {
 };
 
 const scrollToSelected = () => {
-  const selectedNodeName = selectedCategory.value
-    ? getCategoryFromNode(selectedCategory.value).metadata.name
-    : "create";
-  const selectedNode = document.getElementById(`category-${selectedNodeName}`);
-  if (selectedNode) {
-    selectedNode.scrollIntoView({
-      behavior: "smooth",
-      block: "nearest",
-      inline: "start",
-    });
-  }
+  // Wait for the options to render before looking them up.
+  nextTick(() => {
+    const selectedNodeName = selectedCategory.value
+      ? getCategoryFromNode(selectedCategory.value).metadata.name
+      : "create";
+    const selectedNode = document.getElementById(
+      `category-${selectedNodeName}`
+    );
+    if (selectedNode) {
+      selectedNode.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "start",
+      });
+    }
+  });
 };
 
 const uid = new ShortUniqueId();
@@ -353,18 +396,16 @@ const handleDelete = () => {
 </script>
 
 <template>
-  <VDropdown
-    :triggers="[]"
-    :shown="dropdownVisible"
-    auto-size
-    :auto-hide="false"
-    container="body"
-    :distance="10"
-    class="w-full"
-    popper-class="post-category-dropdown"
+  <VPopover
+    v-model:open="dropdownVisible"
+    :arrow="false"
+    match-trigger-width
+    :offset="10"
+    content-class="!p-0 overflow-hidden"
   >
-    <div ref="wrapperRef" :class="context.classes['post-categories-wrapper']">
-      <div :class="context.classes['post-categories']">
+    <div :class="context.classes['post-categories-wrapper']">
+      <!-- Keep chip interactions from toggling the popover through the trigger. -->
+      <div :class="context.classes['post-categories']" @click.stop>
         <CategoryTag
           v-for="(category, index) in selectedCategories"
           :key="index"
@@ -372,25 +413,24 @@ const handleDelete = () => {
           @select="handleSelect"
         />
         <input
+          ref="inputRef"
           :value="text"
           :class="context.classes.input"
           type="text"
           @input="onTextInput"
+          @click.stop="dropdownVisible = true"
           @focus="dropdownVisible = true"
           @keydown="handleKeydown"
           @keydown.delete="handleDelete"
         />
       </div>
 
-      <div
-        :class="context.classes['post-categories-button']"
-        @click="dropdownVisible = !dropdownVisible"
-      >
+      <div :class="context.classes['post-categories-button']">
         <IconArrowRight class="rotate-90 text-gray-500 hover:text-gray-700" />
       </div>
     </div>
-    <template #popper>
-      <div ref="popperRef" :class="context.classes['dropdown-wrapper']">
+    <template #content>
+      <div :class="context.classes['dropdown-wrapper']">
         <ul class="p-1">
           <HasPermission
             v-if="allowCreate && text.trim()"
@@ -433,15 +473,5 @@ const handleDelete = () => {
         </ul>
       </div>
     </template>
-  </VDropdown>
+  </VPopover>
 </template>
-<style lang="scss">
-.post-category-dropdown {
-  .v-popper__arrow-container {
-    display: none;
-  }
-  .v-popper__inner {
-    padding: 0 !important;
-  }
-}
-</style>
