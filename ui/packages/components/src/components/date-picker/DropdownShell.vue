@@ -88,7 +88,7 @@ defineExpose({
       <div
         role="group"
         :aria-label="panelLabelText"
-        class="max-h-[var(--reka-popper-available-height)] max-w-[calc(100vw-2rem)] overflow-y-auto bg-white"
+        class="max-h-[var(--reka-popper-available-height)] max-w-[calc(100vw-2rem)] overflow-y-auto rounded-[inherit] bg-white"
         :style="panelWidth ? { width: panelWidth } : undefined"
       >
         <slot name="panel" />
