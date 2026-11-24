@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/vue3-vite";
-import { shallowRef } from "vue";
+import { markRaw, shallowRef } from "vue";
 import { VTabItem, VTabs } from ".";
+import { IconComputer, IconPhone, IconTablet } from "../../icons/icons";
 import { VAlert } from "../alert";
 
 const meta: Meta<typeof VTabs> = {
@@ -86,4 +87,61 @@ export const Vertical: Story = {
     direction: "column",
     type: "pills",
   },
+};
+
+export const WithIcons: Story = {
+  render: () => ({
+    components: { VAlert, VTabItem, VTabs },
+    setup() {
+      const activeId = shallowRef("desktop");
+      const icons = {
+        desktop: markRaw(IconComputer),
+        tablet: markRaw(IconTablet),
+        phone: markRaw(IconPhone),
+      };
+
+      return { activeId, icons };
+    },
+    template: `
+      <div class="max-w-3xl">
+        <VTabs v-model:activeId="activeId" type="outline">
+          <VTabItem id="desktop" label="桌面端" :icon="icons.desktop">
+            <VAlert title="桌面端预览" :closable="false" />
+          </VTabItem>
+          <VTabItem id="tablet" label="平板" :icon="icons.tablet">
+            <VAlert title="平板预览" :closable="false" />
+          </VTabItem>
+          <VTabItem id="phone" label="手机" :icon="icons.phone">
+            <VAlert title="手机预览" :closable="false" />
+          </VTabItem>
+        </VTabs>
+      </div>
+    `,
+  }),
+};
+
+export const DisabledAndPersistent: Story = {
+  render: () => ({
+    components: { VAlert, VTabItem, VTabs },
+    setup() {
+      const activeId = shallowRef("general");
+
+      return { activeId };
+    },
+    template: `
+      <div class="max-w-3xl">
+        <VTabs v-model:activeId="activeId">
+          <VTabItem id="general" label="基础设置" badge="新" persistent>
+            <VAlert title="切换 tab 后本面板保持挂载" :closable="false" />
+          </VTabItem>
+          <VTabItem id="advanced" label="高级设置" disabled>
+            <VAlert title="不可访问" type="warning" :closable="false" />
+          </VTabItem>
+          <VTabItem id="seo" label="SEO">
+            <VAlert title="SEO 设置" type="success" :closable="false" />
+          </VTabItem>
+        </VTabs>
+      </div>
+    `,
+  }),
 };

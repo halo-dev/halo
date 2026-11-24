@@ -79,13 +79,33 @@ export const Variants: Story = {
 
 export const Sizes: Story = {
   render: () => ({
-    components: { VButton, VSpace },
+    components: { IconAddCircle, VButton, VSpace },
     template: `
-      <VSpace align="center" spacing="sm">
-        <VButton size="lg" type="primary">新建页面</VButton>
-        <VButton size="md" type="primary">新建页面</VButton>
-        <VButton size="sm" type="primary">新建页面</VButton>
-        <VButton size="xs" type="primary">新建页面</VButton>
+      <VSpace direction="column" align="start" spacing="md">
+        <VSpace align="center" spacing="sm">
+          <VButton size="lg" type="primary">新建页面</VButton>
+          <VButton size="md" type="primary">新建页面</VButton>
+          <VButton size="sm" type="primary">新建页面</VButton>
+          <VButton size="xs" type="primary">新建页面</VButton>
+        </VSpace>
+        <VSpace align="center" spacing="sm">
+          <VButton size="lg" type="primary">
+            <template #icon><IconAddCircle /></template>
+            新建页面
+          </VButton>
+          <VButton size="md" type="primary">
+            <template #icon><IconAddCircle /></template>
+            新建页面
+          </VButton>
+          <VButton size="sm" type="primary">
+            <template #icon><IconAddCircle /></template>
+            新建页面
+          </VButton>
+          <VButton size="xs" type="primary">
+            <template #icon><IconAddCircle /></template>
+            新建页面
+          </VButton>
+        </VSpace>
       </VSpace>
     `,
   }),

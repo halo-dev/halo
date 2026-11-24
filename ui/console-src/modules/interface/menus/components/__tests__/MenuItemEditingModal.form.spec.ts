@@ -63,6 +63,27 @@ const AnnotationsStub = defineComponent({
   },
 });
 
+// Render the popover content in place and emulate the trigger click toggle.
+const PopoverStub = defineComponent({
+  props: {
+    open: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: ["update:open"],
+  setup(props, { emit, slots }) {
+    return () =>
+      h(
+        "div",
+        {
+          onClick: () => emit("update:open", !props.open),
+        },
+        [slots.default?.(), props.open ? slots.content?.() : undefined]
+      );
+  },
+});
+
 async function mountForm(menuItem?: MenuItem) {
   const wrapper = mount(MenuItemEditingModal, {
     attachTo: document.body,
@@ -95,6 +116,8 @@ async function mountForm(menuItem?: MenuItem) {
         // Render popper slots in place; retain the real Halo select and option components.
         Dropdown: { template: "<div><slot /><slot name='popper' /></div>" },
         VDropdown: { template: "<div><slot /><slot name='popper' /></div>" },
+        Popover: PopoverStub,
+        VPopover: PopoverStub,
       },
     },
   });
