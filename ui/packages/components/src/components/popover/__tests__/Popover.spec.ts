@@ -136,6 +136,44 @@ describe("Popover", () => {
     wrapper.unmount();
   });
 
+  it("closes when focus moves outside unless closeOnFocusOutside is false", async () => {
+    const outside = document.createElement("input");
+    document.body.appendChild(outside);
+
+    async function moveFocusOutside() {
+      // Reka checks focus outside in a timeout.
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await settle();
+    }
+
+    const wrapper = mountPopover({ open: true });
+
+    await settle();
+    expect(getContent()).not.toBeNull();
+
+    outside.focus();
+    await moveFocusOutside();
+
+    expect(wrapper.emitted("update:open")?.at(-1)).toEqual([false]);
+    expect(getContent()).toBeNull();
+
+    wrapper.unmount();
+
+    const sticky = mountPopover({ open: true, closeOnFocusOutside: false });
+
+    await settle();
+    expect(getContent()).not.toBeNull();
+
+    outside.focus();
+    await moveFocusOutside();
+
+    expect(sticky.emitted("update:open")).toBeUndefined();
+    expect(getContent()).not.toBeNull();
+
+    sticky.unmount();
+    outside.remove();
+  }, 20_000);
+
   it("exposes show and hide", async () => {
     const wrapper = mountPopover();
 

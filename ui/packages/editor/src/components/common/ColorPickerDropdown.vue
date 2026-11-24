@@ -68,7 +68,7 @@ function onColorChange(color: Payload) {
 </script>
 
 <template>
-  <VPopover v-model:open="shown" :offset="4">
+  <VPopover v-model:open="shown" :offset="4" :close-on-focus-outside="false">
     <slot />
     <template #content>
       <slot name="prefix" />
@@ -83,7 +83,12 @@ function onColorChange(color: Payload) {
         ></div>
       </div>
 
-      <VPopover placement="right" :offset="4" content-class="!p-0">
+      <VPopover
+        placement="right"
+        :offset="4"
+        content-class="!p-0"
+        :close-on-focus-outside="false"
+      >
         <div class="p-1">
           <div
             class="flex cursor-pointer items-center justify-between rounded p-1 text-xs text-gray-600 hover:bg-gray-100 hover:text-gray-900"

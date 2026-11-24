@@ -9,6 +9,14 @@ import {
 import { computed, ref, watch } from "vue";
 import type { VPopoverPlacement } from "./types";
 
+/**
+ * Panels are portaled to `body`, so a nested popover is not a DOM descendant of
+ * the panel that opened it. Track the mount order of open panels to tell a
+ * parent panel which clicks belong to a panel opened from inside it.
+ */
+let panelOrderSeed = 0;
+const openPanels = new Map<HTMLElement, number>();
+
 // The component renders a trigger and a teleported panel, so attributes belong
 // to the slotted trigger element instead of a root element.
 defineOptions({ inheritAttrs: false });
@@ -45,6 +53,13 @@ const props = withDefaults(
      */
     matchTriggerWidth?: boolean;
     /**
+     * Whether moving focus outside the panel closes it. Panels that apply
+     * their value to a focused editor can set this to `false`, so refocusing
+     * the editor does not dismiss the panel while the user is still adjusting
+     * it.
+     */
+    closeOnFocusOutside?: boolean;
+    /**
      * Extra classes applied to the panel. Useful for removing the default
      * padding, for example `!p-0`.
      */
@@ -58,6 +73,7 @@ const props = withDefaults(
     modal: false,
     arrow: true,
     matchTriggerWidth: false,
+    closeOnFocusOutside: true,
     contentClass: undefined,
   }
 );
@@ -101,6 +117,61 @@ function hide() {
   onOpenUpdate(false);
 }
 
+const contentRef = ref<InstanceType<typeof PopoverContent> | null>(null);
+let panelElement: HTMLElement | null = null;
+let panelOrder = 0;
+
+watch(
+  contentRef,
+  (instance) => {
+    if (panelElement) {
+      openPanels.delete(panelElement);
+      panelElement = null;
+    }
+
+    const element = (instance?.$el ?? null) as HTMLElement | null;
+    if (!element) {
+      return;
+    }
+
+    panelElement = element;
+    panelOrder = ++panelOrderSeed;
+    openPanels.set(element, panelOrder);
+  },
+  { flush: "post" }
+);
+
+function isFocusInteraction(event: Event) {
+  const originalEvent = (event as CustomEvent<{ originalEvent?: Event }>).detail
+    ?.originalEvent;
+
+  return originalEvent?.type === "focusin";
+}
+
+/**
+ * Interacting with a panel opened from this one (for example a color picker
+ * opened from another popover) must not dismiss this panel. Only panels opened
+ * later count as children; panels opened earlier are siblings or parents.
+ */
+function onInteractOutside(event: Event) {
+  if (!props.closeOnFocusOutside && isFocusInteraction(event)) {
+    event.preventDefault();
+    return;
+  }
+
+  const target = event.target;
+  if (!(target instanceof Node)) {
+    return;
+  }
+
+  for (const [element, order] of openPanels) {
+    if (order > panelOrder && element.contains(target)) {
+      event.preventDefault();
+      return;
+    }
+  }
+}
+
 defineExpose({
   show,
   hide,
@@ -124,6 +195,7 @@ defineExpose({
     </PopoverTrigger>
     <PopoverPortal>
       <PopoverContent
+        ref="contentRef"
         :side="sideAndAlign.side"
         :align="sideAndAlign.align"
         :side-offset="offset"
@@ -133,6 +205,7 @@ defineExpose({
           { 'w-[var(--reka-popover-trigger-width)]': matchTriggerWidth },
           contentClass,
         ]"
+        @interact-outside="onInteractOutside"
       >
         <slot name="content" :open="isOpen" :close="hide" />
         <!-- The SVG is scaled from a 12x6 viewBox, so widen the stroke to keep it at 1px. -->
