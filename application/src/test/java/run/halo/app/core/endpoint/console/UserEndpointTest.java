@@ -459,6 +459,43 @@ class UserEndpointTest {
             verify(client, never()).update(any(User.class));
         }
 
+        @Test
+        void shouldRejectDisplayNameExceedingMaxLength() {
+            var currentUser = createUser("fake-user");
+            when(client.get(User.class, "fake-user")).thenReturn(Mono.just(currentUser));
+
+            webClient
+                    .put()
+                    .uri("/users/-")
+                    .bodyValue(Map.of("displayName", "a".repeat(51)))
+                    .exchange()
+                    .expectStatus()
+                    .isBadRequest()
+                    .expectBody()
+                    .jsonPath("$.detail")
+                    .isEqualTo("The display name is too long.");
+
+            verify(client, never()).update(any(User.class));
+        }
+
+        @Test
+        void shouldAllowUpdatingOtherFieldsWhenExistingDisplayNameExceedsMaxLength() {
+            var currentUser = createUser("fake-user");
+            currentUser.getSpec().setDisplayName("a".repeat(51));
+            when(client.get(User.class, "fake-user")).thenReturn(Mono.just(currentUser));
+            when(client.update(currentUser)).thenReturn(Mono.just(currentUser));
+
+            webClient
+                    .put()
+                    .uri("/users/-")
+                    .bodyValue(Map.of("displayName", "a".repeat(51), "bio", "Updated bio"))
+                    .exchange()
+                    .expectStatus()
+                    .isOk();
+
+            assertEquals("Updated bio", currentUser.getSpec().getBio());
+        }
+
         User createUser(String name) {
             var spec = new User.UserSpec();
             spec.setEmail("hi@halo.run");
@@ -664,6 +701,44 @@ class UserEndpointTest {
         verify(userService, never()).createUser(any(User.class), anySet());
     }
 
+    @Test
+    void shouldRejectCreateWhenDisplayNameIsTooLong() {
+        var userRequest = new UserEndpoint.CreateUserRequest(
+                "fake-user", "fake-email", "a".repeat(51), "", "", "password", "", Map.of());
+
+        webClient
+                .post()
+                .uri("/users")
+                .bodyValue(userRequest)
+                .exchange()
+                .expectStatus()
+                .isBadRequest()
+                .expectBody()
+                .jsonPath("$.detail")
+                .isEqualTo("The display name is too long.");
+
+        verify(userService, never()).createUser(any(User.class), anySet());
+    }
+
+    @Test
+    void shouldRejectCreateWhenUsernameIsTooLong() {
+        var userRequest = new UserEndpoint.CreateUserRequest(
+                "a".repeat(64), "fake-email", "display name", "", "", "password", "", Map.of());
+
+        webClient
+                .post()
+                .uri("/users")
+                .bodyValue(userRequest)
+                .exchange()
+                .expectStatus()
+                .isBadRequest()
+                .expectBody()
+                .jsonPath("$.detail")
+                .isEqualTo("The username is too long.");
+
+        verify(userService, never()).createUser(any(User.class), anySet());
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {"role-template-manage-users", "role-template-manage-permissions"})
     void shouldRejectRoleAssignmentAndPasswordResetForNonSuperUser(String role) {
@@ -744,6 +819,49 @@ class UserEndpointTest {
                 Map.of("custom", "value", User.EMAIL_TO_VERIFY, "pending@example.com"),
                 user.getMetadata().getAnnotations());
         verify(userService, never()).grantRoles(anyString(), anySet());
+    }
+
+    @Test
+    void shouldRejectUpdatingDisplayNameExceedingMaxLength() {
+        var user = new User();
+        user.setMetadata(new Metadata());
+        user.getMetadata().setName("target");
+        user.getSpec().setEmail("target@example.com");
+        when(client.get(User.class, "target")).thenReturn(Mono.just(user));
+
+        webClient
+                .put()
+                .uri("/users/target")
+                .bodyValue(Map.of("displayName", "a".repeat(51), "email", "target@example.com"))
+                .exchange()
+                .expectStatus()
+                .isBadRequest()
+                .expectBody()
+                .jsonPath("$.detail")
+                .isEqualTo("The display name is too long.");
+
+        verify(client, never()).update(any(User.class));
+    }
+
+    @Test
+    void shouldAllowUpdatingOtherFieldsWhenExistingDisplayNameExceedsMaxLength() {
+        var user = new User();
+        user.setMetadata(new Metadata());
+        user.getMetadata().setName("target");
+        user.getSpec().setEmail("target@example.com");
+        user.getSpec().setDisplayName("a".repeat(51));
+        when(client.get(User.class, "target")).thenReturn(Mono.just(user));
+        when(client.update(user)).thenReturn(Mono.just(user));
+
+        webClient
+                .put()
+                .uri("/users/target")
+                .bodyValue(Map.of("displayName", "a".repeat(51), "email", "target@example.com", "bio", "Updated bio"))
+                .exchange()
+                .expectStatus()
+                .isOk();
+
+        assertEquals("Updated bio", user.getSpec().getBio());
     }
 
     @Test
