@@ -62,7 +62,7 @@ function handleExpand() {
     @keydown.space.stop.prevent="handleClick"
   >
     <div :class="{ active }" class="menu-item-title">
-      <span v-if="$slots.icon" class="menu-icon mr-3 self-center">
+      <span v-if="$slots.icon" class="menu-icon mr-2.5 self-center">
         <slot name="icon" />
       </span>
       <span
@@ -148,9 +148,9 @@ function handleExpand() {
 .sub-menu-items {
   @apply my-1;
 
-  // Align child labels with the parent label text: px-2 + icon (1.2em) + mr-3,
+  // Align child labels with the parent label text: px-2 + icon (1.2em) + mr-2.5,
   // minus this row's own p-1.5.
-  padding-left: calc(0.5rem + 1.2rem + 0.75rem - 0.375rem);
+  padding-left: calc(0.5rem + 1.2rem + 0.625rem - 0.375rem);
 
   .menu-item-title {
     @apply p-1.5 text-sm;
