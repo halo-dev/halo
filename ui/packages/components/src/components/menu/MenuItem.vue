@@ -61,13 +61,7 @@ function handleExpand() {
     @keydown.enter.stop.prevent="handleClick"
     @keydown.space.stop.prevent="handleClick"
   >
-    <div
-      :class="{
-        active: active && !$slots.default,
-        'active-trail': active && $slots.default,
-      }"
-      class="menu-item-title"
-    >
+    <div :class="{ active }" class="menu-item-title">
       <span v-if="$slots.icon" class="menu-icon mr-3 self-center">
         <slot name="icon" />
       </span>
@@ -106,10 +100,6 @@ function handleExpand() {
   &:hover,
   &.active {
     @apply bg-gray-100 font-medium;
-  }
-
-  &.active-trail {
-    @apply font-medium;
   }
 
   &.active::after {

@@ -59,7 +59,7 @@ describe("Menu", () => {
     const [parent, child] = wrapper.findAllComponents(VMenuItem);
 
     expect(parent.attributes("aria-current")).toBeUndefined();
-    expect(parent.html()).toContain("active-trail");
+    expect(parent.find(".menu-item-title").classes()).toContain("active");
     expect(child.attributes("aria-current")).toBe("page");
   });
 
