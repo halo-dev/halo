@@ -5,6 +5,7 @@ import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.fn.builders.parameter.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -44,6 +45,7 @@ public class MenuQueryEndpoint implements CustomEndpoint {
                         builder -> builder.operationId("queryPrimaryMenu")
                                 .description("Gets primary menu.")
                                 .tag(tag)
+                                .parameter(localeParameter())
                                 .response(responseBuilder().implementation(MenuVo.class)))
                 .GET(
                         "menus/{name}",
@@ -56,8 +58,17 @@ public class MenuQueryEndpoint implements CustomEndpoint {
                                         .name("name")
                                         .description("Menu metadata.name")
                                         .required(true))
+                                .parameter(localeParameter())
                                 .response(responseBuilder().implementation(MenuVo.class)))
                 .build();
+    }
+
+    private static Builder localeParameter() {
+        return parameterBuilder()
+                .in(ParameterIn.QUERY)
+                .name("locale")
+                .description("BCP 47 content language tag.")
+                .required(false);
     }
 
     private Mono<ServerResponse> getByName(ServerRequest request) {

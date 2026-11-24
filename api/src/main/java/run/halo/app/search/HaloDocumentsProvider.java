@@ -13,6 +13,11 @@ public interface HaloDocumentsProvider extends ExtensionPoint {
     /**
      * Fetch all halo documents.
      *
+     * <p>Providers for Extension resources should set {@link HaloDocument#getResource()} from the source extension.
+     * Providers for non-Extension data should use {@link run.halo.app.localization.ResourceReference#external(String,
+     * String, String)}. Localized variant providers use that stable identity instead of inferring a resource type from
+     * {@link HaloDocument#getType()}.
+     *
      * @return all halo documents
      */
     Flux<HaloDocument> fetchAll();

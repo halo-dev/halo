@@ -10,7 +10,6 @@ import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentest4j.AssertionFailedError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
@@ -85,7 +84,7 @@ public class LuceneSearchEngineIntegrationTest {
         var retryTemplate = new RetryTemplate(RetryPolicy.builder()
                 .delay(Duration.ofSeconds(1))
                 .maxRetries(maxAttempts)
-                .predicate(AssertionFailedError.class::isInstance)
+                .predicate(AssertionError.class::isInstance)
                 .build());
         var option = new SearchOption();
         option.setKeyword("halo");
@@ -120,7 +119,7 @@ public class LuceneSearchEngineIntegrationTest {
         var retryTemplate = new RetryTemplate(RetryPolicy.builder()
                 .delay(Duration.ofSeconds(1))
                 .maxRetries(maxAttempts)
-                .predicate(AssertionFailedError.class::isInstance)
+                .predicate(AssertionError.class::isInstance)
                 .build());
 
         var option = new SearchOption();

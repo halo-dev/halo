@@ -1,12 +1,15 @@
 package run.halo.app.plugin;
 
 import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
+import java.util.function.Consumer;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
 import org.springframework.security.web.server.savedrequest.ServerRequestCache;
+import org.springframework.web.reactive.function.server.RouterFunction;
+import org.springframework.web.reactive.function.server.RouterFunctions;
 import run.halo.app.content.PostContentService;
 import run.halo.app.core.extension.service.AttachmentService;
 import run.halo.app.core.user.service.RoleService;
@@ -46,9 +49,30 @@ public enum SharedApplicationContextFactory {
         var reactiveExtensionClient = rootContext.getBean(ReactiveExtensionClient.class);
         beanFactory.registerSingleton("extensionClient", extensionClient);
         beanFactory.registerSingleton("reactiveExtensionClient", reactiveExtensionClient);
+        beanFactory.registerSingleton(
+                "reactivePresentationExtensionClient",
+                rootContext.getBean(run.halo.app.extension.ReactivePresentationExtensionClient.class));
+        beanFactory.registerSingleton(
+                "resourcePresentationService",
+                rootContext.getBean(run.halo.app.localization.ResourcePresentationService.class));
+        beanFactory.registerSingleton(
+                "resourceLocalizationDescriptors",
+                rootContext.getBean(run.halo.app.localization.ResourceLocalizationDescriptors.class));
+        beanFactory.registerSingleton(
+                "resourceLocalizationDescriptorLocalizer",
+                rootContext.getBean(run.halo.app.localization.ResourceLocalizationDescriptorLocalizer.class));
+        beanFactory.registerSingleton(
+                "publicApiLocalizationFilter",
+                rootContext.getBean(run.halo.app.localization.PublicApiLocalizationFilter.class));
 
         DefaultSchemeManager defaultSchemeManager = rootContext.getBean(DefaultSchemeManager.class);
         beanFactory.registerSingleton("schemeManager", defaultSchemeManager);
+        beanFactory.registerSingleton(
+                "resourceLocalizationService",
+                rootContext.getBean(run.halo.app.localization.ResourceLocalizationService.class));
+        beanFactory.registerSingleton(
+                "localizationRouteService",
+                rootContext.getBean(run.halo.app.localization.LocalizationRouteService.class));
         beanFactory.registerSingleton("externalUrlSupplier", rootContext.getBean(ExternalUrlSupplier.class));
         beanFactory.registerSingleton(
                 "serverSecurityContextRepository", rootContext.getBean(ServerSecurityContextRepository.class));
@@ -91,6 +115,13 @@ public enum SharedApplicationContextFactory {
         rootContext
                 .getBeanProvider(SystemInfoGetter.class)
                 .ifUnique(systemInfoGetter -> beanFactory.registerSingleton("systemInfoGetter", systemInfoGetter));
+        rootContext.getBeanProvider(PluginRouterFunctionRegistry.class).ifUnique(registry -> {
+            if (registry instanceof RouterFunction<?> routes) {
+                // Read-only traversal must not be discovered as another RouterFunction in plugin contexts.
+                Consumer<RouterFunctions.Visitor> visitor = routes::accept;
+                beanFactory.registerSingleton("pluginRouteVisitor", visitor);
+            }
+        });
         // TODO add more shared instance here
 
         sharedContext.refresh();

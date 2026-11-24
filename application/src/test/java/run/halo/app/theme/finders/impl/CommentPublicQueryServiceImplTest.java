@@ -14,13 +14,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
+import run.halo.app.content.comment.CommentPermalinkService;
 import run.halo.app.core.counter.CounterService;
 import run.halo.app.core.extension.Counter;
 import run.halo.app.core.extension.User;
@@ -30,6 +30,8 @@ import run.halo.app.core.user.service.UserService;
 import run.halo.app.extension.*;
 import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.localization.PresentationTestSupport;
+import run.halo.app.localization.ResourceLocalizationService;
 
 /**
  * Tests for {@link CommentFinderImpl}.
@@ -49,11 +51,22 @@ class CommentPublicQueryServiceImplTest {
     @Mock
     CounterService counterService;
 
-    @InjectMocks
+    @Mock
+    CommentPermalinkService permalinkService;
+
+    @Mock
+    ResourceLocalizationService localization;
+
     CommentPublicQueryServiceImpl commentPublicQueryService;
 
     @BeforeEach
     void setUp() {
+        commentPublicQueryService = new CommentPublicQueryServiceImpl(
+                PresentationTestSupport.client(client),
+                userService,
+                counterService,
+                permalinkService,
+                PresentationTestSupport.service(localization));
         when(userService.getUserOrGhost(eq("fake-user"))).thenReturn(Mono.just(createUser()));
     }
 

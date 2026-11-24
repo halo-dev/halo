@@ -52,6 +52,11 @@ public class ArchiveRouteFactory implements RouteFactory {
         return RouterFunctions.route(requestPredicate, handlerFunction());
     }
 
+    @Override
+    public List<String> publicPatterns(String prefix) {
+        return patterns(prefix);
+    }
+
     HandlerFunction<ServerResponse> handlerFunction() {
         return request -> {
             String templateName = DefaultTemplateEnum.ARCHIVES.getValue();

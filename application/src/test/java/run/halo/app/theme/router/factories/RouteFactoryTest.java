@@ -3,12 +3,15 @@ package run.halo.app.theme.router.factories;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpMethod;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.theme.router.ModelConst;
 
@@ -56,6 +59,24 @@ class RouteFactoryTest extends RouteFactoryTestSuite {
                         .configuredPageSize(environmentFetcher, SystemSetting.Post::getAuthorPageSize)
                         .block())
                 .isEqualTo(post.getAuthorPageSize());
+    }
+
+    @Test
+    void derivesOwnershipFromPublicPatterns() {
+        var routeFactory = new TestRouteFactory();
+
+        assertThat(routeFactory.publicPatterns("/posts/{slug}")).containsExactly("/posts/{slug}");
+        assertThat(routeFactory.publicPatterns("/")).containsExactly("/");
+
+        StepVerifier.create(routeFactory.claimedPrefixes("/posts/{slug}"))
+                .expectNext(Set.of("posts"))
+                .verifyComplete();
+        StepVerifier.create(routeFactory.matches("/posts/{slug}", "/posts/hello", HttpMethod.GET))
+                .expectNext(true)
+                .verifyComplete();
+        StepVerifier.create(routeFactory.matches("/posts/{slug}", "/posts/hello", HttpMethod.POST))
+                .expectNext(false)
+                .verifyComplete();
     }
 
     static class TestRouteFactory implements RouteFactory {

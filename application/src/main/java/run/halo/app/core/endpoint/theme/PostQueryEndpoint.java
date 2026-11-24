@@ -59,6 +59,7 @@ public class PostQueryEndpoint implements CustomEndpoint {
                                         .name("name")
                                         .description("Post metadata.name")
                                         .required(true))
+                                .parameter(PublicApiUtils.localeParameter())
                                 .response(responseBuilder().implementation(PostVo.class)))
                 .GET(
                         "posts/{name}/navigation",
@@ -78,6 +79,7 @@ public class PostQueryEndpoint implements CustomEndpoint {
                                                 + "limit navigation to the post's primary category."
                                                 + " Defaults to global scope.")
                                         .required(false))
+                                .parameter(PublicApiUtils.localeParameter())
                                 .response(responseBuilder().implementation(NavigationPostVo.class)))
                 .build();
     }

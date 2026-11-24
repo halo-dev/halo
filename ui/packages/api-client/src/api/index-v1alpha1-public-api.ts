@@ -32,11 +32,12 @@ export const IndexV1alpha1PublicApiAxiosParamCreator = function (configuration?:
     return {
         /**
          * Search indices.
-         * @param {SearchOption} [searchOption] Please note that the \&quot;filterPublished\&quot;, \&quot;filterExposed\&quot; and \&quot;filterRecycled\&quot; fields are ignored in this endpoint.
+         * @param {string} [locale] BCP 47 content language tag.
+         * @param {SearchOption} [searchOption] Please note that the \&quot;filterPublished\&quot;, \&quot;filterExposed\&quot; and \&quot;filterRecycled\&quot; fields are ignored in this endpoint. The search language follows the current localization context.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        indicesSearch: async (searchOption?: SearchOption, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        indicesSearch: async (locale?: string, searchOption?: SearchOption, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/api.halo.run/v1alpha1/indices/-/search`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -56,6 +57,10 @@ export const IndexV1alpha1PublicApiAxiosParamCreator = function (configuration?:
             // authentication bearerAuth required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (locale !== undefined) {
+                localVarQueryParameter['locale'] = locale;
+            }
 
             localVarHeaderParameter['Content-Type'] = 'application/json';
             localVarHeaderParameter['Accept'] = '*/*';
@@ -81,12 +86,13 @@ export const IndexV1alpha1PublicApiFp = function(configuration?: Configuration) 
     return {
         /**
          * Search indices.
-         * @param {SearchOption} [searchOption] Please note that the \&quot;filterPublished\&quot;, \&quot;filterExposed\&quot; and \&quot;filterRecycled\&quot; fields are ignored in this endpoint.
+         * @param {string} [locale] BCP 47 content language tag.
+         * @param {SearchOption} [searchOption] Please note that the \&quot;filterPublished\&quot;, \&quot;filterExposed\&quot; and \&quot;filterRecycled\&quot; fields are ignored in this endpoint. The search language follows the current localization context.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async indicesSearch(searchOption?: SearchOption, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SearchResult>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.indicesSearch(searchOption, options);
+        async indicesSearch(locale?: string, searchOption?: SearchOption, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SearchResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.indicesSearch(locale, searchOption, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['IndexV1alpha1PublicApi.indicesSearch']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -107,7 +113,7 @@ export const IndexV1alpha1PublicApiFactory = function (configuration?: Configura
          * @throws {RequiredError}
          */
         indicesSearch(requestParameters: IndexV1alpha1PublicApiIndicesSearchRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<SearchResult> {
-            return localVarFp.indicesSearch(requestParameters.searchOption, options).then((request) => request(axios, basePath));
+            return localVarFp.indicesSearch(requestParameters.locale, requestParameters.searchOption, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -117,7 +123,12 @@ export const IndexV1alpha1PublicApiFactory = function (configuration?: Configura
  */
 export interface IndexV1alpha1PublicApiIndicesSearchRequest {
     /**
-     * Please note that the \&quot;filterPublished\&quot;, \&quot;filterExposed\&quot; and \&quot;filterRecycled\&quot; fields are ignored in this endpoint.
+     * BCP 47 content language tag.
+     */
+    readonly locale?: string
+
+    /**
+     * Please note that the \&quot;filterPublished\&quot;, \&quot;filterExposed\&quot; and \&quot;filterRecycled\&quot; fields are ignored in this endpoint. The search language follows the current localization context.
      */
     readonly searchOption?: SearchOption
 }
@@ -133,7 +144,7 @@ export class IndexV1alpha1PublicApi extends BaseAPI {
      * @throws {RequiredError}
      */
     public indicesSearch(requestParameters: IndexV1alpha1PublicApiIndicesSearchRequest = {}, options?: RawAxiosRequestConfig) {
-        return IndexV1alpha1PublicApiFp(this.configuration).indicesSearch(requestParameters.searchOption, options).then((request) => request(this.axios, this.basePath));
+        return IndexV1alpha1PublicApiFp(this.configuration).indicesSearch(requestParameters.locale, requestParameters.searchOption, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

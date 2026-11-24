@@ -24,6 +24,7 @@ import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.localization.ResourceLocalizationService;
 
 /**
  * Tests for {@link DefaultSettingFetcher}.
@@ -49,7 +50,8 @@ class DefaultSettingFetcherTest {
 
     @BeforeEach
     void setUp() {
-        this.reactiveSettingFetcher = new DefaultReactiveSettingFetcher(pluginContext, client);
+        this.reactiveSettingFetcher =
+                new DefaultReactiveSettingFetcher(pluginContext, client, mock(ResourceLocalizationService.class));
         reactiveSettingFetcher.setApplicationContext(applicationContext);
 
         settingFetcher = new DefaultSettingFetcher(reactiveSettingFetcher);

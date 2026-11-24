@@ -1,72 +1,17 @@
 package run.halo.app.extension;
 
-import java.util.Comparator;
-import java.util.function.Predicate;
-import org.springframework.data.domain.Sort;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.extension.index.IndexedQueryEngine;
 
 /**
- * ExtensionClient is an interface which contains some operations on Extension instead of ExtensionStore.
+ * Reactive extension client for source reads, administration and writes.
+ *
+ * <p>Read operations belong to {@link ReactiveExtensionReadClient}. This interface adds source mutation and lifecycle
+ * operations. Public display consumers should use {@link ReactivePresentationExtensionClient}.
  *
  * @author johnniang
  */
-public interface ReactiveExtensionClient {
-
-    /**
-     * Lists Extensions by Extension type, filter and sorter.
-     *
-     * @param type is the class type of Extension.
-     * @param predicate filters the reEnqueue.
-     * @param comparator sorts the reEnqueue.
-     * @param <E> is Extension type.
-     * @return all filtered and sorted Extensions.
-     */
-    <E extends Extension> Flux<E> list(Class<E> type, Predicate<E> predicate, Comparator<E> comparator);
-
-    /**
-     * Lists Extensions by Extension type, filter, sorter and page info.
-     *
-     * @param type is the class type of Extension.
-     * @param predicate filters the reEnqueue.
-     * @param comparator sorts the reEnqueue.
-     * @param page is page number which starts from 0.
-     * @param size is page size.
-     * @param <E> is Extension type.
-     * @return a list of Extensions.
-     */
-    @Deprecated
-    <E extends Extension> Mono<ListResult<E>> list(
-            Class<E> type, Predicate<E> predicate, Comparator<E> comparator, int page, int size);
-
-    <E extends Extension> Flux<E> listAll(Class<E> type, ListOptions options, Sort sort);
-
-    <E extends Extension> Flux<String> listAllNames(Class<E> type, ListOptions options, Sort sort);
-
-    <E extends Extension> Flux<String> listTopNames(Class<E> type, ListOptions options, Sort sort, int topN);
-
-    <E extends Extension> Mono<ListResult<E>> listBy(Class<E> type, ListOptions options, PageRequest pageable);
-
-    <E extends Extension> Mono<ListResult<String>> listNamesBy(
-            Class<E> type, ListOptions options, PageRequest pageable);
-
-    <E extends Extension> Mono<Long> countBy(Class<E> type, ListOptions options);
-
-    /**
-     * Fetches Extension by its type and name.
-     *
-     * @param type is Extension type.
-     * @param name is Extension name.
-     * @param <E> is Extension type.
-     * @return an optional Extension.
-     */
-    <E extends Extension> Mono<E> fetch(Class<E> type, String name);
-
-    Mono<Unstructured> fetch(GroupVersionKind gvk, String name);
-
-    <E extends Extension> Mono<E> get(Class<E> type, String name);
-
+public interface ReactiveExtensionClient extends ReactiveExtensionReadClient {
     @Deprecated(forRemoval = true, since = "2.23.0")
     Mono<JsonExtension> getJsonExtension(GroupVersionKind gvk, String name);
 

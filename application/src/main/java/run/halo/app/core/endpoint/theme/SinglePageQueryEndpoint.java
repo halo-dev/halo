@@ -61,6 +61,7 @@ public class SinglePageQueryEndpoint implements CustomEndpoint {
                                         .name("name")
                                         .description("SinglePage metadata.name")
                                         .required(true))
+                                .parameter(PublicApiUtils.localeParameter())
                                 .response(responseBuilder().implementation(SinglePageVo.class)))
                 .build();
     }
@@ -89,6 +90,7 @@ public class SinglePageQueryEndpoint implements CustomEndpoint {
 
         public static void buildParameters(Builder builder) {
             SortableRequest.buildParameters(builder);
+            builder.parameter(PublicApiUtils.localeParameter());
         }
     }
 

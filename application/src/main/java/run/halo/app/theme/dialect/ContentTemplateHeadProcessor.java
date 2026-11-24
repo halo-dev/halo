@@ -73,7 +73,12 @@ public class ContentTemplateHeadProcessor implements TemplateHeadProcessor {
     static List<Map<String, String>> excerptToMetaDescriptionIfAbsent(
             List<Map<String, String>> htmlMetas, String excerpt) {
         String excerptNullSafe = StringUtils.defaultString(excerpt);
-        List<Map<String, String>> metas = new ArrayList<>(defaultIfNull(htmlMetas, List.of()));
+        List<Map<String, String>> metas = new ArrayList<>();
+        for (var meta : defaultIfNull(htmlMetas, List.<Map<String, String>>of())) {
+            if (meta != null) {
+                metas.add(new LinkedHashMap<>(meta));
+            }
+        }
         metas.stream()
                 .filter(Objects::nonNull)
                 .filter(map -> Meta.DESCRIPTION.equals(map.get(Meta.NAME)))

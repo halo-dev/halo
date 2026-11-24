@@ -22,6 +22,7 @@ import run.halo.app.core.extension.content.Category;
 import run.halo.app.extension.*;
 import run.halo.app.extension.index.query.Queries;
 import run.halo.app.extension.router.selector.FieldSelector;
+import run.halo.app.localization.ResourcePresentationService;
 import run.halo.app.theme.finders.CategoryFinder;
 import run.halo.app.theme.finders.Finder;
 import run.halo.app.theme.finders.vo.CategoryTreeVo;
@@ -37,8 +38,11 @@ import run.halo.app.theme.finders.vo.CategoryVo;
 @Finder("categoryFinder")
 @RequiredArgsConstructor
 public class CategoryFinderImpl implements CategoryFinder {
-    private final ReactiveExtensionClient client;
+    private final ReactivePresentationExtensionClient client;
+
     private final CategoryService categoryService;
+
+    private final ResourcePresentationService presentation;
 
     @Override
     public Mono<CategoryVo> getByName(String name) {
@@ -251,7 +255,11 @@ public class CategoryFinderImpl implements CategoryFinder {
 
     @Override
     public Mono<CategoryVo> getParentByName(String name) {
-        return categoryService.getParentByName(name).map(CategoryVo::from);
+        return categoryService
+                .getParentByName(name)
+                .flatMap(parent -> presentation.presentAll(List.of(parent)))
+                .map(List::getFirst)
+                .map(CategoryVo::from);
     }
 
     @Override

@@ -33,10 +33,11 @@ export const SinglePageV1alpha1PublicApiAxiosParamCreator = function (configurat
         /**
          * Gets single page by metadata.name
          * @param {string} name SinglePage metadata.name
+         * @param {string} [locale] BCP 47 content language tag.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        querySinglePageByName: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        querySinglePageByName: async (name: string, locale?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
             assertParamExists('querySinglePageByName', 'name', name)
             const localVarPath = `/apis/api.content.halo.run/v1alpha1/singlepages/{name}`
@@ -60,6 +61,10 @@ export const SinglePageV1alpha1PublicApiAxiosParamCreator = function (configurat
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            if (locale !== undefined) {
+                localVarQueryParameter['locale'] = locale;
+            }
+
             localVarHeaderParameter['Accept'] = '*/*';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -78,10 +83,11 @@ export const SinglePageV1alpha1PublicApiAxiosParamCreator = function (configurat
          * @param {Array<string>} [labelSelector] Label selector. e.g.: hidden!&#x3D;true
          * @param {Array<string>} [fieldSelector] Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
          * @param {Array<string>} [sort] Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+         * @param {string} [locale] BCP 47 content language tag.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        querySinglePages: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        querySinglePages: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, locale?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/api.content.halo.run/v1alpha1/singlepages`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -122,6 +128,10 @@ export const SinglePageV1alpha1PublicApiAxiosParamCreator = function (configurat
                 localVarQueryParameter['sort'] = sort;
             }
 
+            if (locale !== undefined) {
+                localVarQueryParameter['locale'] = locale;
+            }
+
             localVarHeaderParameter['Accept'] = '*/*';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -145,11 +155,12 @@ export const SinglePageV1alpha1PublicApiFp = function(configuration?: Configurat
         /**
          * Gets single page by metadata.name
          * @param {string} name SinglePage metadata.name
+         * @param {string} [locale] BCP 47 content language tag.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async querySinglePageByName(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SinglePageVo>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.querySinglePageByName(name, options);
+        async querySinglePageByName(name: string, locale?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SinglePageVo>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.querySinglePageByName(name, locale, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['SinglePageV1alpha1PublicApi.querySinglePageByName']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -161,11 +172,12 @@ export const SinglePageV1alpha1PublicApiFp = function(configuration?: Configurat
          * @param {Array<string>} [labelSelector] Label selector. e.g.: hidden!&#x3D;true
          * @param {Array<string>} [fieldSelector] Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
          * @param {Array<string>} [sort] Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+         * @param {string} [locale] BCP 47 content language tag.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async querySinglePages(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListedSinglePageVoList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.querySinglePages(page, size, labelSelector, fieldSelector, sort, options);
+        async querySinglePages(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, locale?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListedSinglePageVoList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.querySinglePages(page, size, labelSelector, fieldSelector, sort, locale, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['SinglePageV1alpha1PublicApi.querySinglePages']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -186,7 +198,7 @@ export const SinglePageV1alpha1PublicApiFactory = function (configuration?: Conf
          * @throws {RequiredError}
          */
         querySinglePageByName(requestParameters: SinglePageV1alpha1PublicApiQuerySinglePageByNameRequest, options?: RawAxiosRequestConfig): AxiosPromise<SinglePageVo> {
-            return localVarFp.querySinglePageByName(requestParameters.name, options).then((request) => request(axios, basePath));
+            return localVarFp.querySinglePageByName(requestParameters.name, requestParameters.locale, options).then((request) => request(axios, basePath));
         },
         /**
          * Lists single pages
@@ -195,7 +207,7 @@ export const SinglePageV1alpha1PublicApiFactory = function (configuration?: Conf
          * @throws {RequiredError}
          */
         querySinglePages(requestParameters: SinglePageV1alpha1PublicApiQuerySinglePagesRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ListedSinglePageVoList> {
-            return localVarFp.querySinglePages(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+            return localVarFp.querySinglePages(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.locale, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -208,6 +220,11 @@ export interface SinglePageV1alpha1PublicApiQuerySinglePageByNameRequest {
      * SinglePage metadata.name
      */
     readonly name: string
+
+    /**
+     * BCP 47 content language tag.
+     */
+    readonly locale?: string
 }
 
 /**
@@ -238,6 +255,11 @@ export interface SinglePageV1alpha1PublicApiQuerySinglePagesRequest {
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
      */
     readonly sort?: Array<string>
+
+    /**
+     * BCP 47 content language tag.
+     */
+    readonly locale?: string
 }
 
 /**
@@ -251,7 +273,7 @@ export class SinglePageV1alpha1PublicApi extends BaseAPI {
      * @throws {RequiredError}
      */
     public querySinglePageByName(requestParameters: SinglePageV1alpha1PublicApiQuerySinglePageByNameRequest, options?: RawAxiosRequestConfig) {
-        return SinglePageV1alpha1PublicApiFp(this.configuration).querySinglePageByName(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+        return SinglePageV1alpha1PublicApiFp(this.configuration).querySinglePageByName(requestParameters.name, requestParameters.locale, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -261,7 +283,7 @@ export class SinglePageV1alpha1PublicApi extends BaseAPI {
      * @throws {RequiredError}
      */
     public querySinglePages(requestParameters: SinglePageV1alpha1PublicApiQuerySinglePagesRequest = {}, options?: RawAxiosRequestConfig) {
-        return SinglePageV1alpha1PublicApiFp(this.configuration).querySinglePages(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+        return SinglePageV1alpha1PublicApiFp(this.configuration).querySinglePages(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.locale, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

@@ -11,7 +11,6 @@ import io.swagger.v3.oas.models.media.Schema;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springdoc.core.fn.builders.operation.Builder;
@@ -21,6 +20,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.localization.PresentationTestSupport;
 import run.halo.app.theme.finders.PostPublicQueryService;
 import run.halo.app.theme.finders.TagFinder;
 import run.halo.app.theme.finders.vo.ListedPostVo;
@@ -37,8 +37,12 @@ class TagQueryEndpointTest {
     @Mock
     private PostPublicQueryService postPublicQueryService;
 
-    @InjectMocks
     private TagQueryEndpoint endpoint;
+
+    @org.junit.jupiter.api.BeforeEach
+    void setUp() {
+        endpoint = new TagQueryEndpoint(PresentationTestSupport.client(client), tagFinder, postPublicQueryService);
+    }
 
     @Test
     void postsResponseSchemaIncludesPaginationAndPostItems() {

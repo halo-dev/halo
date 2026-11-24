@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,6 +43,7 @@ import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.controller.Reconciler;
+import run.halo.app.localization.ResourceReference;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.ViewNameResolver;
 import run.halo.app.theme.finders.SinglePageFinder;
@@ -94,6 +96,8 @@ class SinglePageRouteTest {
                 assertThat(model.get("plural")).isEqualTo("singlepages");
                 assertThat(model.get("singlePage")).isNotNull();
                 assertThat(model.get("groupVersionKind")).isEqualTo(GroupVersionKind.fromExtension(SinglePage.class));
+                assertThat(model.get(ModelConst.RESOURCE_REFERENCE))
+                        .isEqualTo(new ResourceReference(GroupVersionKind.fromExtension(SinglePage.class), pageName));
                 return super.render(model, contentType, exchange);
             }
         }));
@@ -136,6 +140,23 @@ class SinglePageRouteTest {
         singlePageRoute.setQuickRouteMap(
                 Map.of(nameSlugPair, r -> ServerResponse.ok().build()));
         StepVerifier.create(singlePageRoute.route(request)).expectNextCount(1).verifyComplete();
+    }
+
+    @Test
+    void declaresOwnershipFromPublishedRouteMap() {
+        singlePageRoute.setQuickRouteMap(Map.of(
+                new NameSlugPair("about-page", "about/team"),
+                request -> ServerResponse.ok().build()));
+
+        StepVerifier.create(singlePageRoute.claimedPrefixes())
+                .assertNext(prefixes -> assertThat(prefixes).isEqualTo(Set.of("about")))
+                .verifyComplete();
+        StepVerifier.create(singlePageRoute.matches("/about/team", HttpMethod.GET))
+                .expectNext(true)
+                .verifyComplete();
+        StepVerifier.create(singlePageRoute.matches("/about/other", HttpMethod.GET))
+                .expectNext(false)
+                .verifyComplete();
     }
 
     @Nested

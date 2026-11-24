@@ -4,12 +4,14 @@ import static org.thymeleaf.spring6.context.SpringContextUtils.getApplicationCon
 
 import java.time.Duration;
 import org.thymeleaf.context.ITemplateContext;
+import org.thymeleaf.context.IWebContext;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.ITemplateEvent;
 import org.thymeleaf.processor.element.AbstractElementModelProcessor;
 import org.thymeleaf.processor.element.IElementModelStructureHandler;
 import org.thymeleaf.templatemode.TemplateMode;
 import reactor.core.publisher.Flux;
+import run.halo.app.localization.LocalizationContext;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 
 /**
@@ -74,11 +76,17 @@ public class GlobalHeadInjectionProcessor extends AbstractElementModelProcessor 
         modelToInsert.remove(0);
 
         // apply processors to modelToInsert
-        getTemplateHeadProcessors(context)
+        var processing = getTemplateHeadProcessors(context)
                 .concatMap(processor ->
                         processor.process(SecureTemplateContextWrapper.wrap(context), modelToInsert, structureHandler))
-                .then()
-                .block(BLOCKING_TIMEOUT);
+                .then();
+        if (context instanceof IWebContext web) {
+            var locale = web.getExchange().getAttributeValue(LocalizationContext.EXCHANGE_ATTRIBUTE);
+            if (locale instanceof LocalizationContext localization) {
+                processing = processing.contextWrite(current -> current.put(LocalizationContext.class, localization));
+            }
+        }
+        processing.block(BLOCKING_TIMEOUT);
 
         // reset model to insert
         model.reset();

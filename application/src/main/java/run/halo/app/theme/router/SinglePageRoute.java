@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -27,9 +28,11 @@ import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.exception.NotFoundException;
+import run.halo.app.localization.LocalizationRouteProvider;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.ViewNameResolver;
 import run.halo.app.theme.finders.SinglePageFinder;
+import run.halo.app.theme.utils.PublicRoutePatterns;
 
 /**
  * The {@link SinglePageRoute} for route request to specific template <code>page.html</code>.
@@ -39,7 +42,11 @@ import run.halo.app.theme.finders.SinglePageFinder;
  */
 @Component
 @RequiredArgsConstructor
-public class SinglePageRoute implements RouterFunction<ServerResponse>, Reconciler<Reconciler.Request>, DisposableBean {
+public class SinglePageRoute
+        implements RouterFunction<ServerResponse>,
+                Reconciler<Reconciler.Request>,
+                DisposableBean,
+                LocalizationRouteProvider {
     private Map<NameSlugPair, HandlerFunction<ServerResponse>> quickRouteMap = new ConcurrentHashMap<>();
 
     private final ExtensionClient client;
@@ -57,6 +64,26 @@ public class SinglePageRoute implements RouterFunction<ServerResponse>, Reconcil
         return Flux.fromIterable(routerFunctions())
                 .concatMap(routerFunction -> routerFunction.route(request))
                 .next();
+    }
+
+    @Override
+    public Mono<Set<String>> claimedPrefixes() {
+        return Flux.fromIterable(quickRouteMap.keySet())
+                .map(pair -> singlePageRoute(pair.slug()))
+                .map(PublicRoutePatterns::staticPrefix)
+                .filter(prefix -> !prefix.isEmpty())
+                .collect(Collectors.toSet())
+                .map(Set::copyOf);
+    }
+
+    @Override
+    public Mono<Boolean> matches(String path, HttpMethod method) {
+        if (!PublicRoutePatterns.supportsRead(method)) {
+            return Mono.just(false);
+        }
+        return Mono.just(quickRouteMap.keySet().stream()
+                .map(pair -> singlePageRoute(pair.slug()))
+                .anyMatch(routePath -> PublicRoutePatterns.samePath(path, routePath)));
     }
 
     /**

@@ -18,7 +18,7 @@ import run.halo.app.core.extension.content.Tag;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.extension.GroupVersion;
 import run.halo.app.extension.ListResult;
-import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.ReactivePresentationExtensionClient;
 import run.halo.app.extension.index.query.Queries;
 import run.halo.app.extension.router.SortableRequest;
 import run.halo.app.theme.finders.PostPublicQueryService;
@@ -36,7 +36,7 @@ import run.halo.app.theme.finders.vo.TagVo;
 @RequiredArgsConstructor
 public class TagQueryEndpoint implements CustomEndpoint {
 
-    private final ReactiveExtensionClient client;
+    private final ReactivePresentationExtensionClient client;
     private final TagFinder tagFinder;
     private final PostPublicQueryService postPublicQueryService;
 
@@ -62,6 +62,7 @@ public class TagQueryEndpoint implements CustomEndpoint {
                                         .name("name")
                                         .description("Tag metadata.name")
                                         .required(true))
+                                .parameter(PublicApiUtils.localeParameter())
                                 .response(responseBuilder().implementation(TagVo.class)))
                 .GET("tags/{name}/posts", this::listPostsByTagName, builder -> {
                     builder.operationId("queryPostsByTagName")
@@ -120,6 +121,7 @@ public class TagQueryEndpoint implements CustomEndpoint {
 
         public static void buildParameters(Builder builder) {
             SortableRequest.buildParameters(builder);
+            builder.parameter(PublicApiUtils.localeParameter());
         }
     }
 

@@ -8,13 +8,15 @@ import static org.mockito.Mockito.*;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Predicate;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Sort;
@@ -25,6 +27,10 @@ import run.halo.app.content.PostService;
 import run.halo.app.core.counter.CounterService;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.*;
+import run.halo.app.localization.LocalizationContext;
+import run.halo.app.localization.LocalizationScope;
+import run.halo.app.localization.PresentationTestSupport;
+import run.halo.app.localization.ResourceLocalizationService;
 import run.halo.app.theme.finders.CategoryFinder;
 import run.halo.app.theme.finders.ContributorFinder;
 import run.halo.app.theme.finders.PostPublicQueryService;
@@ -68,8 +74,25 @@ class PostFinderImplTest {
     @Mock
     ReactiveQueryPostPredicateResolver postPredicateResolver;
 
-    @InjectMocks
+    @Mock
+    private ResourceLocalizationService localizationService;
+
     private PostFinderImpl postFinder;
+
+    @org.junit.jupiter.api.BeforeEach
+    void setUp() {
+        lenient()
+                .when(postPredicateResolver.getPredicate())
+                .thenReturn(new DefaultQueryPostPredicateResolver().getPredicate());
+        lenient()
+                .when(localizationService.localizeAll(anyList(), any()))
+                .thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
+        postFinder = new PostFinderImpl(
+                PresentationTestSupport.client(client, localizationService),
+                publicQueryService,
+                postPredicateResolver,
+                org.mockito.Mockito.mock(run.halo.app.content.CategoryService.class));
+    }
 
     @Test
     void predicate() {
@@ -133,6 +156,102 @@ class PostFinderImplTest {
         verify(publicQueryService).convertToListedVos(assertArg(items -> {
             assertTrue(items.containsAll(posts));
         }));
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void navigationFromPrivateAnchorPreservesSourceWithoutLoadingRelations(boolean byCategory) {
+        var source = stubNavigation();
+        var navigation = byCategory ? postFinder.cursorByCategory("post-1") : postFinder.cursor("post-1");
+
+        navigation
+                .as(StepVerifier::create)
+                .assertNext(result -> {
+                    assertThat(result.previous().getSpec().getTitle())
+                            .isEqualTo(source.getSpec().getTitle());
+                    assertThat(result.next().getStatus().getPermalink()).isEqualTo("/post-2");
+                })
+                .verifyComplete();
+
+        verifyNoInteractions(publicQueryService);
+        verify(postPredicateResolver, never()).getPredicate();
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void navigationProjectsAnchorAndReturnedNeighbors(boolean byCategory) {
+        var source = stubNavigation();
+        var translated = post(2);
+        translated.getSpec().setTitle("Translated title");
+        translated.getStatus().setPermalink("/en/post-2");
+        var context = new LocalizationContext(Locale.CHINA, Locale.ENGLISH, List.of(), LocalizationScope.PUBLIC_PAGE);
+        when(localizationService.localizeAll(List.of(source), context)).thenReturn(Mono.just(List.of(translated)));
+        var navigation = byCategory ? postFinder.cursorByCategory("post-1") : postFinder.cursor("post-1");
+
+        navigation
+                .contextWrite(ctx -> ctx.put(LocalizationContext.class, context))
+                .as(StepVerifier::create)
+                .assertNext(result -> {
+                    assertThat(result.previous().getSpec().getTitle()).isEqualTo("Translated title");
+                    assertThat(result.next().getStatus().getPermalink()).isEqualTo("/en/post-2");
+                })
+                .verifyComplete();
+
+        verifyNoInteractions(publicQueryService);
+        verify(postPredicateResolver, never()).getPredicate();
+        verify(localizationService, times(2)).localizeAll(List.of(source), context);
+        verify(localizationService, times(1))
+                .localizeAll(
+                        argThat(posts -> posts.size() == 1
+                                && "post-1"
+                                        .equals(posts.getFirst().getMetadata().getName())),
+                        same(context));
+        verifyNoMoreInteractions(localizationService);
+        assertThat(source.getSpec().getTitle()).isEqualTo("title-2");
+        assertThat(source.getStatus().getPermalink()).isEqualTo("/post-2");
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void navigationStillRequiresPublishedAnchorWithPublishTime(boolean byCategory) {
+        var current = post(1);
+        current.getSpec().setCategories(List.of("category"));
+        current.getMetadata().getLabels().clear();
+        when(client.fetch(Post.class, "post-1")).thenReturn(Mono.just(current));
+        var navigation = byCategory ? postFinder.cursorByCategory("post-1") : postFinder.cursor("post-1");
+
+        navigation
+                .as(StepVerifier::create)
+                .assertNext(result -> {
+                    assertThat(result.hasPrevious()).isFalse();
+                    assertThat(result.hasNext()).isFalse();
+                })
+                .verifyComplete();
+
+        current.getMetadata().getLabels().put(Post.PUBLISHED_LABEL, "true");
+        current.getSpec().setPublishTime(null);
+        navigation
+                .as(StepVerifier::create)
+                .assertNext(result -> {
+                    assertThat(result.hasPrevious()).isFalse();
+                    assertThat(result.hasNext()).isFalse();
+                })
+                .verifyComplete();
+
+        verifyNoInteractions(publicQueryService);
+        verify(postPredicateResolver, never()).getListOptions();
+    }
+
+    private Post stubNavigation() {
+        var current = post(1);
+        current.getSpec().setVisible(Post.VisibleEnum.PRIVATE);
+        current.getSpec().setCategories(List.of("category"));
+        var adjacent = post(2);
+        when(client.fetch(Post.class, "post-1")).thenReturn(Mono.just(current));
+        when(postPredicateResolver.getListOptions()).thenReturn(Mono.just(new ListOptions()));
+        when(client.listBy(eq(Post.class), any(ListOptions.class), any(PageRequest.class)))
+                .thenReturn(Mono.just(new ListResult<>(1, 1, 1, List.of(adjacent))));
+        return adjacent;
     }
 
     List<Post> postsForArchives() {

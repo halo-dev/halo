@@ -24,6 +24,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import run.halo.app.extension.router.JsonPatch;
+import run.halo.app.infra.utils.PublicApiPaths;
 
 @Configuration
 @ConditionalOnProperty(name = SPRINGDOC_ENABLED, matchIfMissing = true)
@@ -76,12 +77,8 @@ public class SwaggerConfig {
         return GroupedOpenApi.builder()
                 .group("apis_public.api_v1alpha1")
                 .displayName("Public API V1alpha1")
-                .pathsToMatch("/apis/api.*/**")
-                .pathsToExclude(
-                        "/apis/api.console.*/v1alpha1/**",
-                        // compatible with legacy issues
-                        "/apis/api.notification.halo.run/v1alpha1/userspaces/**",
-                        "/apis/api.notification.halo.run/v1alpha1/notifiers/**")
+                .pathsToMatch(PublicApiPaths.PATTERN)
+                .pathsToExclude(PublicApiPaths.EXCLUDED_PATTERNS.toArray(String[]::new))
                 .build();
     }
 

@@ -39,10 +39,11 @@ export const CategoryV1alpha1PublicApiAxiosParamCreator = function (configuratio
          * @param {Array<string>} [labelSelector] Label selector. e.g.: hidden!&#x3D;true
          * @param {Array<string>} [fieldSelector] Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
          * @param {Array<string>} [sort] Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+         * @param {string} [locale] BCP 47 content language tag.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        queryCategories: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        queryCategories: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, locale?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/api.content.halo.run/v1alpha1/categories`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -83,6 +84,10 @@ export const CategoryV1alpha1PublicApiAxiosParamCreator = function (configuratio
                 localVarQueryParameter['sort'] = sort;
             }
 
+            if (locale !== undefined) {
+                localVarQueryParameter['locale'] = locale;
+            }
+
             localVarHeaderParameter['Accept'] = '*/*';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -97,10 +102,11 @@ export const CategoryV1alpha1PublicApiAxiosParamCreator = function (configuratio
         /**
          * Gets category by metadata.name.
          * @param {string} name Category metadata.name
+         * @param {string} [locale] BCP 47 content language tag.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        queryCategoryByName: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        queryCategoryByName: async (name: string, locale?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
             assertParamExists('queryCategoryByName', 'name', name)
             const localVarPath = `/apis/api.content.halo.run/v1alpha1/categories/{name}`
@@ -124,6 +130,10 @@ export const CategoryV1alpha1PublicApiAxiosParamCreator = function (configuratio
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            if (locale !== undefined) {
+                localVarQueryParameter['locale'] = locale;
+            }
+
             localVarHeaderParameter['Accept'] = '*/*';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -143,10 +153,11 @@ export const CategoryV1alpha1PublicApiAxiosParamCreator = function (configuratio
          * @param {Array<string>} [labelSelector] Label selector. e.g.: hidden!&#x3D;true
          * @param {Array<string>} [fieldSelector] Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
          * @param {Array<string>} [sort] Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+         * @param {string} [locale] BCP 47 content language tag.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        queryPostsByCategoryName: async (name: string, page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        queryPostsByCategoryName: async (name: string, page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, locale?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
             assertParamExists('queryPostsByCategoryName', 'name', name)
             const localVarPath = `/apis/api.content.halo.run/v1alpha1/categories/{name}/posts`
@@ -190,6 +201,10 @@ export const CategoryV1alpha1PublicApiAxiosParamCreator = function (configuratio
                 localVarQueryParameter['sort'] = sort;
             }
 
+            if (locale !== undefined) {
+                localVarQueryParameter['locale'] = locale;
+            }
+
             localVarHeaderParameter['Accept'] = '*/*';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -217,11 +232,12 @@ export const CategoryV1alpha1PublicApiFp = function(configuration?: Configuratio
          * @param {Array<string>} [labelSelector] Label selector. e.g.: hidden!&#x3D;true
          * @param {Array<string>} [fieldSelector] Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
          * @param {Array<string>} [sort] Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+         * @param {string} [locale] BCP 47 content language tag.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async queryCategories(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CategoryVoList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.queryCategories(page, size, labelSelector, fieldSelector, sort, options);
+        async queryCategories(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, locale?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CategoryVoList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.queryCategories(page, size, labelSelector, fieldSelector, sort, locale, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CategoryV1alpha1PublicApi.queryCategories']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -229,11 +245,12 @@ export const CategoryV1alpha1PublicApiFp = function(configuration?: Configuratio
         /**
          * Gets category by metadata.name.
          * @param {string} name Category metadata.name
+         * @param {string} [locale] BCP 47 content language tag.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async queryCategoryByName(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CategoryVo>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.queryCategoryByName(name, options);
+        async queryCategoryByName(name: string, locale?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CategoryVo>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.queryCategoryByName(name, locale, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CategoryV1alpha1PublicApi.queryCategoryByName']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -246,11 +263,12 @@ export const CategoryV1alpha1PublicApiFp = function(configuration?: Configuratio
          * @param {Array<string>} [labelSelector] Label selector. e.g.: hidden!&#x3D;true
          * @param {Array<string>} [fieldSelector] Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
          * @param {Array<string>} [sort] Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+         * @param {string} [locale] BCP 47 content language tag.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async queryPostsByCategoryName(name: string, page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListedPostVoList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.queryPostsByCategoryName(name, page, size, labelSelector, fieldSelector, sort, options);
+        async queryPostsByCategoryName(name: string, page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, locale?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListedPostVoList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.queryPostsByCategoryName(name, page, size, labelSelector, fieldSelector, sort, locale, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CategoryV1alpha1PublicApi.queryPostsByCategoryName']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -271,7 +289,7 @@ export const CategoryV1alpha1PublicApiFactory = function (configuration?: Config
          * @throws {RequiredError}
          */
         queryCategories(requestParameters: CategoryV1alpha1PublicApiQueryCategoriesRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<CategoryVoList> {
-            return localVarFp.queryCategories(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+            return localVarFp.queryCategories(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.locale, options).then((request) => request(axios, basePath));
         },
         /**
          * Gets category by metadata.name.
@@ -280,7 +298,7 @@ export const CategoryV1alpha1PublicApiFactory = function (configuration?: Config
          * @throws {RequiredError}
          */
         queryCategoryByName(requestParameters: CategoryV1alpha1PublicApiQueryCategoryByNameRequest, options?: RawAxiosRequestConfig): AxiosPromise<CategoryVo> {
-            return localVarFp.queryCategoryByName(requestParameters.name, options).then((request) => request(axios, basePath));
+            return localVarFp.queryCategoryByName(requestParameters.name, requestParameters.locale, options).then((request) => request(axios, basePath));
         },
         /**
          * Lists posts by category metadata.name.
@@ -289,7 +307,7 @@ export const CategoryV1alpha1PublicApiFactory = function (configuration?: Config
          * @throws {RequiredError}
          */
         queryPostsByCategoryName(requestParameters: CategoryV1alpha1PublicApiQueryPostsByCategoryNameRequest, options?: RawAxiosRequestConfig): AxiosPromise<ListedPostVoList> {
-            return localVarFp.queryPostsByCategoryName(requestParameters.name, requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+            return localVarFp.queryPostsByCategoryName(requestParameters.name, requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.locale, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -322,6 +340,11 @@ export interface CategoryV1alpha1PublicApiQueryCategoriesRequest {
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
      */
     readonly sort?: Array<string>
+
+    /**
+     * BCP 47 content language tag.
+     */
+    readonly locale?: string
 }
 
 /**
@@ -332,6 +355,11 @@ export interface CategoryV1alpha1PublicApiQueryCategoryByNameRequest {
      * Category metadata.name
      */
     readonly name: string
+
+    /**
+     * BCP 47 content language tag.
+     */
+    readonly locale?: string
 }
 
 /**
@@ -367,6 +395,11 @@ export interface CategoryV1alpha1PublicApiQueryPostsByCategoryNameRequest {
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
      */
     readonly sort?: Array<string>
+
+    /**
+     * BCP 47 content language tag.
+     */
+    readonly locale?: string
 }
 
 /**
@@ -380,7 +413,7 @@ export class CategoryV1alpha1PublicApi extends BaseAPI {
      * @throws {RequiredError}
      */
     public queryCategories(requestParameters: CategoryV1alpha1PublicApiQueryCategoriesRequest = {}, options?: RawAxiosRequestConfig) {
-        return CategoryV1alpha1PublicApiFp(this.configuration).queryCategories(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+        return CategoryV1alpha1PublicApiFp(this.configuration).queryCategories(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.locale, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -390,7 +423,7 @@ export class CategoryV1alpha1PublicApi extends BaseAPI {
      * @throws {RequiredError}
      */
     public queryCategoryByName(requestParameters: CategoryV1alpha1PublicApiQueryCategoryByNameRequest, options?: RawAxiosRequestConfig) {
-        return CategoryV1alpha1PublicApiFp(this.configuration).queryCategoryByName(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+        return CategoryV1alpha1PublicApiFp(this.configuration).queryCategoryByName(requestParameters.name, requestParameters.locale, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -400,7 +433,7 @@ export class CategoryV1alpha1PublicApi extends BaseAPI {
      * @throws {RequiredError}
      */
     public queryPostsByCategoryName(requestParameters: CategoryV1alpha1PublicApiQueryPostsByCategoryNameRequest, options?: RawAxiosRequestConfig) {
-        return CategoryV1alpha1PublicApiFp(this.configuration).queryPostsByCategoryName(requestParameters.name, requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+        return CategoryV1alpha1PublicApiFp(this.configuration).queryPostsByCategoryName(requestParameters.name, requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.locale, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

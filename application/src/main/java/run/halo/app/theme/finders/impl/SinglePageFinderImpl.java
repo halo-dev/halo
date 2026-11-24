@@ -12,7 +12,7 @@ import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.PageRequestImpl;
-import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.ReactivePresentationExtensionClient;
 import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.theme.finders.Finder;
 import run.halo.app.theme.finders.SinglePageConversionService;
@@ -31,7 +31,7 @@ import run.halo.app.theme.finders.vo.SinglePageVo;
 @AllArgsConstructor
 public class SinglePageFinderImpl implements SinglePageFinder {
 
-    private final ReactiveExtensionClient client;
+    private final ReactivePresentationExtensionClient client;
 
     private final SinglePageConversionService singlePagePublicQueryService;
 
