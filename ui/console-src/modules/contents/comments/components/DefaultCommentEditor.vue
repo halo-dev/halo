@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import i18n from "@emoji-mart/data/i18n/zh.json";
-import { IconMotionLine, VDropdown } from "@halo-dev/components";
-import { onMounted, ref, useId, watch } from "vue";
+import { IconMotionLine, VPopover } from "@halo-dev/components";
+import { nextTick, onMounted, ref, useId, watch } from "vue";
 import { setFocus } from "@/formkit/utils/focus";
 
 const props = withDefaults(
@@ -20,6 +20,7 @@ const emit = defineEmits<{
 }>();
 
 const emojiPickerRef = ref<HTMLElement | null>(null);
+const emojiPickerOpen = ref(false);
 
 const handleCreateEmojiPicker = async () => {
   if (emojiPickerRef.value?.childElementCount) {
@@ -43,8 +44,18 @@ const handleCreateEmojiPicker = async () => {
 const inputId = useId();
 const raw = ref(props.initialContent);
 
+watch(emojiPickerOpen, async (open) => {
+  if (!open) {
+    return;
+  }
+
+  await nextTick();
+  await handleCreateEmojiPicker();
+});
+
 const onEmojiSelect = (emoji: { native: string }) => {
   raw.value += emoji.native;
+  emojiPickerOpen.value = false;
   setFocus(inputId);
 };
 
@@ -75,16 +86,13 @@ watch(
     :rows="6"
   ></FormKit>
   <div class="flex w-full justify-end sm:max-w-lg">
-    <VDropdown
-      popper-class="[&_.v-popper\_\_inner]:!p-0"
-      @show="handleCreateEmojiPicker"
-    >
+    <VPopover v-model:open="emojiPickerOpen" content-class="!p-0">
       <IconMotionLine
         class="h-5 w-5 cursor-pointer text-gray-500 transition-all hover:text-gray-900"
       />
-      <template #popper>
+      <template #content>
         <div ref="emojiPickerRef"></div>
       </template>
-    </VDropdown>
+    </VPopover>
   </div>
 </template>
