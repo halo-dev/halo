@@ -1,20 +1,19 @@
 <script lang="ts" setup>
-import { provide } from "vue";
+import { provide, toRef } from "vue";
+import { menuContextKey } from "./context";
 
 const props = defineProps<{
   openIds?: string[];
   ariaLabel?: string;
 }>();
 
-provide<string[] | undefined>("openIds", props.openIds);
+provide(menuContextKey, {
+  openIds: toRef(props, "openIds"),
+});
 </script>
 
 <template>
-  <div
-    :aria-label="ariaLabel"
-    class="menu-container w-full p-3"
-    role="navigation"
-  >
+  <div :aria-label="ariaLabel" class="w-full p-3" role="navigation">
     <ul>
       <slot />
     </ul>

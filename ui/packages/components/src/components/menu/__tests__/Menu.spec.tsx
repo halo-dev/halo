@@ -1,5 +1,7 @@
+/* eslint-disable vue/one-component-per-file -- Test-local host components keep the reactive menu state isolated. */
 import { mount } from "@vue/test-utils";
 import { describe, expect, it } from "vite-plus/test";
+import { defineComponent, nextTick, ref } from "vue";
 import { VMenu, VMenuItem } from "../index";
 
 describe("Menu", () => {
@@ -12,44 +14,53 @@ describe("Menu", () => {
     ).toMatchSnapshot();
   });
 
-  // fixme: fix this test
-  it.skip("should work with sub menus", async () => {
-    const wrapper = await mount({
-      setup() {
-        return () => (
-          <VMenu>
-            <VMenuItem id="1" title="Menu Item 1" />
-            <VMenuItem id="2" title="Menu Item 2" />
-            <VMenuItem id="3" title="Menu Item 3">
-              <VMenuItem key="4" title="Menu Item 4" />
-            </VMenuItem>
-          </VMenu>
-        );
-      },
-    });
-    expect(wrapper.html()).toMatchSnapshot();
+  it("opens sub menus when openIds changes", async () => {
+    const openIds = ref<string[]>([]);
 
-    // toggling sub menu
-    expect(
-      wrapper.find(".has-submenus .sub-menu-items").attributes().style
-    ).toBe("display: none;");
+    const wrapper = mount(
+      defineComponent({
+        setup() {
+          return () => (
+            <VMenu openIds={openIds.value}>
+              <VMenuItem id="content" title="Content">
+                <VMenuItem id="posts" title="Posts" />
+              </VMenuItem>
+            </VMenu>
+          );
+        },
+      })
+    );
 
-    await wrapper.find(".has-submenus").trigger("click");
+    const parent = wrapper.findAllComponents(VMenuItem)[0];
 
-    expect(
-      wrapper.find(".has-submenus .sub-menu-items").attributes().style
-    ).toBe(""); // visible
+    expect(parent.attributes("aria-expanded")).toBe("false");
 
-    await wrapper.find(".has-submenus").trigger("click");
-    expect(
-      wrapper.find(".has-submenus .sub-menu-items").attributes().style
-    ).toBe(""); // visible
+    openIds.value = ["content"];
+    await nextTick();
 
-    await wrapper.find(".has-submenus .menu-icon-collapse").trigger("click");
+    expect(parent.attributes("aria-expanded")).toBe("true");
+  });
 
-    expect(
-      wrapper.find(".has-submenus .sub-menu-items").attributes().style
-    ).toBe("display: none;");
+  it("keeps the current page marker on the leaf item", () => {
+    const wrapper = mount(
+      defineComponent({
+        setup() {
+          return () => (
+            <VMenu openIds={["content"]}>
+              <VMenuItem id="content" title="Content" active>
+                <VMenuItem id="posts" title="Posts" active />
+              </VMenuItem>
+            </VMenu>
+          );
+        },
+      })
+    );
+
+    const [parent, child] = wrapper.findAllComponents(VMenuItem);
+
+    expect(parent.attributes("aria-current")).toBeUndefined();
+    expect(parent.html()).toContain("active-trail");
+    expect(child.attributes("aria-current")).toBe("page");
   });
 
   it("names the navigation landmark", () => {
@@ -91,40 +102,5 @@ describe("Menu", () => {
     expect(wrapper.find(".sub-menu-items .menu-title").text()).contain(
       "Menu Item 4"
     );
-  });
-
-  // fixme: fix this test
-  it.skip("should work with select emit", async () => {
-    const wrapper = mount({
-      setup() {
-        return () => (
-          <VMenu openIds={["3"]}>
-            <VMenuItem id="1" title="Menu Item 1" />
-            <VMenuItem id="2" title="Menu Item 2" />
-            <VMenuItem id="3" title="Menu Item 3">
-              <VMenuItem id="4" title="Menu Item 4" />
-            </VMenuItem>
-          </VMenu>
-        );
-      },
-    });
-
-    wrapper.findAllComponents(VMenuItem).forEach((item) => {
-      // has not sub menu
-      if (item.props().id === "1") {
-        item.trigger("click");
-        expect(item.emitted().select[0]).toEqual(["1"]);
-      }
-      // has sub menu
-      if (item.props().id === "3") {
-        item.trigger("click");
-        expect(item.emitted().select).toBeDefined();
-
-        expect(item.vm.open).toBe(true);
-
-        item.trigger("click");
-        expect(item.vm.open).toBe(true);
-      }
-    });
   });
 });
