@@ -217,7 +217,7 @@ const handleMouseover = (event: MouseEvent) => {
             selectedValues && selectedValues.includes(option.value),
           'cursor-not-allowed opacity-25': isDisabled(option),
         }"
-        @mousedown.stop="handleSelected(index)"
+        @mousedown.stop.prevent="handleSelected(index)"
       >
       </SelectOptionItem>
     </template>
