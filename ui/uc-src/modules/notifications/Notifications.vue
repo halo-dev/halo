@@ -720,10 +720,7 @@ function handleMarkAllAsRead() {
     </template>
   </VPageHeader>
   <div class="m-0 md:m-4">
-    <VCard
-      style="height: calc(100vh - 5.5rem)"
-      :body-class="['h-full', '!p-0']"
-    >
+    <VCard style="height: calc(100vh - 5.5rem)" flush :body-class="['h-full']">
       <div class="grid h-full grid-cols-12 divide-y sm:divide-x sm:divide-y-0">
         <div
           class="relative col-span-12 flex h-full flex-col overflow-hidden sm:col-span-6 lg:col-span-5 xl:col-span-3"

@@ -267,7 +267,7 @@ watch(
   <div class="m-0 md:m-4">
     <div class="flex flex-col gap-2 sm:flex-row">
       <div class="w-full">
-        <VCard :body-class="[viewType === 'list' ? '!p-0' : '']">
+        <VCard :flush="viewType === 'list'">
           <template #toolbar>
             <div
               class="relative flex flex-col flex-wrap items-start gap-4 sm:flex-row sm:items-center"

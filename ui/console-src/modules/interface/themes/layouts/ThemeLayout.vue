@@ -271,7 +271,7 @@ watch(
       </VEmpty>
 
       <div v-else>
-        <VCard :body-class="['!p-0', '!overflow-visible']">
+        <VCard flush overflow="visible">
           <template #header>
             <VTabbar
               :active-id="activeTab"

@@ -99,7 +99,7 @@ const handleUpdateRole = async () => {
     </template>
   </VPageHeader>
   <div class="m-0 md:m-4">
-    <VCard :body-class="['!p-0']">
+    <VCard flush>
       <template #header>
         <VTabbar
           v-model:active-id="tabActiveId"

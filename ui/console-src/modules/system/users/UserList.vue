@@ -275,7 +275,7 @@ function onCreationModalClose() {
   </VPageHeader>
 
   <div class="m-0 md:m-4">
-    <VCard :body-class="['!p-0']">
+    <VCard flush>
       <template #toolbar>
         <div
           class="relative flex flex-col flex-wrap items-start gap-4 sm:flex-row sm:items-center"

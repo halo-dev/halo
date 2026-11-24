@@ -92,7 +92,7 @@ provide<Ref<Setting | undefined>>("setting", setting);
   </VPageHeader>
 
   <div class="m-0 md:m-4">
-    <VCard :body-class="['!p-0', '!overflow-visible']">
+    <VCard flush overflow="visible">
       <template #header>
         <VTabbar
           v-model:active-id="activeTab"

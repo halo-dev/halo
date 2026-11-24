@@ -234,7 +234,7 @@ function getMenuItemRefDisplayName(node: MenuItemTreeNode) {
         <MenuList v-model:selected-menu="selectedMenu" />
       </div>
       <div class="min-w-0 flex-1 shrink">
-        <VCard :body-class="['!p-0']">
+        <VCard flush>
           <template #toolbar>
             <div
               class="relative flex flex-col items-start sm:flex-row sm:items-center"

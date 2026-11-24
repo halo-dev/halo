@@ -213,7 +213,7 @@ const handleDelete = async (role: Role) => {
   </VPageHeader>
 
   <div class="m-0 md:m-4">
-    <VCard :body-class="['!p-0']">
+    <VCard flush>
       <template #toolbar>
         <div
           class="relative flex flex-col items-start sm:flex-row sm:items-center"
