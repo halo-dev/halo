@@ -94,7 +94,7 @@ const handleClose = () => {
   padding: 8px 12px;
 
   .alert-icon {
-    @apply mr-2 mt-0.5 flex flex-shrink-0 items-center text-base;
+    @apply mr-2 flex h-5 flex-shrink-0 items-center text-base;
   }
 
   .alert-content {
@@ -118,7 +118,11 @@ const handleClose = () => {
   }
 
   .alert-description {
-    @apply mt-0.5 text-sm leading-5;
+    @apply text-sm leading-5;
+  }
+
+  .alert-header + .alert-description {
+    @apply mt-0.5;
   }
 
   .alert-actions {
