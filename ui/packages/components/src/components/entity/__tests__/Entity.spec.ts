@@ -103,8 +103,33 @@ describe("Entity", () => {
     wrapper.findComponent({ name: "VDropdown" }).vm.$emit("update:shown", true);
     await nextTick();
 
-    expect(
-      wrapper.get(".entity-dropdown-trigger").attributes("aria-expanded")
-    ).toBe("true");
+    const openTrigger = wrapper.get(".entity-dropdown-trigger");
+
+    expect(openTrigger.attributes("aria-expanded")).toBe("true");
+    expect(openTrigger.classes()).toContain("bg-gray-200/60");
+    expect(openTrigger.classes()).toContain("text-blue-600");
+  });
+
+  it("keeps the selected trigger background when the dropdown is open", async () => {
+    const wrapper = mount(VEntity, {
+      props: { isSelected: true },
+      global: {
+        stubs: {
+          VDropdown: VDropdownStub,
+        },
+      },
+      slots: {
+        dropdownItems: () => h("button", "Edit"),
+      },
+    });
+
+    wrapper.findComponent({ name: "VDropdown" }).vm.$emit("update:shown", true);
+    await nextTick();
+
+    const trigger = wrapper.get(".entity-dropdown-trigger");
+
+    expect(trigger.attributes("aria-expanded")).toBe("true");
+    expect(trigger.classes()).toContain("!bg-gray-300/60");
+    expect(trigger.classes()).toContain("text-blue-600");
   });
 });
