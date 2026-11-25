@@ -27,7 +27,7 @@ const handleAppendClick = () => {
 
 <template>
   <div :class="context.classes.add" @click="handleAppendClick">
-    <VButton :disabled="disabled" type="secondary">
+    <VButton :disabled="disabled" type="secondary" size="sm">
       <template #icon>
         <IconAddCircle />
       </template>

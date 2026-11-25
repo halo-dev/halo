@@ -5,10 +5,12 @@ import {
 } from "@halo-dev/api-client";
 import { useQuery } from "@tanstack/vue-query";
 import { cloneDeep } from "es-toolkit";
-import { ref } from "vue";
+import { ref, type MaybeRefOrGetter } from "vue";
 import { flattenCategoryTreeNodes } from "../utils";
 
-export function usePostCategory() {
+export function usePostCategory(options?: {
+  enabled?: MaybeRefOrGetter<boolean>;
+}) {
   const categoriesTree = ref<CategoryTreeNode[]>([]);
   const previousCategoriesTree = ref<CategoryTreeNode[]>([]);
   const categories = ref<Category[]>([]);
@@ -26,6 +28,7 @@ export function usePostCategory() {
         await consoleApiClient.content.category.listCategoryTree();
       return data;
     },
+    enabled: options?.enabled,
     refetchInterval(data) {
       const hasAbnormalCategory = flattenCategoryTreeNodes(data || []).some(
         (category) =>

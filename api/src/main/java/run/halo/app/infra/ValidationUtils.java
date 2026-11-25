@@ -13,6 +13,10 @@ public class ValidationUtils {
     public static final String NAME_REGEX = "^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$";
     public static final Pattern NAME_PATTERN = Pattern.compile(NAME_REGEX);
 
+    public static final int USERNAME_MAX_LENGTH = 63;
+
+    public static final int DISPLAY_NAME_MAX_LENGTH = 50;
+
     /** {@code A-Z, a-z, 0-9, !@#$%^&*.?} are allowed. */
     public static final String PASSWORD_REGEX = "^[A-Za-z0-9!@#$%^&*.?]+$";
 

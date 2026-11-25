@@ -1,5 +1,11 @@
 <script lang="ts" setup>
-import { Toast, VButton, VDropdown, VDropdownItem } from "@halo-dev/components";
+import {
+  Toast,
+  VButton,
+  VDropdown,
+  VDropdownItem,
+  VPopover,
+} from "@halo-dev/components";
 import {
   utils,
   type AttachmentLike,
@@ -23,6 +29,10 @@ const emit = defineEmits<{
 
 // Attachment Selector Modal
 const attachmentSelectorModalVisible = ref(false);
+
+// The permalink panel is portaled outside the menu, so keep the menu open while
+// the user interacts with it.
+const permalinkOpen = ref(false);
 
 function onAttachmentSelect(attachments: AttachmentLike[]) {
   if (!attachments.length) {
@@ -67,7 +77,7 @@ function onExternalLinkChange(value?: string | number) {
 }
 </script>
 <template>
-  <VDropdown class="inline-flex">
+  <VDropdown class="inline-flex" :auto-hide="!permalinkOpen">
     <VButton size="sm" type="secondary">
       {{ i18n.global.t("editor.extensions.upload.operations.replace.button") }}
     </VButton>
@@ -89,11 +99,21 @@ function onExternalLinkChange(value?: string | number) {
       >
         {{ i18n.global.t("editor.extensions.upload.attachment.title") }}
       </VDropdownItem>
-      <VDropdown>
-        <VDropdownItem>
-          {{ i18n.global.t("editor.extensions.upload.permalink.title") }}
-        </VDropdownItem>
-        <template #popper>
+      <VPopover v-model:open="permalinkOpen">
+        <!--
+          A `VDropdownItem` always closes the parent dropdown when clicked. Use a
+          plain menu item so the permalink panel can open without closing the menu.
+        -->
+        <div
+          class="dropdown-item-wrapper dropdown-item-wrapper--default"
+          role="menuitem"
+          tabindex="-1"
+        >
+          <div class="flex items-center gap-3">
+            {{ i18n.global.t("editor.extensions.upload.permalink.title") }}
+          </div>
+        </div>
+        <template #content>
           <div class="w-80">
             <Input
               auto-focus
@@ -105,7 +125,7 @@ function onExternalLinkChange(value?: string | number) {
             />
           </div>
         </template>
-      </VDropdown>
+      </VPopover>
     </template>
   </VDropdown>
 

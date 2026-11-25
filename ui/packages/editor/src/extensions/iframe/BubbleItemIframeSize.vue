@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { VDropdown } from "@halo-dev/components";
+import { VPopover } from "@halo-dev/components";
 import { computed } from "vue";
 import MdiImageSizeSelectSmall from "~icons/mdi/image-size-select-small";
 import MingcuteCellphoneLine from "~icons/mingcute/cellphone-line";
@@ -69,7 +69,7 @@ const presetSizes = [
 ];
 </script>
 <template>
-  <VDropdown class="inline-flex" :auto-hide="true" :distance="10">
+  <VPopover :offset="10">
     <BubbleButton
       :title="i18n.global.t('editor.extensions.iframe.resize')"
       show-more-indicator
@@ -78,7 +78,7 @@ const presetSizes = [
         <MdiImageSizeSelectSmall />
       </template>
     </BubbleButton>
-    <template #popper>
+    <template #content>
       <div class="flex w-56 flex-col gap-3">
         <div class="flex flex-col items-center gap-3">
           <Input
@@ -113,5 +113,5 @@ const presetSizes = [
         </div>
       </div>
     </template>
-  </VDropdown>
+  </VPopover>
 </template>

@@ -16,6 +16,7 @@ import { cloneDeep } from "es-toolkit";
 import { computed, nextTick, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import type AnnotationsForm from "@/components/form/AnnotationsForm.vue";
+import { POST_CONTRIBUTOR_ROLE_NAME } from "@/constants/constants";
 import { postLabels } from "@/constants/labels";
 import { usePostUpdateMutate } from "../composables/use-post-update-mutate";
 
@@ -352,7 +353,9 @@ const showCancelPublishButton = computed(() => {
               </span>
             </div>
           </div>
-          <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">
+          <div
+            class="formkit-stack mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0"
+          >
             <FormKit
               v-model="formState.spec.title"
               :label="$t('core.post.settings.fields.title.label')"
@@ -446,11 +449,14 @@ const showCancelPublishButton = computed(() => {
               </span>
             </div>
           </div>
-          <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">
+          <div
+            class="formkit-stack mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0"
+          >
             <FormKit
               v-if="utils.permission.has(['system:users:view'])"
               v-model="formState.spec.owner"
               :label="$t('core.post.settings.fields.owner.label')"
+              :effective-role="POST_CONTRIBUTOR_ROLE_NAME"
               type="userSelect"
             ></FormKit>
             <FormKit

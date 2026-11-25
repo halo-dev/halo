@@ -1,3 +1,4 @@
+/* eslint-disable vue/one-component-per-file -- Test-local host components keep the nested-popover flows isolated. */
 import { mount } from "@vue/test-utils";
 import {
   afterEach,
@@ -136,6 +137,44 @@ describe("Popover", () => {
     wrapper.unmount();
   });
 
+  it("closes when focus moves outside unless closeOnFocusOutside is false", async () => {
+    const outside = document.createElement("input");
+    document.body.appendChild(outside);
+
+    async function moveFocusOutside() {
+      // Reka checks focus outside in a timeout.
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await settle();
+    }
+
+    const wrapper = mountPopover({ open: true });
+
+    await settle();
+    expect(getContent()).not.toBeNull();
+
+    outside.focus();
+    await moveFocusOutside();
+
+    expect(wrapper.emitted("update:open")?.at(-1)).toEqual([false]);
+    expect(getContent()).toBeNull();
+
+    wrapper.unmount();
+
+    const sticky = mountPopover({ open: true, closeOnFocusOutside: false });
+
+    await settle();
+    expect(getContent()).not.toBeNull();
+
+    outside.focus();
+    await moveFocusOutside();
+
+    expect(sticky.emitted("update:open")).toBeUndefined();
+    expect(getContent()).not.toBeNull();
+
+    sticky.unmount();
+    outside.remove();
+  }, 20_000);
+
   it("exposes show and hide", async () => {
     const wrapper = mountPopover();
 
@@ -174,6 +213,93 @@ describe("Popover", () => {
 
     expect(wrapper.emitted("update:open")).toBeUndefined();
     expect(getContent()).toBeNull();
+
+    wrapper.unmount();
+  });
+
+  it("closes when its trigger leaves the document", async () => {
+    const wrapper = mountPopover({ open: true });
+    await settle();
+    expect(getContent()).not.toBeNull();
+
+    wrapper.get("button").element.remove();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    await settle();
+
+    expect(wrapper.emitted("update:open")?.at(-1)).toEqual([false]);
+    expect(getContent()).toBeNull();
+
+    wrapper.unmount();
+  });
+
+  it("keeps the panel open when the trigger is replaced", async () => {
+    const wrapper = mountPopover({ open: true });
+    await settle();
+
+    const trigger = wrapper.get("button").element;
+    const panelId = trigger.getAttribute("aria-controls");
+    expect(panelId).toBeTruthy();
+
+    // Reka binds the replacement through `aria-controls`, so the panel keeps a
+    // valid anchor.
+    const replacement = document.createElement("button");
+    replacement.type = "button";
+    replacement.setAttribute("aria-controls", panelId as string);
+    document.body.appendChild(replacement);
+
+    trigger.remove();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    await settle();
+
+    expect(wrapper.emitted("update:open")).toBeUndefined();
+    expect(getContent()).not.toBeNull();
+
+    wrapper.unmount();
+  });
+
+  it("keeps a parent panel open while a nested panel is used", async () => {
+    const Host = defineComponent({
+      components: { VPopover },
+      setup() {
+        return { parentOpen: ref(true), childOpen: ref(true) };
+      },
+      template: `
+        <VPopover v-model:open="parentOpen">
+          <button type="button">Parent</button>
+          <template #content>
+            <div data-testid="parent-content">
+              <VPopover v-model:open="childOpen">
+                <button type="button">Child</button>
+                <template #content>
+                  <div data-testid="child-content">Child panel</div>
+                </template>
+              </VPopover>
+            </div>
+          </template>
+        </VPopover>
+      `,
+    });
+
+    const wrapper = mount(Host, { attachTo: document.body });
+    await settle();
+    // Reka registers its document listeners on a later tick.
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    document
+      .querySelector("[data-testid='child-content']")
+      ?.dispatchEvent(new MouseEvent("pointerdown", { bubbles: true }));
+    await settle();
+
+    expect(wrapper.vm.parentOpen).toBe(true);
+    expect(wrapper.vm.childOpen).toBe(true);
+
+    document.body.dispatchEvent(
+      new MouseEvent("pointerdown", { bubbles: true })
+    );
+    await settle();
+
+    expect(wrapper.vm.parentOpen).toBe(false);
+    expect(wrapper.vm.childOpen).toBe(false);
 
     wrapper.unmount();
   });

@@ -7,6 +7,7 @@
   "common.next": "Página siguiente",
   "common.expand": "Expandir",
   "common.collapse": "Contraer",
+  "entity.more_actions": "Más acciones",
   "pagination.page": "Página",
   "pagination.size": "Elementos por página",
   "pagination.total": "Total de {total} elementos",

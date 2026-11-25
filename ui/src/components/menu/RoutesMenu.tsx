@@ -1,7 +1,7 @@
 import { VMenu, VMenuItem, VMenuLabel } from "@halo-dev/components";
 import type { MenuGroupType, MenuItemType } from "@halo-dev/ui-shared";
 import type { Component, PropType } from "vue";
-import { computed, defineComponent } from "vue";
+import { Fragment, computed, defineComponent } from "vue";
 import { useI18n } from "vue-i18n";
 import type { RouteLocationMatched } from "vue-router";
 import { useRoute, useRouter } from "vue-router";
@@ -43,7 +43,7 @@ const RoutesMenu = defineComponent({
     function renderItems(items: MenuItemType[] | undefined) {
       return items?.map((item) => {
         return (
-          <>
+          <Fragment key={item.path}>
             {item.children?.length ? (
               <VMenuItem
                 key={item.path}
@@ -69,7 +69,7 @@ const RoutesMenu = defineComponent({
                 active={openIds.value.includes(item.path)}
               />
             )}
-          </>
+          </Fragment>
         );
       });
     }
@@ -79,10 +79,10 @@ const RoutesMenu = defineComponent({
       <VMenu openIds={openIds.value} ariaLabel={props.ariaLabel}>
         {props.menus?.map((menu: MenuGroupType) => {
           return (
-            <>
+            <Fragment key={menu.id}>
               {menu.name && <VMenuLabel>{t(menu.name, menu.name)}</VMenuLabel>}
               {menu.items?.length && renderItems(menu.items)}
-            </>
+            </Fragment>
           );
         })}
       </VMenu>

@@ -1,7 +1,15 @@
 <script lang="ts" setup>
 import type { TotpRequest } from "@halo-dev/api-client";
 import { ucApiClient } from "@halo-dev/api-client";
-import { Toast, VAlert, VButton, VModal, VSpace } from "@halo-dev/components";
+import {
+  Toast,
+  VAccordion,
+  VAccordionItem,
+  VAlert,
+  VButton,
+  VModal,
+  VSpace,
+} from "@halo-dev/components";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 import { useQRCode } from "@vueuse/integrations/useQRCode";
 import { computed, ref } from "vue";
@@ -75,31 +83,36 @@ function onSubmit(data: TotpRequest) {
           }}
         </div>
         <img :src="qrcode" class="rounded-base border border-gray-100" />
-        <details>
-          <summary class="cursor-pointer select-none text-sm text-gray-800">
-            {{
+        <VAccordion type="single" collapsible variant="plain">
+          <VAccordionItem
+            value="manual"
+            header-as="div"
+            :title="
               $t(
-                "core.uc_profile.2fa.methods.totp.operations.configure.fields.manual.label"
+                'core.uc_profile.2fa.methods.totp.operations.configure.fields.manual.label'
               )
-            }}
-          </summary>
-          <div class="mt-3 rounded-base border border-gray-100 p-2">
-            <span class="text-sm text-gray-600">
-              {{
-                $t(
-                  "core.uc_profile.2fa.methods.totp.operations.configure.fields.manual.help"
-                )
-              }}
-            </span>
-            <div class="mt-2">
-              <code
-                class="select-all rounded bg-gray-200 p-1 text-xs text-gray-900"
-              >
-                {{ data?.rawSecret }}
-              </code>
+            "
+            trigger-class="select-none !py-0"
+            content-class="!pb-0"
+          >
+            <div class="mt-3 rounded-base border border-gray-100 p-2">
+              <span class="text-sm text-gray-600">
+                {{
+                  $t(
+                    "core.uc_profile.2fa.methods.totp.operations.configure.fields.manual.help"
+                  )
+                }}
+              </span>
+              <div class="mt-2">
+                <code
+                  class="select-all rounded bg-gray-200 p-1 text-xs text-gray-900"
+                >
+                  {{ data?.rawSecret }}
+                </code>
+              </div>
             </div>
-          </div>
-        </details>
+          </VAccordionItem>
+        </VAccordion>
       </div>
       <FormKit id="totp-form" type="form" name="totp-form" @submit="onSubmit">
         <FormKit

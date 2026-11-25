@@ -8,7 +8,7 @@ import {
   IconSettings3Line,
   IconShieldUser,
   VAvatar,
-  VDropdown,
+  VPopover,
   VTag,
 } from "@halo-dev/components";
 import { stores } from "@halo-dev/ui-shared";
@@ -111,7 +111,7 @@ const actions = computed(() => {
             ] || currentUser.roles[0].metadata.name
           }}
         </VTag>
-        <VDropdown v-else :triggers="['click']">
+        <VPopover v-else>
           <div class="user-profile__roles-dropdown">
             <VTag>
               <template #leftIcon>
@@ -121,7 +121,7 @@ const actions = computed(() => {
             </VTag>
             <IconArrowDownLine />
           </div>
-          <template #popper>
+          <template #content>
             <div class="user-profile__roles-popper">
               <h2 class="user-profile__roles-title">
                 {{ $t("core.sidebar.profile.aggregate_role") }}
@@ -143,7 +143,7 @@ const actions = computed(() => {
               </div>
             </div>
           </template>
-        </VDropdown>
+        </VPopover>
       </div>
     </div>
 
@@ -172,6 +172,7 @@ const actions = computed(() => {
 
   &__avatar {
     display: flex;
+    flex-shrink: 0;
     align-items: center;
     align-self: center;
   }
@@ -183,7 +184,10 @@ const actions = computed(() => {
   }
 
   &__name {
-    display: flex;
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
     font-size: 0.875rem;
     font-weight: 500;
   }

@@ -16,8 +16,8 @@ import {
   IconSearch,
 } from "../../icons/icons";
 import { useComponentsI18n } from "../../locales";
-import { VDropdown, type VDropdownPlacement } from "../dropdown";
 import { VLoading } from "../loading";
+import { VPopover, type VPopoverPlacement } from "../popover";
 import { filterDropdownGroupKey } from "./group";
 import { getFilterTriggerClasses } from "./trigger";
 import type {
@@ -97,7 +97,7 @@ const props = withDefaults(
     /**
      * Placement of the panel.
      */
-    placement?: VDropdownPlacement;
+    placement?: VPopoverPlacement;
     /**
      * Width of the panel, for example "20rem". By default the panel width is
      * sized by its content, between 12rem and 20rem.
@@ -189,7 +189,7 @@ const listboxId = `${uid}-listbox`;
 const group = inject(filterDropdownGroupKey);
 const groupEntryId = Symbol("filter-dropdown");
 
-const dropdown = ref<{ show: () => void; hide: () => void }>();
+const popover = ref<InstanceType<typeof VPopover>>();
 const triggerRef = ref<HTMLButtonElement>();
 const searchInputRef = ref<HTMLInputElement>();
 const listRef = ref<HTMLElement>();
@@ -447,11 +447,11 @@ const selectedOption = computed<FilterDropdownOption | undefined>(() => {
 });
 
 function show() {
-  dropdown.value?.show();
+  popover.value?.show();
 }
 
 function hide() {
-  dropdown.value?.hide();
+  popover.value?.hide();
 }
 
 function toggleRow(row: OptionRow) {
@@ -730,20 +730,38 @@ function onScroll(event: Event) {
   }
 }
 
-async function onShow() {
-  isOpen.value = true;
+function onOpenChange(value: boolean) {
+  isOpen.value = value;
   lastAutoLoadSignature = "";
   loadMoreRequested = false;
+
+  if (!value) {
+    activeKey.value = undefined;
+    return;
+  }
+
+  focusOnOpen();
 }
 
-async function onApplyShow() {
-  await nextTick();
+async function focusOnOpen() {
+  // The popover mounts its panel asynchronously after `open` flips, so wait
+  // for the panel element instead of assuming a fixed number of ticks.
+  const focusTarget = () =>
+    showSearch.value ? searchInputRef.value : listRef.value;
 
-  if (showSearch.value) {
-    searchInputRef.value?.focus();
-  } else {
-    listRef.value?.focus();
+  for (let attempt = 0; attempt < 10 && isOpen.value; attempt += 1) {
+    if (focusTarget()) {
+      break;
+    }
+
+    await nextTick();
   }
+
+  if (!isOpen.value) {
+    return;
+  }
+
+  focusTarget()?.focus();
 
   const selectedRow = optionRows.value.find((row) => isRowSelected(row));
   activeKey.value = selectedRow?.key;
@@ -776,13 +794,6 @@ function onTriggerKeyup(event: KeyboardEvent) {
   if (event.key === "Escape") {
     event.stopPropagation();
   }
-}
-
-function onHide() {
-  isOpen.value = false;
-  activeKey.value = undefined;
-  lastAutoLoadSignature = "";
-  loadMoreRequested = false;
 }
 
 watch(
@@ -833,16 +844,14 @@ defineExpose({
 </script>
 
 <template>
-  <VDropdown
-    ref="dropdown"
+  <VPopover
+    ref="popover"
+    :open="isOpen"
     :disabled="disabled"
     :placement="placement"
-    :distance="4"
-    :no-auto-focus="true"
-    popper-class="[&_.v-popper\_\_inner]:!overflow-hidden [&_.v-popper\_\_inner]:!p-0"
-    @show="onShow"
-    @apply-show="onApplyShow"
-    @hide="onHide"
+    :offset="4"
+    content-class="!p-0"
+    @update:open="onOpenChange"
   >
     <button
       ref="triggerRef"
@@ -873,7 +882,7 @@ defineExpose({
         </span>
       </slot>
     </button>
-    <template #popper>
+    <template #content>
       <div
         class="flex flex-col"
         :class="
@@ -1030,5 +1039,5 @@ defineExpose({
         </div>
       </div>
     </template>
-  </VDropdown>
+  </VPopover>
 </template>

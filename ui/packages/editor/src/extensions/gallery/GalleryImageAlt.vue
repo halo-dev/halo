@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { VDropdown } from "@halo-dev/components";
+import { VPopover } from "@halo-dev/components";
 import { nextTick, ref, useTemplateRef } from "vue";
 import MingcuteEdit4Line from "~icons/mingcute/edit-4-line";
 import Input from "@/components/base/Input.vue";
@@ -17,6 +17,13 @@ async function close() {
   trigger.value?.focus();
 }
 
+function onOpenUpdate(open: boolean) {
+  shown.value = open;
+  if (open) {
+    draft.value = props.alt;
+  }
+}
+
 function save(event: Event) {
   const input = (event.target as HTMLFormElement).elements.item(
     0
@@ -27,28 +34,21 @@ function save(event: Event) {
 </script>
 
 <template>
-  <VDropdown
-    v-model:shown="shown"
-    class="pointer-events-none group-focus-within/actions:pointer-events-auto group-hover/image:pointer-events-auto [@media(hover:none)]:pointer-events-auto"
-    :triggers="['click']"
-    :distance="10"
-    :no-auto-focus="true"
-    @show="draft = props.alt"
-    @click.stop
-    @mousedown.stop
-    @dragstart.stop.prevent
-  >
+  <VPopover :open="shown" :offset="10" @update:open="onOpenUpdate">
     <button
       ref="trigger"
       v-tooltip="i18n.global.t('editor.extensions.image.edit_alt')"
       type="button"
       :aria-label="i18n.global.t('editor.extensions.image.edit_alt')"
       :aria-expanded="shown"
-      class="text-grey-900 flex size-8 cursor-pointer items-center justify-center rounded-md bg-white/90 transition-all hover:bg-white hover:text-black active:!bg-white/80"
+      class="text-grey-900 pointer-events-none flex size-8 cursor-pointer items-center justify-center rounded-md bg-white/90 transition-all hover:bg-white hover:text-black active:!bg-white/80 group-focus-within/actions:pointer-events-auto group-hover/image:pointer-events-auto [@media(hover:none)]:pointer-events-auto"
+      @click.stop
+      @mousedown.stop
+      @dragstart.stop.prevent
     >
       <MingcuteEdit4Line class="size-4" />
     </button>
-    <template #popper>
+    <template #content>
       <form
         v-if="shown"
         class="w-56"
@@ -65,5 +65,5 @@ function save(event: Event) {
         />
       </form>
     </template>
-  </VDropdown>
+  </VPopover>
 </template>

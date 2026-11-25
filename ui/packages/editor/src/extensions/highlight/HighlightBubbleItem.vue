@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import MingcuteCloseLine from "~icons/mingcute/close-line";
-import { BubbleItem } from "@/components";
+import { BubbleButton } from "@/components";
 import ColorPickerDropdown from "@/components/common/ColorPickerDropdown.vue";
 import { i18n } from "@/locales";
 import type { BubbleItemComponentProps } from "@/types";
@@ -9,13 +9,15 @@ import { ExtensionHighlight } from ".";
 const props = defineProps<BubbleItemComponentProps>();
 
 function handleSetColor(color?: string) {
+  // Applying a highlight must not refocus the editor: the picker stays open
+  // while the user drags, and stealing focus moves the caret and the floating
+  // panels.
   if (props.editor.isActive(ExtensionHighlight.name)) {
-    props.editor.chain().focus().unsetHighlight().run();
+    props.editor.chain().unsetHighlight().run();
   }
 
   props.editor
     ?.chain()
-    .focus()
     .setHighlight(color ? { color } : undefined)
     .run();
 }
@@ -27,7 +29,15 @@ function handleUnsetColor() {
 
 <template>
   <ColorPickerDropdown @update:model-value="handleSetColor">
-    <BubbleItem v-bind="props" @click="handleSetColor()" />
+    <BubbleButton
+      v-if="!visible || visible({ editor })"
+      :title="i18n.global.t('editor.common.highlight')"
+      :is-active="isActive?.({ editor })"
+    >
+      <template #icon>
+        <component :is="icon" :style="iconStyle" />
+      </template>
+    </BubbleButton>
     <template #prefix>
       <div class="p-1">
         <div

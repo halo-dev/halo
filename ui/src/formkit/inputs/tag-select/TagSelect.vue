@@ -8,14 +8,31 @@ import {
   IconArrowRight,
   IconCheckboxCircle,
   IconClose,
-  VDropdown,
+  VPopover,
 } from "@halo-dev/components";
 import { utils } from "@halo-dev/ui-shared";
-import { onClickOutside, useResizeObserver } from "@vueuse/core";
+import { useEventListener } from "@vueuse/core";
 import Fuse from "fuse.js";
 import ShortUniqueId from "short-unique-id";
 import { slugify } from "transliteration";
-import { computed, ref, useTemplateRef, watch, type PropType } from "vue";
+import {
+  computed,
+  nextTick,
+  ref,
+  useTemplateRef,
+  watch,
+  type PropType,
+} from "vue";
+import {
+  applyDataPermissionGuard,
+  noPermissionMessage,
+} from "@/formkit/utils/permission";
+
+const tagPermissions = [
+  "system:posts:view",
+  "system:posts:manage",
+  "uc:posts:manage",
+];
 
 const props = defineProps({
   context: {
@@ -40,26 +57,56 @@ const multiple = computed(() => {
 const selectedTag = ref<Tag>();
 const dropdownVisible = ref(false);
 const text = ref("");
-const wrapperRef = useTemplateRef<HTMLElement>("wrapperRef");
-const popperRef = useTemplateRef<HTMLElement>("popperRef");
+const inputRef = useTemplateRef<HTMLInputElement>("inputRef");
 
-// resolve the issue of the dropdown position when the container size changes
-// https://github.com/Akryum/floating-vue/issues/977#issuecomment-1651898070
-useResizeObserver(wrapperRef, () => {
-  window.dispatchEvent(new Event("resize"));
-});
+let blockEscapeKeyup = false;
 
-onClickOutside(
-  wrapperRef,
-  () => {
-    dropdownVisible.value = false;
+// Escape closes the panel through the popover itself. The surrounding modal
+// also listens for Escape on keyup, so swallow that keyup once the panel has
+// handled the key.
+useEventListener(
+  window,
+  "keydown",
+  (event: KeyboardEvent) => {
+    if (event.key === "Escape" && dropdownVisible.value) {
+      blockEscapeKeyup = true;
+    }
   },
-  {
-    ignore: [popperRef],
-  }
+  { capture: true }
 );
 
-const { data: postTags, refetch: handleFetchTags } = useAllPostTagsQuery();
+useEventListener(
+  window,
+  "keyup",
+  (event: KeyboardEvent) => {
+    if (event.key !== "Escape" || !blockEscapeKeyup) {
+      return;
+    }
+    blockEscapeKeyup = false;
+    event.stopPropagation();
+  },
+  { capture: true }
+);
+
+// The non-modal popover moves focus to its content when it mounts, so return
+// the focus to the search input after the panel has rendered.
+watch(dropdownVisible, async (visible) => {
+  if (!visible) {
+    return;
+  }
+  await nextTick();
+  await nextTick();
+  inputRef.value?.focus();
+});
+
+const canViewTags = applyDataPermissionGuard(
+  props.context.node,
+  tagPermissions
+);
+
+const { data: postTags, refetch: handleFetchTags } = useAllPostTagsQuery({
+  enabled: canViewTags,
+});
 
 // search
 let fuse: Fuse<Tag> | undefined = undefined;
@@ -144,16 +191,30 @@ const handleSelect = (tag: Tag) => {
       props.context.node.input([...currentValue, tag.metadata.name]);
       text.value = "";
     }
-    return;
+  } else {
+    props.context.node.input(
+      tag.metadata.name === props.context._value ? "" : tag.metadata.name
+    );
   }
-
-  props.context.node.input(
-    tag.metadata.name === props.context._value ? "" : tag.metadata.name
-  );
+  // Selecting with the mouse moves the focus away from the input, so put it
+  // back once the tag has been selected.
+  nextTick(() => inputRef.value?.focus());
 };
 
 const handleKeydown = (e: KeyboardEvent) => {
+  if (e.key === "Escape") {
+    return;
+  }
+
   if (!searchResults.value) return;
+
+  if (!dropdownVisible.value) {
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault();
+      dropdownVisible.value = true;
+    }
+    return;
+  }
 
   if (e.key === "ArrowDown") {
     e.preventDefault();
@@ -198,19 +259,22 @@ const handleKeydown = (e: KeyboardEvent) => {
 };
 
 const scrollToSelected = () => {
-  const selectedNodeName = selectedTag.value
-    ? selectedTag.value?.metadata.name
-    : "tag-create";
+  // Wait for the options to render before looking them up.
+  nextTick(() => {
+    const selectedNodeName = selectedTag.value
+      ? selectedTag.value?.metadata.name
+      : "tag-create";
 
-  const selectedNode = document.getElementById(selectedNodeName);
+    const selectedNode = document.getElementById(selectedNodeName);
 
-  if (selectedNode) {
-    selectedNode.scrollIntoView({
-      behavior: "smooth",
-      block: "nearest",
-      inline: "start",
-    });
-  }
+    if (selectedNode) {
+      selectedNode.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "start",
+      });
+    }
+  });
 };
 
 const uid = new ShortUniqueId();
@@ -276,22 +340,17 @@ const handleDelete = () => {
 </script>
 
 <template>
-  <VDropdown
-    :triggers="[]"
-    :shown="dropdownVisible"
-    auto-size
-    :auto-hide="false"
-    container="body"
-    :distance="10"
-    class="w-full"
-    popper-class="post-tag-dropdown"
+  <VPopover
+    v-model:open="dropdownVisible"
+    :disabled="!canViewTags"
+    :arrow="false"
+    match-trigger-width
+    :offset="10"
+    content-class="!p-0 overflow-hidden"
   >
-    <div
-      ref="wrapperRef"
-      :class="context.classes['post-tags-wrapper']"
-      @keydown="handleKeydown"
-    >
-      <div :class="context.classes['post-tags']">
+    <div :class="context.classes['post-tags-wrapper']" @keydown="handleKeydown">
+      <!-- Keep chip interactions from toggling the popover through the trigger. -->
+      <div :class="context.classes['post-tags']" @click.stop>
         <div
           v-for="(tag, index) in selectedTags"
           :key="index"
@@ -307,24 +366,30 @@ const handleDelete = () => {
           </PostTag>
         </div>
         <input
+          ref="inputRef"
           :value="text"
           :class="context.classes.input"
           type="text"
+          :disabled="!canViewTags"
+          :placeholder="canViewTags ? undefined : noPermissionMessage()"
           @input="onTextInput"
+          @click.stop="dropdownVisible = true"
           @focus="dropdownVisible = true"
           @keydown.delete="handleDelete"
         />
       </div>
 
       <div
-        :class="context.classes['post-tags-button']"
-        @click="dropdownVisible = !dropdownVisible"
+        :class="[
+          context.classes['post-tags-button'],
+          { 'cursor-not-allowed opacity-60': !canViewTags },
+        ]"
       >
         <IconArrowRight class="rotate-90 text-gray-500 hover:text-gray-700" />
       </div>
     </div>
-    <template #popper>
-      <div ref="popperRef" :class="context.classes['dropdown-wrapper']">
+    <template #content>
+      <div :class="context.classes['dropdown-wrapper']">
         <ul class="p-1">
           <HasPermission
             v-if="text.trim()"
@@ -363,15 +428,5 @@ const handleDelete = () => {
         </ul>
       </div>
     </template>
-  </VDropdown>
+  </VPopover>
 </template>
-<style lang="scss">
-.post-tag-dropdown {
-  .v-popper__arrow-container {
-    display: none;
-  }
-  .v-popper__inner {
-    padding: 0 !important;
-  }
-}
-</style>

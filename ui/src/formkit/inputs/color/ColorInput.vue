@@ -2,7 +2,7 @@
 import { Sketch, type Payload } from "@ckpack/vue-color";
 import { TinyColor } from "@ctrl/tinycolor";
 import type { FormKitFrameworkContext } from "@formkit/core";
-import { IconClose, VButton, VDropdown } from "@halo-dev/components";
+import { IconClose, VButton, VPopover } from "@halo-dev/components";
 import Color from "colorjs.io";
 import { computed, useTemplateRef, type PropType } from "vue";
 import RiCodeSSlashLine from "~icons/ri/code-s-slash-line";
@@ -63,7 +63,7 @@ const isHighContrast = computed(() => {
 });
 
 const editFormDropdown =
-  useTemplateRef<InstanceType<typeof VDropdown>>("editFormDropdown");
+  useTemplateRef<InstanceType<typeof VPopover>>("editFormDropdown");
 
 function onEditFormSubmit({ value }: { value: string }) {
   props.context.node.input(formatColorByUnpredictableValue(value));
@@ -73,7 +73,7 @@ function onEditFormSubmit({ value }: { value: string }) {
 
 <template>
   <div class="group/color-input inline-flex items-center gap-2">
-    <VDropdown class="inline-flex" popper-class="[&_.v-popper\_\_inner]:!p-0">
+    <VPopover class="inline-flex" content-class="!p-0">
       <button
         type="button"
         aria-label="Choose color"
@@ -90,28 +90,28 @@ function onEditFormSubmit({ value }: { value: string }) {
           {{ context._value || $t("core.formkit.color.placeholder") }}
         </span>
       </button>
-      <template #popper>
+      <template #content>
         <Sketch
           :model-value="context._value || '#000'"
           @update:model-value="onColorChange"
         />
       </template>
-    </VDropdown>
+    </VPopover>
 
     <div class="inline-flex items-center gap-1.5">
-      <VDropdown ref="editFormDropdown" class="inline-flex">
-        <template #default="{ shown }">
+      <VPopover ref="editFormDropdown" class="inline-flex">
+        <template #default="{ open }">
           <button
             v-tooltip="$t('core.formkit.color.operations.edit')"
             type="button"
             :aria-label="$t('core.formkit.color.operations.edit')"
             class="text-gray-500 opacity-0 transition-all hover:text-gray-900 group-hover/color-input:opacity-100"
-            :class="{ '!text-gray-900 !opacity-100': shown }"
+            :class="{ '!text-gray-900 !opacity-100': open }"
           >
             <RiCodeSSlashLine />
           </button>
         </template>
-        <template #popper>
+        <template #content>
           <div class="w-96">
             <FormKit
               id="color-edit-form"
@@ -132,7 +132,7 @@ function onEditFormSubmit({ value }: { value: string }) {
             </div>
           </div>
         </template>
-      </VDropdown>
+      </VPopover>
       <button
         v-if="context._value"
         v-tooltip="$t('core.common.buttons.delete')"

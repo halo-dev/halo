@@ -25,6 +25,12 @@ vi.mock("@halo-dev/components", () => ({
     emits: ["show", "update:shown"],
     template: '<div><slot /><slot name="popper" /></div>',
   },
+  VPopover: {
+    name: "VPopover",
+    props: ["open"],
+    emits: ["update:open"],
+    template: '<div><slot /><slot v-if="open" name="content" /></div>',
+  },
   VButton: { template: "<button><slot /></button>" },
   VSpace: { template: "<div><slot /></div>" },
 }));
@@ -256,23 +262,21 @@ describe("GalleryView", () => {
       attachTo: document.body,
       props: { alt: "Existing", "onUpdate:alt": updateAlt },
     });
-    wrapper.findComponent({ name: "VDropdown" }).vm.$emit("update:shown", true);
-    wrapper.findComponent({ name: "VDropdown" }).vm.$emit("show");
+    wrapper.findComponent({ name: "VPopover" }).vm.$emit("update:open", true);
     await wrapper.vm.$nextTick();
     expect(wrapper.get("input").element.value).toBe("Existing");
     await wrapper.get("input").setValue("Sunrise");
     wrapper.get("input").element.focus();
     await wrapper.get("form").trigger("submit");
     expect(document.activeElement).toBe(wrapper.get("button").element);
-    wrapper.findComponent({ name: "VDropdown" }).vm.$emit("update:shown", true);
+    wrapper.findComponent({ name: "VPopover" }).vm.$emit("update:open", true);
     await wrapper.vm.$nextTick();
     wrapper.get("input").element.value = "";
     await wrapper.get("input").trigger("input");
     await wrapper.get("form").trigger("submit");
     expect(updateAlt.mock.calls).toEqual([["Sunrise"], [""]]);
     await wrapper.setProps({ alt: "Updated" });
-    wrapper.findComponent({ name: "VDropdown" }).vm.$emit("update:shown", true);
-    wrapper.findComponent({ name: "VDropdown" }).vm.$emit("show");
+    wrapper.findComponent({ name: "VPopover" }).vm.$emit("update:open", true);
     await wrapper.vm.$nextTick();
     expect(wrapper.get("input").element.value).toBe("Updated");
     wrapper.get("input").element.value = "Unsaved";

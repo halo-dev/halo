@@ -10,6 +10,7 @@ import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuil
 import static org.springdoc.core.fn.builders.schema.Builder.schemaBuilder;
 import static org.springframework.web.reactive.function.server.RequestPredicates.contentType;
 import static run.halo.app.extension.ListResult.generateGenericClass;
+import static run.halo.app.extension.index.query.Queries.all;
 import static run.halo.app.extension.index.query.Queries.contains;
 import static run.halo.app.extension.index.query.Queries.equal;
 import static run.halo.app.extension.index.query.Queries.in;
@@ -75,6 +76,7 @@ import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.core.extension.service.AttachmentService;
+import run.halo.app.core.user.service.EffectiveRoleResolver;
 import run.halo.app.core.user.service.EmailVerificationService;
 import run.halo.app.core.user.service.RoleService;
 import run.halo.app.core.user.service.UserService;
@@ -111,6 +113,7 @@ public class UserEndpoint implements CustomEndpoint {
     private final ReactiveExtensionClient client;
     private final UserService userService;
     private final RoleService roleService;
+    private final EffectiveRoleResolver effectiveRoleResolver;
     private final AttachmentService attachmentService;
     private final EmailVerificationService emailVerificationService;
     private final RateLimiterRegistry rateLimiterRegistry;
@@ -510,6 +513,8 @@ public class UserEndpoint implements CustomEndpoint {
                     if (StringUtils.isBlank(createUserRequest.email())) {
                         throw new ServerWebInputException("Email is required");
                     }
+                    checkUsernameLength(createUserRequest.name());
+                    checkDisplayNameLength(defaultIfBlank(createUserRequest.displayName(), createUserRequest.name()));
                 })
                 .flatMap(userRequest -> {
                     User newUser = CreateUserRequest.from(userRequest);
@@ -540,6 +545,9 @@ public class UserEndpoint implements CustomEndpoint {
                 })
                 .flatMap(profile -> client.get(User.class, username).flatMap(user -> {
                     var spec = user.getSpec();
+                    if (!Objects.equals(spec.getDisplayName(), profile.displayName())) {
+                        checkDisplayNameLength(profile.displayName());
+                    }
                     var authorization = Objects.equals(spec.getEmail(), profile.email())
                             ? Mono.<Void>empty()
                             : requireSuperAdministrator();
@@ -675,6 +683,9 @@ public class UserEndpoint implements CustomEndpoint {
                         .doOnNext(profile -> {
                             if (StringUtils.isBlank(profile.displayName())) {
                                 throw new ServerWebInputException("Display name is required.");
+                            }
+                            if (!Objects.equals(currentUser.getSpec().getDisplayName(), profile.displayName())) {
+                                checkDisplayNameLength(profile.displayName());
                             }
                         })
                         .filterWhen(profile -> {
@@ -944,8 +955,13 @@ public class UserEndpoint implements CustomEndpoint {
             return queryParams.getFirst("role");
         }
 
+        @Schema(name = "effectiveRole")
+        public String getEffectiveRole() {
+            return queryParams.getFirst("effectiveRole");
+        }
+
         /** Converts query parameters to list options. */
-        public ListOptions toListOptions() {
+        public ListOptions toListOptions(Optional<Set<String>> effectiveRoleNames) {
             var defaultListOptions = labelAndFieldSelectorToListOptions(getLabelSelector(), getFieldSelector());
 
             var builder = ListOptions.builder(defaultListOptions);
@@ -960,6 +976,16 @@ public class UserEndpoint implements CustomEndpoint {
             Optional.ofNullable(getRole())
                     .filter(StringUtils::isNotBlank)
                     .ifPresent(role -> builder.andQuery(in(User.USER_RELATED_ROLES_INDEX, role)));
+
+            effectiveRoleNames.ifPresent(roleNames -> {
+                if (CollectionUtils.isEmpty(roleNames)) {
+                    // No role effectively contains the required role, return an empty result
+                    // instead of falling back to all users.
+                    builder.andQuery(all("metadata.name").not());
+                    return;
+                }
+                builder.andQuery(in(User.USER_RELATED_ROLES_INDEX, roleNames));
+            });
 
             return builder.build();
         }
@@ -977,6 +1003,15 @@ public class UserEndpoint implements CustomEndpoint {
                             .name("role")
                             .description("Role metadata.name")
                             .implementation(String.class)
+                            .required(false))
+                    .parameter(parameterBuilder()
+                            .in(ParameterIn.QUERY)
+                            .name("effectiveRole")
+                            .description("""
+                                    Filter users whose effective roles contain the given role name. \
+                                    Role dependencies are expanded and the super role is always \
+                                    included.""")
+                            .implementation(String.class)
                             .required(false));
         }
     }
@@ -988,12 +1023,23 @@ public class UserEndpoint implements CustomEndpoint {
     Mono<ServerResponse> list(ServerRequest request) {
         return Mono.just(request)
                 .map(UserEndpoint.ListRequest::new)
-                .flatMap(listRequest -> client.listBy(
-                        User.class,
-                        listRequest.toListOptions(),
-                        PageRequestImpl.of(listRequest.getPage(), listRequest.getSize(), listRequest.getSort())))
+                .flatMap(listRequest -> resolveEffectiveRoleNames(listRequest)
+                        .flatMap(effectiveRoleNames -> client.listBy(
+                                User.class,
+                                listRequest.toListOptions(effectiveRoleNames),
+                                PageRequestImpl.of(
+                                        listRequest.getPage(), listRequest.getSize(), listRequest.getSort()))))
                 .flatMap(this::toListedUser)
                 .flatMap(listResult -> ServerResponse.ok().bodyValue(listResult));
+    }
+
+    private Mono<Optional<Set<String>>> resolveEffectiveRoleNames(ListRequest listRequest) {
+        return Optional.ofNullable(listRequest.getEffectiveRole())
+                .filter(StringUtils::isNotBlank)
+                .map(effectiveRole -> effectiveRoleResolver
+                        .resolveRolesContaining(effectiveRole)
+                        .map(Optional::of))
+                .orElseGet(() -> Mono.just(Optional.empty()));
     }
 
     private Mono<ListResult<ListedUser>> toListedUser(ListResult<User> listResult) {
@@ -1028,6 +1074,24 @@ public class UserEndpoint implements CustomEndpoint {
         Assert.notNull(listResult, "listResult must not be null");
         Assert.notNull(items, "items must not be null");
         return new ListResult<>(listResult.getPage(), listResult.getSize(), listResult.getTotal(), items);
+    }
+
+    private static void checkUsernameLength(String username) {
+        if (username.length() > ValidationUtils.USERNAME_MAX_LENGTH) {
+            throw new UnsatisfiedAttributeValueException(
+                    "The username is too long.",
+                    "validation.error.username.size",
+                    new Object[] {ValidationUtils.USERNAME_MAX_LENGTH});
+        }
+    }
+
+    private static void checkDisplayNameLength(String displayName) {
+        if (displayName.length() > ValidationUtils.DISPLAY_NAME_MAX_LENGTH) {
+            throw new UnsatisfiedAttributeValueException(
+                    "The display name is too long.",
+                    "validation.error.displayName.size",
+                    new Object[] {ValidationUtils.DISPLAY_NAME_MAX_LENGTH});
+        }
     }
 
     private boolean isDisplayNameAllowed(SystemSetting.User setting, String displayName) {

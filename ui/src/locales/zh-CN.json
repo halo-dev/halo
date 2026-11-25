@@ -1075,6 +1075,7 @@
   "core.components.h2_warning_alert.description": "H2 数据库仅适用于开发环境和测试环境，不推荐在生产环境中使用，H2 非常容易因为操作不当导致数据文件损坏。如果必须要使用，请按时进行数据备份。",
   "core.composables.content_cache.toast_recovered": "已从缓存中恢复未保存的内容",
   "core.formkit.select.no_data": "暂无数据",
+  "core.formkit.permission.no_permission": "无权限加载选项",
   "core.formkit.category_select.creation_label": "创建 {text} 分类",
   "core.formkit.tag_select.creation_label": "创建 {text} 标签",
   "core.formkit.validation.password": "密码只能使用大小写字母 (A-Z, a-z)、数字 (0-9)，以及以下特殊字符: !{'@'}#$%^&*",

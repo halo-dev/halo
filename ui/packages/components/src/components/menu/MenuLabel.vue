@@ -5,10 +5,6 @@
 </template>
 <style lang="scss">
 .menu-label {
-  padding-top: 10px;
-  padding-bottom: 10px;
-  color: #847e7e;
-  font-size: 14px;
-  font-weight: 400;
+  @apply py-2.5 text-sm font-normal text-gray-500;
 }
 </style>

@@ -19,6 +19,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -30,6 +31,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -53,8 +55,10 @@ import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.service.AttachmentService;
+import run.halo.app.core.user.service.EffectiveRoleResolver;
 import run.halo.app.core.user.service.RoleService;
 import run.halo.app.core.user.service.UserService;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.PageRequest;
@@ -71,6 +75,9 @@ class UserEndpointTest {
 
     @Mock
     RoleService roleService;
+
+    @Mock
+    EffectiveRoleResolver effectiveRoleResolver;
 
     @Mock
     AttachmentService attachmentService;
@@ -225,6 +232,54 @@ class UserEndpointTest {
             when(roleService.list(anySet())).thenReturn(Flux.empty());
 
             webClient.get().uri("/users?role=guest").exchange().expectStatus().isOk();
+
+            verify(effectiveRoleResolver, never()).resolveRolesContaining(anyString());
+        }
+
+        @Test
+        void shouldFilterUsersWhenEffectiveRoleProvided() {
+            var effectiveRoleNames = new LinkedHashSet<>(List.of("post-author", "super-role"));
+            when(effectiveRoleResolver.resolveRolesContaining("role-template-post-contributor"))
+                    .thenReturn(Mono.just(effectiveRoleNames));
+            when(client.listBy(same(User.class), any(), any(PageRequest.class)))
+                    .thenReturn(Mono.just(ListResult.emptyResult()));
+            when(roleService.getRolesByUsernames(any())).thenReturn(Mono.just(Map.of()));
+            when(roleService.list(anySet())).thenReturn(Flux.empty());
+
+            webClient
+                    .get()
+                    .uri("/users?effectiveRole=role-template-post-contributor")
+                    .exchange()
+                    .expectStatus()
+                    .isOk();
+
+            var listOptionsCaptor = ArgumentCaptor.forClass(ListOptions.class);
+            verify(client).listBy(same(User.class), listOptionsCaptor.capture(), any(PageRequest.class));
+            assertEquals(
+                    "(EMPTY AND roles IN (post-author, super-role))",
+                    listOptionsCaptor.getValue().toString());
+        }
+
+        @Test
+        void shouldReturnNoUsersWhenEffectiveRoleCannotBeResolved() {
+            when(effectiveRoleResolver.resolveRolesContaining("missing-role")).thenReturn(Mono.just(Set.of()));
+            when(client.listBy(same(User.class), any(), any(PageRequest.class)))
+                    .thenReturn(Mono.just(ListResult.emptyResult()));
+            when(roleService.getRolesByUsernames(any())).thenReturn(Mono.just(Map.of()));
+            when(roleService.list(anySet())).thenReturn(Flux.empty());
+
+            webClient
+                    .get()
+                    .uri("/users?effectiveRole=missing-role")
+                    .exchange()
+                    .expectStatus()
+                    .isOk();
+
+            var listOptionsCaptor = ArgumentCaptor.forClass(ListOptions.class);
+            verify(client).listBy(same(User.class), listOptionsCaptor.capture(), any(PageRequest.class));
+            assertEquals(
+                    "(EMPTY AND NONE metadata.name)",
+                    listOptionsCaptor.getValue().toString());
         }
 
         @Test
@@ -459,6 +514,43 @@ class UserEndpointTest {
             verify(client, never()).update(any(User.class));
         }
 
+        @Test
+        void shouldRejectDisplayNameExceedingMaxLength() {
+            var currentUser = createUser("fake-user");
+            when(client.get(User.class, "fake-user")).thenReturn(Mono.just(currentUser));
+
+            webClient
+                    .put()
+                    .uri("/users/-")
+                    .bodyValue(Map.of("displayName", "a".repeat(51)))
+                    .exchange()
+                    .expectStatus()
+                    .isBadRequest()
+                    .expectBody()
+                    .jsonPath("$.detail")
+                    .isEqualTo("The display name is too long.");
+
+            verify(client, never()).update(any(User.class));
+        }
+
+        @Test
+        void shouldAllowUpdatingOtherFieldsWhenExistingDisplayNameExceedsMaxLength() {
+            var currentUser = createUser("fake-user");
+            currentUser.getSpec().setDisplayName("a".repeat(51));
+            when(client.get(User.class, "fake-user")).thenReturn(Mono.just(currentUser));
+            when(client.update(currentUser)).thenReturn(Mono.just(currentUser));
+
+            webClient
+                    .put()
+                    .uri("/users/-")
+                    .bodyValue(Map.of("displayName", "a".repeat(51), "bio", "Updated bio"))
+                    .exchange()
+                    .expectStatus()
+                    .isOk();
+
+            assertEquals("Updated bio", currentUser.getSpec().getBio());
+        }
+
         User createUser(String name) {
             var spec = new User.UserSpec();
             spec.setEmail("hi@halo.run");
@@ -664,6 +756,44 @@ class UserEndpointTest {
         verify(userService, never()).createUser(any(User.class), anySet());
     }
 
+    @Test
+    void shouldRejectCreateWhenDisplayNameIsTooLong() {
+        var userRequest = new UserEndpoint.CreateUserRequest(
+                "fake-user", "fake-email", "a".repeat(51), "", "", "password", "", Map.of());
+
+        webClient
+                .post()
+                .uri("/users")
+                .bodyValue(userRequest)
+                .exchange()
+                .expectStatus()
+                .isBadRequest()
+                .expectBody()
+                .jsonPath("$.detail")
+                .isEqualTo("The display name is too long.");
+
+        verify(userService, never()).createUser(any(User.class), anySet());
+    }
+
+    @Test
+    void shouldRejectCreateWhenUsernameIsTooLong() {
+        var userRequest = new UserEndpoint.CreateUserRequest(
+                "a".repeat(64), "fake-email", "display name", "", "", "password", "", Map.of());
+
+        webClient
+                .post()
+                .uri("/users")
+                .bodyValue(userRequest)
+                .exchange()
+                .expectStatus()
+                .isBadRequest()
+                .expectBody()
+                .jsonPath("$.detail")
+                .isEqualTo("The username is too long.");
+
+        verify(userService, never()).createUser(any(User.class), anySet());
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {"role-template-manage-users", "role-template-manage-permissions"})
     void shouldRejectRoleAssignmentAndPasswordResetForNonSuperUser(String role) {
@@ -744,6 +874,49 @@ class UserEndpointTest {
                 Map.of("custom", "value", User.EMAIL_TO_VERIFY, "pending@example.com"),
                 user.getMetadata().getAnnotations());
         verify(userService, never()).grantRoles(anyString(), anySet());
+    }
+
+    @Test
+    void shouldRejectUpdatingDisplayNameExceedingMaxLength() {
+        var user = new User();
+        user.setMetadata(new Metadata());
+        user.getMetadata().setName("target");
+        user.getSpec().setEmail("target@example.com");
+        when(client.get(User.class, "target")).thenReturn(Mono.just(user));
+
+        webClient
+                .put()
+                .uri("/users/target")
+                .bodyValue(Map.of("displayName", "a".repeat(51), "email", "target@example.com"))
+                .exchange()
+                .expectStatus()
+                .isBadRequest()
+                .expectBody()
+                .jsonPath("$.detail")
+                .isEqualTo("The display name is too long.");
+
+        verify(client, never()).update(any(User.class));
+    }
+
+    @Test
+    void shouldAllowUpdatingOtherFieldsWhenExistingDisplayNameExceedsMaxLength() {
+        var user = new User();
+        user.setMetadata(new Metadata());
+        user.getMetadata().setName("target");
+        user.getSpec().setEmail("target@example.com");
+        user.getSpec().setDisplayName("a".repeat(51));
+        when(client.get(User.class, "target")).thenReturn(Mono.just(user));
+        when(client.update(user)).thenReturn(Mono.just(user));
+
+        webClient
+                .put()
+                .uri("/users/target")
+                .bodyValue(Map.of("displayName", "a".repeat(51), "email", "target@example.com", "bio", "Updated bio"))
+                .exchange()
+                .expectStatus()
+                .isOk();
+
+        assertEquals("Updated bio", user.getSpec().getBio());
     }
 
     @Test
