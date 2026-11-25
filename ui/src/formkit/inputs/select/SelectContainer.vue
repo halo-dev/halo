@@ -244,7 +244,14 @@ const handleSortSelectedOptions = (options: SelectOption[]) => {
       class="select-container relative w-full items-center"
       :class="{ 'pointer-events-none opacity-60': disabled }"
     >
-      <div class="relative h-full items-center rounded-md pe-7 ps-3 text-sm">
+      <!--
+        The row keeps the same height as the tag and category triggers, so the
+        popover offset is measured from the same edge and the three panels sit
+        the same distance below their field.
+      -->
+      <div
+        class="relative flex h-full min-h-7 items-center rounded-md pe-7 ps-3 text-sm"
+      >
         <component
           :is="multiple ? MultipleSelectSelector : SelectSelector"
           v-bind="{
