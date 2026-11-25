@@ -64,7 +64,7 @@ const canViewRoles = computed(() =>
           <VTag
             v-for="role in user?.roles"
             :key="role.metadata.name"
-            :class="{ '!cursor-default': !canViewRoles }"
+            :clickable="canViewRoles"
             @click="
               canViewRoles &&
               $router.push({
