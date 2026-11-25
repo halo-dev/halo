@@ -84,11 +84,9 @@ public class EffectiveRoleResolver {
 
         while (!queue.isEmpty()) {
             var current = queue.removeFirst();
-            if (!visited.add(current)) {
-                continue;
-            }
             var role = roleMap.get(current);
-            if (role == null) {
+            // Skip roles that were already visited or are not present in the map.
+            if (!visited.add(current) || role == null) {
                 continue;
             }
             dependencies(role).stream()
