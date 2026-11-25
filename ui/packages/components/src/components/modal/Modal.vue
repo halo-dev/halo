@@ -329,7 +329,7 @@ watch(
     }
 
     .modal-header {
-      @apply flex select-none items-center justify-between border-b;
+      @apply flex items-center justify-between border-b;
       padding: 10px 16px;
 
       .modal-header-title {
