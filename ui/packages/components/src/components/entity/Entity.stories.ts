@@ -59,7 +59,7 @@ const meta: Meta<typeof VEntity> = {
           <VEntity
             v-for="post in posts"
             :key="post.id"
-            :is-selected="args.highlightSelected && post.selected"
+            :is-selected="args.isSelected && post.selected"
           >
             <template #checkbox>
               <input class="h-4 w-4 rounded border-gray-300 text-primary" type="checkbox" :checked="post.selected" />
@@ -93,12 +93,12 @@ const meta: Meta<typeof VEntity> = {
     `,
   }),
   argTypes: {
-    highlightSelected: {
+    isSelected: {
       control: { type: "boolean" },
     },
   },
   args: {
-    highlightSelected: true,
+    isSelected: true,
   },
 };
 
@@ -109,6 +109,40 @@ export const PostList: Story = {};
 
 export const WithoutSelection: Story = {
   args: {
-    highlightSelected: false,
+    isSelected: false,
   },
+};
+
+export const WithFooter: Story = {
+  render: (args) => ({
+    components: {
+      VEntity,
+      VEntityContainer,
+      VEntityField,
+    },
+    setup() {
+      return { args };
+    },
+    template: `
+      <div class="max-w-4xl rounded border border-gray-100 bg-white">
+        <VEntityContainer>
+          <VEntity
+            v-for="index in 3"
+            :key="index"
+            :is-selected="args.isSelected && index === 1"
+          >
+            <template #start>
+              <VEntityField
+                :title="'条目 ' + index"
+                description="列表底部的分页或汇总信息会渲染在 footer 插槽中"
+              />
+            </template>
+            <template v-if="index === 3" #footer>
+              <div class="px-4 py-3 text-sm text-gray-500">共 3 条记录</div>
+            </template>
+          </VEntity>
+        </VEntityContainer>
+      </div>
+    `,
+  }),
 };

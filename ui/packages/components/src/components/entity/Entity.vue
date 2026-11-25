@@ -1,10 +1,19 @@
 <script lang="ts" setup>
-import { computed } from "vue";
+import { ref } from "vue";
 import { IconMore } from "../../icons/icons";
+import { useComponentsI18n } from "../../locales";
 import { VDropdown } from "../dropdown";
 
-const props = withDefaults(
+// The component can render a second row for the footer slot, so fallthrough
+// attributes are forwarded to the main row explicitly.
+defineOptions({ inheritAttrs: false });
+
+withDefaults(
   defineProps<{
+    /**
+     * Whether the row is selected. Shows the selected background and the
+     * leading accent bar.
+     */
     isSelected?: boolean;
   }>(),
   {
@@ -12,20 +21,24 @@ const props = withDefaults(
   }
 );
 
-const classes = computed(() => {
-  const result = [];
-  if (props.isSelected) {
-    result.push("entity-selected");
-  }
-  return result;
-});
+const { t } = useComponentsI18n();
+
+const dropdownOpen = ref(false);
 </script>
 
 <template>
-  <tr :class="classes" v-bind="$attrs" class="entity-wrapper group">
+  <tr
+    :class="{ 'entity-selected': isSelected }"
+    v-bind="$attrs"
+    class="entity-wrapper group"
+  >
     <td class="entity-start-wrapper">
       <slot name="prepend" />
-      <div v-show="isSelected" class="entity-selected-indicator"></div>
+      <div
+        v-if="isSelected"
+        aria-hidden="true"
+        class="entity-selected-indicator"
+      ></div>
       <div class="entity-start">
         <div v-if="$slots.checkbox" class="entity-checkbox">
           <slot name="checkbox" />
@@ -38,14 +51,18 @@ const classes = computed(() => {
         <slot name="end" />
         <div v-if="$slots.dropdownItems" class="entity-dropdown">
           <!-- @vue-ignore -->
-          <VDropdown :dispose-timeout="null">
-            <div
+          <VDropdown v-model:shown="dropdownOpen" :dispose-timeout="null">
+            <button
+              type="button"
               class="entity-dropdown-trigger group-hover:bg-gray-200/60"
               :class="{ '!bg-gray-300/60': isSelected }"
+              aria-haspopup="menu"
+              :aria-expanded="dropdownOpen"
+              :aria-label="t('entity.more_actions')"
               @click.stop
             >
               <IconMore />
-            </div>
+            </button>
             <template #popper>
               <slot name="dropdownItems"></slot>
             </template>
@@ -62,7 +79,7 @@ const classes = computed(() => {
 </template>
 <style lang="scss">
 .entity-wrapper {
-  @apply relative w-full transition-all hover:bg-gray-50;
+  @apply relative w-full transition-colors focus-within:bg-gray-50 hover:bg-gray-50;
 
   &.entity-selected {
     @apply bg-gray-100;
@@ -70,10 +87,6 @@ const classes = computed(() => {
 
   .entity-selected-indicator {
     @apply absolute inset-y-0 left-0 w-0.5 bg-primary;
-  }
-
-  .entity-body {
-    @apply relative flex w-full flex-row items-center;
   }
 
   .entity-checkbox {
@@ -98,7 +111,7 @@ const classes = computed(() => {
   }
 
   .entity-dropdown-trigger {
-    @apply cursor-pointer rounded p-1 transition-all hover:text-blue-600;
+    @apply inline-flex cursor-pointer items-center justify-center rounded p-1 transition-colors hover:text-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary;
   }
 }
 </style>

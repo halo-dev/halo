@@ -7,6 +7,7 @@
   "common.next": "Next page",
   "common.expand": "Expand",
   "common.collapse": "Collapse",
+  "entity.more_actions": "More actions",
   "pagination.page": "Page",
   "pagination.size": "Items per page",
   "pagination.total": "Total {total} items",
