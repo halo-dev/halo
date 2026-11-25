@@ -9,6 +9,7 @@ import { useMutation, useQueryClient } from "@tanstack/vue-query";
 import { chunk } from "es-toolkit";
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
+import { POST_CONTRIBUTOR_ROLE_NAME } from "@/constants/constants";
 
 type ArrayPatchOp = "add" | "replace" | "removeAll";
 
@@ -268,6 +269,7 @@ function onSubmit(data: FormData) {
         <FormKit
           v-if="value?.enabled"
           :label="$t('core.post.batch_setting_modal.fields.owner_value')"
+          :effective-role="POST_CONTRIBUTOR_ROLE_NAME"
           name="value"
           type="userSelect"
         ></FormKit>
