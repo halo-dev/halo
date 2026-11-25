@@ -194,7 +194,7 @@ watch(selectedTagNames, (newVal) => {
               </VSpace>
               <SearchInput v-else v-model="keyword" />
             </div>
-            <VSpace spacing="lg" class="flex-wrap">
+            <VSpace spacing="lg" wrap>
               <VFilterDropdownGroup
                 :clear-label="$t('core.common.buttons.reset')"
               >

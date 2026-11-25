@@ -222,7 +222,7 @@ const handleApproveInBatch = async () => {
                 </VButton>
               </VSpace>
             </div>
-            <VSpace spacing="lg" class="flex-wrap">
+            <VSpace spacing="lg" wrap>
               <VFilterDropdownGroup
                 :clear-label="$t('core.common.buttons.reset')"
                 :has-external-filters="!!selectedUser"

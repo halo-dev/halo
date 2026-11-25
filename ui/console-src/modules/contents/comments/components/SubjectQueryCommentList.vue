@@ -60,7 +60,7 @@ watch(
   <div>
     <div class="mb-4 flex flex-wrap items-center justify-between gap-4">
       <SearchInput v-model="keyword" />
-      <VSpace spacing="lg" class="flex-wrap">
+      <VSpace spacing="lg" wrap>
         <VFilterDropdownGroup
           :clear-label="$t('core.common.buttons.reset')"
           :has-external-filters="!!selectedUser"
