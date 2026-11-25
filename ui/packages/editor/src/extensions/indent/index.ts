@@ -52,6 +52,10 @@ export interface ExtensionIndentOptions
   names: Array<string> | null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   HTMLAttributes: Record<string, any>;
+  /**
+   * Apply first-line indentation on Tab at the start of text blocks that keep
+   * the legacy `lineIndent` attribute.
+   */
   firstLineIndent: boolean;
 }
 
@@ -316,6 +320,7 @@ export const ExtensionIndent = Extension.create<ExtensionIndentOptions>({
           tr = updateIndentLevel(
             tr,
             resolveHaloEditorIndentationSettings(this.options),
+            this.options.firstLineIndent,
             "indent"
           );
           if (tr.docChanged) {
@@ -334,6 +339,7 @@ export const ExtensionIndent = Extension.create<ExtensionIndentOptions>({
           tr = updateIndentLevel(
             tr,
             resolveHaloEditorIndentationSettings(this.options),
+            false,
             "outdent"
           );
           if (tr.docChanged) {
@@ -429,25 +435,64 @@ function setNodeIndentMarkup(
   const delta = options.indentRange * dir;
   const min = options.minIndentLevel;
   const max = options.maxIndentLevel;
-  const currentIndent =
-    Number(node.attrs.indent) ||
-    (node.attrs.lineIndent ? options.indentRange : 0);
+  const currentIndent = Number(node.attrs.indent) || 0;
   const indent = clamp(currentIndent + delta, min, max);
-  if (indent === node.attrs.indent && !node.attrs.lineIndent) {
+  if (indent === currentIndent && !node.attrs.lineIndent) {
     return tr;
   }
   const nodeAttrs = { ...node.attrs, indent, lineIndent: false };
   return tr.setNodeMarkup(pos, node.type, nodeAttrs, node.marks);
 }
 
+function setFirstLineIndentMarkup(tr: Transaction) {
+  const { selection } = tr;
+  if (!(selection instanceof TextSelection) || !selection.empty) {
+    return false;
+  }
+
+  const { $from } = selection;
+  if (
+    $from.depth === 0 ||
+    !$from.parent.isTextblock ||
+    $from.parentOffset !== 0 ||
+    findAncestorListItems($from).length > 0
+  ) {
+    return false;
+  }
+
+  const node = $from.parent;
+  const metadata = getNodeIndentationMetadata(node.type);
+  if (
+    !metadata.enabled ||
+    !metadata.legacyLineIndent ||
+    node.attrs.lineIndent ||
+    Number(node.attrs.indent) > 0
+  ) {
+    return false;
+  }
+
+  tr.setNodeMarkup(
+    $from.before($from.depth),
+    node.type,
+    { ...node.attrs, lineIndent: true },
+    node.marks
+  );
+  return true;
+}
+
 type IndentType = "indent" | "outdent";
 const updateIndentLevel = (
   tr: Transaction,
   options: HaloEditorIndentationOptions,
+  firstLineIndent: boolean,
   type: IndentType
 ): Transaction => {
   const { doc, selection } = tr;
   if (!doc || !selection) return tr;
+
+  if (type === "indent" && firstLineIndent && setFirstLineIndentMarkup(tr)) {
+    return tr;
+  }
 
   const dir = type === "indent" ? 1 : -1;
   if (selection instanceof GapCursor) {
