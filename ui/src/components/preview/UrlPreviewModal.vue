@@ -4,6 +4,7 @@ import {
   IconLink,
   IconPhone,
   IconTablet,
+  VButton,
   VLoading,
   VModal,
   VTabbar,
@@ -70,11 +71,19 @@ const iframeClasses = computed(() => {
     </template>
     <template #actions>
       <slot name="actions"></slot>
-      <span>
-        <a :href="url" target="_blank">
+      <VButton
+        as="a"
+        :label="$t('core.common.buttons.open_in_new_window')"
+        :href="url"
+        variant="ghost"
+        shape="circle"
+        size="sm"
+        target="_blank"
+      >
+        <template #icon>
           <IconLink />
-        </a>
-      </span>
+        </template>
+      </VButton>
     </template>
     <div class="flex h-full items-center justify-center">
       <VLoading v-if="!url" />

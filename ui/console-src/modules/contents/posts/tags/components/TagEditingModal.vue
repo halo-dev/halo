@@ -172,12 +172,28 @@ async function slugUniqueValidation(node: FormKitNode) {
 <template>
   <VModal ref="modal" :title="modalTitle" :width="700" @close="emit('close')">
     <template #actions>
-      <span @click="emit('previous')">
-        <IconArrowLeft />
-      </span>
-      <span @click="emit('next')">
-        <IconArrowRight />
-      </span>
+      <VButton
+        :label="$t('core.common.buttons.previous')"
+        variant="ghost"
+        shape="circle"
+        size="sm"
+        @click="emit('previous')"
+      >
+        <template #icon>
+          <IconArrowLeft />
+        </template>
+      </VButton>
+      <VButton
+        :label="$t('core.common.buttons.next')"
+        variant="ghost"
+        shape="circle"
+        size="sm"
+        @click="emit('next')"
+      >
+        <template #icon>
+          <IconArrowRight />
+        </template>
+      </VButton>
     </template>
 
     <FormKit

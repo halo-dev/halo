@@ -51,12 +51,17 @@ function handleSelect() {
     @close="emit('close')"
   >
     <template #actions>
-      <span
-        v-tooltip="$t('core.common.buttons.new')"
+      <VButton
+        :label="$t('core.common.buttons.new')"
+        variant="ghost"
+        shape="circle"
+        size="sm"
         @click="creationModalVisible = true"
       >
-        <IconAddCircle />
-      </span>
+        <template #icon>
+          <IconAddCircle />
+        </template>
+      </VButton>
     </template>
     <VLoading v-if="isLoading" />
     <VEmpty

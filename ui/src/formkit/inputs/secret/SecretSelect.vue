@@ -6,6 +6,7 @@ import {
   IconClose,
   IconExchange,
   IconInformation,
+  VButton,
 } from "@halo-dev/components";
 import { utils } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
@@ -157,37 +158,41 @@ const missingKeys = computed(() => {
       </div>
     </div>
     <div v-if="hasPermission" class="flex items-center gap-1">
-      <button
+      <VButton
         v-if="data"
-        type="button"
-        class="p-1 text-gray-500 hover:text-gray-900"
+        :label="$t('core.common.buttons.clear')"
+        variant="ghost"
+        size="xs"
         @click="context.node.input('')"
       >
-        <IconClose class="size-4" />
-      </button>
-      <button
+        <template #icon><IconClose /></template>
+      </VButton>
+      <VButton
         v-if="data"
-        type="button"
-        class="p-1 text-gray-500 hover:text-gray-900"
+        :label="$t('core.formkit.secret.edit_modal.title')"
+        variant="ghost"
+        size="xs"
         @click="editModalVisible = true"
       >
-        <RiEditBoxLine class="size-4" />
-      </button>
-      <button
+        <template #icon><RiEditBoxLine /></template>
+      </VButton>
+      <VButton
         v-else
-        type="button"
-        class="p-1 text-gray-500 hover:text-gray-900"
+        :label="$t('core.formkit.secret.creation_modal.title')"
+        variant="ghost"
+        size="xs"
         @click="creationModalVisible = true"
       >
-        <IconAddCircle class="size-4" />
-      </button>
-      <button
-        type="button"
-        class="p-1 text-gray-500 hover:text-gray-900"
+        <template #icon><IconAddCircle /></template>
+      </VButton>
+      <VButton
+        :label="$t('core.formkit.secret.list_modal.title')"
+        variant="ghost"
+        size="xs"
         @click="listModalVisible = true"
       >
-        <IconExchange class="size-4" />
-      </button>
+        <template #icon><IconExchange /></template>
+      </VButton>
     </div>
   </div>
 
