@@ -1,6 +1,6 @@
 import { mount } from "@vue/test-utils";
 import { afterEach, describe, expect, it } from "vite-plus/test";
-import { h, nextTick } from "vue";
+import { defineComponent, h, nextTick } from "vue";
 import { VAccordion, VAccordionItem } from "..";
 
 interface ItemOptions {
@@ -282,14 +282,165 @@ describe("Accordion", () => {
   });
 
   it("applies variant classes", async () => {
-    const bordered = mountAccordion();
-    await settle();
-    expect(bordered.classes()).toContain("v-accordion--bordered");
-    bordered.unmount();
+    for (const variant of [
+      "default",
+      "bordered",
+      "filled",
+      "separated",
+      "plain",
+    ]) {
+      const wrapper = mountAccordion({ variant });
+      await settle();
+      expect(wrapper.classes()).toContain(`v-accordion--${variant}`);
+      wrapper.unmount();
+    }
+  });
 
-    const plain = mountAccordion({ variant: "plain" });
+  it("places the chevron on the configured side", async () => {
+    const right = mountAccordion();
     await settle();
-    expect(plain.classes()).toContain("v-accordion--plain");
-    plain.unmount();
+    expect(
+      right
+        .get("button.v-accordion-trigger")
+        .attributes("data-chevron-position")
+    ).toBe("right");
+    right.unmount();
+
+    const left = mountAccordion({ chevronPosition: "left" });
+    await settle();
+    expect(
+      left.get("button.v-accordion-trigger").attributes("data-chevron-position")
+    ).toBe("left");
+    left.unmount();
+  });
+
+  it("can disable chevron rotation", async () => {
+    const rotating = mountAccordion();
+    await settle();
+    expect(
+      rotating
+        .get("button.v-accordion-trigger")
+        .attributes("data-chevron-rotation")
+    ).toBe("true");
+    rotating.unmount();
+
+    const staticChevron = mountAccordion({
+      disableChevronRotation: true,
+    });
+    await settle();
+    expect(
+      staticChevron
+        .get("button.v-accordion-trigger")
+        .attributes("data-chevron-rotation")
+    ).toBe("false");
+    staticChevron.unmount();
+  });
+
+  it("applies the transition duration through a CSS variable", async () => {
+    const wrapper = mountAccordion({ transitionDuration: 400 });
+    await settle();
+    expect(wrapper.attributes("style")).toContain(
+      "--v-accordion-transition-duration: 400ms"
+    );
+    expect(wrapper.classes()).not.toContain("v-accordion--no-transition");
+    wrapper.unmount();
+
+    const instant = mountAccordion({ transitionDuration: 0 });
+    await settle();
+    expect(instant.classes()).toContain("v-accordion--no-transition");
+    expect(instant.attributes("style")).toContain(
+      "--v-accordion-transition-duration: 0ms"
+    );
+    instant.unmount();
+  });
+
+  it("renders a leading icon before the label", async () => {
+    const LeadingIcon = defineComponent({
+      render: () => h("span", { "data-testid": "leading-icon" }, "*"),
+    });
+
+    const wrapper = mountAccordion({}, [
+      { value: "one", props: { leadingIcon: LeadingIcon } },
+    ]);
+    await settle();
+
+    const trigger = wrapper.get("button.v-accordion-trigger");
+    expect(trigger.find('[data-testid="leading-icon"]').exists()).toBe(true);
+    expect(trigger.find(".v-accordion-leading").exists()).toBe(true);
+
+    wrapper.unmount();
+  });
+
+  it("supports a custom chevron on the item and on the root", async () => {
+    const itemChevron = mount(VAccordion, {
+      slots: {
+        default: () =>
+          h(
+            VAccordionItem,
+            { value: "one", title: "One" },
+            {
+              chevron: () =>
+                h("span", { "data-testid": "item-chevron" }, "item"),
+              default: () => h("div", "Content"),
+            }
+          ),
+      },
+      attachTo: document.body,
+    });
+    await settle();
+    expect(itemChevron.find('[data-testid="item-chevron"]').exists()).toBe(
+      true
+    );
+    expect(itemChevron.find(".v-accordion-icon").exists()).toBe(false);
+    itemChevron.unmount();
+
+    const rootChevron = mount(VAccordion, {
+      slots: {
+        default: () => [makeItem({ value: "one" }), makeItem({ value: "two" })],
+        chevron: () => h("span", { "data-testid": "root-chevron" }, "root"),
+      },
+      attachTo: document.body,
+    });
+    await settle();
+    expect(rootChevron.findAll('[data-testid="root-chevron"]')).toHaveLength(2);
+    expect(rootChevron.find(".v-accordion-icon").exists()).toBe(false);
+    rootChevron.unmount();
+  });
+
+  it("uses the root order as the default heading level", async () => {
+    const wrapper = mountAccordion({ order: 4 }, [
+      { value: "one" },
+      { value: "two", props: { headerAs: "h2" } },
+    ]);
+    await settle();
+
+    expect(wrapper.findAll("h4.v-accordion-header")).toHaveLength(1);
+    expect(wrapper.findAll("h2.v-accordion-header")).toHaveLength(1);
+
+    wrapper.unmount();
+  });
+
+  it("merges per-part class names", async () => {
+    const wrapper = mountAccordion({}, [
+      {
+        value: "one",
+        props: {
+          classNames: {
+            item: "custom-item",
+            trigger: "custom-trigger",
+            label: "custom-label",
+            content: "custom-content",
+          },
+        },
+      },
+    ]);
+    await settle();
+
+    expect(wrapper.find(".custom-item").exists()).toBe(true);
+    expect(wrapper.find("button.custom-trigger").exists()).toBe(true);
+    expect(wrapper.find(".custom-label").exists()).toBe(true);
+    expect(wrapper.find(".custom-content").exists()).toBe(true);
+
+    wrapper.unmount();
   });
 });
