@@ -83,7 +83,7 @@ const handleClose = () => {
     @apply flex;
 
     .alert-icon {
-      @apply mr-3 self-center text-lg;
+      @apply mr-3 flex h-5 flex-shrink-0 items-center self-center text-lg;
     }
 
     .alert-title {
