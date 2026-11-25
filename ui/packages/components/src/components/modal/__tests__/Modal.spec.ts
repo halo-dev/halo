@@ -11,6 +11,32 @@ describe("Modal", () => {
     expect(VModal).toBeDefined();
   });
 
+  describe("scroll container", () => {
+    it("does not keep body padding on the viewport", async () => {
+      const wrapper = mount(VModal, {
+        props: { visible: false },
+        slots: { default: "Content" },
+      });
+      const body = wrapper.get(".modal-body").element as HTMLElement;
+      body.style.padding = "12px 16px";
+
+      await wrapper.setProps({ visible: true });
+      await nextTick();
+      await vi.waitFor(() => {
+        expect(OverlayScrollbars.valid(OverlayScrollbars(body))).toBe(true);
+      });
+      const viewport = OverlayScrollbars(body)!.elements().viewport;
+
+      await wrapper.setProps({ visible: false });
+      await nextTick();
+
+      // OverlayScrollbars must not keep the padding it derived from the body
+      // element, otherwise the content shifts when the modal is closing.
+      expect(viewport.style.paddingTop).toBe("0px");
+      expect(viewport.style.paddingLeft).toBe("0px");
+    });
+  });
+
   describe.each([
     {
       name: "v-if",
