@@ -479,10 +479,11 @@ export const UserV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
          * @param {Array<string>} [sort] Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
          * @param {string} [keyword] Keyword to search
          * @param {string} [role] Role metadata.name
+         * @param {string} [effectiveRole] Filter users whose effective roles contain the given role name. Role dependencies are expanded and the super role is always included.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listUsers: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, keyword?: string, role?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listUsers: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, keyword?: string, role?: string, effectiveRole?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/api.console.halo.run/v1alpha1/users`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -529,6 +530,10 @@ export const UserV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
 
             if (role !== undefined) {
                 localVarQueryParameter['role'] = role;
+            }
+
+            if (effectiveRole !== undefined) {
+                localVarQueryParameter['effectiveRole'] = effectiveRole;
             }
 
             localVarHeaderParameter['Accept'] = '*/*';
@@ -907,11 +912,12 @@ export const UserV1alpha1ConsoleApiFp = function(configuration?: Configuration) 
          * @param {Array<string>} [sort] Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
          * @param {string} [keyword] Keyword to search
          * @param {string} [role] Role metadata.name
+         * @param {string} [effectiveRole] Filter users whose effective roles contain the given role name. Role dependencies are expanded and the super role is always included.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listUsers(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, keyword?: string, role?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserEndpointListedUserList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listUsers(page, size, labelSelector, fieldSelector, sort, keyword, role, options);
+        async listUsers(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, keyword?: string, role?: string, effectiveRole?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserEndpointListedUserList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listUsers(page, size, labelSelector, fieldSelector, sort, keyword, role, effectiveRole, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['UserV1alpha1ConsoleApi.listUsers']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -1088,7 +1094,7 @@ export const UserV1alpha1ConsoleApiFactory = function (configuration?: Configura
          * @throws {RequiredError}
          */
         listUsers(requestParameters: UserV1alpha1ConsoleApiListUsersRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<UserEndpointListedUserList> {
-            return localVarFp.listUsers(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.keyword, requestParameters.role, options).then((request) => request(axios, basePath));
+            return localVarFp.listUsers(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.keyword, requestParameters.role, requestParameters.effectiveRole, options).then((request) => request(axios, basePath));
         },
         /**
          * Send email verification code for user
@@ -1267,6 +1273,11 @@ export interface UserV1alpha1ConsoleApiListUsersRequest {
      * Role metadata.name
      */
     readonly role?: string
+
+    /**
+     * Filter users whose effective roles contain the given role name. Role dependencies are expanded and the super role is always included.
+     */
+    readonly effectiveRole?: string
 }
 
 /**
@@ -1426,7 +1437,7 @@ export class UserV1alpha1ConsoleApi extends BaseAPI {
      * @throws {RequiredError}
      */
     public listUsers(requestParameters: UserV1alpha1ConsoleApiListUsersRequest = {}, options?: RawAxiosRequestConfig) {
-        return UserV1alpha1ConsoleApiFp(this.configuration).listUsers(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.keyword, requestParameters.role, options).then((request) => request(this.axios, this.basePath));
+        return UserV1alpha1ConsoleApiFp(this.configuration).listUsers(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.keyword, requestParameters.role, requestParameters.effectiveRole, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
