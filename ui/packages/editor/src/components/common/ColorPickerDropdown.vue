@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { Payload } from "@ckpack/vue-color";
 import { Sketch } from "@ckpack/vue-color";
-import { VDropdown } from "@halo-dev/components";
+import { VPopover } from "@halo-dev/components";
 import tailwindcssColors from "tailwindcss/colors";
 import MingcutePaletteLine from "~icons/mingcute/palette-line";
 import MingcuteRightLine from "~icons/mingcute/right-line";
@@ -68,9 +68,9 @@ function onColorChange(color: Payload) {
 </script>
 
 <template>
-  <VDropdown v-model:shown="shown" class="inline-flex items-center">
+  <VPopover v-model:open="shown" :offset="4" :close-on-focus-outside="false">
     <slot />
-    <template #popper>
+    <template #content>
       <slot name="prefix" />
       <div class="grid grid-cols-9 gap-1.5 p-2 pt-1">
         <div
@@ -83,7 +83,12 @@ function onColorChange(color: Payload) {
         ></div>
       </div>
 
-      <VDropdown popper-class="[&_.v-popper\_\_inner]:!p-0" placement="right">
+      <VPopover
+        placement="right"
+        :offset="4"
+        content-class="!p-0"
+        :close-on-focus-outside="false"
+      >
         <div class="p-1">
           <div
             class="flex cursor-pointer items-center justify-between rounded p-1 text-xs text-gray-600 hover:bg-gray-100 hover:text-gray-900"
@@ -99,10 +104,10 @@ function onColorChange(color: Payload) {
             </div>
           </div>
         </div>
-        <template #popper>
+        <template #content>
           <Sketch model-value="#000" @update:model-value="onColorChange" />
         </template>
-      </VDropdown>
+      </VPopover>
     </template>
-  </VDropdown>
+  </VPopover>
 </template>

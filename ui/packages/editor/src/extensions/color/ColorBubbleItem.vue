@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { BubbleItem } from "@/components";
+import { BubbleButton } from "@/components";
 import ColorPickerDropdown from "@/components/common/ColorPickerDropdown.vue";
 import { i18n } from "@/locales";
 import type { BubbleItemComponentProps } from "@/types";
@@ -10,7 +10,9 @@ function handleSetColor(color?: string) {
   if (!color) {
     return;
   }
-  props.editor?.chain().focus().setColor(color).run();
+  // Applying a color must not refocus the editor: the picker stays open while
+  // the user drags, and stealing focus moves the caret and the floating panels.
+  props.editor?.chain().setColor(color).run();
 }
 
 function handleUnsetColor() {
@@ -20,7 +22,15 @@ function handleUnsetColor() {
 
 <template>
   <ColorPickerDropdown @update:model-value="handleSetColor">
-    <BubbleItem v-bind="props" :editor="editor" />
+    <BubbleButton
+      v-if="!visible || visible({ editor })"
+      :title="i18n.global.t('editor.common.color')"
+      :is-active="isActive?.({ editor })"
+    >
+      <template #icon>
+        <component :is="icon" :style="iconStyle" />
+      </template>
+    </BubbleButton>
     <template #prefix>
       <div class="p-1">
         <div

@@ -9,13 +9,15 @@ import { ExtensionHighlight } from ".";
 const props = defineProps<ToolbarItemComponentProps>();
 
 function handleSetColor(color?: string) {
+  // Applying a highlight must not refocus the editor: the picker stays open
+  // while the user drags, and stealing focus moves the caret and the floating
+  // panels.
   if (props.editor?.isActive(ExtensionHighlight.name)) {
-    props.editor?.chain().focus().unsetHighlight().run();
+    props.editor?.chain().unsetHighlight().run();
   }
 
   props.editor
     ?.chain()
-    .focus()
     .setHighlight(color ? { color } : undefined)
     .run();
 }
@@ -27,7 +29,7 @@ function handleUnsetColor() {
 
 <template>
   <ColorPickerDropdown @update:model-value="handleSetColor">
-    <ToolbarItem v-bind="props" @click="handleSetColor()" />
+    <ToolbarItem v-bind="props" />
     <template #prefix>
       <div class="p-1">
         <div

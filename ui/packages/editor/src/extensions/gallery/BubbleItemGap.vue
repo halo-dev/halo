@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { VDropdown } from "@halo-dev/components";
+import { VPopover } from "@halo-dev/components";
 import { computed } from "vue";
 import MingcuteDistributeSpacingHorizontalLine from "~icons/mingcute/distribute-spacing-horizontal-line";
 import { BlockActionSeparator } from "@/components";
@@ -24,12 +24,7 @@ function onGapChange(value: string | number | undefined) {
 </script>
 
 <template>
-  <VDropdown
-    ref="dropdownRef"
-    class="inline-flex"
-    :triggers="['click']"
-    :distance="10"
-  >
+  <VPopover :offset="10">
     <BubbleButton
       :title="i18n.global.t('editor.extensions.gallery.gap')"
       :text="`${gap}px`"
@@ -40,7 +35,7 @@ function onGapChange(value: string | number | undefined) {
       </template>
     </BubbleButton>
 
-    <template #popper>
+    <template #content>
       <div class="w-80">
         <Input
           auto-focus
@@ -51,7 +46,7 @@ function onGapChange(value: string | number | undefined) {
         />
       </div>
     </template>
-  </VDropdown>
+  </VPopover>
 
   <BlockActionSeparator :editor="editor" />
 </template>

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { VDropdown, vTooltip } from "@halo-dev/components";
+import { VPopover, vTooltip } from "@halo-dev/components";
 import { TextSelection } from "@tiptap/pm/state";
 import { test } from "linkifyjs";
 import { computed } from "vue";
@@ -85,12 +85,7 @@ const handleLinkBubbleButton = () => {
 </script>
 
 <template>
-  <VDropdown
-    class="inline-flex"
-    :triggers="['click']"
-    :distance="10"
-    @click="handleLinkBubbleButton"
-  >
+  <VPopover :offset="10">
     <button
       v-tooltip="
         isActive?.({ editor })
@@ -100,11 +95,12 @@ const handleLinkBubbleButton = () => {
       type="button"
       class="inline-flex size-8 items-center justify-center rounded-md text-lg text-gray-600 hover:bg-gray-100 active:!bg-gray-200"
       :class="{ 'bg-gray-200 !text-black': isActive?.({ editor }) }"
+      @click="handleLinkBubbleButton"
     >
       <MingcuteLinkLine />
     </button>
 
-    <template #popper>
+    <template #content>
       <div class="relative w-96">
         <Input
           v-model.lazy="href"
@@ -126,5 +122,5 @@ const handleLinkBubbleButton = () => {
         </label>
       </div>
     </template>
-  </VDropdown>
+  </VPopover>
 </template>
