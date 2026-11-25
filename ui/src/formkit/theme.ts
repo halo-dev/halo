@@ -166,7 +166,7 @@ const theme: Record<string, Record<string, string>> = {
     ...textClassification,
     inner: `${textClassification.inner} !overflow-visible !h-auto min-h-[2.25rem]`,
     input: `w-0 flex-grow bg-transparent py-1 px-3 block transition-all text-sm`,
-    "post-tags-wrapper": "flex w-full items-center",
+    "post-tags-wrapper": "flex min-h-7 w-full items-center",
     "post-tags": "flex w-full flex-wrap items-center",
     "post-tag-wrapper": "inline-flex items-center p-1",
     "post-tag-close":
@@ -178,7 +178,7 @@ const theme: Record<string, Record<string, string>> = {
     ...textClassification,
     inner: `${textClassification.inner} !overflow-visible !h-auto min-h-[2.25rem]`,
     input: `w-0 flex-grow bg-transparent py-1 px-3 block transition-all text-sm`,
-    "post-categories-wrapper": "flex w-full items-center",
+    "post-categories-wrapper": "flex min-h-7 w-full items-center",
     "post-categories": "flex w-full flex-wrap items-center",
     "post-categories-button":
       "inline-flex h-full cursor-pointer items-center px-1",
