@@ -116,21 +116,17 @@ const handleCopyCode = () => {
             />
           </button>
         </div>
-        <CodeBlockSelect
-          v-model="selectedLanguage"
-          class="w-48"
-          :container="editor.options.element"
-          :options="languageOptions"
-        >
-        </CodeBlockSelect>
-        <CodeBlockSelect
-          v-if="themeOptions && themeOptions.length > 0"
-          v-model="selectedTheme"
-          :container="editor.options.element"
-          class="w-48"
-          :options="themeOptions"
-        >
-        </CodeBlockSelect>
+        <div class="w-48">
+          <CodeBlockSelect
+            v-model="selectedLanguage"
+            :options="languageOptions"
+          >
+          </CodeBlockSelect>
+        </div>
+        <div v-if="themeOptions && themeOptions.length > 0" class="w-48">
+          <CodeBlockSelect v-model="selectedTheme" :options="themeOptions">
+          </CodeBlockSelect>
+        </div>
       </div>
       <div class="flex items-center pr-3">
         <button

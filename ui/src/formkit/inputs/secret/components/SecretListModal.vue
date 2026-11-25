@@ -2,7 +2,9 @@
 import {
   IconAddCircle,
   VButton,
+  VEmpty,
   VEntityContainer,
+  VLoading,
   VModal,
   VSpace,
 } from "@halo-dev/components";
@@ -25,7 +27,7 @@ const emit = defineEmits<{
   (event: "select", secretName: string): void;
 }>();
 
-const { data } = useSecretsFetch();
+const { data, isLoading } = useSecretsFetch();
 
 const creationModalVisible = ref(false);
 
@@ -56,7 +58,22 @@ function handleSelect() {
         <IconAddCircle />
       </span>
     </template>
-    <VEntityContainer>
+    <VLoading v-if="isLoading" />
+    <VEmpty
+      v-else-if="!data?.length"
+      :message="$t('core.formkit.secret.list_modal.empty.message')"
+      :title="$t('core.formkit.secret.list_modal.empty.title')"
+    >
+      <template #actions>
+        <VButton type="secondary" @click="creationModalVisible = true">
+          <template #icon>
+            <IconAddCircle />
+          </template>
+          {{ $t("core.common.buttons.new") }}
+        </VButton>
+      </template>
+    </VEmpty>
+    <VEntityContainer v-else>
       <SecretListItem
         v-for="secret in data"
         :key="secret.metadata.name"
@@ -77,7 +94,11 @@ function handleSelect() {
     </VEntityContainer>
     <template #footer>
       <VSpace>
-        <VButton type="secondary" @click="handleSelect">
+        <VButton
+          type="secondary"
+          :disabled="!selectedSecretName"
+          @click="handleSelect"
+        >
           {{ $t("core.common.buttons.confirm") }}
         </VButton>
         <VButton @click="modal?.close()">
@@ -92,5 +113,6 @@ function handleSelect() {
     :description-preset="descriptionPreset"
     :required-keys="requiredKeys"
     @close="creationModalVisible = false"
+    @created="selectedSecretName = $event"
   />
 </template>

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { VDropdown } from "@halo-dev/components";
-import { computed, ref, useTemplateRef, watch } from "vue";
+import { VPopover } from "@halo-dev/components";
+import { computed, nextTick, ref, useTemplateRef, watch } from "vue";
 import MingcuteDownLine from "~icons/mingcute/down-line";
 
 export interface Option {
@@ -8,8 +8,6 @@ export interface Option {
   value: string;
 }
 const props = defineProps<{
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  container?: any;
   containerClass?: string;
   options: Option[];
   filterSort?: (options: Option[], query: string) => number;
@@ -54,7 +52,6 @@ const handleInputFocus = () => {
 };
 
 const handleInputBlur = () => {
-  isFocus.value = false;
   if (inputValue.value) {
     value.value = inputValue.value;
     inputValue.value = "";
@@ -68,14 +65,28 @@ const handleSelectOption = (option?: Option) => {
   selectedOption.value = option;
   value.value = option.value;
   inputValue.value = "";
+  isFocus.value = false;
   inputRef.value?.blur();
   emit("select");
 };
+
+watch(isFocus, async (focused) => {
+  if (!focused) {
+    return;
+  }
+  await nextTick();
+  inputRef.value?.focus();
+});
 
 const selectedIndex = ref(-1);
 
 const handleOptionKeydown = (event: KeyboardEvent) => {
   const key = event.key;
+  if (key === "Escape") {
+    isFocus.value = false;
+    inputRef.value?.blur();
+    return;
+  }
   if (!["ArrowUp", "ArrowDown", "Enter"].includes(key)) {
     return;
   }
@@ -155,14 +166,7 @@ const handleScrollIntoView = () => {
 };
 </script>
 <template>
-  <VDropdown
-    :triggers="[]"
-    :shown="isFocus"
-    :auto-hide="false"
-    :distance="0"
-    auto-size
-    :container="container || 'body'"
-  >
+  <VPopover v-model:open="isFocus" :offset="0" match-trigger-width>
     <div class="relative inline-block w-full" @keydown="handleOptionKeydown">
       <div class="h-8">
         <div
@@ -171,6 +175,7 @@ const handleScrollIntoView = () => {
             'bg-white': isFocus,
             'border-[1px]': isFocus,
           }"
+          @click.stop="inputRef?.focus()"
         >
           <span class="absolute bottom-0 top-0">
             <input
@@ -192,7 +197,7 @@ const handleScrollIntoView = () => {
       </div>
     </div>
 
-    <template #popper>
+    <template #content>
       <div class="bg-white">
         <div ref="select" class="select max-h-64 cursor-pointer p-1">
           <template v-if="filterOptions && filterOptions.length > 0">
@@ -222,7 +227,7 @@ const handleScrollIntoView = () => {
         </div>
       </div>
     </template>
-  </VDropdown>
+  </VPopover>
 </template>
 <style lang="scss" scoped>
 .select-input {

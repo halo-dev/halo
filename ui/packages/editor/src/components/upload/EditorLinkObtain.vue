@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Attachment } from "@halo-dev/api-client";
-import { VButton, VDropdown, VSpace } from "@halo-dev/components";
+import { VButton, VPopover, VSpace } from "@halo-dev/components";
 import {
   utils,
   type AttachmentLike,
@@ -216,11 +216,11 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
             {{ i18n.global.t("editor.extensions.upload.attachment.title") }}
           </VButton>
 
-          <VDropdown>
+          <VPopover>
             <VButton>
               {{ i18n.global.t("editor.extensions.upload.permalink.title") }}
             </VButton>
-            <template #popper>
+            <template #content>
               <div class="w-80">
                 <Input
                   v-model="externalLink"
@@ -234,7 +234,7 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
                 />
               </div>
             </template>
-          </VDropdown>
+          </VPopover>
         </VSpace>
       </div>
     </div>

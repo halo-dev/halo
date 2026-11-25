@@ -7,16 +7,16 @@ import {
   type FilterDropdownVariant,
 } from "..";
 
-const VDropdownStub = defineComponent({
-  name: "VDropdown",
-  emits: ["show", "hide"],
-  setup(_, { slots, expose }) {
+const VPopoverStub = defineComponent({
+  name: "VPopover",
+  emits: ["update:open"],
+  setup(_, { slots, expose, emit }) {
     expose({
-      show: vi.fn(),
-      hide: vi.fn(),
+      show: () => emit("update:open", true),
+      hide: () => emit("update:open", false),
     });
 
-    return () => h("div", [slots.default?.(), slots.popper?.()]);
+    return () => h("div", [slots.default?.(), slots.content?.()]);
   },
 });
 
@@ -48,7 +48,8 @@ function mountDropdown(
     ...(options.attachTo ? { attachTo: options.attachTo } : {}),
     global: {
       stubs: {
-        VDropdown: VDropdownStub,
+        // VPopover's component name is inferred from its file name.
+        Popover: VPopoverStub,
       },
     },
   });
@@ -116,7 +117,7 @@ describe("FilterDropdown", () => {
   it("highlights the trigger while the panel is open", async () => {
     const wrapper = mountDropdown();
 
-    wrapper.getComponent({ name: "VDropdown" }).vm.$emit("show");
+    wrapper.getComponent({ name: "VPopover" }).vm.$emit("update:open", true);
     await wrapper.vm.$nextTick();
 
     expect(wrapper.get("button").classes()).toContain("bg-gray-100");
@@ -334,7 +335,7 @@ describe("FilterDropdown", () => {
       { attachTo: document.body }
     );
 
-    wrapper.findComponent(VDropdownStub).vm.$emit("apply-show");
+    wrapper.findComponent(VPopoverStub).vm.$emit("update:open", true);
     await nextTick();
 
     expect(document.activeElement).toBe(wrapper.get("input").element);
@@ -348,7 +349,7 @@ describe("FilterDropdown", () => {
     const input = wrapper.get("input");
     const trigger = wrapper.get("button");
 
-    wrapper.findComponent(VDropdownStub).vm.$emit("apply-show");
+    wrapper.findComponent(VPopoverStub).vm.$emit("update:open", true);
     await nextTick();
     expect(document.activeElement).toBe(input.element);
 
@@ -368,7 +369,7 @@ describe("FilterDropdown", () => {
         { attachTo: document.body }
       );
 
-      wrapper.findComponent(VDropdownStub).vm.$emit("apply-show");
+      wrapper.findComponent(VPopoverStub).vm.$emit("update:open", true);
       await nextTick();
 
       await wrapper.get("input").trigger("keydown", { key: "Escape" });
@@ -418,7 +419,7 @@ describe("FilterDropdown", () => {
         { attachTo: document.body }
       );
 
-      wrapper.findComponent(VDropdownStub).vm.$emit("apply-show");
+      wrapper.findComponent(VPopoverStub).vm.$emit("update:open", true);
       await nextTick();
 
       await wrapper.get("input").trigger("keydown", { key: "Escape" });
@@ -445,7 +446,7 @@ describe("FilterDropdown", () => {
     );
     const trigger = wrapper.get("button");
 
-    wrapper.findComponent(VDropdownStub).vm.$emit("apply-show");
+    wrapper.findComponent(VPopoverStub).vm.$emit("update:open", true);
     await nextTick();
 
     await wrapper.findAll('[role="option"]')[0].trigger("click");
@@ -462,7 +463,7 @@ describe("FilterDropdown", () => {
     const input = wrapper.get("input");
     const trigger = wrapper.get("button");
 
-    wrapper.findComponent(VDropdownStub).vm.$emit("apply-show");
+    wrapper.findComponent(VPopoverStub).vm.$emit("update:open", true);
     await nextTick();
 
     await input.trigger("keydown", { key: "Tab" });
@@ -486,7 +487,7 @@ describe("FilterDropdown", () => {
   it("emits load-more when opening a short list with more pages", async () => {
     const wrapper = mountDropdown({ hasMore: true });
 
-    wrapper.findComponent(VDropdownStub).vm.$emit("apply-show");
+    wrapper.findComponent(VPopoverStub).vm.$emit("update:open", true);
     await flushPromises();
 
     expect(wrapper.emitted("load-more")).toHaveLength(1);
@@ -503,9 +504,7 @@ describe("FilterDropdown", () => {
       ],
     });
 
-    wrapper.findComponent(VDropdownStub).vm.$emit("show");
-    await nextTick();
-    wrapper.findComponent(VDropdownStub).vm.$emit("apply-show");
+    wrapper.findComponent(VPopoverStub).vm.$emit("update:open", true);
     await flushPromises();
 
     expect(wrapper.emitted("load-more")).toHaveLength(1);
@@ -536,9 +535,7 @@ describe("FilterDropdown", () => {
 
     const wrapper = mountDropdown({ hasMore: true, options });
 
-    wrapper.findComponent(VDropdownStub).vm.$emit("show");
-    await nextTick();
-    wrapper.findComponent(VDropdownStub).vm.$emit("apply-show");
+    wrapper.findComponent(VPopoverStub).vm.$emit("update:open", true);
     await flushPromises();
 
     expect(wrapper.emitted("load-more")).toHaveLength(1);
@@ -564,9 +561,7 @@ describe("FilterDropdown", () => {
       searchDelay: 10000,
     });
 
-    wrapper.findComponent(VDropdownStub).vm.$emit("show");
-    await nextTick();
-    wrapper.findComponent(VDropdownStub).vm.$emit("apply-show");
+    wrapper.findComponent(VPopoverStub).vm.$emit("update:open", true);
     await flushPromises();
 
     expect(wrapper.emitted("load-more")).toHaveLength(1);
@@ -613,9 +608,7 @@ describe("FilterDropdown", () => {
       get: () => wrapper.findAll("[data-option-id]").length * 20,
     });
 
-    wrapper.findComponent(VDropdownStub).vm.$emit("show");
-    await nextTick();
-    wrapper.findComponent(VDropdownStub).vm.$emit("apply-show");
+    wrapper.findComponent(VPopoverStub).vm.$emit("update:open", true);
     await flushPromises();
 
     expect(wrapper.emitted("load-more")).toBeUndefined();

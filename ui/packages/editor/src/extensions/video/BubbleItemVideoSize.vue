@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { VDropdown } from "@halo-dev/components";
+import { VPopover } from "@halo-dev/components";
 import { computed } from "vue";
 import MdiImageSizeSelectActual from "~icons/mdi/image-size-select-actual";
 import MdiImageSizeSelectLarge from "~icons/mdi/image-size-select-large";
@@ -62,12 +62,7 @@ const presetSizes = [
 </script>
 
 <template>
-  <VDropdown
-    v-if="visible?.({ editor })"
-    class="inline-flex"
-    :auto-hide="true"
-    :distance="10"
-  >
+  <VPopover v-if="visible?.({ editor })" :offset="10">
     <BubbleButton
       :title="i18n.global.t('editor.extensions.video.resize')"
       show-more-indicator
@@ -76,7 +71,7 @@ const presetSizes = [
         <MdiImageSizeSelectSmall />
       </template>
     </BubbleButton>
-    <template #popper>
+    <template #content>
       <div class="flex w-56 flex-col gap-3">
         <div class="flex flex-col items-center gap-3">
           <Input
@@ -111,5 +106,5 @@ const presetSizes = [
         </div>
       </div>
     </template>
-  </VDropdown>
+  </VPopover>
 </template>

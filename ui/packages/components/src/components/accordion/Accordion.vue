@@ -1,8 +1,30 @@
 <script lang="ts" setup>
 import { AccordionRoot } from "reka-ui";
-import type { VAccordionType, VAccordionVariant } from "./types";
+import { computed, provide, useSlots } from "vue";
+import type {
+  VAccordionContext,
+  VAccordionHeadingOrder,
+  VAccordionType,
+  VAccordionVariant,
+} from "./types";
+import {
+  accordionContextKey,
+  accordionSlotsKey,
+  defaultAccordionContext,
+} from "./types";
 
-withDefaults(
+const HEADING_BY_ORDER: Record<
+  VAccordionHeadingOrder,
+  VAccordionContext["headerAs"]
+> = {
+  2: "h2",
+  3: "h3",
+  4: "h4",
+  5: "h5",
+  6: "h6",
+};
+
+const props = withDefaults(
   defineProps<{
     /**
      * `single` keeps one item open at a time, `multiple` allows several.
@@ -11,7 +33,8 @@ withDefaults(
      */
     type?: VAccordionType;
     /**
-     * Whether clicking an open item in `single` mode closes it again.
+     * Whether clicking an open item in `single` mode closes it again. Set to
+     * `false` to keep one item always open.
      */
     collapsible?: boolean;
     /**
@@ -32,10 +55,28 @@ withDefaults(
      */
     unmountOnHide?: boolean;
     /**
-     * `bordered` renders a card-like list, `plain` removes the container
-     * chrome for section headers inside an existing card or form.
+     * Visual layout of the accordion: `default` (divided list), `bordered`
+     * (card), `filled`, `separated`, or `plain` (no container chrome).
      */
     variant?: VAccordionVariant;
+    /**
+     * Places the chevron before or after the label.
+     */
+    chevronPosition?: "left" | "right";
+    /**
+     * Keeps the chevron fixed instead of rotating it when an item opens.
+     */
+    disableChevronRotation?: boolean;
+    /**
+     * Duration of the open/close transition and chevron rotation in
+     * milliseconds. Use `0` to disable the animation.
+     */
+    transitionDuration?: number;
+    /**
+     * Heading level used to wrap item triggers. Items can override this with
+     * their own `headerAs` prop. Defaults to `h3`.
+     */
+    order?: VAccordionHeadingOrder;
   }>(),
   {
     type: undefined,
@@ -44,13 +85,42 @@ withDefaults(
     defaultValue: undefined,
     disabled: false,
     unmountOnHide: false,
-    variant: "bordered",
+    variant: "default",
+    chevronPosition: "right",
+    disableChevronRotation: false,
+    transitionDuration: 200,
+    order: undefined,
   }
 );
 
 const emit = defineEmits<{
   (event: "update:modelValue", value: string | string[] | undefined): void;
 }>();
+
+const context = computed<VAccordionContext>(() => ({
+  variant: props.variant,
+  chevronPosition: props.chevronPosition,
+  disableChevronRotation: props.disableChevronRotation,
+  transitionDuration: props.transitionDuration,
+  headerAs: props.order
+    ? HEADING_BY_ORDER[props.order]
+    : defaultAccordionContext.headerAs,
+}));
+
+provide(accordionContextKey, context);
+provide(accordionSlotsKey, useSlots());
+
+const duration = computed(() => Math.max(0, props.transitionDuration));
+
+const classes = computed(() => [
+  "v-accordion",
+  `v-accordion--${props.variant}`,
+  { "v-accordion--no-transition": duration.value <= 0 },
+]);
+
+const style = computed(() => ({
+  "--v-accordion-transition-duration": `${duration.value}ms`,
+}));
 </script>
 
 <template>
@@ -61,7 +131,8 @@ const emit = defineEmits<{
     :default-value="defaultValue"
     :disabled="disabled"
     :unmount-on-hide="unmountOnHide"
-    :class="['v-accordion', `v-accordion--${variant}`]"
+    :class="classes"
+    :style="style"
     @update:model-value="emit('update:modelValue', $event)"
   >
     <slot />

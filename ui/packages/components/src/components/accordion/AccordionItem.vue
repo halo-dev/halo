@@ -5,11 +5,22 @@ import {
   AccordionItem as AccordionItemRoot,
   AccordionTrigger,
 } from "reka-ui";
-import { onMounted, shallowRef } from "vue";
-import { IconArrowRight } from "../../icons/icons";
-import type { VAccordionHeaderTag } from "./types";
+import type { Component } from "vue";
+import { computed, inject, onMounted, shallowRef } from "vue";
+import { IconArrowDownLine } from "../../icons/icons";
+import { VAccordionSlotRenderer } from "./SlotRenderer";
+import type {
+  VAccordionChevron,
+  VAccordionClassNames,
+  VAccordionHeaderTag,
+} from "./types";
+import {
+  accordionContextKey,
+  accordionSlotsKey,
+  defaultAccordionContext,
+} from "./types";
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     /**
      * Unique identifier of the item within its accordion.
@@ -22,8 +33,9 @@ withDefaults(
     title?: string;
     disabled?: boolean;
     /**
-     * Heading element used to wrap the trigger. Defaults to `h3`; use `div`
-     * when the accordion should not add an entry to the document outline.
+     * Heading element used to wrap the trigger. Defaults to the accordion's
+     * `order` (or `h3`); use `div` when the accordion should not add an entry
+     * to the document outline.
      */
     headerAs?: VAccordionHeaderTag;
     /**
@@ -35,18 +47,56 @@ withDefaults(
      * unmounts hidden content.
      */
     forceMount?: boolean;
+    /**
+     * Icon rendered before the label.
+     */
+    leadingIcon?: Component;
+    /**
+     * Replaces the chevron for this item. The `chevron` slot takes precedence.
+     */
+    chevron?: VAccordionChevron;
     triggerClass?: string | string[] | Record<string, boolean>;
+    labelClass?: string | string[] | Record<string, boolean>;
+    leadingClass?: string | string[] | Record<string, boolean>;
+    chevronClass?: string | string[] | Record<string, boolean>;
     contentClass?: string | string[] | Record<string, boolean>;
+    /**
+     * Per-part classes for this item. Merged with the individual `*Class`
+     * props above.
+     */
+    classNames?: VAccordionClassNames;
   }>(),
   {
     title: undefined,
     disabled: false,
-    headerAs: "h3",
+    headerAs: undefined,
     unmountOnHide: undefined,
     forceMount: false,
+    leadingIcon: undefined,
+    chevron: undefined,
     triggerClass: undefined,
+    labelClass: undefined,
+    leadingClass: undefined,
+    chevronClass: undefined,
     contentClass: undefined,
+    classNames: undefined,
   }
+);
+
+const accordionContext = inject(accordionContextKey, null);
+const accordion = computed(
+  () => accordionContext?.value ?? defaultAccordionContext
+);
+
+const rootSlots = inject(accordionSlotsKey, null);
+const rootChevron = computed(() => rootSlots?.chevron);
+
+const resolvedHeaderAs = computed(
+  () => props.headerAs ?? accordion.value.headerAs
+);
+
+const resolvedChevronRotation = computed(() =>
+  String(!accordion.value.disableChevronRotation)
 );
 
 // Reka 2.11 stores the generated content id on a non-reactive context object.
@@ -74,19 +124,41 @@ function onContentAnimationEnd() {
     :value="value"
     :disabled="disabled"
     :unmount-on-hide="unmountOnHide"
-    class="v-accordion-item"
+    :class="['v-accordion-item', classNames?.item]"
   >
-    <AccordionHeader :as="headerAs" class="v-accordion-header">
+    <AccordionHeader :as="resolvedHeaderAs" class="v-accordion-header">
       <AccordionTrigger
-        :class="['v-accordion-trigger', triggerClass]"
+        :class="['v-accordion-trigger', triggerClass, classNames?.trigger]"
         :data-content-ready="contentReady || undefined"
+        :data-chevron-position="accordion.chevronPosition"
+        :data-chevron-rotation="resolvedChevronRotation"
       >
-        <slot name="trigger" :open="open">
-          <span class="v-accordion-title">{{ title }}</span>
-        </slot>
-        <slot name="icon" :open="open">
-          <IconArrowRight class="v-accordion-icon" />
-        </slot>
+        <span :class="['v-accordion-label', labelClass, classNames?.label]">
+          <slot name="trigger" :open="open">
+            <span class="v-accordion-title">{{ title }}</span>
+          </slot>
+        </span>
+        <span
+          v-if="leadingIcon || $slots.leading"
+          :class="['v-accordion-leading', leadingClass, classNames?.leading]"
+        >
+          <slot name="leading" :open="open">
+            <component :is="leadingIcon" />
+          </slot>
+        </span>
+        <span
+          :class="['v-accordion-chevron', chevronClass, classNames?.chevron]"
+        >
+          <slot v-if="$slots.chevron" name="chevron" :open="open" />
+          <slot v-else-if="$slots.icon" name="icon" :open="open" />
+          <component :is="chevron" v-else-if="chevron" />
+          <VAccordionSlotRenderer
+            v-else-if="rootChevron"
+            :source="rootChevron"
+            :slot-props="{ open }"
+          />
+          <IconArrowDownLine v-else class="v-accordion-icon" />
+        </span>
       </AccordionTrigger>
     </AccordionHeader>
     <AccordionContent
@@ -99,7 +171,13 @@ function onContentAnimationEnd() {
       @animationend.self="onContentAnimationEnd"
       @animationcancel.self="onContentAnimationEnd"
     >
-      <div :class="contentClass" class="v-accordion-content-inner">
+      <div
+        :class="[
+          'v-accordion-content-inner',
+          contentClass,
+          classNames?.content,
+        ]"
+      >
         <slot :open="open" />
       </div>
     </AccordionContent>
@@ -107,8 +185,44 @@ function onContentAnimationEnd() {
 </template>
 
 <style lang="scss">
+// Item chrome per variant.
 .v-accordion--bordered > .v-accordion-item:not(:first-child) {
   border-top: 1px solid #eaecf0;
+}
+
+.v-accordion--default > .v-accordion-item:not(:last-child) {
+  border-bottom: 1px solid #eaecf0;
+}
+
+.v-accordion--bordered > .v-accordion-item,
+.v-accordion--separated > .v-accordion-item {
+  @apply transition-colors duration-150;
+}
+
+.v-accordion--bordered > .v-accordion-item[data-state="open"] {
+  @apply bg-gray-50;
+}
+
+.v-accordion--filled > .v-accordion-item,
+.v-accordion--separated > .v-accordion-item {
+  @apply overflow-hidden rounded-base;
+}
+
+.v-accordion--filled > .v-accordion-item[data-state="open"] {
+  @apply bg-gray-50;
+}
+
+.v-accordion--separated > .v-accordion-item {
+  @apply bg-gray-50;
+  border: 1px solid transparent;
+}
+
+.v-accordion--separated > .v-accordion-item[data-state="open"] {
+  @apply border-gray-100 bg-white;
+}
+
+.v-accordion--separated > .v-accordion-item + .v-accordion-item {
+  @apply mt-4;
 }
 
 .v-accordion-header {
@@ -116,7 +230,7 @@ function onContentAnimationEnd() {
 }
 
 .v-accordion-trigger {
-  @apply flex w-full cursor-pointer items-center justify-between gap-3 border-0 bg-transparent px-4 py-3 text-left text-sm font-medium text-gray-700 outline-none transition-colors;
+  @apply flex w-full cursor-pointer items-center gap-3 border-0 bg-transparent px-4 py-3 text-left text-sm font-medium text-gray-700 outline-none transition-colors;
 
   &:hover {
     @apply bg-gray-100;
@@ -135,16 +249,66 @@ function onContentAnimationEnd() {
   }
 }
 
-.v-accordion-title {
+// Bordered and default variants use the subtle gray on hover.
+.v-accordion--bordered .v-accordion-trigger,
+.v-accordion--default .v-accordion-trigger {
+  &:hover {
+    @apply bg-gray-50;
+  }
+}
+
+// Filled and separated items already carry a background; only darken closed
+// items so the open state stays visually stable.
+.v-accordion--filled .v-accordion-trigger[data-state="closed"],
+.v-accordion--separated .v-accordion-trigger[data-state="closed"] {
+  &:hover {
+    @apply bg-gray-100;
+  }
+}
+
+.v-accordion-label {
   @apply min-w-0 flex-1;
+  order: 1;
+}
+
+.v-accordion-title {
+  @apply block;
+}
+
+.v-accordion-leading {
+  @apply flex shrink-0 items-center;
+  order: 0;
+}
+
+.v-accordion-chevron {
+  @apply flex shrink-0 items-center text-gray-500;
+  order: 2;
+  transition: transform var(--v-accordion-transition-duration, 200ms) ease;
+}
+
+// With the chevron on the left, the optional leading icon moves to the end so
+// the two sides stay balanced.
+.v-accordion-trigger[data-chevron-position="left"] {
+  .v-accordion-chevron {
+    order: 0;
+  }
+
+  .v-accordion-leading {
+    order: 2;
+  }
+}
+
+.v-accordion-trigger[data-chevron-rotation="true"][data-state="open"]
+  .v-accordion-chevron {
+  transform: rotate(180deg);
 }
 
 .v-accordion-icon {
-  @apply h-4 w-4 shrink-0 text-gray-500 transition-transform duration-200;
+  @apply h-4 w-4 shrink-0;
 }
 
-.v-accordion-trigger[data-state="open"] .v-accordion-icon {
-  @apply rotate-90 text-gray-900;
+.v-accordion-trigger[data-state="open"] .v-accordion-chevron {
+  @apply text-gray-900;
 }
 
 .v-accordion--plain .v-accordion-trigger {
@@ -166,11 +330,23 @@ function onContentAnimationEnd() {
   }
 
   &[data-state="open"] {
-    animation: v-accordion-slide-down 200ms ease-out;
+    animation: v-accordion-slide-down
+      var(--v-accordion-transition-duration, 200ms) ease-out;
   }
 
   &[data-state="closed"] {
-    animation: v-accordion-slide-up 200ms ease-out;
+    animation: v-accordion-slide-up
+      var(--v-accordion-transition-duration, 200ms) ease-out;
+  }
+}
+
+.v-accordion--no-transition {
+  .v-accordion-content {
+    animation: none !important;
+  }
+
+  .v-accordion-chevron {
+    transition: none;
   }
 }
 
@@ -178,10 +354,16 @@ function onContentAnimationEnd() {
   .v-accordion-content {
     animation: none !important;
   }
+
+  .v-accordion-chevron {
+    transition: none;
+  }
 }
 
+// Match the reference spacing: the trigger carries 12px vertical padding, and
+// the content adds 4px above and 16px on the sides and bottom.
 .v-accordion-content-inner {
-  @apply px-4 pb-4;
+  @apply px-4 pb-4 pt-1;
 }
 
 .v-accordion--plain .v-accordion-content-inner {

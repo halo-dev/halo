@@ -20,6 +20,7 @@ import {
   type PolicyV1alpha1ApiListPolicyRequest,
 } from "@halo-dev/api-client";
 import { defineAsyncComponent } from "vue";
+import { applyDataPermissionGuard } from "@/formkit/utils/permission";
 import { select } from "./select";
 import { SelectSection } from "./select/sections";
 
@@ -34,8 +35,17 @@ const PolicySettingsSuffix = createSection("PolicySettingsSuffix", () => ({
   },
 }));
 
+const requiredPermissions = [
+  "system:attachments:view",
+  "system:attachments:manage",
+];
+
 function optionsHandler(node: FormKitNode) {
   node.on("created", async () => {
+    if (!applyDataPermissionGuard(node, requiredPermissions)) {
+      return;
+    }
+
     const policies = await paginate<PolicyV1alpha1ApiListPolicyRequest, Policy>(
       (params) => coreApiClient.storage.policy.listPolicy(params),
       {

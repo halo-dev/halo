@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue";
 import { useComponentsI18n } from "../../locales";
-import type { VDropdownPlacement } from "../dropdown";
+import type { VPopoverPlacement } from "../popover";
 import DatePickerPanel from "./DatePickerPanel.vue";
 import DateTimePickerPanel from "./DateTimePickerPanel.vue";
 import DropdownShell from "./DropdownShell.vue";
@@ -19,7 +19,7 @@ const props = withDefaults(
      */
     modelValue?: string;
     disabled?: boolean;
-    placement?: VDropdownPlacement;
+    placement?: VPopoverPlacement;
     panelWidth?: string;
     panelLabel?: string;
     /**

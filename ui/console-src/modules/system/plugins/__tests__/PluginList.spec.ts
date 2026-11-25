@@ -59,6 +59,20 @@ const plugins = [
   plugin("blank-author", "  "),
 ];
 
+// Renders the trigger along with the panel slot of both dropdowns, since the
+// panels are portalled to the body in the real components.
+const PanelStub = defineComponent({
+  emits: ["update:open"],
+  setup(_, { slots, emit, expose }) {
+    expose({
+      show: () => emit("update:open", true),
+      hide: () => emit("update:open", false),
+    });
+    return () =>
+      h("div", [slots.default?.(), slots.popper?.(), slots.content?.()]);
+  },
+});
+
 const cleanups: (() => void)[] = [];
 
 beforeEach(() => {
@@ -101,12 +115,9 @@ async function mountList(query: Record<string, string> = {}) {
         HasPermission: { template: "<div><slot /></div>" },
         SearchInput: true,
         DropdownItem: true,
-        VDropdown: defineComponent({
-          setup(_, { slots, expose }) {
-            expose({ show: vi.fn(), hide: vi.fn() });
-            return () => h("div", [slots.default?.(), slots.popper?.()]);
-          },
-        }),
+        VDropdown: PanelStub,
+        // VPopover's component name is inferred from its file name.
+        Popover: PanelStub,
       },
       directives: { permission: () => {}, tooltip: () => {} },
     },

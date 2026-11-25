@@ -6,16 +6,27 @@ import {
   type ListedUser,
   type UserV1alpha1ConsoleApiListUsersRequest,
 } from "@halo-dev/api-client";
+import { applyDataPermissionGuard } from "@/formkit/utils/permission";
 import { select } from "./select";
+
+const requiredPermissions = ["system:users:view", "system:users:manage"];
 
 const ANONYMOUSUSER_NAME = "anonymousUser";
 const DELETEDUSER_NAME = "ghost";
 
-const search = async ({ page, size, keyword }) => {
+interface SearchParams {
+  page?: number;
+  size?: number;
+  keyword?: string;
+  effectiveRole?: string;
+}
+
+const search = async ({ page, size, keyword, effectiveRole }: SearchParams) => {
   const { data } = await consoleApiClient.user.listUsers({
     page,
     size,
     keyword,
+    effectiveRole,
     fieldSelector: [`name!=${ANONYMOUSUSER_NAME}`, `name!=${DELETEDUSER_NAME}`],
   });
   return {
@@ -54,11 +65,21 @@ const findOptionsByValues = async (values: string[]) => {
 
 function optionsHandler(node: FormKitNode) {
   node.on("created", async () => {
+    if (!applyDataPermissionGuard(node, requiredPermissions)) {
+      return;
+    }
+
+    const effectiveRole = node.props.effectiveRole as string | undefined;
     node.props = {
       ...node.props,
       remote: true,
+      // Disable the remote-optimize cache so selected values outside the filtered
+      // result set still resolve through findOptionsByValues instead of the cache.
+      remoteOptimize: false,
       remoteOption: {
-        search,
+        // Filter search results by effective role while keeping already selected values
+        // resolvable via findOptionsByValues, so existing owners are still displayed.
+        search: (params: SearchParams) => search({ ...params, effectiveRole }),
         findOptionsByValues,
       },
       searchable: true,
@@ -69,6 +90,7 @@ function optionsHandler(node: FormKitNode) {
 export const userSelect: FormKitTypeDefinition = {
   ...select,
   forceTypeProp: "select",
+  props: [...(select.props as string[]), "effectiveRole"],
   features: [optionsHandler],
 };
 
@@ -77,6 +99,7 @@ declare module "@formkit/inputs" {
     userSelect: {
       type: "userSelect";
       value?: string;
+      effectiveRole?: string;
     };
   }
 }
