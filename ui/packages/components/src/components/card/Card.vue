@@ -75,12 +75,12 @@ const bodyClasses = computed(() => [
 .card-wrapper {
   --v-card-border-color: #eaecf0;
   --v-card-border-color-hover: #d0d5dd;
-  --v-card-radius: 4px;
   --v-card-padding-x: 16px;
   --v-card-padding-y: 12px;
 
-  @apply box-border flex flex-col bg-white shadow-sm ring-1 ring-[color:var(--v-card-border-color)];
-  border-radius: var(--v-card-radius);
+  // `rounded-base` is the same token the flush tab bar uses for its top
+  // corners, so the card radius and the tab bar radius cannot drift apart.
+  @apply box-border flex flex-col rounded-base bg-white shadow-sm ring-1 ring-[color:var(--v-card-border-color)];
 
   // Only the card's own outer corners are rounded; an interior edge stays
   // square. A radius on an interior edge clips the first or last row for no
