@@ -7,6 +7,7 @@
   "common.next": "下一頁",
   "common.expand": "展開",
   "common.collapse": "收合",
+  "entity.more_actions": "更多操作",
   "pagination.page": "頁",
   "pagination.size": "筆 / 頁",
   "pagination.total": "共 {total} 筆資料",

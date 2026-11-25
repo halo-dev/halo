@@ -7,7 +7,10 @@ import {
   type PostV1alpha1ConsoleApiListPostsRequest,
 } from "@halo-dev/api-client";
 import { postLabels } from "@/constants/labels";
+import { applyDataPermissionGuard } from "@/formkit/utils/permission";
 import { select } from "./select";
+
+const requiredPermissions = ["system:posts:view", "system:posts:manage"];
 
 async function search({ page, size, keyword }) {
   const { data } = await consoleApiClient.content.post.listPosts({
@@ -56,6 +59,10 @@ async function findOptionsByValues(values: string[]) {
 
 function optionsHandler(node: FormKitNode) {
   node.on("created", async () => {
+    if (!applyDataPermissionGuard(node, requiredPermissions)) {
+      return;
+    }
+
     node.props = {
       ...node.props,
       remote: true,

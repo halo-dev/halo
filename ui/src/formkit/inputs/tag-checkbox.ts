@@ -11,9 +11,21 @@ import {
   type Tag,
   type TagV1alpha1ApiListTagRequest,
 } from "@halo-dev/api-client";
+import { applyDataPermissionGuard } from "@/formkit/utils/permission";
+
+const requiredPermissions = [
+  "system:posts:view",
+  "system:posts:manage",
+  "uc:posts:manage",
+];
 
 function optionsHandler(node: FormKitNode) {
   node.on("created", async () => {
+    if (!applyDataPermissionGuard(node, requiredPermissions)) {
+      node.props.options = [];
+      return;
+    }
+
     const tags = await paginate<TagV1alpha1ApiListTagRequest, Tag>(
       (params) => coreApiClient.content.tag.listTag(params),
       {

@@ -6,10 +6,17 @@ import {
   type MenuItem,
   type MenuItemV1alpha1ApiListMenuItemRequest,
 } from "@halo-dev/api-client";
+import { applyDataPermissionGuard } from "@/formkit/utils/permission";
 import { select } from "./select";
+
+const requiredPermissions = ["system:menus:view", "system:menus:manage"];
 
 function optionsHandler(node: FormKitNode) {
   node.on("created", async () => {
+    if (!applyDataPermissionGuard(node, requiredPermissions)) {
+      return;
+    }
+
     const menuItems = await paginate<
       MenuItemV1alpha1ApiListMenuItemRequest,
       MenuItem

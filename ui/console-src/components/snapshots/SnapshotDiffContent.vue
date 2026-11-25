@@ -207,20 +207,12 @@ const handleDiffScroll = () => {
           v-model="onlyDiff"
           type="checkbox"
           :label="$t('core.snapshots.diff_mode.show_diff_only')"
-          :classes="{
-            outer: '!py-0',
-            wrapper: '!mb-0',
-          }"
         ></FormKit>
         <FormKit
           v-model="enableSyncScroll"
           type="checkbox"
           :label="$t('core.snapshots.diff_mode.sync_scroll')"
           :disabled="onlyDiff"
-          :classes="{
-            outer: '!py-0',
-            wrapper: '!mb-0',
-          }"
         ></FormKit>
       </div>
     </div>

@@ -9,7 +9,7 @@ import {
 } from "@halo-dev/api-client";
 import { Dialog, Toast } from "@halo-dev/components";
 import { useQuery, type QueryObserverResult } from "@tanstack/vue-query";
-import { ref, watch, type Ref } from "vue";
+import { ref, watch, type MaybeRefOrGetter, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
 
 interface usePostTagReturn {
@@ -140,9 +140,12 @@ export function usePostTag(filterOptions?: {
   };
 }
 
-export function useAllPostTagsQuery() {
+export function useAllPostTagsQuery(options?: {
+  enabled?: MaybeRefOrGetter<boolean>;
+}) {
   return useQuery({
     queryKey: ["core:post-tags:all"],
+    enabled: options?.enabled,
     queryFn: async () => {
       return await paginate<TagV1alpha1ConsoleApiListPostTagsRequest, Tag>(
         (params) => consoleApiClient.content.tag.listPostTags(params),

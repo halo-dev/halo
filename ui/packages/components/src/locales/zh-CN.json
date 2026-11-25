@@ -7,6 +7,7 @@
   "common.next": "下一页",
   "common.expand": "展开",
   "common.collapse": "收起",
+  "entity.more_actions": "更多操作",
   "pagination.page": "页",
   "pagination.size": "条 / 页",
   "pagination.total": "共 {total} 项数据",

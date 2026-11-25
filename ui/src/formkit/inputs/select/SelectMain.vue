@@ -630,6 +630,7 @@ const handleNextPage = async () => {
     :clearable="selectProps.clearable"
     :searchable="selectProps.searchable"
     :auto-select="selectProps.autoSelect"
+    :disabled="!!context.disabled"
     @update="handleUpdate"
     @search="handleSearch"
     @load-more="handleNextPage"

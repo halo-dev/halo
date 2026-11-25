@@ -25,9 +25,28 @@ import {
   type PropType,
   type Ref,
 } from "vue";
+import {
+  applyDataPermissionGuard,
+  noPermissionMessage,
+} from "@/formkit/utils/permission";
 import CategoryListItem from "./components/CategoryListItem.vue";
 import CategoryTag from "./components/CategoryTag.vue";
 import SearchResultListItem from "./components/SearchResultListItem.vue";
+
+const categoryPermissions = [
+  "system:categories:view",
+  "system:categories:manage",
+  "uc:categories:view",
+  "uc:categories:manage",
+  "system:posts:view",
+  "system:posts:manage",
+  "uc:posts:manage",
+];
+
+const categoryManagePermissions = [
+  "system:categories:manage",
+  "uc:categories:manage",
+];
 
 const props = defineProps({
   context: {
@@ -47,7 +66,14 @@ const multiple = computed(() => {
   return multiple === "true";
 });
 
-const { categories, categoriesTree, handleFetchCategories } = usePostCategory();
+const canViewCategories = applyDataPermissionGuard(
+  props.context.node,
+  categoryPermissions
+);
+
+const { categories, categoriesTree, handleFetchCategories } = usePostCategory({
+  enabled: canViewCategories,
+});
 
 const excludedNames = computed(() => {
   const names = props.context.excludedNames;
@@ -332,7 +358,7 @@ const scrollToSelected = () => {
 const uid = new ShortUniqueId();
 
 const handleCreateCategory = async () => {
-  if (!allowCreate.value || !utils.permission.has(["system:posts:manage"])) {
+  if (!allowCreate.value || !utils.permission.has(categoryManagePermissions)) {
     return;
   }
 
@@ -398,6 +424,7 @@ const handleDelete = () => {
 <template>
   <VPopover
     v-model:open="dropdownVisible"
+    :disabled="!canViewCategories"
     :arrow="false"
     match-trigger-width
     :offset="10"
@@ -417,6 +444,8 @@ const handleDelete = () => {
           :value="text"
           :class="context.classes.input"
           type="text"
+          :disabled="!canViewCategories"
+          :placeholder="canViewCategories ? undefined : noPermissionMessage()"
           @input="onTextInput"
           @click.stop="dropdownVisible = true"
           @focus="dropdownVisible = true"
@@ -425,7 +454,12 @@ const handleDelete = () => {
         />
       </div>
 
-      <div :class="context.classes['post-categories-button']">
+      <div
+        :class="[
+          context.classes['post-categories-button'],
+          { 'cursor-not-allowed opacity-60': !canViewCategories },
+        ]"
+      >
         <IconArrowRight class="rotate-90 text-gray-500 hover:text-gray-700" />
       </div>
     </div>
@@ -434,7 +468,7 @@ const handleDelete = () => {
         <ul class="p-1">
           <HasPermission
             v-if="allowCreate && text.trim()"
-            :permissions="['system:posts:manage']"
+            :permissions="categoryManagePermissions"
           >
             <li
               id="category-create"
