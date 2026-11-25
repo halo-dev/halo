@@ -19,6 +19,8 @@ const meta: Meta<typeof VSwitch> = {
         v-model="enabled"
         :disabled="args.disabled"
         :loading="args.loading"
+        :label="args.label"
+        :label-position="args.labelPosition"
       />
     `,
   }),
@@ -29,11 +31,20 @@ const meta: Meta<typeof VSwitch> = {
     loading: {
       control: { type: "boolean" },
     },
+    label: {
+      control: { type: "text" },
+    },
+    labelPosition: {
+      control: { type: "inline-radio" },
+      options: ["left", "right"],
+    },
   },
   args: {
     modelValue: true,
     disabled: false,
     loading: false,
+    label: undefined,
+    labelPosition: "right",
   },
 };
 
@@ -41,6 +52,33 @@ export default meta;
 type Story = StoryObj<typeof VSwitch>;
 
 export const Default: Story = {};
+
+export const WithLabel: Story = {
+  args: {
+    label: "Enable notifications",
+  },
+};
+
+export const LabelPosition: Story = {
+  render: () => ({
+    components: { VSwitch },
+    setup() {
+      const labelLeft = shallowRef(true);
+      const labelRight = shallowRef(false);
+      return { labelLeft, labelRight };
+    },
+    template: `
+      <div class="flex flex-col items-start gap-4">
+        <VSwitch v-model="labelRight" label="Label on the right" />
+        <VSwitch
+          v-model="labelLeft"
+          label="Label on the left"
+          label-position="left"
+        />
+      </div>
+    `,
+  }),
+};
 
 export const SettingsPanel: Story = {
   render: () => ({

@@ -38,6 +38,101 @@ describe("Switch", () => {
     expect(wrapper.classes()).toContain("custom-switch");
   });
 
+  it("renders a label associated with the switch control", () => {
+    const wrapper = mount(VSwitch, {
+      props: {
+        label: "Enable feature",
+      },
+    });
+
+    const button = wrapper.get("button");
+    const label = wrapper.get("label");
+
+    expect(label.text()).toBe("Enable feature");
+    expect(button.attributes("id")).toBeTruthy();
+    expect(label.attributes("for")).toBe(button.attributes("id"));
+  });
+
+  it("uses the provided id for the label association", () => {
+    const wrapper = mount(VSwitch, {
+      props: {
+        label: "Enable feature",
+      },
+      attrs: {
+        id: "feature-switch",
+      },
+    });
+
+    expect(wrapper.get("button").attributes("id")).toBe("feature-switch");
+    expect(wrapper.get("label").attributes("for")).toBe("feature-switch");
+  });
+
+  it("toggles the switch when the label is clicked", async () => {
+    const wrapper = mount(VSwitch, {
+      props: {
+        label: "Enable feature",
+      },
+    });
+
+    await wrapper.get("label").trigger("click");
+
+    expect(wrapper.emitted("update:modelValue")).toEqual([[true]]);
+  });
+
+  it("forwards a single click to the wrapper when the label is clicked", async () => {
+    let clicks = 0;
+    const wrapper = mount(VSwitch, {
+      props: {
+        label: "Enable feature",
+      },
+      attrs: {
+        onClick: () => clicks++,
+      },
+    });
+
+    await wrapper.get("label").trigger("click");
+
+    expect(clicks).toBe(1);
+  });
+
+  it("does not render a label by default", () => {
+    const wrapper = mount(VSwitch);
+
+    expect(wrapper.find("label").exists()).toBe(false);
+    expect(wrapper.get("button").attributes("id")).toBeUndefined();
+  });
+
+  it("does not toggle a disabled switch when the label is clicked", async () => {
+    const wrapper = mount(VSwitch, {
+      props: {
+        label: "Enable feature",
+        disabled: true,
+      },
+    });
+
+    await wrapper.get("label").trigger("click");
+
+    expect(wrapper.emitted("update:modelValue")).toBeUndefined();
+  });
+
+  it("renders the label slot and places the label on the requested side", async () => {
+    const wrapper = mount(VSwitch, {
+      slots: {
+        label: "<span data-testid='label-content'>Custom label</span>",
+      },
+    });
+
+    expect(wrapper.get("[data-testid='label-content']").text()).toBe(
+      "Custom label"
+    );
+    // The label comes first in the DOM; `order-last` moves it to the right.
+    expect(wrapper.get("label").classes()).toContain("order-last");
+
+    await wrapper.setProps({ labelPosition: "left" });
+
+    expect(wrapper.get("label").classes()).not.toContain("order-last");
+  });
+
   it("forwards attributes that are added after an initially empty attrs object", async () => {
     const wrapper = mount(
       defineComponent({
