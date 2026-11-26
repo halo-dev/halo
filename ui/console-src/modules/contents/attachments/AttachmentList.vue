@@ -283,188 +283,172 @@ watch(
   <div class="m-0 md:m-4">
     <div class="flex flex-col gap-2 sm:flex-row">
       <div class="w-full">
-        <VCard :body-class="[viewType === 'list' ? '!p-0' : '']">
-          <template #header>
-            <div class="block w-full bg-gray-50 px-4 py-3">
+        <VCard :flush="viewType === 'list'">
+          <template #toolbar>
+            <div
+              class="relative flex flex-col flex-wrap items-start gap-4 sm:flex-row sm:items-center"
+            >
               <div
-                class="relative flex flex-col flex-wrap items-start gap-4 sm:flex-row sm:items-center"
+                v-permission="['system:attachments:manage']"
+                class="hidden items-center sm:flex"
               >
-                <div
-                  v-permission="['system:attachments:manage']"
-                  class="hidden items-center sm:flex"
-                >
-                  <input
-                    v-model="checkedAll"
-                    type="checkbox"
-                    @change="handleCheckAllChange"
-                  />
-                </div>
-                <div class="flex w-full flex-1 items-center sm:w-auto">
-                  <SearchInput
-                    v-if="!selectedAttachmentNames.size"
-                    v-model="keyword"
-                  />
-                  <VSpace v-else>
-                    <VButton type="danger" @click="handleDeleteInBatch">
-                      {{ $t("core.common.buttons.delete") }}
+                <input
+                  v-model="checkedAll"
+                  type="checkbox"
+                  @change="handleCheckAllChange"
+                />
+              </div>
+              <div class="flex w-full flex-1 items-center sm:w-auto">
+                <SearchInput
+                  v-if="!selectedAttachmentNames.size"
+                  v-model="keyword"
+                />
+                <VSpace v-else>
+                  <VButton type="danger" @click="handleDeleteInBatch">
+                    {{ $t("core.common.buttons.delete") }}
+                  </VButton>
+                  <VButton @click="selectedAttachmentNames.clear()">
+                    {{ $t("core.attachment.operations.deselect_items.button") }}
+                  </VButton>
+                  <VDropdown v-if="groups?.length">
+                    <VButton>
+                      {{ $t("core.attachment.operations.move.button") }}
                     </VButton>
-                    <VButton @click="selectedAttachmentNames.clear()">
-                      {{
-                        $t("core.attachment.operations.deselect_items.button")
-                      }}
-                    </VButton>
-                    <VDropdown v-if="groups?.length">
-                      <VButton>
-                        {{ $t("core.attachment.operations.move.button") }}
-                      </VButton>
-                      <template #popper>
-                        <VDropdownItem
-                          v-for="group in groups"
-                          :key="group.metadata.name"
-                          @click="handleMove(group)"
-                        >
-                          {{ group.spec.displayName }}
-                        </VDropdownItem>
-                      </template>
-                    </VDropdown>
-                  </VSpace>
-                </div>
-                <VSpace spacing="sm" class="flex-wrap">
-                  <VFilterDropdownGroup
-                    :clear-label="$t('core.common.buttons.reset')"
-                    :has-external-filters="!!selectedUser"
-                    @clear="selectedUser = undefined"
-                  >
-                    <VFilterDropdown
-                      v-model="selectedPolicy"
-                      :label="
-                        $t('core.attachment.filters.storage_policy.label')
-                      "
-                      show-clear-option
-                      :clear-label="t('core.common.filters.item_labels.all')"
-                      :options="
-                        policies?.map((policy) => {
-                          return {
-                            label: policy.spec.displayName,
-                            value: policy.metadata.name,
-                          };
-                        }) || []
-                      "
-                    />
-                    <VFilterDropdown
-                      v-model="selectedAccepts"
-                      :label="$t('core.attachment.filters.accept.label')"
-                      show-clear-option
-                      :clear-label="t('core.common.filters.item_labels.all')"
-                      :options="[
-                        {
-                          label: t(
-                            'core.attachment.filters.accept.items.image'
-                          ),
-                          value: 'image/*',
-                        },
-                        {
-                          label: t(
-                            'core.attachment.filters.accept.items.audio'
-                          ),
-                          value: 'audio/*',
-                        },
-                        {
-                          label: t(
-                            'core.attachment.filters.accept.items.video'
-                          ),
-                          value: 'video/*',
-                        },
-                        {
-                          label: t('core.attachment.filters.accept.items.file'),
-                          value: 'text/*,application/*',
-                        },
-                      ]"
-                    />
-                    <HasPermission :permissions="['system:users:view']">
-                      <UserFilterDropdown
-                        v-model="selectedUser"
-                        :label="$t('core.attachment.filters.owner.label')"
-                      />
-                    </HasPermission>
-                    <VFilterDropdown
-                      v-model="selectedSort"
-                      :label="$t('core.common.filters.labels.sort')"
-                      show-clear-option
-                      :clear-label="
-                        t('core.common.filters.item_labels.default')
-                      "
-                      :options="[
-                        {
-                          label: t(
-                            'core.attachment.filters.sort.items.create_time_desc'
-                          ),
-                          value: 'metadata.creationTimestamp,desc',
-                        },
-                        {
-                          label: t(
-                            'core.attachment.filters.sort.items.create_time_asc'
-                          ),
-                          value: 'metadata.creationTimestamp,asc',
-                        },
-                        {
-                          label: t(
-                            'core.attachment.filters.sort.items.display_name_desc'
-                          ),
-                          value: 'spec.displayName,desc',
-                        },
-                        {
-                          label: t(
-                            'core.attachment.filters.sort.items.display_name_asc'
-                          ),
-                          value: 'spec.displayName,asc',
-                        },
-                        {
-                          label: t(
-                            'core.attachment.filters.sort.items.size_desc'
-                          ),
-                          value: 'spec.size,desc',
-                        },
-                        {
-                          label: t(
-                            'core.attachment.filters.sort.items.size_asc'
-                          ),
-                          value: 'spec.size,asc',
-                        },
-                      ]"
-                    />
-                  </VFilterDropdownGroup>
-                  <div class="flex flex-row gap-2">
-                    <div
-                      v-for="(item, index) in viewTypes"
-                      :key="index"
-                      v-tooltip="`${item.tooltip}`"
-                      :class="{
-                        'bg-gray-200 font-bold text-black':
-                          viewType === item.name,
-                      }"
-                      class="cursor-pointer rounded p-1 hover:bg-gray-200"
-                      @click="viewType = item.name"
-                    >
-                      <component :is="item.icon" class="h-4 w-4" />
-                    </div>
-                  </div>
-                  <div class="flex flex-row gap-2">
-                    <VButton
-                      :label="$t('core.common.buttons.refresh')"
-                      variant="ghost"
-                      size="sm"
-                      @click="handleFetchAttachments()"
-                    >
-                      <template #icon>
-                        <IconRefreshLine
-                          :class="{ 'animate-spin': isFetching }"
-                        />
-                      </template>
-                    </VButton>
-                  </div>
+                    <template #popper>
+                      <VDropdownItem
+                        v-for="group in groups"
+                        :key="group.metadata.name"
+                        @click="handleMove(group)"
+                      >
+                        {{ group.spec.displayName }}
+                      </VDropdownItem>
+                    </template>
+                  </VDropdown>
                 </VSpace>
               </div>
+              <VSpace spacing="sm" class="flex-wrap">
+                <VFilterDropdownGroup
+                  :clear-label="$t('core.common.buttons.reset')"
+                  :has-external-filters="!!selectedUser"
+                  @clear="selectedUser = undefined"
+                >
+                  <VFilterDropdown
+                    v-model="selectedPolicy"
+                    :label="$t('core.attachment.filters.storage_policy.label')"
+                    show-clear-option
+                    :clear-label="t('core.common.filters.item_labels.all')"
+                    :options="
+                      policies?.map((policy) => {
+                        return {
+                          label: policy.spec.displayName,
+                          value: policy.metadata.name,
+                        };
+                      }) || []
+                    "
+                  />
+                  <VFilterDropdown
+                    v-model="selectedAccepts"
+                    :label="$t('core.attachment.filters.accept.label')"
+                    show-clear-option
+                    :clear-label="t('core.common.filters.item_labels.all')"
+                    :options="[
+                      {
+                        label: t('core.attachment.filters.accept.items.image'),
+                        value: 'image/*',
+                      },
+                      {
+                        label: t('core.attachment.filters.accept.items.audio'),
+                        value: 'audio/*',
+                      },
+                      {
+                        label: t('core.attachment.filters.accept.items.video'),
+                        value: 'video/*',
+                      },
+                      {
+                        label: t('core.attachment.filters.accept.items.file'),
+                        value: 'text/*,application/*',
+                      },
+                    ]"
+                  />
+                  <HasPermission :permissions="['system:users:view']">
+                    <UserFilterDropdown
+                      v-model="selectedUser"
+                      :label="$t('core.attachment.filters.owner.label')"
+                    />
+                  </HasPermission>
+                  <VFilterDropdown
+                    v-model="selectedSort"
+                    :label="$t('core.common.filters.labels.sort')"
+                    show-clear-option
+                    :clear-label="t('core.common.filters.item_labels.default')"
+                    :options="[
+                      {
+                        label: t(
+                          'core.attachment.filters.sort.items.create_time_desc'
+                        ),
+                        value: 'metadata.creationTimestamp,desc',
+                      },
+                      {
+                        label: t(
+                          'core.attachment.filters.sort.items.create_time_asc'
+                        ),
+                        value: 'metadata.creationTimestamp,asc',
+                      },
+                      {
+                        label: t(
+                          'core.attachment.filters.sort.items.display_name_desc'
+                        ),
+                        value: 'spec.displayName,desc',
+                      },
+                      {
+                        label: t(
+                          'core.attachment.filters.sort.items.display_name_asc'
+                        ),
+                        value: 'spec.displayName,asc',
+                      },
+                      {
+                        label: t(
+                          'core.attachment.filters.sort.items.size_desc'
+                        ),
+                        value: 'spec.size,desc',
+                      },
+                      {
+                        label: t('core.attachment.filters.sort.items.size_asc'),
+                        value: 'spec.size,asc',
+                      },
+                    ]"
+                  />
+                </VFilterDropdownGroup>
+                <div class="flex flex-row gap-2">
+                  <div
+                    v-for="(item, index) in viewTypes"
+                    :key="index"
+                    v-tooltip="`${item.tooltip}`"
+                    :class="{
+                      'bg-gray-200 font-bold text-black':
+                        viewType === item.name,
+                    }"
+                    class="cursor-pointer rounded p-1 hover:bg-gray-200"
+                    @click="viewType = item.name"
+                  >
+                    <component :is="item.icon" class="h-4 w-4" />
+                  </div>
+                </div>
+                <div class="flex flex-row gap-2">
+                  <VButton
+                    :label="$t('core.common.buttons.refresh')"
+                    variant="ghost"
+                    size="sm"
+                    @click="handleFetchAttachments()"
+                  >
+                    <template #icon>
+                      <IconRefreshLine
+                        :class="{ 'animate-spin': isFetching }"
+                      />
+                    </template>
+                  </VButton>
+                </div>
+              </VSpace>
             </div>
           </template>
 

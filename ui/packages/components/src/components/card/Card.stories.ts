@@ -84,6 +84,115 @@ export const PlainContent: Story = {
   }),
 };
 
+export const CustomTitle: Story = {
+  render: () => ({
+    components: { VButton, VCard, VStatusDot },
+    template: `
+      <div class="max-w-xl">
+        <VCard>
+          <template #title>
+            <span class="flex items-center gap-2">
+              <VStatusDot state="success" />
+              www.halo.run
+            </span>
+          </template>
+          <template #actions>
+            <VButton size="xs">查看日志</VButton>
+          </template>
+          <p class="text-sm leading-6 text-gray-600">
+            使用 title 插槽只替换标题内容，右上角的 actions 仍然由组件负责布局。
+          </p>
+        </VCard>
+      </div>
+    `,
+  }),
+};
+
+export const Toolbar: Story = {
+  render: () => ({
+    components: { VButton, VCard },
+    template: `
+      <div class="max-w-2xl">
+        <VCard flush>
+          <template #toolbar>
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <span class="text-sm font-medium text-gray-900">评论管理</span>
+              <VButton size="xs">批量通过</VButton>
+            </div>
+          </template>
+          <ul class="divide-y divide-gray-100">
+            <li
+              v-for="item in ['这是一条评论', '这是另一条评论', '最后一条评论']"
+              :key="item"
+              class="px-4 py-3 text-sm text-gray-600"
+            >
+              {{ item }}
+            </li>
+          </ul>
+        </VCard>
+      </div>
+    `,
+  }),
+};
+
+export const Flush: Story = {
+  render: () => ({
+    components: { VCard },
+    template: `
+      <div class="max-w-xl">
+        <VCard flush>
+          <div class="divide-y divide-gray-100">
+            <div class="px-4 py-3 text-sm text-gray-900">无内边距的列表行</div>
+            <div class="px-4 py-3 text-sm text-gray-900">由调用方自行控制间距</div>
+          </div>
+        </VCard>
+      </div>
+    `,
+  }),
+};
+
+export const FullHeightScrollable: Story = {
+  render: () => ({
+    components: { VCard },
+    template: `
+      <div class="h-48 max-w-xl">
+        <VCard title="可滚动内容" full-height scrollable>
+          <div v-for="index in 20" :key="index" class="py-1 text-sm text-gray-600">
+            第 {{ index }} 行内容
+          </div>
+        </VCard>
+      </div>
+    `,
+  }),
+};
+
+export const Hoverable: Story = {
+  render: () => ({
+    components: { VCard },
+    template: `
+      <div class="max-w-sm">
+        <VCard hoverable>
+          <div class="text-sm font-medium text-gray-900">悬停查看阴影变化</div>
+          <div class="mt-1 text-xs text-gray-500">用于可点击或需要强调的卡片</div>
+        </VCard>
+      </div>
+    `,
+  }),
+};
+
+export const Shadow: Story = {
+  render: () => ({
+    components: { VCard },
+    template: `
+      <div class="grid max-w-3xl gap-4 md:grid-cols-3">
+        <VCard v-for="variant in ['always', 'hover', 'never']" :key="variant" :shadow="variant">
+          <div class="text-sm font-medium text-gray-900">shadow={{ variant }}</div>
+        </VCard>
+      </div>
+    `,
+  }),
+};
+
 export const MetricGrid: Story = {
   render: () => ({
     components: { VCard, VStatusDot },

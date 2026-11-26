@@ -307,7 +307,7 @@ const handleSetPrimaryMenu = async (menu: Menu) => {
     @close="menuEditingModal = false"
     @created="handleSelect"
   />
-  <VCard :body-class="['!p-0']" :title="$t('core.menu.title')">
+  <VCard flush :title="$t('core.menu.title')">
     <VLoading v-if="isLoading" />
     <Transition v-else-if="!menus?.length" appear name="fade">
       <VEmpty

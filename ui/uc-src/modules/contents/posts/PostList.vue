@@ -111,47 +111,45 @@ const {
   </VPageHeader>
 
   <div class="m-0 md:m-4">
-    <VCard :body-class="['!p-0']">
-      <template #header>
-        <div class="block w-full bg-gray-50 px-4 py-3">
-          <div
-            class="relative flex flex-col flex-wrap items-start justify-between gap-4 sm:flex-row sm:items-center"
-          >
-            <SearchInput v-model="keyword" />
+    <VCard flush>
+      <template #toolbar>
+        <div
+          class="relative flex flex-col flex-wrap items-start justify-between gap-4 sm:flex-row sm:items-center"
+        >
+          <SearchInput v-model="keyword" />
 
-            <VSpace spacing="sm" class="flex-wrap">
-              <VFilterDropdownGroup
-                :clear-label="$t('core.common.buttons.reset')"
-              >
-                <VFilterDropdown
-                  v-model="selectedPublishPhase"
-                  :label="$t('core.common.filters.labels.status')"
-                  show-clear-option
-                  :clear-label="$t('core.common.filters.item_labels.all')"
-                  :options="[
-                    {
-                      label: $t('core.post.filters.status.items.published'),
-                      value: 'PUBLISHED',
-                    },
-                    {
-                      label: $t('core.post.filters.status.items.draft'),
-                      value: 'DRAFT',
-                    },
-                  ]"
-                />
-              </VFilterDropdownGroup>
-              <VButton
-                :label="$t('core.common.buttons.refresh')"
-                variant="ghost"
-                size="sm"
-                @click="refetch()"
-              >
-                <template #icon>
-                  <IconRefreshLine :class="{ 'animate-spin': isFetching }" />
-                </template>
-              </VButton>
-            </VSpace>
-          </div>
+          <VSpace spacing="sm" class="flex-wrap">
+            <VFilterDropdownGroup
+              :clear-label="$t('core.common.buttons.reset')"
+            >
+              <VFilterDropdown
+                v-model="selectedPublishPhase"
+                :label="$t('core.common.filters.labels.status')"
+                show-clear-option
+                :clear-label="$t('core.common.filters.item_labels.all')"
+                :options="[
+                  {
+                    label: $t('core.post.filters.status.items.published'),
+                    value: 'PUBLISHED',
+                  },
+                  {
+                    label: $t('core.post.filters.status.items.draft'),
+                    value: 'DRAFT',
+                  },
+                ]"
+              />
+            </VFilterDropdownGroup>
+            <VButton
+              :label="$t('core.common.buttons.refresh')"
+              variant="ghost"
+              size="sm"
+              @click="refetch()"
+            >
+              <template #icon>
+                <IconRefreshLine :class="{ 'animate-spin': isFetching }" />
+              </template>
+            </VButton>
+          </VSpace>
         </div>
       </template>
       <VLoading v-if="isLoading" />

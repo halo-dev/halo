@@ -305,115 +305,111 @@ watch(selectedPageNames, (newValue) => {
   </VPageHeader>
 
   <div class="m-0 md:m-4">
-    <VCard :body-class="['!p-0']">
-      <template #header>
-        <div class="block w-full bg-gray-50 px-4 py-3">
+    <VCard flush>
+      <template #toolbar>
+        <div
+          class="relative flex flex-col flex-wrap items-start gap-4 sm:flex-row sm:items-center"
+        >
           <div
-            class="relative flex flex-col flex-wrap items-start gap-4 sm:flex-row sm:items-center"
+            v-permission="['system:singlepages:manage']"
+            class="hidden items-center sm:flex"
           >
-            <div
-              v-permission="['system:singlepages:manage']"
-              class="hidden items-center sm:flex"
-            >
-              <input
-                v-model="checkedAll"
-                type="checkbox"
-                @change="handleCheckAllChange"
-              />
-            </div>
-            <div class="flex w-full flex-1 items-center sm:w-auto">
-              <SearchInput v-if="!selectedPageNames.length" v-model="keyword" />
-              <VSpace v-else>
-                <VButton type="danger" @click="handleDeleteInBatch">
-                  {{ $t("core.common.buttons.delete") }}
-                </VButton>
-              </VSpace>
-            </div>
-            <VSpace spacing="sm" class="flex-wrap">
-              <VFilterDropdownGroup
-                :clear-label="$t('core.common.buttons.reset')"
-                :has-external-filters="!!selectedContributor"
-                @clear="selectedContributor = undefined"
-              >
-                <VFilterDropdown
-                  v-model="selectedPublishStatus"
-                  :label="$t('core.common.filters.labels.status')"
-                  show-clear-option
-                  :clear-label="t('core.common.filters.item_labels.all')"
-                  :options="[
-                    {
-                      label: t('core.page.filters.status.items.published'),
-                      value: 'true',
-                    },
-                    {
-                      label: t('core.page.filters.status.items.draft'),
-                      value: 'false',
-                    },
-                  ]"
-                />
-                <VFilterDropdown
-                  v-model="selectedVisible"
-                  :label="$t('core.page.filters.visible.label')"
-                  show-clear-option
-                  :clear-label="t('core.common.filters.item_labels.all')"
-                  :options="[
-                    {
-                      label: t('core.page.filters.visible.items.public'),
-                      value: 'PUBLIC',
-                    },
-                    {
-                      label: t('core.page.filters.visible.items.private'),
-                      value: 'PRIVATE',
-                    },
-                  ]"
-                />
-                <HasPermission :permissions="['system:users:view']">
-                  <UserFilterDropdown
-                    v-model="selectedContributor"
-                    :label="$t('core.page.filters.author.label')"
-                  />
-                </HasPermission>
-                <VFilterDropdown
-                  v-model="selectedSort"
-                  :label="$t('core.common.filters.labels.sort')"
-                  show-clear-option
-                  :clear-label="t('core.common.filters.item_labels.default')"
-                  :options="[
-                    {
-                      label: t(
-                        'core.page.filters.sort.items.publish_time_desc'
-                      ),
-                      value: 'publishTime,desc',
-                    },
-                    {
-                      label: t('core.page.filters.sort.items.publish_time_asc'),
-                      value: 'publishTime,asc',
-                    },
-                    {
-                      label: t('core.page.filters.sort.items.create_time_desc'),
-                      value: 'creationTimestamp,desc',
-                    },
-                    {
-                      label: t('core.page.filters.sort.items.create_time_asc'),
-                      value: 'creationTimestamp,asc',
-                    },
-                  ]"
-                />
-              </VFilterDropdownGroup>
-              <div class="flex flex-row gap-2">
-                <VButton
-                  :label="$t('core.common.buttons.refresh')"
-                  variant="ghost"
-                  size="sm"
-                  @click="refetch()"
-                >
-                  <template #icon>
-                    <IconRefreshLine :class="{ 'animate-spin': isFetching }" />
-                  </template>
-                </VButton>
-              </div>
+            <input
+              v-model="checkedAll"
+              type="checkbox"
+              @change="handleCheckAllChange"
+            />
+          </div>
+          <div class="flex w-full flex-1 items-center sm:w-auto">
+            <SearchInput v-if="!selectedPageNames.length" v-model="keyword" />
+            <VSpace v-else>
+              <VButton type="danger" @click="handleDeleteInBatch">
+                {{ $t("core.common.buttons.delete") }}
+              </VButton>
             </VSpace>
           </div>
+          <VSpace spacing="sm" class="flex-wrap">
+            <VFilterDropdownGroup
+              :clear-label="$t('core.common.buttons.reset')"
+              :has-external-filters="!!selectedContributor"
+              @clear="selectedContributor = undefined"
+            >
+              <VFilterDropdown
+                v-model="selectedPublishStatus"
+                :label="$t('core.common.filters.labels.status')"
+                show-clear-option
+                :clear-label="t('core.common.filters.item_labels.all')"
+                :options="[
+                  {
+                    label: t('core.page.filters.status.items.published'),
+                    value: 'true',
+                  },
+                  {
+                    label: t('core.page.filters.status.items.draft'),
+                    value: 'false',
+                  },
+                ]"
+              />
+              <VFilterDropdown
+                v-model="selectedVisible"
+                :label="$t('core.page.filters.visible.label')"
+                show-clear-option
+                :clear-label="t('core.common.filters.item_labels.all')"
+                :options="[
+                  {
+                    label: t('core.page.filters.visible.items.public'),
+                    value: 'PUBLIC',
+                  },
+                  {
+                    label: t('core.page.filters.visible.items.private'),
+                    value: 'PRIVATE',
+                  },
+                ]"
+              />
+              <HasPermission :permissions="['system:users:view']">
+                <UserFilterDropdown
+                  v-model="selectedContributor"
+                  :label="$t('core.page.filters.author.label')"
+                />
+              </HasPermission>
+              <VFilterDropdown
+                v-model="selectedSort"
+                :label="$t('core.common.filters.labels.sort')"
+                show-clear-option
+                :clear-label="t('core.common.filters.item_labels.default')"
+                :options="[
+                  {
+                    label: t('core.page.filters.sort.items.publish_time_desc'),
+                    value: 'publishTime,desc',
+                  },
+                  {
+                    label: t('core.page.filters.sort.items.publish_time_asc'),
+                    value: 'publishTime,asc',
+                  },
+                  {
+                    label: t('core.page.filters.sort.items.create_time_desc'),
+                    value: 'creationTimestamp,desc',
+                  },
+                  {
+                    label: t('core.page.filters.sort.items.create_time_asc'),
+                    value: 'creationTimestamp,asc',
+                  },
+                ]"
+              />
+            </VFilterDropdownGroup>
+            <div class="flex flex-row gap-2">
+              <VButton
+                :label="$t('core.common.buttons.refresh')"
+                variant="ghost"
+                size="sm"
+                @click="refetch()"
+              >
+                <template #icon>
+                  <IconRefreshLine :class="{ 'animate-spin': isFetching }" />
+                </template>
+              </VButton>
+            </div>
+          </VSpace>
         </div>
       </template>
       <VLoading v-if="isLoading" />
