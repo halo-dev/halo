@@ -95,7 +95,7 @@ const descriptionText = computed(() => {
       <VEntityField v-if="secret.metadata.deletionTimestamp">
         <template #description>
           <VStatusDot
-            v-tooltip="$t('core.common.status.deleting')"
+            :label="$t('core.common.status.deleting')"
             state="warning"
             animate
           />

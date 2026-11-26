@@ -205,13 +205,13 @@ const { data: operationItems } = useOperationItemExtensionPoint<Theme>(
           <div>
             <VStatusDot
               v-if="getFailedMessage()"
-              v-tooltip="getFailedMessage()"
+              :label="getFailedMessage()"
               state="warning"
               animate
             />
             <VStatusDot
               v-if="theme.metadata.deletionTimestamp"
-              v-tooltip="$t('core.common.status.deleting')"
+              :label="$t('core.common.status.deleting')"
               state="warning"
               animate
             />

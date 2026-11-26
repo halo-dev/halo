@@ -385,16 +385,15 @@ watch(
               <VEntityField v-if="!post?.post?.spec.deleted">
                 <template #description>
                   <VStatusDot
-                    v-tooltip="$t('core.common.tooltips.recovering')"
-                    state="success"
-                    animate
+                    :label="$t('core.common.tooltips.recovering')"
+                    state="processing"
                   />
                 </template>
               </VEntityField>
               <VEntityField v-if="post?.post?.metadata.deletionTimestamp">
                 <template #description>
                   <VStatusDot
-                    v-tooltip="$t('core.common.status.deleting')"
+                    :label="$t('core.common.status.deleting')"
                     state="warning"
                     animate
                   />

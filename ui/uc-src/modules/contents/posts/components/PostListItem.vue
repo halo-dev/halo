@@ -156,7 +156,10 @@ function handleDelete() {
                 query: { name: post.post.metadata.name },
               }"
             >
-              <VStatusDot state="success" animate />
+              <VStatusDot
+                state="processing"
+                :label="$t('core.common.tooltips.unpublished_content_tip')"
+              />
             </RouterLink>
             <a
               target="_blank"

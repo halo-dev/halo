@@ -1,8 +1,7 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`StatusDot > should match snapshot 1`] = `
-"<div class="status-dot-wrapper status-dot-success">
-  <div class="status-dot-body"><span class="status-dot-inner"></span></div>
+"<div class="status-dot-wrapper status-dot-success status-dot-md"><span class="status-dot-body" aria-hidden="true"></span>
   <!--v-if-->
 </div>"
 `;
