@@ -50,7 +50,7 @@ const onModalClose = async () => {
 
 <template>
   <div
-    v-if="utils.permission.has(['system:attachments:manage'])"
+    v-if="utils.permission.has(['*'])"
     v-tooltip="$t('core.attachment.policies_modal.title')"
     class="group flex h-full cursor-pointer items-center border-l px-3 transition-all hover:bg-gray-100"
     @click="modalVisible = true"
