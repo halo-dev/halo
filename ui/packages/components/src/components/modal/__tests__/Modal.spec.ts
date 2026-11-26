@@ -305,6 +305,47 @@ describe("Modal", () => {
       expect(wrapper.emitted("update:visible")).toEqual([[false]]);
       expect(wrapper.emitted("close")).toHaveLength(1);
     });
+
+    it("keeps the modal open while interacting with a teleported dropdown popper", async () => {
+      const wrapper = mount(VModal, {
+        attachTo: document.body,
+        props: {
+          visible: true,
+          title: "Modal title",
+          layerClosable: true,
+        },
+      });
+
+      await nextTick();
+      await waitForPointerDownListener();
+      vi.useFakeTimers();
+
+      const popper = document.createElement("div");
+      popper.className =
+        "v-popper__popper v-popper--theme-dropdown v-popper__popper--shown";
+      const item = document.createElement("div");
+      popper.appendChild(item);
+      document.body.appendChild(popper);
+
+      item.dispatchEvent(
+        new MouseEvent("pointerdown", {
+          bubbles: true,
+          cancelable: true,
+          button: 0,
+        })
+      );
+      await flushPromises();
+      vi.advanceTimersByTime(250);
+      await flushPromises();
+
+      expect(wrapper.emitted("update:visible")).toBeUndefined();
+      expect(wrapper.emitted("close")).toBeUndefined();
+      expect(wrapper.get(".modal-content").classes()).not.toContain(
+        "modal-focus"
+      );
+
+      popper.remove();
+    });
   });
 
   describe("scroll container", () => {

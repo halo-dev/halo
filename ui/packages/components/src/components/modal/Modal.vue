@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { UseOverlayScrollbarsParams } from "overlayscrollbars-vue";
 import { useOverlayScrollbars } from "overlayscrollbars-vue";
-import type { PointerDownOutsideEvent } from "reka-ui";
+import type { FocusOutsideEvent, PointerDownOutsideEvent } from "reka-ui";
 import {
   DialogContent,
   DialogOverlay,
@@ -23,6 +23,7 @@ import {
 import { IconClose } from "../../icons/icons";
 import { useComponentsI18n } from "../../locales";
 import { VButton } from "../button";
+import { isFloatingPopperTarget } from "../dropdown/utils";
 
 defineOptions({
   inheritAttrs: false,
@@ -295,9 +296,13 @@ function handleOpenAutoFocus(event: Event) {
 }
 
 function handlePointerDownOutside(event: PointerDownOutsideEvent) {
+  const originalEvent = event.detail.originalEvent;
+
   event.preventDefault();
 
-  const originalEvent = event.detail.originalEvent;
+  if (isFloatingPopperTarget(originalEvent.target)) {
+    return;
+  }
 
   if (originalEvent.button !== 0 || originalEvent.ctrlKey) {
     return;
@@ -309,6 +314,12 @@ function handlePointerDownOutside(event: PointerDownOutsideEvent) {
   }
 
   void requestClose();
+}
+
+function handleFocusOutside(event: FocusOutsideEvent) {
+  if (isFloatingPopperTarget(event.detail.originalEvent.target)) {
+    event.preventDefault();
+  }
 }
 
 function triggerLayerFeedback() {
@@ -390,6 +401,7 @@ watch(
           @escape-key-down="handleEscapeKeyDown"
           @open-auto-focus="handleOpenAutoFocus"
           @pointer-down-outside="handlePointerDownOutside"
+          @focus-outside="handleFocusOutside"
         >
           <VisuallyHidden v-if="!hasVisibleTitle">
             <DialogTitle as="h2">{{ resolvedAriaLabel }}</DialogTitle>

@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import type { FocusOutsideEvent, PointerDownOutsideEvent } from "reka-ui";
 import {
   DialogClose,
   DialogContent,
@@ -20,6 +21,7 @@ import {
 } from "vue";
 import { IconClose } from "../../icons/icons";
 import { useComponentsI18n } from "../../locales";
+import { isFloatingPopperTarget } from "../dropdown/utils";
 import {
   isHorizontalPlacement,
   normalizeSnapPoints,
@@ -650,14 +652,20 @@ function handleEscapeKeyDown(event: KeyboardEvent) {
   }
 }
 
-function handlePointerDownOutside(event: Event) {
-  if (!props.layerClosable) {
+function handlePointerDownOutside(event: PointerDownOutsideEvent) {
+  if (
+    isFloatingPopperTarget(event.detail.originalEvent.target) ||
+    !props.layerClosable
+  ) {
     event.preventDefault();
   }
 }
 
-function handleFocusOutside(event: Event) {
-  if (!props.layerClosable) {
+function handleFocusOutside(event: FocusOutsideEvent) {
+  if (
+    isFloatingPopperTarget(event.detail.originalEvent.target) ||
+    !props.layerClosable
+  ) {
     event.preventDefault();
   }
 }
