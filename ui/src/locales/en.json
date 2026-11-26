@@ -1115,6 +1115,7 @@
   "core.formkit.attachment.operations.input": "Input link",
   "core.common.buttons.save": "Save",
   "core.common.buttons.close": "Close",
+  "core.common.buttons.open_in_new_window": "Open in new window",
   "core.common.buttons.save_and_continue": "Save and keep adding",
   "core.common.buttons.close_and_shortcut": "Close (Esc)",
   "core.common.buttons.delete": "Delete",

@@ -180,7 +180,7 @@ function handleCleanup() {
       <IconHistoryLine />
     </template>
     <template #actions>
-      <VButton size="sm" ghost @click="$router.back()">
+      <VButton size="sm" variant="ghost" @click="$router.back()">
         {{ $t("core.common.buttons.back") }}
       </VButton>
       <VButton size="sm" @click="handleToggleDiffMode">
