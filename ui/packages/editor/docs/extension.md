@@ -678,7 +678,7 @@ export const MyBlock = Node.create({
 
 - 设置为 `false` 可以让 block 节点退出通用缩进。
 - 设置为 `true` 可以让不属于 block group 的特殊节点显式接入缩进。
-- `legacyLineIndent: true` 仅用于需要兼容旧版首行缩进数据的文本节点，不建议新扩展启用。
+- `legacyLineIndent: true` 用于需要兼容旧版首行缩进数据的文本节点：段首按 Tab 时优先应用首行缩进，再次按 Tab 转为块级缩进。内置的段落和标题节点已启用，不建议新扩展使用。
 
 自定义列表容器应加入 `list` group，列表项应加入 `listItem` group。编辑器通过这两个 schema group 识别列表层级、继承缩进和行内拖拽目标，不依赖 `bulletList`、`orderedList`、`listItem` 等具体节点名称。
 

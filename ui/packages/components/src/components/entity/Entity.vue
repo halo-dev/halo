@@ -54,8 +54,12 @@ const dropdownOpen = ref(false);
           <VDropdown v-model:shown="dropdownOpen" :dispose-timeout="null">
             <button
               type="button"
-              class="entity-dropdown-trigger group-hover:bg-gray-200/60"
-              :class="{ '!bg-gray-300/60': isSelected }"
+              class="entity-dropdown-trigger active:!bg-gray-300/60 group-hover:bg-gray-200/60"
+              :class="{
+                '!bg-gray-300/60': isSelected,
+                'bg-gray-200/60': dropdownOpen && !isSelected,
+                'text-blue-600': dropdownOpen,
+              }"
               aria-haspopup="menu"
               :aria-expanded="dropdownOpen"
               :aria-label="t('entity.more_actions')"

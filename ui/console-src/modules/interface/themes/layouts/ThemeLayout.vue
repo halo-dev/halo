@@ -271,12 +271,13 @@ watch(
       </VEmpty>
 
       <div v-else>
-        <VCard :body-class="['!p-0', '!overflow-visible']">
+        <VCard flush overflow="visible">
           <template #header>
             <VTabbar
               :active-id="activeTab"
               :items="tabs.map((item) => ({ id: item.id, label: item.label }))"
-              class="w-full !rounded-none"
+              flush
+              class="w-full"
               type="outline"
               @change="handleTabChange"
             ></VTabbar>

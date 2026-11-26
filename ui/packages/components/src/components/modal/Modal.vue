@@ -15,6 +15,7 @@ import {
 } from "vue";
 import { IconClose } from "../../icons/icons";
 import { useComponentsI18n } from "../../locales";
+import { VButton } from "../button";
 
 const props = withDefaults(
   defineProps<{
@@ -282,17 +283,17 @@ watch(
               </div>
               <div class="modal-header-actions">
                 <slot name="actions"></slot>
-                <span
+                <VButton
                   :aria-label="t('common.close')"
-                  class="bg-gray-50"
-                  role="button"
-                  tabindex="0"
+                  variant="ghost"
+                  shape="circle"
+                  size="sm"
                   @click="handleClose()"
-                  @keydown.enter.prevent="handleClose()"
-                  @keydown.space.prevent="handleClose()"
                 >
-                  <IconClose aria-hidden="true" />
-                </span>
+                  <template #icon>
+                    <IconClose aria-hidden="true" />
+                  </template>
+                </VButton>
               </div>
             </slot>
           </div>
@@ -329,7 +330,7 @@ watch(
     }
 
     .modal-header {
-      @apply flex select-none items-center justify-between border-b;
+      @apply flex items-center justify-between border-b;
       padding: 10px 16px;
 
       .modal-header-title {
@@ -337,10 +338,7 @@ watch(
       }
 
       .modal-header-actions {
-        @apply flex flex-row gap-2;
-        span {
-          @apply inline-flex h-7 w-7 cursor-pointer select-none items-center justify-center rounded-full text-gray-600 hover:bg-gray-100 hover:text-gray-900 group-hover:hidden;
-        }
+        @apply flex flex-row items-center gap-2;
       }
     }
 

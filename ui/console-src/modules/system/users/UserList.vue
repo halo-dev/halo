@@ -275,119 +275,114 @@ function onCreationModalClose() {
   </VPageHeader>
 
   <div class="m-0 md:m-4">
-    <VCard :body-class="['!p-0']">
-      <template #header>
-        <div class="block w-full bg-gray-50 px-4 py-3">
-          <div
-            class="relative flex flex-col flex-wrap items-start gap-4 sm:flex-row sm:items-center"
-          >
-            <div v-permission="['*']" class="hidden items-center sm:flex">
-              <input
-                v-model="checkedAll"
-                type="checkbox"
-                @change="handleCheckAllChange"
-              />
-            </div>
-            <div class="flex w-full flex-1 items-center sm:w-auto">
-              <SearchInput v-if="!selectedUserNames.length" v-model="keyword" />
-              <VSpace v-else>
-                <VButton
-                  v-permission="['*']"
-                  @click="handleEnableOrDisableInBatch('disable')"
-                >
-                  {{ $t("core.common.buttons.disable") }}
-                </VButton>
-                <VButton
-                  v-permission="['*']"
-                  @click="handleEnableOrDisableInBatch('enable')"
-                >
-                  {{ $t("core.common.buttons.enable") }}
-                </VButton>
-                <VButton
-                  v-permission="['*']"
-                  type="danger"
-                  @click="handleDeleteInBatch"
-                >
-                  {{ $t("core.common.buttons.delete") }}
-                </VButton>
-              </VSpace>
-            </div>
-            <VSpace spacing="lg" class="flex-wrap">
-              <VFilterDropdownGroup
-                :clear-label="$t('core.common.buttons.reset')"
+    <VCard flush>
+      <template #toolbar>
+        <div
+          class="relative flex flex-col flex-wrap items-start gap-4 sm:flex-row sm:items-center"
+        >
+          <div v-permission="['*']" class="hidden items-center sm:flex">
+            <input
+              v-model="checkedAll"
+              type="checkbox"
+              @change="handleCheckAllChange"
+            />
+          </div>
+          <div class="flex w-full flex-1 items-center sm:w-auto">
+            <SearchInput v-if="!selectedUserNames.length" v-model="keyword" />
+            <VSpace v-else>
+              <VButton
+                v-permission="['*']"
+                @click="handleEnableOrDisableInBatch('disable')"
               >
-                <VFilterDropdown
-                  v-if="utils.permission.has(['system:roles:view'])"
-                  v-model="selectedRoleValue"
-                  :label="$t('core.user.filters.role.label')"
-                  show-clear-option
-                  searchable
-                  :clear-label="t('core.common.filters.item_labels.all')"
-                  :search-placeholder="$t('core.common.placeholder.search')"
-                  :empty-text="$t('core.components.global_search.no_results')"
-                  :options="
-                    roles?.map((role) => {
-                      return {
-                        label:
-                          role.metadata.annotations?.[
-                            rbacAnnotations.DISPLAY_NAME
-                          ] || role.metadata.name,
-                        value: role.metadata.name,
-                        keywords: [role.metadata.name],
-                      };
-                    }) || []
-                  "
-                />
-                <VFilterDropdown
-                  v-model="selectedDisabledValue"
-                  :label="$t('core.common.filters.labels.status')"
-                  show-clear-option
-                  :clear-label="t('core.common.filters.item_labels.all')"
-                  :options="[
-                    {
-                      label: t('core.user.filters.status.items.normal'),
-                      value: 'false',
-                    },
-                    {
-                      label: t('core.user.fields.disabled'),
-                      value: 'true',
-                    },
-                  ]"
-                />
-                <VFilterDropdown
-                  v-model="selectedSortValue"
-                  :label="$t('core.common.filters.labels.sort')"
-                  show-clear-option
-                  :clear-label="t('core.common.filters.item_labels.default')"
-                  :options="[
-                    {
-                      label: t('core.user.filters.sort.items.create_time_desc'),
-                      value: 'metadata.creationTimestamp,desc',
-                    },
-                    {
-                      label: t('core.user.filters.sort.items.create_time_asc'),
-                      value: 'metadata.creationTimestamp,asc',
-                    },
-                  ]"
-                />
-              </VFilterDropdownGroup>
-              <div class="flex flex-row gap-2">
-                <button
-                  v-tooltip="$t('core.common.buttons.refresh')"
-                  type="button"
-                  class="group cursor-pointer rounded p-1 hover:bg-gray-200"
-                  @click="refetch()"
-                >
-                  <IconRefreshLine
-                    :class="{
-                      'animate-spin text-gray-900': isFetching,
-                    }"
-                    class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
-                  />
-                </button>
-              </div>
+                {{ $t("core.common.buttons.disable") }}
+              </VButton>
+              <VButton
+                v-permission="['*']"
+                @click="handleEnableOrDisableInBatch('enable')"
+              >
+                {{ $t("core.common.buttons.enable") }}
+              </VButton>
+              <VButton
+                v-permission="['*']"
+                type="danger"
+                @click="handleDeleteInBatch"
+              >
+                {{ $t("core.common.buttons.delete") }}
+              </VButton>
             </VSpace>
           </div>
+          <VSpace spacing="sm" class="flex-wrap">
+            <VFilterDropdownGroup
+              :clear-label="$t('core.common.buttons.reset')"
+            >
+              <VFilterDropdown
+                v-if="utils.permission.has(['system:roles:view'])"
+                v-model="selectedRoleValue"
+                :label="$t('core.user.filters.role.label')"
+                show-clear-option
+                searchable
+                :clear-label="t('core.common.filters.item_labels.all')"
+                :search-placeholder="$t('core.common.placeholder.search')"
+                :empty-text="$t('core.components.global_search.no_results')"
+                :options="
+                  roles?.map((role) => {
+                    return {
+                      label:
+                        role.metadata.annotations?.[
+                          rbacAnnotations.DISPLAY_NAME
+                        ] || role.metadata.name,
+                      value: role.metadata.name,
+                      keywords: [role.metadata.name],
+                    };
+                  }) || []
+                "
+              />
+              <VFilterDropdown
+                v-model="selectedDisabledValue"
+                :label="$t('core.common.filters.labels.status')"
+                show-clear-option
+                :clear-label="t('core.common.filters.item_labels.all')"
+                :options="[
+                  {
+                    label: t('core.user.filters.status.items.normal'),
+                    value: 'false',
+                  },
+                  {
+                    label: t('core.user.fields.disabled'),
+                    value: 'true',
+                  },
+                ]"
+              />
+              <VFilterDropdown
+                v-model="selectedSortValue"
+                :label="$t('core.common.filters.labels.sort')"
+                show-clear-option
+                :clear-label="t('core.common.filters.item_labels.default')"
+                :options="[
+                  {
+                    label: t('core.user.filters.sort.items.create_time_desc'),
+                    value: 'metadata.creationTimestamp,desc',
+                  },
+                  {
+                    label: t('core.user.filters.sort.items.create_time_asc'),
+                    value: 'metadata.creationTimestamp,asc',
+                  },
+                ]"
+              />
+            </VFilterDropdownGroup>
+            <div class="flex flex-row gap-2">
+              <VButton
+                :label="$t('core.common.buttons.refresh')"
+                variant="ghost"
+                size="sm"
+                @click="refetch()"
+              >
+                <template #icon>
+                  <IconRefreshLine :class="{ 'animate-spin': isFetching }" />
+                </template>
+              </VButton>
+            </div>
+          </VSpace>
         </div>
       </template>
 

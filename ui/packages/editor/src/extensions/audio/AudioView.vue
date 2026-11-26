@@ -146,7 +146,7 @@ const isPercentageWidth = computed(() => {
             "
             :loading="transferring"
             size="sm"
-            ghost
+            variant="ghost"
             @click="handleTransfer"
           >
             {{

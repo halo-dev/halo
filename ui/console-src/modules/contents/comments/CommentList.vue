@@ -188,130 +188,121 @@ const handleApproveInBatch = async () => {
   </VPageHeader>
 
   <div class="m-0 md:m-4">
-    <VCard :body-class="['!p-0']">
-      <template #header>
-        <div class="block w-full bg-gray-50 px-4 py-3">
+    <VCard flush>
+      <template #toolbar>
+        <div
+          class="relative flex flex-col flex-wrap items-start gap-4 sm:flex-row sm:items-center"
+        >
           <div
-            class="relative flex flex-col flex-wrap items-start gap-4 sm:flex-row sm:items-center"
+            v-permission="['system:comments:manage']"
+            class="hidden items-center sm:flex"
           >
-            <div
-              v-permission="['system:comments:manage']"
-              class="hidden items-center sm:flex"
-            >
-              <input
-                v-model="checkAll"
-                type="checkbox"
-                @change="handleCheckAllChange"
-              />
-            </div>
-            <div class="flex w-full flex-1 items-center sm:w-auto">
-              <SearchInput
-                v-if="!selectedCommentNames.length"
-                v-model="keyword"
-              />
-              <VSpace v-else>
-                <VButton type="secondary" @click="handleApproveInBatch">
-                  {{
-                    $t(
-                      "core.comment.operations.approve_comment_in_batch.button"
-                    )
-                  }}
-                </VButton>
-                <VButton type="danger" @click="handleDeleteInBatch">
-                  {{ $t("core.common.buttons.delete") }}
-                </VButton>
-              </VSpace>
-            </div>
-            <VSpace spacing="lg" class="flex-wrap">
-              <VFilterDropdownGroup
-                :clear-label="$t('core.common.buttons.reset')"
-                :has-external-filters="!!selectedUser"
-                @clear="selectedUser = undefined"
-              >
-                <VFilterDropdown
-                  v-model="selectedApprovedStatus"
-                  :label="$t('core.common.filters.labels.status')"
-                  show-clear-option
-                  :clear-label="t('core.common.filters.item_labels.all')"
-                  :options="[
-                    {
-                      label: t('core.comment.filters.status.items.approved'),
-                      value: 'true',
-                    },
-                    {
-                      label: t(
-                        'core.comment.filters.status.items.pending_review'
-                      ),
-                      value: 'false',
-                    },
-                  ]"
-                />
-                <HasPermission :permissions="['system:users:view']">
-                  <UserFilterDropdown
-                    v-model="selectedUser"
-                    :label="$t('core.comment.filters.owner.label')"
-                  />
-                </HasPermission>
-                <VFilterDropdown
-                  v-model="selectedSort"
-                  :label="$t('core.common.filters.labels.sort')"
-                  show-clear-option
-                  :clear-label="t('core.common.filters.item_labels.default')"
-                  :options="[
-                    {
-                      label: t(
-                        'core.comment.filters.sort.items.last_reply_time_desc'
-                      ),
-                      value: 'status.lastReplyTime,desc',
-                    },
-                    {
-                      label: t(
-                        'core.comment.filters.sort.items.last_reply_time_asc'
-                      ),
-                      value: 'status.lastReplyTime,asc',
-                    },
-                    {
-                      label: t(
-                        'core.comment.filters.sort.items.reply_count_desc'
-                      ),
-                      value: 'status.replyCount,desc',
-                    },
-                    {
-                      label: t(
-                        'core.comment.filters.sort.items.reply_count_asc'
-                      ),
-                      value: 'status.replyCount,asc',
-                    },
-                    {
-                      label: t(
-                        'core.comment.filters.sort.items.create_time_desc'
-                      ),
-                      value: 'metadata.creationTimestamp,desc',
-                    },
-                    {
-                      label: t(
-                        'core.comment.filters.sort.items.create_time_asc'
-                      ),
-                      value: 'metadata.creationTimestamp,asc',
-                    },
-                  ]"
-                />
-              </VFilterDropdownGroup>
-              <div class="flex flex-row gap-2">
-                <button
-                  v-tooltip="$t('core.common.buttons.refresh')"
-                  type="button"
-                  class="group cursor-pointer rounded p-1 hover:bg-gray-200"
-                  @click="refetch()"
-                >
-                  <IconRefreshLine
-                    :class="{ 'animate-spin text-gray-900': isFetching }"
-                    class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
-                  />
-                </button>
-              </div>
+            <input
+              v-model="checkAll"
+              type="checkbox"
+              @change="handleCheckAllChange"
+            />
+          </div>
+          <div class="flex w-full flex-1 items-center sm:w-auto">
+            <SearchInput
+              v-if="!selectedCommentNames.length"
+              v-model="keyword"
+            />
+            <VSpace v-else>
+              <VButton type="secondary" @click="handleApproveInBatch">
+                {{
+                  $t("core.comment.operations.approve_comment_in_batch.button")
+                }}
+              </VButton>
+              <VButton type="danger" @click="handleDeleteInBatch">
+                {{ $t("core.common.buttons.delete") }}
+              </VButton>
             </VSpace>
           </div>
+          <VSpace spacing="sm" class="flex-wrap">
+            <VFilterDropdownGroup
+              :clear-label="$t('core.common.buttons.reset')"
+              :has-external-filters="!!selectedUser"
+              @clear="selectedUser = undefined"
+            >
+              <VFilterDropdown
+                v-model="selectedApprovedStatus"
+                :label="$t('core.common.filters.labels.status')"
+                show-clear-option
+                :clear-label="t('core.common.filters.item_labels.all')"
+                :options="[
+                  {
+                    label: t('core.comment.filters.status.items.approved'),
+                    value: 'true',
+                  },
+                  {
+                    label: t(
+                      'core.comment.filters.status.items.pending_review'
+                    ),
+                    value: 'false',
+                  },
+                ]"
+              />
+              <HasPermission :permissions="['system:users:view']">
+                <UserFilterDropdown
+                  v-model="selectedUser"
+                  :label="$t('core.comment.filters.owner.label')"
+                />
+              </HasPermission>
+              <VFilterDropdown
+                v-model="selectedSort"
+                :label="$t('core.common.filters.labels.sort')"
+                show-clear-option
+                :clear-label="t('core.common.filters.item_labels.default')"
+                :options="[
+                  {
+                    label: t(
+                      'core.comment.filters.sort.items.last_reply_time_desc'
+                    ),
+                    value: 'status.lastReplyTime,desc',
+                  },
+                  {
+                    label: t(
+                      'core.comment.filters.sort.items.last_reply_time_asc'
+                    ),
+                    value: 'status.lastReplyTime,asc',
+                  },
+                  {
+                    label: t(
+                      'core.comment.filters.sort.items.reply_count_desc'
+                    ),
+                    value: 'status.replyCount,desc',
+                  },
+                  {
+                    label: t('core.comment.filters.sort.items.reply_count_asc'),
+                    value: 'status.replyCount,asc',
+                  },
+                  {
+                    label: t(
+                      'core.comment.filters.sort.items.create_time_desc'
+                    ),
+                    value: 'metadata.creationTimestamp,desc',
+                  },
+                  {
+                    label: t('core.comment.filters.sort.items.create_time_asc'),
+                    value: 'metadata.creationTimestamp,asc',
+                  },
+                ]"
+              />
+            </VFilterDropdownGroup>
+            <div class="flex flex-row gap-2">
+              <VButton
+                :label="$t('core.common.buttons.refresh')"
+                variant="ghost"
+                size="sm"
+                @click="refetch()"
+              >
+                <template #icon>
+                  <IconRefreshLine :class="{ 'animate-spin': isFetching }" />
+                </template>
+              </VButton>
+            </div>
+          </VSpace>
         </div>
       </template>
       <VLoading v-if="isLoading" />

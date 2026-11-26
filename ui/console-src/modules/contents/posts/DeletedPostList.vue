@@ -228,45 +228,42 @@ watch(
   </VPageHeader>
 
   <div class="m-0 md:m-4">
-    <VCard :body-class="['!p-0']">
-      <template #header>
-        <div class="block w-full bg-gray-50 px-4 py-3">
+    <VCard flush>
+      <template #toolbar>
+        <div
+          class="relative flex flex-col flex-wrap items-start gap-4 sm:flex-row sm:items-center"
+        >
           <div
-            class="relative flex flex-col flex-wrap items-start gap-4 sm:flex-row sm:items-center"
+            v-permission="['system:posts:manage']"
+            class="hidden items-center sm:flex"
           >
-            <div
-              v-permission="['system:posts:manage']"
-              class="hidden items-center sm:flex"
-            >
-              <input
-                v-model="checkedAll"
-                type="checkbox"
-                @change="handleCheckAllChange"
-              />
-            </div>
-            <div class="flex w-full flex-1 items-center sm:w-auto">
-              <SearchInput v-if="!selectedPostNames.length" v-model="keyword" />
-              <VSpace v-else>
-                <VButton type="danger" @click="handleDeletePermanentlyInBatch">
-                  {{ $t("core.common.buttons.delete_permanently") }}
-                </VButton>
-                <VButton type="default" @click="handleRecoveryInBatch">
-                  {{ $t("core.common.buttons.restore") }}
-                </VButton>
-              </VSpace>
-            </div>
-            <button
-              v-tooltip="$t('core.common.buttons.refresh')"
-              type="button"
-              class="group cursor-pointer rounded p-1 hover:bg-gray-200"
-              @click="refetch()"
-            >
-              <IconRefreshLine
-                :class="{ 'animate-spin text-gray-900': isFetching }"
-                class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
-              />
-            </button>
+            <input
+              v-model="checkedAll"
+              type="checkbox"
+              @change="handleCheckAllChange"
+            />
           </div>
+          <div class="flex w-full flex-1 items-center sm:w-auto">
+            <SearchInput v-if="!selectedPostNames.length" v-model="keyword" />
+            <VSpace v-else>
+              <VButton type="danger" @click="handleDeletePermanentlyInBatch">
+                {{ $t("core.common.buttons.delete_permanently") }}
+              </VButton>
+              <VButton type="default" @click="handleRecoveryInBatch">
+                {{ $t("core.common.buttons.restore") }}
+              </VButton>
+            </VSpace>
+          </div>
+          <VButton
+            :label="$t('core.common.buttons.refresh')"
+            variant="ghost"
+            size="sm"
+            @click="refetch()"
+          >
+            <template #icon>
+              <IconRefreshLine :class="{ 'animate-spin': isFetching }" />
+            </template>
+          </VButton>
         </div>
       </template>
 

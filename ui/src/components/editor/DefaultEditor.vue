@@ -454,7 +454,11 @@ const expandedCover = ref(false);
             <div
               class="top-0 flex h-12 items-center justify-end gap-2 bg-gradient-to-b from-gray-300 to-transparent px-2 opacity-0 transition-all group-hover/cover:opacity-100"
             >
-              <VButton size="sm" ghost @click="expandedCover = !expandedCover">
+              <VButton
+                size="sm"
+                variant="ghost"
+                @click="expandedCover = !expandedCover"
+              >
                 <template #icon>
                   <MingcuteUnfoldVerticalLine v-if="!expandedCover" />
                   <MingcuteFoldVerticalLine v-else />
