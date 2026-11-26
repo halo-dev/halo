@@ -1,48 +1,297 @@
 <script lang="ts" setup>
-defineProps<{
-  title?: string;
+import { useEventListener } from "@vueuse/core";
+import { computed, onMounted, ref, watch } from "vue";
+import { IconArrowLeft } from "../../icons/icons";
+import { useComponentsI18n } from "../../locales";
+
+const props = withDefaults(
+  defineProps<{
+    /**
+     * Page title. Ignored when the `title` slot is used.
+     */
+    title?: string;
+    /**
+     * Secondary line below the title, e.g. counts, versions or timestamps.
+     * Ignored when the `subtitle` slot is used.
+     */
+    subtitle?: string;
+    /**
+     * Renders a back button before the icon and emits `back` when clicked.
+     */
+    back?: boolean;
+    /**
+     * Sticks the header to the top of the viewport while scrolling.
+     * Implies `bordered` and adds a shadow once the header is stuck.
+     */
+    sticky?: boolean;
+    /**
+     * Draws a bottom border. Enabled automatically when `sticky` is set.
+     */
+    bordered?: boolean;
+    /**
+     * Replaces the title and subtitle with skeletons and makes the actions inert.
+     */
+    loading?: boolean;
+    /**
+     * Truncates the title and subtitle to a single line. Set to `false` to wrap.
+     */
+    truncate?: boolean;
+    /**
+     * Heading level for the title. Defaults to `1` because the page header is the
+     * top-level heading of the page.
+     */
+    headingLevel?: 1 | 2 | 3;
+  }>(),
+  {
+    title: undefined,
+    subtitle: undefined,
+    back: false,
+    sticky: false,
+    bordered: false,
+    loading: false,
+    truncate: true,
+    headingLevel: 1,
+  }
+);
+
+const emit = defineEmits<{
+  (event: "back"): void;
 }>();
+
+const { t } = useComponentsI18n();
+
+const headingTag = computed(() => `h${props.headingLevel}` as const);
+
+const root = ref<HTMLElement | null>(null);
+const isStuck = ref(false);
+
+function updateStuck() {
+  if (!props.sticky || !root.value) {
+    isStuck.value = false;
+    return;
+  }
+
+  isStuck.value =
+    window.scrollY > 0 && root.value.getBoundingClientRect().top <= 0;
+}
+
+useEventListener(window, "scroll", updateStuck, { passive: true });
+useEventListener(window, "resize", updateStuck);
+
+watch(() => props.sticky, updateStuck);
+onMounted(updateStuck);
 </script>
+
 <template>
-  <div class="page-header">
-    <h2 class="page-header__title">
-      <slot name="icon" />
-      <span class="page-header__title-text">{{ title }}</span>
-    </h2>
-    <div class="page-header__actions">
+  <header
+    ref="root"
+    class="page-header"
+    :class="{
+      'page-header--bordered': bordered || sticky,
+      'page-header--sticky': sticky,
+      'page-header--stuck': isStuck,
+      'page-header--wrapped': !truncate,
+      'page-header--with-footer': Boolean($slots.footer),
+    }"
+    :aria-busy="loading ? 'true' : undefined"
+  >
+    <div class="page-header__leading">
+      <button
+        v-if="back"
+        type="button"
+        class="page-header__back"
+        :aria-label="t('page_header.back')"
+        @click="emit('back')"
+      >
+        <IconArrowLeft aria-hidden="true" />
+      </button>
+
+      <div v-if="$slots.icon" class="page-header__icon" aria-hidden="true">
+        <slot name="icon" />
+      </div>
+
+      <div class="page-header__titles">
+        <template v-if="loading">
+          <div
+            aria-hidden="true"
+            class="page-header__skeleton page-header__skeleton--title"
+          />
+          <div
+            aria-hidden="true"
+            class="page-header__skeleton page-header__skeleton--subtitle"
+          />
+        </template>
+        <template v-else>
+          <div v-if="title || $slots.title" class="page-header__titleline">
+            <component
+              :is="headingTag"
+              class="page-header__title"
+              :title="$slots.title ? undefined : title"
+            >
+              <slot name="title">{{ title }}</slot>
+            </component>
+            <div v-if="$slots.tags" class="page-header__tags">
+              <slot name="tags" />
+            </div>
+          </div>
+          <p
+            v-if="subtitle || $slots.subtitle"
+            class="page-header__subtitle"
+            :title="$slots.subtitle ? undefined : subtitle"
+          >
+            <slot name="subtitle">{{ subtitle }}</slot>
+          </p>
+        </template>
+      </div>
+    </div>
+
+    <div
+      class="page-header__actions"
+      :class="{ 'page-header__actions--loading': loading }"
+      role="group"
+      :aria-label="t('page_header.actions')"
+      :inert="loading || undefined"
+    >
       <slot name="actions" />
     </div>
-  </div>
+
+    <div v-if="$slots.footer" class="page-header__footer">
+      <slot name="footer" />
+    </div>
+  </header>
 </template>
 
 <style lang="scss">
 .page-header {
+  --page-header-bg: theme("colors.white");
+  --page-header-text: theme("colors.gray.800");
+  --page-header-subtle: theme("colors.gray.500");
+  --page-header-border: theme("colors.gray.200");
+  --page-header-hover: theme("colors.gray.100");
+  --page-header-skeleton: theme("colors.gray.100");
+  --page-header-skeleton-highlight: theme("colors.gray.200");
+
+  box-sizing: border-box;
   display: flex;
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
   align-items: center;
   justify-content: space-between;
+  gap: theme("spacing.2") theme("spacing.4");
   min-height: 3.5rem;
-  background-color: theme("colors.white");
-  padding-left: 1rem;
-  padding-right: 1rem;
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-  flex-wrap: wrap;
-  gap: theme("spacing.2");
+  padding: theme("spacing.2") theme("spacing.4");
+  color: var(--page-header-text);
+  background-color: var(--page-header-bg);
 
-  &__title {
-    display: flex;
-    align-items: center;
-    text-overflow: truncate;
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: theme("colors.gray.800");
-    gap: theme("spacing.2");
+  &--bordered {
+    border-bottom: 1px solid var(--page-header-border);
   }
 
-  &__title-text {
+  &--sticky {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  &--with-footer {
+    flex-wrap: wrap;
+  }
+
+  &--stuck {
+    box-shadow: 0 8px 18px -12px rgba(16, 24, 40, 0.35);
+  }
+
+  &__back {
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    width: theme("spacing.7");
+    height: theme("spacing.7");
+    padding: 0;
+    color: var(--page-header-subtle);
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: theme("borderRadius.base");
+    cursor: pointer;
+    transition:
+      color 0.15s,
+      background-color 0.15s,
+      border-color 0.15s;
+
+    &:hover {
+      color: var(--page-header-text);
+      background-color: var(--page-header-hover);
+      border-color: var(--page-header-border);
+    }
+
+    &:focus-visible {
+      outline: 2px solid theme("colors.primary");
+      outline-offset: 2px;
+    }
+
+    svg {
+      width: theme("spacing.4");
+      height: theme("spacing.4");
+    }
+  }
+
+  &__leading {
+    display: flex;
+    align-items: center;
+    gap: theme("spacing.2");
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  &__icon {
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+  }
+
+  &__titles {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  &__titleline {
+    display: flex;
+    align-items: center;
+    gap: theme("spacing.2");
+    min-width: 0;
+  }
+
+  &__title {
+    margin: 0;
+    min-width: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.4;
+    color: var(--page-header-text);
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  &__subtitle {
+    margin: 0;
+    min-width: 0;
+    font-size: 0.75rem;
+    line-height: 1.4;
+    color: var(--page-header-subtle);
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__tags {
+    display: flex;
+    align-items: center;
+    gap: theme("spacing.1");
+    flex: none;
   }
 
   &__actions {
@@ -50,6 +299,88 @@ defineProps<{
     align-items: center;
     justify-content: flex-end;
     gap: theme("spacing.2");
+    flex: none;
+    margin-left: auto;
+
+    &--loading {
+      pointer-events: none;
+      opacity: 0.45;
+    }
+  }
+
+  &__footer {
+    flex: 1 0 100%;
+    min-width: 0;
+  }
+
+  &__skeleton {
+    border-radius: theme("borderRadius.base");
+    background: linear-gradient(
+      90deg,
+      var(--page-header-skeleton) 25%,
+      var(--page-header-skeleton-highlight) 37%,
+      var(--page-header-skeleton) 63%
+    );
+    background-size: 400% 100%;
+    animation: page-header-shimmer 1.25s ease infinite;
+
+    &--title {
+      width: 11.25rem;
+      height: 1.25rem;
+    }
+
+    &--subtitle {
+      width: 7.5rem;
+      height: 0.625rem;
+    }
+  }
+
+  &--wrapped {
+    .page-header__title,
+    .page-header__subtitle {
+      white-space: normal;
+      overflow: visible;
+      text-overflow: clip;
+      overflow-wrap: anywhere;
+    }
+
+    .page-header__titleline {
+      flex-wrap: wrap;
+      align-items: flex-start;
+    }
+  }
+}
+
+@keyframes page-header-shimmer {
+  0% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0 50%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-header__skeleton {
+    animation: none;
+  }
+}
+
+// Tailwind's `sm` breakpoint: below it the actions move to their own row.
+@media (max-width: 640px) {
+  .page-header {
+    flex-wrap: wrap;
+  }
+
+  .page-header__leading {
+    flex-basis: 100%;
+  }
+
+  .page-header__actions {
+    width: 100%;
+    margin-left: 0;
+    justify-content: flex-start;
     flex-wrap: wrap;
   }
 }

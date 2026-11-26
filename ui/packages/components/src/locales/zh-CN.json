@@ -40,6 +40,8 @@
   "filter.reset": "重置筛选",
   "drawer.label": "抽屉",
   "empty.image": "空状态",
+  "page_header.back": "返回",
+  "page_header.actions": "页面操作",
   "toast.notification": "通知",
   "toast.notifications": "通知"
 }

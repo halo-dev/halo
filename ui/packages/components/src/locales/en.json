@@ -40,6 +40,8 @@
   "filter.reset": "Reset filters",
   "drawer.label": "Drawer",
   "empty.image": "Empty",
+  "page_header.back": "Back",
+  "page_header.actions": "Page actions",
   "toast.notification": "Notification",
   "toast.notifications": "Notifications"
 }

@@ -40,6 +40,8 @@
   "filter.reset": "Restablecer filtros",
   "drawer.label": "Cajón",
   "empty.image": "Vacío",
+  "page_header.back": "Volver",
+  "page_header.actions": "Acciones de la página",
   "toast.notification": "Notificación",
   "toast.notifications": "Notificaciones"
 }
