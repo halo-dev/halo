@@ -261,45 +261,70 @@ const iframeClasses = computed(() => {
       ></VTabbar>
     </template>
     <template #actions>
-      <span
+      <VButton
         v-tooltip="{
           content: $t('core.theme.empty.actions.switch'),
           delay: 300,
         }"
-        :class="{ 'bg-gray-200': themesVisible }"
+        :aria-label="$t('core.theme.empty.actions.switch')"
+        :class="{ '!bg-gray-200': themesVisible }"
+        variant="ghost"
+        shape="circle"
+        size="sm"
         @click="handleOpenThemes"
       >
-        <IconPalette />
-      </span>
-      <span
+        <template #icon>
+          <IconPalette />
+        </template>
+      </VButton>
+      <VButton
         v-tooltip="{
           content: $t('core.theme.preview_model.actions.setting'),
           delay: 300,
         }"
-        :class="{ 'bg-gray-200': settingsVisible }"
+        :aria-label="$t('core.theme.preview_model.actions.setting')"
+        :class="{ '!bg-gray-200': settingsVisible }"
+        variant="ghost"
+        shape="circle"
+        size="sm"
         @click="handleOpenSettings(undefined)"
       >
-        <IconSettings />
-      </span>
-      <span
+        <template #icon>
+          <IconSettings />
+        </template>
+      </VButton>
+      <VButton
         v-tooltip="{
           content: $t('core.common.buttons.refresh'),
           delay: 300,
         }"
+        :aria-label="$t('core.common.buttons.refresh')"
+        variant="ghost"
+        shape="circle"
+        size="sm"
         @click="handleRefresh()"
       >
-        <IconRefreshLine />
-      </span>
-      <span
+        <template #icon>
+          <IconRefreshLine />
+        </template>
+      </VButton>
+      <VButton
         v-tooltip="{
           content: $t('core.theme.preview_model.actions.open'),
           delay: 300,
         }"
+        as="a"
+        :aria-label="$t('core.theme.preview_model.actions.open')"
+        :href="previewUrl"
+        variant="ghost"
+        shape="circle"
+        size="sm"
+        target="_blank"
       >
-        <a :href="previewUrl" target="_blank">
+        <template #icon>
           <IconLink />
-        </a>
-      </span>
+        </template>
+      </VButton>
     </template>
     <div
       class="flex h-full items-center justify-center divide-x divide-gray-100 transition-all"

@@ -23,7 +23,7 @@ function onReload() {
 }
 </script>
 <template>
-  <VCard :title="title" :body-class="['!p-0']">
+  <VCard flush :title="title">
     <div class="w-full overflow-x-auto">
       <table class="w-full border-spacing-0">
         <VueDraggable

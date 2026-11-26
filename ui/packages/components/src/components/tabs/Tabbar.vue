@@ -653,17 +653,14 @@ useEventListener(tabbarItemsRef, "wheel", handleWheel, {
     }
   }
 
-  // Full-bleed form for card headers: the bar carries the top corners itself
-  // and drops its horizontal padding, so callers no longer need `!rounded-none`
-  // together with an outer clipping parent.
+  // Full-bleed form for card headers: the bar carries the top corners itself,
+  // so callers no longer need `!rounded-none` together with an outer clipping
+  // parent. The variant's horizontal padding stays: with no padding a tab at
+  // either edge sits directly on the card border.
   &.is-flush {
     @apply rounded-t-base;
     border-bottom-right-radius: 0;
     border-bottom-left-radius: 0;
-
-    &.tabbar-outline {
-      @apply px-0;
-    }
   }
 
   &.tabbar-direction-row {

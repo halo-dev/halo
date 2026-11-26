@@ -231,156 +231,143 @@ const { handleChangeStatusInBatch, handleUninstallInBatch } =
   </VPageHeader>
 
   <div class="m-0 md:m-4">
-    <VCard :body-class="['!p-0']">
-      <template #header>
-        <div class="block w-full bg-gray-50 px-4 py-3">
+    <VCard flush>
+      <template #toolbar>
+        <div
+          class="relative flex flex-col flex-wrap items-start gap-4 sm:flex-row sm:items-center"
+        >
           <div
-            class="relative flex flex-col flex-wrap items-start gap-4 sm:flex-row sm:items-center"
+            v-permission="['system:plugins:manage']"
+            class="hidden items-center sm:flex"
           >
-            <div
-              v-permission="['system:plugins:manage']"
-              class="hidden items-center sm:flex"
-            >
-              <input
-                v-model="checkedAll"
-                type="checkbox"
-                @change="handleCheckAllChange"
-              />
-            </div>
-            <div class="flex w-full flex-1 items-center gap-2 sm:w-auto">
-              <SearchInput
-                v-if="!selectedNames.length"
-                v-model="keyword"
-                sync
-              />
-              <VSpace v-else>
-                <VButton @click="handleChangeStatusInBatch(true)">
-                  {{ $t("core.common.buttons.activate") }}
+            <input
+              v-model="checkedAll"
+              type="checkbox"
+              @change="handleCheckAllChange"
+            />
+          </div>
+          <div class="flex w-full flex-1 items-center gap-2 sm:w-auto">
+            <SearchInput v-if="!selectedNames.length" v-model="keyword" sync />
+            <VSpace v-else>
+              <VButton @click="handleChangeStatusInBatch(true)">
+                {{ $t("core.common.buttons.activate") }}
+              </VButton>
+              <VButton @click="handleChangeStatusInBatch(false)">
+                {{ $t("core.common.buttons.inactivate") }}
+              </VButton>
+              <VDropdown>
+                <VButton type="danger">
+                  {{ $t("core.common.buttons.uninstall") }}
                 </VButton>
-                <VButton @click="handleChangeStatusInBatch(false)">
-                  {{ $t("core.common.buttons.inactivate") }}
-                </VButton>
-                <VDropdown>
-                  <VButton type="danger">
+                <template #popper>
+                  <VDropdownItem
+                    type="danger"
+                    @click="handleUninstallInBatch(false)"
+                  >
                     {{ $t("core.common.buttons.uninstall") }}
-                  </VButton>
-                  <template #popper>
-                    <VDropdownItem
-                      type="danger"
-                      @click="handleUninstallInBatch(false)"
-                    >
-                      {{ $t("core.common.buttons.uninstall") }}
-                    </VDropdownItem>
-                    <VDropdownItem
-                      type="danger"
-                      @click="handleUninstallInBatch(true)"
-                    >
-                      {{
-                        $t(
-                          "core.plugin.operations.uninstall_and_delete_config.button"
-                        )
-                      }}
-                    </VDropdownItem>
-                  </template>
-                </VDropdown>
-              </VSpace>
-            </div>
-            <VSpace spacing="lg" wrap>
-              <VFilterDropdownGroup
-                :clear-label="$t('core.common.buttons.reset')"
-              >
-                <VFilterDropdown
-                  v-model="selectedEnabledValue"
-                  :label="$t('core.common.filters.labels.status')"
-                  show-clear-option
-                  :clear-label="t('core.common.filters.item_labels.all')"
-                  :options="[
-                    {
-                      label: t('core.plugin.filters.status.items.active'),
-                      value: 'true',
-                    },
-                    {
-                      label: t('core.plugin.filters.status.items.inactive'),
-                      value: 'false',
-                    },
-                  ]"
-                />
-                <VFilterDropdown
-                  v-model="selectedAuthor"
-                  :label="$t('core.plugin.filters.author.label')"
-                  :options="authorOptions"
-                  :selected-label="selectedAuthorName"
-                  searchable
-                  :search-placeholder="$t('core.common.placeholder.search')"
-                  :empty-text="$t('core.components.global_search.no_results')"
-                  show-clear-option
-                  :clear-label="t('core.common.filters.item_labels.all')"
-                  panel-width="22rem"
-                >
-                  <template #option="{ option, selected }">
-                    <div class="flex min-w-0 flex-1 flex-col">
-                      <span
-                        class="truncate text-sm"
-                        :class="
-                          selected
-                            ? 'font-medium text-gray-900'
-                            : 'text-gray-700'
-                        "
-                      >
-                        {{ option.label }}
-                      </span>
-                      <span
-                        v-if="option.description"
-                        class="truncate text-xs text-gray-500"
-                        :title="option.description"
-                      >
-                        {{ option.description }}
-                      </span>
-                    </div>
-                    <span
-                      v-if="option.count"
-                      class="shrink-0 text-xs text-gray-500"
-                    >
-                      {{ option.count }}
-                    </span>
-                  </template>
-                </VFilterDropdown>
-                <VFilterDropdown
-                  v-model="selectedSortValue"
-                  :label="$t('core.common.filters.labels.sort')"
-                  show-clear-option
-                  :clear-label="t('core.common.filters.item_labels.default')"
-                  :options="[
-                    {
-                      label: t(
-                        'core.plugin.filters.sort.items.create_time_desc'
-                      ),
-                      value: 'creationTimestamp,desc',
-                    },
-                    {
-                      label: t(
-                        'core.plugin.filters.sort.items.create_time_asc'
-                      ),
-                      value: 'creationTimestamp,asc',
-                    },
-                  ]"
-                />
-              </VFilterDropdownGroup>
-              <div class="flex flex-row gap-2">
-                <button
-                  v-tooltip="$t('core.common.buttons.refresh')"
-                  type="button"
-                  class="group cursor-pointer rounded p-1 hover:bg-gray-200"
-                  @click="refetch()"
-                >
-                  <IconRefreshLine
-                    :class="{ 'animate-spin text-gray-900': isFetching }"
-                    class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
-                  />
-                </button>
-              </div>
+                  </VDropdownItem>
+                  <VDropdownItem
+                    type="danger"
+                    @click="handleUninstallInBatch(true)"
+                  >
+                    {{
+                      $t(
+                        "core.plugin.operations.uninstall_and_delete_config.button"
+                      )
+                    }}
+                  </VDropdownItem>
+                </template>
+              </VDropdown>
             </VSpace>
           </div>
+          <VSpace spacing="sm" wrap>
+            <VFilterDropdownGroup
+              :clear-label="$t('core.common.buttons.reset')"
+            >
+              <VFilterDropdown
+                v-model="selectedEnabledValue"
+                :label="$t('core.common.filters.labels.status')"
+                show-clear-option
+                :clear-label="t('core.common.filters.item_labels.all')"
+                :options="[
+                  {
+                    label: t('core.plugin.filters.status.items.active'),
+                    value: 'true',
+                  },
+                  {
+                    label: t('core.plugin.filters.status.items.inactive'),
+                    value: 'false',
+                  },
+                ]"
+              />
+              <VFilterDropdown
+                v-model="selectedAuthor"
+                :label="$t('core.plugin.filters.author.label')"
+                :options="authorOptions"
+                :selected-label="selectedAuthorName"
+                searchable
+                :search-placeholder="$t('core.common.placeholder.search')"
+                :empty-text="$t('core.components.global_search.no_results')"
+                show-clear-option
+                :clear-label="t('core.common.filters.item_labels.all')"
+                panel-width="22rem"
+              >
+                <template #option="{ option, selected }">
+                  <div class="flex min-w-0 flex-1 flex-col">
+                    <span
+                      class="truncate text-sm"
+                      :class="
+                        selected ? 'font-medium text-gray-900' : 'text-gray-700'
+                      "
+                    >
+                      {{ option.label }}
+                    </span>
+                    <span
+                      v-if="option.description"
+                      class="truncate text-xs text-gray-500"
+                      :title="option.description"
+                    >
+                      {{ option.description }}
+                    </span>
+                  </div>
+                  <span
+                    v-if="option.count"
+                    class="shrink-0 text-xs text-gray-500"
+                  >
+                    {{ option.count }}
+                  </span>
+                </template>
+              </VFilterDropdown>
+              <VFilterDropdown
+                v-model="selectedSortValue"
+                :label="$t('core.common.filters.labels.sort')"
+                show-clear-option
+                :clear-label="t('core.common.filters.item_labels.default')"
+                :options="[
+                  {
+                    label: t('core.plugin.filters.sort.items.create_time_desc'),
+                    value: 'creationTimestamp,desc',
+                  },
+                  {
+                    label: t('core.plugin.filters.sort.items.create_time_asc'),
+                    value: 'creationTimestamp,asc',
+                  },
+                ]"
+              />
+            </VFilterDropdownGroup>
+            <div class="flex flex-row gap-2">
+              <VButton
+                :label="$t('core.common.buttons.refresh')"
+                variant="ghost"
+                size="sm"
+                @click="refetch()"
+              >
+                <template #icon>
+                  <IconRefreshLine :class="{ 'animate-spin': isFetching }" />
+                </template>
+              </VButton>
+            </div>
+          </VSpace>
         </div>
       </template>
 

@@ -37,7 +37,10 @@ export interface HaloEditorNodeIndentationMetadata {
    */
   keyboard?: "block" | "passthrough";
 
-  /** Keep parsing the legacy first-line indentation attribute for this node. */
+  /**
+   * Keep parsing the legacy first-line indentation attribute for this node and
+   * let Tab apply it at the start of the text block.
+   */
   legacyLineIndent?: boolean;
 }
 

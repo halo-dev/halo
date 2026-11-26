@@ -922,6 +922,7 @@
   "core.formkit.attachment.operations.input": "Enlace de entrada",
   "core.common.buttons.save": "Guardar",
   "core.common.buttons.close": "Cerrar",
+  "core.common.buttons.open_in_new_window": "Abrir en una ventana nueva",
   "core.common.buttons.save_and_continue": "Guardar y seguir añadiendo",
   "core.common.buttons.close_and_shortcut": "Cerrar (Esc)",
   "core.common.buttons.delete": "Borrar",

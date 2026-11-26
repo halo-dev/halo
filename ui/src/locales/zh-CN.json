@@ -1116,6 +1116,7 @@
   "core.formkit.attachment.operations.input": "输入链接",
   "core.common.buttons.save": "保存",
   "core.common.buttons.close": "关闭",
+  "core.common.buttons.open_in_new_window": "在新窗口打开",
   "core.common.buttons.save_and_continue": "保存并继续添加",
   "core.common.buttons.close_and_shortcut": "关闭（Esc）",
   "core.common.buttons.delete": "删除",

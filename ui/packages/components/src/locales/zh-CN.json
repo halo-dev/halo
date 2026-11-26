@@ -39,5 +39,7 @@
   "filter.all": "全部",
   "filter.reset": "重置筛选",
   "drawer.label": "抽屉",
-  "empty.image": "空状态"
+  "empty.image": "空状态",
+  "toast.notification": "通知",
+  "toast.notifications": "通知"
 }

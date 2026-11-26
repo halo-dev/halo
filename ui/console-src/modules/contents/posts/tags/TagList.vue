@@ -171,85 +171,82 @@ watch(selectedTagNames, (newVal) => {
     </template>
   </VPageHeader>
   <div class="m-0 md:m-4">
-    <VCard :body-class="['!p-0']">
-      <template #header>
-        <div class="block w-full bg-gray-50 px-4 py-3">
-          <div
-            class="relative flex h-9 flex-col flex-wrap items-start gap-4 sm:flex-row sm:items-center"
-          >
-            <HasPermission :permissions="['system:posts:manage']">
-              <div class="hidden items-center sm:flex">
-                <input
-                  v-model="checkedAll"
-                  type="checkbox"
-                  @change="handleCheckAllChange"
-                />
-              </div>
-            </HasPermission>
-            <div class="flex w-full flex-1 items-center sm:w-auto">
-              <VSpace v-if="selectedTagNames.length > 0">
-                <VButton type="danger" @click="handleDeleteTagInBatch">
-                  {{ $t("core.common.buttons.delete") }}
-                </VButton>
-              </VSpace>
-              <SearchInput v-else v-model="keyword" />
+    <VCard flush>
+      <template #toolbar>
+        <div
+          class="relative flex h-9 flex-col flex-wrap items-start gap-4 sm:flex-row sm:items-center"
+        >
+          <HasPermission :permissions="['system:posts:manage']">
+            <div class="hidden items-center sm:flex">
+              <input
+                v-model="checkedAll"
+                type="checkbox"
+                @change="handleCheckAllChange"
+              />
             </div>
-            <VSpace spacing="lg" wrap>
-              <VFilterDropdownGroup
-                :clear-label="$t('core.common.buttons.reset')"
-              >
-                <VFilterDropdown
-                  v-model="selectedSort"
-                  :label="$t('core.common.filters.labels.sort')"
-                  show-clear-option
-                  :clear-label="t('core.common.filters.item_labels.default')"
-                  :options="[
-                    {
-                      label: t(
-                        'core.post.tag.filters.sort.items.create_time_desc'
-                      ),
-                      value: 'metadata.creationTimestamp,desc',
-                    },
-                    {
-                      label: t(
-                        'core.post.tag.filters.sort.items.create_time_asc'
-                      ),
-                      value: 'metadata.creationTimestamp,asc',
-                    },
-                    {
-                      label: t(
-                        'core.post.tag.filters.sort.items.display_name_desc'
-                      ),
-                      value: 'spec.displayName,desc',
-                    },
-                    {
-                      label: t(
-                        'core.post.tag.filters.sort.items.display_name_asc'
-                      ),
-                      value: 'spec.displayName,asc',
-                    },
-                    {
-                      label: t('core.post.tag.filters.sort.items.post_desc'),
-                      value: 'status.postCount,desc',
-                    },
-                  ]"
-                />
-              </VFilterDropdownGroup>
-              <div class="flex flex-row gap-2">
-                <button
-                  v-tooltip="$t('core.common.buttons.refresh')"
-                  type="button"
-                  class="group cursor-pointer rounded p-1 hover:bg-gray-200"
-                  @click="handleFetchTags()"
-                >
-                  <IconRefreshLine
-                    :class="{ 'animate-spin text-gray-900': isFetching }"
-                    class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
-                  />
-                </button>
-              </div>
+          </HasPermission>
+          <div class="flex w-full flex-1 items-center sm:w-auto">
+            <VSpace v-if="selectedTagNames.length > 0">
+              <VButton type="danger" @click="handleDeleteTagInBatch">
+                {{ $t("core.common.buttons.delete") }}
+              </VButton>
             </VSpace>
+            <SearchInput v-else v-model="keyword" />
           </div>
+          <VSpace spacing="sm" wrap>
+            <VFilterDropdownGroup
+              :clear-label="$t('core.common.buttons.reset')"
+            >
+              <VFilterDropdown
+                v-model="selectedSort"
+                :label="$t('core.common.filters.labels.sort')"
+                show-clear-option
+                :clear-label="t('core.common.filters.item_labels.default')"
+                :options="[
+                  {
+                    label: t(
+                      'core.post.tag.filters.sort.items.create_time_desc'
+                    ),
+                    value: 'metadata.creationTimestamp,desc',
+                  },
+                  {
+                    label: t(
+                      'core.post.tag.filters.sort.items.create_time_asc'
+                    ),
+                    value: 'metadata.creationTimestamp,asc',
+                  },
+                  {
+                    label: t(
+                      'core.post.tag.filters.sort.items.display_name_desc'
+                    ),
+                    value: 'spec.displayName,desc',
+                  },
+                  {
+                    label: t(
+                      'core.post.tag.filters.sort.items.display_name_asc'
+                    ),
+                    value: 'spec.displayName,asc',
+                  },
+                  {
+                    label: t('core.post.tag.filters.sort.items.post_desc'),
+                    value: 'status.postCount,desc',
+                  },
+                ]"
+              />
+            </VFilterDropdownGroup>
+            <div class="flex flex-row gap-2">
+              <VButton
+                :label="$t('core.common.buttons.refresh')"
+                variant="ghost"
+                size="sm"
+                @click="handleFetchTags()"
+              >
+                <template #icon>
+                  <IconRefreshLine :class="{ 'animate-spin': isFetching }" />
+                </template>
+              </VButton>
+            </div>
+          </VSpace>
         </div>
       </template>
       <VLoading v-if="isLoading" />

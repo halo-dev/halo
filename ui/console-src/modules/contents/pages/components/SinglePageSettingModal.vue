@@ -511,7 +511,7 @@ async function slugUniqueValidation(node: FormKitNode) {
           "
           :loading="publishCanceling"
           type="danger"
-          ghost
+          variant="ghost"
           @click="handleUnpublish()"
         >
           {{ $t("core.common.buttons.cancel_publish") }}

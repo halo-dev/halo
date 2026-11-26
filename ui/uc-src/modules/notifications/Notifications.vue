@@ -720,113 +720,127 @@ function handleMarkAllAsRead() {
     </template>
   </VPageHeader>
   <div class="m-0 md:m-4">
-    <VCard
-      style="height: calc(100vh - 5.5rem)"
-      :body-class="['h-full', '!p-0']"
-    >
+    <VCard style="height: calc(100vh - 5.5rem)" flush :body-class="['h-full']">
       <div class="grid h-full grid-cols-12 divide-y sm:divide-x sm:divide-y-0">
         <div
           class="relative col-span-12 flex h-full flex-col overflow-hidden sm:col-span-6 lg:col-span-5 xl:col-span-3"
         >
           <div class="sticky top-0 z-10 flex-none">
-            <VTabbar
-              v-model:active-id="activeTab"
-              class="!rounded-none"
-              :items="[
-                { id: 'unread', label: $t('core.uc_notification.tabs.unread') },
-                { id: 'read', label: $t('core.uc_notification.tabs.read') },
-              ]"
-              type="outline"
-              @change="selectedNotificationName = undefined"
-            ></VTabbar>
+            <div class="flex items-center gap-2 pr-4">
+              <VTabbar
+                v-model:active-id="activeTab"
+                class="min-w-0 flex-1 !rounded-none"
+                :items="[
+                  {
+                    id: 'unread',
+                    label: $t('core.uc_notification.tabs.unread'),
+                  },
+                  { id: 'read', label: $t('core.uc_notification.tabs.read') },
+                ]"
+                type="outline"
+                @change="selectedNotificationName = undefined"
+              ></VTabbar>
 
-            <div
-              class="absolute right-4 top-1/2 flex -translate-y-1/2 items-center gap-2"
-            >
-              <!-- Normal mode actions -->
-              <template v-if="!isSelectMode">
-                <button
-                  v-tooltip="
-                    $t('core.uc_notification.operations.select_mode.tooltip')
-                  "
-                  class="flex size-7 cursor-pointer items-center justify-center rounded-full hover:bg-gray-200 disabled:pointer-events-none disabled:opacity-70"
-                  :disabled="!notifications.length"
-                  @click="toggleSelectMode"
-                >
-                  <RiCheckboxMultipleLine
-                    class="size-4 text-gray-600 group-hover:text-gray-900"
-                  />
-                </button>
-                <button
-                  v-if="activeTab === 'unread'"
-                  v-tooltip="
-                    $t(
-                      'core.uc_notification.operations.mark_all_as_read.tooltip'
-                    )
-                  "
-                  class="flex size-7 cursor-pointer items-center justify-center rounded-full hover:bg-gray-200 disabled:pointer-events-none disabled:opacity-70"
-                  :disabled="!notifications.length"
-                  @click="handleMarkAllAsRead"
-                >
-                  <RiCheckDoubleLine
-                    class="size-4 text-gray-600 group-hover:text-gray-900"
-                  />
-                </button>
-                <button
-                  v-tooltip="
-                    $t('core.uc_notification.operations.delete_all.tooltip')
-                  "
-                  class="group flex size-7 cursor-pointer items-center justify-center rounded-full hover:bg-gray-200 disabled:pointer-events-none disabled:opacity-70"
-                  :disabled="!notifications.length"
-                  @click="handleDeleteNotifications"
-                >
-                  <IconDeleteBin
-                    class="size-4 text-gray-600 group-hover:text-red-600"
-                  />
-                </button>
-              </template>
+              <div class="flex shrink-0 items-center gap-2">
+                <!-- Normal mode actions -->
+                <template v-if="!isSelectMode">
+                  <VButton
+                    :label="
+                      $t('core.uc_notification.operations.select_mode.tooltip')
+                    "
+                    variant="ghost"
+                    shape="circle"
+                    size="sm"
+                    :disabled="!notifications.length"
+                    @click="toggleSelectMode"
+                  >
+                    <template #icon>
+                      <RiCheckboxMultipleLine />
+                    </template>
+                  </VButton>
+                  <VButton
+                    v-if="activeTab === 'unread'"
+                    :label="
+                      $t(
+                        'core.uc_notification.operations.mark_all_as_read.tooltip'
+                      )
+                    "
+                    variant="ghost"
+                    shape="circle"
+                    size="sm"
+                    :disabled="!notifications.length"
+                    @click="handleMarkAllAsRead"
+                  >
+                    <template #icon>
+                      <RiCheckDoubleLine />
+                    </template>
+                  </VButton>
+                  <VButton
+                    :label="
+                      $t('core.uc_notification.operations.delete_all.tooltip')
+                    "
+                    class="group"
+                    variant="ghost"
+                    shape="circle"
+                    size="sm"
+                    :disabled="!notifications.length"
+                    @click="handleDeleteNotifications"
+                  >
+                    <template #icon>
+                      <IconDeleteBin class="group-hover:text-red-600" />
+                    </template>
+                  </VButton>
+                </template>
 
-              <!-- Select mode actions -->
-              <template v-else>
-                <button
-                  v-tooltip="
-                    $t('core.uc_notification.operations.select_all.tooltip')
-                  "
-                  class="flex size-7 cursor-pointer items-center justify-center rounded-full hover:bg-gray-200 disabled:pointer-events-none disabled:opacity-70"
-                  @click="handleSelectAll"
-                >
-                  <RiCheckboxMultipleFill
-                    class="size-4 text-gray-600 group-hover:text-gray-900"
-                  />
-                </button>
-                <button
-                  v-tooltip="
-                    $t(
-                      'core.uc_notification.operations.delete_selected.tooltip'
-                    )
-                  "
-                  class="flex size-7 cursor-pointer items-center justify-center rounded-full hover:bg-gray-200 disabled:pointer-events-none disabled:opacity-70"
-                  :disabled="selectedNames.size === 0"
-                  @click="handleDeleteSelected"
-                >
-                  <IconDeleteBin
-                    class="size-4 text-gray-600 group-hover:text-red-600"
-                  />
-                </button>
-                <button
-                  v-tooltip="
-                    $t(
-                      'core.uc_notification.operations.exit_select_mode.tooltip'
-                    )
-                  "
-                  class="flex size-7 cursor-pointer items-center justify-center rounded-full hover:bg-gray-200 disabled:pointer-events-none disabled:opacity-70"
-                  @click="toggleSelectMode"
-                >
-                  <IconClose
-                    class="size-4 text-gray-600 group-hover:text-gray-900"
-                  />
-                </button>
-              </template>
+                <!-- Select mode actions -->
+                <template v-else>
+                  <VButton
+                    :label="
+                      $t('core.uc_notification.operations.select_all.tooltip')
+                    "
+                    variant="ghost"
+                    shape="circle"
+                    size="sm"
+                    @click="handleSelectAll"
+                  >
+                    <template #icon>
+                      <RiCheckboxMultipleFill />
+                    </template>
+                  </VButton>
+                  <VButton
+                    :label="
+                      $t(
+                        'core.uc_notification.operations.delete_selected.tooltip'
+                      )
+                    "
+                    class="group"
+                    variant="ghost"
+                    shape="circle"
+                    size="sm"
+                    :disabled="selectedNames.size === 0"
+                    @click="handleDeleteSelected"
+                  >
+                    <template #icon>
+                      <IconDeleteBin class="group-hover:text-red-600" />
+                    </template>
+                  </VButton>
+                  <VButton
+                    :label="
+                      $t(
+                        'core.uc_notification.operations.exit_select_mode.tooltip'
+                      )
+                    "
+                    variant="ghost"
+                    shape="circle"
+                    size="sm"
+                    @click="toggleSelectMode"
+                  >
+                    <template #icon>
+                      <IconClose />
+                    </template>
+                  </VButton>
+                </template>
+              </div>
             </div>
           </div>
           <OverlayScrollbarsComponent
