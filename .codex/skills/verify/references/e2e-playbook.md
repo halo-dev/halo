@@ -5,7 +5,7 @@ Prerequisite: SKILL.md has already decided that this change needs T3. This file 
 ## Configuration sources and isolation
 
 - Ports, workdir, database, Basic Auth, and UI proxy come from `application/src/main/resources/application.yaml` and the relevant `application-*.yaml` profile. Never assume port occupancy, paths, or database names on any machine.
-- Prefer the `dev` profile: H2 file database, Basic Auth enabled, UI proxy pointing at 3000, plugin runtime `development`. **Do not use the `local` profile**: it is gitignored (`application-local.yaml`) and typically points at personal databases and local plugin paths.
+- Prefer the `dev` profile: H2 file database, Basic Auth enabled, plugin runtime `development`. Its UI proxy points at 3000, which only matters for Option B; the default UI path disables it and serves a built bundle. **Do not use the `local` profile**: it is gitignored (`application-local.yaml`) and typically points at personal databases and local plugin paths.
 - Do not use the `mysql`/`postgresql`/`mariadb` profiles against a user's existing database; spin up isolated containers as described under "Other database dialects".
 - For E2E, always override `--server.port` and `--halo.work-dir` with temporary values; never use the profile's default workdir (`dev` uses `${user.home}/halo2-dev`).
 - **Port 8091 is reserved by `generateOpenApiDocs`**; start E2E from 8092. Run `lsof -nP -iTCP -sTCP:LISTEN` before starting, and never kill processes you did not start.
@@ -110,7 +110,9 @@ jq '.paths["<path>"].post.requestBody' api-docs/openapi/v3_0/apis_console.api_v1
 
 Every change under `ui/` — including CSS, copy, or template-only tweaks — gets this pass. T1 and Vitest do not replace it: they prove the code compiles and units pass, not that the page renders or the flow works.
 
-### Option A: Build into the backend (recommended, self-contained)
+Prefer Option A. `pnpm -C ui dev` adds a second, fixed port: 3000 is hard-coded in `ui/vite.config.ts` and the `dev` profile's proxy endpoint points at `http://localhost:3000/`. When 3000 is already in use, making dev mode work means changing repo config or threading several overrides through both processes. Building the UI keeps verification on the single backend port and exercises the real production bundle, so it is both more isolated and more representative. Use Option B only when hot reload genuinely saves time while iterating, never as the default E2E path.
+
+### Option A: Build into the backend (default, self-contained)
 
 ```bash
 ./gradlew :ui:doBuild :application:copyUiDist
@@ -122,14 +124,14 @@ Every change under `ui/` — including CSS, copy, or template-only tweaks — ge
 - Open `http://127.0.0.1:$PORT/console`; unauthenticated requests redirect with 302 to `/login`, which is expected. Log in as admin in a browser to enter the Console.
 - `halo.ui.proxy.enabled=false` is required; otherwise the `dev` profile proxies UI requests to port 3000.
 
-### Option B: Vite dev server
+### Option B: Vite dev server (fallback for hot reload)
 
 ```bash
 pnpm -C ui dev
 # Keep the backend's dev profile default halo.ui.proxy.enabled=true
 ```
 
-- The Vite port is hard-coded as `DEV_SERVER_PORT = 3000` in `ui/vite.config.ts`; do not change repo configuration. If 3000 is occupied, prefer Option A.
+- Check `lsof -nP -iTCP:3000 -sTCP:LISTEN` before starting. The Vite port is hard-coded as `DEV_SERVER_PORT = 3000` in `ui/vite.config.ts`; do not change repo configuration. If 3000 is occupied, use Option A instead of hunting for another port.
 - Vite has no API proxy; the Halo backend proxies UI requests to Vite. The entry point is still the backend port's `/console`.
 - Vite hot-reloads UI changes; Java changes require restarting the backend.
 
