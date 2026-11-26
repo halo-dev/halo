@@ -90,7 +90,11 @@ const handleLoadMore = () => {
       ></SelectOption>
     </div>
     <div v-else>
-      <VEmpty :title="i18n.global.t('core.formkit.select.no_data')"></VEmpty>
+      <VEmpty
+        :title="i18n.global.t('core.formkit.select.no_data')"
+        :show-image="false"
+        size="sm"
+      ></VEmpty>
     </div>
   </div>
 </template>
