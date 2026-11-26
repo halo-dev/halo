@@ -115,10 +115,9 @@ const showDisplayNameForm = ref(false);
           <VDescriptionItem
             :label="$t('core.attachment.detail_modal.fields.preview')"
           >
-            <AttachmentImagePreview
-              v-if="isImage(attachment?.spec.mediaType)"
-              :attachment="attachment"
-            />
+            <div v-if="isImage(attachment?.spec.mediaType)" class="lg:w-3/5">
+              <AttachmentImagePreview :attachment="attachment" />
+            </div>
             <div v-else-if="attachment?.spec.mediaType?.startsWith('video/')">
               <video
                 :src="attachment.status?.permalink"
@@ -192,7 +191,9 @@ const showDisplayNameForm = ref(false);
           <VDescriptionItem
             :label="$t('core.attachment.detail_modal.fields.permalink')"
           >
-            <AttachmentPermalinkList :attachment="attachment" />
+            <div class="lg:w-3/5">
+              <AttachmentPermalinkList :attachment="attachment" />
+            </div>
           </VDescriptionItem>
         </VDescription>
       </div>
