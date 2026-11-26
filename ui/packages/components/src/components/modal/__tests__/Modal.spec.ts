@@ -1,4 +1,4 @@
-import { enableAutoUnmount, mount } from "@vue/test-utils";
+import { enableAutoUnmount, flushPromises, mount } from "@vue/test-utils";
 import { OverlayScrollbars } from "overlayscrollbars";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 import { defineComponent, nextTick, ref } from "vue";
@@ -7,6 +7,7 @@ import { VModal } from "../index";
 enableAutoUnmount(afterEach);
 
 afterEach(() => {
+  vi.useRealTimers();
   vi.restoreAllMocks();
 });
 
@@ -16,133 +17,93 @@ describe("Modal", () => {
   });
 
   describe("accessibility", () => {
-    it("labels the dialog with its title", () => {
+    it("opens when initially controlled as visible", async () => {
       const wrapper = mount(VModal, {
-        props: { visible: true, title: "Hello Halo" },
+        attachTo: document.body,
+        props: { visible: true, title: "Modal title" },
       });
-      const dialog = wrapper.get(".modal-wrapper");
+
+      await nextTick();
+
+      expect(wrapper.get(".modal-wrapper").isVisible()).toBe(true);
+      expect(wrapper.get(".modal-content").attributes("data-state")).toBe(
+        "open"
+      );
+    });
+
+    it("labels the dialog with its title", async () => {
+      const wrapper = mount(VModal, {
+        attachTo: document.body,
+        props: { visible: true, title: "Modal title" },
+      });
+      const dialog = wrapper.get(".modal-content");
       const labelledby = dialog.attributes("aria-labelledby");
 
       expect(labelledby).toBeTruthy();
-      expect(wrapper.get(`[id="${labelledby}"]`).text()).toBe("Hello Halo");
+      expect(wrapper.get(`[id="${labelledby}"]`).text()).toBe("Modal title");
     });
 
-    it("keeps a native summary in the tab sequence", async () => {
-      vi.spyOn(HTMLElement.prototype, "getClientRects").mockReturnValue([
-        { width: 10, height: 10 },
-      ] as unknown as DOMRectList);
+    it("uses aria-label when no visible title is rendered", async () => {
+      const wrapper = mount(VModal, {
+        attachTo: document.body,
+        props: { visible: true, ariaLabel: "Search" },
+      });
+      const dialog = wrapper.get(".modal-content");
+      const labelledby = dialog.attributes("aria-labelledby");
+
+      expect(labelledby).toBeTruthy();
+      expect(wrapper.get(`[id="${labelledby}"]`).text()).toBe("Search");
+    });
+
+    it("moves focus into the dialog and keeps it there", async () => {
+      const outside = document.createElement("button");
+      document.body.appendChild(outside);
 
       const wrapper = mount(VModal, {
         attachTo: document.body,
-        props: { visible: false },
+        props: { visible: true, title: "Modal title" },
         slots: {
-          default: `
-            <button id="before">Before</button>
-            <details>
-              <summary id="more">More</summary>
-              <div>Hidden content</div>
-            </details>
-          `,
+          default: '<button id="inside">Inside</button>',
         },
       });
 
-      await wrapper.setProps({ visible: true });
       await nextTick();
       await nextTick();
 
-      const before = document.getElementById("before") as HTMLButtonElement;
-      before.focus();
-
-      const event = new KeyboardEvent("keydown", {
-        key: "Tab",
-        bubbles: true,
-        cancelable: true,
+      const dialog = wrapper.get(".modal-content").element;
+      await vi.waitFor(() => {
+        expect(dialog.contains(document.activeElement)).toBe(true);
       });
-      before.dispatchEvent(event);
 
-      expect(event.defaultPrevented).toBe(false);
+      outside.focus();
+      await nextTick();
+
+      expect(dialog.contains(document.activeElement)).toBe(true);
+
+      outside.remove();
     });
 
-    it.each(["-1", "-2", "-1x", "-1.5", " -2 "])(
-      "ignores a summary with tabindex %j in the tab order",
-      async (tabindex) => {
-        vi.spyOn(HTMLElement.prototype, "getClientRects").mockReturnValue([
-          { width: 10, height: 10 },
-        ] as unknown as DOMRectList);
+    it("does not focus the first header action when opening", async () => {
+      const wrapper = mount(VModal, {
+        attachTo: document.body,
+        props: { visible: true, title: "Modal title" },
+        slots: {
+          actions: '<button id="previous">Previous</button>',
+          default: '<button id="inside">Inside</button>',
+        },
+      });
 
-        const wrapper = mount(VModal, {
-          attachTo: document.body,
-          props: { visible: false },
-          slots: {
-            default: `
-              <button id="before">Before</button>
-              <details>
-                <summary id="more" tabindex="${tabindex}">More</summary>
-                <div>Hidden content</div>
-              </details>
-            `,
-          },
-        });
+      await nextTick();
+      await nextTick();
 
-        await wrapper.setProps({ visible: true });
-        await nextTick();
-        await nextTick();
+      const dialog = wrapper.get(".modal-content").element;
 
-        const before = document.getElementById("before") as HTMLButtonElement;
-        before.focus();
+      await vi.waitFor(() => {
+        expect(document.activeElement).toBe(dialog);
+      });
 
-        const event = new KeyboardEvent("keydown", {
-          key: "Tab",
-          bubbles: true,
-          cancelable: true,
-        });
-        before.dispatchEvent(event);
-
-        expect(event.defaultPrevented).toBe(true);
-      }
-    );
-
-    it.each(["invalid", "", " -1", "-0"])(
-      "keeps a focusable element with tabindex %j in the tab sequence",
-      async (tabindex) => {
-        vi.spyOn(HTMLElement.prototype, "getClientRects").mockReturnValue([
-          { width: 10, height: 10 },
-        ] as unknown as DOMRectList);
-
-        const wrapper = mount(VModal, {
-          attachTo: document.body,
-          props: { visible: false },
-          slots: {
-            default: `
-              <button id="before">Before</button>
-              <div id="edit" contenteditable="true" tabindex="${tabindex}">Edit</div>
-            `,
-          },
-        });
-
-        await wrapper.setProps({ visible: true });
-        await nextTick();
-        await nextTick();
-
-        const edit = document.getElementById("edit") as HTMLElement;
-        Object.defineProperty(edit, "tabIndex", {
-          configurable: true,
-          get: () => -1,
-        });
-
-        const before = document.getElementById("before") as HTMLButtonElement;
-        before.focus();
-
-        const event = new KeyboardEvent("keydown", {
-          key: "Tab",
-          bubbles: true,
-          cancelable: true,
-        });
-        before.dispatchEvent(event);
-
-        expect(event.defaultPrevented).toBe(false);
-      }
-    );
+      expect(wrapper.get("#previous").element).not.toBe(document.activeElement);
+    });
 
     it("restores focus to the opener after closing", async () => {
       const opener = document.createElement("button");
@@ -151,29 +112,224 @@ describe("Modal", () => {
 
       const wrapper = mount(VModal, {
         attachTo: document.body,
-        props: { visible: false, title: "Hello Halo" },
+        props: { visible: false, title: "Modal title" },
       });
 
       await wrapper.setProps({ visible: true });
       await nextTick();
       await nextTick();
 
-      expect(document.activeElement).toBe(
-        wrapper.get(".modal-wrapper").element
-      );
+      const dialog = wrapper.get(".modal-content").element;
+      await vi.waitFor(() => {
+        expect(dialog.contains(document.activeElement)).toBe(true);
+      });
 
       await wrapper.setProps({ visible: false });
-      await nextTick();
-
-      expect(document.activeElement).toBe(opener);
+      await vi.waitFor(() => {
+        expect(document.activeElement).toBe(opener);
+      });
 
       opener.remove();
+    });
+
+    it("does not close on Escape when close-on-esc is disabled", async () => {
+      const wrapper = mount(VModal, {
+        attachTo: document.body,
+        props: {
+          visible: true,
+          title: "Modal title",
+          closeOnEsc: false,
+        },
+      });
+
+      await nextTick();
+      vi.useFakeTimers();
+
+      window.dispatchEvent(
+        new KeyboardEvent("keydown", {
+          key: "Escape",
+          bubbles: true,
+          cancelable: true,
+        })
+      );
+      await nextTick();
+      vi.advanceTimersByTime(250);
+
+      expect(wrapper.emitted("update:visible")).toBeUndefined();
+      expect(wrapper.emitted("close")).toBeUndefined();
+    });
+
+    it("closes on Escape by default", async () => {
+      const wrapper = mount(VModal, {
+        attachTo: document.body,
+        props: { visible: true, title: "Modal title" },
+      });
+
+      await nextTick();
+      vi.useFakeTimers();
+
+      window.dispatchEvent(
+        new KeyboardEvent("keydown", {
+          key: "Escape",
+          bubbles: true,
+          cancelable: true,
+        })
+      );
+      await nextTick();
+      vi.advanceTimersByTime(250);
+
+      expect(wrapper.emitted("update:visible")).toEqual([[false]]);
+      expect(wrapper.emitted("close")).toHaveLength(1);
+    });
+
+    it("keeps the modal open when before-close rejects the request", async () => {
+      const beforeClose = vi.fn(() => false);
+      const wrapper = mount(VModal, {
+        attachTo: document.body,
+        props: {
+          visible: true,
+          title: "Modal title",
+          beforeClose,
+        },
+      });
+
+      await nextTick();
+      vi.useFakeTimers();
+
+      wrapper.vm.close();
+      await flushPromises();
+      vi.advanceTimersByTime(250);
+
+      expect(beforeClose).toHaveBeenCalledTimes(1);
+      expect(wrapper.emitted("update:visible")).toBeUndefined();
+      expect(wrapper.get(".modal-content").attributes("data-state")).toBe(
+        "open"
+      );
+    });
+
+    it("closes after an async before-close succeeds", async () => {
+      const beforeClose = vi.fn(async () => true);
+      const wrapper = mount(VModal, {
+        attachTo: document.body,
+        props: {
+          visible: true,
+          title: "Modal title",
+          beforeClose,
+        },
+      });
+
+      await nextTick();
+      vi.useFakeTimers();
+
+      wrapper.vm.close();
+      await flushPromises();
+      vi.advanceTimersByTime(250);
+
+      expect(beforeClose).toHaveBeenCalledTimes(1);
+      expect(wrapper.emitted("update:visible")).toEqual([[false]]);
+    });
+
+    it("can hide the built-in close button", async () => {
+      const wrapper = mount(VModal, {
+        attachTo: document.body,
+        props: { visible: true, title: "Modal title", showClose: false },
+      });
+
+      await nextTick();
+
+      expect(wrapper.find('button[aria-label="Close"]').exists()).toBe(false);
+    });
+  });
+
+  describe("layer dismissal", () => {
+    async function waitForPointerDownListener() {
+      // Reka registers the document-level pointerdown listener on the next
+      // macrotask so the click that opened the dialog cannot dismiss it.
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    }
+
+    function pressBackdrop() {
+      document.body.dispatchEvent(
+        new MouseEvent("pointerdown", {
+          bubbles: true,
+          cancelable: true,
+          button: 0,
+        })
+      );
+    }
+
+    it("nudges the modal and keeps it open when the layer is not closable", async () => {
+      const wrapper = mount(VModal, {
+        attachTo: document.body,
+        props: { visible: true, title: "Modal title" },
+      });
+
+      await nextTick();
+      await waitForPointerDownListener();
+      vi.useFakeTimers();
+
+      pressBackdrop();
+      await nextTick();
+
+      const content = wrapper.get(".modal-content");
+      expect(content.classes()).toContain("modal-focus");
+      expect(content.attributes("data-state")).toBe("open");
+
+      vi.advanceTimersByTime(350);
+      await nextTick();
+
+      expect(content.classes()).not.toContain("modal-focus");
+      expect(wrapper.emitted("update:visible")).toBeUndefined();
+      expect(wrapper.emitted("close")).toBeUndefined();
+    });
+
+    it("closes when the layer is clicked and layer-closable is enabled", async () => {
+      const wrapper = mount(VModal, {
+        attachTo: document.body,
+        props: {
+          visible: true,
+          title: "Modal title",
+          layerClosable: true,
+        },
+      });
+
+      await nextTick();
+      await waitForPointerDownListener();
+      vi.useFakeTimers();
+
+      pressBackdrop();
+      await flushPromises();
+      vi.advanceTimersByTime(250);
+      await flushPromises();
+
+      expect(wrapper.emitted("update:visible")).toEqual([[false]]);
+      expect(wrapper.emitted("close")).toHaveLength(1);
     });
   });
 
   describe("scroll container", () => {
-    it("does not keep body padding on the viewport", async () => {
+    it("locks page scrolling while open", async () => {
       const wrapper = mount(VModal, {
+        attachTo: document.body,
+        props: { visible: false, title: "Modal title" },
+      });
+
+      await wrapper.setProps({ visible: true });
+      await nextTick();
+      await nextTick();
+
+      expect(document.body.style.overflow).toBe("hidden");
+
+      await wrapper.setProps({ visible: false });
+
+      await vi.waitFor(() => {
+        expect(document.body.style.overflow).toBe("");
+      });
+    });
+
+    it("keeps the viewport padding until the closing animation finishes", async () => {
+      const wrapper = mount(VModal, {
+        attachTo: document.body,
         props: { visible: false },
         slots: { default: "Content" },
       });
@@ -187,13 +343,25 @@ describe("Modal", () => {
       });
       const viewport = OverlayScrollbars(body)!.elements().viewport;
 
+      expect(viewport.style.paddingTop).toBe("12px");
+      expect(viewport.style.paddingLeft).toBe("16px");
+
+      vi.useFakeTimers();
       await wrapper.setProps({ visible: false });
       await nextTick();
 
-      // OverlayScrollbars must not keep the padding it derived from the body
-      // element, otherwise the content shifts when the modal is closing.
-      expect(viewport.style.paddingTop).toBe("0px");
-      expect(viewport.style.paddingLeft).toBe("0px");
+      // OverlayScrollbars must keep the padding while the modal is fading out,
+      // otherwise the content shifts as soon as the closing animation starts.
+      expect(viewport.style.paddingTop).toBe("12px");
+      expect(viewport.style.paddingLeft).toBe("16px");
+
+      vi.advanceTimersByTime(250);
+      await nextTick();
+
+      // Once hidden, the viewport styles are reset so reopening starts from a
+      // clean host padding.
+      expect(viewport.style.paddingTop).toBe("");
+      expect(viewport.style.paddingLeft).toBe("");
     });
   });
 
@@ -226,7 +394,8 @@ describe("Modal", () => {
             components: { VModal },
             setup: () => ({ visible, showContent }),
             template: `<VModal :visible="visible">${template}</VModal>`,
-          })
+          }),
+          { attachTo: document.body }
         );
         const body = wrapper.get(".modal-body").element as HTMLElement;
 
@@ -251,7 +420,9 @@ describe("Modal", () => {
 
           visible.value = false;
           await nextTick();
-          expect(OverlayScrollbars(body)).toBeUndefined();
+          await vi.waitFor(() => {
+            expect(OverlayScrollbars(body)).toBeUndefined();
+          });
         }
       }
     );

@@ -25,6 +25,8 @@ const meta: Meta<typeof VModal> = {
         :fullscreen="args.fullscreen"
         :centered="args.centered"
         :layer-closable="args.layerClosable"
+        :close-on-esc="args.closeOnEsc"
+        :show-close="args.showClose"
       >
         <template #actions>
           <button class="inline-flex h-7 w-7 items-center justify-center rounded-full text-gray-600 hover:bg-gray-100">
@@ -67,6 +69,12 @@ const meta: Meta<typeof VModal> = {
     layerClosable: {
       control: { type: "boolean" },
     },
+    closeOnEsc: {
+      control: { type: "boolean" },
+    },
+    showClose: {
+      control: { type: "boolean" },
+    },
   },
   args: {
     title: "预览文章",
@@ -74,6 +82,8 @@ const meta: Meta<typeof VModal> = {
     centered: true,
     fullscreen: false,
     layerClosable: true,
+    closeOnEsc: true,
+    showClose: true,
   },
 };
 
@@ -88,4 +98,37 @@ export const Fullscreen: Story = {
     fullscreen: true,
     centered: false,
   },
+};
+
+export const ConfirmBeforeClose: Story = {
+  args: {
+    title: "关闭前确认",
+    layerClosable: true,
+  },
+  render: (args) => ({
+    components: { VButton, VModal, VSpace },
+    setup() {
+      const visible = shallowRef(false);
+      const beforeClose = () => window.confirm("确定关闭弹窗吗？");
+
+      return { args, beforeClose, visible };
+    },
+    template: `
+      <VButton type="primary" @click="visible = true">打开弹窗</VButton>
+      <VModal
+        v-model:visible="visible"
+        v-bind="args"
+        :before-close="beforeClose"
+      >
+        <p class="text-sm text-gray-600">
+          点击关闭按钮、遮罩或按 Esc 时都会先执行 beforeClose。
+        </p>
+        <template #footer>
+          <VSpace spacing="sm">
+            <VButton type="primary" @click="visible = false">保存并关闭</VButton>
+          </VSpace>
+        </template>
+      </VModal>
+    `,
+  }),
 };
