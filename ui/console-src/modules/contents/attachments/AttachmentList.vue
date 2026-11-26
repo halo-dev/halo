@@ -257,11 +257,7 @@ watch(
       <IconFolder />
     </template>
     <template #actions>
-      <VButton
-        v-permission="['system:attachments:manage']"
-        size="sm"
-        @click="policyVisible = true"
-      >
+      <VButton v-permission="['*']" size="sm" @click="policyVisible = true">
         <template #icon>
           <IconDatabase2Line />
         </template>

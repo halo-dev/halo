@@ -154,17 +154,14 @@ describe("createGlobalSearchProviders", () => {
       expect(getProvider("categories").isAvailable()).toBe(true);
     });
 
-    it("requires both settings and configmaps view for the settings provider", () => {
+    it("requires super admin permission for the settings provider", () => {
       utils.permission.setUserPermissions(["system:settings:view"]);
       expect(getProvider("settings").isAvailable()).toBe(false);
 
       utils.permission.setUserPermissions(["system:configmaps:view"]);
       expect(getProvider("settings").isAvailable()).toBe(false);
 
-      utils.permission.setUserPermissions([
-        "system:settings:view",
-        "system:configmaps:view",
-      ]);
+      utils.permission.setUserPermissions(["*"]);
       expect(getProvider("settings").isAvailable()).toBe(true);
     });
   });
