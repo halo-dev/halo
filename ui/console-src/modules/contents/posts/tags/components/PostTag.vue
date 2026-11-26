@@ -1,8 +1,6 @@
 <script lang="ts" setup>
 import type { Tag } from "@halo-dev/api-client";
 import { VTag } from "@halo-dev/components";
-import Color from "colorjs.io";
-import { computed } from "vue";
 import { useRouter } from "vue-router";
 
 const props = withDefaults(
@@ -10,22 +8,18 @@ const props = withDefaults(
     tag: Tag;
     rounded?: boolean;
     route?: boolean;
+    closable?: boolean;
   }>(),
   {
     rounded: false,
     route: false,
+    closable: false,
   }
 );
 
-const labelColor = computed(() => {
-  const { color } = props.tag.spec;
-  if (!color) {
-    return "inherit";
-  }
-  const onWhite = Math.abs(Color.contrast(color, "white", "APCA"));
-  const onBlack = Math.abs(Color.contrast(color, "black", "APCA"));
-  return onWhite > onBlack ? "white" : "#333";
-});
+const emit = defineEmits<{
+  (event: "close", mouseEvent: MouseEvent): void;
+}>();
 
 const router = useRouter();
 
@@ -41,17 +35,13 @@ const handleRouteToDetail = () => {
 </script>
 <template>
   <VTag
-    :styles="{
-      background: tag.spec.color,
-      color: labelColor,
-    }"
+    :closable="closable"
+    :clickable="route"
+    :color="tag.spec.color || undefined"
     :rounded="rounded"
     @click="handleRouteToDetail"
+    @close="emit('close', $event)"
   >
     {{ tag.spec.displayName }}
-
-    <template #rightIcon>
-      <slot name="rightIcon" />
-    </template>
   </VTag>
 </template>

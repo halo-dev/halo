@@ -169,8 +169,6 @@ const theme: Record<string, Record<string, string>> = {
     "post-tags-wrapper": "flex min-h-7 w-full items-center",
     "post-tags": "flex w-full flex-wrap items-center",
     "post-tag-wrapper": "inline-flex items-center p-1",
-    "post-tag-close":
-      "h-4 w-4 cursor-pointer text-gray-600 hover:text-gray-900",
     "post-tags-button": "inline-flex h-full cursor-pointer items-center px-1",
     "dropdown-wrapper": "max-h-96 w-full overflow-auto bg-white",
   },

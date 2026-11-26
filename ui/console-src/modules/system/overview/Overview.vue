@@ -247,11 +247,12 @@ const handleDownloadLogfile = () => {
               }}</VButton>
               <VTag
                 v-else-if="activatedTheme"
+                clickable
                 @click="$router.push({ name: 'ThemeDetail' })"
               >
                 <template v-if="activatedTheme.spec.logo" #leftIcon>
                   <img
-                    class="h-3.5 w-3.5 rounded-sm"
+                    class="rounded-sm"
                     :src="activatedTheme.spec.logo"
                     :alt="activatedTheme.spec.displayName"
                   />
@@ -271,6 +272,7 @@ const handleDownloadLogfile = () => {
                 <VTag
                   v-for="plugin in plugins"
                   :key="plugin.metadata.name"
+                  clickable
                   @click="
                     $router.push({
                       name: 'PluginDetail',
@@ -280,7 +282,7 @@ const handleDownloadLogfile = () => {
                 >
                   <template v-if="plugin.status?.logo" #leftIcon>
                     <img
-                      class="h-3.5 w-3.5 rounded-sm"
+                      class="rounded-sm"
                       :src="plugin.status?.logo"
                       :alt="plugin.spec.displayName"
                     />
