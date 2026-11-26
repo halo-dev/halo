@@ -73,7 +73,6 @@ onMounted(updateStuck);
       'page-header--sticky': sticky,
       'page-header--stuck': isStuck,
       'page-header--wrapped': !truncate,
-      'page-header--with-footer': Boolean($slots.footer),
     }"
     :aria-busy="loading ? 'true' : undefined"
   >
@@ -125,10 +124,6 @@ onMounted(updateStuck);
     >
       <slot name="actions" />
     </div>
-
-    <div v-if="$slots.footer" class="page-header__footer">
-      <slot name="footer" />
-    </div>
   </header>
 </template>
 
@@ -162,10 +157,6 @@ onMounted(updateStuck);
     position: sticky;
     top: 0;
     z-index: 10;
-  }
-
-  &--with-footer {
-    flex-wrap: wrap;
   }
 
   &--stuck {
@@ -245,11 +236,6 @@ onMounted(updateStuck);
       pointer-events: none;
       opacity: 0.45;
     }
-  }
-
-  &__footer {
-    flex: 1 0 100%;
-    min-width: 0;
   }
 
   &__skeleton {

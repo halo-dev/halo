@@ -92,24 +92,19 @@ describe("PageHeader", () => {
     expect(wrapper.classes()).toContain("page-header--wrapped");
   });
 
-  it("renders the title, subtitle, tags and footer slots", () => {
+  it("renders the title, subtitle and tags slots", () => {
     const wrapper = mount(VPageHeader, {
       slots: {
         title: () => h("span", { class: "custom-title" }, "Rich title"),
         subtitle: () =>
           h("span", { class: "custom-subtitle" }, "Rich subtitle"),
         tags: () => h("span", { class: "custom-tag" }, "Active"),
-        footer: () => h("div", { class: "custom-footer" }, "Tabs"),
       },
     });
 
     expect(wrapper.get("h1 .custom-title").text()).toBe("Rich title");
     expect(wrapper.get(".custom-subtitle").text()).toBe("Rich subtitle");
     expect(wrapper.get(".page-header__tags .custom-tag").text()).toBe("Active");
-    expect(wrapper.get(".page-header__footer .custom-footer").text()).toBe(
-      "Tabs"
-    );
-    expect(wrapper.classes()).toContain("page-header--with-footer");
     expect(wrapper.get("h1").attributes("title")).toBeUndefined();
   });
 

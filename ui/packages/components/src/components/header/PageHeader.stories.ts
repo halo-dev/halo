@@ -1,15 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/vue3-vite";
-import { shallowRef } from "vue";
-import {
-  IconAddCircle,
-  IconBookRead,
-  IconDeleteBin,
-  IconFolder,
-  IconRefreshLine,
-} from "@/icons/icons";
+import { IconAddCircle, IconBookRead, IconRefreshLine } from "@/icons/icons";
 import { VPageHeader } from ".";
 import { VButton } from "../button";
-import { VTabbar } from "../tabs";
 import { VTag } from "../tag";
 
 const meta: Meta<typeof VPageHeader> = {
@@ -159,71 +151,6 @@ export const WrappedTitle: Story = {
     subtitle: "halo-dev · v2.28.0 · 最近更新于 2026-11-25",
     truncate: false,
   },
-};
-
-export const WithFooterTabs: Story = {
-  render: (args) => ({
-    components: {
-      IconAddCircle,
-      IconBookRead,
-      IconDeleteBin,
-      IconFolder,
-      VButton,
-      VPageHeader,
-      VTabbar,
-    },
-    setup() {
-      const activeId = shallowRef("all");
-      const items = [
-        { id: "all", label: "全部" },
-        { id: "published", label: "已发布" },
-        { id: "draft", label: "草稿" },
-        { id: "scheduled", label: "定时发布" },
-      ];
-      return { activeId, args, items };
-    },
-    template: `
-      <div class="max-w-4xl overflow-hidden rounded border border-gray-100 bg-white">
-        <VPageHeader :bordered="args.bordered" :title="args.title">
-          <template #icon>
-            <IconBookRead />
-          </template>
-          <template #actions>
-            <VButton size="sm">
-              <template #icon>
-                <IconFolder />
-              </template>
-              分类
-            </VButton>
-            <VButton size="sm">
-              <template #icon>
-                <IconBookRead />
-              </template>
-              标签
-            </VButton>
-            <VButton size="sm">
-              <template #icon>
-                <IconDeleteBin />
-              </template>
-              回收站
-            </VButton>
-            <VButton size="sm" type="primary">
-              <template #icon>
-                <IconAddCircle />
-              </template>
-              新建文章
-            </VButton>
-          </template>
-          <template #footer>
-            <VTabbar v-model:active-id="activeId" :items="items" type="pills" />
-          </template>
-        </VPageHeader>
-        <div class="min-h-40 bg-gray-50 p-4">
-          <div class="h-24 rounded-base border border-gray-100 bg-white"></div>
-        </div>
-      </div>
-    `,
-  }),
 };
 
 export const Sticky: Story = {
