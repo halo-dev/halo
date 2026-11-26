@@ -30,9 +30,7 @@ const meta: Meta<typeof VPageHeader> = {
     template: `
       <div class="max-w-4xl overflow-hidden rounded border border-gray-100 bg-white">
         <VPageHeader
-          :back="args.back"
           :bordered="args.bordered"
-          :heading-level="args.headingLevel"
           :loading="args.loading"
           :sticky="args.sticky"
           :subtitle="args.subtitle"
@@ -63,21 +61,13 @@ const meta: Meta<typeof VPageHeader> = {
       </div>
     `,
   }),
-  argTypes: {
-    headingLevel: {
-      control: { type: "inline-radio" },
-      options: [1, 2, 3],
-    },
-  },
   args: {
     title: "文章管理",
     subtitle: "共 128 篇 · 最近更新于 2 分钟前",
-    back: false,
     bordered: true,
     loading: false,
     sticky: false,
     truncate: true,
-    headingLevel: 1,
   },
 };
 
@@ -109,7 +99,6 @@ export const Detail: Story = {
   args: {
     title: "Markdown 编辑器",
     subtitle: "halo-dev · v2.1.0 · 3 天前更新",
-    back: true,
   },
   render: (args) => ({
     components: { IconRefreshLine, VButton, VPageHeader, VTag },
@@ -119,7 +108,6 @@ export const Detail: Story = {
     template: `
       <div class="max-w-4xl overflow-hidden rounded border border-gray-100 bg-white">
         <VPageHeader
-          :back="args.back"
           :bordered="args.bordered"
           :subtitle="args.subtitle"
           :title="args.title"
@@ -160,15 +148,15 @@ export const Loading: Story = {
 
 export const LongTitle: Story = {
   args: {
-    title: "Halo 官方 Markdown 编辑器（增强版）Pro Max 2026 · v2.28.0",
-    subtitle: "halo-dev · 该副标题同样单行截断，悬停标题可以查看完整文本",
+    title: "Halo 官方 Markdown 编辑器（增强版） · 支持实时预览与自定义快捷键",
+    subtitle: "halo-dev · v2.28.0 · 最近更新于 2026-11-25",
   },
 };
 
 export const WrappedTitle: Story = {
   args: {
-    title: "Halo 官方 Markdown 编辑器（增强版）Pro Max 2026 · v2.28.0",
-    subtitle: "halo-dev · 该副标题同样单行截断，悬停标题可以查看完整文本",
+    title: "Halo 官方 Markdown 编辑器（增强版） · 支持实时预览与自定义快捷键",
+    subtitle: "halo-dev · v2.28.0 · 最近更新于 2026-11-25",
     truncate: false,
   },
 };

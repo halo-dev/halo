@@ -49,36 +49,6 @@ describe("PageHeader", () => {
     expect(wrapper.get(".my-action").text()).toBe("New");
   });
 
-  it("supports a custom heading level", () => {
-    const wrapper = mount(VPageHeader, {
-      props: { title: "Posts", headingLevel: 2 },
-    });
-
-    expect(wrapper.find("h1").exists()).toBe(false);
-    expect(wrapper.get("h2.page-header__title").text()).toBe("Posts");
-  });
-
-  it("emits back when the back button is clicked", async () => {
-    const wrapper = mount(VPageHeader, {
-      props: { title: "Posts", back: true },
-    });
-
-    const back = wrapper.get(".page-header__back");
-    expect(back.attributes("aria-label")).toBe("Back");
-
-    await back.trigger("click");
-
-    expect(wrapper.emitted("back")).toHaveLength(1);
-  });
-
-  it("does not render a back button by default", () => {
-    const wrapper = mount(VPageHeader, {
-      props: { title: "Posts" },
-    });
-
-    expect(wrapper.find(".page-header__back").exists()).toBe(false);
-  });
-
   it("shows skeletons and disables the actions while loading", () => {
     const wrapper = mount(VPageHeader, {
       props: { title: "Posts", subtitle: "128 items", loading: true },

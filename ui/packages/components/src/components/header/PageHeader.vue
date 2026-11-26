@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { useEventListener } from "@vueuse/core";
-import { computed, onMounted, ref, watch } from "vue";
-import { IconArrowLeft } from "../../icons/icons";
+import { onMounted, ref, watch } from "vue";
 import { useComponentsI18n } from "../../locales";
 
 const props = withDefaults(
@@ -15,10 +14,6 @@ const props = withDefaults(
      * Ignored when the `subtitle` slot is used.
      */
     subtitle?: string;
-    /**
-     * Renders a back button before the icon and emits `back` when clicked.
-     */
-    back?: boolean;
     /**
      * Sticks the header to the top of the viewport while scrolling.
      * Implies `bordered` and adds a shadow once the header is stuck.
@@ -36,31 +31,18 @@ const props = withDefaults(
      * Truncates the title and subtitle to a single line. Set to `false` to wrap.
      */
     truncate?: boolean;
-    /**
-     * Heading level for the title. Defaults to `1` because the page header is the
-     * top-level heading of the page.
-     */
-    headingLevel?: 1 | 2 | 3;
   }>(),
   {
     title: undefined,
     subtitle: undefined,
-    back: false,
     sticky: false,
     bordered: false,
     loading: false,
     truncate: true,
-    headingLevel: 1,
   }
 );
 
-const emit = defineEmits<{
-  (event: "back"): void;
-}>();
-
 const { t } = useComponentsI18n();
-
-const headingTag = computed(() => `h${props.headingLevel}` as const);
 
 const root = ref<HTMLElement | null>(null);
 const isStuck = ref(false);
@@ -96,16 +78,6 @@ onMounted(updateStuck);
     :aria-busy="loading ? 'true' : undefined"
   >
     <div class="page-header__leading">
-      <button
-        v-if="back"
-        type="button"
-        class="page-header__back"
-        :aria-label="t('page_header.back')"
-        @click="emit('back')"
-      >
-        <IconArrowLeft aria-hidden="true" />
-      </button>
-
       <div v-if="$slots.icon" class="page-header__icon" aria-hidden="true">
         <slot name="icon" />
       </div>
@@ -123,13 +95,12 @@ onMounted(updateStuck);
         </template>
         <template v-else>
           <div v-if="title || $slots.title" class="page-header__titleline">
-            <component
-              :is="headingTag"
+            <h1
               class="page-header__title"
               :title="$slots.title ? undefined : title"
             >
               <slot name="title">{{ title }}</slot>
-            </component>
+            </h1>
             <div v-if="$slots.tags" class="page-header__tags">
               <slot name="tags" />
             </div>
@@ -201,40 +172,6 @@ onMounted(updateStuck);
     box-shadow: 0 8px 18px -12px rgba(16, 24, 40, 0.35);
   }
 
-  &__back {
-    display: inline-grid;
-    place-items: center;
-    flex: none;
-    width: theme("spacing.7");
-    height: theme("spacing.7");
-    padding: 0;
-    color: var(--page-header-subtle);
-    background: transparent;
-    border: 1px solid transparent;
-    border-radius: theme("borderRadius.base");
-    cursor: pointer;
-    transition:
-      color 0.15s,
-      background-color 0.15s,
-      border-color 0.15s;
-
-    &:hover {
-      color: var(--page-header-text);
-      background-color: var(--page-header-hover);
-      border-color: var(--page-header-border);
-    }
-
-    &:focus-visible {
-      outline: 2px solid theme("colors.primary");
-      outline-offset: 2px;
-    }
-
-    svg {
-      width: theme("spacing.4");
-      height: theme("spacing.4");
-    }
-  }
-
   &__leading {
     display: flex;
     align-items: center;
@@ -247,6 +184,8 @@ onMounted(updateStuck);
     display: inline-grid;
     place-items: center;
     flex: none;
+    // Match the title so `1em` icon slots keep their previous size.
+    font-size: 1.25rem;
   }
 
   &__titles {
