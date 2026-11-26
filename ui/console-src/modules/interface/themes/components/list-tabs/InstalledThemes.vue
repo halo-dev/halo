@@ -208,17 +208,16 @@ const handleUninstallInBatch = (deleteExtensions: boolean) => {
           </VDropdown>
         </div>
         <div class=":uno: mt-4 flex sm:mt-0">
-          <button
-            v-tooltip="$t('core.common.buttons.refresh')"
-            type="button"
-            class=":uno: group cursor-pointer rounded p-1 hover:bg-gray-200"
+          <VButton
+            :label="$t('core.common.buttons.refresh')"
+            variant="ghost"
+            size="sm"
             @click="refetch()"
           >
-            <IconRefreshLine
-              :class="{ ':uno: animate-spin text-gray-900': isFetching }"
-              class=":uno: h-4 w-4 text-gray-600 group-hover:text-gray-900"
-            />
-          </button>
+            <template #icon>
+              <IconRefreshLine :class="{ 'animate-spin': isFetching }" />
+            </template>
+          </VButton>
         </div>
       </div>
     </div>

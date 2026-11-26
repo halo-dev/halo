@@ -32,16 +32,20 @@ provide<Ref<Setting | undefined>>("setting", setting);
     @close="emit('close')"
   >
     <template #actions>
-      <span>
-        <RouterLink
-          :to="{
-            name: 'PluginDetail',
-            params: { name },
-          }"
-        >
+      <VButton
+        :label="$t('core.common.buttons.detail')"
+        :route="{
+          name: 'PluginDetail',
+          params: { name },
+        }"
+        variant="ghost"
+        shape="circle"
+        size="sm"
+      >
+        <template #icon>
           <IconLink />
-        </RouterLink>
-      </span>
+        </template>
+      </VButton>
     </template>
     <VTabbar
       v-model:active-id="activeTab"

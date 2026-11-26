@@ -245,7 +245,7 @@ function onUploaded(response: UppyUploadSuccessResponse) {
         <SearchInput v-model="keyword" />
       </div>
       <div class="mt-4 flex sm:mt-0">
-        <VSpace spacing="lg">
+        <VSpace spacing="sm">
           <VFilterDropdownGroup :clear-label="$t('core.common.buttons.reset')">
             <VFilterDropdown
               v-model="selectedSort"
@@ -305,17 +305,16 @@ function onUploaded(response: UppyUploadSuccessResponse) {
           </div>
 
           <div class="flex flex-row gap-2">
-            <button
-              v-tooltip="$t('core.common.buttons.refresh')"
-              type="button"
-              class="group cursor-pointer rounded p-1 hover:bg-gray-200"
+            <VButton
+              :label="$t('core.common.buttons.refresh')"
+              variant="ghost"
+              size="sm"
               @click="handleFetchAttachments()"
             >
-              <IconRefreshLine
-                :class="{ 'animate-spin text-gray-900': isFetching }"
-                class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
-              />
-            </button>
+              <template #icon>
+                <IconRefreshLine :class="{ 'animate-spin': isFetching }" />
+              </template>
+            </VButton>
           </div>
         </VSpace>
       </div>
@@ -338,14 +337,18 @@ function onUploaded(response: UppyUploadSuccessResponse) {
       <template
         v-if="(props.max === undefined || props.max > 1) && !uploadVisible"
       >
-        <VButton v-if="data?.items?.length" ghost @click="handleSelectAll">
+        <VButton
+          v-if="data?.items?.length"
+          variant="ghost"
+          @click="handleSelectAll"
+        >
           {{
             $t("core.uc_attachment.select_modal.operations.select_page.button")
           }}
         </VButton>
         <VButton
           v-if="selectedAttachmentNames.size"
-          ghost
+          variant="ghost"
           @click="handleDeselectAll"
         >
           {{ $t("core.uc_attachment.select_modal.operations.deselect.button") }}
@@ -450,22 +453,55 @@ function onUploaded(response: UppyUploadSuccessResponse) {
     @close="onDetailModalClose"
   >
     <template #actions>
-      <span
+      <VButton
         v-if="isChecked(selectedAttachment)"
+        :label="
+          $t('core.uc_attachment.select_modal.operations.deselect.button')
+        "
+        variant="ghost"
+        shape="circle"
+        size="sm"
         @click="handleSelect(selectedAttachment)"
       >
-        <IconCheckboxFill />
-      </span>
-      <span v-else @click="handleSelect(selectedAttachment)">
-        <IconCheckboxCircle />
-      </span>
+        <template #icon>
+          <IconCheckboxFill />
+        </template>
+      </VButton>
+      <VButton
+        v-else
+        :label="$t('core.common.buttons.select')"
+        variant="ghost"
+        shape="circle"
+        size="sm"
+        @click="handleSelect(selectedAttachment)"
+      >
+        <template #icon>
+          <IconCheckboxCircle />
+        </template>
+      </VButton>
 
-      <span @click="handleSelectPrevious">
-        <IconArrowLeft />
-      </span>
-      <span @click="handleSelectNext">
-        <IconArrowRight />
-      </span>
+      <VButton
+        :label="$t('core.common.buttons.previous')"
+        variant="ghost"
+        shape="circle"
+        size="sm"
+        @click="handleSelectPrevious"
+      >
+        <template #icon>
+          <IconArrowLeft />
+        </template>
+      </VButton>
+      <VButton
+        :label="$t('core.common.buttons.next')"
+        variant="ghost"
+        shape="circle"
+        size="sm"
+        @click="handleSelectNext"
+      >
+        <template #icon>
+          <IconArrowRight />
+        </template>
+      </VButton>
     </template>
   </AttachmentDetailModal>
 </template>

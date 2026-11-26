@@ -1,10 +1,14 @@
 <template>
-  <button
+  <component
+    :is="as"
+    v-tooltip="label"
     :aria-busy="loading ? 'true' : undefined"
-    :class="classes"
-    :disabled="disabled"
+    :aria-disabled="!isNativeButton && disabled ? 'true' : undefined"
+    :aria-label="label"
+    :class="classes()"
+    :disabled="isNativeButton ? disabled : undefined"
+    :type="isNativeButton ? 'button' : undefined"
     class="btn"
-    type="button"
     @click="handleClick"
   >
     <span v-if="$slots.icon || loading" aria-hidden="true" class="btn-icon">
@@ -35,57 +39,122 @@
     <span v-if="$slots.default" class="btn-content">
       <slot />
     </span>
-  </button>
+  </component>
 </template>
 
 <script lang="ts" setup>
-import { computed, inject } from "vue";
+import { computed, inject, useAttrs, useSlots, type Component } from "vue";
 import type { RouteLocationRaw } from "vue-router";
 import { routerKey } from "vue-router";
-import type { ButtonSize, ButtonType } from "./types";
+import { vTooltip } from "../tooltip";
+import type {
+  ButtonShape,
+  ButtonSize,
+  ButtonType,
+  ButtonVariant,
+} from "./types";
 
 const props = withDefaults(
   defineProps<{
+    /** Semantic color of the button. */
     type?: ButtonType;
+    /** Visual weight of the button. */
+    variant?: ButtonVariant;
     size?: ButtonSize;
+    /**
+     * @deprecated Use `shape="circle"` instead.
+     */
     circle?: boolean;
+    shape?: ButtonShape;
+    /**
+     * @deprecated Use `variant="ghost"` instead.
+     */
+    ghost?: boolean;
+    /** Accessible name of the button, also used as the tooltip content. */
+    label?: string;
+    /** Element or component to render as, for example `"a"`. */
+    as?: string | Component;
     block?: boolean;
     disabled?: boolean;
     loading?: boolean;
+    /** Route to navigate to, only applies to native buttons. */
     route?: RouteLocationRaw | undefined;
-    ghost?: boolean;
   }>(),
   {
     type: "default",
+    variant: "solid",
     size: "md",
     circle: false,
+    shape: "default",
+    ghost: false,
+    label: undefined,
+    as: "button",
     block: false,
     disabled: false,
     loading: false,
     route: undefined,
-    ghost: false,
   }
 );
 
 const router = inject(routerKey, undefined);
+const slots = useSlots();
+const attrs = useAttrs();
 const emit = defineEmits<{
   (event: "click"): void;
 }>();
 
-const classes = computed(() => {
+const isNativeButton = computed(() => props.as === "button");
+
+const resolvedShape = computed<ButtonShape>(() =>
+  props.circle ? "circle" : props.shape
+);
+
+const resolvedVariant = computed<ButtonVariant>(() =>
+  props.ghost ? "ghost" : props.variant
+);
+
+let warnedMissingAccessibleName = false;
+
+function iconOnly() {
+  return !slots.default && !!(slots.icon || props.loading);
+}
+
+function classes() {
+  const isIconOnly = iconOnly();
+
+  if (
+    import.meta.env.DEV &&
+    isIconOnly &&
+    !warnedMissingAccessibleName &&
+    !props.label &&
+    !attrs["aria-label"] &&
+    !attrs["aria-labelledby"]
+  ) {
+    warnedMissingAccessibleName = true;
+    console.warn(
+      "[VButton] An icon-only button must have an accessible name. Add `label`, `aria-label` or `aria-labelledby`."
+    );
+  }
+
   return [
     `btn-${props.size}`,
     `btn-${props.type}`,
-    { "btn-circle": props.circle },
+    { "btn-circle": resolvedShape.value === "circle" },
+    { "btn-round": resolvedShape.value === "round" },
+    { "btn-icon-only": isIconOnly },
     { "btn-block": props.block },
     { "btn-loading": props.loading },
-    { "btn-ghost": props.ghost },
+    { "btn-ghost": resolvedVariant.value === "ghost" },
+    { "btn-soft": resolvedVariant.value === "soft" },
   ];
-});
+}
 
-function handleClick() {
-  if (props.disabled || props.loading) return;
-  if (props.route) {
+function handleClick(event: MouseEvent) {
+  if (props.disabled || props.loading) {
+    event.preventDefault();
+    return;
+  }
+  if (props.route && isNativeButton.value) {
     router?.push(props.route);
   }
   emit("click");
@@ -100,14 +169,14 @@ $btn-sizes: (
     padding-x: theme("spacing.2"),
     font-size: theme("fontSize.xs"),
     icon-size: theme("spacing.3"),
-    icon-gap: theme("spacing.1.5"),
+    icon-gap: theme("spacing[1.5]"),
   ),
   sm: (
     height: theme("spacing.8"),
-    padding-x: theme("spacing.2.5"),
+    padding-x: theme("spacing[2.5]"),
     font-size: theme("fontSize.sm"),
     icon-size: theme("spacing.4"),
-    icon-gap: theme("spacing.1.5"),
+    icon-gap: theme("spacing[1.5]"),
   ),
   md: (
     height: theme("spacing.9"),
@@ -137,6 +206,11 @@ $btn-themes: (
     ghost-hover-bg: theme("colors.gray.100"),
     ghost-active-bg: theme("colors.gray.200"),
     ghost-icon-color: theme("colors.secondary"),
+    soft-bg: theme("colors.gray.100"),
+    soft-hover-bg: theme("colors.gray.200"),
+    soft-active-bg: theme("colors.gray.300"),
+    soft-color: theme("colors.secondary"),
+    soft-icon-color: theme("colors.secondary"),
   ),
   primary: (
     bg: theme("colors.primary"),
@@ -149,6 +223,11 @@ $btn-themes: (
     ghost-hover-bg: theme("colors.primary / 10%"),
     ghost-active-bg: theme("colors.primary / 15%"),
     ghost-icon-color: theme("colors.primary"),
+    soft-bg: theme("colors.primary / 10%"),
+    soft-hover-bg: theme("colors.primary / 15%"),
+    soft-active-bg: theme("colors.primary / 20%"),
+    soft-color: theme("colors.primary"),
+    soft-icon-color: theme("colors.primary"),
   ),
   secondary: (
     bg: theme("colors.secondary"),
@@ -161,6 +240,11 @@ $btn-themes: (
     ghost-hover-bg: theme("colors.secondary / 10%"),
     ghost-active-bg: theme("colors.secondary / 15%"),
     ghost-icon-color: theme("colors.secondary"),
+    soft-bg: theme("colors.secondary / 10%"),
+    soft-hover-bg: theme("colors.secondary / 15%"),
+    soft-active-bg: theme("colors.secondary / 20%"),
+    soft-color: theme("colors.secondary"),
+    soft-icon-color: theme("colors.secondary"),
   ),
   danger: (
     bg: theme("colors.danger"),
@@ -173,6 +257,11 @@ $btn-themes: (
     ghost-hover-bg: theme("colors.danger / 10%"),
     ghost-active-bg: theme("colors.danger / 15%"),
     ghost-icon-color: theme("colors.danger"),
+    soft-bg: theme("colors.danger / 10%"),
+    soft-hover-bg: theme("colors.danger / 15%"),
+    soft-active-bg: theme("colors.danger / 20%"),
+    soft-color: theme("colors.danger"),
+    soft-icon-color: theme("colors.danger"),
   ),
 );
 
@@ -209,11 +298,12 @@ $btn-themes: (
     outline-offset: 2px;
   }
 
-  &:not(:disabled):not(.btn-loading):active {
+  &:not(:disabled):not([aria-disabled="true"]):not(.btn-loading):active {
     opacity: 1;
   }
 
-  &:disabled {
+  &:disabled,
+  &[aria-disabled="true"] {
     opacity: 0.5;
     cursor: not-allowed;
   }
@@ -244,6 +334,10 @@ $btn-themes: (
       width: 100%;
     }
   }
+
+  &.btn-round {
+    border-radius: 9999px;
+  }
 }
 
 @each $size, $config in $btn-sizes {
@@ -257,6 +351,13 @@ $btn-themes: (
     .btn-icon {
       height: map.get($config, icon-size);
       width: map.get($config, icon-size);
+    }
+
+    &.btn-icon-only {
+      width: map.get($config, height);
+      padding-left: 0;
+      padding-right: 0;
+      gap: 0;
     }
 
     &.btn-circle {
@@ -305,6 +406,28 @@ $btn-themes: (
 
       .btn-icon {
         color: map.get($config, ghost-icon-color);
+      }
+    }
+  }
+}
+
+.btn-soft {
+  @each $theme, $config in $btn-themes {
+    &.btn-#{$theme} {
+      background-color: map.get($config, soft-bg) !important;
+      color: map.get($config, soft-color);
+      border: none;
+
+      &:hover {
+        background-color: map.get($config, soft-hover-bg) !important;
+      }
+
+      &:not(:disabled):not(.btn-loading):active {
+        background-color: map.get($config, soft-active-bg) !important;
+      }
+
+      .btn-icon {
+        color: map.get($config, soft-icon-color);
       }
     }
   }

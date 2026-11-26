@@ -75,6 +75,133 @@ describe("Button", () => {
     expect(button.find(".btn").classes()).toContain("btn-circle");
   });
 
+  it("should work with shape prop", async () => {
+    const button = mount(VButton);
+
+    expect(button.find(".btn").classes()).not.toContain("btn-circle");
+    expect(button.find(".btn").classes()).not.toContain("btn-round");
+
+    await button.setProps({ shape: "circle" });
+    expect(button.find(".btn").classes()).toContain("btn-circle");
+
+    await button.setProps({ shape: "round" });
+    expect(button.find(".btn").classes()).toContain("btn-round");
+    expect(button.find(".btn").classes()).not.toContain("btn-circle");
+  });
+
+  it("should prefer the deprecated circle prop over shape", () => {
+    const button = mount(VButton, { props: { circle: true, shape: "round" } });
+
+    expect(button.find(".btn").classes()).toContain("btn-circle");
+    expect(button.find(".btn").classes()).not.toContain("btn-round");
+  });
+
+  it("should work with variant prop", async () => {
+    const button = mount(VButton);
+
+    expect(button.find(".btn").classes()).not.toContain("btn-ghost");
+    expect(button.find(".btn").classes()).not.toContain("btn-soft");
+
+    await button.setProps({ variant: "soft" });
+    expect(button.find(".btn").classes()).toContain("btn-soft");
+
+    await button.setProps({ variant: "ghost" });
+    expect(button.find(".btn").classes()).toContain("btn-ghost");
+    expect(button.find(".btn").classes()).not.toContain("btn-soft");
+  });
+
+  it("should prefer the deprecated ghost prop over variant", () => {
+    const button = mount(VButton, { props: { ghost: true, variant: "soft" } });
+
+    expect(button.find(".btn").classes()).toContain("btn-ghost");
+    expect(button.find(".btn").classes()).not.toContain("btn-soft");
+  });
+
+  it("should apply icon-only layout when only the icon slot is provided", () => {
+    const button = mount(VButton, {
+      props: { "aria-label": "设置" },
+      slots: { icon: IconSettings },
+    });
+
+    expect(button.find(".btn").classes()).toContain("btn-icon-only");
+  });
+
+  it("should not apply icon-only layout when text content is provided", () => {
+    const button = mount(VButton, {
+      props: { "aria-label": "设置" },
+      slots: { icon: IconSettings, default: "设置" },
+    });
+
+    expect(button.find(".btn").classes()).not.toContain("btn-icon-only");
+  });
+
+  it("should warn when an icon-only button has no accessible name", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    mount(VButton, { slots: { icon: IconSettings } });
+
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining("accessible name")
+    );
+
+    warn.mockRestore();
+  });
+
+  it("should not warn when an icon-only button has an accessible name", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    mount(VButton, {
+      props: { "aria-label": "设置" },
+      slots: { icon: IconSettings },
+    });
+
+    expect(warn).not.toHaveBeenCalled();
+
+    warn.mockRestore();
+  });
+
+  it("should use the label prop as the accessible name", () => {
+    const button = mount(VButton, { props: { label: "刷新" } });
+
+    expect(button.find(".btn").attributes("aria-label")).toBe("刷新");
+  });
+
+  it("should not warn when an icon-only button has a label", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    mount(VButton, { props: { label: "设置" }, slots: { icon: IconSettings } });
+
+    expect(warn).not.toHaveBeenCalled();
+
+    warn.mockRestore();
+  });
+
+  it("should render as an anchor when the as prop is set", () => {
+    const button = mount(VButton, { props: { as: "a", href: "/console" } });
+
+    expect(button.element.tagName).toBe("A");
+    expect(button.attributes("href")).toBe("/console");
+    expect(button.attributes("type")).toBeUndefined();
+  });
+
+  it("should not navigate when a disabled anchor button is clicked", () => {
+    const onClick = vi.fn();
+    const button = mount(VButton, {
+      props: { as: "a", href: "/console", disabled: true, onClick },
+    });
+    const event = new MouseEvent("click", {
+      bubbles: true,
+      cancelable: true,
+    });
+
+    button.element.dispatchEvent(event);
+
+    expect(event.defaultPrevented).toBe(true);
+    expect(onClick).not.toHaveBeenCalled();
+    expect(button.attributes("aria-disabled")).toBe("true");
+    expect(button.attributes("disabled")).toBeUndefined();
+  });
+
   it("should work with block prop", async () => {
     const button = mount(VButton);
 
@@ -132,7 +259,9 @@ describe("Button", () => {
   });
 
   it("should expose the loading state to assistive technology", async () => {
-    const wrapper = mount(VButton, { props: { loading: true } });
+    const wrapper = mount(VButton, {
+      props: { "aria-label": "加载中", loading: true },
+    });
 
     expect(wrapper.get("button").attributes("aria-busy")).toBe("true");
     expect(wrapper.get("svg").attributes("aria-hidden")).toBe("true");

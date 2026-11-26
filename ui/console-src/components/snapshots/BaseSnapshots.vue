@@ -180,7 +180,7 @@ function handleCleanup() {
       <IconHistoryLine />
     </template>
     <template #actions>
-      <VButton size="sm" ghost @click="$router.back()">
+      <VButton size="sm" variant="ghost" @click="$router.back()">
         {{ $t("core.common.buttons.back") }}
       </VButton>
       <VButton size="sm" @click="handleToggleDiffMode">
@@ -197,10 +197,7 @@ function handleCleanup() {
   </VPageHeader>
 
   <div class="m-0 md:m-4">
-    <VCard
-      style="height: calc(100vh - 5.5rem)"
-      :body-class="['h-full', '!p-0']"
-    >
+    <VCard style="height: calc(100vh - 5.5rem)" flush :body-class="['h-full']">
       <div class="grid h-full grid-cols-12 divide-y sm:divide-x sm:divide-y-0">
         <div
           class="relative col-span-12 h-full overflow-auto sm:col-span-3 xl:col-span-2"

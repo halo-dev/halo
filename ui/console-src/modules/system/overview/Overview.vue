@@ -218,7 +218,7 @@ const handleDownloadLogfile = () => {
   </VPageHeader>
 
   <div class="m-0 flex flex-col gap-4 md:m-4">
-    <VCard :body-class="['!p-0']">
+    <VCard flush>
       <div class="bg-white">
         <div
           class="flex items-center justify-between bg-white px-4 py-4 sm:px-6"
@@ -293,7 +293,7 @@ const handleDownloadLogfile = () => {
         </div>
       </div>
     </VCard>
-    <VCard v-if="info" :body-class="['!p-0']">
+    <VCard v-if="info" flush>
       <div class="bg-white">
         <div
           class="flex items-center justify-between bg-white px-4 py-4 sm:px-6"

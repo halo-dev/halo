@@ -85,21 +85,19 @@ async function handleUpdatePosition() {
     </template>
   </VPageHeader>
   <div class="m-0 md:m-4">
-    <VCard :body-class="['!p-0']">
-      <template #header>
-        <div class="block w-full bg-gray-50 px-4 py-3">
-          <div
-            class="relative flex flex-col items-start sm:flex-row sm:items-center"
-          >
-            <div class="flex w-full flex-1 sm:w-auto">
-              <span class="text-base font-medium">
-                {{
-                  $t("core.post_category.header.title", {
-                    count: categories?.length || 0,
-                  })
-                }}
-              </span>
-            </div>
+    <VCard flush>
+      <template #toolbar>
+        <div
+          class="relative flex flex-col items-start sm:flex-row sm:items-center"
+        >
+          <div class="flex w-full flex-1 sm:w-auto">
+            <span class="text-base font-medium">
+              {{
+                $t("core.post_category.header.title", {
+                  count: categories?.length || 0,
+                })
+              }}
+            </span>
           </div>
         </div>
       </template>
