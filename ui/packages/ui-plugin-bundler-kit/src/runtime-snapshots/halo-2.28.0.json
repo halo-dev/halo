@@ -385,7 +385,6 @@
       "exports": [
         "AvatarGroupContextInjectionKey",
         "Dialog",
-        "DialogProviderProvideKey",
         "IconAccountCircleLine",
         "IconAddCircle",
         "IconArrowDown",
