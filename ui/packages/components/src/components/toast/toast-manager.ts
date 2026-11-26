@@ -1,131 +1,340 @@
-import { createVNode, render, type Component, type VNode } from "vue";
-import ToastComponent from "./Toast.vue";
-import type { ToastProps } from "./types";
+import {
+  createToastManager,
+  type GlobalToastManager,
+  type ToastActionOptions as RekaToastActionOptions,
+} from "reka-ui";
+import { createVNode, markRaw, render } from "vue";
+import type { ToastItemData } from "./internal";
+import {
+  cancelToastClosing,
+  markToastClosing,
+  toastConfig,
+} from "./toast-state";
+import ToastHost from "./ToastHost.vue";
+import type {
+  ToastActionOptions,
+  ToastApi,
+  ToastApiProps,
+  ToastConfig,
+  ToastEntry,
+  ToastInstance,
+  ToastPromiseOptions,
+  ToastProps,
+} from "./types";
 
-export type ToastApiProps = Omit<ToastProps, "type" | "content">;
+let toastSequence = 0;
 
-export interface ToastInstance {
-  id: string;
-  vnode: VNode;
+function nextToastId() {
+  toastSequence += 1;
+  return `halo-toast-${toastSequence}`;
 }
 
-export type ToastApi = (
-  content: string,
-  props?: ToastApiProps
-) => ToastInstance;
-
-export interface ToastEntry {
-  (props: ToastProps): ToastInstance;
-  info: ToastApi;
-  success: ToastApi;
-  error: ToastApi;
-  warning: ToastApi;
+function normalizeDuration(duration?: number) {
+  if (duration === undefined) {
+    return toastConfig.duration;
+  }
+  return duration > 0 ? duration : 0;
 }
 
-let index = 0;
-
-const instances: ToastInstance[] = [];
-
-const defaultProps: ToastProps = {
-  frozenOnHover: true,
-  duration: 3000,
-  count: 0,
-};
-
-const toast: ToastEntry = (userProps: ToastProps) => {
-  const id = "toast-" + index++;
-
-  const props = {
-    ...defaultProps,
-    ...userProps,
-    id,
+function toRekaAction(
+  action?: ToastActionOptions
+): RekaToastActionOptions | undefined {
+  if (!action) {
+    return undefined;
+  }
+  return {
+    label: action.label,
+    altText: action.altText || action.label,
+    closeOnClick: action.closeOnClick ?? true,
+    onClick: action.onClick,
   };
+}
 
-  let container = document.body.querySelector(".toast-container");
-  if (!container) {
-    container = document.createElement("div");
-    container.className = "toast-container";
-    document.body.appendChild(container);
+function toSensitivity(item: ToastItemData) {
+  return item.type === "error"
+    ? ("foreground" as const)
+    : ("background" as const);
+}
+
+function toToastOptions(item: ToastItemData) {
+  return {
+    type: toSensitivity(item),
+    status: item.status,
+    duration: item.duration,
+    actionProps: toRekaAction(item.action),
+    data: item,
+  };
+}
+
+export function createToastApi(
+  manager: GlobalToastManager<ToastItemData> = createToastManager<ToastItemData>(),
+  ensureHost?: () => void
+): ToastEntry {
+  interface Entry {
+    id: string;
+    item: ToastItemData;
+    open: boolean;
+    instance: ToastInstance;
   }
 
-  // Grouping toasts
-  if (instances.length > 0) {
-    const instance = instances.find((item) => {
-      const { vnode } = item;
-      if (vnode?.props) {
-        return (
-          vnode.props.content === props.content &&
-          vnode.props.type === props.type
-        );
-      }
-      return undefined;
-    });
+  const entries = new Map<string, Entry>();
 
-    if (instance?.vnode.component?.props) {
-      (instance.vnode.component.props.count as number) += 1;
-      index = instances.length - 1;
-      return instance;
-    }
-  }
-
-  const { vnode, container: hostContainer } = createVNodeComponent(
-    ToastComponent,
-    props
-  );
-
-  if (hostContainer.firstElementChild) {
-    container.appendChild(hostContainer.firstElementChild);
-  }
-
-  if (vnode?.props) {
-    // close emit
-    vnode.props.onClose = () => {
-      removeInstance(id);
-      render(null, hostContainer);
+  function buildItem(
+    base: ToastItemData | undefined,
+    props: ToastProps
+  ): ToastItemData {
+    return {
+      type: props.type ?? base?.type ?? "success",
+      content: props.content ?? base?.content ?? "",
+      title: props.title ?? base?.title,
+      count: props.count ?? base?.count ?? 0,
+      closable: props.closable ?? base?.closable ?? true,
+      frozenOnHover: props.frozenOnHover ?? base?.frozenOnHover ?? true,
+      icon: props.icon ? markRaw(props.icon) : base?.icon,
+      action: props.action ?? base?.action,
+      customClass: props.customClass ?? base?.customClass,
+      status: props.status ?? base?.status,
+      duration:
+        props.duration === undefined
+          ? (base?.duration ?? toastConfig.duration)
+          : normalizeDuration(props.duration),
     };
   }
 
-  const instance = {
-    id,
-    vnode,
-    close: () => {
-      vnode?.component?.exposed?.close();
-    },
-  };
+  function openEntries() {
+    return [...entries.values()].filter((entry) => entry.open);
+  }
 
-  instances.push(instance);
-  return instance;
-};
+  function findGrouped(type: ToastItemData["type"], content: string) {
+    for (const entry of entries.values()) {
+      if (
+        entry.open &&
+        !entry.item.status &&
+        entry.item.type === type &&
+        entry.item.content === content
+      ) {
+        return entry;
+      }
+    }
+    return undefined;
+  }
 
-function createVNodeComponent(
-  component: Component,
-  props: Record<string, unknown>
-) {
-  const vnode = createVNode(component, props);
-  const container = document.createElement("div");
-  render(vnode, container);
-  return { vnode, container };
-}
+  function enforceMaxCount() {
+    const max = toastConfig.maxCount;
+    if (!max || max < 1) {
+      return;
+    }
 
-function removeInstance(id: string) {
-  const index = instances.findIndex((instance) => instance.id === id);
-  if (index >= 0) {
-    instances.splice(index, 1);
-
-    if (instances.length === 0) {
-      const container = document.body.querySelector(".toast-container");
-      container?.remove();
+    while (openEntries().length >= max) {
+      const oldest = openEntries()[0];
+      if (!oldest) {
+        return;
+      }
+      // Mark it closed locally first so the loop terminates even when the
+      // toast provider has not subscribed to the manager yet.
+      oldest.open = false;
+      manager.close(oldest.id);
     }
   }
+
+  function update(id: string, props: ToastProps = {}) {
+    const entry = entries.get(id);
+    if (!entry?.open) {
+      return;
+    }
+
+    const item = buildItem(entry.item, props);
+    entry.item = item;
+    manager.add({ id, ...toToastOptions(item) });
+  }
+
+  function dismiss(id?: string) {
+    manager.close(id);
+  }
+
+  function clear() {
+    manager.close();
+  }
+
+  function configure(options: ToastConfig) {
+    if (options.placement) {
+      toastConfig.placement = options.placement;
+    }
+    if (options.duration !== undefined) {
+      toastConfig.duration = options.duration;
+    }
+    if ("maxCount" in options) {
+      toastConfig.maxCount = options.maxCount;
+    }
+    if (options.hotkey) {
+      toastConfig.hotkey = [...options.hotkey];
+    }
+  }
+
+  const toast = ((userProps: ToastProps): ToastInstance => {
+    ensureHost?.();
+
+    const status = userProps.status;
+    const persistent = status === "loading";
+    const grouping = userProps.grouping ?? true;
+    const key = userProps.key;
+
+    if (grouping && !key && !status) {
+      const existing = findGrouped(
+        userProps.type ?? "success",
+        userProps.content ?? ""
+      );
+      if (existing) {
+        existing.item = {
+          ...existing.item,
+          count: existing.item.count + 1,
+        };
+        manager.add({ id: existing.id, data: existing.item });
+        return existing.instance;
+      }
+    }
+
+    const id = key ? `halo-toast-key-${key}` : nextToastId();
+    const existing = key ? entries.get(id) : undefined;
+
+    if (existing?.open) {
+      const item = buildItem(existing.item, userProps);
+      if (persistent) {
+        item.duration = 0;
+      }
+      existing.item = item;
+      manager.add({ id, ...toToastOptions(item) });
+      return existing.instance;
+    }
+
+    const item = buildItem(undefined, userProps);
+    if (persistent) {
+      item.duration = 0;
+    }
+
+    enforceMaxCount();
+
+    const instance: ToastInstance = {
+      id,
+      close: () => manager.close(id),
+    };
+
+    const entry: Entry = { id, item, open: true, instance };
+    entries.set(id, entry);
+
+    manager.add({
+      id,
+      ...toToastOptions(item),
+      onClose: () => {
+        if (entries.get(id) === entry) {
+          entry.open = false;
+          markToastClosing(id);
+        }
+        userProps.onClose?.();
+      },
+      onRemove: () => {
+        if (entries.get(id) === entry) {
+          cancelToastClosing(id);
+          entries.delete(id);
+        }
+      },
+    });
+
+    return instance;
+  }) as ToastEntry;
+
+  toast.success = ((content: string, props?: ToastApiProps) =>
+    toast({ ...props, type: "success", content })) as ToastApi;
+  toast.info = ((content: string, props?: ToastApiProps) =>
+    toast({ ...props, type: "info", content })) as ToastApi;
+  toast.warning = ((content: string, props?: ToastApiProps) =>
+    toast({ ...props, type: "warning", content })) as ToastApi;
+  toast.error = ((content: string, props?: ToastApiProps) =>
+    toast({ ...props, type: "error", content })) as ToastApi;
+  toast.loading = ((content: string, props?: ToastApiProps) =>
+    toast({
+      ...props,
+      type: "info",
+      content,
+      status: "loading",
+      duration: 0,
+      grouping: false,
+    })) as ToastApi;
+
+  toast.dismiss = dismiss;
+  toast.clear = clear;
+  toast.update = update;
+  toast.configure = configure;
+
+  toast.promise = async <T>(
+    promise: Promise<T>,
+    options: ToastPromiseOptions<T>
+  ): Promise<T> => {
+    const loadingProps =
+      typeof options.loading === "string"
+        ? { content: options.loading }
+        : options.loading;
+
+    const instance = toast({
+      ...loadingProps,
+      type: loadingProps.type ?? "info",
+      status: "loading",
+      duration: 0,
+      grouping: false,
+    });
+
+    try {
+      const value = await promise;
+      const state = options.success;
+      const next = typeof state === "function" ? state(value) : state;
+      const props = typeof next === "string" ? { content: next } : next;
+
+      update(instance.id, {
+        ...props,
+        type: props.type ?? "success",
+        status: "success",
+        duration: props.duration ?? toastConfig.duration,
+      });
+
+      return value;
+    } catch (error) {
+      const state = options.error;
+      const next = typeof state === "function" ? state(error) : state;
+      const props = typeof next === "string" ? { content: next } : next;
+
+      update(instance.id, {
+        ...props,
+        type: props.type ?? "error",
+        status: "error",
+        duration: props.duration ?? toastConfig.duration,
+      });
+
+      throw error;
+    }
+  };
+
+  return toast;
 }
 
-toast.success = (content: string, props?: ToastApiProps) =>
-  toast({ ...props, type: "success", content });
-toast.info = (content: string, props?: ToastApiProps) =>
-  toast({ ...props, type: "info", content });
-toast.warning = (content: string, props?: ToastApiProps) =>
-  toast({ ...props, type: "warning", content });
-toast.error = (content: string, props?: ToastApiProps) =>
-  toast({ ...props, type: "error", content });
+const defaultManager = createToastManager<ToastItemData>();
 
-export { toast as Toast };
+let hostMounted = false;
+
+function ensureDefaultHost() {
+  if (hostMounted || typeof document === "undefined") {
+    return;
+  }
+
+  hostMounted = true;
+
+  const container = document.createElement("div");
+  container.className = "toast-host";
+  document.body.appendChild(container);
+
+  render(createVNode(ToastHost, { manager: defaultManager }), container);
+}
+
+export const Toast: ToastEntry = createToastApi(
+  defaultManager,
+  ensureDefaultHost
+);

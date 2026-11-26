@@ -39,5 +39,7 @@
   "filter.all": "Todos",
   "filter.reset": "Restablecer filtros",
   "drawer.label": "Cajón",
-  "empty.image": "Vacío"
+  "empty.image": "Vacío",
+  "toast.notification": "Notificación",
+  "toast.notifications": "Notificaciones"
 }
