@@ -326,7 +326,7 @@ watch(
                   </VDropdown>
                 </VSpace>
               </div>
-              <VSpace spacing="sm" class="flex-wrap">
+              <VSpace spacing="sm" wrap>
                 <VFilterDropdownGroup
                   :clear-label="$t('core.common.buttons.reset')"
                   :has-external-filters="!!selectedUser"

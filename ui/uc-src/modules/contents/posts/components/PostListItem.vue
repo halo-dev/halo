@@ -169,7 +169,7 @@ function handleDelete() {
         </template>
         <template #description>
           <div class="flex flex-col gap-1.5">
-            <VSpace class="flex-wrap !gap-y-1">
+            <VSpace wrap :spacing="[10, 4]">
               <p
                 v-if="post.categories.length"
                 class="inline-flex flex-wrap gap-1 text-xs text-gray-500"
@@ -204,7 +204,7 @@ function handleDelete() {
                 {{ $t("core.post.list.fields.pinned") }}
               </span>
             </VSpace>
-            <VSpace v-if="post.tags.length" class="flex-wrap">
+            <VSpace v-if="post.tags.length" wrap>
               <PostTag
                 v-for="(tag, tagIndex) in post.tags"
                 :key="tagIndex"

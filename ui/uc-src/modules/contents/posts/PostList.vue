@@ -118,7 +118,7 @@ const {
         >
           <SearchInput v-model="keyword" />
 
-          <VSpace spacing="sm" class="flex-wrap">
+          <VSpace spacing="sm" wrap>
             <VFilterDropdownGroup
               :clear-label="$t('core.common.buttons.reset')"
             >
