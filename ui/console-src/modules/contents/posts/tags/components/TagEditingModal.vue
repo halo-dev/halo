@@ -170,7 +170,13 @@ async function slugUniqueValidation(node: FormKitNode) {
 }
 </script>
 <template>
-  <VModal ref="modal" :title="modalTitle" :width="700" @close="emit('close')">
+  <VModal
+    ref="modal"
+    :title="modalTitle"
+    :width="700"
+    :centered="false"
+    @close="emit('close')"
+  >
     <template #actions>
       <VButton
         :label="$t('core.common.buttons.previous')"
