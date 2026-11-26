@@ -82,9 +82,16 @@ function handleConfirm() {
   >
     <template #actions>
       <VDropdown>
-        <span v-tooltip="$t('core.common.buttons.new')">
-          <IconAddCircle />
-        </span>
+        <VButton
+          :label="$t('core.common.buttons.new')"
+          variant="ghost"
+          shape="circle"
+          size="sm"
+        >
+          <template #icon>
+            <IconAddCircle />
+          </template>
+        </VButton>
         <template #popper>
           <VDropdownItem
             v-for="policyTemplate in policyTemplates"

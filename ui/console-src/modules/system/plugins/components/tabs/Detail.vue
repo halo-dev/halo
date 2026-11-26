@@ -127,7 +127,7 @@ const pluginUpgradeModalVisible = ref(false);
           @change="changeStatus()"
         />
         <VDropdown>
-          <VButton size="sm" ghost>
+          <VButton size="sm" variant="ghost">
             <IconMore />
           </VButton>
           <template #popper>

@@ -27,6 +27,7 @@ import { setCodeBlockWithIndent } from "../code-block/set-code-block-with-indent
 import { ExtensionColumns } from "../columns";
 import { ExtensionDetails } from "../details";
 import { ExtensionGapCursor, HaloGapCursor } from "../gap-cursor";
+import { ExtensionHeading } from "../heading";
 import { ExtensionHistory } from "../history";
 import { ExtensionTable } from "../table";
 import { ExtensionIndent, type ExtensionIndentOptions } from "./index";
@@ -235,6 +236,189 @@ describe("ExtensionIndent", () => {
     ]);
   });
 
+  it("adds first-line indentation with Tab at the beginning of a paragraph", () => {
+    const editor = createEditor({
+      content: {
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            content: [{ type: "text", text: "content" }],
+          },
+        ],
+      },
+    });
+    editor.commands.setTextSelection(1);
+
+    expect(runKey(editor, "Tab")).toBe(true);
+    expect(editor.getJSON().content?.[0].attrs).toMatchObject({
+      indent: 0,
+      lineIndent: true,
+    });
+    expect(editor.getHTML()).toContain("text-indent: 2em");
+    expect(editor.getHTML()).not.toContain("margin-left");
+  });
+
+  it("turns first-line indentation into block indentation on the next Tab", () => {
+    const editor = createEditor({
+      content: {
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            content: [{ type: "text", text: "content" }],
+          },
+        ],
+      },
+    });
+    editor.commands.setTextSelection(1);
+
+    expect(runKey(editor, "Tab")).toBe(true);
+    expect(runKey(editor, "Tab")).toBe(true);
+    expect(editor.getJSON().content?.[0].attrs).toMatchObject({
+      indent: 24,
+      lineIndent: false,
+    });
+    expect(editor.getHTML()).toContain("margin-left: 24px");
+    expect(editor.getHTML()).not.toContain("text-indent");
+  });
+
+  it("adds first-line indentation to a heading at the beginning", () => {
+    const editor = createHeadingEditor({
+      type: "doc",
+      content: [
+        {
+          type: "heading",
+          attrs: { level: 2 },
+          content: [{ type: "text", text: "Title" }],
+        },
+      ],
+    });
+    editor.commands.setTextSelection(1);
+
+    expect(runKey(editor, "Tab")).toBe(true);
+    expect(editor.getJSON().content?.[0].attrs).toMatchObject({
+      indent: 0,
+      lineIndent: true,
+    });
+    expect(editor.getHTML()).toContain("text-indent: 2em");
+  });
+
+  it("does not carry first-line indentation added by Tab to the next paragraph", () => {
+    const editor = createEditor({
+      content: {
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            content: [{ type: "text", text: "content" }],
+          },
+        ],
+      },
+    });
+    editor.commands.setTextSelection(1);
+
+    expect(runKey(editor, "Tab")).toBe(true);
+    editor.commands.setTextSelection(editor.state.doc.content.size - 1);
+    expect(runKey(editor, "Enter")).toBe(true);
+    expect(editor.getJSON().content).toEqual([
+      expect.objectContaining({
+        type: "paragraph",
+        attrs: expect.objectContaining({ lineIndent: true }),
+      }),
+      expect.objectContaining({
+        type: "paragraph",
+        attrs: expect.objectContaining({ indent: 0, lineIndent: false }),
+      }),
+    ]);
+  });
+
+  it("removes first-line indentation added by Tab with Backspace or Shift-Tab", () => {
+    const editor = createEditor({
+      content: {
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            content: [{ type: "text", text: "content" }],
+          },
+        ],
+      },
+    });
+    editor.commands.setTextSelection(1);
+
+    expect(runKey(editor, "Tab")).toBe(true);
+    expect(runKey(editor, "Tab", true)).toBe(true);
+    expect(editor.getJSON().content?.[0].attrs).toMatchObject({
+      lineIndent: false,
+    });
+
+    expect(runKey(editor, "Tab")).toBe(true);
+    expect(runKey(editor, "Backspace")).toBe(true);
+    expect(editor.getJSON().content?.[0].attrs).toMatchObject({
+      lineIndent: false,
+    });
+  });
+
+  it("disables first-line indentation when the option is off", () => {
+    const editor = createEditor(
+      {
+        content: {
+          type: "doc",
+          content: [
+            {
+              type: "paragraph",
+              content: [{ type: "text", text: "content" }],
+            },
+          ],
+        },
+      },
+      { firstLineIndent: false }
+    );
+    editor.commands.setTextSelection(1);
+
+    expect(runKey(editor, "Tab")).toBe(true);
+    expect(editor.getJSON().content?.[0].attrs).toMatchObject({ indent: 24 });
+    expect(editor.getJSON().content?.[0].attrs?.lineIndent).toBeUndefined();
+  });
+
+  it("sinks list items instead of applying first-line indentation", () => {
+    const editor = createListEditor({
+      type: "doc",
+      content: [
+        {
+          type: "bulletList",
+          content: [
+            {
+              type: "listItem",
+              content: [
+                {
+                  type: "paragraph",
+                  content: [{ type: "text", text: "one" }],
+                },
+              ],
+            },
+            {
+              type: "listItem",
+              content: [
+                {
+                  type: "paragraph",
+                  content: [{ type: "text", text: "two" }],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    });
+    editor.commands.setTextSelection(findTextPosition(editor, "two") + 1);
+
+    expect(runKey(editor, "Tab")).toBe(true);
+    const list = editor.getJSON().content?.[0] as JSONContent | undefined;
+    expect(list?.content?.[0].content?.[1]?.type).toBe("bulletList");
+    expect(JSON.stringify(editor.getJSON())).not.toContain('"lineIndent":true');
+  });
+
   it("uses block indentation for Tab and carries it to the next paragraph", () => {
     const editor = createEditor({
       content: {
@@ -247,7 +431,7 @@ describe("ExtensionIndent", () => {
         ],
       },
     });
-    editor.commands.setTextSelection(1);
+    editor.commands.setTextSelection(4);
 
     expect(runKey(editor, "Tab")).toBe(true);
     expect(editor.getJSON().content?.[0].attrs).toMatchObject({
@@ -445,11 +629,13 @@ describe("ExtensionIndent", () => {
         ],
       },
     });
-    editor.commands.setTextSelection(1);
+    editor.commands.setTextSelection(4);
 
     expect(runKey(editor, "Tab")).toBe(true);
     expect(runKey(editor, "Tab")).toBe(true);
     expect(editor.getJSON().content?.[0].attrs).toMatchObject({ indent: 48 });
+
+    editor.commands.setTextSelection(1);
     expect(runKey(editor, "Backspace")).toBe(true);
     expect(editor.getJSON().content?.[0].attrs).toMatchObject({ indent: 24 });
     expect(runKey(editor, "Backspace")).toBe(true);
@@ -525,7 +711,7 @@ describe("ExtensionIndent", () => {
       ],
     });
 
-    editor.commands.setTextSelection(contentParagraphPos + 1);
+    editor.commands.setTextSelection(contentParagraphPos + 2);
     expect(runKey(editor, "Tab")).toBe(true);
     expect(editor.getJSON().content?.[0]).toMatchObject({
       attrs: { indent: 0 },
@@ -942,6 +1128,16 @@ function createEditor(
       Text,
       ExtensionIndent.configure(indentOptions),
     ],
+    content,
+  });
+  editors.push(editor);
+  return editor;
+}
+
+function createHeadingEditor(content: JSONContent) {
+  const editor = new Editor({
+    element: document.createElement("div"),
+    extensions: [Document, Paragraph, Text, ExtensionHeading, ExtensionIndent],
     content,
   });
   editors.push(editor);

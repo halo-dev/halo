@@ -1,12 +1,46 @@
 <script lang="ts" setup>
-import { useAttrs } from "vue";
+import { useAttrs, useId, useSlots } from "vue";
 
 defineOptions({ inheritAttrs: false });
 
+const props = withDefaults(
+  defineProps<{
+    modelValue?: boolean;
+    disabled?: boolean;
+    loading?: boolean;
+    /**
+     * Text label rendered beside the switch. Clicking it toggles the switch.
+     * Ignored when the `label` slot is used.
+     */
+    label?: string;
+    /** Side of the switch the label is rendered on. */
+    labelPosition?: "left" | "right";
+  }>(),
+  {
+    modelValue: false,
+    disabled: false,
+    loading: false,
+    label: undefined,
+    labelPosition: "right",
+  }
+);
+
+const emit = defineEmits<{
+  (event: "update:modelValue", value: boolean): void;
+  (event: "change", value: boolean): void;
+}>();
+
 const attrs = useAttrs();
+const slots = useSlots();
+
+const generatedId = `switch-${useId()}`;
 
 function isControlAttr(key: string) {
   return key === "id" || key.startsWith("aria-");
+}
+
+function hasLabel() {
+  return Boolean(props.label) || Boolean(slots.label);
 }
 
 function getControlAttrs() {
@@ -16,6 +50,12 @@ function getControlAttrs() {
     if (isControlAttr(key)) {
       result[key] = value;
     }
+  }
+
+  // Associate the generated id with the label so that clicking the label
+  // activates the switch, unless the consumer provided an id of their own.
+  if (hasLabel() && !result.id) {
+    result.id = generatedId;
   }
 
   return result;
@@ -33,23 +73,9 @@ function getWrapperAttrs() {
   return result;
 }
 
-const props = withDefaults(
-  defineProps<{
-    modelValue?: boolean;
-    disabled?: boolean;
-    loading?: boolean;
-  }>(),
-  {
-    modelValue: false,
-    disabled: false,
-    loading: false,
-  }
-);
-
-const emit = defineEmits<{
-  (event: "update:modelValue", value: boolean): void;
-  (event: "change", value: boolean): void;
-}>();
+function getLabelFor() {
+  return (attrs.id as string | undefined) ?? generatedId;
+}
 
 const handleChange = () => {
   if (props.disabled || props.loading) return;
@@ -60,6 +86,18 @@ const handleChange = () => {
 </script>
 <template>
   <div class="switch-wrapper" v-bind="getWrapperAttrs()">
+    <label
+      v-if="hasLabel()"
+      :class="{
+        'order-last': labelPosition === 'right',
+        'switch-label-disabled': disabled || loading,
+      }"
+      :for="getLabelFor()"
+      class="switch-label"
+      @click.stop
+    >
+      <slot name="label">{{ label }}</slot>
+    </label>
     <button
       v-bind="getControlAttrs()"
       :aria-busy="loading ? 'true' : undefined"
@@ -111,7 +149,7 @@ const handleChange = () => {
 </template>
 <style lang="scss">
 .switch-wrapper {
-  @apply box-border inline-flex;
+  @apply box-border inline-flex items-center gap-2;
 
   .switch-inner {
     @apply relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out;
@@ -122,6 +160,14 @@ const handleChange = () => {
 
     .switch-indicator {
       @apply pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out;
+    }
+  }
+
+  .switch-label {
+    @apply cursor-pointer text-sm font-medium text-gray-700;
+
+    &.switch-label-disabled {
+      @apply cursor-not-allowed opacity-60;
     }
   }
 }

@@ -338,7 +338,7 @@ function handleCopyFromLayout(breakpoint: string) {
       ></VTabbar>
     </div>
     <div class="page-header__actions">
-      <VButton ghost @click="handleBack">
+      <VButton variant="ghost" @click="handleBack">
         {{ $t("core.common.buttons.back") }}
       </VButton>
       <VDropdown>

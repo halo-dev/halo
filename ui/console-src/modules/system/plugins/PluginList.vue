@@ -280,7 +280,7 @@ const { handleChangeStatusInBatch, handleUninstallInBatch } =
               </VDropdown>
             </VSpace>
           </div>
-          <VSpace spacing="lg" class="flex-wrap">
+          <VSpace spacing="sm" class="flex-wrap">
             <VFilterDropdownGroup
               :clear-label="$t('core.common.buttons.reset')"
             >
@@ -356,17 +356,16 @@ const { handleChangeStatusInBatch, handleUninstallInBatch } =
               />
             </VFilterDropdownGroup>
             <div class="flex flex-row gap-2">
-              <button
-                v-tooltip="$t('core.common.buttons.refresh')"
-                type="button"
-                class="group cursor-pointer rounded p-1 hover:bg-gray-200"
+              <VButton
+                :label="$t('core.common.buttons.refresh')"
+                variant="ghost"
+                size="sm"
                 @click="refetch()"
               >
-                <IconRefreshLine
-                  :class="{ 'animate-spin text-gray-900': isFetching }"
-                  class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
-                />
-              </button>
+                <template #icon>
+                  <IconRefreshLine :class="{ 'animate-spin': isFetching }" />
+                </template>
+              </VButton>
             </div>
           </VSpace>
         </div>

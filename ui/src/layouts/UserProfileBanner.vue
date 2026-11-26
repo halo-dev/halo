@@ -8,6 +8,7 @@ import {
   IconSettings3Line,
   IconShieldUser,
   VAvatar,
+  VButton,
   VPopover,
   VTag,
 } from "@halo-dev/components";
@@ -148,15 +149,19 @@ const actions = computed(() => {
     </div>
 
     <div class="user-profile__actions">
-      <button
+      <VButton
         v-for="action in actions"
         :key="action.label"
-        v-tooltip="action.label"
-        class="user-profile__action-button"
+        :label="action.label"
+        variant="ghost"
+        shape="circle"
+        size="sm"
         @click="action.onClick"
       >
-        <component :is="action.icon" class="user-profile__action-icon" />
-      </button>
+        <template #icon>
+          <component :is="action.icon" />
+        </template>
+      </VButton>
     </div>
   </div>
 </template>
@@ -225,28 +230,6 @@ const actions = computed(() => {
     display: flex;
     align-items: center;
     gap: 0.25rem;
-  }
-
-  &__action-button {
-    display: inline-block;
-    cursor: pointer;
-    border-radius: 9999px;
-    padding: 0.375rem;
-    transition: all;
-
-    &:hover {
-      background-color: theme("colors.gray.100");
-    }
-  }
-
-  &__action-icon {
-    height: 1.25rem;
-    width: 1.25rem;
-    color: theme("colors.gray.600");
-
-    .user-profile__action-button:hover & {
-      color: theme("colors.gray.900");
-    }
   }
 }
 </style>
