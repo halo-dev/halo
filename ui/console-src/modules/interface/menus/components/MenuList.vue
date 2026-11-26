@@ -349,7 +349,7 @@ const handleSetPrimaryMenu = async (menu: Menu) => {
             <VEntityField v-if="menu.metadata.deletionTimestamp">
               <template #description>
                 <VStatusDot
-                  v-tooltip="$t('core.common.status.deleting')"
+                  :label="$t('core.common.status.deleting')"
                   state="warning"
                   animate
                 />

@@ -127,7 +127,7 @@ const { data: fields } = useEntityFieldItemExtensionPoint<ListedSinglePage>(
       position: "end",
       component: markRaw(StatusDotField),
       props: {
-        tooltip: t("core.common.status.deleting"),
+        label: t("core.common.status.deleting"),
         state: "warning",
         animate: true,
       },

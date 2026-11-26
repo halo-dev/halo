@@ -403,7 +403,7 @@ const { data: operationItems } = useOperationItemExtensionPoint<ListedComment>(
               </span>
               <VStatusDot
                 v-show="(comment?.comment?.status?.unreadReplyCount || 0) > 0"
-                v-tooltip="$t('core.comment.list.fields.has_new_replies')"
+                :label="$t('core.comment.list.fields.has_new_replies')"
                 state="success"
                 animate
               />
@@ -434,7 +434,7 @@ const { data: operationItems } = useOperationItemExtensionPoint<ListedComment>(
       <VEntityField v-if="comment?.comment?.metadata.deletionTimestamp">
         <template #description>
           <VStatusDot
-            v-tooltip="$t('core.common.status.deleting')"
+            :label="$t('core.common.status.deleting')"
             state="warning"
             animate
           />

@@ -127,7 +127,7 @@ const { handleExportThemeConfiguration, openSelectImportFileDialog } =
               </VTag>
               <VStatusDot
                 v-if="getFailedMessage()"
-                v-tooltip="getFailedMessage()"
+                :label="getFailedMessage()"
                 state="warning"
                 animate
               />

@@ -263,7 +263,7 @@ const handleDelete = async (role: Role) => {
               <VEntityField v-if="role.metadata.deletionTimestamp">
                 <template #description>
                   <VStatusDot
-                    v-tooltip="$t('core.common.status.deleting')"
+                    :label="$t('core.common.status.deleting')"
                     state="warning"
                     animate
                   />
