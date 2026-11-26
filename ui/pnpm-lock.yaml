@@ -754,6 +754,9 @@ importers:
         specifier: ~5.1.0
         version: 5.1.0(@rspack/core@2.1.9)(@voidzero-dev/vite-plus-core@1.5.1)(@vue/compiler-sfc@3.5.41)(esbuild@0.28.2)(pinia@4.0.3)(rolldown@1.2.1)(rollup@4.43.0)(vue@3.5.41)(webpack@5.99.9)
     devDependencies:
+      '@storybook/addon-a11y':
+        specifier: ^10.5.7
+        version: 10.6.9(storybook@10.6.2)
       '@storybook/addon-docs':
         specifier: ^10.5.7
         version: 10.5.7(@types/react@18.2.41)(@voidzero-dev/vite-plus-core@1.5.1)(esbuild@0.28.2)(rollup@4.43.0)(storybook@10.6.2)(webpack@5.99.9)
@@ -3320,6 +3323,11 @@ packages:
   '@rspack/lite-tapable@1.1.5':
     resolution: {integrity: sha512-uzB782zJbFTM3ta+e2Glikx36dca/6Y+DXyvFN+wb0Tx5ItIW+g03A0t3amP3LGzPHSkb0k81VHCm4jxLQwfag==}
 
+  '@storybook/addon-a11y@10.6.9':
+    resolution: {integrity: sha512-z+nQJ0yCIRovchelyzE5I1ReujJ0FdTcA3eMyzB7zM+zZbUc3OO6NqDMdyYNhybocNbhVH5+wa2Jd470HeOnvQ==}
+    peerDependencies:
+      storybook: ^10.6.9
+
   '@storybook/addon-docs@10.5.7':
     resolution: {integrity: sha512-KNARJfjICaizinsR3INMEiipZm1ObYo+xw+E26gteu50Bcy2dIZUtk5uHY5XdtardU3AXX6yRXoBZ2HCY3lbHA==}
     peerDependencies:
@@ -4804,6 +4812,10 @@ packages:
   available-typed-arrays@1.0.5:
     resolution: {integrity: sha512-DMD0KiN46eipeziST1LPP/STfDU0sufISXmjSgvVsoU2tqxctQeASejWcfNtxYKqETM1UxQ8sp2OrSBWpHY6sw==}
     engines: {node: '>= 0.4'}
+
+  axe-core@4.14.1:
+    resolution: {integrity: sha512-FHfa+lmNjQZfJz1q8wKqIDwC6DExcHt/pkjNQb09a3NPjCKg2rhu5qb2S4r76ASyFNNtuFooJpZe37OgudVGtQ==}
+    engines: {node: '>=4'}
 
   axios@1.20.0:
     resolution: {integrity: sha512-r8aOh8j9cGKpgQAqpzrUHnSIc6a59Y3Xf/cv8sy1DrHCkZHzQGEuoq1tARk6qSyDdtQGSDgpb9kFlruzPvrgwg==}
@@ -8518,10 +8530,12 @@ packages:
   yuku-core@0.19.0:
     resolution: {integrity: sha512-kYK9e1XdfirNhkipzW0wmMcSWcVF/CWnuugodfVYRCUwvoBefweL9HzB96OiKEhsx78V5WbUxbJqlizMX869Qg==}
     engines: {node: '>=14.18.0'}
+    deprecated: 'Yuku is now one package with one core. Use "yuku" instead: https://yuku.fyi/javascript/. Existing installs keep working but get no more fixes.'
 
   yuku-parser@0.19.0:
     resolution: {integrity: sha512-XrBh9ZiQK5mJVRxZBAvD6LwRyAYrK3MFtH3+onyuxFL5hFD44EC3QOmIC1FjTj6H2MMwq46/NAI+NZxLZPZgxg==}
     engines: {node: '>=14.18.0'}
+    deprecated: 'Yuku is now one package with one core. Use "yuku" instead: https://yuku.fyi/javascript/. Existing installs keep working but get no more fixes.'
 
   zimmerframe@1.1.5:
     resolution: {integrity: sha512-msJxIvYDYcoNL+PJsu+7qmpDWsYmAxTY+2TNYXXF0hzBzBk0BMecOqDOG/EckUoKCuKwObfbugIl8QpqHDXeFA==}
@@ -10522,6 +10536,12 @@ snapshots:
 
   '@rspack/lite-tapable@1.1.5': {}
 
+  '@storybook/addon-a11y@10.6.9(storybook@10.6.2)':
+    dependencies:
+      '@storybook/global': 5.0.0
+      axe-core: 4.14.1
+      storybook: 10.6.2(@types/react@18.2.41)(prettier@3.6.2)(react@18.3.1)(vite-plus@1.5.1)
+
   '@storybook/addon-docs@10.5.7(@types/react@18.2.41)(@voidzero-dev/vite-plus-core@1.5.1)(esbuild@0.28.2)(rollup@4.43.0)(storybook@10.6.2)(webpack@5.99.9)':
     dependencies:
       '@mdx-js/react': 3.1.1(@types/react@18.2.41)(react@18.3.1)
@@ -12126,6 +12146,8 @@ snapshots:
       postcss-value-parser: 4.2.0
 
   available-typed-arrays@1.0.5: {}
+
+  axe-core@4.14.1: {}
 
   axios@1.20.0(debug@4.4.3)(supports-color@10.2.2):
     dependencies:

@@ -58,6 +58,7 @@
     "reka-ui": "catalog:"
   },
   "devDependencies": {
+    "@storybook/addon-a11y": "^10.5.7",
     "@storybook/addon-docs": "^10.5.7",
     "@storybook/addon-links": "^10.5.7",
     "@storybook/testing-library": "^0.2.2",
