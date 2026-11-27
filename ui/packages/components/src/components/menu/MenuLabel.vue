@@ -5,6 +5,6 @@
 </template>
 <style lang="scss">
 .menu-label {
-  @apply py-2.5 text-sm font-normal text-gray-500;
+  @apply px-2 py-2.5 text-sm font-normal text-gray-500;
 }
 </style>
