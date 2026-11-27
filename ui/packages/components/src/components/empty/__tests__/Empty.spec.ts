@@ -29,9 +29,25 @@ describe("Empty", () => {
     expect(wrapper.find(".empty-title").text()).toEqual("Not found");
   });
 
+  it("should render only the regions that have content", () => {
+    const wrapper = mount(VEmpty, { props: { title: "Not found" } });
+
+    expect(wrapper.find(".empty-title").exists()).toBe(true);
+    expect(wrapper.find(".empty-message").exists()).toBe(false);
+    expect(wrapper.find(".empty-actions").exists()).toBe(false);
+  });
+
   it("should work with message prop", () => {
     const wrapper = mount(VEmpty, { props: { message: "No posts found" } });
     expect(wrapper.find(".empty-message").text()).toEqual("No posts found");
+  });
+
+  it("should work with title slot", () => {
+    const wrapper = mount(VEmpty, {
+      slots: { title: h("span", "Custom title") },
+    });
+
+    expect(wrapper.find(".empty-title").text()).toEqual("Custom title");
   });
 
   it("should work with message slot", () => {
@@ -82,6 +98,36 @@ describe("Empty", () => {
     expect(wrapper.find(".empty-image > img").attributes().src).toEqual(
       "./empty.png"
     );
+  });
+
+  it("should render a decorative image by default", () => {
+    const wrapper = mount(VEmpty);
+
+    expect(wrapper.find(".empty-image > img").attributes().alt).toEqual("");
+  });
+
+  it("should work with imageAlt prop", () => {
+    const wrapper = mount(VEmpty, {
+      props: { imageAlt: "No posts found" },
+    });
+
+    expect(wrapper.find(".empty-image > img").attributes().alt).toEqual(
+      "No posts found"
+    );
+  });
+
+  it("should hide the image with showImage prop", () => {
+    const wrapper = mount(VEmpty, {
+      props: { showImage: false, title: "No posts found" },
+    });
+
+    expect(wrapper.find(".empty-image").exists()).toBe(false);
+  });
+
+  it("should apply the size class", () => {
+    const wrapper = mount(VEmpty, { props: { size: "sm" } });
+
+    expect(wrapper.find(".empty-size-sm").exists()).toBe(true);
   });
 
   it("should work with image slot", () => {
