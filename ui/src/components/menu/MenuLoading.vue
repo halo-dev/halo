@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { VSkeleton } from "@halo-dev/components";
+
 const itemWidths = [52, 68, 44, 60, 48];
 </script>
 
@@ -10,13 +12,12 @@ const itemWidths = [52, 68, 44, 60, 48];
         :key="x"
         class="flex items-center rounded-base py-[0.4rem]"
       >
-        <div
-          class="mr-3 size-[1.2rem] animate-pulse rounded-lg bg-gray-200"
-        ></div>
-        <div
-          class="h-6 animate-pulse rounded-lg bg-gray-200"
-          :style="{ width: `${itemWidths[x - 1]}%` }"
-        ></div>
+        <VSkeleton class="mr-3 rounded-lg" width="1.2rem" height="1.2rem" />
+        <VSkeleton
+          class="rounded-lg"
+          :width="`${itemWidths[x - 1]}%`"
+          height="1.5rem"
+        />
       </li>
     </ul>
   </div>

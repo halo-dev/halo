@@ -59,6 +59,7 @@ describe("PageHeader", () => {
 
     expect(wrapper.attributes("aria-busy")).toBe("true");
     expect(wrapper.findAll(".page-header__skeleton")).toHaveLength(2);
+    expect(wrapper.findAll(".skeleton--shimmer")).toHaveLength(2);
     expect(wrapper.find(".page-header__title").exists()).toBe(false);
     expect(
       wrapper.get(".page-header__actions").attributes("inert")
