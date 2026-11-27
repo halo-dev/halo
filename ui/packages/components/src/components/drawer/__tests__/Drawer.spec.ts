@@ -267,6 +267,32 @@ describe("Drawer", () => {
     expect(updateVisibleEvents(wrapper)).not.toContain(false);
   });
 
+  it("keeps the drawer open when interacting with a teleported dropdown popper", async () => {
+    const wrapper = mount(VDrawer, {
+      attachTo: document.body,
+      props: { defaultVisible: true, layerClosable: true },
+    });
+    await nextTick();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    const popper = document.createElement("div");
+    popper.className =
+      "v-popper__popper v-popper--theme-dropdown v-popper__popper--shown";
+    const item = document.createElement("div");
+    popper.appendChild(item);
+    document.body.appendChild(popper);
+
+    item.dispatchEvent(
+      new Event("pointerdown", { bubbles: true, cancelable: true })
+    );
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    await nextTick();
+
+    expect(updateVisibleEvents(wrapper)).not.toContain(false);
+
+    popper.remove();
+  });
+
   it("renders a non-modal drawer without an overlay", async () => {
     mount(VDrawer, {
       attachTo: document.body,

@@ -3,3 +3,10 @@
     padding: theme("spacing[1.5]");
   }
 }
+
+// Reka UI sets pointer-events: none on <body> while a modal is open. Dropdown
+// poppers are teleported to <body>, so restore pointer events on the popper
+// itself or clicks fall through to the modal content underneath.
+.v-popper--theme-dropdown.v-popper__popper--shown {
+  pointer-events: auto;
+}
