@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed } from "vue";
+import { computed, onMounted, watch } from "vue";
 import { IconArrowLeft, IconArrowRight } from "../../icons/icons";
 
 const props = withDefaults(
@@ -31,29 +31,101 @@ const emit = defineEmits<{
   (event: "change", value: { page: number; size: number }): void;
 }>();
 
-const totalPages = computed(() => Math.ceil(props.total / props.size));
+const DEFAULT_SIZE = 10;
 
-const hasNext = computed(() => props.page < totalPages.value);
+const normalizeSize = (size: number) => {
+  if (!Number.isFinite(size) || size <= 0) {
+    return undefined;
+  }
 
-const hasPrevious = computed(() => props.page > 1);
+  const normalized = Math.floor(size);
+  return normalized > 0 ? normalized : undefined;
+};
+
+const safeTotal = computed(() =>
+  Number.isFinite(props.total) && props.total > 0 ? Math.floor(props.total) : 0
+);
+
+const fallbackSize = computed(() => {
+  for (const option of props.sizeOptions) {
+    const size = normalizeSize(option);
+    if (size !== undefined) {
+      return size;
+    }
+  }
+
+  return DEFAULT_SIZE;
+});
+
+const currentSize = computed(
+  () => normalizeSize(props.size) ?? fallbackSize.value
+);
+
+const totalPages = computed(() =>
+  safeTotal.value === 0 ? 0 : Math.ceil(safeTotal.value / currentSize.value)
+);
+
+const currentPage = computed(() => {
+  if (totalPages.value === 0) {
+    return 1;
+  }
+
+  const page = Number.isFinite(props.page) ? Math.floor(props.page) : 1;
+  return Math.min(Math.max(1, page), totalPages.value);
+});
+
+const hasNext = computed(() => currentPage.value < totalPages.value);
+
+const hasPrevious = computed(() => currentPage.value > 1);
+
+const sizeOptionsValue = computed(() => {
+  const options: number[] = [];
+
+  for (const option of [...props.sizeOptions, currentSize.value]) {
+    const size = normalizeSize(option);
+    if (size !== undefined && !options.includes(size)) {
+      options.push(size);
+    }
+  }
+
+  return options;
+});
 
 const totalLabelText = computed(() => {
   if (props.totalLabel) {
     return props.totalLabel;
   }
-  return `共 ${props.total} 项数据`;
+  return `共 ${safeTotal.value} 项数据`;
 });
+
+const goToPage = (page: number) => {
+  if (totalPages.value === 0 || !Number.isFinite(page)) {
+    return;
+  }
+
+  const target = Math.min(Math.max(1, Math.floor(page)), totalPages.value);
+
+  if (target === currentPage.value) {
+    return;
+  }
+
+  emit("update:page", target);
+  emit("change", { page: target, size: currentSize.value });
+};
 
 const onPageChange = (event: Event) => {
   const target = event.target as HTMLSelectElement;
-  const page = Number(target.value);
-  emit("update:page", page);
-  emit("change", { page, size: props.size });
+  goToPage(Number(target.value));
 };
 
 const onSizeChange = (event: Event) => {
   const target = event.target as HTMLSelectElement;
-  const size = Number(target.value);
+  const size = normalizeSize(Number(target.value));
+
+  if (size === undefined || size === currentSize.value) {
+    return;
+  }
+
   emit("update:size", size);
 
   // reset page to 1
@@ -63,19 +135,39 @@ const onSizeChange = (event: Event) => {
 
 const previous = () => {
   if (hasPrevious.value) {
-    const page = props.page - 1;
-    emit("update:page", page);
-    emit("change", { page: page, size: props.size });
+    goToPage(currentPage.value - 1);
   }
 };
 
 const next = () => {
   if (hasNext.value) {
-    const page = props.page + 1;
-    emit("update:page", page);
-    emit("change", { page: page, size: props.size });
+    goToPage(currentPage.value + 1);
   }
 };
+
+const clampPage = () => {
+  if (totalPages.value === 0) {
+    return;
+  }
+
+  if (props.page !== currentPage.value) {
+    emit("update:page", currentPage.value);
+  }
+};
+
+const clampSize = () => {
+  if (props.size !== currentSize.value) {
+    emit("update:size", currentSize.value);
+  }
+};
+
+onMounted(() => {
+  clampSize();
+  clampPage();
+});
+
+watch(currentSize, clampSize);
+watch([() => props.page, totalPages], clampPage);
 </script>
 <template>
   <div class="pagination">
@@ -101,13 +193,13 @@ const next = () => {
       </nav>
       <div class="pagination__select-wrap">
         <select
-          :value="page"
+          :value="currentPage"
           :disabled="totalPages === 0"
           class="pagination__select"
           @change="onPageChange"
         >
           <option v-if="totalPages === 0" :value="1">0 / 0</option>
-          <option v-for="i in totalPages || 1" :key="i" :value="i">
+          <option v-for="i in totalPages" :key="i" :value="i">
             {{ i }} / {{ totalPages }}
           </option>
         </select>
@@ -116,10 +208,14 @@ const next = () => {
         </span>
       </div>
       <div class="pagination__select-wrap">
-        <select :value="size" class="pagination__select" @change="onSizeChange">
+        <select
+          :value="currentSize"
+          class="pagination__select"
+          @change="onSizeChange"
+        >
           <option
-            v-for="(sizeOption, index) in sizeOptions"
-            :key="index"
+            v-for="sizeOption in sizeOptionsValue"
+            :key="sizeOption"
             :value="sizeOption"
           >
             {{ sizeOption }}
@@ -150,7 +246,7 @@ const next = () => {
   }
 
   &__btn {
-    @apply relative inline-flex h-8 cursor-pointer items-center rounded-base border border-gray-300 bg-white px-2 py-1.5 text-sm font-medium text-gray-500 outline-none hover:bg-gray-50 disabled:cursor-not-allowed;
+    @apply relative inline-flex h-8 cursor-pointer items-center rounded-base border border-gray-300 bg-white px-2 py-1.5 text-sm font-medium text-gray-500 outline-none focus-visible:z-10 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary hover:enabled:bg-gray-50 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400 disabled:opacity-50;
 
     &--prev {
       @apply rounded-r-none;
@@ -166,7 +262,7 @@ const next = () => {
   }
 
   &__select {
-    @apply h-8 rounded-base border border-solid border-gray-300 px-2 pr-10 text-sm text-gray-800 outline-none focus:border-primary;
+    @apply h-8 cursor-pointer rounded-base border border-solid border-gray-300 bg-white px-2 pr-10 text-sm text-gray-800 outline-none focus:border-primary focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400 disabled:opacity-50;
   }
 
   &__select-label {
