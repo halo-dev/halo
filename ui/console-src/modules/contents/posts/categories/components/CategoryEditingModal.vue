@@ -242,6 +242,7 @@ async function slugUniqueValidation(node: FormKitNode) {
     mount-to-body
     :title="modalTitle"
     :width="700"
+    :centered="false"
     @close="emit('close')"
   >
     <FormKit
