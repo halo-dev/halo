@@ -501,6 +501,8 @@
         "VPagination",
         "VPopover",
         "VScrollArea",
+        "VSkeleton",
+        "VSkeletonText",
         "VSpace",
         "VStatusDot",
         "VSwitch",

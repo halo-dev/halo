@@ -18,6 +18,7 @@ export * from "./components/modal";
 export * from "./components/pagination";
 export * from "./components/popover";
 export * from "./components/scroll-area";
+export * from "./components/skeleton";
 export * from "./components/space";
 export * from "./components/status";
 export * from "./components/switch";
