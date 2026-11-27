@@ -29,6 +29,7 @@ import {
 } from "../../icons/icons";
 import { useComponentsI18n } from "../../locales";
 import { VButton } from "../button";
+import { VScrollArea } from "../scroll-area";
 
 defineOptions({
   inheritAttrs: false,
@@ -224,7 +225,7 @@ defineExpose({
         :style="contentStyle"
         @escape-key-down="handleEscapeKeyDown"
       >
-        <div class="dialog-body">
+        <VScrollArea class="dialog-body" content-class="dialog-body-content">
           <div class="dialog-header">
             <div class="flex min-w-0 flex-1 items-center gap-3">
               <slot name="icon">
@@ -263,7 +264,7 @@ defineExpose({
             </AlertDialogDescription>
           </VisuallyHidden>
           <slot />
-        </div>
+        </VScrollArea>
         <div class="dialog-footer">
           <slot name="footer">
             <VButton
@@ -317,8 +318,18 @@ defineExpose({
 }
 
 .dialog-body {
-  @apply min-h-0 flex-1 overflow-y-auto px-4 pb-4 pt-5;
-  overscroll-behavior: contain;
+  @apply flex min-h-0 flex-col overflow-hidden;
+  flex: 1 1 auto;
+
+  > .v-scroll-area__viewport {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+}
+
+.dialog-body-content {
+  height: 100%;
+  @apply px-4 pb-4 pt-5;
 }
 
 .dialog-header {

@@ -11,6 +11,7 @@ import {
   VEmpty,
   VLoading,
   VPageHeader,
+  VScrollArea,
   VTabbar,
 } from "@halo-dev/components";
 import { stores } from "@halo-dev/ui-shared";
@@ -25,12 +26,11 @@ import {
 import { useVirtualizer } from "@tanstack/vue-virtual";
 import { useRouteQuery } from "@vueuse/router";
 import { chunk } from "es-toolkit";
-import type { OverlayScrollbars } from "overlayscrollbars";
-import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import {
   computed,
   reactive,
   ref,
+  useTemplateRef,
   watch,
   type ComponentPublicInstance,
 } from "vue";
@@ -472,10 +472,15 @@ const localMutationCount = computed(
 
 // ---- Virtual scrolling ----
 const scrollElement = ref<HTMLElement | null>(null);
+const scrollArea = useTemplateRef<{ viewport?: HTMLElement }>("scrollArea");
 
-function handleScrollbarsInitialized(instance: OverlayScrollbars) {
-  scrollElement.value = instance.elements().viewport;
-}
+watch(
+  () => scrollArea.value?.viewport,
+  (viewport) => {
+    scrollElement.value = viewport ?? null;
+  },
+  { immediate: true, flush: "post" }
+);
 
 const virtualizerOptions = computed(() => ({
   count: notifications.value.length,
@@ -843,13 +848,7 @@ function handleMarkAllAsRead() {
               </div>
             </div>
           </div>
-          <OverlayScrollbarsComponent
-            element="div"
-            :options="{ scrollbars: { autoHide: 'scroll' } }"
-            class="h-full w-full flex-1"
-            defer
-            @os-initialized="handleScrollbarsInitialized"
-          >
+          <VScrollArea ref="scrollArea" class="h-full w-full flex-1">
             <VLoading v-if="isLoading" />
             <Transition v-else-if="!notifications.length" appear name="fade">
               <VEmpty
@@ -905,10 +904,10 @@ function handleMarkAllAsRead() {
                 {{ $t("core.common.buttons.retry") }}
               </VButton>
             </div>
-          </OverlayScrollbarsComponent>
+          </VScrollArea>
         </div>
         <div
-          class="col-span-12 overflow-auto sm:col-span-6 lg:col-span-7 xl:col-span-9"
+          class="col-span-12 min-h-0 sm:col-span-6 lg:col-span-7 xl:col-span-9"
         >
           <NotificationContent :notification="selectedNotification" />
         </div>

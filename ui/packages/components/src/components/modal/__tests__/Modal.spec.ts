@@ -1,5 +1,4 @@
 import { enableAutoUnmount, flushPromises, mount } from "@vue/test-utils";
-import { OverlayScrollbars } from "overlayscrollbars";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 import { defineComponent, nextTick, ref } from "vue";
 import { VModal } from "../index";
@@ -368,41 +367,31 @@ describe("Modal", () => {
       });
     });
 
-    it("keeps the viewport padding until the closing animation finishes", async () => {
+    it("renders the default slot inside the scroll viewport", async () => {
       const wrapper = mount(VModal, {
         attachTo: document.body,
         props: { visible: false },
         slots: { default: "Content" },
       });
-      const body = wrapper.get(".modal-body").element as HTMLElement;
-      body.style.padding = "12px 16px";
 
       await wrapper.setProps({ visible: true });
       await nextTick();
-      await vi.waitFor(() => {
-        expect(OverlayScrollbars.valid(OverlayScrollbars(body))).toBe(true);
+
+      expect(
+        wrapper.get(".modal-body [data-reka-scroll-area-viewport]").text()
+      ).toBe("Content");
+    });
+
+    it("applies body classes to the padded scroll content", async () => {
+      const wrapper = mount(VModal, {
+        attachTo: document.body,
+        props: { visible: true, bodyClass: ["!p-0"] },
+        slots: { default: "Content" },
       });
-      const viewport = OverlayScrollbars(body)!.elements().viewport;
 
-      expect(viewport.style.paddingTop).toBe("12px");
-      expect(viewport.style.paddingLeft).toBe("16px");
-
-      vi.useFakeTimers();
-      await wrapper.setProps({ visible: false });
       await nextTick();
 
-      // OverlayScrollbars must keep the padding while the modal is fading out,
-      // otherwise the content shifts as soon as the closing animation starts.
-      expect(viewport.style.paddingTop).toBe("12px");
-      expect(viewport.style.paddingLeft).toBe("16px");
-
-      vi.advanceTimersByTime(250);
-      await nextTick();
-
-      // Once hidden, the viewport styles are reset so reopening starts from a
-      // clean host padding.
-      expect(viewport.style.paddingTop).toBe("");
-      expect(viewport.style.paddingLeft).toBe("");
+      expect(wrapper.get(".modal-body-content").classes()).toContain("!p-0");
     });
   });
 
@@ -438,32 +427,38 @@ describe("Modal", () => {
           }),
           { attachTo: document.body }
         );
-        const body = wrapper.get(".modal-body").element as HTMLElement;
+        let viewport: Element | undefined;
 
         for (let opening = 0; opening < 2; opening++) {
           visible.value = true;
           await nextTick();
-          await vi.waitFor(() => {
-            expect(OverlayScrollbars.valid(OverlayScrollbars(body))).toBe(true);
-          });
-          const viewport = OverlayScrollbars(body)!.elements().viewport;
-          expect(viewport.textContent).toBe(
+
+          const currentViewport = wrapper.get(
+            ".modal-body [data-reka-scroll-area-viewport]"
+          );
+
+          if (viewport) {
+            // The slot nodes must stay inside the same viewport when the modal
+            // is reopened instead of being re-parented.
+            expect(currentViewport.element).toBe(viewport);
+          }
+
+          viewport = currentViewport.element;
+
+          expect(currentViewport.text()).toBe(
             initialCondition ? "Content" : hiddenText
           );
 
           for (const condition of [!initialCondition, initialCondition]) {
             showContent.value = condition;
             await nextTick();
-            expect(viewport.textContent).toBe(
+            expect(currentViewport.text()).toBe(
               condition ? "Content" : hiddenText
             );
           }
 
           visible.value = false;
           await nextTick();
-          await vi.waitFor(() => {
-            expect(OverlayScrollbars(body)).toBeUndefined();
-          });
         }
       }
     );

@@ -9,10 +9,10 @@ import {
   VEntityContainer,
   VEntityField,
   VLoading,
+  VScrollArea,
 } from "@halo-dev/components";
 import { stores, utils } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
-import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import sanitize from "sanitize-html";
 
 const { currentUser } = stores.currentUser();
@@ -66,13 +66,7 @@ function handleRouteToNotification(notification: Notification) {
         </VButton>
       </template>
     </VEmpty>
-    <OverlayScrollbarsComponent
-      v-else
-      element="div"
-      :options="{ scrollbars: { autoHide: 'scroll' } }"
-      class="h-full w-full"
-      defer
-    >
+    <VScrollArea v-else class="h-full w-full">
       <VEntityContainer>
         <VEntity
           v-for="notification in notifications"
@@ -103,6 +97,6 @@ function handleRouteToNotification(notification: Notification) {
           </template>
         </VEntity>
       </VEntityContainer>
-    </OverlayScrollbarsComponent>
+    </VScrollArea>
   </WidgetCard>
 </template>

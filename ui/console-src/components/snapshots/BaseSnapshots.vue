@@ -11,10 +11,10 @@ import {
   VCard,
   VLoading,
   VPageHeader,
+  VScrollArea,
 } from "@halo-dev/components";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
-import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { computed, toRefs, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { SNAPSHOTS_QUERY_KEY } from "./query-keys";
@@ -199,15 +199,8 @@ function handleCleanup() {
   <div class="m-0 md:m-4">
     <VCard style="height: calc(100vh - 5.5rem)" flush :body-class="['h-full']">
       <div class="grid h-full grid-cols-12 divide-y sm:divide-x sm:divide-y-0">
-        <div
-          class="relative col-span-12 h-full overflow-auto sm:col-span-3 xl:col-span-2"
-        >
-          <OverlayScrollbarsComponent
-            element="div"
-            :options="{ scrollbars: { autoHide: 'scroll' } }"
-            class="h-full w-full"
-            defer
-          >
+        <div class="relative col-span-12 h-full sm:col-span-3 xl:col-span-2">
+          <VScrollArea class="h-full w-full">
             <VLoading v-if="isLoading" />
             <Transition v-else appear name="fade">
               <ul
@@ -233,11 +226,9 @@ function handleCleanup() {
                 </li>
               </ul>
             </Transition>
-          </OverlayScrollbarsComponent>
+          </VScrollArea>
         </div>
-        <div
-          class="col-span-12 h-full overflow-auto sm:col-span-9 xl:col-span-10"
-        >
+        <div class="col-span-12 h-full min-h-0 sm:col-span-9 xl:col-span-10">
           <SnapshotContent
             v-if="!diffMode"
             :cache-key="cacheKey"

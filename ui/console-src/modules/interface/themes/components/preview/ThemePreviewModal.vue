@@ -22,12 +22,12 @@ import {
   VEmpty,
   VLoading,
   VModal,
+  VScrollArea,
   VTabbar,
 } from "@halo-dev/components";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { cloneDeep } from "es-toolkit";
 import { set } from "es-toolkit/compat";
-import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { computed, markRaw, watch, ref, toRaw } from "vue";
 import { useI18n } from "vue-i18n";
 import StickyBlock from "@/components/sticky-block/StickyBlock.vue";
@@ -338,13 +338,10 @@ const iframeClasses = computed(() => {
         leave-to-class="-translate-x-full"
         appear
       >
-        <OverlayScrollbarsComponent
+        <VScrollArea
           v-if="themesVisible || settingsVisible"
-          element="div"
-          :options="{ scrollbars: { autoHide: 'scroll' } }"
           class="relative h-full w-96"
           :class="{ '!overflow-hidden': switching }"
-          defer
         >
           <transition
             enter-active-class="transform transition ease-in-out duration-300 delay-150"
@@ -425,7 +422,7 @@ const iframeClasses = computed(() => {
               />
             </VEntityContainer>
           </transition>
-        </OverlayScrollbarsComponent>
+        </VScrollArea>
       </transition>
       <div
         class="flex h-full flex-1 items-center justify-center transition-all duration-300"

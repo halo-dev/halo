@@ -17,10 +17,10 @@ import {
   Toast,
   VButton,
   VModal,
+  VScrollArea,
   VSpace,
 } from "@halo-dev/components";
 import type { DashboardWidgetQuickActionItem } from "@halo-dev/ui-shared";
-import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { computed, markRaw, ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import { useDashboardQuickActionExtensionPoint } from "./composables/use-dashboard-extension-point";
@@ -211,13 +211,7 @@ const availableItems = computed(() => {
         />
       </div>
     </template>
-    <OverlayScrollbarsComponent
-      element="div"
-      :options="{ scrollbars: { autoHide: 'scroll' } }"
-      class="h-full w-full"
-      style="padding: 12px 16px"
-      defer
-    >
+    <VScrollArea class="h-full w-full" content-class="py-3 px-4">
       <div
         class="grid grid-cols-1 gap-2 overflow-hidden @sm:grid-cols-2 @md:grid-cols-3"
       >
@@ -226,7 +220,7 @@ const availableItems = computed(() => {
           <component :is="item.component" v-else :item="item" />
         </template>
       </div>
-    </OverlayScrollbarsComponent>
+    </VScrollArea>
   </WidgetCard>
   <VModal
     v-if="configVisible"

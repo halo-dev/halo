@@ -16,6 +16,7 @@ import {
   VDropdown,
   VDropdownItem,
   VLoading,
+  VScrollArea,
   VTabItem,
   VTabs,
 } from "@halo-dev/components";
@@ -37,7 +38,6 @@ import {
 import { utils, type AttachmentLike } from "@halo-dev/ui-shared";
 import { useDebounceFn, useFileDialog, useLocalStorage } from "@vueuse/core";
 import type { AxiosRequestConfig } from "axios";
-import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import {
   inject,
   markRaw,
@@ -565,12 +565,7 @@ const expandedCover = ref(false);
         </div>
       </template>
       <template v-if="showSidebar" #extra>
-        <OverlayScrollbarsComponent
-          element="div"
-          :options="{ scrollbars: { autoHide: 'scroll' } }"
-          class="h-full border-l bg-white p-2"
-          defer
-        >
+        <VScrollArea class="h-full border-l bg-white" content-class="p-2">
           <VTabs v-model:active-id="extraActiveId" type="outline">
             <VTabItem
               id="toc"
@@ -755,7 +750,7 @@ const expandedCover = ref(false);
               </div>
             </VTabItem>
           </VTabs>
-        </OverlayScrollbarsComponent>
+        </VScrollArea>
       </template>
     </RichTextEditor>
   </div>

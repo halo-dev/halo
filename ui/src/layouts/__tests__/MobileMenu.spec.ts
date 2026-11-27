@@ -31,7 +31,7 @@ describe("MobileMenu", () => {
           $t: (key: string) => key,
         },
         stubs: {
-          OverlayScrollbarsComponent: { template: "<div><slot /></div>" },
+          VScrollArea: { template: "<div><slot /></div>" },
           UserProfileBanner: true,
         },
       },

@@ -218,3 +218,32 @@ export function shouldDismissOnDrag(options: DragDismissOptions): boolean {
 
   return distance > size * threshold || velocity >= velocityThreshold;
 }
+
+export interface ScrollDragBounds {
+  scrollTop: number;
+  clientHeight: number;
+  scrollHeight: number;
+}
+
+/**
+ * Content can only start a drag when it cannot scroll further in the drag
+ * direction, so a scrollable body keeps receiving the gesture.
+ */
+export function canStartScrollDrag(
+  element: ScrollDragBounds | undefined,
+  placement: DrawerPlacement
+): boolean {
+  if (isHorizontalPlacement(placement)) {
+    return true;
+  }
+
+  if (!element) {
+    return false;
+  }
+
+  if (placement === "bottom") {
+    return element.scrollTop <= 0;
+  }
+
+  return element.scrollTop + element.clientHeight >= element.scrollHeight - 1;
+}

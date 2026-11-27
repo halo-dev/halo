@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import type { UseOverlayScrollbarsParams } from "overlayscrollbars-vue";
-import { useOverlayScrollbars } from "overlayscrollbars-vue";
 import type { FocusOutsideEvent, PointerDownOutsideEvent } from "reka-ui";
 import {
   DialogContent,
@@ -13,17 +11,16 @@ import {
   computed,
   onBeforeUnmount,
   onMounted,
-  reactive,
   ref,
   useAttrs,
   useSlots,
-  useTemplateRef,
   watch,
 } from "vue";
 import { IconClose } from "../../icons/icons";
 import { useComponentsI18n } from "../../locales";
 import { VButton } from "../button";
 import { isFloatingPopperTarget } from "../dropdown/utils";
+import { VScrollArea } from "../scroll-area";
 
 defineOptions({
   inheritAttrs: false,
@@ -172,7 +169,6 @@ watch(internalOpen, (open) => {
   hideTimer = setTimeout(() => {
     rootVisible.value = false;
     hideTimer = undefined;
-    destroyScrollbars();
   }, CLOSE_DURATION);
 });
 
@@ -186,7 +182,6 @@ onBeforeUnmount(() => {
   clearHideTimer();
   clearCloseTimer();
   clearFeedbackTimer();
-  destroyScrollbars();
 });
 
 defineExpose({
@@ -332,52 +327,10 @@ function triggerLayerFeedback() {
   }, LAYER_FEEDBACK_DURATION);
 }
 
-const modalBody = useTemplateRef<HTMLElement>("modalBody");
-const modalViewport = useTemplateRef<HTMLElement>("modalViewport");
-const reactiveParams = reactive<UseOverlayScrollbarsParams>({
-  options: {
-    // Keep the host padding inside the scroll viewport. Otherwise the
-    // viewport is inset by the padding and content that touches its edges,
-    // such as rings and shadows, is clipped.
-    paddingAbsolute: false,
-    scrollbars: {
-      autoHide: "scroll",
-      autoHideDelay: 600,
-    },
-  },
-  defer: true,
-});
-const [initialize, instance] = useOverlayScrollbars(reactiveParams);
-
-function scrollbarInstance() {
-  return instance();
-}
-
-function destroyScrollbars() {
-  scrollbarInstance()?.destroy();
-
-  // OverlayScrollbars leaves its inline styles on the custom viewport after
-  // destroying the instance. Reset them once the modal is hidden so they are
-  // not applied on top of the host padding when it is reopened.
-  modalViewport.value?.removeAttribute("style");
-}
-
-watch(
-  internalOpen,
-  (open) => {
-    if (open && modalBody.value && modalViewport.value) {
-      initialize({
-        target: modalBody.value,
-        // Keep Vue's slot nodes inside their original parent during updates.
-        elements: {
-          viewport: modalViewport.value,
-          content: modalViewport.value,
-        },
-      });
-    }
-  },
-  { immediate: true, flush: "post" }
-);
+const modalBodyClasses = computed(() => [
+  "modal-body-content",
+  ...(props.bodyClass ?? []),
+]);
 </script>
 
 <template>
@@ -433,11 +386,9 @@ watch(
             </slot>
           </div>
 
-          <div ref="modalBody" :class="bodyClass" class="modal-body">
-            <div ref="modalViewport">
-              <slot />
-            </div>
-          </div>
+          <VScrollArea class="modal-body" :content-class="modalBodyClasses">
+            <slot />
+          </VScrollArea>
 
           <div v-if="$slots.footer" class="modal-footer">
             <slot name="footer" />
@@ -566,8 +517,18 @@ watch(
     }
 
     .modal-body {
-      @apply min-h-0 flex-1 overflow-x-hidden overflow-y-hidden;
+      @apply flex min-h-0 flex-col overflow-hidden;
+      flex: 1 1 auto;
       word-wrap: break-word;
+
+      > .v-scroll-area__viewport {
+        flex: 1 1 auto;
+        min-height: 0;
+      }
+    }
+
+    .modal-body-content {
+      height: 100%;
       padding: 12px 16px;
     }
 

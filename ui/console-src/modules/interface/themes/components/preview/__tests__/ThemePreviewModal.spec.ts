@@ -60,7 +60,7 @@ async function setup(theme?: Theme) {
       stubs: {
         Modal: { template: "<div><slot name='actions'/><slot/></div>" },
         Tabbar: true,
-        OverlayScrollbarsComponent: { template: "<div><slot/></div>" },
+        VScrollArea: { template: "<div><slot/></div>" },
         ThemePreviewListItem: {
           props: ["theme"],
           emits: ["click"],
