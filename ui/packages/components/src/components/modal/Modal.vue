@@ -259,6 +259,8 @@ watch(
   }
 
   &.modal-wrapper-fullscreen {
+    @apply py-0;
+
     .modal-content {
       width: 100vw !important;
       max-width: 100vw !important;
