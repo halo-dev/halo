@@ -2,6 +2,7 @@
 import { computed, provide, shallowReactive } from "vue";
 import { IconClose } from "../../icons/icons";
 import { useComponentsI18n } from "../../locales";
+import { VButton } from "../button";
 import { filterDropdownGroupKey, type FilterDropdownGroupEntry } from "./group";
 import type { FilterDropdownGroupSpacing } from "./types";
 
@@ -91,15 +92,18 @@ defineExpose({
     :style="{ gap: `${gap}px` }"
   >
     <slot name="clear" :clear="clearAll" :has-filters="hasFilters">
-      <button
+      <VButton
         v-if="hasFilters"
-        type="button"
-        class="inline-flex h-7 w-7 cursor-pointer items-center justify-center rounded text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-        :aria-label="clearLabelText"
+        :label="clearLabelText"
+        variant="ghost"
+        shape="circle"
+        size="sm"
         @click="clearAll"
       >
-        <IconClose class="h-4 w-4" aria-hidden="true" />
-      </button>
+        <template #icon>
+          <IconClose aria-hidden="true" />
+        </template>
+      </VButton>
     </slot>
     <slot />
   </div>
