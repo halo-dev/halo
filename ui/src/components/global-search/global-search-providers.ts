@@ -187,11 +187,7 @@ function createSettingsProvider(
   return {
     id: "settings",
     mode: "cached",
-    isAvailable: () =>
-      utils.permission.has(
-        ["system:settings:view", "system:configmaps:view"],
-        false
-      ),
+    isAvailable: () => utils.permission.has(["*"]),
     fetch: async () => {
       const { data } = await coreApiClient.setting.getSetting({
         name: "system",

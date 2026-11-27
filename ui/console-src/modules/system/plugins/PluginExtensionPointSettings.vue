@@ -71,10 +71,7 @@ watch(
   </VPageHeader>
 
   <div class="m-0 md:m-4">
-    <VCard
-      style="height: calc(100vh - 5.5rem)"
-      :body-class="['h-full', '!p-0']"
-    >
+    <VCard style="height: calc(100vh - 5.5rem)" flush :body-class="['h-full']">
       <div class="flex h-full divide-x">
         <div class="w-72 flex-none">
           <div

@@ -172,7 +172,7 @@ const onEditingModalClose = () => {
       </slot>
       <VStatusDot
         v-if="group?.metadata.deletionTimestamp"
-        v-tooltip="$t('core.common.status.deleting')"
+        :label="$t('core.common.status.deleting')"
         state="warning"
         animate
       />

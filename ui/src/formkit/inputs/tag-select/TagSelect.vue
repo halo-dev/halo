@@ -7,7 +7,6 @@ import { coreApiClient } from "@halo-dev/api-client";
 import {
   IconArrowRight,
   IconCheckboxCircle,
-  IconClose,
   VPopover,
 } from "@halo-dev/components";
 import { utils } from "@halo-dev/ui-shared";
@@ -356,14 +355,7 @@ const handleDelete = () => {
           :key="index"
           :class="context.classes['post-tag-wrapper']"
         >
-          <PostTag :tag="tag" rounded>
-            <template #rightIcon>
-              <IconClose
-                :class="context.classes['post-tag-close']"
-                @click="handleSelect(tag)"
-              />
-            </template>
-          </PostTag>
+          <PostTag :tag="tag" closable rounded @close="handleSelect(tag)" />
         </div>
         <input
           ref="inputRef"

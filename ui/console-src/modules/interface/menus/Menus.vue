@@ -234,29 +234,27 @@ function getMenuItemRefDisplayName(node: MenuItemTreeNode) {
         <MenuList v-model:selected-menu="selectedMenu" />
       </div>
       <div class="min-w-0 flex-1 shrink">
-        <VCard :body-class="['!p-0']">
-          <template #header>
-            <div class="block w-full bg-gray-50 px-4 py-3">
-              <div
-                class="relative flex flex-col items-start sm:flex-row sm:items-center"
-              >
-                <div class="flex w-full flex-1 sm:w-auto">
-                  <span class="text-base font-medium">
-                    {{ selectedMenu?.spec.displayName }}
-                  </span>
-                </div>
-                <div class="mt-4 flex sm:mt-0">
-                  <VSpace>
-                    <VButton
-                      v-permission="['system:menus:manage']"
-                      size="xs"
-                      type="default"
-                      @click="menuItemEditingModal = true"
-                    >
-                      {{ $t("core.common.buttons.new") }}
-                    </VButton>
-                  </VSpace>
-                </div>
+        <VCard flush>
+          <template #toolbar>
+            <div
+              class="relative flex flex-col items-start sm:flex-row sm:items-center"
+            >
+              <div class="flex w-full flex-1 sm:w-auto">
+                <span class="text-base font-medium">
+                  {{ selectedMenu?.spec.displayName }}
+                </span>
+              </div>
+              <div class="mt-4 flex sm:mt-0">
+                <VSpace>
+                  <VButton
+                    v-permission="['system:menus:manage']"
+                    size="xs"
+                    type="default"
+                    @click="menuItemEditingModal = true"
+                  >
+                    {{ $t("core.common.buttons.new") }}
+                  </VButton>
+                </VSpace>
               </div>
             </div>
           </template>
@@ -335,7 +333,7 @@ function getMenuItemRefDisplayName(node: MenuItemTreeNode) {
                   <div class="flex flex-none items-center gap-6">
                     <VStatusDot
                       v-if="node.menuItem.metadata.deletionTimestamp"
-                      v-tooltip="$t('core.common.status.deleting')"
+                      :label="$t('core.common.status.deleting')"
                       state="warning"
                       animate
                     />

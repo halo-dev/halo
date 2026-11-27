@@ -39,7 +39,7 @@
   "filter.all": "Todos",
   "filter.reset": "Restablecer filtros",
   "drawer.label": "Cajón",
-  "empty.image": "Vacío",
+  "modal.label": "Diálogo",
   "page_header.actions": "Acciones de la página",
   "toast.notification": "Notificación",
   "toast.notifications": "Notificaciones"

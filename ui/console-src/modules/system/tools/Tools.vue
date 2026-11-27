@@ -77,7 +77,7 @@ onMounted(() => {
   </VPageHeader>
 
   <div class="m-0 md:m-4">
-    <VCard :body-class="['!p-0']">
+    <VCard flush>
       <VEmpty
         v-if="!routes?.length"
         :title="$t('core.tool.empty.title')"

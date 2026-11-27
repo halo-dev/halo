@@ -68,7 +68,10 @@ const commentText = computed(() => {
           }"
           class="flex items-center"
         >
-          <VStatusDot state="success" animate />
+          <VStatusDot
+            state="processing"
+            :label="$t('core.common.tooltips.unpublished_content_tip')"
+          />
         </RouterLink>
         <a
           target="_blank"

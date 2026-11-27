@@ -1,89 +1,124 @@
-import { createVNode, render, type Component } from "vue";
+import { createVNode, render } from "vue";
 import DialogComponent from "./Dialog.vue";
 import type { DialogProps } from "./types";
 
 export type DialogApiProps = Omit<DialogProps, "type" | "visible">;
 
-export type DialogApi = (props?: DialogApiProps) => void;
+export interface DialogInstance {
+  /**
+   * Closes the dialog without calling `onCancel`.
+   */
+  close: () => void;
+  /**
+   * Removes the dialog immediately, skipping the leave animation.
+   */
+  destroy: () => void;
+}
+
+export type DialogApi = (props?: DialogApiProps) => DialogInstance | undefined;
 
 export interface DialogEntry {
-  (props: DialogProps): void;
+  (props: DialogProps): DialogInstance | undefined;
   info: DialogApi;
   success: DialogApi;
   error: DialogApi;
   warning: DialogApi;
+  /**
+   * Destroys every open dialog created through the manager API.
+   */
+  destroyAll: () => void;
 }
 
+const LEAVE_ANIMATION_MS = 200;
+
 const defaultProps: DialogProps = {
-  title: "",
   visible: false,
 };
 
-const DIALOG_CONTAINER_CLASS = ".dialog-container";
-const MODAL_WRAPPER_CLASS = ".modal-wrapper";
+interface ActiveDialog {
+  uniqueId?: string;
+  host: HTMLElement;
+  dispose: () => void;
+}
 
-function getOrCreateContainer() {
-  let container = document.body.querySelector(DIALOG_CONTAINER_CLASS);
-  if (!container) {
-    container = document.createElement("div");
-    container.className = "dialog-container";
-    document.body.appendChild(container);
-  }
-  return container;
+const activeDialogs = new Set<ActiveDialog>();
+
+function disposeDialog(active: ActiveDialog) {
+  render(null, active.host);
+  active.host.remove();
+  activeDialogs.delete(active);
 }
 
 const dialog: DialogEntry = (userProps: DialogProps) => {
-  const props = {
-    ...defaultProps,
-    ...userProps,
-  };
-
-  const container = getOrCreateContainer();
+  const { uniqueId } = userProps;
 
   if (
-    props.uniqueId &&
-    container.querySelector(`[data-unique-id="${props.uniqueId}"]`)
+    uniqueId &&
+    Array.from(activeDialogs).some((item) => item.uniqueId === uniqueId)
   ) {
     return;
   }
 
-  const { vnode, container: hostContainer } = createVNodeComponent(
-    DialogComponent,
-    props
-  );
+  const host = document.createElement("div");
+  document.body.appendChild(host);
 
-  if (hostContainer.firstElementChild) {
-    container.appendChild(hostContainer.firstElementChild);
-  }
+  let disposed = false;
+  let leaveTimer: ReturnType<typeof setTimeout> | undefined;
 
-  if (vnode.component?.props) {
-    vnode.component.props.visible = true;
-  }
+  const dispose = () => {
+    if (disposed) {
+      return;
+    }
 
-  if (vnode?.props) {
-    vnode.props.onClose = () => {
-      const modals = container.querySelectorAll(MODAL_WRAPPER_CLASS);
+    disposed = true;
 
-      if (modals.length > 1) {
-        hostContainer.firstElementChild?.remove();
+    if (leaveTimer !== undefined) {
+      clearTimeout(leaveTimer);
+      leaveTimer = undefined;
+    }
+
+    disposeDialog(active);
+  };
+
+  const active: ActiveDialog = {
+    uniqueId,
+    host,
+    dispose,
+  };
+
+  const instance: DialogInstance = {
+    close: () => {
+      const exposed = vnode.component?.exposed as
+        | { close?: () => void }
+        | undefined;
+
+      if (exposed?.close) {
+        exposed.close();
       } else {
-        container.remove();
+        dispose();
+      }
+    },
+    destroy: dispose,
+  };
+
+  const vnode = createVNode(DialogComponent, {
+    ...defaultProps,
+    ...userProps,
+    visible: true,
+    onClose: () => {
+      if (leaveTimer !== undefined) {
+        clearTimeout(leaveTimer);
       }
 
-      render(null, hostContainer);
-    };
-  }
-};
+      leaveTimer = setTimeout(dispose, LEAVE_ANIMATION_MS);
+    },
+  });
 
-function createVNodeComponent(
-  component: Component,
-  props: Record<string, unknown>
-) {
-  const vnode = createVNode(component, props);
-  const container = document.createElement("div");
-  render(vnode, container);
-  return { vnode, container };
-}
+  activeDialogs.add(active);
+  render(vnode, host);
+
+  return instance;
+};
 
 dialog.success = (props?: DialogApiProps) =>
   dialog({ ...props, type: "success" });
@@ -91,5 +126,9 @@ dialog.info = (props?: DialogApiProps) => dialog({ ...props, type: "info" });
 dialog.warning = (props?: DialogApiProps) =>
   dialog({ ...props, type: "warning" });
 dialog.error = (props?: DialogApiProps) => dialog({ ...props, type: "error" });
+
+dialog.destroyAll = () => {
+  Array.from(activeDialogs).forEach((item) => item.dispose());
+};
 
 export { dialog as Dialog };

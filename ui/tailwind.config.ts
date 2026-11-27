@@ -31,8 +31,19 @@ export default {
         extend: {
           colors: {
             primary: "#4CCBA0",
+            "primary-ink": "#0E7A5F",
+            "primary-soft": "#E6F8F1",
             secondary: "#0E1731",
+            "secondary-soft": "#EEF0F4",
             danger: "#D71D1D",
+            "danger-ink": "#B91C1C",
+            "danger-soft": "#FEE2E2",
+            success: "#15803D",
+            "success-soft": "#DCFCE7",
+            warning: "#B45309",
+            "warning-soft": "#FEF3C7",
+            info: "#3D5A80",
+            "info-soft": "#E8EEF5",
           },
           borderRadius: {
             base: "4px",

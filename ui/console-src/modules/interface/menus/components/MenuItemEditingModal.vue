@@ -353,7 +353,13 @@ onMounted(() => {
 });
 </script>
 <template>
-  <VModal ref="modal" :width="700" :title="modalTitle" @close="emit('close')">
+  <VModal
+    ref="modal"
+    :width="700"
+    :title="modalTitle"
+    :centered="false"
+    @close="emit('close')"
+  >
     <FormKit
       id="menuitem-form"
       name="menuitem-form"

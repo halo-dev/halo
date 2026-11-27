@@ -329,7 +329,7 @@ const { data: operationItems } = useOperationItemExtensionPoint<ListedReply>(
       <VEntityField v-if="reply?.reply.metadata.deletionTimestamp">
         <template #description>
           <VStatusDot
-            v-tooltip="$t('core.common.status.deleting')"
+            :label="$t('core.common.status.deleting')"
             state="warning"
             animate
           />

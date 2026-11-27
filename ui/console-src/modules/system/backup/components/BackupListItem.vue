@@ -137,7 +137,7 @@ const { data: operationItems } = useOperationItemExtensionPoint<Backup>(
         :description="backup.status?.filename"
       >
         <template v-if="backup.status?.filename" #description>
-          <VSpace class="flex-wrap">
+          <VSpace wrap>
             <span class="text-xs text-gray-500">
               {{ backup.status?.filename }}
             </span>
@@ -162,7 +162,7 @@ const { data: operationItems } = useOperationItemExtensionPoint<Backup>(
       <VEntityField v-if="backup.metadata.deletionTimestamp">
         <template #description>
           <VStatusDot
-            v-tooltip="$t('core.common.status.deleting')"
+            :label="$t('core.common.status.deleting')"
             state="warning"
             animate
           />

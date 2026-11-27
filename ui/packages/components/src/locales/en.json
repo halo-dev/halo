@@ -39,7 +39,7 @@
   "filter.all": "All",
   "filter.reset": "Reset filters",
   "drawer.label": "Drawer",
-  "empty.image": "Empty",
+  "modal.label": "Dialog",
   "page_header.actions": "Page actions",
   "toast.notification": "Notification",
   "toast.notifications": "Notifications"

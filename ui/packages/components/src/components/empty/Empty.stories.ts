@@ -18,6 +18,9 @@ const meta: Meta<typeof VEmpty> = {
         :title="args.title"
         :message="args.message"
         :image="args.image"
+        :image-alt="args.imageAlt"
+        :size="args.size"
+        :show-image="args.showImage"
       >
         <template v-if="args.showActions" #actions>
           <VSpace spacing="sm">
@@ -42,10 +45,23 @@ const meta: Meta<typeof VEmpty> = {
     showActions: {
       control: { type: "boolean" },
     },
+    size: {
+      control: { type: "select" },
+      options: ["sm", "md"],
+    },
+    showImage: {
+      control: { type: "boolean" },
+    },
+    imageAlt: {
+      control: { type: "text" },
+    },
   },
   args: {
     title: "没有找到匹配的文章",
     message: "调整关键词、分类或状态筛选后再试，或者直接创建一篇新文章。",
+    imageAlt: "",
+    size: "md",
+    showImage: true,
     showActions: true,
   },
 };
@@ -67,6 +83,34 @@ export const WithoutActions: Story = {
   args: {
     title: "暂无评论",
     message: "当读者提交评论后，会显示在这里等待你审核。",
+    showActions: false,
+  },
+};
+
+export const Compact: Story = {
+  args: {
+    title: "暂无待审核评论",
+    message: "当读者提交评论后，会显示在这里等待你审核。",
+    size: "sm",
+    showActions: false,
+  },
+};
+
+export const WithoutImage: Story = {
+  args: {
+    title: "没有匹配的分类",
+    message: "试试其他关键词。",
+    size: "sm",
+    showImage: false,
+    showActions: false,
+  },
+};
+
+export const TitleOnly: Story = {
+  args: {
+    title: "暂无数据",
+    message: "",
+    size: "sm",
     showActions: false,
   },
 };

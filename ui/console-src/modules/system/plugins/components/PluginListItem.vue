@@ -183,7 +183,7 @@ const { data: fields } = useEntityFieldItemExtensionPoint<Plugin>(
         priority: 10,
         component: markRaw(StatusDotField),
         props: {
-          tooltip: getStatusMessage(),
+          label: getStatusMessage(),
           state: getStatusDotState(),
           animate: true,
         },
@@ -194,7 +194,7 @@ const { data: fields } = useEntityFieldItemExtensionPoint<Plugin>(
         priority: 20,
         component: markRaw(StatusDotField),
         props: {
-          tooltip: t("core.common.status.deleting"),
+          label: t("core.common.status.deleting"),
           state: "warning",
           animate: true,
         },

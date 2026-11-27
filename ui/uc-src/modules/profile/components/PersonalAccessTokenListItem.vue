@@ -110,7 +110,7 @@ const lastUsedDescription = computed(() => {
       <VEntityField v-if="token.metadata.deletionTimestamp">
         <template #description>
           <VStatusDot
-            v-tooltip="$t('core.common.status.deleting')"
+            :label="$t('core.common.status.deleting')"
             state="warning"
             animate
           />

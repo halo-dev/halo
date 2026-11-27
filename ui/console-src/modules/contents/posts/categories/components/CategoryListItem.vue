@@ -104,7 +104,7 @@ const handleOpenCreateByParentModal = () => {
     <div class="flex flex-none items-center gap-6">
       <VStatusDot
         v-if="category.metadata.deletionTimestamp"
-        v-tooltip="$t('core.common.status.deleting')"
+        :label="$t('core.common.status.deleting')"
         state="warning"
         animate
       />

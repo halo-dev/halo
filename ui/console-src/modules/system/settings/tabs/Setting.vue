@@ -87,10 +87,7 @@ const handleSaveConfigMap = async (data: Record<string, unknown>) => {
       />
     </FormKit>
 
-    <HasPermission
-      v-if="!isLoading"
-      :permissions="['system:configmaps:manage']"
-    >
+    <HasPermission v-if="!isLoading" :permissions="['*']">
       <StickyBlock
         class="-mx-4 -mb-4 rounded-b-base rounded-t-lg bg-white p-4 pt-5"
         position="bottom"

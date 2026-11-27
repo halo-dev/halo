@@ -74,7 +74,7 @@ const content = computed(() => {
         </div>
         <VStatusDot
           v-if="notification.metadata.deletionTimestamp"
-          v-tooltip="$t('core.common.status.deleting')"
+          :label="$t('core.common.status.deleting')"
           state="warning"
           animate
         />

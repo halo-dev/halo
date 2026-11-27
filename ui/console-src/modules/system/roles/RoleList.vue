@@ -213,19 +213,17 @@ const handleDelete = async (role: Role) => {
   </VPageHeader>
 
   <div class="m-0 md:m-4">
-    <VCard :body-class="['!p-0']">
-      <template #header>
-        <div class="block w-full bg-gray-50 px-4 py-3">
-          <div
-            class="relative flex flex-col items-start sm:flex-row sm:items-center"
-          >
-            <div class="flex w-full flex-1 sm:w-auto">
-              <FormKit
-                v-model="keyword"
-                :placeholder="$t('core.common.placeholder.search')"
-                type="text"
-              ></FormKit>
-            </div>
+    <VCard flush>
+      <template #toolbar>
+        <div
+          class="relative flex flex-col items-start sm:flex-row sm:items-center"
+        >
+          <div class="flex w-full flex-1 sm:w-auto">
+            <FormKit
+              v-model="keyword"
+              :placeholder="$t('core.common.placeholder.search')"
+              type="text"
+            ></FormKit>
           </div>
         </div>
       </template>
@@ -265,7 +263,7 @@ const handleDelete = async (role: Role) => {
               <VEntityField v-if="role.metadata.deletionTimestamp">
                 <template #description>
                   <VStatusDot
-                    v-tooltip="$t('core.common.status.deleting')"
+                    :label="$t('core.common.status.deleting')"
                     state="warning"
                     animate
                   />
