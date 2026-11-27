@@ -2,6 +2,7 @@
 import { useEventListener } from "@vueuse/core";
 import { onMounted, ref, watch } from "vue";
 import { useComponentsI18n } from "../../locales";
+import { VSkeleton } from "../skeleton";
 
 const props = withDefaults(
   defineProps<{
@@ -83,13 +84,17 @@ onMounted(updateStuck);
 
       <div class="page-header__titles">
         <template v-if="loading">
-          <div
-            aria-hidden="true"
+          <VSkeleton
             class="page-header__skeleton page-header__skeleton--title"
+            width="11.25rem"
+            height="1.25rem"
+            animation="shimmer"
           />
-          <div
-            aria-hidden="true"
+          <VSkeleton
             class="page-header__skeleton page-header__skeleton--subtitle"
+            width="7.5rem"
+            height="0.625rem"
+            animation="shimmer"
           />
         </template>
         <template v-else>
@@ -134,8 +139,6 @@ onMounted(updateStuck);
   --page-header-subtle: theme("colors.gray.500");
   --page-header-border: theme("colors.gray.200");
   --page-header-hover: theme("colors.gray.100");
-  --page-header-skeleton: theme("colors.gray.100");
-  --page-header-skeleton-highlight: theme("colors.gray.200");
 
   box-sizing: border-box;
   display: flex;
@@ -238,28 +241,6 @@ onMounted(updateStuck);
     }
   }
 
-  &__skeleton {
-    border-radius: theme("borderRadius.base");
-    background: linear-gradient(
-      90deg,
-      var(--page-header-skeleton) 25%,
-      var(--page-header-skeleton-highlight) 37%,
-      var(--page-header-skeleton) 63%
-    );
-    background-size: 400% 100%;
-    animation: page-header-shimmer 1.25s ease infinite;
-
-    &--title {
-      width: 11.25rem;
-      height: 1.25rem;
-    }
-
-    &--subtitle {
-      width: 7.5rem;
-      height: 0.625rem;
-    }
-  }
-
   &--wrapped {
     .page-header__title,
     .page-header__subtitle {
@@ -273,22 +254,6 @@ onMounted(updateStuck);
       flex-wrap: wrap;
       align-items: flex-start;
     }
-  }
-}
-
-@keyframes page-header-shimmer {
-  0% {
-    background-position: 100% 50%;
-  }
-
-  100% {
-    background-position: 0 50%;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .page-header__skeleton {
-    animation: none;
   }
 }
 
