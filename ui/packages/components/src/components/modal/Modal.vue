@@ -472,7 +472,7 @@ watch(
 @keyframes modal-content-in-sm {
   from {
     opacity: 0;
-    transform: translateY(0) scale(0.95);
+    transform: translateY(0.5rem) scale(0.96);
   }
 
   to {
@@ -513,11 +513,11 @@ watch(
     @apply absolute left-0 top-0 h-full w-full flex-none bg-gray-500 bg-opacity-75;
 
     &[data-state="open"] {
-      animation: modal-layer-in 200ms cubic-bezier(0.16, 1, 0.3, 1);
+      animation: modal-layer-in 240ms ease-out;
     }
 
     &[data-state="closed"] {
-      animation: modal-layer-out 150ms cubic-bezier(0.4, 0, 1, 1) forwards;
+      animation: modal-layer-out 180ms ease-in forwards;
     }
   }
 
@@ -528,11 +528,11 @@ watch(
     transition: transform 300ms ease;
 
     &[data-state="open"] {
-      animation: modal-content-in 200ms cubic-bezier(0.16, 1, 0.3, 1);
+      animation: modal-content-in 280ms cubic-bezier(0.32, 0.72, 0, 1);
     }
 
     &[data-state="closed"] {
-      animation: modal-content-out 150ms cubic-bezier(0.4, 0, 1, 1) forwards;
+      animation: modal-content-out 180ms cubic-bezier(0.4, 0, 1, 1) forwards;
     }
 
     &.modal-focus {
