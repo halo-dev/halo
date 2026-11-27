@@ -225,7 +225,7 @@ const customFormOpen = computed({
       v-model="customFormOpen"
       type="single"
       collapsible
-      variant="plain"
+      variant="separated"
     >
       <VAccordionItem
         value="custom"
