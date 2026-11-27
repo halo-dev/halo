@@ -26,7 +26,7 @@ const selectClassification = {
   label: textClassification.label,
   wrapper: textClassification.wrapper,
   inner:
-    "group/select py-0.5 min-h-[36px] inline-flex items-center w-full relative box-border border border-gray-300 formkit-invalid:border-red-500 rounded-base overflow-hidden focus-within:border-primary focus-within:shadow-sm sm:max-w-lg transition-all",
+    "group/select min-h-[36px] inline-flex items-center w-full relative box-border border border-gray-300 formkit-invalid:border-red-500 rounded-base overflow-hidden focus-within:border-primary focus-within:shadow-sm sm:max-w-lg transition-all",
 };
 
 const theme: Record<string, Record<string, string>> = {

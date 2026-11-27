@@ -82,6 +82,7 @@ const selectContainerRef = ref<HTMLElement>();
 const inputRef = ref<HTMLInputElement | null>();
 const searchKeyword = ref<string>("");
 const isDropdownVisible = ref<boolean>(false);
+const hasSuffix = ref<boolean>(false);
 const selectedOptions = computed({
   get: () => [...props.selected],
   set: (value) => {
@@ -92,6 +93,13 @@ const hasClearable = computed(
   () =>
     props.clearable && (selectedOptions.value.length > 0 || searchKeyword.value)
 );
+// The suffix is rendered as a sibling section, so the popover has to know
+// about it to span the whole field instead of only the select area.
+const popoverContentClass = computed(() =>
+  hasSuffix.value
+    ? "!p-0 overflow-hidden select-dropdown-with-suffix"
+    : "!p-0 overflow-hidden"
+);
 
 const getInputHTMLRef = () => {
   nextTick(() => {
@@ -99,8 +107,15 @@ const getInputHTMLRef = () => {
   });
 };
 
+const syncSuffix = () => {
+  hasSuffix.value = !!selectContainerRef.value?.parentElement?.querySelector(
+    "[data-select-suffix]"
+  );
+};
+
 onMounted(() => {
   getInputHTMLRef();
+  syncSuffix();
 });
 
 // The non-modal popover moves focus to its content when it mounts, so return
@@ -109,6 +124,7 @@ watch(isDropdownVisible, async (visible) => {
   if (!visible) {
     return;
   }
+  syncSuffix();
   await nextTick();
   await nextTick();
   inputRef.value?.focus();
@@ -223,6 +239,7 @@ const clearAllSelectedOptions = () => {
 
   selectedOptions.value = [];
   clearInputValue();
+  nextTick(() => inputRef.value?.focus());
 };
 
 const handleSortSelectedOptions = (options: SelectOption[]) => {
@@ -237,7 +254,7 @@ const handleSortSelectedOptions = (options: SelectOption[]) => {
     :arrow="false"
     match-trigger-width
     :offset="10"
-    content-class="!p-0 overflow-hidden"
+    :content-class="popoverContentClass"
   >
     <div
       ref="selectContainerRef"
@@ -250,7 +267,7 @@ const handleSortSelectedOptions = (options: SelectOption[]) => {
         the same distance below their field.
       -->
       <div
-        class="relative flex h-full min-h-7 items-center rounded-md pe-7 ps-3 text-sm"
+        class="relative flex h-full min-h-7 items-center rounded-md pe-9 ps-3 text-sm"
       >
         <component
           :is="multiple ? MultipleSelectSelector : SelectSelector"
@@ -268,21 +285,24 @@ const handleSortSelectedOptions = (options: SelectOption[]) => {
         ></component>
       </div>
       <span
-        class="absolute inset-y-0 right-2.5 flex items-center text-gray-500 hover:text-gray-700"
+        class="absolute inset-y-0 right-2.5 flex items-center text-gray-500"
       >
         <IconArrowDownLine
           class="pointer-events-none"
           :class="{
-            'group-hover/select:hidden': hasClearable,
+            'group-focus-within/select:hidden group-hover/select:hidden':
+              hasClearable,
           }"
         />
-        <IconCloseCircle
-          class="hidden cursor-pointer"
-          :class="{
-            'group-hover/select:block': hasClearable,
-          }"
+        <button
+          v-if="hasClearable"
+          type="button"
+          :aria-label="$t('core.common.buttons.clear')"
+          class="hidden h-6 w-6 cursor-pointer items-center justify-center rounded text-gray-500 transition-colors hover:text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary group-focus-within/select:inline-flex group-hover/select:inline-flex"
           @click.stop="clearAllSelectedOptions"
-        />
+        >
+          <IconCloseCircle class="h-4 w-4" aria-hidden="true" />
+        </button>
       </span>
     </div>
     <template #content>
@@ -302,3 +322,10 @@ const handleSortSelectedOptions = (options: SelectOption[]) => {
     </template>
   </VPopover>
 </template>
+
+<style>
+.select-dropdown-with-suffix {
+  /* The suffix is 2.5rem wide, including its 1px divider. */
+  width: calc(var(--reka-popover-trigger-width) + 2.5rem) !important;
+}
+</style>
