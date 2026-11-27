@@ -507,6 +507,7 @@ watch(
 
 .modal-wrapper {
   @apply fixed left-0 top-0 flex h-full w-full flex-row items-start justify-center py-10;
+  margin: 0 !important;
   z-index: 2000;
 
   .modal-layer {
