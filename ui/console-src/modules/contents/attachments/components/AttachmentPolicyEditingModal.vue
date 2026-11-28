@@ -252,6 +252,7 @@ const modalTitle = props.policy
     mount-to-body
     :title="modalTitle"
     :width="650"
+    :centered="false"
     @close="emit('close')"
   >
     <div>
