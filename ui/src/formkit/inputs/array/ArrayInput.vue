@@ -352,6 +352,27 @@ const commitOpenAccordionItem = async () => {
         );
   return (await openItem?.commit()) ?? true;
 };
+
+const handleAccordionToggle = async (value: string | string[] | undefined) => {
+  const next = (Array.isArray(value) ? value[0] : value) || undefined;
+  if (next === openAccordionItem.value) {
+    return;
+  }
+  if (openAccordionItem.value) {
+    const openItem =
+      openAccordionItem.value === draftItemKey
+        ? draftAccordionItem.value
+        : existingAccordionItems.value.find(
+            (item) => item.value === openAccordionItem.value
+          );
+    if (openAccordionItem.value === draftItemKey && !openItem?.isDirty) {
+      closeAccordionItem();
+    } else if (!(await commitOpenAccordionItem())) {
+      return;
+    }
+  }
+  openAccordionItem.value = next;
+};
 </script>
 
 <template>
@@ -406,12 +427,13 @@ const commitOpenAccordionItem = async () => {
       <VAccordion
         v-if="arrayValue.length > 0 || creatingAccordionItem"
         ref="accordion"
-        v-model="openAccordionItem"
+        :model-value="openAccordionItem ?? ''"
         type="single"
         collapsible
         variant="plain"
         :unmount-on-hide="true"
         class="array-accordion flex w-full flex-col gap-1"
+        @update:model-value="handleAccordionToggle"
       >
         <ArrayAccordionItem
           v-for="(item, index) in arrayValue"

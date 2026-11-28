@@ -54,8 +54,11 @@ const commit = async () => {
   return (await formRef.value?.submit()) ?? false;
 };
 
+const isDirty = computed(() => formRef.value?.isDirty ?? false);
+
 defineExpose({
   commit,
+  isDirty,
   value: props.value,
 });
 </script>

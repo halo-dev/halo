@@ -25,12 +25,15 @@ const messages = {
 
 let mountSeed = 0;
 
-function mountArray(props: Record<string, unknown> = {}) {
+function mountArray(
+  props: Record<string, unknown> = {},
+  fieldValidation?: string
+) {
   const id = `array-test-${mountSeed++}`;
   const harness = defineComponent({
     name: "ArrayHarness",
     setup() {
-      return { props, ArrayInput };
+      return { props, fieldValidation, ArrayInput };
     },
     template: `
       <FormKit type="form" :id="'${id}-form'" :actions="false">
@@ -41,7 +44,12 @@ function mountArray(props: Record<string, unknown> = {}) {
           :library="{ ArrayInput }"
           v-bind="props"
         >
-          <FormKit type="text" name="key" label="Key" />
+          <FormKit
+            type="text"
+            name="key"
+            label="Key"
+            :validation="fieldValidation"
+          />
           <FormKit type="text" name="value" label="Value" />
         </FormKit>
       </FormKit>
@@ -68,10 +76,70 @@ function mountArray(props: Record<string, unknown> = {}) {
   return { wrapper, nodeId: `${id}-items` };
 }
 
+function mountNestedArray(labelValidation?: string) {
+  const id = `array-test-nested-${mountSeed++}`;
+  const harness = defineComponent({
+    name: "NestedArrayHarness",
+    setup() {
+      return { id, labelValidation, ArrayInput };
+    },
+    template: `
+      <FormKit type="form" :id="'${id}-form'" :actions="false">
+        <FormKit
+          :id="'${id}-items'"
+          type="array"
+          name="items"
+          item-form-mode="accordion"
+          :library="{ ArrayInput }"
+          :value="[{ name: 'A', children: [{ label: 'A1' }] }]"
+        >
+          <FormKit type="text" name="name" label="Name" />
+          <FormKit
+            type="array"
+            name="children"
+            item-form-mode="accordion"
+            :item-labels="[{ type: 'text', label: '$value.label' }]"
+            min="1"
+          >
+            <FormKit
+              type="text"
+              name="label"
+              label="Label"
+              :validation="labelValidation"
+            />
+          </FormKit>
+        </FormKit>
+      </FormKit>
+    `,
+  });
+
+  const wrapper = mount(harness, {
+    attachTo: document.body,
+    global: {
+      directives: { tooltip: () => undefined },
+      plugins: [
+        [formKitPlugin, defaultConfig({ inputs: { array } })],
+        createI18n({
+          legacy: false,
+          locale: "en",
+          messages: { en: messages },
+        }),
+      ],
+    },
+  });
+
+  return { wrapper, nodeId: `${id}-items` };
+}
+
 async function settle() {
   await flushPromises();
   await flushPromises();
   await nextTick();
+}
+
+async function waitForInput() {
+  await new Promise((resolve) => setTimeout(resolve, 250));
+  await settle();
 }
 
 function findButton(
@@ -294,51 +362,7 @@ describe("array input", () => {
   });
 
   it("renders nested array values and saves changes from the inline form", async () => {
-    const id = `array-test-nested-${mountSeed++}`;
-    const harness = defineComponent({
-      name: "NestedArrayHarness",
-      setup() {
-        return { id, ArrayInput };
-      },
-      template: `
-        <FormKit type="form" :id="'${id}-form'" :actions="false">
-          <FormKit
-            :id="'${id}-items'"
-            type="array"
-            name="items"
-            item-form-mode="accordion"
-            :library="{ ArrayInput }"
-            :value="[{ name: 'A', children: [{ label: 'A1' }] }]"
-          >
-            <FormKit type="text" name="name" label="Name" />
-            <FormKit
-              type="array"
-              name="children"
-              item-form-mode="accordion"
-              :item-labels="[{ type: 'text', label: '$value.label' }]"
-              min="1"
-            >
-              <FormKit type="text" name="label" label="Label" />
-            </FormKit>
-          </FormKit>
-        </FormKit>
-      `,
-    });
-
-    const wrapper = mount(harness, {
-      attachTo: document.body,
-      global: {
-        directives: { tooltip: () => undefined },
-        plugins: [
-          [formKitPlugin, defaultConfig({ inputs: { array } })],
-          createI18n({
-            legacy: false,
-            locale: "en",
-            messages: { en: messages },
-          }),
-        ],
-      },
-    });
+    const { wrapper, nodeId: id } = mountNestedArray();
     await settle();
 
     await wrapper.get("button.v-accordion-trigger").trigger("click");
@@ -366,7 +390,7 @@ describe("array input", () => {
     await findButton(wrapper, "Save")?.trigger("click");
     await settle();
 
-    expect(getNode(`${id}-items`)?.value).toEqual([
+    expect(getNode(id)?.value).toEqual([
       {
         name: "A",
         children: [{ label: "A1 updated" }],
@@ -401,6 +425,251 @@ describe("array input", () => {
 
     expect(getNode(nodeId)?.value).toEqual([{ key: "updated", value: "2" }]);
     expect(wrapper.find(".v-accordion-content input").exists()).toBe(false);
+    wrapper.unmount();
+  });
+
+  it("commits an unsaved nested accordion item when the parent item is saved", async () => {
+    const { wrapper, nodeId } = mountNestedArray();
+    await settle();
+
+    await wrapper.get("button.v-accordion-trigger").trigger("click");
+    await settle();
+    await wrapper
+      .get(".v-accordion-content button.v-accordion-trigger")
+      .trigger("click");
+    await settle();
+
+    await wrapper
+      .get(".v-accordion-content .v-accordion-content input")
+      .setValue("A1 updated");
+    await waitForInput();
+
+    const saveButtons = wrapper
+      .findAll("button")
+      .filter((button) => button.text() === "Save");
+    expect(saveButtons).toHaveLength(2);
+    await saveButtons[1].trigger("click");
+    await waitForInput();
+    await waitForInput();
+
+    expect(getNode(nodeId)?.value).toEqual([
+      {
+        name: "A",
+        children: [{ label: "A1 updated" }],
+      },
+    ]);
+    expect(wrapper.find(".v-accordion-content input").exists()).toBe(false);
+    wrapper.unmount();
+  });
+
+  it("blocks the parent item save when a nested accordion item is invalid", async () => {
+    const { wrapper, nodeId } = mountNestedArray("required");
+    await settle();
+
+    await wrapper.get("button.v-accordion-trigger").trigger("click");
+    await settle();
+    await wrapper
+      .get(".v-accordion-content button.v-accordion-trigger")
+      .trigger("click");
+    await settle();
+
+    await wrapper
+      .get(".v-accordion-content .v-accordion-content input")
+      .setValue("");
+    await waitForInput();
+
+    const saveButtons = wrapper
+      .findAll("button")
+      .filter((button) => button.text() === "Save");
+    await saveButtons[1].trigger("click");
+    await waitForInput();
+    await waitForInput();
+
+    expect(getNode(nodeId)?.value).toEqual([
+      {
+        name: "A",
+        children: [{ label: "A1" }],
+      },
+    ]);
+    expect(wrapper.find(".formkit-message").exists()).toBe(true);
+    expect(
+      wrapper.findAll("button.v-accordion-trigger")[0].attributes("data-state")
+    ).toBe("open");
+    wrapper.unmount();
+  });
+
+  it("commits the open item when switching to another accordion item", async () => {
+    const { wrapper, nodeId } = mountArray({
+      value: [
+        { key: "alpha", value: "1" },
+        { key: "beta", value: "2" },
+      ],
+      itemFormMode: "accordion",
+    });
+    await settle();
+
+    await wrapper.findAll("button.v-accordion-trigger")[0].trigger("click");
+    await settle();
+    await wrapper.findAll(".v-accordion-content input")[0].setValue("updated");
+    await waitForInput();
+
+    await wrapper.findAll("button.v-accordion-trigger")[1].trigger("click");
+    await waitForInput();
+    await waitForInput();
+
+    expect(getNode(nodeId)?.value).toEqual([
+      { key: "updated", value: "1" },
+      { key: "beta", value: "2" },
+    ]);
+    expect(
+      wrapper.findAll("button.v-accordion-trigger")[1].attributes("data-state")
+    ).toBe("open");
+
+    await wrapper.findAll("button.v-accordion-trigger")[0].trigger("click");
+    await settle();
+    await settle();
+
+    expect(wrapper.findAll(".v-accordion-content input")[0].element.value).toBe(
+      "updated"
+    );
+    wrapper.unmount();
+  });
+
+  it("keeps the open item when switching with invalid edits", async () => {
+    const { wrapper, nodeId } = mountArray(
+      {
+        value: [
+          { key: "alpha", value: "1" },
+          { key: "beta", value: "2" },
+        ],
+        itemFormMode: "accordion",
+      },
+      "required"
+    );
+    await settle();
+
+    await wrapper.findAll("button.v-accordion-trigger")[0].trigger("click");
+    await settle();
+    await wrapper.findAll(".v-accordion-content input")[0].setValue("");
+    await waitForInput();
+
+    await wrapper.findAll("button.v-accordion-trigger")[1].trigger("click");
+    await waitForInput();
+    await waitForInput();
+
+    expect(
+      wrapper.findAll("button.v-accordion-trigger")[0].attributes("data-state")
+    ).toBe("open");
+    expect(getNode(nodeId)?.value).toEqual([
+      { key: "alpha", value: "1" },
+      { key: "beta", value: "2" },
+    ]);
+    wrapper.unmount();
+  });
+
+  it("discards a pristine draft when switching to an existing item", async () => {
+    const { wrapper, nodeId } = mountArray({
+      value: [{ key: "alpha", value: "1" }],
+      itemFormMode: "accordion",
+    });
+    await settle();
+
+    await findButton(wrapper, "Add")?.trigger("click");
+    await settle();
+    expect(wrapper.text()).toContain("New item");
+
+    await wrapper.get("button.v-accordion-trigger").trigger("click");
+    await waitForInput();
+    await waitForInput();
+
+    expect(getNode(nodeId)?.value).toEqual([{ key: "alpha", value: "1" }]);
+    expect(wrapper.text()).not.toContain("New item");
+    wrapper.unmount();
+  });
+
+  it("remounts conditional schema fields when the if branch changes", async () => {
+    const id = `array-test-conditional-${mountSeed++}`;
+    const harness = defineComponent({
+      name: "ConditionalArrayHarness",
+      setup() {
+        return {
+          id,
+          ArrayInput,
+          schema: [
+            {
+              $formkit: "array",
+              name: "items",
+              "item-form-mode": "accordion",
+              "item-labels": [{ type: "text", label: "$value.kind" }],
+              value: [{ kind: "link", link: "https://example.com" }],
+              children: [
+                { $formkit: "text", name: "kind", label: "Kind" },
+                {
+                  $formkit: "text",
+                  name: "link",
+                  label: "Link",
+                  if: "$value.kind === 'link'",
+                },
+                {
+                  $formkit: "group",
+                  name: "options",
+                  label: "Options",
+                  if: "$value.kind === 'group'",
+                  children: [
+                    {
+                      $formkit: "text",
+                      name: "label",
+                      label: "Option label",
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        };
+      },
+      template: `
+        <FormKit :id="'${id}-form'" type="form" :actions="false">
+          <FormKitSchema :schema="schema" />
+        </FormKit>
+      `,
+    });
+
+    const wrapper = mount(harness, {
+      attachTo: document.body,
+      global: {
+        directives: { tooltip: () => undefined },
+        plugins: [
+          [formKitPlugin, defaultConfig({ inputs: { array } })],
+          createI18n({
+            legacy: false,
+            locale: "en",
+            messages: { en: messages },
+          }),
+        ],
+      },
+    });
+    await settle();
+
+    await wrapper.get("button.v-accordion-trigger").trigger("click");
+    await settle();
+
+    const kindInput = wrapper.findAll(".v-accordion-content input")[0];
+    expect(wrapper.text()).toContain("Link");
+
+    await kindInput.setValue("group");
+    await waitForInput();
+    await waitForInput();
+
+    expect(wrapper.text()).toContain("Option label");
+    expect(wrapper.text()).not.toContain("Link");
+
+    await kindInput.setValue("link");
+    await waitForInput();
+    await waitForInput();
+
+    expect(wrapper.text()).toContain("Link");
+    expect(wrapper.text()).not.toContain("Option label");
     wrapper.unmount();
   });
 });
