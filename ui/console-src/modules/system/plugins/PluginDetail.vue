@@ -11,7 +11,7 @@ const router = useRouter();
 
 const { name } = toRefs(route.params);
 
-const { plugin, setting, activeTab, tabs } = usePluginDetailTabs(
+const { plugin, pluginLoading, setting, activeTab, tabs } = usePluginDetailTabs(
   name as Ref<string | undefined>,
   true
 );
@@ -30,7 +30,7 @@ async function handleTabChange(id: string | number) {
 }
 </script>
 <template>
-  <VPageHeader :title="plugin?.spec?.displayName">
+  <VPageHeader :loading="pluginLoading" :title="plugin?.spec?.displayName">
     <template #icon>
       <VAvatar
         v-if="plugin"

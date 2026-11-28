@@ -346,7 +346,7 @@ export function usePluginDetailTabs(
     ? useRouteQuery<string>("tab", tabs.value[0].id)
     : ref(tabs.value[0].id);
 
-  const { data: plugin } = useQuery({
+  const { data: plugin, isLoading: pluginLoading } = useQuery({
     queryKey: ["plugin", pluginName],
     queryFn: async () => {
       const { data } = await coreApiClient.plugin.plugin.getPlugin({
@@ -427,6 +427,7 @@ export function usePluginDetailTabs(
 
   return {
     plugin,
+    pluginLoading,
     setting,
     tabs,
     activeTab,

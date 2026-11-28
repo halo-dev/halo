@@ -30,16 +30,17 @@ const tabs = shallowRef<{ id: string; label: string }[]>([
 
 const activeTab = ref<string>("detail");
 
-const { data: authProvider } = useQuery<AuthProvider>({
-  queryKey: ["auth-provider", name],
-  queryFn: async () => {
-    const { data } = await coreApiClient.auth.authProvider.getAuthProvider({
-      name: name.value as string,
-    });
-    return data;
-  },
-  enabled: computed(() => !!name.value),
-});
+const { data: authProvider, isLoading: authProviderLoading } =
+  useQuery<AuthProvider>({
+    queryKey: ["auth-provider", name],
+    queryFn: async () => {
+      const { data } = await coreApiClient.auth.authProvider.getAuthProvider({
+        name: name.value as string,
+      });
+      return data;
+    },
+    enabled: computed(() => !!name.value),
+  });
 
 watch(
   () => authProvider.value,
@@ -188,7 +189,7 @@ const description = computed(() => {
 </script>
 
 <template>
-  <VPageHeader :title="displayName">
+  <VPageHeader :loading="authProviderLoading" :title="displayName">
     <template #icon>
       <VAvatar
         :src="authProvider?.spec.logo"
