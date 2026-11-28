@@ -182,6 +182,7 @@ useQuery({
             :help="$t('core.backup.restore.fields.password.help')"
             type="password"
             autocomplete="current-password"
+            outer-class="mb-4"
           ></FormKit>
           <UppyUpload
             :restrictions="{
