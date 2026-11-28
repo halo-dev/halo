@@ -12,6 +12,7 @@ import {
   VButton,
   VDropdown,
   VDropdownItem,
+  VPageHeader,
   VTabbar,
 } from "@halo-dev/components";
 import {
@@ -319,25 +320,24 @@ function handleCopyFromLayout(breakpoint: string) {
 }
 </script>
 <template>
-  <div class="page-header py-1.5">
-    <h2 class="page-header__title">
-      <IconDashboard class="mr-2 self-center" />
-      <span class="page-header__title-text">
-        {{ $t("core.dashboard_designer.title") }}
-      </span>
-    </h2>
-    <div
-      class="hidden sm:block"
-      :class="{ '!cursor-progress opacity-50': isLoading }"
-    >
-      <VTabbar
-        :active-id="selectBreakpoint"
-        :items="deviceOptions"
-        type="outline"
-        @change="handleBreakpointChange"
-      ></VTabbar>
-    </div>
-    <div class="page-header__actions">
+  <VPageHeader :title="$t('core.dashboard_designer.title')">
+    <template #icon>
+      <IconDashboard />
+    </template>
+    <template #center>
+      <div
+        class="hidden sm:block"
+        :class="{ '!cursor-progress opacity-50': isLoading }"
+      >
+        <VTabbar
+          :active-id="selectBreakpoint"
+          :items="deviceOptions"
+          type="outline"
+          @change="handleBreakpointChange"
+        ></VTabbar>
+      </div>
+    </template>
+    <template #actions>
       <VButton variant="ghost" @click="handleBack">
         {{ $t("core.common.buttons.back") }}
       </VButton>
@@ -396,8 +396,8 @@ function handleCopyFromLayout(breakpoint: string) {
         </template>
         {{ $t("core.common.buttons.save") }}
       </VButton>
-    </div>
-  </div>
+    </template>
+  </VPageHeader>
 
   <div class="dashboard m-4 transition-all" :style="designContainerStyles">
     <grid-layout
