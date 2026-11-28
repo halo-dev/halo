@@ -10,7 +10,7 @@ import {
   watch,
 } from "vue";
 import { VTabbar } from "./index";
-import type { TabbarItem, TabsDirection, TabsType } from "./types";
+import type { TabbarItem, TabsDirection, TabsSize, TabsType } from "./types";
 
 const props = withDefaults(
   defineProps<{
@@ -20,6 +20,12 @@ const props = withDefaults(
     idKey?: string;
     labelKey?: string;
     flush?: boolean;
+    size?: TabsSize;
+    stretch?: boolean;
+    ariaLabel?: string;
+    centered?: boolean;
+    divider?: boolean;
+    background?: boolean;
   }>(),
   {
     activeId: undefined,
@@ -28,6 +34,12 @@ const props = withDefaults(
     idKey: "id",
     labelKey: "label",
     flush: false,
+    size: "md",
+    stretch: false,
+    ariaLabel: undefined,
+    centered: false,
+    divider: true,
+    background: true,
   }
 );
 
@@ -124,12 +136,25 @@ const handleChange = (id: string | number) => {
     <div class="tabs-bar-wrapper">
       <VTabbar
         :active-id="resolvedActiveId"
+        :aria-label="ariaLabel"
+        :background="background"
+        :centered="centered"
         :direction="direction"
+        :divider="divider"
         :flush="flush"
         :items="tabItems"
+        :size="size"
+        :stretch="stretch"
         :type="type"
         @change="handleChange"
-      />
+      >
+        <template v-if="$slots.left" #left>
+          <slot name="left" />
+        </template>
+        <template v-if="$slots.right" #right>
+          <slot name="right" />
+        </template>
+      </VTabbar>
     </div>
     <div class="tabs-items-wrapper">
       <slot />
