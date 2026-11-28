@@ -2,7 +2,7 @@
 import { ToastProvider, type GlobalToastManager } from "reka-ui";
 import { useComponentsI18n } from "../../locales";
 import type { ToastItemData } from "./internal";
-import { toastConfig } from "./toast-state";
+import { DEFAULT_TOAST_DURATION } from "./toast-state";
 import ToastList from "./ToastList.vue";
 
 defineProps<{
@@ -16,7 +16,7 @@ const { t } = useComponentsI18n();
   <ToastProvider
     :toast-manager="manager"
     :label="t('toast.notification')"
-    :duration="toastConfig.duration"
+    :duration="DEFAULT_TOAST_DURATION"
     swipe-direction="right"
     :swipe-threshold="60"
   >

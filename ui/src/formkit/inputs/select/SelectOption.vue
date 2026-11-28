@@ -43,6 +43,13 @@ const getSelectedIndex = () => {
 };
 
 const handleKeydown = (event: KeyboardEvent) => {
+  // Let buttons keep their native keyboard behavior (for example the clear
+  // button) instead of selecting the highlighted option.
+  const target = event.target;
+  if (target instanceof Element && target.closest("button")) {
+    return;
+  }
+
   if (selectOptionRef.value) {
     isCursorHidden.value = true;
   }

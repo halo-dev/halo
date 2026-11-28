@@ -49,6 +49,29 @@ describe("PageHeader", () => {
     expect(wrapper.get(".my-action").text()).toBe("New");
   });
 
+  it("does not render an empty actions row", () => {
+    const wrapper = mount(VPageHeader, {
+      props: { title: "Posts" },
+    });
+
+    expect(wrapper.find(".page-header__actions").exists()).toBe(false);
+  });
+
+  it("renders a center slot between the title and actions", () => {
+    const wrapper = mount(VPageHeader, {
+      props: { title: "Posts" },
+      slots: {
+        center: () => h("div", { class: "my-center" }, "Center"),
+        actions: () => h("button", { class: "my-action" }, "New"),
+      },
+    });
+
+    expect(wrapper.classes()).toContain("page-header--has-center");
+    expect(wrapper.get(".page-header__center .my-center").text()).toBe(
+      "Center"
+    );
+  });
+
   it("shows skeletons and disables the actions while loading", () => {
     const wrapper = mount(VPageHeader, {
       props: { title: "Posts", subtitle: "128 items", loading: true },
