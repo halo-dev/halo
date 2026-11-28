@@ -262,6 +262,7 @@ if (import.meta.env.DEV) {
   --segmented-padding: 2px;
   --segmented-item-height: 32px;
   --segmented-item-padding: 1rem;
+  --segmented-font-size: 0.875rem;
   --segmented-icon-size: 1rem;
   --segmented-icon-item-width: calc(var(--segmented-item-height) * 1.5);
 
@@ -277,6 +278,7 @@ if (import.meta.env.DEV) {
   &.segmented-control-sm {
     --segmented-item-height: 28px;
     --segmented-item-padding: 0.75rem;
+    --segmented-font-size: 0.75rem;
     --segmented-icon-size: 0.875rem;
   }
 
@@ -311,10 +313,11 @@ if (import.meta.env.DEV) {
   }
 
   .segmented-control-item {
-    @apply relative z-[1] inline-flex min-w-8 cursor-pointer items-center justify-center gap-1.5 whitespace-nowrap rounded-sm text-xs font-medium text-gray-600 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary;
+    @apply relative z-[1] inline-flex min-w-8 cursor-pointer items-center justify-center gap-1.5 whitespace-nowrap rounded-sm font-medium text-gray-600 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary;
 
     height: var(--segmented-item-height);
     padding: 0 var(--segmented-item-padding);
+    font-size: var(--segmented-font-size);
 
     &[data-state="checked"] {
       @apply text-secondary;

@@ -664,11 +664,11 @@ useEventListener(tabbarItemsRef, "wheel", handleWheel, {
 
   &.tabbar-outline {
     .tabbar-items-track {
-      @apply justify-start gap-1 rounded-base bg-gray-100 px-1 py-0.5;
+      @apply justify-start gap-0.5 rounded-base bg-gray-100 p-0.5;
     }
 
     .tabbar-item {
-      @apply rounded-sm px-6 py-1 text-gray-600;
+      @apply h-8 rounded-sm px-4 text-gray-600;
 
       &.tabbar-item-active {
         @apply bg-white text-gray-900 shadow-sm;
@@ -689,15 +689,18 @@ useEventListener(tabbarItemsRef, "wheel", handleWheel, {
       @apply h-8 gap-1.5 text-xs;
     }
 
-    &.tabbar-pills .tabbar-item,
-    &.tabbar-outline .tabbar-item {
+    &.tabbar-pills .tabbar-item {
       @apply px-3;
+    }
+
+    &.tabbar-outline .tabbar-item {
+      @apply h-7 px-3;
     }
   }
 
   &.tabbar-direction-row {
     .tabbar-items-track {
-      @apply w-max flex-row;
+      @apply w-max min-w-full flex-row;
     }
 
     &.tabbar-default .tabbar-items-track {
@@ -729,6 +732,8 @@ useEventListener(tabbarItemsRef, "wheel", handleWheel, {
       }
 
       .tabbar-item {
+        @apply px-4;
+
         border-bottom-width: 0;
         border-right-width: 2px;
 
@@ -741,7 +746,7 @@ useEventListener(tabbarItemsRef, "wheel", handleWheel, {
 
   &.is-centered.tabbar-direction-row {
     .tabbar-items-track {
-      @apply mx-auto;
+      justify-content: safe center;
     }
   }
 
@@ -766,7 +771,7 @@ useEventListener(tabbarItemsRef, "wheel", handleWheel, {
   }
 
   &.tabbar-outline.is-backgroundless .tabbar-items-track {
-    @apply bg-transparent px-0 py-0;
+    @apply bg-transparent;
   }
 
   &.tabbar-outline.is-backgroundless {

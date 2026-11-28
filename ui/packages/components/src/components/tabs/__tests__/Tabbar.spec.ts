@@ -568,6 +568,14 @@ describe("Tabbar", () => {
     expect(wrapper.classes()).toContain("is-backgroundless");
   });
 
+  it("keeps the divider and background by default", async () => {
+    const { wrapper } = await mountTabbar();
+    await flushPromises();
+
+    expect(wrapper.classes()).not.toContain("is-dividerless");
+    expect(wrapper.classes()).not.toContain("is-backgroundless");
+  });
+
   it("renders content on both sides of the tab list", () => {
     const slotted = mount(VTabbar, {
       props: { activeId: "tab-1", items },

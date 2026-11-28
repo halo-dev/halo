@@ -146,6 +146,12 @@ export const Pills: Story = {
   },
 };
 
+export const Outline: Story = {
+  args: {
+    type: "outline",
+  },
+};
+
 export const Compact: Story = {
   args: {
     size: "sm",
@@ -220,6 +226,12 @@ export const Column: Story = {
   args: {
     direction: "column",
     type: "outline",
+  },
+};
+
+export const ColumnDefault: Story = {
+  args: {
+    direction: "column",
   },
 };
 
