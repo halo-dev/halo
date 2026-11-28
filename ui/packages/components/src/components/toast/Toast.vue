@@ -99,7 +99,7 @@ const icon = computed<{ icon: Raw<Component>; color: string; spin: boolean }>(
 @keyframes toast-enter {
   from {
     opacity: 0;
-    translate: 0 calc(var(--toast-y) - var(--stack-dir, 1) * 8px);
+    translate: 0 calc(var(--toast-y) - 8px);
   }
 
   to {
@@ -116,7 +116,7 @@ const icon = computed<{ icon: Raw<Component>; color: string; spin: boolean }>(
 
   to {
     opacity: 0;
-    translate: 0 calc(var(--toast-y) - var(--stack-dir, 1) * 6px);
+    translate: 0 calc(var(--toast-y) - 6px);
   }
 }
 
@@ -124,14 +124,13 @@ const icon = computed<{ icon: Raw<Component>; color: string; spin: boolean }>(
   @apply pointer-events-auto absolute w-fit max-w-full list-none;
   --toast-gap: 10px;
   --toast-y: calc(
-    var(--stack-dir, 1) *
-      (
-        var(--reka-toast-offset-y, 0px) + var(--reka-toast-index, 0) *
-          var(--toast-gap)
-      )
+    var(--reka-toast-offset-y, 0px) + var(--reka-toast-index, 0) *
+      var(--toast-gap)
   );
   left: 0;
+  right: 0;
   top: 0;
+  margin-inline: auto;
   z-index: calc(100 - var(--reka-toast-index, 0));
   translate: 0 var(--toast-y);
   animation: toast-enter 200ms cubic-bezier(0.16, 1, 0.3, 1);
