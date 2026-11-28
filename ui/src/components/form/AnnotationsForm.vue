@@ -2,7 +2,6 @@
 import {
   getNode,
   reset,
-  submitForm,
   type FormKitNode,
   type FormKitSchemaDefinition,
   type FormKitSchemaNode,
@@ -15,13 +14,37 @@ import { utils } from "@halo-dev/ui-shared";
 import { cloneDeep } from "es-toolkit";
 import { computed, nextTick, onMounted, ref, watch } from "vue";
 
+function findArrayItemOriginalKey(node: FormKitNode) {
+  let parent = node.parent;
+  while (parent) {
+    const original = (
+      parent.context as { arrayItemOriginal?: { key?: unknown } } | undefined
+    )?.arrayItemOriginal;
+    if (original) {
+      return typeof original.key === "string" ? original.key : undefined;
+    }
+    parent = parent.parent;
+  }
+  return undefined;
+}
+
 function keyValidationRule(node: FormKitNode) {
-  const validAnnotations = [
-    ...Object.keys(annotations.value),
-    ...customAnnotationsState.value.map((item) => item.key),
-  ];
-  const count = validAnnotations.filter((item) => item === node.value);
-  return count.length < 2;
+  if (!node.value) {
+    return true;
+  }
+  const originalKey = findArrayItemOriginalKey(node);
+  let skippedOriginal = false;
+  const savedKeys = customAnnotationsState.value
+    .map((item) => item.key)
+    .filter((key) => {
+      if (!skippedOriginal && key === originalKey) {
+        skippedOriginal = true;
+        return false;
+      }
+      return true;
+    });
+  const usedKeys = [...Object.keys(annotations.value), ...savedKeys];
+  return !usedKeys.includes(String(node.value));
 }
 
 const props = withDefaults(
@@ -154,7 +177,13 @@ watch(
 const specFormInvalid = ref(true);
 const customFormInvalid = ref(true);
 
+let specSubmitResolver: (() => void) | undefined;
 let customSubmitResolver: (() => void) | undefined;
+
+const resolveSpecSubmit = () => {
+  specSubmitResolver?.();
+  specSubmitResolver = undefined;
+};
 
 const resolveCustomSubmit = () => {
   customSubmitResolver?.();
@@ -189,10 +218,21 @@ const submitCustomForm = async () => {
 };
 
 const handleSubmit = async () => {
-  if (annotationSettings.value.length) {
-    submitForm(specFormId);
-  } else {
+  if (!annotationSettings.value.length) {
     specFormInvalid.value = false;
+  } else {
+    const specFormNode = getNode(specFormId);
+    if (!specFormNode) {
+      specFormInvalid.value = true;
+      return;
+    }
+    await new Promise<void>((resolve) => {
+      specSubmitResolver = resolve;
+      specFormNode.submit();
+    });
+    if (specFormInvalid.value) {
+      return;
+    }
   }
   if (!(await commitOpenCustomAnnotation())) {
     customFormInvalid.value = true;
@@ -208,6 +248,12 @@ const onSpecFormSubmitCheck = async (node?: FormKitNode) => {
   }
   const validations = getValidationMessages(node);
   specFormInvalid.value = validations.size > 0;
+  resolveSpecSubmit();
+};
+
+const onSpecFormSubmit = () => {
+  specFormInvalid.value = false;
+  resolveSpecSubmit();
 };
 
 const onCustomFormSubmitCheck = async (node?: FormKitNode) => {
@@ -251,7 +297,7 @@ const customFormOpen = computed({
       type="form"
       :preserve="true"
       @submit-invalid="onSpecFormSubmitCheck"
-      @submit="specFormInvalid = false"
+      @submit="onSpecFormSubmit"
     >
       <template v-for="annotationSetting in annotationSettings">
         <FormKitSchema

@@ -21,9 +21,7 @@ const formState = ref({
 const annotationsFormRef = ref();
 
 async function handleSubmit () {
-  annotationsFormRef.value?.handleSubmit();
-
-  await nextTick();
+  await annotationsFormRef.value?.handleSubmit();
 
   const { customAnnotations, annotations, customFormInvalid, specFormInvalid } =
     annotationsFormRef.value || {};
