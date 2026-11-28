@@ -75,6 +75,9 @@ const selectedTheme = computed(() => {
       !theme.metadata.deletionTimestamp
   );
 });
+const selectedThemeLoading = computed(() =>
+  hasThemeQuery.value ? themesLoading.value : activeThemeLoading.value
+);
 const themesModal = ref(false);
 const themeListModal = ref<InstanceType<typeof ThemeListModal>>();
 const previewModal = ref(false);
@@ -184,7 +187,10 @@ watch(
 </script>
 <template>
   <BasicLayout>
-    <VPageHeader :title="selectedTheme?.spec.displayName">
+    <VPageHeader
+      :loading="selectedThemeLoading"
+      :title="selectedTheme?.spec.displayName"
+    >
       <template #icon>
         <IconPalette />
       </template>
