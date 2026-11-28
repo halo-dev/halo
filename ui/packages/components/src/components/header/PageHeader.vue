@@ -4,12 +4,18 @@ defineProps<{
 }>();
 </script>
 <template>
-  <div class="page-header">
+  <div
+    class="page-header"
+    :class="{ 'page-header--has-center': $slots.center }"
+  >
     <h2 class="page-header__title">
       <slot name="icon" />
       <span class="page-header__title-text">{{ title }}</span>
     </h2>
-    <div class="page-header__actions">
+    <div v-if="$slots.center" class="page-header__center">
+      <slot name="center" />
+    </div>
+    <div v-if="$slots.actions" class="page-header__actions">
       <slot name="actions" />
     </div>
   </div>
@@ -32,6 +38,7 @@ defineProps<{
   &__title {
     display: flex;
     align-items: center;
+    min-width: 0;
     text-overflow: truncate;
     font-size: 1.25rem;
     font-weight: 700;
@@ -45,12 +52,36 @@ defineProps<{
     white-space: nowrap;
   }
 
+  &__center {
+    display: contents;
+  }
+
   &__actions {
     display: flex;
     align-items: center;
     justify-content: flex-end;
     gap: theme("spacing.2");
     flex-wrap: wrap;
+  }
+}
+
+// Center the middle slot on the header itself instead of spacing it between
+// the title and actions groups, whose widths usually differ.
+@media (min-width: 640px) {
+  .page-header--has-center {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+
+    .page-header__center {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 0;
+    }
+
+    .page-header__actions {
+      justify-self: end;
+    }
   }
 }
 </style>
