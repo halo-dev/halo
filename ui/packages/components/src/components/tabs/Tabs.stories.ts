@@ -20,6 +20,11 @@ const meta: Meta<typeof VTabs> = {
           v-model:activeId="activeId"
           :type="args.type"
           :direction="args.direction"
+          :background="args.background"
+          :centered="args.centered"
+          :divider="args.divider"
+          :size="args.size"
+          :stretch="args.stretch"
         >
           <VTabItem id="general" label="基础设置">
             <VAlert
@@ -58,10 +63,31 @@ const meta: Meta<typeof VTabs> = {
       control: { type: "select" },
       options: ["default", "pills", "outline"],
     },
+    size: {
+      control: { type: "select" },
+      options: ["sm", "md"],
+    },
+    stretch: {
+      control: "boolean",
+    },
+    centered: {
+      control: "boolean",
+    },
+    divider: {
+      control: "boolean",
+    },
+    background: {
+      control: "boolean",
+    },
   },
   args: {
     direction: "row",
     type: "default",
+    size: "md",
+    stretch: false,
+    centered: false,
+    divider: true,
+    background: true,
   },
 };
 
@@ -113,6 +139,80 @@ export const WithIcons: Story = {
           </VTabItem>
           <VTabItem id="phone" label="手机" :icon="icons.phone">
             <VAlert title="手机预览" :closable="false" />
+          </VTabItem>
+        </VTabs>
+      </div>
+    `,
+  }),
+};
+
+export const Compact: Story = {
+  args: {
+    size: "sm",
+  },
+};
+
+export const Stretch: Story = {
+  args: {
+    size: "sm",
+    stretch: true,
+  },
+};
+
+export const Centered: Story = {
+  args: {
+    centered: true,
+  },
+};
+
+export const NoDivider: Story = {
+  args: {
+    divider: false,
+  },
+};
+
+export const OutlineNoBackground: Story = {
+  args: {
+    type: "outline",
+    background: false,
+  },
+};
+
+export const WithExtraContent: Story = {
+  render: () => ({
+    components: { VAlert, VTabItem, VTabs },
+    setup() {
+      const activeId = shallowRef("general");
+
+      return { activeId };
+    },
+    template: `
+      <div class="max-w-3xl">
+        <VTabs v-model:activeId="activeId" centered>
+          <template #left>
+            <button
+              class="rounded-base border border-gray-200 px-3 py-1.5 text-sm text-gray-700"
+              type="button"
+            >
+              Left Extra Action
+            </button>
+          </template>
+          <template #right>
+            <button
+              class="rounded-base border border-gray-200 px-3 py-1.5 text-sm text-gray-700"
+              type="button"
+            >
+              Right Extra Action
+            </button>
+          </template>
+          <VTabItem id="general" label="基础设置">
+            <VAlert title="基础设置" :closable="false" />
+          </VTabItem>
+          <VTabItem id="seo" label="SEO">
+            <VAlert title="SEO 设置" type="success" :closable="false" />
+          </VTabItem>
+          <VTabItem id="comment" label="评论">
+            <VAlert title="评论设置" type="warning" :closable="false" />
           </VTabItem>
         </VTabs>
       </div>

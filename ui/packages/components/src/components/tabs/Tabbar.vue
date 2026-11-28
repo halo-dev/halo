@@ -11,7 +11,7 @@ import {
 } from "vue";
 import { IconArrowLeft, IconArrowRight } from "../../icons/icons";
 import { useComponentsI18n } from "../../locales";
-import type { TabbarItem, TabsDirection, TabsType } from "./types";
+import type { TabbarItem, TabsDirection, TabsSize, TabsType } from "./types";
 
 // Matches the arrow button width (2rem) plus its horizontal margin (0.25rem × 2).
 const ARROW_OFFSET = 40;
@@ -25,6 +25,12 @@ const props = withDefaults(
     idKey?: string;
     labelKey?: string;
     flush?: boolean;
+    size?: TabsSize;
+    stretch?: boolean;
+    ariaLabel?: string;
+    centered?: boolean;
+    divider?: boolean;
+    background?: boolean;
   }>(),
   {
     activeId: undefined,
@@ -34,6 +40,12 @@ const props = withDefaults(
     idKey: "id",
     labelKey: "label",
     flush: false,
+    size: "md",
+    stretch: false,
+    ariaLabel: undefined,
+    centered: false,
+    divider: true,
+    background: true,
   }
 );
 
@@ -48,7 +60,14 @@ const classes = computed(() => {
   return [
     `tabbar-${props.type}`,
     `tabbar-direction-${props.direction}`,
-    { "is-flush": props.flush },
+    {
+      "is-flush": props.flush,
+      "is-stretch": props.stretch,
+      "is-centered": props.centered,
+      "is-dividerless": !props.divider,
+      "is-backgroundless": !props.background,
+      "tabbar-size-sm": props.size === "sm",
+    },
   ];
 });
 
@@ -389,96 +408,116 @@ useEventListener(tabbarItemsRef, "wheel", handleWheel, {
 </script>
 <template>
   <div :class="classes" class="tabbar-wrapper">
-    <div
-      :aria-hidden="!canScrollLeft"
-      :class="['indicator', 'left', canScrollLeft ? 'is-visible' : 'is-hidden']"
-    >
-      <button
-        ref="leftArrowRef"
-        :aria-label="t('tabs.scroll_left')"
-        :disabled="!canScrollLeft"
-        :title="t('tabs.scroll_left')"
-        class="tabbar-arrow"
-        type="button"
-        @click="handleClickArrow(true)"
-      >
-        <IconArrowLeft />
-      </button>
+    <div v-if="$slots.left" class="tabbar-extra tabbar-extra-left">
+      <slot name="left" />
     </div>
-    <div
-      :aria-hidden="!canScrollRight"
-      :class="[
-        'indicator',
-        'right',
-        canScrollRight ? 'is-visible' : 'is-hidden',
-      ]"
-    >
-      <button
-        ref="rightArrowRef"
-        :aria-label="t('tabs.scroll_right')"
-        :disabled="!canScrollRight"
-        :title="t('tabs.scroll_right')"
-        class="tabbar-arrow"
-        type="button"
-        @click="handleClickArrow(false)"
-      >
-        <IconArrowRight />
-      </button>
-    </div>
-    <div
-      ref="tabbarItemsRef"
-      :aria-label="isScrollable ? t('tabs.list') : undefined"
-      :class="{
-        'is-scrollable': isScrollable,
-        'is-fade-left': direction === 'row' && canScrollLeft,
-        'is-fade-right': direction === 'row' && canScrollRight,
-      }"
-      :role="isScrollable ? 'group' : undefined"
-      :tabindex="isScrollable ? 0 : undefined"
-      class="tabbar-items"
-    >
+    <div class="tabbar-main">
       <div
-        ref="tabbarTrackRef"
-        :aria-label="t('tabs.list')"
-        :aria-orientation="direction === 'column' ? 'vertical' : 'horizontal'"
-        class="tabbar-items-track"
-        role="tablist"
+        :aria-hidden="!canScrollLeft"
+        :class="[
+          'indicator',
+          'left',
+          canScrollLeft ? 'is-visible' : 'is-hidden',
+        ]"
+      >
+        <button
+          ref="leftArrowRef"
+          :aria-label="t('tabs.scroll_left')"
+          :disabled="!canScrollLeft"
+          :title="t('tabs.scroll_left')"
+          class="tabbar-arrow"
+          type="button"
+          @click="handleClickArrow(true)"
+        >
+          <IconArrowLeft />
+        </button>
+      </div>
+      <div
+        :aria-hidden="!canScrollRight"
+        :class="[
+          'indicator',
+          'right',
+          canScrollRight ? 'is-visible' : 'is-hidden',
+        ]"
+      >
+        <button
+          ref="rightArrowRef"
+          :aria-label="t('tabs.scroll_right')"
+          :disabled="!canScrollRight"
+          :title="t('tabs.scroll_right')"
+          class="tabbar-arrow"
+          type="button"
+          @click="handleClickArrow(false)"
+        >
+          <IconArrowRight />
+        </button>
+      </div>
+      <div
+        ref="tabbarItemsRef"
+        :aria-label="isScrollable ? (ariaLabel ?? t('tabs.list')) : undefined"
+        :class="{
+          'is-scrollable': isScrollable,
+          'is-fade-left': direction === 'row' && canScrollLeft,
+          'is-fade-right': direction === 'row' && canScrollRight,
+        }"
+        :role="isScrollable ? 'group' : undefined"
+        :tabindex="isScrollable ? 0 : undefined"
+        class="tabbar-items"
       >
         <div
-          v-for="(item, index) in itemList"
-          :id="getTabElementId(item)"
-          :key="getItemId(item) ?? index"
-          :aria-controls="getPanelElementId(item)"
-          :aria-disabled="item.disabled ? 'true' : undefined"
-          :aria-label="getItemLabel(item) ? undefined : item.ariaLabel"
-          :aria-selected="index === resolvedIndex"
-          :class="{
-            'tabbar-item-active': index === resolvedIndex,
-            'is-disabled': item.disabled,
-          }"
-          :tabindex="index === tabStopIndex && !item.disabled ? 0 : -1"
-          class="tabbar-item"
-          role="tab"
-          @click="handleChange(getItemId(item), index)"
-          @keydown="handleKeydown($event, index)"
+          ref="tabbarTrackRef"
+          :aria-label="ariaLabel ?? t('tabs.list')"
+          :aria-orientation="direction === 'column' ? 'vertical' : 'horizontal'"
+          class="tabbar-items-track"
+          role="tablist"
         >
-          <div v-if="item.icon" class="tabbar-item-icon">
-            <component :is="item.icon" aria-hidden="true" />
+          <div
+            v-for="(item, index) in itemList"
+            :id="getTabElementId(item)"
+            :key="getItemId(item) ?? index"
+            :aria-controls="getPanelElementId(item)"
+            :aria-disabled="item.disabled ? 'true' : undefined"
+            :aria-label="getItemLabel(item) ? undefined : item.ariaLabel"
+            :aria-selected="index === resolvedIndex"
+            :class="{
+              'tabbar-item-active': index === resolvedIndex,
+              'is-disabled': item.disabled,
+            }"
+            :tabindex="index === tabStopIndex && !item.disabled ? 0 : -1"
+            class="tabbar-item"
+            role="tab"
+            @click="handleChange(getItemId(item), index)"
+            @keydown="handleKeydown($event, index)"
+          >
+            <div v-if="item.icon" class="tabbar-item-icon">
+              <component :is="item.icon" aria-hidden="true" />
+            </div>
+            <div v-if="getItemLabel(item)" class="tabbar-item-label">
+              {{ getItemLabel(item) }}
+            </div>
+            <span v-if="hasBadge(item)" class="tabbar-item-badge">
+              {{ item.badge }}
+            </span>
           </div>
-          <div v-if="getItemLabel(item)" class="tabbar-item-label">
-            {{ getItemLabel(item) }}
-          </div>
-          <span v-if="hasBadge(item)" class="tabbar-item-badge">
-            {{ item.badge }}
-          </span>
         </div>
       </div>
+    </div>
+    <div v-if="$slots.right" class="tabbar-extra tabbar-extra-right">
+      <slot name="right" />
     </div>
   </div>
 </template>
 <style lang="scss">
 .tabbar-wrapper {
-  @apply relative;
+  @apply relative flex items-center gap-2;
+
+  .tabbar-extra {
+    @apply flex shrink-0 items-center;
+  }
+
+  .tabbar-main {
+    @apply relative min-w-0 flex-1;
+  }
 
   .indicator {
     @apply pointer-events-none absolute top-0 z-10 flex h-full w-16 items-center transition-opacity duration-150 ease-out;
@@ -546,8 +585,9 @@ useEventListener(tabbarItemsRef, "wheel", handleWheel, {
   }
 
   // The edge fade is a mask on the scroller, which would fade its focus ring
-  // too. Draw the ring on the wrapper so it stays whole while the list scrolls.
-  &:has(> .tabbar-items:focus-visible) {
+  // too. Draw the ring on the scroll area so it stays whole while the list
+  // scrolls without covering the extra content on either side.
+  .tabbar-main:has(> .tabbar-items:focus-visible) {
     outline: 2px solid theme("colors.primary");
     outline-offset: -2px;
   }
@@ -580,20 +620,13 @@ useEventListener(tabbarItemsRef, "wheel", handleWheel, {
   &.tabbar-default {
     --tabbar-line-width: 2px;
 
-    border-bottom-width: var(--tabbar-line-width);
-    @apply border-b-gray-100;
-
-    .tabbar-items {
-      /* Align the active underline with the bar's bottom line. */
-      margin-bottom: calc(-1 * (var(--tabbar-line-width) + 0.125rem));
-    }
-
     .tabbar-items-track {
-      justify-content: flex-start;
+      box-shadow: inset 0 calc(-1 * var(--tabbar-line-width)) 0
+        theme("colors.gray.100");
     }
 
     .tabbar-item {
-      @apply border-b-gray-100 px-5 py-1;
+      @apply border-b-gray-100 py-1;
 
       border-bottom-width: var(--tabbar-line-width);
 
@@ -630,14 +663,12 @@ useEventListener(tabbarItemsRef, "wheel", handleWheel, {
   }
 
   &.tabbar-outline {
-    @apply rounded-base bg-gray-100 px-1 py-0.5;
-
     .tabbar-items-track {
-      @apply justify-start gap-1;
+      @apply justify-start gap-0.5 rounded-base bg-gray-100 p-0.5;
     }
 
     .tabbar-item {
-      @apply rounded-sm px-6 py-1 text-gray-600;
+      @apply h-8 rounded-sm px-4 text-gray-600;
 
       &.tabbar-item-active {
         @apply bg-white text-gray-900 shadow-sm;
@@ -653,19 +684,31 @@ useEventListener(tabbarItemsRef, "wheel", handleWheel, {
     }
   }
 
-  // Full-bleed form for card headers: the bar carries the top corners itself,
-  // so callers no longer need `!rounded-none` together with an outer clipping
-  // parent. The variant's horizontal padding stays: with no padding a tab at
-  // either edge sits directly on the card border.
-  &.is-flush {
-    @apply rounded-t-base;
-    border-bottom-right-radius: 0;
-    border-bottom-left-radius: 0;
+  &.tabbar-size-sm {
+    .tabbar-item {
+      @apply h-8 gap-1.5 text-xs;
+    }
+
+    &.tabbar-pills .tabbar-item {
+      @apply px-3;
+    }
+
+    &.tabbar-outline .tabbar-item {
+      @apply h-7 px-3;
+    }
   }
 
   &.tabbar-direction-row {
     .tabbar-items-track {
       @apply w-max min-w-full flex-row;
+    }
+
+    &.tabbar-default .tabbar-items-track {
+      @apply justify-start gap-8;
+    }
+
+    &.tabbar-size-sm.tabbar-default .tabbar-items-track {
+      @apply gap-6;
     }
   }
 
@@ -675,7 +718,7 @@ useEventListener(tabbarItemsRef, "wheel", handleWheel, {
     }
 
     .tabbar-items-track {
-      @apply w-full flex-col;
+      @apply w-max flex-col;
     }
 
     .tabbar-item {
@@ -683,23 +726,93 @@ useEventListener(tabbarItemsRef, "wheel", handleWheel, {
     }
 
     &.tabbar-default {
-      border-bottom-width: 0;
-      @apply border-b-0;
-      border-right-width: 2px;
-      @apply border-r-gray-100;
-
-      .tabbar-items {
-        margin-bottom: 0;
-        margin-right: -2px;
+      .tabbar-items-track {
+        box-shadow: inset calc(-1 * var(--tabbar-line-width)) 0 0
+          theme("colors.gray.100");
       }
 
       .tabbar-item {
+        @apply px-4;
+
         border-bottom-width: 0;
         border-right-width: 2px;
 
         &.tabbar-item-active {
           @apply border-r-secondary;
         }
+      }
+    }
+  }
+
+  &.is-centered.tabbar-direction-row {
+    .tabbar-items-track {
+      justify-content: safe center;
+    }
+  }
+
+  &.is-dividerless.tabbar-default {
+    .tabbar-items-track {
+      box-shadow: none;
+    }
+
+    .tabbar-item:not(.tabbar-item-active) {
+      @apply border-b-transparent;
+    }
+  }
+
+  &.is-dividerless.tabbar-default.tabbar-direction-column {
+    .tabbar-items-track {
+      box-shadow: none;
+    }
+
+    .tabbar-item:not(.tabbar-item-active) {
+      @apply border-r-transparent;
+    }
+  }
+
+  &.tabbar-outline.is-backgroundless .tabbar-items-track {
+    @apply bg-transparent;
+  }
+
+  &.tabbar-outline.is-backgroundless {
+    .tabbar-item.tabbar-item-active {
+      @apply ring-1 ring-gray-200;
+    }
+
+    .tabbar-item:not(.is-disabled):not(.tabbar-item-active):hover {
+      @apply ring-1 ring-gray-200;
+    }
+  }
+
+  // Full-bleed form for card headers: the bar carries the top corners itself,
+  // so callers no longer need `!rounded-none` together with an outer clipping
+  // parent. The variant's horizontal padding stays: with no horizontal padding
+  // a tab at either edge sits directly on the card border.
+  &.is-flush {
+    @apply rounded-t-base;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+
+    .tabbar-items-track {
+      @apply rounded-t-base;
+      border-bottom-right-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+  }
+
+  &.is-stretch {
+    &.tabbar-direction-row {
+      .tabbar-items-track {
+        @apply w-full;
+      }
+
+      .tabbar-item {
+        flex: 1 1 0;
+        min-width: 0;
+      }
+
+      .tabbar-item-label {
+        @apply truncate;
       }
     }
   }

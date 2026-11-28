@@ -26,9 +26,14 @@ const meta: Meta<typeof VTabbar> = {
       <div class="max-w-2xl">
         <VTabbar
           v-model:activeId="activeId"
+          :background="args.background"
+          :centered="args.centered"
           :direction="args.direction"
+          :divider="args.divider"
           :flush="args.flush"
           :items="items"
+          :size="args.size"
+          :stretch="args.stretch"
           :type="args.type"
         />
       </div>
@@ -46,11 +51,32 @@ const meta: Meta<typeof VTabbar> = {
       control: { type: "select" },
       options: ["default", "pills", "outline"],
     },
+    size: {
+      control: { type: "select" },
+      options: ["sm", "md"],
+    },
+    stretch: {
+      control: "boolean",
+    },
+    centered: {
+      control: "boolean",
+    },
+    divider: {
+      control: "boolean",
+    },
+    background: {
+      control: "boolean",
+    },
   },
   args: {
     direction: "row",
     flush: false,
     type: "default",
+    size: "md",
+    stretch: false,
+    centered: false,
+    divider: true,
+    background: true,
   },
 };
 
@@ -120,10 +146,92 @@ export const Pills: Story = {
   },
 };
 
+export const Outline: Story = {
+  args: {
+    type: "outline",
+  },
+};
+
+export const Compact: Story = {
+  args: {
+    size: "sm",
+  },
+};
+
+export const Stretch: Story = {
+  args: {
+    size: "sm",
+    stretch: true,
+  },
+};
+
+export const Centered: Story = {
+  args: {
+    centered: true,
+  },
+};
+
+export const NoDivider: Story = {
+  args: {
+    divider: false,
+  },
+};
+
+export const OutlineNoBackground: Story = {
+  args: {
+    type: "outline",
+    background: false,
+  },
+};
+
+export const WithExtraContent: Story = {
+  render: () => ({
+    components: { VTabbar },
+    setup() {
+      const activeId = shallowRef("general");
+      const items = [
+        { id: "general", label: "基础设置" },
+        { id: "seo", label: "SEO" },
+        { id: "comment", label: "评论" },
+      ];
+
+      return { activeId, items };
+    },
+    template: `
+      <div class="max-w-3xl">
+        <VTabbar v-model:activeId="activeId" :items="items" centered>
+          <template #left>
+            <button
+              class="rounded-base border border-gray-200 px-3 py-1.5 text-sm text-gray-700"
+              type="button"
+            >
+              Left Extra Action
+            </button>
+          </template>
+          <template #right>
+            <button
+              class="rounded-base border border-gray-200 px-3 py-1.5 text-sm text-gray-700"
+              type="button"
+            >
+              Right Extra Action
+            </button>
+          </template>
+        </VTabbar>
+      </div>
+    `,
+  }),
+};
+
 export const Column: Story = {
   args: {
     direction: "column",
     type: "outline",
+  },
+};
+
+export const ColumnDefault: Story = {
+  args: {
+    direction: "column",
   },
 };
 

@@ -7,7 +7,7 @@ import {
   it,
   vi,
 } from "vite-plus/test";
-import { nextTick } from "vue";
+import { h, nextTick } from "vue";
 import {
   VTabbar,
   type TabbarItem,
@@ -65,9 +65,14 @@ class ResizeObserverMock {
 async function mountTabbar(
   props: {
     activeId?: string;
+    centered?: boolean;
+    divider?: boolean;
+    background?: boolean;
     direction?: TabsDirection;
     flush?: boolean;
     items?: TabbarItem[];
+    size?: "sm" | "md";
+    stretch?: boolean;
     type?: TabsType;
   } = {}
 ) {
@@ -547,5 +552,44 @@ describe("Tabbar", () => {
     expect(wrapper.get(".tabbar-items").attributes("aria-label")).toBe(
       "Tab list"
     );
+  });
+
+  it("applies the centered, divider and background options", async () => {
+    const { wrapper } = await mountTabbar({
+      centered: true,
+      divider: false,
+      background: false,
+      type: "outline",
+    });
+    await flushPromises();
+
+    expect(wrapper.classes()).toContain("is-centered");
+    expect(wrapper.classes()).toContain("is-dividerless");
+    expect(wrapper.classes()).toContain("is-backgroundless");
+  });
+
+  it("keeps the divider and background by default", async () => {
+    const { wrapper } = await mountTabbar();
+    await flushPromises();
+
+    expect(wrapper.classes()).not.toContain("is-dividerless");
+    expect(wrapper.classes()).not.toContain("is-backgroundless");
+  });
+
+  it("renders content on both sides of the tab list", () => {
+    const slotted = mount(VTabbar, {
+      props: { activeId: "tab-1", items },
+      slots: {
+        left: () => h("button", { class: "left-extra" }, "Left"),
+        right: () => h("button", { class: "right-extra" }, "Right"),
+      },
+    });
+    wrapper = slotted;
+
+    expect(slotted.get(".tabbar-extra-left .left-extra").text()).toBe("Left");
+    expect(slotted.get(".tabbar-extra-right .right-extra").text()).toBe(
+      "Right"
+    );
+    expect(slotted.findAll(".tabbar-item")).toHaveLength(items.length);
   });
 });

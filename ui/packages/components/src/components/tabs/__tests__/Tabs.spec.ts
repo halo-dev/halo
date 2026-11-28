@@ -190,6 +190,77 @@ describe("Tabs", () => {
     expect(wrapper.get(".tabbar-wrapper").classes()).toContain("is-flush");
   });
 
+  it("passes the size and stretch options through to the tab bar", () => {
+    const wrapper = mount(VTabs, {
+      props: { activeId: "basic", size: "sm", stretch: true },
+      slots: {
+        default: () => [
+          h(VTabItem, { id: "basic", label: "Basic" }, () => "Basic panel"),
+        ],
+      },
+    });
+
+    const tabbar = wrapper.get(".tabbar-wrapper");
+    expect(tabbar.classes()).toContain("tabbar-size-sm");
+    expect(tabbar.classes()).toContain("is-stretch");
+  });
+
+  it("uses a custom label for the tab list", () => {
+    const wrapper = mount(VTabs, {
+      props: { activeId: "basic", ariaLabel: "订单状态" },
+      slots: {
+        default: () => [
+          h(VTabItem, { id: "basic", label: "Basic" }, () => "Basic panel"),
+        ],
+      },
+    });
+
+    expect(wrapper.get('[role="tablist"]').attributes("aria-label")).toBe(
+      "订单状态"
+    );
+  });
+
+  it("passes the centered, divider and background options to the tab bar", () => {
+    const wrapper = mount(VTabs, {
+      props: {
+        activeId: "basic",
+        centered: true,
+        divider: false,
+        background: false,
+        type: "outline",
+      },
+      slots: {
+        default: () => [
+          h(VTabItem, { id: "basic", label: "Basic" }, () => "Basic panel"),
+        ],
+      },
+    });
+
+    const tabbar = wrapper.get(".tabbar-wrapper");
+    expect(tabbar.classes()).toContain("is-centered");
+    expect(tabbar.classes()).toContain("is-dividerless");
+    expect(tabbar.classes()).toContain("is-backgroundless");
+  });
+
+  it("renders the left and right slots around the tab bar", () => {
+    const wrapper = mount(VTabs, {
+      props: { activeId: "basic" },
+      slots: {
+        default: () => [
+          h(VTabItem, { id: "basic", label: "Basic" }, () => "Basic panel"),
+        ],
+        left: () => h("button", { class: "left-extra" }, "Left"),
+        right: () => h("button", { class: "right-extra" }, "Right"),
+      },
+    });
+
+    expect(wrapper.get(".tabbar-extra-left .left-extra").text()).toBe("Left");
+    expect(wrapper.get(".tabbar-extra-right .right-extra").text()).toBe(
+      "Right"
+    );
+    expect(wrapper.findAll('[role="tab"]')).toHaveLength(1);
+  });
+
   it("treats a bare disabled attribute as disabled", () => {
     const wrapper = mount(VTabs, {
       props: { activeId: "basic" },

@@ -2,6 +2,7 @@ import type { Component } from "vue";
 
 export type TabsType = "default" | "pills" | "outline";
 export type TabsDirection = "row" | "column";
+export type TabsSize = "sm" | "md";
 
 export interface TabbarItem {
   id?: string | number;
