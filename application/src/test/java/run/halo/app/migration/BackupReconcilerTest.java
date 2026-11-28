@@ -10,6 +10,8 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
@@ -41,6 +43,9 @@ class BackupReconcilerTest {
         var name = "fake-backup";
         var backup = createPureBackup(name);
         backup.getSpec().setFormat("zip");
+        backup.getMetadata()
+                .setAnnotations(
+                        new HashMap<>(Map.of(Backup.PASSWORD_ANNOTATION, "secret", "example.com/keep", "value")));
         when(client.fetch(Backup.class, name)).thenReturn(Optional.of(backup));
         doNothing().when(client).update(backup);
         when(migrationService.backup(backup)).thenReturn(Mono.fromRunnable(() -> {
@@ -60,6 +65,10 @@ class BackupReconcilerTest {
         assertNotNull(status.getCompletionTimestamp());
         assertEquals("fake-backup-filename", status.getFilename());
         assertEquals(1024L, status.getSize());
+        assertFalse(
+                backup.getMetadata().getAnnotations().containsKey(Backup.PASSWORD_ANNOTATION),
+                "Password annotation should be removed after backup");
+        assertEquals("value", backup.getMetadata().getAnnotations().get("example.com/keep"));
 
         // 1. query
         // 2. pending -> running
@@ -95,6 +104,9 @@ class BackupReconcilerTest {
     void setPhaseToFailedIfPhaseIsRunning() {
         var name = "fake-backup";
         var backup = createPureBackup(name);
+        backup.getMetadata()
+                .setAnnotations(
+                        new HashMap<>(Map.of(Backup.PASSWORD_ANNOTATION, "secret", "example.com/keep", "value")));
         var status = backup.getStatus();
         status.setPhase(Backup.Phase.RUNNING);
 
@@ -107,6 +119,10 @@ class BackupReconcilerTest {
 
         assertEquals(Backup.Phase.FAILED, status.getPhase());
         assertEquals("UnexpectedExit", status.getFailureReason());
+        assertFalse(
+                backup.getMetadata().getAnnotations().containsKey(Backup.PASSWORD_ANNOTATION),
+                "Password annotation should be removed after backup failure");
+        assertEquals("value", backup.getMetadata().getAnnotations().get("example.com/keep"));
         // 1. add finalizer
         // 2. update status
         verify(client, times(2)).fetch(Backup.class, name);

@@ -1,5 +1,6 @@
 package run.halo.app.migration;
 
+import org.jspecify.annotations.Nullable;
 import org.reactivestreams.Publisher;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -12,7 +13,14 @@ public interface MigrationService {
 
     Mono<Resource> download(Backup backup);
 
-    Mono<Void> restore(Publisher<DataBuffer> content);
+    /**
+     * Restores a backup from the given content.
+     *
+     * @param content backup content
+     * @param password password of the encrypted backup, or null for unencrypted backups
+     * @return void publisher
+     */
+    Mono<Void> restore(Publisher<DataBuffer> content, @Nullable String password);
 
     /**
      * Clean up backup file.

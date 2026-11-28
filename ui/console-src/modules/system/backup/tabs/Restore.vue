@@ -11,6 +11,8 @@ import {
   VEntityContainer,
   VEntityField,
   VLoading,
+  VModal,
+  VSpace,
   VTabItem,
   VTabs,
 } from "@halo-dev/components";
@@ -20,6 +22,7 @@ import axios from "axios";
 import prettyBytes from "pretty-bytes";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
+import SubmitButton from "@/components/button/SubmitButton.vue";
 
 const { t } = useI18n();
 
@@ -49,11 +52,13 @@ async function handleShutdown() {
 
 // Remote download to restore
 const remoteDownloadUrl = ref("");
+const remotePassword = ref("");
 const { isLoading: downloading, mutate: handleRemoteDownload } = useMutation({
   mutationKey: ["remote-download-restore"],
   mutationFn: async () => {
     return await consoleApiClient.migration.restoreBackup({
       downloadUrl: remoteDownloadUrl.value,
+      password: remotePassword.value || undefined,
     });
   },
   retry: false,
@@ -61,6 +66,8 @@ const { isLoading: downloading, mutate: handleRemoteDownload } = useMutation({
     onProcessCompleted();
   },
 });
+
+const localPassword = ref("");
 
 const {
   data: backupFiles,
@@ -76,7 +83,17 @@ const {
   enabled: computed(() => activeTabId.value === "backups"),
 });
 
+const restoreTarget = ref<BackupFile>();
+const restorePassword = ref("");
+const isRestoring = ref(false);
+
 function handleRestoreFromBackup(backupFile: BackupFile) {
+  if (backupFile.filename?.endsWith(".enc")) {
+    restoreTarget.value = backupFile;
+    restorePassword.value = "";
+    return;
+  }
+
   Dialog.info({
     title: t("core.backup.operations.restore_by_backup.title"),
     description: t("core.backup.operations.restore_by_backup.description", {
@@ -91,6 +108,25 @@ function handleRestoreFromBackup(backupFile: BackupFile) {
       }, 200);
     },
   });
+}
+
+async function handleRestoreEncryptedBackup() {
+  if (!restoreTarget.value) {
+    return;
+  }
+  try {
+    isRestoring.value = true;
+    await consoleApiClient.migration.restoreBackup({
+      filename: restoreTarget.value.filename,
+      password: restorePassword.value,
+    });
+    restoreTarget.value = undefined;
+    setTimeout(() => {
+      onProcessCompleted();
+    }, 200);
+  } finally {
+    isRestoring.value = false;
+  }
 }
 
 useQuery({
@@ -140,12 +176,22 @@ useQuery({
           id="local"
           :label="$t('core.backup.restore.tabs.local.label')"
         >
+          <FormKit
+            v-model="localPassword"
+            :label="$t('core.backup.restore.fields.password.label')"
+            :help="$t('core.backup.restore.fields.password.help')"
+            type="password"
+            autocomplete="current-password"
+            outer-class="mb-4"
+          ></FormKit>
           <UppyUpload
             :restrictions="{
               maxNumberOfFiles: 1,
-              allowedFileTypes: ['.zip'],
+              allowedFileTypes: ['.zip', '.enc'],
             }"
             endpoint="/apis/console.api.migration.halo.run/v1alpha1/restorations"
+            :meta="{ password: localPassword }"
+            :allowed-meta-fields="['password']"
             width="100%"
             @uploaded="onProcessCompleted"
           />
@@ -166,6 +212,13 @@ useQuery({
               :label="$t('core.backup.restore.tabs.remote.fields.url')"
               type="text"
               validation="required"
+            ></FormKit>
+            <FormKit
+              v-model="remotePassword"
+              :label="$t('core.backup.restore.fields.password.label')"
+              :help="$t('core.backup.restore.fields.password.help')"
+              type="password"
+              autocomplete="current-password"
             ></FormKit>
           </FormKit>
 
@@ -245,4 +298,47 @@ useQuery({
       {{ $t("core.backup.restore.tips.complete") }}
     </div>
   </div>
+
+  <VModal
+    v-if="restoreTarget"
+    :width="500"
+    :title="$t('core.backup.operations.restore_by_backup.title')"
+    @close="restoreTarget = undefined"
+  >
+    <p class="mb-4 text-sm text-gray-600">
+      {{
+        $t("core.backup.operations.restore_by_backup.description", {
+          filename: restoreTarget.filename,
+        })
+      }}
+    </p>
+    <FormKit
+      id="restore-backup-password-form"
+      type="form"
+      :actions="false"
+      @submit="handleRestoreEncryptedBackup"
+    >
+      <FormKit
+        v-model="restorePassword"
+        :label="$t('core.backup.restore.fields.password.label')"
+        type="password"
+        validation="required"
+        autocomplete="current-password"
+      ></FormKit>
+    </FormKit>
+    <template #footer>
+      <VSpace>
+        <SubmitButton
+          :loading="isRestoring"
+          type="secondary"
+          :text="$t('core.common.buttons.submit')"
+          @submit="$formkit.submit('restore-backup-password-form')"
+        >
+        </SubmitButton>
+        <VButton @click="restoreTarget = undefined">
+          {{ $t("core.common.buttons.cancel_and_shortcut") }}
+        </VButton>
+      </VSpace>
+    </template>
+  </VModal>
 </template>

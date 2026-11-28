@@ -72,7 +72,7 @@ public class BackupReconciler implements Reconciler<Request> {
                             migrationService.backup(backup).block(Duration.ofMinutes(30));
                             status.setPhase(Phase.SUCCEEDED);
                             status.setCompletionTimestamp(Instant.now(clock));
-                            updateStatus(request.name(), status);
+                            updateStatus(request.name(), status, true);
                         } catch (Throwable t) {
                             var unwrapped = Exceptions.unwrap(t);
                             log.error("Failed to backup", unwrapped);
@@ -86,7 +86,7 @@ public class BackupReconciler implements Reconciler<Request> {
                                 status.setFailureMessage(
                                         "Something went wrong! Error message: " + unwrapped.getMessage());
                             }
-                            updateStatus(request.name(), status);
+                            updateStatus(request.name(), status, true);
                         }
                     }
                     // Only happen when failing to update status when interrupted
@@ -94,7 +94,7 @@ public class BackupReconciler implements Reconciler<Request> {
                         status.setPhase(Phase.FAILED);
                         status.setFailureReason("UnexpectedExit");
                         status.setFailureMessage("The backup process may exit abnormally.");
-                        updateStatus(request.name(), status);
+                        updateStatus(request.name(), status, true);
                     }
                     // Check the expires at and requeue if necessary
                     if (isTerminal(status.getPhase())) {
@@ -113,8 +113,18 @@ public class BackupReconciler implements Reconciler<Request> {
     }
 
     private void updateStatus(String name, Backup.Status status) {
+        updateStatus(name, status, false);
+    }
+
+    private void updateStatus(String name, Backup.Status status, boolean clearPassword) {
         client.fetch(Backup.class, name).ifPresent(backup -> {
             backup.setStatus(status);
+            if (clearPassword) {
+                var annotations = backup.getMetadata().getAnnotations();
+                if (annotations != null) {
+                    annotations.remove(Backup.PASSWORD_ANNOTATION);
+                }
+            }
             client.update(backup);
         });
     }

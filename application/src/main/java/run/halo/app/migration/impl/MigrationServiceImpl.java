@@ -8,18 +8,20 @@ import static run.halo.app.infra.utils.FileUtils.checkDirectoryTraversal;
 import static run.halo.app.infra.utils.FileUtils.copyRecursively;
 import static run.halo.app.infra.utils.FileUtils.createTempDir;
 import static run.halo.app.infra.utils.FileUtils.deleteRecursivelyAndSilently;
-import static run.halo.app.infra.utils.FileUtils.unzip;
 
 import java.io.IOException;
+import java.io.PushbackInputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.BaseStream;
+import java.util.zip.ZipInputStream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
@@ -27,6 +29,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.ReactiveTransactionManager;
@@ -48,6 +51,7 @@ import run.halo.app.extension.store.ExtensionStore;
 import run.halo.app.extension.store.ExtensionStoreRepository;
 import run.halo.app.infra.BackupRootGetter;
 import run.halo.app.infra.exception.BackupMalformedException;
+import run.halo.app.infra.exception.BackupPasswordRequiredException;
 import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.utils.FileUtils;
@@ -152,13 +156,13 @@ class MigrationServiceImpl implements MigrationService, InitializingBean {
     }
 
     @Override
-    public Mono<Void> restore(Publisher<DataBuffer> content) {
+    public Mono<Void> restore(Publisher<DataBuffer> content, String password) {
         var tx = TransactionalOperator.create(txManager);
         return snapshotWrites
                 .invalidateAll()
                 .then(Mono.defer(() -> Mono.usingWhen(
                         createTempDir("halo-restore-", scheduler),
-                        tempDir -> unpackBackup(content, tempDir)
+                        tempDir -> unpackBackup(content, tempDir, password)
                                 .then(Mono.defer(() ->
                                         // This step skips index verification such as unique index.
                                         // In order to avoid index conflicts after recovery or
@@ -200,7 +204,10 @@ class MigrationServiceImpl implements MigrationService, InitializingBean {
         return Flux.using(() -> Files.list(getBackupsRoot()), Flux::fromStream, BaseStream::close)
                 .filter(Files::isRegularFile)
                 .filter(Files::isReadable)
-                .filter(path -> isExtension(path.getFileName().toString(), "zip"))
+                .filter(path -> {
+                    var filename = path.getFileName().toString();
+                    return isExtension(filename, "zip") || isExtension(filename, "enc");
+                })
                 .map(this::toBackupFile)
                 .sort(comparing(BackupFile::getLastModifiedTime).reversed().thenComparing(BackupFile::getFilename))
                 .subscribeOn(this.scheduler);
@@ -284,15 +291,45 @@ class MigrationServiceImpl implements MigrationService, InitializingBean {
                 .subscribeOn(scheduler);
     }
 
-    private Mono<Void> unpackBackup(Publisher<DataBuffer> content, Path target) {
-        return unzip(content, target, scheduler)
-                .onErrorMap(
-                        IOException.class,
-                        e -> new BackupMalformedException(
-                                "The backup file is malformed, corrupted, or incompatible with the current Halo version.",
-                                e,
-                                "problemDetail.migration.backup.malformed",
-                                null));
+    private Mono<Void> unpackBackup(Publisher<DataBuffer> content, Path target, String password) {
+        var unpack = Mono.<Void>fromCallable(() -> {
+                    try (var is = DataBufferUtils.subscriberInputStream(content, 1);
+                            var input = new PushbackInputStream(is, BackupEncryption.HEADER_LENGTH)) {
+                        var header = new byte[BackupEncryption.HEADER_LENGTH];
+                        var read = input.readNBytes(header, 0, header.length);
+                        if (read < header.length) {
+                            header = Arrays.copyOf(header, read);
+                        }
+                        if (BackupEncryption.isEncrypted(header)) {
+                            if (!StringUtils.hasLength(password)) {
+                                throw new BackupPasswordRequiredException();
+                            }
+                            try (var zipInput = new ZipInputStream(BackupEncryption.decrypt(input, header, password))) {
+                                FileUtils.unzip(zipInput, target);
+                            } catch (IOException e) {
+                                throw new BackupMalformedException(
+                                        "Invalid backup password or corrupted backup file.",
+                                        e,
+                                        "problemDetail.migration.backup.invalidPassword",
+                                        null);
+                            }
+                        } else {
+                            input.unread(header);
+                            try (var zipInput = new ZipInputStream(input)) {
+                                FileUtils.unzip(zipInput, target);
+                            }
+                        }
+                        return null;
+                    }
+                })
+                .subscribeOn(scheduler);
+        return unpack.onErrorMap(
+                IOException.class,
+                e -> new BackupMalformedException(
+                        "The backup file is malformed, corrupted, or incompatible with the current Halo version.",
+                        e,
+                        "problemDetail.migration.backup.malformed",
+                        null));
     }
 
     private Mono<Void> packageBackup(Path baseDir, Backup backup) {
@@ -302,8 +339,18 @@ class MigrationServiceImpl implements MigrationService, InitializingBean {
                     var backupName = backup.getMetadata().getName();
                     var startTimestamp = backup.getStatus().getStartTimestamp();
                     var timePart = this.dateTimeFormatter.format(startTimestamp);
-                    var backupFile = backupsFolder.resolve(timePart + '-' + backupName + ".zip");
-                    FileUtils.zip(baseDir, backupFile);
+                    var annotations = backup.getMetadata().getAnnotations();
+                    var password = annotations == null ? null : annotations.get(Backup.PASSWORD_ANNOTATION);
+                    var encrypted = StringUtils.hasLength(password);
+                    var extension = encrypted ? ".zip.enc" : ".zip";
+                    var backupFile = backupsFolder.resolve(timePart + '-' + backupName + extension);
+                    if (encrypted) {
+                        try (var output = BackupEncryption.encrypt(Files.newOutputStream(backupFile), password)) {
+                            FileUtils.zip(baseDir, output);
+                        }
+                    } else {
+                        FileUtils.zip(baseDir, backupFile);
+                    }
                     backup.getStatus().setFilename(backupFile.getFileName().toString());
                     backup.getStatus().setSize(Files.size(backupFile));
                     return backupsFolder;

@@ -5,10 +5,12 @@ import {
   type Backup,
   type BackupV1alpha1ApiListBackupRequest,
 } from "@halo-dev/api-client";
-import { Dialog, Toast } from "@halo-dev/components";
+import { Toast } from "@halo-dev/components";
 import { utils } from "@halo-dev/ui-shared";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
+
+const BACKUP_PASSWORD_ANNOTATION = "migration.halo.run/backup-password";
 
 export function useBackupFetch() {
   return useQuery({
@@ -50,31 +52,28 @@ export function useBackup() {
   const { t } = useI18n();
   const queryClient = useQueryClient();
 
-  const handleCreate = async () => {
-    Dialog.info({
-      title: t("core.backup.operations.create.title"),
-      description: t("core.backup.operations.create.description"),
-      async onConfirm() {
-        await coreApiClient.migration.backup.createBackup({
-          backup: {
-            apiVersion: "migration.halo.run/v1alpha1",
-            kind: "Backup",
-            metadata: {
-              generateName: "backup-",
-              name: "",
-            },
-            spec: {
-              expiresAt: utils.date.dayjs().add(7, "day").toISOString(),
-            },
-          },
-        });
-
-        queryClient.invalidateQueries({ queryKey: ["backups"] });
-
-        Toast.success(t("core.backup.operations.create.toast_success"));
+  const createBackup = async (password?: string) => {
+    await coreApiClient.migration.backup.createBackup({
+      backup: {
+        apiVersion: "migration.halo.run/v1alpha1",
+        kind: "Backup",
+        metadata: {
+          generateName: "backup-",
+          name: "",
+          annotations: password
+            ? { [BACKUP_PASSWORD_ANNOTATION]: password }
+            : undefined,
+        },
+        spec: {
+          expiresAt: utils.date.dayjs().add(7, "day").toISOString(),
+        },
       },
     });
+
+    queryClient.invalidateQueries({ queryKey: ["backups"] });
+
+    Toast.success(t("core.backup.operations.create.toast_success"));
   };
 
-  return { handleCreate };
+  return { createBackup };
 }
