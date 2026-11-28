@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { type ContentWrapper } from "@halo-dev/api-client";
-import { Toast, VLoading } from "@halo-dev/components";
+import { Toast, VLoading, VScrollArea } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 import DOMPurify from "dompurify";
-import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { computed, toRefs } from "vue";
 import { SNAPSHOT_QUERY_KEY } from "./query-keys";
 
@@ -43,19 +42,14 @@ const sanitizedContent = computed(() => {
 });
 </script>
 <template>
-  <OverlayScrollbarsComponent
-    element="div"
-    :options="{ scrollbars: { autoHide: 'scroll' } }"
-    class="h-full w-full"
-    defer
-  >
+  <VScrollArea class="h-full w-full">
     <VLoading v-if="isLoading" />
     <div
       v-else
       class="snapshot-content markdown-body h-full w-full p-4"
       v-html="sanitizedContent"
     ></div>
-  </OverlayScrollbarsComponent>
+  </VScrollArea>
 </template>
 
 <style scoped lang="scss">

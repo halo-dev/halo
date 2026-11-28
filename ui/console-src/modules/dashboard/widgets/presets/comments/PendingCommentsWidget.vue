@@ -7,9 +7,9 @@ import {
   VEmpty,
   VEntityContainer,
   VLoading,
+  VScrollArea,
 } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
-import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import CommentItem from "./CommentItem.vue";
 
 const { data, isLoading, isFetching, refetch } = useQuery<ListedComment[]>({
@@ -45,12 +45,7 @@ const { data, isLoading, isFetching, refetch } = useQuery<ListedComment[]>({
         </VButton>
       </template>
     </VEmpty>
-    <OverlayScrollbarsComponent
-      element="div"
-      :options="{ scrollbars: { autoHide: 'scroll' } }"
-      class="h-full w-full"
-      defer
-    >
+    <VScrollArea class="h-full w-full">
       <VEntityContainer>
         <CommentItem
           v-for="comment in data"
@@ -58,6 +53,6 @@ const { data, isLoading, isFetching, refetch } = useQuery<ListedComment[]>({
           :comment="comment"
         ></CommentItem>
       </VEntityContainer>
-    </OverlayScrollbarsComponent>
+    </VScrollArea>
   </WidgetCard>
 </template>

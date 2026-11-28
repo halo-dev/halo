@@ -1,6 +1,6 @@
 import type Uppy from "@uppy/core";
 import Dashboard from "@uppy/vue/dashboard";
-import { mount } from "@vue/test-utils";
+import { enableAutoUnmount, mount } from "@vue/test-utils";
 import {
   afterEach,
   beforeEach,
@@ -57,9 +57,14 @@ describe("UppyUpload", () => {
     );
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     vi.unstubAllGlobals();
+    // Uppy renders with Preact, which debounces updates by 35ms. Let the
+    // pending render finish before jsdom tears down the globals it needs.
+    await new Promise((resolve) => setTimeout(resolve, 50));
   });
+
+  enableAutoUnmount(afterEach);
 
   it("keeps the existing props contract when configuring Uppy", () => {
     const doneButtonHandler = vi.fn();

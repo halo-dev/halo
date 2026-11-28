@@ -1,4 +1,3 @@
-import "overlayscrollbars/overlayscrollbars.css";
 import "./styles/tailwind.css";
 
 export * from "./components";

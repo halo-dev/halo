@@ -1,8 +1,7 @@
 <script lang="ts" setup>
-import { IconMore, VMenu, VMenuItem } from "@halo-dev/components";
+import { IconMore, VMenu, VMenuItem, VScrollArea } from "@halo-dev/components";
 import type { MenuGroupType, MenuItemType } from "@halo-dev/ui-shared";
 import type { OverlayScrollbars } from "overlayscrollbars";
-import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { inject, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import RiArrowLeftLine from "~icons/ri/arrow-left-line";
@@ -90,12 +89,7 @@ function handleSelectHome() {
           appear
         >
           <div class="drawer__content">
-            <OverlayScrollbarsComponent
-              element="div"
-              :options="{ scrollbars: { autoHide: 'scroll' } }"
-              class="drawer__body"
-              defer
-            >
+            <VScrollArea class="drawer__body">
               <VMenu aria-label="Home" class="!pb-1">
                 <VMenuItem
                   id="home"
@@ -112,7 +106,7 @@ function handleSelectHome() {
                 :menus="menus"
                 @select="moreMenuVisible = false"
               />
-            </OverlayScrollbarsComponent>
+            </VScrollArea>
             <div class="drawer__footer">
               <UserProfileBanner :platform="platform" />
             </div>
@@ -209,9 +203,13 @@ function handleSelectHome() {
   }
 
   &__body {
-    flex: 1;
-    min-height: 0;
-    overflow-y: auto;
+    @apply flex min-h-0 flex-col overflow-hidden;
+    flex: 1 1 auto;
+
+    > .v-scroll-area__viewport {
+      flex: 1 1 auto;
+      min-height: 0;
+    }
   }
 
   &__footer {

@@ -7,7 +7,6 @@ import {
   routerKey,
   START_LOCATION,
 } from "vue-router";
-import "overlayscrollbars/overlayscrollbars.css";
 import "../src/styles/tailwind.css";
 
 const router = createRouter({

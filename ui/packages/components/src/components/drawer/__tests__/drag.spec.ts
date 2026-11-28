@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vite-plus/test";
 import {
+  canStartScrollDrag,
   findNearestSnapIndex,
   normalizeSnapPoints,
   resolveDrawerSize,
@@ -143,5 +144,43 @@ describe("shouldDismissOnDrag", () => {
     expect(
       shouldDismissOnDrag({ distance: 10, size: 400, velocity: 0.6 })
     ).toBe(true);
+  });
+});
+
+describe("canStartScrollDrag", () => {
+  const top = { scrollTop: 0, clientHeight: 200, scrollHeight: 400 };
+  const middle = { scrollTop: 100, clientHeight: 200, scrollHeight: 400 };
+  const bottom = { scrollTop: 200, clientHeight: 200, scrollHeight: 400 };
+
+  it("allows horizontal drawers to drag from any scroll position", () => {
+    expect(canStartScrollDrag(middle, "left")).toBe(true);
+    expect(canStartScrollDrag(middle, "right")).toBe(true);
+    expect(canStartScrollDrag(undefined, "right")).toBe(true);
+  });
+
+  it("only starts a top drawer drag at the bottom of the content", () => {
+    expect(canStartScrollDrag(top, "top")).toBe(false);
+    expect(canStartScrollDrag(middle, "top")).toBe(false);
+    expect(canStartScrollDrag(bottom, "top")).toBe(true);
+  });
+
+  it("treats the one-pixel rounding boundary as the end", () => {
+    expect(
+      canStartScrollDrag(
+        { scrollTop: 199, clientHeight: 200, scrollHeight: 400 },
+        "top"
+      )
+    ).toBe(true);
+  });
+
+  it("only starts a bottom drawer drag at the top of the content", () => {
+    expect(canStartScrollDrag(top, "bottom")).toBe(true);
+    expect(canStartScrollDrag(middle, "bottom")).toBe(false);
+    expect(canStartScrollDrag(bottom, "bottom")).toBe(false);
+  });
+
+  it("does not start a vertical drag without a viewport", () => {
+    expect(canStartScrollDrag(undefined, "top")).toBe(false);
+    expect(canStartScrollDrag(undefined, "bottom")).toBe(false);
   });
 });

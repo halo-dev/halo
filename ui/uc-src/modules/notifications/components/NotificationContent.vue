@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { Notification } from "@halo-dev/api-client";
-import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
+import { VScrollArea } from "@halo-dev/components";
 import sanitize from "sanitize-html";
 import { computed } from "vue";
 
@@ -17,14 +17,9 @@ const content = computed(() => {
 </script>
 
 <template>
-  <OverlayScrollbarsComponent
-    element="div"
-    :options="{ scrollbars: { autoHide: 'scroll' } }"
-    class="h-full w-full"
-    defer
-  >
+  <VScrollArea class="h-full w-full">
     <div class="markdown-body h-full w-full p-2 text-sm" v-html="content"></div>
-  </OverlayScrollbarsComponent>
+  </VScrollArea>
 </template>
 
 <style scoped lang="scss">

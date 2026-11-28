@@ -500,6 +500,7 @@
         "VPageHeader",
         "VPagination",
         "VPopover",
+        "VScrollArea",
         "VSkeleton",
         "VSkeletonText",
         "VSpace",

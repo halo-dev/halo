@@ -7,9 +7,9 @@ import {
   VEmpty,
   VEntityContainer,
   VLoading,
+  VScrollArea,
 } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
-import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { postLabels } from "@/constants/labels";
 import PostListItem from "./components/PostListItem.vue";
 
@@ -41,13 +41,7 @@ const { data, isLoading, isFetching, refetch } = useQuery<ListedPost[]>({
         </VButton>
       </template>
     </VEmpty>
-    <OverlayScrollbarsComponent
-      v-else
-      element="div"
-      :options="{ scrollbars: { autoHide: 'scroll' } }"
-      class="h-full w-full"
-      defer
-    >
+    <VScrollArea v-else class="h-full w-full">
       <VEntityContainer>
         <PostListItem
           v-for="post in data"
@@ -55,6 +49,6 @@ const { data, isLoading, isFetching, refetch } = useQuery<ListedPost[]>({
           :post="post"
         />
       </VEntityContainer>
-    </OverlayScrollbarsComponent>
+    </VScrollArea>
   </WidgetCard>
 </template>

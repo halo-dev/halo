@@ -17,12 +17,15 @@ import {
   onMounted,
   ref,
   useSlots,
+  useTemplateRef,
   watch,
 } from "vue";
 import { IconClose } from "../../icons/icons";
 import { useComponentsI18n } from "../../locales";
 import { isFloatingPopperTarget } from "../dropdown/utils";
+import { VScrollArea } from "../scroll-area";
 import {
+  canStartScrollDrag,
   isHorizontalPlacement,
   normalizeSnapPoints,
   resolveDrawerSize,
@@ -211,6 +214,17 @@ const panelStyles = computed(() => {
   return styles;
 });
 
+const drawerBodyClasses = computed(() => [
+  "drawer-body-content",
+  ...(props.bodyClass ?? []),
+]);
+
+interface ScrollAreaInstance {
+  viewport?: HTMLElement;
+}
+
+const bodyScroller = useTemplateRef<ScrollAreaInstance>("bodyScroller");
+
 let snapTimer: ReturnType<typeof setTimeout> | undefined;
 let dismissTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -354,18 +368,6 @@ function snapTo(index: number) {
   setSnapIndex(index);
 }
 
-function canStartScrollDrag(element: HTMLElement) {
-  if (horizontal.value) {
-    return true;
-  }
-
-  if (props.placement === "bottom") {
-    return element.scrollTop <= 0;
-  }
-
-  return element.scrollTop + element.clientHeight >= element.scrollHeight - 1;
-}
-
 function onPointerDown(event: PointerEvent) {
   if (!canDrag.value || !isOpen.value || dragSession) {
     return;
@@ -408,7 +410,10 @@ function onPointerDown(event: PointerEvent) {
 
   const scrollElement = target.closest<HTMLElement>("[data-drawer-scroll]");
 
-  if (scrollElement && !canStartScrollDrag(scrollElement)) {
+  if (
+    scrollElement &&
+    !canStartScrollDrag(bodyScroller.value?.viewport, props.placement)
+  ) {
     return;
   }
 
@@ -790,9 +795,14 @@ defineExpose({
           </slot>
         </div>
 
-        <div :class="bodyClass" class="drawer-body" data-drawer-scroll>
+        <VScrollArea
+          ref="bodyScroller"
+          class="drawer-body"
+          data-drawer-scroll
+          :content-class="drawerBodyClasses"
+        >
           <slot />
-        </div>
+        </VScrollArea>
 
         <div v-if="$slots.footer" class="drawer-footer">
           <slot name="footer" />
@@ -971,8 +981,18 @@ defineExpose({
 }
 
 .drawer-body {
-  @apply min-h-0 flex-1 overflow-y-auto px-4 py-3;
-  overscroll-behavior: contain;
+  @apply flex min-h-0 flex-col overflow-hidden;
+  flex: 1 1 auto;
+
+  > .v-scroll-area__viewport {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+}
+
+.drawer-body-content {
+  height: 100%;
+  @apply px-4 py-3;
 }
 
 .drawer-footer {

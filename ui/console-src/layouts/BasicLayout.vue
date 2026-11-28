@@ -1,13 +1,16 @@
 <script lang="ts" setup>
 import { coreMenuGroups } from "@console/router/constant";
-import { IconSearch } from "@halo-dev/components";
+import { IconSearch, VScrollArea } from "@halo-dev/components";
 import { useEventListener } from "@vueuse/core";
-import {
-  useOverlayScrollbars,
-  type UseOverlayScrollbarsParams,
-} from "overlayscrollbars-vue";
 import { defineStore } from "pinia";
-import { defineAsyncComponent, onMounted, reactive, ref } from "vue";
+import {
+  defineAsyncComponent,
+  nextTick,
+  onMounted,
+  ref,
+  useTemplateRef,
+  watch,
+} from "vue";
 import { RouterView, useRoute } from "vue-router";
 import IconLogo from "~icons/core/logo?width=5rem&height=2rem";
 import ImpersonationBanner from "@/components/impersonation/ImpersonationBanner.vue";
@@ -38,7 +41,11 @@ useEventListener(document, "keydown", (e: KeyboardEvent) => {
 const { data, isLoading } = useRouteMenuGenerator(coreMenuGroups);
 
 // aside scroll
-const navbarScroller = ref();
+interface ScrollAreaInstance {
+  viewport?: HTMLElement;
+}
+
+const navbarScroller = useTemplateRef<ScrollAreaInstance>("navbarScroller");
 
 const useNavbarScrollStore = defineStore("navbar", {
   state: () => ({
@@ -48,30 +55,24 @@ const useNavbarScrollStore = defineStore("navbar", {
 
 const navbarScrollStore = useNavbarScrollStore();
 
-const reactiveParams = reactive<UseOverlayScrollbarsParams>({
-  options: {
-    scrollbars: {
-      autoHide: "scroll",
-      autoHideDelay: 600,
-    },
-  },
-  events: {
-    scroll: (_, onScrollArgs) => {
-      const target = onScrollArgs.target as HTMLElement;
-      navbarScrollStore.y = target.scrollTop;
-    },
-    updated: (instance) => {
-      const { viewport } = instance.elements();
-      if (!viewport) return;
-      viewport.scrollTo({ top: navbarScrollStore.y });
-    },
-  },
-});
-const [initialize] = useOverlayScrollbars(reactiveParams);
-onMounted(() => {
-  if (navbarScroller.value) {
-    initialize({ target: navbarScroller.value });
+function handleNavbarScroll(event: Event) {
+  navbarScrollStore.y = (event.target as HTMLElement).scrollTop;
+}
+
+// Restore the offset after the menu is re-rendered, which matches the
+// "updated" hook of the previous OverlayScrollbars setup.
+async function restoreNavbarScroll() {
+  const y = navbarScrollStore.y;
+  await nextTick();
+  const viewport = navbarScroller.value?.viewport;
+  if (viewport) {
+    viewport.scrollTop = y;
   }
+}
+
+onMounted(restoreNavbarScroll);
+watch(() => [isLoading.value, data.value], restoreNavbarScroll, {
+  flush: "post",
 });
 </script>
 
@@ -87,7 +88,11 @@ onMounted(() => {
           <IconLogo class="sidebar__logo" />
         </a>
       </div>
-      <div ref="navbarScroller" class="sidebar__content">
+      <VScrollArea
+        ref="navbarScroller"
+        class="sidebar__content"
+        @scroll="handleNavbarScroll"
+      >
         <div class="sidebar__search-wrapper">
           <div class="sidebar__search" @click="globalSearchVisible = true">
             <span class="sidebar__search-icon">
@@ -103,7 +108,7 @@ onMounted(() => {
         </div>
         <MenuLoading v-if="isLoading" />
         <RoutesMenu v-else :menus="data?.menus || []" />
-      </div>
+      </VScrollArea>
       <div class="sidebar__profile">
         <UserProfileBanner platform="console" />
       </div>
@@ -171,7 +176,7 @@ onMounted(() => {
 
   &__content {
     flex: 1;
-    overflow-y: hidden;
+    min-height: 0;
   }
 
   &__search-wrapper {

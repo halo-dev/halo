@@ -4,14 +4,14 @@ import {
   IconInformation,
   Toast,
   VLoading,
+  VScrollArea,
   VTooltipComponent,
 } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 import { useLocalStorage } from "@vueuse/core";
 import DOMPurify from "dompurify";
-import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { visualDomDiff } from "visual-dom-diff";
-import { computed, nextTick, toRefs, useTemplateRef, watch } from "vue";
+import { computed, toRefs, useTemplateRef } from "vue";
 import { SNAPSHOT_DIFF_QUERY_KEY } from "./query-keys";
 
 const props = withDefaults(
@@ -94,18 +94,13 @@ const diffContent = computed(() => {
 const onlyDiff = useLocalStorage("snapshot-diff-only-diff", false);
 const enableSyncScroll = useLocalStorage("snapshot-diff-sync-scroll", true);
 
-const oldScrollRef =
-  useTemplateRef<InstanceType<typeof OverlayScrollbarsComponent>>(
-    "oldScrollRef"
-  );
-const newScrollRef =
-  useTemplateRef<InstanceType<typeof OverlayScrollbarsComponent>>(
-    "newScrollRef"
-  );
-const diffScrollRef =
-  useTemplateRef<InstanceType<typeof OverlayScrollbarsComponent>>(
-    "diffScrollRef"
-  );
+interface ScrollAreaInstance {
+  viewport?: HTMLElement;
+}
+
+const oldScrollRef = useTemplateRef<ScrollAreaInstance>("oldScrollRef");
+const newScrollRef = useTemplateRef<ScrollAreaInstance>("newScrollRef");
+const diffScrollRef = useTemplateRef<ScrollAreaInstance>("diffScrollRef");
 
 let isSyncing = false;
 
@@ -115,10 +110,8 @@ const syncScroll = (
 ) => {
   if (isSyncing || !enableSyncScroll.value || onlyDiff.value) return;
 
-  const sourceInstance = sourceRef.value?.osInstance();
-  if (!sourceInstance) return;
-
-  const sourceViewport = sourceInstance.elements().viewport;
+  const sourceViewport = sourceRef.value?.viewport;
+  if (!sourceViewport) return;
   const scrollTop = sourceViewport.scrollTop;
   const scrollHeight = sourceViewport.scrollHeight;
   const clientHeight = sourceViewport.clientHeight;
@@ -130,10 +123,8 @@ const syncScroll = (
   isSyncing = true;
 
   targetRefs.forEach((targetRef) => {
-    const targetInstance = targetRef.value?.osInstance();
-    if (!targetInstance) return;
-
-    const targetViewport = targetInstance.elements().viewport;
+    const targetViewport = targetRef.value?.viewport;
+    if (!targetViewport) return;
     const targetScrollHeight = targetViewport.scrollHeight;
     const targetClientHeight = targetViewport.clientHeight;
 
@@ -148,34 +139,6 @@ const syncScroll = (
     isSyncing = false;
   }, 10);
 };
-
-watch([oldScrollRef, newScrollRef, diffScrollRef, onlyDiff, snapshot], () => {
-  nextTick(() => {
-    setTimeout(() => {
-      const oldInstance = oldScrollRef.value?.osInstance();
-      const newInstance = newScrollRef.value?.osInstance();
-      const diffInstance = diffScrollRef.value?.osInstance();
-
-      if (oldInstance) {
-        const viewport = oldInstance.elements().viewport;
-        viewport.removeEventListener("scroll", handleOldScroll);
-        viewport.addEventListener("scroll", handleOldScroll);
-      }
-
-      if (newInstance) {
-        const viewport = newInstance.elements().viewport;
-        viewport.removeEventListener("scroll", handleNewScroll);
-        viewport.addEventListener("scroll", handleNewScroll);
-      }
-
-      if (diffInstance) {
-        const viewport = diffInstance.elements().viewport;
-        viewport.removeEventListener("scroll", handleDiffScroll);
-        viewport.addEventListener("scroll", handleDiffScroll);
-      }
-    }, 100);
-  });
-});
 
 const handleOldScroll = () => {
   const targets = onlyDiff.value
@@ -233,13 +196,11 @@ const handleDiffScroll = () => {
         'md:grid-cols-3': !onlyDiff,
       }"
     >
-      <OverlayScrollbarsComponent
+      <VScrollArea
         v-if="!onlyDiff"
         ref="oldScrollRef"
-        element="div"
-        :options="{ scrollbars: { autoHide: 'scroll' } }"
         class="h-full w-full"
-        defer
+        @scroll="handleOldScroll"
       >
         <div class="sticky top-0 border-b bg-white px-4 py-3">
           {{ $t("core.snapshots.diff_mode.old_version") }}
@@ -248,14 +209,12 @@ const handleDiffScroll = () => {
           class="snapshot-content markdown-body"
           v-html="sanitizedOldContent"
         ></div>
-      </OverlayScrollbarsComponent>
-      <OverlayScrollbarsComponent
+      </VScrollArea>
+      <VScrollArea
         v-if="!onlyDiff"
         ref="newScrollRef"
-        element="div"
-        :options="{ scrollbars: { autoHide: 'scroll' } }"
         class="h-full w-full"
-        defer
+        @scroll="handleNewScroll"
       >
         <div class="sticky top-0 border-b bg-white px-4 py-3">
           {{ $t("core.snapshots.diff_mode.new_version") }}
@@ -264,13 +223,11 @@ const handleDiffScroll = () => {
           class="snapshot-content markdown-body"
           v-html="sanitizedNewContent"
         ></div>
-      </OverlayScrollbarsComponent>
-      <OverlayScrollbarsComponent
+      </VScrollArea>
+      <VScrollArea
         ref="diffScrollRef"
-        element="div"
-        :options="{ scrollbars: { autoHide: 'scroll' } }"
         class="h-full w-full"
-        defer
+        @scroll="handleDiffScroll"
       >
         <div
           class="sticky top-0 flex items-center gap-2 border-b bg-white px-4 py-3"
@@ -296,7 +253,7 @@ const handleDiffScroll = () => {
           </VTooltipComponent>
         </div>
         <div class="snapshot-content markdown-body" v-html="diffContent"></div>
-      </OverlayScrollbarsComponent>
+      </VScrollArea>
     </div>
   </div>
 </template>
