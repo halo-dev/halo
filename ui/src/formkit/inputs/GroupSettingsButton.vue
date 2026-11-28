@@ -28,6 +28,7 @@ const { context } = toRefs(props);
 const modalVisible = ref(false);
 
 const selectedName = computed(() => context.value._value as string | undefined);
+const isDisabled = computed(() => !!context.value.disabled);
 
 const onSelect = (groupName: string) => {
   context.value.node.input(groupName);
@@ -53,14 +54,21 @@ const onModalClose = async () => {
 </script>
 
 <template>
-  <div
+  <button
     v-if="utils.permission.has(['system:attachments:manage'])"
     v-tooltip="$t('core.attachment.groups_modal.title')"
-    class="group flex h-full cursor-pointer items-center border-l px-3 transition-all hover:bg-gray-100"
+    type="button"
+    :aria-label="$t('core.attachment.groups_modal.title')"
+    :disabled="isDisabled"
+    data-select-suffix
+    class="group flex w-10 shrink-0 cursor-pointer select-none items-center justify-center self-stretch border-l transition-all hover:bg-gray-100 focus-visible:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
     @click="modalVisible = true"
   >
-    <IconSettings class="h-4 w-4 text-gray-500 group-hover:text-gray-700" />
-  </div>
+    <IconSettings
+      class="h-4 w-4 text-gray-500 group-hover:text-gray-700"
+      aria-hidden="true"
+    />
+  </button>
   <AttachmentGroupsModal
     v-if="modalVisible"
     :selected-name="selectedName"
