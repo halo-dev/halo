@@ -171,6 +171,7 @@ models/group-kind.ts
 models/group-list.ts
 models/group-spec.ts
 models/group-status.ts
+models/group-version-kind.ts
 models/group.ts
 models/halo-document.ts
 models/index.ts
@@ -274,6 +275,7 @@ models/reply-status.ts
 models/reply-vo-list.ts
 models/reply-vo.ts
 models/reply.ts
+models/resource-reference.ts
 models/reverse-proxy-list.ts
 models/reverse-proxy-rule.ts
 models/reverse-proxy.ts

@@ -20,13 +20,13 @@ import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.PageRequest;
-import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.ReactivePresentationExtensionClient;
 
 @ExtendWith(MockitoExtension.class)
 class SiteStatsFinderImplTest {
 
     @Mock
-    ReactiveExtensionClient client;
+    ReactivePresentationExtensionClient client;
 
     @Mock
     CounterService counterService;

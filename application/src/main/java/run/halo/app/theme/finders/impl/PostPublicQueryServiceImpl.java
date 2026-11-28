@@ -21,7 +21,9 @@ import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.PageRequest;
-import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.ReactivePresentationExtensionClient;
+import run.halo.app.localization.ContentLocalizationTransformer;
+import run.halo.app.localization.ResourceReference;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 import run.halo.app.theme.ReactivePostContentHandler;
 import run.halo.app.theme.finders.CategoryFinder;
@@ -35,7 +37,7 @@ import run.halo.app.theme.router.ReactiveQueryPostPredicateResolver;
 @RequiredArgsConstructor
 public class PostPublicQueryServiceImpl implements PostPublicQueryService {
 
-    private final ReactiveExtensionClient client;
+    private final ReactivePresentationExtensionClient client;
 
     private final TagFinder tagFinder;
 
@@ -46,6 +48,8 @@ public class PostPublicQueryServiceImpl implements PostPublicQueryService {
     private final CounterService counterService;
 
     private final PostService postService;
+
+    private final ContentLocalizationTransformer contentLocalization;
 
     private final ExtensionGetter extensionGetter;
 
@@ -212,6 +216,7 @@ public class PostPublicQueryServiceImpl implements PostPublicQueryService {
                 .map(PostVo::from)
                 .flatMap(postVo -> postService
                         .getContent(snapshotName, baseSnapshotName)
+                        .flatMap(wrapper -> contentLocalization.transform(ResourceReference.from(post), wrapper))
                         .flatMap(wrapper -> extendPostContent(post, wrapper))
                         .doOnNext(postVo::setContent)
                         .thenReturn(postVo));
@@ -224,8 +229,10 @@ public class PostPublicQueryServiceImpl implements PostPublicQueryService {
                 .flatMap(predicate -> client.get(Post.class, postName).filter(predicate))
                 .flatMap(post -> {
                     String releaseSnapshot = post.getSpec().getReleaseSnapshot();
+                    String baseSnapshot = post.getSpec().getBaseSnapshot();
                     return postService
-                            .getContent(releaseSnapshot, post.getSpec().getBaseSnapshot())
+                            .getContent(releaseSnapshot, baseSnapshot)
+                            .flatMap(wrapper -> contentLocalization.transform(ResourceReference.from(post), wrapper))
                             .flatMap(wrapper -> extendPostContent(post, wrapper));
                 });
     }

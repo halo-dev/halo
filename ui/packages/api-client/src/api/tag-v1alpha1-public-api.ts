@@ -40,10 +40,11 @@ export const TagV1alpha1PublicApiAxiosParamCreator = function (configuration?: C
          * @param {Array<string>} [labelSelector] Label selector. e.g.: hidden!&#x3D;true
          * @param {Array<string>} [fieldSelector] Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
          * @param {Array<string>} [sort] Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+         * @param {string} [locale] BCP 47 content language tag.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        queryPostsByTagName: async (name: string, page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        queryPostsByTagName: async (name: string, page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, locale?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
             assertParamExists('queryPostsByTagName', 'name', name)
             const localVarPath = `/apis/api.content.halo.run/v1alpha1/tags/{name}/posts`
@@ -87,6 +88,10 @@ export const TagV1alpha1PublicApiAxiosParamCreator = function (configuration?: C
                 localVarQueryParameter['sort'] = sort;
             }
 
+            if (locale !== undefined) {
+                localVarQueryParameter['locale'] = locale;
+            }
+
             localVarHeaderParameter['Accept'] = '*/*';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -101,10 +106,11 @@ export const TagV1alpha1PublicApiAxiosParamCreator = function (configuration?: C
         /**
          * Gets tag by metadata.name
          * @param {string} name Tag metadata.name
+         * @param {string} [locale] BCP 47 content language tag.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        queryTagByName: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        queryTagByName: async (name: string, locale?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
             assertParamExists('queryTagByName', 'name', name)
             const localVarPath = `/apis/api.content.halo.run/v1alpha1/tags/{name}`
@@ -128,6 +134,10 @@ export const TagV1alpha1PublicApiAxiosParamCreator = function (configuration?: C
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            if (locale !== undefined) {
+                localVarQueryParameter['locale'] = locale;
+            }
+
             localVarHeaderParameter['Accept'] = '*/*';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -146,10 +156,11 @@ export const TagV1alpha1PublicApiAxiosParamCreator = function (configuration?: C
          * @param {Array<string>} [labelSelector] Label selector. e.g.: hidden!&#x3D;true
          * @param {Array<string>} [fieldSelector] Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
          * @param {Array<string>} [sort] Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+         * @param {string} [locale] BCP 47 content language tag.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        queryTags: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        queryTags: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, locale?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/api.content.halo.run/v1alpha1/tags`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -190,6 +201,10 @@ export const TagV1alpha1PublicApiAxiosParamCreator = function (configuration?: C
                 localVarQueryParameter['sort'] = sort;
             }
 
+            if (locale !== undefined) {
+                localVarQueryParameter['locale'] = locale;
+            }
+
             localVarHeaderParameter['Accept'] = '*/*';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -218,11 +233,12 @@ export const TagV1alpha1PublicApiFp = function(configuration?: Configuration) {
          * @param {Array<string>} [labelSelector] Label selector. e.g.: hidden!&#x3D;true
          * @param {Array<string>} [fieldSelector] Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
          * @param {Array<string>} [sort] Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+         * @param {string} [locale] BCP 47 content language tag.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async queryPostsByTagName(name: string, page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListedPostVoList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.queryPostsByTagName(name, page, size, labelSelector, fieldSelector, sort, options);
+        async queryPostsByTagName(name: string, page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, locale?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListedPostVoList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.queryPostsByTagName(name, page, size, labelSelector, fieldSelector, sort, locale, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['TagV1alpha1PublicApi.queryPostsByTagName']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -230,11 +246,12 @@ export const TagV1alpha1PublicApiFp = function(configuration?: Configuration) {
         /**
          * Gets tag by metadata.name
          * @param {string} name Tag metadata.name
+         * @param {string} [locale] BCP 47 content language tag.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async queryTagByName(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TagVo>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.queryTagByName(name, options);
+        async queryTagByName(name: string, locale?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TagVo>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.queryTagByName(name, locale, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['TagV1alpha1PublicApi.queryTagByName']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -246,11 +263,12 @@ export const TagV1alpha1PublicApiFp = function(configuration?: Configuration) {
          * @param {Array<string>} [labelSelector] Label selector. e.g.: hidden!&#x3D;true
          * @param {Array<string>} [fieldSelector] Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
          * @param {Array<string>} [sort] Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+         * @param {string} [locale] BCP 47 content language tag.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async queryTags(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TagVoList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.queryTags(page, size, labelSelector, fieldSelector, sort, options);
+        async queryTags(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, locale?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TagVoList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.queryTags(page, size, labelSelector, fieldSelector, sort, locale, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['TagV1alpha1PublicApi.queryTags']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -271,7 +289,7 @@ export const TagV1alpha1PublicApiFactory = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         queryPostsByTagName(requestParameters: TagV1alpha1PublicApiQueryPostsByTagNameRequest, options?: RawAxiosRequestConfig): AxiosPromise<ListedPostVoList> {
-            return localVarFp.queryPostsByTagName(requestParameters.name, requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+            return localVarFp.queryPostsByTagName(requestParameters.name, requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.locale, options).then((request) => request(axios, basePath));
         },
         /**
          * Gets tag by metadata.name
@@ -280,7 +298,7 @@ export const TagV1alpha1PublicApiFactory = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         queryTagByName(requestParameters: TagV1alpha1PublicApiQueryTagByNameRequest, options?: RawAxiosRequestConfig): AxiosPromise<TagVo> {
-            return localVarFp.queryTagByName(requestParameters.name, options).then((request) => request(axios, basePath));
+            return localVarFp.queryTagByName(requestParameters.name, requestParameters.locale, options).then((request) => request(axios, basePath));
         },
         /**
          * Lists tags
@@ -289,7 +307,7 @@ export const TagV1alpha1PublicApiFactory = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         queryTags(requestParameters: TagV1alpha1PublicApiQueryTagsRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<TagVoList> {
-            return localVarFp.queryTags(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+            return localVarFp.queryTags(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.locale, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -327,6 +345,11 @@ export interface TagV1alpha1PublicApiQueryPostsByTagNameRequest {
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
      */
     readonly sort?: Array<string>
+
+    /**
+     * BCP 47 content language tag.
+     */
+    readonly locale?: string
 }
 
 /**
@@ -337,6 +360,11 @@ export interface TagV1alpha1PublicApiQueryTagByNameRequest {
      * Tag metadata.name
      */
     readonly name: string
+
+    /**
+     * BCP 47 content language tag.
+     */
+    readonly locale?: string
 }
 
 /**
@@ -367,6 +395,11 @@ export interface TagV1alpha1PublicApiQueryTagsRequest {
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
      */
     readonly sort?: Array<string>
+
+    /**
+     * BCP 47 content language tag.
+     */
+    readonly locale?: string
 }
 
 /**
@@ -380,7 +413,7 @@ export class TagV1alpha1PublicApi extends BaseAPI {
      * @throws {RequiredError}
      */
     public queryPostsByTagName(requestParameters: TagV1alpha1PublicApiQueryPostsByTagNameRequest, options?: RawAxiosRequestConfig) {
-        return TagV1alpha1PublicApiFp(this.configuration).queryPostsByTagName(requestParameters.name, requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+        return TagV1alpha1PublicApiFp(this.configuration).queryPostsByTagName(requestParameters.name, requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.locale, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -390,7 +423,7 @@ export class TagV1alpha1PublicApi extends BaseAPI {
      * @throws {RequiredError}
      */
     public queryTagByName(requestParameters: TagV1alpha1PublicApiQueryTagByNameRequest, options?: RawAxiosRequestConfig) {
-        return TagV1alpha1PublicApiFp(this.configuration).queryTagByName(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+        return TagV1alpha1PublicApiFp(this.configuration).queryTagByName(requestParameters.name, requestParameters.locale, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -400,7 +433,7 @@ export class TagV1alpha1PublicApi extends BaseAPI {
      * @throws {RequiredError}
      */
     public queryTags(requestParameters: TagV1alpha1PublicApiQueryTagsRequest = {}, options?: RawAxiosRequestConfig) {
-        return TagV1alpha1PublicApiFp(this.configuration).queryTags(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+        return TagV1alpha1PublicApiFp(this.configuration).queryTags(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.locale, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

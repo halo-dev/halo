@@ -23,14 +23,18 @@ public class SiteSettingVariablesAcquirer implements ViewContextBasedVariablesAc
     private final SystemConfigFetcher environmentFetcher;
     private final ExternalUrlSupplier externalUrlSupplier;
     private final SystemVersionSupplier systemVersionSupplier;
+    private final SiteSettingLocalizer siteSettingLocalizer;
 
     @Override
     public Mono<Map<String, Object>> acquire(ServerWebExchange exchange) {
-        return environmentFetcher.getConfig().map(config -> {
-            var siteSettingVo = SiteSettingVo.from(config)
-                    .withUrl(externalUrlSupplier.getURL(exchange.getRequest()))
-                    .withVersion(systemVersionSupplier.get().toString());
-            return Map.of("site", siteSettingVo);
-        });
+        return environmentFetcher
+                .getConfig()
+                .flatMap(config -> {
+                    var site = SiteSettingVo.from(config)
+                            .withUrl(externalUrlSupplier.getURL(exchange.getRequest()))
+                            .withVersion(systemVersionSupplier.get().toString());
+                    return siteSettingLocalizer.localize(site);
+                })
+                .map(site -> Map.<String, Object>of("site", site));
     }
 }

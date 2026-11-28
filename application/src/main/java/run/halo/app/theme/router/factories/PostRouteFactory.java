@@ -5,27 +5,37 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
 import static run.halo.app.content.permalinks.PostPermalinkPolicy.DEFAULT_CATEGORY;
 
+import java.net.URI;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.http.server.PathContainer;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.server.*;
 import org.springframework.web.server.i18n.LocaleContextResolver;
+import org.springframework.web.util.pattern.PathPattern;
+import org.springframework.web.util.pattern.PathPatternParser;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.PostService;
 import run.halo.app.core.extension.content.Post;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.MetadataUtil;
-import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.ReactivePresentationExtensionClient;
 import run.halo.app.extension.index.query.Queries;
+import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.infra.utils.JacksonUtils;
 import run.halo.app.theme.finders.PostFinder;
@@ -34,6 +44,7 @@ import run.halo.app.theme.router.ModelMapUtils;
 import run.halo.app.theme.router.PostViewNameResolver;
 import run.halo.app.theme.router.ReactiveQueryPostPredicateResolver;
 import run.halo.app.theme.router.TitleVisibilityIdentifyCalculator;
+import run.halo.app.theme.utils.PublicRoutePatterns;
 
 /**
  * The {@link PostRouteFactory} for generate {@link RouterFunction} specific to the template <code>post.html</code>.
@@ -49,7 +60,7 @@ public class PostRouteFactory implements RouteFactory {
 
     private final PostViewNameResolver postViewNameResolver;
 
-    private final ReactiveExtensionClient client;
+    private final ReactivePresentationExtensionClient client;
 
     private final ReactiveQueryPostPredicateResolver queryPostPredicateResolver;
 
@@ -57,6 +68,7 @@ public class PostRouteFactory implements RouteFactory {
 
     private final LocaleContextResolver localeContextResolver;
     private final PostService postService;
+    private final ExternalUrlSupplier externalUrl;
 
     @Override
     public RouterFunction<ServerResponse> create(String pattern) {
@@ -66,6 +78,102 @@ public class PostRouteFactory implements RouteFactory {
             return RouterFunctions.route(GET("/").and(requestPredicate), queryParamHandlerFunction(postParamPredicate));
         }
         return RouterFunctions.route(GET(pattern).and(accept(MediaType.TEXT_HTML)), handlerFunction());
+    }
+
+    @Override
+    public List<String> publicPatterns(String pattern) {
+        return List.of();
+    }
+
+    @Override
+    public Mono<Set<String>> claimedPrefixes(String pattern) {
+        if (pattern == null || pattern.contains("?")) {
+            return Mono.just(Set.of());
+        }
+        return publishedPostPaths()
+                .map(PublicRoutePatterns::staticPrefix)
+                .filter(prefix -> !prefix.isEmpty())
+                .collect(Collectors.toSet())
+                .map(Set::copyOf);
+    }
+
+    @Override
+    public Mono<Boolean> matches(String pattern, String path, HttpMethod method) {
+        if (!PublicRoutePatterns.supportsRead(method) || pattern == null || pattern.contains("?")) {
+            return Mono.just(false);
+        }
+        var match = matchPath(pattern, path);
+        if (match == null) {
+            return Mono.just(false);
+        }
+        var name = match.getUriVariables().get("name");
+        var slug = match.getUriVariables().get("slug");
+        if (StringUtils.isBlank(name) && StringUtils.isBlank(slug)) {
+            return publishedPostPaths().any(routePath -> PublicRoutePatterns.samePath(path, routePath));
+        }
+
+        var identity =
+                StringUtils.isNotBlank(name) ? Queries.equal("metadata.name", name) : Queries.equal("spec.slug", slug);
+        var options = ListOptions.builder()
+                .andQuery(identity)
+                .andQuery(Queries.isNull("metadata.deletionTimestamp"))
+                .andQuery(Queries.equal("spec.deleted", false))
+                .labelSelector()
+                .eq(Post.PUBLISHED_LABEL, "true")
+                .end()
+                .build();
+        return client.listAll(Post.class, options, Sort.unsorted())
+                .filter(post -> post.getStatus() != null && post.getStatus().getPermalink() != null)
+                .any(post -> PublicRoutePatterns.samePath(
+                        path, permalinkPath(post.getStatus().getPermalink())));
+    }
+
+    private Flux<String> publishedPostPaths() {
+        var options = ListOptions.builder()
+                .andQuery(Queries.isNull("metadata.deletionTimestamp"))
+                .andQuery(Queries.equal("spec.deleted", false))
+                .labelSelector()
+                .eq(Post.PUBLISHED_LABEL, "true")
+                .end()
+                .build();
+        return client.listAll(Post.class, options, Sort.unsorted())
+                .filter(post -> post.getStatus() != null && post.getStatus().getPermalink() != null)
+                .map(post -> permalinkPath(post.getStatus().getPermalink()))
+                .filter(path -> !path.isEmpty());
+    }
+
+    private PathPattern.PathMatchInfo matchPath(String pattern, String path) {
+        try {
+            return PathPatternParser.defaultInstance
+                    .parse(pattern)
+                    .matchAndExtract(PathContainer.parsePath(path.startsWith("/") ? path : "/" + path));
+        } catch (IllegalArgumentException error) {
+            return null;
+        }
+    }
+
+    private String permalinkPath(String value) {
+        try {
+            var uri = URI.create(value);
+            var path = uri.getRawPath();
+            if (path == null) {
+                return "";
+            }
+            var base = basePath(externalUrl == null ? null : externalUrl.get());
+            if (!base.isEmpty() && (path.equals(base) || path.startsWith(base + "/"))) {
+                path = path.substring(base.length());
+            }
+            return path.isEmpty() ? "/" : path;
+        } catch (IllegalArgumentException error) {
+            return "";
+        }
+    }
+
+    private static String basePath(URI uri) {
+        if (uri == null || uri.getRawPath() == null) {
+            return "";
+        }
+        return uri.getRawPath().replaceFirst("/$", "");
     }
 
     HandlerFunction<ServerResponse> queryParamHandlerFunction(PatternParser paramPredicate) {

@@ -108,6 +108,7 @@ public class CommentFinderEndpoint implements CustomEndpoint {
                             .response(responseBuilder()
                                     .implementation(ListResult.generateGenericClass(CommentWithReplyVo.class)));
                     CommentQuery.buildParameters(builder);
+                    builder.parameter(PublicApiUtils.localeParameter());
                 })
                 .GET("comments/{name}", this::getComment, builder -> {
                     builder.operationId("GetComment")
@@ -119,6 +120,7 @@ public class CommentFinderEndpoint implements CustomEndpoint {
                                     .in(ParameterIn.PATH)
                                     .required(true)
                                     .implementation(String.class))
+                            .parameter(PublicApiUtils.localeParameter())
                             .response(responseBuilder().implementation(CommentVo.class));
                 })
                 .GET(
@@ -137,6 +139,7 @@ public class CommentFinderEndpoint implements CustomEndpoint {
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
+                                .parameter(PublicApiUtils.localeParameter())
                                 .response(responseBuilder().responseCode("200").implementation(ReplyVo.class))
                                 .response(responseBuilder()
                                         .responseCode("404")
@@ -151,6 +154,7 @@ public class CommentFinderEndpoint implements CustomEndpoint {
                                     .in(ParameterIn.PATH)
                                     .required(true)
                                     .implementation(String.class))
+                            .parameter(PublicApiUtils.localeParameter())
                             .response(responseBuilder().implementation(ListResult.generateGenericClass(ReplyVo.class)));
                     PageableRequest.buildParameters(builder);
                 })

@@ -10,6 +10,7 @@ import java.net.URL;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -38,6 +39,9 @@ public class SiteSettingVariablesAcquirerTest {
     @Mock
     private SystemConfigFetcher environmentFetcher;
 
+    @Mock
+    private SiteSettingLocalizer siteSettingLocalizer;
+
     @InjectMocks
     private SiteSettingVariablesAcquirer siteSettingVariablesAcquirer;
 
@@ -47,6 +51,7 @@ public class SiteSettingVariablesAcquirerTest {
         when(externalUrlSupplier.getURL(any())).thenReturn(url);
         when(systemVersionSupplier.get()).thenReturn(Version.parse("0.0.0-alpha.1"));
         when(environmentFetcher.getConfig()).thenReturn(Mono.just(Map.of()));
+        when(siteSettingLocalizer.localize(any())).thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
 
         siteSettingVariablesAcquirer
                 .acquire(mock(ServerWebExchange.class))
@@ -60,5 +65,33 @@ public class SiteSettingVariablesAcquirerTest {
                 })
                 .verifyComplete();
         verify(externalUrlSupplier).getURL(any());
+        verify(siteSettingLocalizer).localize(any());
+    }
+
+    @Test
+    void usesSiteReturnedByLocalizer() throws MalformedURLException {
+        var url = new URL("https://halo.run");
+        when(externalUrlSupplier.getURL(any())).thenReturn(url);
+        when(systemVersionSupplier.get()).thenReturn(Version.parse("0.0.0-alpha.1"));
+        when(environmentFetcher.getConfig()).thenReturn(Mono.just(Map.of()));
+        var localized = SiteSettingVo.builder()
+                .title("Localized")
+                .language("en")
+                .seo(new SiteSettingVo.SeoSetting(false, "Keywords", "Description"))
+                .build();
+        when(siteSettingLocalizer.localize(any())).thenReturn(Mono.just(localized));
+
+        siteSettingVariablesAcquirer
+                .acquire(mock(ServerWebExchange.class))
+                .as(StepVerifier::create)
+                .assertNext(result -> {
+                    assertThat(result.get("site")).isSameAs(localized);
+                })
+                .verifyComplete();
+
+        var captor = ArgumentCaptor.forClass(SiteSettingVo.class);
+        verify(siteSettingLocalizer).localize(captor.capture());
+        assertThat(captor.getValue().url()).isEqualTo(url);
+        assertThat(captor.getValue().version()).isEqualTo("0.0.0-alpha.1");
     }
 }

@@ -67,6 +67,8 @@ const { t } = useI18n();
 const props = withDefaults(
   defineProps<{
     title?: string;
+    compact?: boolean;
+    bodyOnly?: boolean;
     raw?: string;
     content?: string;
     cover?: string;
@@ -79,6 +81,8 @@ const props = withDefaults(
   }>(),
   {
     title: "",
+    compact: false,
+    bodyOnly: false,
     raw: "",
     content: "",
     cover: undefined,
@@ -194,6 +198,9 @@ const customExtensions = [
     addOptions() {
       return {
         getToolbarItems({ editor }: { editor: Editor }) {
+          if (props.compact) {
+            return [];
+          }
           return {
             priority: 1000,
             component: markRaw(ToolbarItem),
@@ -257,7 +264,10 @@ onMounted(async () => {
 
   // debounce OnUpdate
   const debounceOnUpdate = useDebounceFn(() => {
-    const html = editor.value?.getHTML() + "";
+    if (!editor.value || editor.value.isDestroyed) {
+      return;
+    }
+    const html = editor.value.getHTML();
     emit("update:raw", html);
     emit("update:content", html);
     emit("update", html);
@@ -300,7 +310,10 @@ onMounted(async () => {
     onCreate() {
       isInitialized.value = true;
       nextTick(() => {
-        if (editor.value?.isEmpty && !props.title) {
+        if (props.bodyOnly || !editor.value || editor.value.isDestroyed) {
+          return;
+        }
+        if (editor.value.isEmpty && !props.title && editorTitleRef.value) {
           editorTitleRef.value.focus();
         } else {
           editor.value?.commands.focus();
@@ -322,8 +335,13 @@ const handleSelectHeadingNode = (node: HeadingNode) => {
 watch(
   () => props.raw,
   () => {
-    if (props.raw !== editor.value?.getHTML()) {
-      editor.value?.commands.setContent(props.raw);
+    if (!editor.value || editor.value.isDestroyed) {
+      return;
+    }
+    if (props.raw !== editor.value.getHTML()) {
+      editor.value.commands.setContent(props.raw, {
+        emitUpdate: !props.bodyOnly,
+      });
     }
   },
   {
@@ -402,6 +420,19 @@ onCoverInputChange((files) => {
 });
 
 const expandedCover = ref(false);
+
+// Parent save actions can synchronously collect edits pending in the debounce window.
+defineExpose({
+  flush: () => {
+    if (!editor.value || editor.value.isDestroyed) {
+      return;
+    }
+    const html = editor.value.getHTML();
+    emit("update:raw", html);
+    emit("update:content", html);
+    emit("update", html);
+  },
+});
 </script>
 
 <template>
@@ -422,7 +453,7 @@ const expandedCover = ref(false);
       @close="coverSelectorModalVisible = false"
     />
     <RichTextEditor v-if="editor" :editor="editor" :locale="currentLocale">
-      <template #content>
+      <template v-if="!bodyOnly" #content>
         <div class="group">
           <div
             v-if="cover || uploadProgress"
@@ -564,7 +595,7 @@ const expandedCover = ref(false);
           <slot name="content" />
         </div>
       </template>
-      <template v-if="showSidebar" #extra>
+      <template v-if="showSidebar && !compact" #extra>
         <OverlayScrollbarsComponent
           element="div"
           :options="{ scrollbars: { autoHide: 'scroll' } }"

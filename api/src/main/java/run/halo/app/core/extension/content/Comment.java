@@ -16,6 +16,10 @@ import org.springframework.util.CollectionUtils;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
 import run.halo.app.extension.Ref;
+import run.halo.app.localization.Localizable;
+import run.halo.app.localization.LocalizableField;
+import run.halo.app.localization.LocalizableNested;
+import run.halo.app.localization.LocalizableResource;
 
 /**
  * Comment extension for a post, single page, or another commentable subject.
@@ -28,6 +32,7 @@ import run.halo.app.extension.Ref;
 @ToString(callSuper = true)
 @GVK(group = Constant.GROUP, version = Constant.VERSION, kind = Comment.KIND, plural = "comments", singular = "comment")
 @EqualsAndHashCode(callSuper = true)
+@LocalizableResource(label = "core.comment.title")
 public class Comment extends AbstractExtension {
 
     public static final String KIND = "Comment";
@@ -36,6 +41,7 @@ public class Comment extends AbstractExtension {
 
     /** Desired state of the comment, including the subject, owner, body, and moderation flags. */
     @Schema(requiredMode = REQUIRED)
+    @LocalizableNested
     private CommentSpec spec;
 
     /** Observed state of the comment, including reply counters and unread state. */
@@ -73,6 +79,10 @@ public class Comment extends AbstractExtension {
 
         /** Rendered HTML content displayed to REST and theme consumers. */
         @Schema(requiredMode = REQUIRED, minLength = 1)
+        @Localizable(
+                key = "content.html",
+                label = "core.localization.field.body",
+                format = LocalizableField.Format.HTML)
         private String content;
 
         /** Identity of the comment owner. */

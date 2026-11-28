@@ -18,6 +18,8 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Category;
 import run.halo.app.extension.*;
+import run.halo.app.localization.PresentationTestSupport;
+import run.halo.app.localization.ResourceLocalizationService;
 import run.halo.app.theme.finders.PostPublicQueryService;
 import run.halo.app.theme.finders.vo.ListedPostVo;
 
@@ -36,12 +38,16 @@ class CategoryQueryEndpointTest {
     @Mock
     private PostPublicQueryService postPublicQueryService;
 
+    @Mock
+    private ResourceLocalizationService localizationService;
+
     private CategoryQueryEndpoint endpoint;
     private WebTestClient webTestClient;
 
     @BeforeEach
     void setUp() {
-        endpoint = new CategoryQueryEndpoint(client, postPublicQueryService);
+        endpoint = new CategoryQueryEndpoint(
+                PresentationTestSupport.client(client, localizationService), postPublicQueryService);
         RouterFunction<ServerResponse> routerFunction = endpoint.endpoint();
         webTestClient = WebTestClient.bindToRouterFunction(routerFunction).build();
     }

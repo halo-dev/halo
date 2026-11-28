@@ -2,11 +2,15 @@ package run.halo.app.theme.router.factories;
 
 import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
+import static run.halo.app.extension.index.query.Queries.equal;
+import static run.halo.app.extension.index.query.Queries.isNull;
 import static run.halo.app.theme.router.PageUrlUtils.totalPage;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.*;
@@ -14,10 +18,13 @@ import org.springframework.web.server.i18n.LocaleContextResolver;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.user.service.RoleService;
-import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.GroupVersionKind;
+import run.halo.app.extension.ListOptions;
+import run.halo.app.extension.ReactivePresentationExtensionClient;
 import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.exception.NotFoundException;
+import run.halo.app.localization.ResourceReference;
 import run.halo.app.security.authorization.AuthorityUtils;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.PostFinder;
@@ -27,6 +34,7 @@ import run.halo.app.theme.router.ModelConst;
 import run.halo.app.theme.router.PageUrlUtils;
 import run.halo.app.theme.router.TitleVisibilityIdentifyCalculator;
 import run.halo.app.theme.router.UrlContextListResult;
+import run.halo.app.theme.utils.PublicRoutePatterns;
 
 /**
  * The {@link AuthorPostsRouteFactory} for generate {@link RouterFunction} specific to the template <code>index.html
@@ -40,7 +48,7 @@ import run.halo.app.theme.router.UrlContextListResult;
 public class AuthorPostsRouteFactory implements RouteFactory {
 
     private final PostFinder postFinder;
-    private final ReactiveExtensionClient client;
+    private final ReactivePresentationExtensionClient client;
     private final RoleService roleService;
     private SystemConfigFetcher environmentFetcher;
 
@@ -55,6 +63,27 @@ public class AuthorPostsRouteFactory implements RouteFactory {
                         .or(GET("/authors/{name}/page/{page:\\d+}"))
                         .and(accept(MediaType.TEXT_HTML)),
                 handlerFunction());
+    }
+
+    @Override
+    public List<String> publicPatterns(String pattern) {
+        return List.of("/authors/{name}", "/authors/{name}/page/{page:\\d+}");
+    }
+
+    @Override
+    public Mono<Boolean> matches(String pattern, String path, HttpMethod method) {
+        if (!PublicRoutePatterns.supportsRead(method)) {
+            return Mono.just(false);
+        }
+        var variables = PublicRoutePatterns.matchAndExtract(path, publicPatterns(pattern));
+        if (variables.isEmpty()) {
+            return Mono.just(false);
+        }
+        var name = variables.get().get("name");
+        if (name == null || name.isBlank()) {
+            return Mono.just(false);
+        }
+        return userExists(name).flatMap(exists -> exists ? hasPostManageRole(name) : Mono.just(false));
     }
 
     HandlerFunction<ServerResponse> handlerFunction() {
@@ -73,7 +102,9 @@ public class AuthorPostsRouteFactory implements RouteFactory {
                                             "posts",
                                             postList(request, name),
                                             ModelConst.TEMPLATE_ID,
-                                            DefaultTemplateEnum.AUTHOR.getValue()));
+                                            DefaultTemplateEnum.AUTHOR.getValue(),
+                                            ModelConst.RESOURCE_REFERENCE,
+                                            new ResourceReference(GroupVersionKind.fromExtension(User.class), name)));
                 }
                 return Mono.error(new NotFoundException("Author page not found."));
             });
@@ -116,5 +147,13 @@ public class AuthorPostsRouteFactory implements RouteFactory {
         return client.fetch(User.class, name)
                 .switchIfEmpty(Mono.error(() -> new NotFoundException("Author page not found.")))
                 .map(UserVo::from);
+    }
+
+    private Mono<Boolean> userExists(String name) {
+        var listOptions = ListOptions.builder()
+                .andQuery(equal("metadata.name", name))
+                .andQuery(isNull("metadata.deletionTimestamp"))
+                .build();
+        return client.countBy(User.class, listOptions).map(count -> count > 0);
     }
 }

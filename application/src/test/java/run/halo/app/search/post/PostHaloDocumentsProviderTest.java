@@ -19,6 +19,7 @@ import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.Metadata;
 import run.halo.app.infra.ReactiveExtensionPaginatedOperator;
+import run.halo.app.localization.ResourceReference;
 
 @ExtendWith(MockitoExtension.class)
 class PostHaloDocumentsProviderTest {
@@ -53,6 +54,7 @@ class PostHaloDocumentsProviderTest {
                     assertEquals("fake-post", doc.getMetadataName());
                     assertEquals("post.content.halo.run-fake-post", doc.getId());
                     assertEquals("fake-content", doc.getContent());
+                    assertEquals(new ResourceReference(Post.GVK, "fake-post"), doc.getResource());
                 })
                 .verifyComplete();
     }
@@ -69,6 +71,7 @@ class PostHaloDocumentsProviderTest {
                     assertEquals("fake-post", doc.getMetadataName());
                     assertEquals("post.content.halo.run-fake-post", doc.getId());
                     assertEquals("", doc.getContent());
+                    assertEquals(new ResourceReference(Post.GVK, "fake-post"), doc.getResource());
                 })
                 .verifyComplete();
     }

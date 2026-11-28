@@ -1,11 +1,15 @@
 package run.halo.app.core.endpoint.theme;
 
+import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
+
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
+import org.springdoc.core.fn.builders.parameter.Builder;
 import org.springframework.util.Assert;
 import run.halo.app.extension.Extension;
 import run.halo.app.extension.GroupVersion;
@@ -20,6 +24,20 @@ import run.halo.app.extension.ListResult;
  */
 @UtilityClass
 public class PublicApiUtils {
+
+    /**
+     * Builds the public content language query parameter.
+     *
+     * @return locale query parameter
+     */
+    public static Builder localeParameter() {
+        return parameterBuilder()
+                .in(ParameterIn.QUERY)
+                .name("locale")
+                .description("BCP 47 content language tag.")
+                .implementation(String.class)
+                .required(false);
+    }
 
     /**
      * Get group version from extension for public api.

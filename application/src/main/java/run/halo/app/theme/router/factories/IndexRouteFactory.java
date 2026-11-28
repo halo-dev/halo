@@ -5,6 +5,7 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 import static run.halo.app.theme.router.PageUrlUtils.totalPage;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
@@ -49,6 +50,11 @@ public class IndexRouteFactory implements RouteFactory {
                         .or(GET("/index/page/{page:\\d+}"))
                         .and(accept(MediaType.TEXT_HTML))),
                 handlerFunction());
+    }
+
+    @Override
+    public List<String> publicPatterns(String pattern) {
+        return List.of("/", "/index", "/page/{page:\\d+}", "/index/page/{page:\\d+}");
     }
 
     HandlerFunction<ServerResponse> handlerFunction() {

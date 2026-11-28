@@ -38,6 +38,12 @@ export function setupComponents(
     defineAsyncComponent(() => import("@/components/codemirror/Codemirror.vue"))
   );
 
+  // Reuse the host's content editor in plugin-owned language versions and documents.
+  app.component(
+    "HaloContentEditor",
+    defineAsyncComponent(() => import("@/components/editor/ContentEditor.vue"))
+  );
+
   // Console components
   app.component("FilterDropdown", FilterDropdown);
   app.component("FilterCleanButton", FilterCleanButton);
@@ -61,6 +67,7 @@ export function setupComponents(
 
 declare module "vue" {
   interface GlobalComponents {
+    HaloContentEditor: (typeof import("@/components/editor/ContentEditor.vue"))["default"];
     VCodemirror: (typeof import("@/components/codemirror/Codemirror.vue"))["default"];
     FilterDropdown: (typeof import("@/components/filter/FilterDropdown.vue"))["default"];
     FilterCleanButton: (typeof import("@/components/filter/FilterCleanButton.vue"))["default"];

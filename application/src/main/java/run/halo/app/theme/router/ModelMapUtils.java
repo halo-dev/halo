@@ -5,6 +5,7 @@ import java.util.Map;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.extension.Scheme;
+import run.halo.app.localization.ResourceReference;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.dialect.CommentWidget;
 import run.halo.app.theme.finders.vo.PostVo;
@@ -30,6 +31,10 @@ public abstract class ModelMapUtils {
         Map<String, Object> model = new HashMap<>();
         model.put("name", postVo.getMetadata().getName());
         model.put(ModelConst.TEMPLATE_ID, DefaultTemplateEnum.POST.getValue());
+        model.put(
+                ModelConst.RESOURCE_REFERENCE,
+                new ResourceReference(
+                        POST_SCHEME.groupVersionKind(), postVo.getMetadata().getName()));
         model.put("groupVersionKind", POST_SCHEME.groupVersionKind());
         model.put("plural", POST_SCHEME.plural());
         model.put("post", postVo);
@@ -49,6 +54,11 @@ public abstract class ModelMapUtils {
         model.put("groupVersionKind", SINGLE_PAGE_SCHEME.groupVersionKind());
         model.put("plural", SINGLE_PAGE_SCHEME.plural());
         model.put(ModelConst.TEMPLATE_ID, DefaultTemplateEnum.SINGLE_PAGE.getValue());
+        model.put(
+                ModelConst.RESOURCE_REFERENCE,
+                new ResourceReference(
+                        SINGLE_PAGE_SCHEME.groupVersionKind(),
+                        pageVo.getMetadata().getName()));
         model.put("singlePage", pageVo);
         model.put(CommentWidget.ENABLE_COMMENT_ATTRIBUTE, pageVo.getSpec().getAllowComment());
         return model;

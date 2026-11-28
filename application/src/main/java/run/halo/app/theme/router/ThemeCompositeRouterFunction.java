@@ -5,12 +5,15 @@ import static run.halo.app.theme.utils.PatternUtils.normalizePostPattern;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.SmartLifecycle;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.HandlerFunction;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -24,6 +27,7 @@ import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.SystemSetting.ThemeRouteRules;
 import run.halo.app.infra.utils.ReactiveUtils;
+import run.halo.app.localization.LocalizationRouteProvider;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.router.factories.ArchiveRouteFactory;
 import run.halo.app.theme.router.factories.AuthorPostsRouteFactory;
@@ -31,8 +35,10 @@ import run.halo.app.theme.router.factories.CategoriesRouteFactory;
 import run.halo.app.theme.router.factories.CategoryPostRouteFactory;
 import run.halo.app.theme.router.factories.IndexRouteFactory;
 import run.halo.app.theme.router.factories.PostRouteFactory;
+import run.halo.app.theme.router.factories.RouteFactory;
 import run.halo.app.theme.router.factories.TagPostRouteFactory;
 import run.halo.app.theme.router.factories.TagsRouteFactory;
+import run.halo.app.theme.utils.PublicRoutePatterns;
 
 /**
  * The combination router of theme templates is used to render theme templates, but does not include <code>page.html
@@ -46,7 +52,10 @@ import run.halo.app.theme.router.factories.TagsRouteFactory;
 @Component
 @RequiredArgsConstructor
 public class ThemeCompositeRouterFunction
-        implements RouterFunction<ServerResponse>, SmartLifecycle, ApplicationListener<SystemConfigChangedEvent> {
+        implements RouterFunction<ServerResponse>,
+                SmartLifecycle,
+                ApplicationListener<SystemConfigChangedEvent>,
+                LocalizationRouteProvider {
 
     private static final Duration BLOCKING_TIMEOUT = ReactiveUtils.DEFAULT_TIMEOUT;
 
@@ -96,6 +105,41 @@ public class ThemeCompositeRouterFunction
     }
 
     @Override
+    public Mono<Set<String>> claimedPrefixes() {
+        return currentRoutePatterns()
+                .flatMapMany(Flux::fromIterable)
+                .concatMap(routePattern -> routeFactory(routePattern.identifier())
+                        .claimedPrefixes(routePattern.pattern())
+                        .onErrorResume(error -> {
+                            log.warn("Ignoring failed claimed prefixes from theme route {}", routePattern, error);
+                            return Mono.just(Set.of());
+                        }))
+                .reduce(new HashSet<String>(), (prefixes, claimed) -> {
+                    prefixes.addAll(claimed);
+                    return prefixes;
+                })
+                .map(Set::copyOf)
+                .defaultIfEmpty(Set.of());
+    }
+
+    @Override
+    public Mono<Boolean> matches(String path, HttpMethod method) {
+        if (!PublicRoutePatterns.supportsRead(method)) {
+            return Mono.just(false);
+        }
+        return currentRoutePatterns()
+                .flatMapMany(Flux::fromIterable)
+                .concatMap(routePattern -> routeFactory(routePattern.identifier())
+                        .matches(routePattern.pattern(), path, method)
+                        .onErrorResume(error -> {
+                            log.warn("Ignoring failed theme route match for {}", routePattern, error);
+                            return Mono.just(false);
+                        }))
+                .any(Boolean.TRUE::equals)
+                .defaultIfEmpty(false);
+    }
+
+    @Override
     public void accept(RouterFunctions.Visitor visitor) {
         cachedRouters.forEach(routerFunction -> routerFunction.accept(visitor));
     }
@@ -111,16 +155,20 @@ public class ThemeCompositeRouterFunction
     }
 
     private RouterFunction<ServerResponse> createRouterFunction(RoutePattern routePattern) {
-        return switch (routePattern.identifier()) {
-            case POST -> postRouteFactory.create(routePattern.pattern());
-            case ARCHIVES -> archiveRouteFactory.create(routePattern.pattern());
-            case CATEGORIES -> categoriesRouteFactory.create(routePattern.pattern());
-            case CATEGORY -> categoryPostRouteFactory.create(routePattern.pattern());
-            case TAGS -> tagsRouteFactory.create(routePattern.pattern());
-            case TAG -> tagPostRouteFactory.create(routePattern.pattern());
-            case AUTHOR -> authorPostsRouteFactory.create(routePattern.pattern());
-            case INDEX -> indexRouteFactory.create(routePattern.pattern());
-            default -> throw new IllegalStateException("Unexpected value: " + routePattern.identifier());
+        return routeFactory(routePattern.identifier()).create(routePattern.pattern());
+    }
+
+    private RouteFactory routeFactory(DefaultTemplateEnum identifier) {
+        return switch (identifier) {
+            case POST -> postRouteFactory;
+            case ARCHIVES -> archiveRouteFactory;
+            case CATEGORIES -> categoriesRouteFactory;
+            case CATEGORY -> categoryPostRouteFactory;
+            case TAGS -> tagsRouteFactory;
+            case TAG -> tagPostRouteFactory;
+            case AUTHOR -> authorPostsRouteFactory;
+            case INDEX -> indexRouteFactory;
+            default -> throw new IllegalStateException("Unexpected value: " + identifier);
         };
     }
 
@@ -149,26 +197,61 @@ public class ThemeCompositeRouterFunction
 
     record RoutePattern(DefaultTemplateEnum identifier, String pattern) {}
 
+    private Mono<List<RoutePattern>> currentRoutePatterns() {
+        return environmentFetcher
+                .fetchRouteRules()
+                .defaultIfEmpty(ThemeRouteRules.empty())
+                .map(this::transformedPatterns)
+                .onErrorResume(error -> {
+                    log.warn("Failed to read theme route rules; using default route ownership declarations.", error);
+                    return Mono.just(transformedPatterns(ThemeRouteRules.empty()));
+                });
+    }
+
     private List<RoutePattern> transformedPatterns(ThemeRouteRules rules) {
         List<RoutePattern> routePatterns = new ArrayList<>();
-        var archives = normalizePattern(rules.getArchives());
+        var normalizedRules = normalizedRules(rules);
+        var archives = normalizePattern(normalizedRules.getArchives());
         routePatterns.add(new RoutePattern(DefaultTemplateEnum.ARCHIVES, archives));
 
-        var categories = normalizePattern(rules.getCategories());
+        var categories = normalizePattern(normalizedRules.getCategories());
         routePatterns.add(new RoutePattern(DefaultTemplateEnum.CATEGORIES, categories));
         routePatterns.add(new RoutePattern(DefaultTemplateEnum.CATEGORY, categories));
 
-        var tags = normalizePattern(rules.getTags());
+        var tags = normalizePattern(normalizedRules.getTags());
         routePatterns.add(new RoutePattern(DefaultTemplateEnum.TAGS, tags));
         routePatterns.add(new RoutePattern(DefaultTemplateEnum.TAG, tags));
 
-        var post = normalizePostPattern(rules);
+        var post = normalizePostPattern(normalizedRules);
         routePatterns.add(new RoutePattern(DefaultTemplateEnum.POST, post));
 
         // Add the index route to the end to prevent conflict with the queryParam rule of the post
         routePatterns.add(new RoutePattern(DefaultTemplateEnum.AUTHOR, ""));
         routePatterns.add(new RoutePattern(DefaultTemplateEnum.INDEX, "/"));
         return routePatterns;
+    }
+
+    private ThemeRouteRules normalizedRules(ThemeRouteRules rules) {
+        var defaults = ThemeRouteRules.empty();
+        if (rules == null) {
+            return defaults;
+        }
+        var normalized = new ThemeRouteRules();
+        normalized.setDisableThemePreview(rules.isDisableThemePreview());
+        normalized.setArchives(normalizeOrDefault(rules.getArchives(), defaults.getArchives(), "archives"));
+        normalized.setCategories(normalizeOrDefault(rules.getCategories(), defaults.getCategories(), "categories"));
+        normalized.setTags(normalizeOrDefault(rules.getTags(), defaults.getTags(), "tags"));
+        normalized.setPost(normalizeOrDefault(rules.getPost(), defaults.getPost(), "post"));
+        return normalized;
+    }
+
+    private String normalizeOrDefault(String pattern, String fallback, String field) {
+        try {
+            return normalizePattern(pattern);
+        } catch (IllegalArgumentException error) {
+            log.warn("Ignoring invalid {} theme route pattern '{}'; using '{}'.", field, pattern, fallback);
+            return fallback;
+        }
     }
 
     private List<RoutePattern> transformedPatterns() {

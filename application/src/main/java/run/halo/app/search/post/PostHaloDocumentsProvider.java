@@ -10,6 +10,7 @@ import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.index.query.Queries;
 import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.infra.ReactiveExtensionPaginatedOperator;
+import run.halo.app.localization.ResourceReference;
 import run.halo.app.search.HaloDocument;
 import run.halo.app.search.HaloDocumentsProvider;
 
@@ -62,6 +63,7 @@ public class PostHaloDocumentsProvider implements HaloDocumentsProvider {
         var haloDoc = new HaloDocument();
         var spec = post.getSpec();
         haloDoc.setMetadataName(post.getMetadata().getName());
+        haloDoc.setResource(ResourceReference.from(post));
         haloDoc.setType(POST_DOCUMENT_TYPE);
         haloDoc.setId(POST_DOCUMENT_TYPE + '-' + post.getMetadata().getName());
         haloDoc.setTitle(spec.getTitle());
