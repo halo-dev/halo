@@ -1107,6 +1107,7 @@
   "core.formkit.array.empty_text": "No items",
   "core.formkit.array.image_tooltip": "View image:{value}",
   "core.formkit.array.item_modal.title": "Edit item",
+  "core.formkit.array.new_item": "New item",
   "core.formkit.attachment.operations.select": "Select from attachment library",
   "core.formkit.attachment.operations.input": "Input link",
   "core.common.buttons.save": "Save",

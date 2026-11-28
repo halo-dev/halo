@@ -1,34 +1,46 @@
 <script setup lang="ts">
-import { getNode, type FormKitNode, type FormKitProps } from "@formkit/core";
+import {
+  getNode,
+  type FormKitFrameworkContext,
+  type FormKitNode,
+  type FormKitProps,
+} from "@formkit/core";
 import { undefine } from "@formkit/utils";
-import { IconClose, VButton } from "@halo-dev/components";
+import { IconClose, VAccordion, VButton } from "@halo-dev/components";
 import { utils } from "@halo-dev/ui-shared";
 import { isNil, isNotNil } from "es-toolkit";
 import { cloneDeepWith, get } from "es-toolkit/compat";
-import objectHash from "object-hash";
-import { onMounted, ref, toRaw, watch } from "vue";
-import { VueDraggable } from "vue-draggable-plus";
+import { computed, onMounted, ref, toRaw, watch } from "vue";
+import { useDraggable, VueDraggable } from "vue-draggable-plus";
 import MingcuteDotsLine from "~icons/mingcute/dots-line";
 import type { ArrayItemLabel, ArrayItemLabelType } from ".";
-import type { IconifyFormat, IconifyValue } from "../iconify/types";
+import ArrayAccordionItem from "./ArrayAccordionItem.vue";
 import ArrayFormModal from "./ArrayFormModal.vue";
-import ColorLabel from "./labels/ColorLabel.vue";
-import IconifyLabel from "./labels/IconifyLabel.vue";
+import ArrayItemLabels from "./ArrayItemLabels.vue";
 import { renderItemLabelValue } from "./renderers";
+import type { ArrayItemFormMode, FormattedItemLabel } from "./types";
 
 const formKitChildrenId = `formkit-children-${utils.id.uuid()}`;
+const draftItemKey = "array-item-draft";
+const dragHandleClass = `array-drag-handle-${utils.id.uuid()}`;
 
 export type ArrayProps = {
   removeControl?: boolean;
   addButton?: boolean;
-  addLabel?: boolean;
+  addLabel?: string;
   addAttrs?: Record<string, unknown>;
   min?: number;
   max?: number;
-  itemLabels: ArrayItemLabelType[];
+  itemLabels?: ArrayItemLabel[];
+  emptyText?: string;
+  itemFormMode?: ArrayItemFormMode;
 };
 
 export type ArrayValue = Record<string, unknown>[];
+
+type ArrayInputContext = {
+  commitOpenAccordionItem?: () => Promise<boolean>;
+};
 
 const props = defineProps<{
   node: FormKitNode<ArrayValue>;
@@ -50,6 +62,7 @@ function arrayFeature(node: FormKitNode<ArrayValue>) {
   node.props.removeControl = initProps.removeControl ?? true;
   node.props.addButton = initProps.addButton ?? true;
   node.props.addAttrs = initProps.addAttrs ?? {};
+  node.props.itemFormMode = initProps.itemFormMode ?? "modal";
   node.props.min = initProps.min ? Number(initProps.min) : 0;
   node.props.max = initProps.max ? Number(initProps.max) : 1 / 0;
   if (node.props.min > node.props.max) {
@@ -63,6 +76,10 @@ function arrayFeature(node: FormKitNode<ArrayValue>) {
   nodeProps.value = {
     ...initProps,
   };
+
+  node.on("input", ({ payload }) => {
+    arrayValue.value = toRaw(payload);
+  });
 
   if (Array.isArray(node.value)) {
     if (node.value.length < node.props.min) {
@@ -79,10 +96,6 @@ function arrayFeature(node: FormKitNode<ArrayValue>) {
       false
     );
   }
-
-  node.on("input", ({ payload }) => {
-    arrayValue.value = toRaw(payload);
-  });
 }
 
 onMounted(async () => {
@@ -90,20 +103,14 @@ onMounted(async () => {
   node._c.sync = true;
   arrayFeature(node);
   hiddenChildrenFormKit.value = getNode(formKitChildrenId);
+  const context = node.context as
+    | (FormKitFrameworkContext & ArrayInputContext)
+    | undefined;
+  if (context) {
+    context.commitOpenAccordionItem = commitOpenAccordionItem;
+  }
   await updateFormattedLabels();
 });
-
-type FormattedItemLabel =
-  | {
-      type: Exclude<ArrayItemLabelType, "iconify">;
-      value: string;
-    }
-  | {
-      type: "iconify";
-      value: string | IconifyValue;
-      format: IconifyFormat;
-      valueOnly?: boolean;
-    };
 
 const parseItemLabel = async (
   itemLabel: ArrayItemLabel,
@@ -175,12 +182,24 @@ const currentEditIndex = ref<number>(-1);
 
 const formattedItemLabels = ref<Map<string, FormattedItemLabel[]>>(new Map());
 
+const itemKeys = new WeakMap<object, string>();
+let itemKeySeed = 0;
+
+const getItemKey = (item: Record<string, unknown>) => {
+  let key = itemKeys.get(item);
+  if (!key) {
+    key = `array-item-${itemKeySeed++}`;
+    itemKeys.set(item, key);
+  }
+  return key;
+};
+
 const updateFormattedLabels = async () => {
-  const newLabelsMap = new Map();
+  const newLabelsMap = new Map<string, FormattedItemLabel[]>();
 
   for (let index = 0; index < arrayValue.value.length; index++) {
     const item = arrayValue.value[index];
-    const key = generateKey(item, index);
+    const key = getItemKey(item);
     const labels = await formatItemLabel(item);
     newLabelsMap.set(key, labels);
   }
@@ -211,8 +230,30 @@ const handleCloseArrayModal = () => {
   arrayValue.value = [...props.node.value];
 };
 
-const generateKey = (item: Record<string, unknown>, index: number) => {
-  return `${objectHash(item)}-${index}`;
+const applyItemData = (data: Record<string, unknown>, index: number) => {
+  const oldNodeValue = [...((props.node._value as ArrayValue) || [])];
+  if (index === -1) {
+    props.node.input(oldNodeValue.concat(data), false);
+    return;
+  }
+
+  if (index >= oldNodeValue.length) {
+    throw new Error("Current edit index is out of range");
+  }
+
+  const currentItem = oldNodeValue[index];
+  Object.keys(currentItem).forEach((key) => {
+    if (!(key in data)) {
+      delete currentItem[key];
+    }
+  });
+  Object.assign(currentItem, data);
+  props.node.input(oldNodeValue, false);
+};
+
+const handleModalSubmit = (data: Record<string, unknown>) => {
+  applyItemData(data, currentEditIndex.value);
+  arrayModal.value = false;
 };
 
 const handleDragUpdate = () => {
@@ -220,94 +261,209 @@ const handleDragUpdate = () => {
 };
 
 const handleRemoveItem = (index: number) => {
-  if (arrayValue.value.length <= nodeProps.value.min) {
+  if (arrayValue.value.length <= (nodeProps.value.min ?? 0)) {
     return;
   }
   arrayValue.value.splice(index, 1);
   props.node.input(arrayValue.value, false);
 };
+
+const isAccordionMode = computed(() => {
+  return nodeProps.value.itemFormMode === "accordion";
+});
+
+const openAccordionItem = ref<string>();
+const creatingAccordionItem = ref(false);
+const accordion = ref<InstanceType<typeof VAccordion> | null>(null);
+const existingAccordionItems = ref<InstanceType<typeof ArrayAccordionItem>[]>(
+  []
+);
+const draftAccordionItem = ref<InstanceType<typeof ArrayAccordionItem> | null>(
+  null
+);
+const accordionEl = computed(
+  () => accordion.value?.$el as HTMLElement | undefined
+);
+
+const accordionDraggable = useDraggable(accordionEl, arrayValue, {
+  immediate: false,
+  animation: 150,
+  handle: `.${dragHandleClass}`,
+  draggable: ".array-accordion-item:not(.array-accordion-item--draft)",
+  onUpdate: handleDragUpdate,
+});
+
+watch(
+  accordionEl,
+  (el) => {
+    if (!isAccordionMode.value) {
+      return;
+    }
+    if (el) {
+      accordionDraggable.start(el);
+    } else {
+      accordionDraggable.destroy();
+    }
+  },
+  { flush: "post" }
+);
+
+watch(openAccordionItem, (value) => {
+  if (value !== draftItemKey) {
+    creatingAccordionItem.value = false;
+  }
+});
+
+const handleCreateAccordionItem = () => {
+  if (arrayValue.value.length >= (nodeProps.value.max ?? 1 / 0)) {
+    return;
+  }
+  creatingAccordionItem.value = true;
+  openAccordionItem.value = draftItemKey;
+};
+
+const closeAccordionItem = () => {
+  openAccordionItem.value = undefined;
+  creatingAccordionItem.value = false;
+};
+
+const handleSaveAccordionItem = (
+  data: Record<string, unknown>,
+  index: number
+) => {
+  applyItemData(data, index);
+  closeAccordionItem();
+};
+
+const handleRemoveAccordionItem = (index: number) => {
+  closeAccordionItem();
+  handleRemoveItem(index);
+};
+
+const commitOpenAccordionItem = async () => {
+  if (!isAccordionMode.value || !openAccordionItem.value) {
+    return true;
+  }
+  const openItem =
+    openAccordionItem.value === draftItemKey
+      ? draftAccordionItem.value
+      : existingAccordionItems.value.find(
+          (item) => item.value === openAccordionItem.value
+        );
+  return (await openItem?.commit()) ?? true;
+};
 </script>
+
 <template>
-  <div class="mt-4 w-full space-y-2 sm:max-w-lg">
-    <VueDraggable
-      v-if="arrayValue.length > 0"
-      v-model="arrayValue"
-      :animation="150"
-      class="flex flex-col gap-1"
-      handle=".drag-handle"
-      @update="handleDragUpdate"
-    >
-      <div
-        v-for="(item, index) in arrayValue"
-        :key="generateKey(item, index)"
-        class="group/item flex h-12 items-center gap-2.5 rounded-md border bg-gray-50 px-2 transition-colors hover:bg-gray-100 active:bg-gray-200"
-        @click="handleOpenArrayModal(item, index)"
+  <div
+    class="mt-4 w-full space-y-2"
+    :class="isAccordionMode ? 'sm:max-w-2xl' : 'sm:max-w-lg'"
+  >
+    <template v-if="!isAccordionMode">
+      <VueDraggable
+        v-if="arrayValue.length > 0"
+        v-model="arrayValue"
+        :animation="150"
+        class="flex flex-col gap-1"
+        :handle="`.${dragHandleClass}`"
+        @update="handleDragUpdate"
       >
-        <MingcuteDotsLine class="drag-handle size-4.5 flex-none cursor-move" />
         <div
-          class="line-clamp-1 flex min-w-0 flex-1 shrink cursor-pointer items-center gap-2 whitespace-nowrap text-sm text-gray-900"
+          v-for="(item, index) in arrayValue"
+          :key="getItemKey(item)"
+          class="group/item flex h-12 items-center gap-2.5 rounded-md border bg-gray-50 px-2 transition-colors hover:bg-gray-100 active:bg-gray-200"
+          @click="handleOpenArrayModal(item, index)"
         >
-          <template
-            v-for="(itemLabel, labelIndex) in formattedItemLabels.get(
-              generateKey(item, index)
-            ) || []"
-            :key="labelIndex"
+          <MingcuteDotsLine
+            class="drag-handle size-4 flex-none cursor-move text-gray-500"
+            :class="dragHandleClass"
+          />
+          <div
+            class="line-clamp-1 flex min-w-0 flex-1 shrink cursor-pointer items-center gap-2 whitespace-nowrap text-sm text-gray-900"
           >
-            <a
-              v-if="itemLabel.type === 'image'"
-              :href="itemLabel.value"
-              target="_blank"
-              class="block aspect-1 size-8 flex-none"
-              @click.stop
-            >
-              <img
-                v-tooltip="
-                  $t('core.formkit.array.image_tooltip', {
-                    value: itemLabel.value,
-                  })
-                "
-                :src="utils.attachment.getThumbnailUrl(itemLabel.value, 'S')"
-                class="size-full object-cover"
-                @error="
-                  utils.attachment.handleThumbnailError($event, itemLabel.value)
-                "
-              />
-            </a>
-            <span v-if="itemLabel.type === 'text'">
-              {{ itemLabel.value }}
-            </span>
-            <ColorLabel
-              v-if="itemLabel.type === 'color'"
-              :item-label="itemLabel"
+            <ArrayItemLabels
+              :labels="formattedItemLabels.get(getItemKey(item))"
             />
-            <IconifyLabel
-              v-if="itemLabel.type === 'iconify'"
-              :item-label="itemLabel"
-            />
-          </template>
+          </div>
+          <IconClose
+            v-if="nodeProps.removeControl"
+            :disabled="arrayValue.length <= (nodeProps.min ?? 0)"
+            class="size-4 flex-none cursor-pointer text-gray-500 opacity-0 transition-opacity hover:text-gray-900 group-hover/item:opacity-100"
+            :class="{
+              'pointer-events-none cursor-not-allowed opacity-50 hover:text-gray-500 group-hover/item:opacity-50':
+                arrayValue.length <= (nodeProps.min ?? 0),
+            }"
+            @click.stop="handleRemoveItem(index)"
+          />
         </div>
-        <IconClose
-          v-if="nodeProps.removeControl"
-          :disabled="arrayValue.length <= nodeProps.min"
-          class="size-4.5 flex-none cursor-pointer text-gray-500 opacity-0 transition-opacity hover:text-gray-900 group-hover/item:opacity-100"
-          :class="{
-            'pointer-events-none cursor-not-allowed opacity-50 hover:text-gray-500 group-hover/item:opacity-50':
-              arrayValue.length <= nodeProps.min,
-          }"
-          @click.stop="handleRemoveItem(index)"
-        />
+      </VueDraggable>
+      <div v-else class="text-sm text-gray-500">
+        {{ nodeProps.emptyText ?? $t("core.formkit.array.empty_text") }}
       </div>
-    </VueDraggable>
-    <div v-else class="text-sm text-gray-500">
-      {{ nodeProps.emptyText ?? $t("core.formkit.array.empty_text") }}
-    </div>
+    </template>
+
+    <template v-else>
+      <VAccordion
+        v-if="arrayValue.length > 0 || creatingAccordionItem"
+        ref="accordion"
+        v-model="openAccordionItem"
+        type="single"
+        collapsible
+        variant="plain"
+        :unmount-on-hide="true"
+        class="array-accordion flex w-full flex-col gap-1"
+      >
+        <ArrayAccordionItem
+          v-for="(item, index) in arrayValue"
+          ref="existingAccordionItems"
+          :key="getItemKey(item)"
+          :node="node"
+          :value="getItemKey(item)"
+          :item="item"
+          :labels="formattedItemLabels.get(getItemKey(item))"
+          :open="openAccordionItem === getItemKey(item)"
+          :drag-handle-class="dragHandleClass"
+          :remove-control="nodeProps.removeControl"
+          :can-remove="arrayValue.length > (nodeProps.min ?? 0)"
+          @save="handleSaveAccordionItem($event, index)"
+          @cancel="closeAccordionItem"
+          @remove="handleRemoveAccordionItem(index)"
+        />
+        <ArrayAccordionItem
+          v-if="creatingAccordionItem"
+          ref="draftAccordionItem"
+          :node="node"
+          :value="draftItemKey"
+          :item="{}"
+          :open="openAccordionItem === draftItemKey"
+          :drag-handle-class="dragHandleClass"
+          is-draft
+          :remove-control="false"
+          :can-remove="false"
+          @save="handleSaveAccordionItem($event, -1)"
+          @cancel="closeAccordionItem"
+        />
+      </VAccordion>
+      <div
+        v-if="arrayValue.length === 0 && !creatingAccordionItem"
+        class="text-sm text-gray-500"
+      >
+        {{ nodeProps.emptyText ?? $t("core.formkit.array.empty_text") }}
+      </div>
+    </template>
+
     <VButton
       v-if="nodeProps.addButton"
       v-bind="nodeProps.addAttrs"
-      :disabled="arrayValue.length >= nodeProps.max"
+      :disabled="
+        arrayValue.length >= (nodeProps.max ?? 1 / 0) ||
+        (isAccordionMode && creatingAccordionItem)
+      "
       size="sm"
       type="default"
-      @click="handleOpenArrayModal()"
+      @click="
+        isAccordionMode ? handleCreateAccordionItem() : handleOpenArrayModal()
+      "
     >
       {{ nodeProps.addLabel ?? $t("core.common.buttons.add") }}
     </VButton>
@@ -318,10 +474,42 @@ const handleRemoveItem = (index: number) => {
   </FormKit>
 
   <ArrayFormModal
-    v-if="arrayModal"
+    v-if="!isAccordionMode && arrayModal"
     :node="node"
     :item-value="itemValue"
-    :current-edit-index="currentEditIndex"
+    @submit="handleModalSubmit"
     @close="handleCloseArrayModal"
   />
 </template>
+
+<style lang="scss">
+.array-accordion.v-accordion--plain {
+  .v-accordion-item {
+    @apply overflow-hidden rounded-md border border-gray-200 bg-gray-50 transition-colors;
+  }
+
+  .v-accordion-item[data-state="open"] {
+    @apply bg-white;
+  }
+
+  .v-accordion-trigger {
+    @apply h-12 gap-2.5 px-2 py-0;
+
+    &:hover {
+      @apply bg-gray-100;
+    }
+  }
+
+  .v-accordion-item[data-state="open"] .v-accordion-trigger {
+    @apply bg-gray-50;
+  }
+
+  .v-accordion-item[data-state="open"] .v-accordion-trigger:hover {
+    @apply bg-gray-100;
+  }
+
+  .v-accordion-content-inner {
+    @apply p-0;
+  }
+}
+</style>

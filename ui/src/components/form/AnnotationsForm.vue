@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import {
+  getNode,
   reset,
   submitForm,
   type FormKitNode,
@@ -54,6 +55,7 @@ const handleFetchAnnotationSettings = async () => {
 
 const specFormId = `${utils.id.uuid()}-specForm`;
 const customFormId = `${utils.id.uuid()}-customForm`;
+const customAnnotationsId = `${utils.id.uuid()}-customAnnotations`;
 const annotations = ref<{
   [key: string]: string;
 }>({});
@@ -152,13 +154,51 @@ watch(
 const specFormInvalid = ref(true);
 const customFormInvalid = ref(true);
 
+let customSubmitResolver: (() => void) | undefined;
+
+const resolveCustomSubmit = () => {
+  customSubmitResolver?.();
+  customSubmitResolver = undefined;
+};
+
+const commitOpenCustomAnnotation = async () => {
+  const arrayNode = getNode(customAnnotationsId);
+  const commit = (
+    arrayNode?.context as
+      | {
+          commitOpenAccordionItem?: () => Promise<boolean>;
+        }
+      | undefined
+  )?.commitOpenAccordionItem;
+  if (!commit) {
+    return true;
+  }
+  return commit();
+};
+
+const submitCustomForm = async () => {
+  const customFormNode = getNode(customFormId);
+  if (!customFormNode) {
+    customFormInvalid.value = true;
+    return;
+  }
+  await new Promise<void>((resolve) => {
+    customSubmitResolver = resolve;
+    customFormNode.submit();
+  });
+};
+
 const handleSubmit = async () => {
   if (annotationSettings.value.length) {
     submitForm(specFormId);
   } else {
     specFormInvalid.value = false;
   }
-  submitForm(customFormId);
+  if (!(await commitOpenCustomAnnotation())) {
+    customFormInvalid.value = true;
+    return;
+  }
+  await submitCustomForm();
   await nextTick();
 };
 
@@ -176,6 +216,12 @@ const onCustomFormSubmitCheck = async (node?: FormKitNode) => {
   }
   const validations = getValidationMessages(node);
   customFormInvalid.value = validations.size > 0;
+  resolveCustomSubmit();
+};
+
+const onCustomFormSubmit = () => {
+  customFormInvalid.value = false;
+  resolveCustomSubmit();
 };
 
 defineExpose({
@@ -245,11 +291,13 @@ const customFormOpen = computed({
           :preserve="true"
           :form-class="`${annotationSettings.length ? 'py-4' : ''}`"
           @submit-invalid="onCustomFormSubmitCheck"
-          @submit="customFormInvalid = false"
+          @submit="onCustomFormSubmit"
         >
           <FormKit
+            :id="customAnnotationsId"
             v-model="customAnnotationsState"
             type="array"
+            item-form-mode="accordion"
             :label="$t('core.components.annotations_form.custom_fields.label')"
             :item-labels="[{ type: 'text', label: '$value.key' }]"
           >
