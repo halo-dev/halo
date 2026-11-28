@@ -46,11 +46,6 @@ beforeEach(() => {
 afterEach(() => {
   wrapper.unmount();
   document.body.innerHTML = "";
-  toast.configure({
-    placement: "top-center",
-    duration: 3000,
-    maxCount: 5,
-  });
   vi.useRealTimers();
 });
 
@@ -174,24 +169,18 @@ describe("Toast", () => {
     expect(states()).toEqual(["closed", "closed"]);
   });
 
-  it("enforces maxCount by closing the oldest toast", async () => {
-    toast.configure({ maxCount: 2 });
-
-    toast.success("One");
-    toast.success("Two");
-    toast.success("Three");
-    await nextTick();
-
-    expect(states().filter((state) => state === "open")).toHaveLength(2);
-  });
-
-  it("limits the default number of live toasts to five", async () => {
+  it("limits the number of live toasts to five", async () => {
     for (let index = 1; index <= 6; index++) {
       toast.success(`消息 ${index}`);
     }
     await nextTick();
 
     expect(states().filter((state) => state === "open")).toHaveLength(5);
+    expect(
+      toastElements()
+        .filter((element) => element.getAttribute("data-state") === "open")
+        .map((element) => element.textContent)
+    ).not.toContain("消息 1");
   });
 
   it("renders title and action", async () => {
@@ -247,13 +236,16 @@ describe("Toast", () => {
     expect(toastElement()?.textContent).toContain("Shared host");
   });
 
-  it("applies the configured placement", async () => {
-    toast.configure({ placement: "bottom-right" });
+  it("does not expose global configuration", () => {
+    expect("configure" in toast).toBe(false);
+  });
+
+  it("renders toasts in a centered viewport", async () => {
     toast.success("Saved");
     await nextTick();
 
-    expect(
-      document.body.querySelector(".toast-container")?.className
-    ).toContain("toast-placement-bottom-right");
+    const container = document.body.querySelector(".toast-container");
+
+    expect(container?.className).toBe("toast-container");
   });
 });
