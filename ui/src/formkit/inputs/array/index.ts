@@ -13,6 +13,7 @@ import {
 } from "@formkit/inputs";
 import { defineAsyncComponent } from "vue";
 import { arraySection } from "./sections/index";
+import type { ArrayItemFormMode } from "./types";
 /**
  * Input definition for a array input.
  * @public
@@ -41,6 +42,7 @@ export const array: FormKitTypeDefinition = {
     "addButton",
     "itemLabels",
     "emptyText",
+    "itemFormMode",
   ],
   /**
    * Additional features that make this input work.
@@ -66,6 +68,7 @@ declare module "@formkit/inputs" {
         type: ArrayItemLabelType;
         label: string;
       }[];
+      itemFormMode?: ArrayItemFormMode;
     };
   }
 

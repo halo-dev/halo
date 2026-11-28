@@ -14,7 +14,7 @@ import {
 import { FormType } from "@halo-dev/ui-shared";
 import { useQueryClient } from "@tanstack/vue-query";
 import { cloneDeep } from "es-toolkit";
-import { computed, nextTick, onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import SubmitButton from "@/components/button/SubmitButton.vue";
 import type AnnotationsForm from "@/components/form/AnnotationsForm.vue";
@@ -85,8 +85,7 @@ const refreshCategories = () => {
 };
 
 const handleSaveCategory = async () => {
-  annotationsFormRef.value?.handleSubmit();
-  await nextTick();
+  await annotationsFormRef.value?.handleSubmit();
 
   const { customAnnotations, annotations, customFormInvalid, specFormInvalid } =
     annotationsFormRef.value || {};

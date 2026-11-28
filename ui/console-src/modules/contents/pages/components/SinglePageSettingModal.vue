@@ -107,8 +107,7 @@ const handlePublishClick = () => {
 const { mutateAsync: singlePageUpdateMutate } = usePageUpdateMutate();
 
 const handleSave = async () => {
-  annotationsFormRef.value?.handleSubmit();
-  await nextTick();
+  await annotationsFormRef.value?.handleSubmit();
 
   const { customAnnotations, annotations, customFormInvalid, specFormInvalid } =
     annotationsFormRef.value || {};
@@ -150,8 +149,7 @@ const handleSave = async () => {
 };
 
 const handlePublish = async () => {
-  annotationsFormRef.value?.handleSubmit();
-  await nextTick();
+  await annotationsFormRef.value?.handleSubmit();
 
   const { customAnnotations, annotations, customFormInvalid, specFormInvalid } =
     annotationsFormRef.value || {};

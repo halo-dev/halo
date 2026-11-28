@@ -15,6 +15,25 @@
 - `attachment`: 附件选择
   - 参数
     1. accepts：允许上传的文件类型，如：`image/*`
+- `array`: 对象集合，以列表展示条目，支持拖拽排序。点击条目打开或展开子表单。
+  - 参数
+    1. min: 最小数量，默认为 `0`
+    2. max: 最大数量，默认为 `Infinity`，即无限制
+    3. addLabel: 添加按钮的文本，默认为 `添加`
+    4. addButton: 是否显示添加按钮，默认为 `true`
+    5. removeControl: 是否显示删除按钮，默认为 `true`
+    6. emptyText: 空列表提示文本
+    7. itemLabels: 条目摘要配置，数组元素包含 `type` 和 `label`，`type` 可选 `image`、`text`、`iconify`、`color`
+    8. itemFormMode: 子表单展示方式，可选 `modal`（默认）或 `accordion`（在当前界面展开）
+  - 示例：
+
+    ```vue
+    <FormKit type="array" item-form-mode="accordion" name="items">
+      <FormKit type="text" name="key" label="Key" />
+      <FormKit type="text" name="value" label="Value" />
+    </FormKit>
+    ```
+
 - `repeater`: 定义一个对象集合，可以让使用者可视化的操作集合。
   - 参数
     1. min: 最小数量，默认为 `0`

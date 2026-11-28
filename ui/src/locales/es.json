@@ -914,6 +914,7 @@
   "core.formkit.array.empty_text": "Sin elementos",
   "core.formkit.array.image_tooltip": "Ver imagen: {value}",
   "core.formkit.array.item_modal.title": "Editar elemento",
+  "core.formkit.array.new_item": "Nuevo elemento",
   "core.formkit.attachment.operations.select": "Seleccionar de la biblioteca de adjuntos",
   "core.formkit.attachment.operations.input": "Enlace de entrada",
   "core.common.buttons.save": "Guardar",

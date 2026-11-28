@@ -1,50 +1,24 @@
 <script setup lang="ts">
-import { getNode, type FormKitNode } from "@formkit/core";
+import type { FormKitNode } from "@formkit/core";
 import { VButton, VModal, VSpace } from "@halo-dev/components";
-import { utils } from "@halo-dev/ui-shared";
-import { computed, onMounted, ref } from "vue";
-import type { ArrayValue } from "./ArrayInput.vue";
+import { ref } from "vue";
+import ArrayItemForm from "./ArrayItemForm.vue";
 
-const { node, itemValue, currentEditIndex } = defineProps<{
+const { node, itemValue } = defineProps<{
   node: FormKitNode;
   itemValue: Record<string, unknown>;
-  currentEditIndex: number;
 }>();
 
 const modal = ref<InstanceType<typeof VModal> | null>(null);
-const formKitNode = ref<FormKitNode>();
-const isSubmitting = ref(false);
-const formId = `array-item-form-${utils.id.uuid()}`;
-
-onMounted(() => {
-  formKitNode.value = getNode(formId);
-});
-
-const formKitNodeValid = computed(() => {
-  return formKitNode.value?.context?.state.valid ?? true;
-});
+const formRef = ref<InstanceType<typeof ArrayItemForm> | null>(null);
 
 const emit = defineEmits<{
   (event: "close"): void;
+  (event: "submit", data: Record<string, unknown>): void;
 }>();
 
-const handleSave = (data: Record<string, unknown>) => {
-  if (!formKitNodeValid.value) {
-    return;
-  }
-  const oldNodeValue = (node._value as ArrayValue) || [];
-  if (currentEditIndex === -1) {
-    node.input(oldNodeValue.concat(data), false);
-    modal.value?.close();
-    return;
-  }
-
-  if (currentEditIndex >= oldNodeValue.length) {
-    throw new Error("Current edit index is out of range");
-  }
-
-  oldNodeValue[currentEditIndex] = data;
-  node.input(oldNodeValue, false);
+const handleSubmit = (data: Record<string, unknown>) => {
+  emit("submit", data);
   modal.value?.close();
 };
 </script>
@@ -58,29 +32,16 @@ const handleSave = (data: Record<string, unknown>) => {
     :centered="false"
     @close="emit('close')"
   >
-    <FormKit
-      :id="formId"
-      type="form"
-      :ignore="true"
-      :actions="false"
-      :model-value="itemValue"
-      @submit="handleSave"
-    >
-      <component
-        :is="node.context?.slots.default"
-        v-bind="{
-          value: itemValue,
-        }"
-      />
-    </FormKit>
+    <ArrayItemForm
+      ref="formRef"
+      :node="node"
+      :item-value="itemValue"
+      @submit="handleSubmit"
+    />
 
     <template #footer>
       <VSpace>
-        <VButton
-          type="secondary"
-          :loading="isSubmitting"
-          @click="() => formKitNode?.submit()"
-        >
+        <VButton type="secondary" @click="formRef?.submit()">
           {{ $t("core.common.buttons.submit") }}
         </VButton>
         <VButton @click="modal?.close()">

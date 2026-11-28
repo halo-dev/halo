@@ -110,8 +110,7 @@ const handlePublishClick = () => {
 const { mutateAsync: postUpdateMutate } = usePostUpdateMutate();
 
 const syncAnnotations = async () => {
-  annotationsFormRef.value?.handleSubmit();
-  await nextTick();
+  await annotationsFormRef.value?.handleSubmit();
 
   const { customAnnotations, annotations, customFormInvalid, specFormInvalid } =
     annotationsFormRef.value || {};

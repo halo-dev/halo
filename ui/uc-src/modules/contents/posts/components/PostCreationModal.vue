@@ -4,7 +4,7 @@ import { ucApiClient } from "@halo-dev/api-client";
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import { utils } from "@halo-dev/ui-shared";
 import { useMutation } from "@tanstack/vue-query";
-import { nextTick, ref, useTemplateRef } from "vue";
+import { ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import type AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import { contentAnnotations } from "@/constants/annotations";
@@ -108,8 +108,7 @@ const annotationsFormRef =
   useTemplateRef<InstanceType<typeof AnnotationsForm>>("annotationsFormRef");
 
 async function onSubmit(data: PostFormState) {
-  annotationsFormRef.value?.handleSubmit();
-  await nextTick();
+  await annotationsFormRef.value?.handleSubmit();
 
   const { customAnnotations, annotations, customFormInvalid, specFormInvalid } =
     annotationsFormRef.value || {};
