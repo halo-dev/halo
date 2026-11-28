@@ -238,13 +238,15 @@ const handleSave = async (data: {
   }
 };
 
-const modalTitle = props.policy
-  ? t("core.attachment.policy_editing_modal.titles.update", {
-      policy: props.policy?.spec.displayName,
-    })
-  : t("core.attachment.policy_editing_modal.titles.create", {
-      policy_template: policyTemplate.value?.spec?.displayName,
-    });
+const modalTitle = computed(() =>
+  props.policy
+    ? t("core.attachment.policy_editing_modal.titles.update", {
+        policy: props.policy?.spec.displayName,
+      })
+    : t("core.attachment.policy_editing_modal.titles.create", {
+        policy_template: policyTemplate.value?.spec?.displayName,
+      })
+);
 </script>
 <template>
   <VModal
