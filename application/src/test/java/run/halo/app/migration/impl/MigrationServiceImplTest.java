@@ -13,7 +13,9 @@ import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileTime;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.ZipInputStream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -261,7 +263,7 @@ class MigrationServiceImplTest {
         when(backupRoot.get()).thenReturn(tempDir.resolve("backups"));
         var startTimestamp = Instant.now();
         var backup = createRunningBackup("fake-backup", startTimestamp);
-        backup.getSpec().setPassword("secret");
+        backup.getMetadata().setAnnotations(new HashMap<>(Map.of(Backup.PASSWORD_ANNOTATION, "secret")));
 
         StepVerifier.create(migrationService.backup(backup)).verifyComplete();
 

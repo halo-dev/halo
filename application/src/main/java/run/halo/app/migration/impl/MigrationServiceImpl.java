@@ -339,7 +339,8 @@ class MigrationServiceImpl implements MigrationService, InitializingBean {
                     var backupName = backup.getMetadata().getName();
                     var startTimestamp = backup.getStatus().getStartTimestamp();
                     var timePart = this.dateTimeFormatter.format(startTimestamp);
-                    var password = backup.getSpec().getPassword();
+                    var annotations = backup.getMetadata().getAnnotations();
+                    var password = annotations == null ? null : annotations.get(Backup.PASSWORD_ANNOTATION);
                     var encrypted = StringUtils.hasLength(password);
                     var extension = encrypted ? ".zip.enc" : ".zip";
                     var backupFile = backupsFolder.resolve(timePart + '-' + backupName + extension);

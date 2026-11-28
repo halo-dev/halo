@@ -15,6 +15,14 @@ import run.halo.app.extension.GVK;
 @GVK(group = "migration.halo.run", version = "v1alpha1", kind = "Backup", plural = "backups", singular = "backup")
 public class Backup extends AbstractExtension {
 
+    /**
+     * Annotation key for the one-time password used to encrypt the backup file.
+     *
+     * <p>The annotation is removed when the backup reaches a terminal phase. An empty or blank value means the backup
+     * will not be encrypted.
+     */
+    public static final String PASSWORD_ANNOTATION = "migration.halo.run/backup-password";
+
     /** Desired backup options, such as the file format and expiration time. */
     private Spec spec = new Spec();
 
@@ -28,14 +36,6 @@ public class Backup extends AbstractExtension {
 
         /** Backup file format. Currently, only zip is supported. */
         private String format;
-
-        /**
-         * Password used to encrypt the backup file.
-         *
-         * <p>The password is only kept until the backup reaches a terminal phase, and is cleared afterwards. An empty
-         * or blank value means the backup will not be encrypted.
-         */
-        private String password;
 
         /** Time after which the generated backup should be considered expired. */
         private Instant expiresAt;

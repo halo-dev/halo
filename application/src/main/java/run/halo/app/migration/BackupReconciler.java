@@ -120,7 +120,10 @@ public class BackupReconciler implements Reconciler<Request> {
         client.fetch(Backup.class, name).ifPresent(backup -> {
             backup.setStatus(status);
             if (clearPassword) {
-                backup.getSpec().setPassword(null);
+                var annotations = backup.getMetadata().getAnnotations();
+                if (annotations != null) {
+                    annotations.remove(Backup.PASSWORD_ANNOTATION);
+                }
             }
             client.update(backup);
         });

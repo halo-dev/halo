@@ -10,6 +10,8 @@ import { utils } from "@halo-dev/ui-shared";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
 
+const BACKUP_PASSWORD_ANNOTATION = "migration.halo.run/backup-password";
+
 export function useBackupFetch() {
   return useQuery({
     queryKey: ["backups"],
@@ -58,10 +60,12 @@ export function useBackup() {
         metadata: {
           generateName: "backup-",
           name: "",
+          annotations: password
+            ? { [BACKUP_PASSWORD_ANNOTATION]: password }
+            : undefined,
         },
         spec: {
           expiresAt: utils.date.dayjs().add(7, "day").toISOString(),
-          password: password || undefined,
         },
       },
     });
