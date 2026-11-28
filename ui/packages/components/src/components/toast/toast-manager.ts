@@ -7,15 +7,15 @@ import { createVNode, markRaw, render } from "vue";
 import type { ToastItemData } from "./internal";
 import {
   cancelToastClosing,
+  DEFAULT_TOAST_DURATION,
   markToastClosing,
-  toastConfig,
+  TOAST_MAX_COUNT,
 } from "./toast-state";
 import ToastHost from "./ToastHost.vue";
 import type {
   ToastActionOptions,
   ToastApi,
   ToastApiProps,
-  ToastConfig,
   ToastEntry,
   ToastInstance,
   ToastPromiseOptions,
@@ -31,7 +31,7 @@ function nextToastId() {
 
 function normalizeDuration(duration?: number) {
   if (duration === undefined) {
-    return toastConfig.duration;
+    return DEFAULT_TOAST_DURATION;
   }
   return duration > 0 ? duration : 0;
 }
@@ -96,7 +96,7 @@ export function createToastApi(
       status: props.status ?? base?.status,
       duration:
         props.duration === undefined
-          ? (base?.duration ?? toastConfig.duration)
+          ? (base?.duration ?? DEFAULT_TOAST_DURATION)
           : normalizeDuration(props.duration),
     };
   }
@@ -120,12 +120,7 @@ export function createToastApi(
   }
 
   function enforceMaxCount() {
-    const max = toastConfig.maxCount;
-    if (!max || max < 1) {
-      return;
-    }
-
-    while (openEntries().length >= max) {
+    while (openEntries().length >= TOAST_MAX_COUNT) {
       const oldest = openEntries()[0];
       if (!oldest) {
         return;
@@ -154,21 +149,6 @@ export function createToastApi(
 
   function clear() {
     manager.close();
-  }
-
-  function configure(options: ToastConfig) {
-    if (options.placement) {
-      toastConfig.placement = options.placement;
-    }
-    if (options.duration !== undefined) {
-      toastConfig.duration = options.duration;
-    }
-    if ("maxCount" in options) {
-      toastConfig.maxCount = options.maxCount;
-    }
-    if (options.hotkey) {
-      toastConfig.hotkey = [...options.hotkey];
-    }
   }
 
   const toast = ((userProps: ToastProps): ToastInstance => {
@@ -264,7 +244,6 @@ export function createToastApi(
   toast.dismiss = dismiss;
   toast.clear = clear;
   toast.update = update;
-  toast.configure = configure;
 
   toast.promise = async <T>(
     promise: Promise<T>,
@@ -293,7 +272,7 @@ export function createToastApi(
         ...props,
         type: props.type ?? "success",
         status: "success",
-        duration: props.duration ?? toastConfig.duration,
+        duration: props.duration ?? DEFAULT_TOAST_DURATION,
       });
 
       return value;
@@ -306,7 +285,7 @@ export function createToastApi(
         ...props,
         type: props.type ?? "error",
         status: "error",
-        duration: props.duration ?? toastConfig.duration,
+        duration: props.duration ?? DEFAULT_TOAST_DURATION,
       });
 
       throw error;

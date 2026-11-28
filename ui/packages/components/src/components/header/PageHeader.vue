@@ -74,6 +74,7 @@ onMounted(updateStuck);
       'page-header--sticky': sticky,
       'page-header--stuck': isStuck,
       'page-header--wrapped': !truncate,
+      'page-header--has-center': $slots.center,
     }"
     :aria-busy="loading ? 'true' : undefined"
   >
@@ -120,7 +121,12 @@ onMounted(updateStuck);
       </div>
     </div>
 
+    <div v-if="$slots.center" class="page-header__center">
+      <slot name="center" />
+    </div>
+
     <div
+      v-if="$slots.actions"
       class="page-header__actions"
       :class="{ 'page-header__actions--loading': loading }"
       role="group"
@@ -227,6 +233,10 @@ onMounted(updateStuck);
     flex: none;
   }
 
+  &__center {
+    display: contents;
+  }
+
   &__actions {
     display: flex;
     align-items: center;
@@ -257,21 +267,48 @@ onMounted(updateStuck);
   }
 }
 
-// Tailwind's `sm` breakpoint: below it the actions move to their own row.
-@media (max-width: 640px) {
+// Tailwind's `sm` breakpoint: below it the header wraps when actions do not fit.
+@media (max-width: 639px) {
   .page-header {
     flex-wrap: wrap;
   }
 
-  .page-header__leading {
-    flex-basis: 100%;
+  .page-header__actions {
+    flex: 0 1 auto;
+    min-width: 0;
+    max-width: 100%;
+    flex-wrap: wrap;
   }
 
-  .page-header__actions {
-    width: 100%;
-    margin-left: 0;
-    justify-content: flex-start;
-    flex-wrap: wrap;
+  .page-header--has-center {
+    .page-header__leading {
+      flex: 0 1 auto;
+    }
+
+    .page-header__actions {
+      margin-left: auto;
+    }
+  }
+}
+
+// Center the middle slot on the header itself instead of spacing it between
+// the leading and actions groups, whose widths usually differ.
+@media (min-width: 640px) {
+  .page-header--has-center {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+
+    .page-header__center {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 0;
+    }
+
+    .page-header__actions {
+      justify-self: end;
+      margin-left: 0;
+    }
   }
 }
 </style>

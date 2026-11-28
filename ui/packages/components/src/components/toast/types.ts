@@ -4,14 +4,6 @@ export type ToastType = "success" | "info" | "warning" | "error";
 
 export type ToastStatus = "loading" | "success" | "error";
 
-export type ToastPlacement =
-  | "top-left"
-  | "top-center"
-  | "top-right"
-  | "bottom-left"
-  | "bottom-center"
-  | "bottom-right";
-
 export interface ToastActionOptions {
   label: string;
   /**
@@ -72,18 +64,6 @@ export interface ToastProps {
   status?: ToastStatus;
 }
 
-export interface ToastConfig {
-  placement?: ToastPlacement;
-  duration?: number;
-  /**
-   * Maximum number of live toasts. The oldest toast closes when the limit is
-   * exceeded. `undefined` removes the limit.
-   * @defaultValue 5
-   */
-  maxCount?: number;
-  hotkey?: string[];
-}
-
 export type ToastApiProps = Omit<ToastProps, "type" | "content">;
 
 export interface ToastInstance {
@@ -125,5 +105,4 @@ export interface ToastEntry {
     promise: Promise<T>,
     options: ToastPromiseOptions<T>
   ) => Promise<T>;
-  configure: (options: ToastConfig) => void;
 }

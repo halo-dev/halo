@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/vue3-vite";
 import { createToastManager } from "reka-ui";
-import { onMounted, onUnmounted } from "vue";
+import { onMounted } from "vue";
 import { VButton } from "../button";
 import { VSpace } from "../space";
 import { createToastApi } from "./toast-manager";
@@ -23,7 +23,7 @@ const meta: Meta<typeof ToastComponent> = {
     docs: {
       description: {
         component:
-          "基于 Reka UI 的轻提示。通过 `Toast.success/error/info/warning/loading/promise` 调用，支持合并相同消息、悬停/聚焦暂停、滑动关闭、最大条数与全局配置。",
+          "基于 Reka UI 的轻提示。通过 `Toast.success/error/info/warning/loading/promise` 调用，支持合并相同消息、悬停/聚焦暂停、滑动关闭；显示时长等单次行为通过调用参数设置。",
       },
     },
   },
@@ -157,42 +157,6 @@ export const ManagerApi: Story = {
         <VButton @click="showGrouped">合并计数</VButton>
         <VButton @click="showRich">带操作</VButton>
         <VButton @click="showPromise">Promise</VButton>
-      </VSpace>
-    `,
-  }),
-};
-
-export const Placement: Story = {
-  render: () => ({
-    components: { ToastHost, VButton, VSpace },
-    setup() {
-      const { manager, toast } = createStoryHost();
-      const placements = [
-        "top-left",
-        "top-center",
-        "top-right",
-        "bottom-left",
-        "bottom-center",
-        "bottom-right",
-      ] as const;
-
-      const show = (placement: (typeof placements)[number]) => {
-        toast.configure({ placement });
-        toast.info(`当前位置：${placement}`, { duration: 3000 });
-      };
-
-      onUnmounted(() => {
-        toast.configure({ placement: "top-center" });
-      });
-
-      return { manager, placements, show };
-    },
-    template: `
-      <ToastHost :manager="manager" />
-      <VSpace spacing="sm">
-        <VButton v-for="placement in placements" :key="placement" @click="show(placement)">
-          {{ placement }}
-        </VButton>
       </VSpace>
     `,
   }),

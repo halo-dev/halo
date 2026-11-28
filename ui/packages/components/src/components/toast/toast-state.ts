@@ -1,19 +1,8 @@
 import { reactive } from "vue";
-import type { ToastPlacement } from "./types";
 
-export interface ResolvedToastConfig {
-  placement: ToastPlacement;
-  duration: number;
-  maxCount?: number;
-  hotkey: string[];
-}
-
-export const toastConfig = reactive<ResolvedToastConfig>({
-  placement: "top-center",
-  duration: 3000,
-  maxCount: 5,
-  hotkey: ["F8"],
-});
+export const DEFAULT_TOAST_DURATION = 3000;
+export const TOAST_MAX_COUNT = 5;
+export const TOAST_HOTKEY = ["F8"];
 
 /**
  * Toasts stay mounted for one animation frame window after they close so the
