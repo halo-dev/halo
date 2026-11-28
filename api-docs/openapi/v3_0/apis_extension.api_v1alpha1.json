@@ -9562,6 +9562,10 @@
           "format": {
             "type": "string",
             "description": "Backup file format. Currently, only zip is supported."
+          },
+          "password": {
+            "type": "string",
+            "description": "Password used to encrypt the backup file.\n\n \u003cp\u003eThe password is only kept until the backup reaches a terminal phase, and is cleared afterwards. An empty\n or blank value means the backup will not be encrypted."
           }
         }
       },

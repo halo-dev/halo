@@ -258,7 +258,6 @@ uppy.on("upload-error", handleUploadError);
 
 watch(
   [
-    () => props.meta,
     () => props.restrictions,
     () => props.autoProceed,
     () => props.endpoint,
@@ -289,6 +288,17 @@ watch(
       fieldName: props.name,
       method: props.method,
     });
+  },
+  { deep: true }
+);
+
+watch(
+  () => props.meta,
+  () => {
+    uppy.setOptions({
+      meta: props.meta,
+    });
+    uppy.setState({ meta: props.meta || {} });
   },
   { deep: true }
 );

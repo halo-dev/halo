@@ -10,10 +10,10 @@ import {
 } from "@halo-dev/components";
 import type { BackupTab } from "@halo-dev/ui-shared";
 import { useRouteQuery } from "@vueuse/router";
-import { defineAsyncComponent, onMounted, shallowRef } from "vue";
+import { defineAsyncComponent, onMounted, ref, shallowRef } from "vue";
 import { useI18n } from "vue-i18n";
 import { usePluginModuleStore } from "@/stores/plugin";
-import { useBackup } from "./composables/use-backup";
+import BackupCreateModal from "./components/BackupCreateModal.vue";
 
 const { t } = useI18n();
 
@@ -38,7 +38,7 @@ const tabs = shallowRef<BackupTab[]>([
 
 const activeTab = useRouteQuery<string>("tab", tabs.value[0].id);
 
-const { handleCreate } = useBackup();
+const createModalVisible = ref(false);
 
 const { pluginModules } = usePluginModuleStore();
 
@@ -70,7 +70,7 @@ onMounted(async () => {
       <IconServerLine />
     </template>
     <template #actions>
-      <VButton type="secondary" @click="handleCreate">
+      <VButton type="secondary" @click="createModalVisible = true">
         <template #icon>
           <IconAddCircle />
         </template>
@@ -97,4 +97,8 @@ onMounted(async () => {
       </div>
     </VCard>
   </div>
+  <BackupCreateModal
+    v-if="createModalVisible"
+    @close="createModalVisible = false"
+  />
 </template>

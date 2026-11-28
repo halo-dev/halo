@@ -41,6 +41,7 @@ class BackupReconcilerTest {
         var name = "fake-backup";
         var backup = createPureBackup(name);
         backup.getSpec().setFormat("zip");
+        backup.getSpec().setPassword("secret");
         when(client.fetch(Backup.class, name)).thenReturn(Optional.of(backup));
         doNothing().when(client).update(backup);
         when(migrationService.backup(backup)).thenReturn(Mono.fromRunnable(() -> {
@@ -60,6 +61,7 @@ class BackupReconcilerTest {
         assertNotNull(status.getCompletionTimestamp());
         assertEquals("fake-backup-filename", status.getFilename());
         assertEquals(1024L, status.getSize());
+        assertNull(backup.getSpec().getPassword(), "Password should be cleared after backup");
 
         // 1. query
         // 2. pending -> running
@@ -95,6 +97,7 @@ class BackupReconcilerTest {
     void setPhaseToFailedIfPhaseIsRunning() {
         var name = "fake-backup";
         var backup = createPureBackup(name);
+        backup.getSpec().setPassword("secret");
         var status = backup.getStatus();
         status.setPhase(Backup.Phase.RUNNING);
 
@@ -107,6 +110,7 @@ class BackupReconcilerTest {
 
         assertEquals(Backup.Phase.FAILED, status.getPhase());
         assertEquals("UnexpectedExit", status.getFailureReason());
+        assertNull(backup.getSpec().getPassword(), "Password should be cleared after backup failure");
         // 1. add finalizer
         // 2. update status
         verify(client, times(2)).fetch(Backup.class, name);

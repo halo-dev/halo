@@ -37,6 +37,7 @@ import run.halo.app.extension.store.ExtensionStore;
 import run.halo.app.extension.store.ExtensionStoreRepository;
 import run.halo.app.infra.BackupRootGetter;
 import run.halo.app.infra.exception.BackupMalformedException;
+import run.halo.app.infra.exception.BackupPasswordRequiredException;
 import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.utils.FileUtils;
@@ -150,7 +151,7 @@ class MigrationServiceImplTest {
 
         var content = DataBufferUtils.read(
                 backupFile, DefaultDataBufferFactory.sharedInstance, 2048, StandardOpenOption.READ);
-        StepVerifier.create(migrationService.restore(content)).verifyComplete();
+        StepVerifier.create(migrationService.restore(content, null)).verifyComplete();
         assertFalse(snapshotWrites.isReusable(), "Restored database must invalidate shutdown snapshots");
 
         verify(haloProperties).getWorkDir();
@@ -206,7 +207,7 @@ class MigrationServiceImplTest {
 
         var content = DataBufferUtils.read(
                 malformedZip, DefaultDataBufferFactory.sharedInstance, 2048, StandardOpenOption.READ);
-        StepVerifier.create(migrationService.restore(content))
+        StepVerifier.create(migrationService.restore(content, null))
                 .expectErrorSatisfies(e -> {
                     assertInstanceOf(BackupMalformedException.class, e);
                     var ex = (BackupMalformedException) e;
@@ -233,11 +234,90 @@ class MigrationServiceImplTest {
 
         var content = DataBufferUtils.read(
                 backupFile, DefaultDataBufferFactory.sharedInstance, 2048, StandardOpenOption.READ);
-        StepVerifier.create(migrationService.restore(content))
+        StepVerifier.create(migrationService.restore(content, null))
                 .expectErrorSatisfies(e -> {
                     assertInstanceOf(BackupMalformedException.class, e);
                     var ex = (BackupMalformedException) e;
                     assertEquals("problemDetail.migration.backup.extensionsNotFound", ex.getDetailMessageCode());
+                })
+                .verify();
+    }
+
+    @Test
+    void backupWithPasswordTest() throws IOException {
+        Files.writeString(tempDir.resolve("fake-file"), "halo", StandardOpenOption.CREATE_NEW);
+        var extensionStores = List.of(createExtensionStore("fake-extension-store", "fake-data"));
+        var tx = mock(ReactiveTransaction.class);
+        when(txManager.getReactiveTransaction(any())).thenReturn(Mono.just(tx));
+        when(txManager.commit(tx)).thenReturn(Mono.empty());
+
+        when(entityTemplate.select(ExtensionStore.class)).thenReturn(reactiveSelect);
+        when(reactiveSelect.withFetchSize(100)).thenReturn(selectWithQuery);
+        when(selectWithQuery.all())
+                .thenReturn(Flux.fromIterable(extensionStores))
+                .thenReturn(Flux.empty());
+
+        when(haloProperties.getWorkDir()).thenReturn(tempDir);
+        when(backupRoot.get()).thenReturn(tempDir.resolve("backups"));
+        var startTimestamp = Instant.now();
+        var backup = createRunningBackup("fake-backup", startTimestamp);
+        backup.getSpec().setPassword("secret");
+
+        StepVerifier.create(migrationService.backup(backup)).verifyComplete();
+
+        var status = backup.getStatus();
+        var datetimePart = migrationService.getDateTimeFormatter().format(startTimestamp);
+        assertEquals(datetimePart + "-fake-backup.zip.enc", status.getFilename());
+        var backupFile = migrationService.getBackupsRoot().resolve(status.getFilename());
+        assertTrue(Files.exists(backupFile));
+        try (var input = Files.newInputStream(backupFile)) {
+            assertEquals("HALOENC1", new String(input.readNBytes(8), UTF_8));
+        }
+    }
+
+    @Test
+    void restoreEncryptedBackupTest() throws Exception {
+        var backupFile = createEncryptedBackup("secret");
+        var workdir = tempDir.resolve("workdir-for-restoration");
+        Files.createDirectory(workdir);
+
+        var expectStore = createExtensionStore("fake-extension-store", "fake-data");
+        expectStore.setVersion(null);
+        when(haloProperties.getWorkDir()).thenReturn(workdir);
+        when(repository.deleteAll()).thenReturn(Mono.empty());
+        when(repository.saveAll(List.of(expectStore))).thenReturn(Flux.empty());
+        var tx = mock(ReactiveTransaction.class);
+        when(txManager.getReactiveTransaction(any())).thenReturn(Mono.just(tx));
+        when(txManager.commit(tx)).thenReturn(Mono.empty());
+
+        var content = DataBufferUtils.read(
+                backupFile, DefaultDataBufferFactory.sharedInstance, 2048, StandardOpenOption.READ);
+        StepVerifier.create(migrationService.restore(content, "secret")).verifyComplete();
+        verify(repository).deleteAll();
+        verify(repository).saveAll(List.of(expectStore));
+        assertEquals("halo", Files.readString(workdir.resolve("fake-file")));
+    }
+
+    @Test
+    void restoreEncryptedBackupWithoutPasswordTest() throws Exception {
+        var backupFile = createEncryptedBackup("secret");
+        var content = DataBufferUtils.read(
+                backupFile, DefaultDataBufferFactory.sharedInstance, 2048, StandardOpenOption.READ);
+        StepVerifier.create(migrationService.restore(content, null))
+                .expectError(BackupPasswordRequiredException.class)
+                .verify();
+    }
+
+    @Test
+    void restoreEncryptedBackupWithWrongPasswordTest() throws Exception {
+        var backupFile = createEncryptedBackup("secret");
+        var content = DataBufferUtils.read(
+                backupFile, DefaultDataBufferFactory.sharedInstance, 2048, StandardOpenOption.READ);
+        StepVerifier.create(migrationService.restore(content, "wrong-password"))
+                .expectErrorSatisfies(e -> {
+                    assertInstanceOf(BackupMalformedException.class, e);
+                    var ex = (BackupMalformedException) e;
+                    assertEquals("problemDetail.migration.backup.invalidPassword", ex.getDetailMessageCode());
                 })
                 .verify();
     }
@@ -379,6 +459,18 @@ class MigrationServiceImplTest {
         status.setPhase(Backup.Phase.RUNNING);
         status.setStartTimestamp(startTimestamp);
         return backup;
+    }
+
+    Path createEncryptedBackup(String password) throws Exception {
+        var unpackedBackup = getClass().getClassLoader().getResource("backups/backup-for-restoration");
+        assertNotNull(unpackedBackup);
+        var plainBackup = tempDir.resolve("plain-backup.zip");
+        FileUtils.zip(Path.of(unpackedBackup.toURI()), plainBackup);
+        var encryptedBackup = tempDir.resolve("encrypted-backup.zip.enc");
+        try (var output = BackupEncryption.encrypt(Files.newOutputStream(encryptedBackup), password)) {
+            Files.copy(plainBackup, output);
+        }
+        return encryptedBackup;
     }
 
     ExtensionStore createExtensionStore(String name, String data) {

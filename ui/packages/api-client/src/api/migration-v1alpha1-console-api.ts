@@ -115,10 +115,11 @@ export const MigrationV1alpha1ConsoleApiAxiosParamCreator = function (configurat
          * @param {string} [downloadUrl] Remote backup HTTP URL.
          * @param {File} [file] Backup file.
          * @param {string} [filename] Filename of backup file in backups root.
+         * @param {string} [password] Password of the encrypted backup.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        restoreBackup: async (backupName?: string, downloadUrl?: string, file?: File, filename?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        restoreBackup: async (backupName?: string, downloadUrl?: string, file?: File, filename?: string, password?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/console.api.migration.halo.run/v1alpha1/restorations`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -155,6 +156,10 @@ export const MigrationV1alpha1ConsoleApiAxiosParamCreator = function (configurat
 
             if (filename !== undefined) { 
                 localVarFormParams.append('filename', filename as any);
+            }
+
+            if (password !== undefined) { 
+                localVarFormParams.append('password', password as any);
             }
             localVarHeaderParameter['Content-Type'] = 'multipart/form-data';
             localVarHeaderParameter['Accept'] = '*/*';
@@ -208,11 +213,12 @@ export const MigrationV1alpha1ConsoleApiFp = function(configuration?: Configurat
          * @param {string} [downloadUrl] Remote backup HTTP URL.
          * @param {File} [file] Backup file.
          * @param {string} [filename] Filename of backup file in backups root.
+         * @param {string} [password] Password of the encrypted backup.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async restoreBackup(backupName?: string, downloadUrl?: string, file?: File, filename?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.restoreBackup(backupName, downloadUrl, file, filename, options);
+        async restoreBackup(backupName?: string, downloadUrl?: string, file?: File, filename?: string, password?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.restoreBackup(backupName, downloadUrl, file, filename, password, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['MigrationV1alpha1ConsoleApi.restoreBackup']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -250,7 +256,7 @@ export const MigrationV1alpha1ConsoleApiFactory = function (configuration?: Conf
          * @throws {RequiredError}
          */
         restoreBackup(requestParameters: MigrationV1alpha1ConsoleApiRestoreBackupRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<string> {
-            return localVarFp.restoreBackup(requestParameters.backupName, requestParameters.downloadUrl, requestParameters.file, requestParameters.filename, options).then((request) => request(axios, basePath));
+            return localVarFp.restoreBackup(requestParameters.backupName, requestParameters.downloadUrl, requestParameters.file, requestParameters.filename, requestParameters.password, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -293,6 +299,11 @@ export interface MigrationV1alpha1ConsoleApiRestoreBackupRequest {
      * Filename of backup file in backups root.
      */
     readonly filename?: string
+
+    /**
+     * Password of the encrypted backup.
+     */
+    readonly password?: string
 }
 
 /**
@@ -325,7 +336,7 @@ export class MigrationV1alpha1ConsoleApi extends BaseAPI {
      * @throws {RequiredError}
      */
     public restoreBackup(requestParameters: MigrationV1alpha1ConsoleApiRestoreBackupRequest = {}, options?: RawAxiosRequestConfig) {
-        return MigrationV1alpha1ConsoleApiFp(this.configuration).restoreBackup(requestParameters.backupName, requestParameters.downloadUrl, requestParameters.file, requestParameters.filename, options).then((request) => request(this.axios, this.basePath));
+        return MigrationV1alpha1ConsoleApiFp(this.configuration).restoreBackup(requestParameters.backupName, requestParameters.downloadUrl, requestParameters.file, requestParameters.filename, requestParameters.password, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

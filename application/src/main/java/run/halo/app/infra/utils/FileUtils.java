@@ -6,6 +6,7 @@ import static org.springframework.util.FileSystemUtils.deleteRecursively;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Set;
@@ -111,7 +112,23 @@ public abstract class FileUtils {
     }
 
     public static void zip(Path sourcePath, Path targetPath) throws IOException {
-        try (var zos = new ZipOutputStream(Files.newOutputStream(targetPath))) {
+        try (var os = Files.newOutputStream(targetPath)) {
+            zip(sourcePath, os);
+        }
+    }
+
+    /**
+     * Zips the given source directory to the given output stream.
+     *
+     * <p>The output stream is closed when this method returns, so callers can wrap it with encryption or compression
+     * streams.
+     *
+     * @param sourcePath the directory to zip
+     * @param outputStream the target output stream
+     * @throws IOException if an I/O error occurs
+     */
+    public static void zip(Path sourcePath, OutputStream outputStream) throws IOException {
+        try (var zos = new ZipOutputStream(outputStream)) {
             Files.walkFileTree(sourcePath, new SimpleFileVisitor<>() {
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {

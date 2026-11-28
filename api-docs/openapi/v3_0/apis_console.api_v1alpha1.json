@@ -6856,6 +6856,10 @@
           "filename": {
             "type": "string",
             "description": "Filename of backup file in backups root."
+          },
+          "password": {
+            "type": "string",
+            "description": "Password of the encrypted backup."
           }
         }
       },

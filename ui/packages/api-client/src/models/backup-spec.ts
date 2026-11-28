@@ -26,5 +26,9 @@ export interface BackupSpec {
      * Backup file format. Currently, only zip is supported.
      */
     'format'?: string;
+    /**
+     * Password used to encrypt the backup file.   <p>The password is only kept until the backup reaches a terminal phase, and is cleared afterwards. An empty  or blank value means the backup will not be encrypted.
+     */
+    'password'?: string;
 }
 

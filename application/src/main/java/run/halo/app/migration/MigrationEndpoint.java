@@ -105,7 +105,9 @@ public class MigrationEndpoint implements CustomEndpoint {
                                             .switchIfEmpty(
                                                     Mono.error(() -> new ServerWebInputException("Please upload a file "
                                                             + "or provide a download link or backup name.")));
-                                    return migrationService.restore(content);
+                                    return migrationService.restore(
+                                            content,
+                                            restoreRequest.getPassword().orElse(null));
                                 })
                                 .then(Mono.defer(() -> ServerResponse.ok().bodyValue("Restored successfully!"))),
                         builder -> builder.tag(tag)
@@ -212,6 +214,16 @@ public class MigrationEndpoint implements CustomEndpoint {
             var part = multipart.getFirst("backupName");
             if (part instanceof FormFieldPart backupNamePart) {
                 return Optional.of(backupNamePart.value()).filter(StringUtils::hasText);
+            }
+            return Optional.empty();
+        }
+
+        /** Password of the encrypted backup. */
+        @Schema(requiredMode = NOT_REQUIRED, name = "password")
+        public Optional<String> getPassword() {
+            var part = multipart.getFirst("password");
+            if (part instanceof FormFieldPart passwordPart) {
+                return Optional.of(passwordPart.value()).filter(StringUtils::hasLength);
             }
             return Optional.empty();
         }
